@@ -64,11 +64,10 @@ Cria banco de dados e usuários
     psql -U postgres -h localhost template1 -c "create role ecidade with superuser login password 'ecidade'"
     psql -U postgres -h localhost template1 -c "create role dbportal with superuser login password 'dbportal'"
     psql -U postgres -h localhost template1 -c "create role dbseller with login password 'dbseller'"
-    psql -U postgres -h localhost template1 -c "create role contass with login password 'cts36162'"
     psql -U postgres -h localhost template1 -c "create role plugin with login password 'plugin'"
     psql -U postgres -h localhost template1 -c "create role usersrole with login password 'usersrole'"
     createdb -U dbportal e-cidade
-    psql -U dbportal e-cidade -f dump_zerado.sql
+    bunzip db/dump_e-cidade-zerada.sql.bz2 | psql -U dbportal e-cidade -f dump_e-cidade-zerada.sql
 
 
 ### 2. Apache
