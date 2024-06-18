@@ -67,8 +67,6 @@ Cria banco de dados e usuários
     psql -U postgres -h localhost template1 -c "create role plugin with login password 'plugin'"
     psql -U postgres -h localhost template1 -c "create role usersrole with login password 'usersrole'"
     createdb -U dbportal e-cidade
-    bunzip db/dump_e-cidade-zerada.sql.bz2 | psql -U dbportal e-cidade -f dump_e-cidade-zerada.sql
-
 
 ### 2. Apache
 
@@ -141,6 +139,8 @@ Edit o arquivo e altere os parametros conforme o modelo
 
 ### 5. Instale o e-Cidade
 
+Faça clone do repositorio:
+
     cd /var/www
     sudo mkdir /var/www/e-cidade
     sudo chown -R contass.www-data /var/www/e-cidade
@@ -154,6 +154,14 @@ Edit o arquivo e altere os parametros conforme o modelo
     cp -a /var/www/e-cidade/imagens/files.proper /var/www/e-cidade/imagens/files
     cp .env.example .env
 
+
+Restaure o banco dadao inicial:
+
+    cd ~
+    git clone git@github.com:e-cidade/base-dados-ecidade.git 
+    cd base-dados-ecidade
+    bunzip db/dump_e-cidade-zerada.sql.bz2
+    psql -U dbportal e-cidade -f dump_e-cidade-zerada.sql
 
 
 
