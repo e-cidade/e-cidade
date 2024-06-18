@@ -139,16 +139,17 @@ Edit o arquivo e altere os parametros conforme o modelo
 
 ### 5. Instale o e-Cidade
 
-Faça clone do repositorio:
+Faça o clone do repositorio:
 
     cd /var/www
     sudo mkdir /var/www/e-cidade
-    sudo chown -R contass.www-data /var/www/e-cidade
+    sudo chown -R www-data.www-data /var/www/e-cidade
     sudo chmod -R 775 /var/www/e-cidade
     git clone git@github.com:e-cidade/e-cidade.git e-cidade
     sudo chown -R www-data:www-data e-cidade/
     sudo chmod -R 775 e-cidade/
     sudo chmod -R 777 e-cidade/tmp/
+    sudo chmod -R 777 /var/www/e-cidade/storage/
     cd /var/www/e-cidade
     composer install
     cp -a /var/www/e-cidade/imagens/files.proper /var/www/e-cidade/imagens/files
@@ -164,5 +165,19 @@ Restaure o banco dadao inicial:
     psql -U dbportal e-cidade -f dump_e-cidade-zerada.sql
 
 
+### 6. Instale usuarios versão aparência de Desktop e-Cidade
+
+    cd /var/www/
+    sudo chmod -R 775 /var/www/e-cidade/*
+    sudo chmod -R 777 /var/www/e-cidade/tmp/
+    sudo chmod -R 777 /var/www/e-cidade/storage/
+    cd /var/www/e-cidade/
+    cd /var/www/e-cidade/config/
+    cp preferencias.json.dist preferencias.json
+    cd /var/www/e-cidade/extension/data/extension/
+    cp Desktop.data.dist Desktop.data  
+    cd /var/www/e-cidade/extension/modification/data/modification/
+    cp dbportal-v3-desktop.data.dist dbportal-v3-desktop.data
+    bin/v3/extension/install Desktop dbseller
 
 

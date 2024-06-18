@@ -56,5 +56,5 @@ Algumas perguntas aparecem recorrentemente. Olhe primeiro por aqui: [FAQ](https:
 
 ---
 
-Powered by [Contass](https://www.contassconsultoria.com.br/).
+Documento by [Contass](https://www.contassconsultoria.com.br/). Como fonte o documento criado pela comunidade i-Educar.
 
