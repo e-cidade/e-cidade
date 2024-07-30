@@ -94,6 +94,9 @@ class cl_empempenho
     var $e60_esferaemendaparlamentar = null;
     /** FIM - OC19656 */
     var $e60_codco = null;
+    var $e60_id_documento_assinado = null;
+
+    var $e60_node_id_libresing = null;
     // cria propriedade com as variaveis do arquivo
     var $campos = "
                  e60_numemp = int4 = Número
@@ -129,6 +132,8 @@ class cl_empempenho
                  e60_esferaemendaparlamentar = int8 = esfera emenda parlamentar
                  e60_vlrutilizado = float8 = Valor utilizado
                  e60_codco = varchar(4) = codigo co
+                 e60_id_documento_assinado = varchar = documento assinado
+                 e60_node_id_libresing = varchar = e60_node_id_libresing
                  ";
     //funcao construtor da classe
     function cl_empempenho()
@@ -214,7 +219,9 @@ class cl_empempenho
         $this->e60_emendaparlamentar = ($this->e60_emendaparlamentar == "" ? @$GLOBALS["HTTP_POST_VARS"]["e60_emendaparlamentar"] : $this->e60_emendaparlamentar);
         $this->e60_esferaemendaparlamentar = ($this->e60_esferaemendaparlamentar == "" ? @$GLOBALS["HTTP_POST_VARS"]["e60_esferaemendaparlamentar"] : $this->e60_esferaemendaparlamentar);
         $this->e60_codco = ($this->e60_codco == "" ? @$GLOBALS["HTTP_POST_VARS"]["e60_codco"] : $this->e60_codco);
-    } 
+        $this->e60_id_documento_assinado = ($this->e60_id_documento_assinado == "" ? @$GLOBALS["HTTP_POST_VARS"]["e60_id_documento_assinado"] : $this->e60_id_documento_assinado);
+        $this->e60_node_id_libresing = ($this->e60_node_id_libresing == "" ? @$GLOBALS["HTTP_POST_VARS"]["e60_node_id_libresing"] : $this->e60_node_id_libresing);
+    }
     // funcao para inclusao
     function incluir($e60_numemp)
     {
@@ -464,6 +471,8 @@ class cl_empempenho
                                       ,e60_esferaemendaparlamentar
                                       ,e60_vlrutilizado
                                       ,e60_codco
+                                      ,e60_id_documento_assinado
+                                      ,e60_node_id_libresing
                        )
                 values (
                                 $this->e60_numemp
@@ -499,6 +508,8 @@ class cl_empempenho
                                ,$this->e60_esferaemendaparlamentar
                                ,$this->e60_vlrutilizado
                                ,'$this->e60_codco'
+                               ,'$this->e60_id_documento_assinado'
+                               ,'$this->e60_node_id_libresing'
                       )";
         $result = db_query($sql);
         if ($result == false) {
@@ -2568,7 +2579,7 @@ class cl_empempenho
         $sSql .= "        o58_programa,                                                                                                                                     ";
         $sSql .= "        o54_descr as descprograma,                                                                                                                        ";
         $sSql .= "        o15_codtri,                                                                                                                                       ";
-        $sSql .= "        o15_codigo,                                                                                                                                       ";                                                                                                                                     
+        $sSql .= "        o15_codigo,                                                                                                                                       ";
         $sSql .= "        o56_elemento,                                                                                                                                     ";
         $sSql .= "        coalesce(e60_vlremp,0) as e60_vlremp,                                                                                                             ";
         $sSql .= "        coalesce(e60_vlranu,0) as e60_vlranu,                                                                                                             ";
@@ -2703,7 +2714,7 @@ class cl_empempenho
         $sSql .= " INNER JOIN conlancamemp ON e60_numemp = c75_numemp";
         $sSql .= " WHERE e60_numemp IN ({$e60_numemp})";
         $sSql .= " AND c75_codlan IN (SELECT c75_codlan from cod_lan);";
-        
+
         $sSql .= " CREATE TEMP TABLE w_lancamentos ON COMMIT DROP AS";
         $sSql .= " SELECT * FROM conlancamval";
         $sSql .= " JOIN conlancamdoc ON c71_codlan = c69_codlan";
@@ -2712,31 +2723,31 @@ class cl_empempenho
         $sSql .= "     WHERE c75_numemp IN ";
         $sSql .= "         (SELECT nro_emp FROM alt_emp))";
         $sSql .= " AND c71_codlan IN (SELECT c75_codlan from cod_lan);";
-        
+
         $sSql .= " ALTER TABLE conlancamval DISABLE TRIGGER ALL;";
-        
+
         $sSql .= " UPDATE conlancamval";
         $sSql .= " SET c69_data = '{$novaDataEmpenho}'";
         $sSql .= " WHERE c69_codlan IN";
         $sSql .= "     (SELECT c69_codlan FROM w_lancamentos);";
-        
+
         $sSql .= " ALTER TABLE conlancamval ENABLE TRIGGER ALL;";
-        
+
         $sSql .= " UPDATE conlancamemp";
         $sSql .= " SET c75_data = '{$novaDataEmpenho}'";
         $sSql .= " WHERE c75_codlan IN";
         $sSql .= "     (SELECT c71_codlan FROM w_lancamentos);";
-        
+
         $sSql .= " UPDATE conlancam";
         $sSql .= " SET c70_data = '{$novaDataEmpenho}'";
         $sSql .= " WHERE c70_codlan IN";
         $sSql .= "     (SELECT c71_codlan FROM w_lancamentos);";
-        
+
         $sSql .= " UPDATE conlancamdot";
         $sSql .= " SET c73_data = '{$novaDataEmpenho}'";
         $sSql .= " WHERE c73_codlan IN";
         $sSql .= "     (SELECT c71_codlan FROM w_lancamentos);";
-        
+
         $sSql .= " UPDATE conlancamdoc";
         $sSql .= " SET c71_data = '{$novaDataEmpenho}'";
         $sSql .= " WHERE c71_codlan IN";
@@ -2752,7 +2763,7 @@ class cl_empempenho
         $sSql .= "     e60_vencim = '{$novaDataEmpenho}'";
         $sSql .= " WHERE e60_numemp IN";
         $sSql .= "     (SELECT nro_emp FROM alt_emp);";
-        
+
         $sSql .= " UPDATE empautoriza";
         $sSql .= " SET e54_emiss = '{$novaDataEmpenho}'";
         $sSql .= " WHERE e54_autori IN";
@@ -2774,7 +2785,7 @@ class cl_empempenho
             $sSql .= " WHERE conlancamval.c69_anousu = {$novaDataEmpenhoAno}";
             $sSql .= " AND EXTRACT (MONTH FROM conlancamval.c69_data)::integer = {$i}";
             $sSql .= " GROUP BY conlancamval.c69_anousu, conlancamval.c69_debito, to_char(conlancamval.c69_data,'MM')::integer;";
-            
+
             $sSql .= " CREATE TEMP TABLE lancre".$i." ON COMMIT DROP AS";
             $sSql .= " SELECT c69_anousu,";
             $sSql .= "     c69_credito,";
@@ -2786,11 +2797,11 @@ class cl_empempenho
             $sSql .= " WHERE conlancamval.c69_anousu = {$novaDataEmpenhoAno}";
             $sSql .= " AND EXTRACT (MONTH FROM conlancamval.c69_data)::integer = {$i}";
             $sSql .= " GROUP BY conlancamval.c69_anousu, conlancamval.c69_credito, to_char(conlancamval.c69_data,'MM')::integer;";
-            
+
             $sSql .= " INSERT INTO conplanoexesaldo";
             $sSql .= " SELECT * FROM landeb".$i."";
             $sSql .= " WHERE c69_anousu = {$novaDataEmpenhoAno};";
-            
+
             $sSql .= " UPDATE conplanoexesaldo";
             $sSql .= " SET c68_credito = lancre".$i.".sum";
             $sSql .= " FROM lancre".$i."";
@@ -2798,20 +2809,20 @@ class cl_empempenho
             $sSql .= " AND c68_reduz = lancre".$i.".c69_credito";
             $sSql .= " AND c68_mes = lancre".$i.".c69_data";
             $sSql .= " AND c68_anousu = {$novaDataEmpenhoAno};";
-            
+
             $sSql .= " DELETE FROM lancre".$i."";
             $sSql .= " USING conplanoexesaldo";
             $sSql .= " WHERE lancre".$i.".c69_anousu = conplanoexesaldo.c68_anousu";
             $sSql .= " AND conplanoexesaldo.c68_reduz = lancre".$i.".c69_credito";
             $sSql .= " AND conplanoexesaldo.c68_mes = lancre".$i.".c69_data";
             $sSql .= " AND c68_anousu = {$novaDataEmpenhoAno};";
-            
+
             $sSql .= " INSERT INTO conplanoexesaldo";
             $sSql .= " SELECT * FROM lancre".$i."";
             $sSql .= " WHERE c69_anousu = {$novaDataEmpenhoAno};";
         }
         return $sSql;
-        
+
     }
 
     public function verificaSaldoEmpenhoPosterior($numEmpenho, $saldoData, $codOrd, $tipoDoc){
@@ -2843,7 +2854,7 @@ class cl_empempenho
         $sSql .= " JOIN conlancamemp  ON c70_codlan = c75_codlan ";
         $sSql .= " WHERE c75_numemp  = {$numEmpenho} AND c53_tipo = 21";
         $sSql .= " AND c70_data <= '{$saldoData}' ".$tipoAnul;
-        
+
         $sSql .= " valor_empenho AS ";
         $sSql .= " (SELECT e60_vlremp AS valor_empenho FROM empempenho WHERE e60_numemp = {$numEmpenho})";
 
@@ -2852,11 +2863,11 @@ class cl_empempenho
 
         return $sSql;
     }
-    
+
     function alteraHistorico($e60_numemp){
         $sSql  = "UPDATE empempenho SET e60_informacaoop = '{$this->e60_informacaoop}'";
         $sSql .= " WHERE e60_numemp = {$e60_numemp}";
-        
+
         $result = db_query($sSql);
 
         if ($result == false) {
@@ -2947,6 +2958,24 @@ class cl_empempenho
             $sql .= " limit $limit ";
         }
         return $sql;
+    }
+
+    function sqlEmpenhosParaAnexar($sWhere){
+
+        return "
+        select
+            e60_numemp,
+            e60_codemp || '/' || e60_anousu as e60_codemp,
+            z01_nome,
+            z01_cgccpf,
+            e60_resumo
+        from
+            empempenho
+        join cgm on
+            e60_numcgm = z01_numcgm
+        join empempenhopncp on
+            e213_contrato = e60_numemp
+            where e60_instit = " . db_getsession("DB_instit")  . $sWhere;
     }
 
 }

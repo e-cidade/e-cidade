@@ -22,6 +22,7 @@ use App\Models\ISSQN\RedesimSettings;
 use App\Models\ISSQN\Tabativ;
 use App\Models\ISSQN\Tabativbaixa;
 use App\Models\Socio;
+use App\Repositories\Tributario\ISSQN\Redesim\Alvara\Filters\ObterEmpresasFilter;
 use App\Repositories\Tributario\ISSQN\Redesim\ApiRedesimSettings;
 use App\Repositories\Tributario\ISSQN\Redesim\ConfirmacaoLeitura\Filters\ConfirmacaoLeituraEmpresaFilter;
 use App\Services\Tributario\ISSQN\AlvaraSimplesNacionalService;
@@ -38,18 +39,23 @@ use App\Services\Tributario\ISSQN\Redesim\ConfirmacaoLeitura\ReadConfirmationCom
 use App\Services\Tributario\ISSQN\Redesim\CreateRedesimLogService;
 use App\Services\Tributario\ISSQN\Redesim\RedesimApiService;
 use App\Services\Tributario\ISSQN\Redesim\RelatorioInscricoesService;
-use BusinessException;
 use DateTime;
 use Exception;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 class RedesimController extends Controller
 {
     public function index(): Response
     {
+        $settingsModel = RedesimSettings::all()->first();
+
+        if (!$settingsModel->q180_active) {
+            return new JsonResponse(['statusCode' => 200, 'message' => 'Integracao com REDESIM desativada.'], 200);
+        }
+
         $cgmCompanyService = new UpdateOrCreateCgmCompanyService((new Cgm()));
         $companyPartnerService = new UpdateOrCreateCompanyPartnerService((new Cgm()), (new Socio()), (new CreateIssbaseLogService(new IssbaseLog())));
         $activityService = new UpdateOrCreateCompanyActivityService((new Cnae()), (new InscricaoRedesim()), (new Tabativ()), (new Ativprinc()), (new CreateIssbaseLogService(new IssbaseLog())));
@@ -59,17 +65,18 @@ class RedesimController extends Controller
         $companySuspensionService = new CompanySuspensionService((new IssbaseParalisacao()));
         $companyShutdownService = new CompanyShutdownService(new Tabativbaixa(), new CreateIssbaseLogService(new IssbaseLog()));
         $alvaraSimplesNacionalService = new AlvaraSimplesNacionalService(new IssCadSimples(), new IssCadSimplesBaixa());
-        $settingsModel = RedesimSettings::all()->first();
         $redesimSettingsRepository = new ApiRedesimSettings($settingsModel);
         $service = new GetCompaniesService($settingsModel, $redesimSettingsRepository, (new Client()));
         $confirmacaoLeituraEmpresaFilter = new ConfirmacaoLeituraEmpresaFilter();
 
+        $filter = new ObterEmpresasFilter($this->request->request->all());
+
         try {
 
-            $companies = $service->execute();
+            $companies = $service->execute($filter);
 
             if (empty($companies)) {
-                return new Response('No content', 204);
+                return new JsonResponse(['statusCode' => 200, 'message' => 'Nenhuma empresa nova no REDESIM.'], 200);
             }
 
             $redesimApiService = new RedesimApiService(
@@ -92,8 +99,8 @@ class RedesimController extends Controller
             }
             $readConfirmationCompanyService = new ReadConfirmationCompanyService($settingsModel, $redesimSettingsRepository, (new Client()));
             $readConfirmationCompanyService->execute($confirmacaoLeituraEmpresaFilter);
-        } catch (BusinessException|GuzzleException $e) {
-            return new Response($e->getMessage(), 500);
+        } catch (Throwable $e) {
+            return new JsonResponse(['statusCode' => 500, 'message' => $e->getMessage()], 200);
         }
 
         return new JsonResponse(['statusCode' => 200, 'message' => 'Success'], 200);

@@ -1150,7 +1150,7 @@ class empenho {
                           ,$iContaPagadora = null,$iCattrabalhador = null,$iNumempresa = null,$iContribuicaoPrev = null
                           ,$iCattrabalhadorremuneracao = null,$iValorremuneracao = null,$iValordesconto = null,$iCompetencia = null
                           ,$bRetencaoIr = null, $iNaturezaBemServico = null, $dDataLiquidacao = null, $dDataVencimento = null) {
-                            
+
     if ($dDataLiquidacao == null){
       $dDataLiquidacao = date("Y-m-d",db_getsession("DB_datausu"));
     }
@@ -1885,7 +1885,7 @@ class empenho {
       $rsEle         = $clempelemento->sql_record($clempelemento->sql_query_file($iEmpenho, null, " e64_codele "));
       $iAnoSessao          = date('Y', strtotime($dDataEstorno));
       if ($clempelemento->numrows > 0){
-        $objEmpElem  = db_utils::fieldsMemory($rsEle,0);        
+        $objEmpElem  = db_utils::fieldsMemory($rsEle,0);
         $oPlanoContaOrcamento = new ContaOrcamento( $objEmpElem->e64_codele, $iAnoSessao, null, db_getsession("DB_instit") );
         $oPlanoConta          = $oPlanoContaOrcamento->getPlanoContaPCASP();
         if (empty($oPlanoConta)) {
@@ -2046,7 +2046,7 @@ class empenho {
 
         $total = 1;
       }
-      $retorno = array("erro"=>1,"mensagem" => "OK","total"=>$total);
+      $retorno = array("erro"=>1,"mensagem" => "OK","total"=>$total,"estorno" => "1");
     }
     return $objJson->encode($retorno);
   }
@@ -2787,6 +2787,7 @@ class empenho {
     /**
      * incluimos o dados do empenho na empanulado.
      */
+    $iCodAnu = 0;
     if (!$this->lSqlErro) {
 
       $clempanulado = $this->usarDao("empanulado",true);
@@ -2874,9 +2875,9 @@ class empenho {
         $dbwhere = "pc10_solicitacaotipo = 5 and e62_sequencial = " . $aItens[$iInd]->e62_sequencial;
         $ItemSol = $clsolicitem->sql_record($clsolicitem->sql_query_solicitem_emp(null, "distinct pc11_codigo", null,$dbwhere));
         $rsItemSol = db_utils::fieldsMemory($ItemSol,0);
-         
+
         if(pg_num_rows($ItemSol) > 0){
-        $clsolicitemanul = $this->usarDao("solicitemanul",true); 
+        $clsolicitemanul = $this->usarDao("solicitemanul",true);
         $clsolicitemanul->pc28_solicitem = $rsItemSol->pc11_codigo;
         $clsolicitemanul->pc28_vlranu     = $aItens[$iInd]->vlrtot;
         $clsolicitemanul->pc28_qtd       = $aItens[$iInd]->quantidade;
@@ -3160,11 +3161,11 @@ class empenho {
                                                                             from solicitem
                                                                             where pc11_numero = {$oSolicitem->solicitacao}))");
         $rsSql = $sSql;
-        
+
         for($i = 0; $i < pg_num_rows($sSql); $i++){
-          
+
           $oDadoAutoriza = db_utils::fieldsMemory($rsSql,$i)->e54_anulad;
-          
+
           $Autoriza[] = $oDadoAutoriza;
         }
 
@@ -3176,7 +3177,7 @@ class empenho {
         $rsAnulada   = $oDaoSolicitaAnulada->sql_record($sSqlAnulada);
 
           if(pg_num_rows($result) > 0 && pg_num_rows($rsAnulada) == 0){
-            
+
             $oDaoSolicitaAnulada->pc67_sequencial = null;
             $oDaoSolicitaAnulada->pc67_usuario    = db_getsession('DB_id_usuario');
             $oDaoSolicitaAnulada->pc67_data       = date('Y-m-d', db_getsession('DB_datausu'));
@@ -3195,7 +3196,7 @@ class empenho {
           $dbwhere = "e54_autori = {$iAutori} and pc10_solicitacaotipo = 5";
           $result1 = $clsolicitem->sql_record($clsolicitem->sql_query_sol_proc_orc(null,$campos,null,$dbwhere));
           $oResult = db_utils::fieldsMemory($result1, 0);
-          
+
           /*excluir orcamento do processo de compras e tabelas relacionadas*/
           require_once("classes/db_pcorcamjulg_classe.php");
           $oDaoOrcamJulg = new cl_pcorcamjulg();
@@ -3209,7 +3210,7 @@ class empenho {
               $this->lSqlErro  = true;
               $this->sErroMsg  = "Erro[]:Empenho não anulado.\n";
               $this->sErroMsg .= "({$oDaoOrcamJulg->erro_msg})";
-      
+
             }
           }
 
@@ -3225,7 +3226,7 @@ class empenho {
               $this->lSqlErro  = true;
               $this->sErroMsg  = "Erro[]:Empenho não anulado.\n";
               $this->sErroMsg .= "({$oDaoOrcamVal->erro_msg})";
-      
+
             }
           }
 
@@ -3241,7 +3242,7 @@ class empenho {
               $this->lSqlErro  = true;
               $this->sErroMsg  = "Erro[]:Empenho não anulado.\n";
               $this->sErroMsg .= "({$oDaoOrcamTroca->erro_msg})";
-      
+
             }
           }
 
@@ -3257,7 +3258,7 @@ class empenho {
               $this->lSqlErro  = true;
               $this->sErroMsg  = "Erro[]:Empenho não anulado.\n";
               $this->sErroMsg .= "({$oDaoOrcamForne->erro_msg})";
-      
+
             }
           }
 
@@ -3273,7 +3274,7 @@ class empenho {
               $this->lSqlErro  = true;
               $this->sErroMsg  = "Erro[]:Empenho não anulado.\n";
               $this->sErroMsg .= "({$oDaoOrcItemProc->erro_msg})";
-      
+
             }
           }
 
@@ -3283,13 +3284,13 @@ class empenho {
           $rsOrcam   = $oDaoOrcamItem->sql_record($sSqlOrcamItem);
           if($oDaoOrcamItem->numrows > 0){
             $oDaoOrcamItem->excluir(null,"pc22_codorc = {$oResult->orcamento}");
-            
+
             if ($oDaoOrcamItem->erro_status == 0) {
 
               $this->lSqlErro  = true;
               $this->sErroMsg  = "Erro[]:Empenho não anulado.\n";
               $this->sErroMsg .= "({$oDaoOrcamItem->erro_msg})";
-      
+
             }
           }
 
@@ -3305,7 +3306,7 @@ class empenho {
               $this->lSqlErro  = true;
               $this->sErroMsg  = "Erro[]:Empenho não anulado.\n";
               $this->sErroMsg .= "({$oDaoOrcam->erro_msg})";
-      
+
             }
           }
 
@@ -3322,7 +3323,7 @@ class empenho {
               $this->lSqlErro  = true;
               $this->sErroMsg  = "Erro[]:Empenho não anulado.\n";
               $this->sErroMsg .= "({$oDaoEmpAutProcItem->erro_msg})";
-      
+
             }
           }
 
@@ -3332,29 +3333,29 @@ class empenho {
           $rsProcItem   = $oDaoProcItem->sql_record($sSqlProcItem);
           if($oDaoProcItem->numrows > 0){
             $oDaoProcItem->excluir(null,"pc81_codproc = {$oResult->processo}");
-            
+
             if ($oDaoProcItem->erro_status == 0) {
 
               $this->lSqlErro  = true;
               $this->sErroMsg  = "Erro[]:Empenho não anulado.\n";
               $this->sErroMsg .= "({$oDaoProcItem->erro_msg})";
-      
+
             }
           }
-          
+
           require_once("classes/db_pcproc_classe.php");
           $oDaoProc = new cl_pcproc();
           $sSqlProc = $oDaoProc->sql_query_file(null,"*",null,"pc80_codproc = {$oResult->processo}");
           $rsProc   = $oDaoProc->sql_record($sSqlProc);
           if($oDaoProc->numrows > 0){
             $oDaoProc->excluir(null,"pc80_codproc = {$oResult->processo}");
-            
+
             if ($oDaoProc->erro_status == 0) {
 
               $this->lSqlErro  = true;
               $this->sErroMsg  = "Erro[]:Empenho não anulado.\n";
               $this->sErroMsg .= "({$oDaoProc->erro_msg})";
-      
+
               }
             }
           }
@@ -3394,7 +3395,7 @@ class empenho {
     if (!$this->lSqlErro){
       $this->sErroMsg = "Anulação efetuada com sucesso.";
     }
-
+    return $iCodAnu;
   }//end function anularEmpenho;
 
   /**
@@ -3674,7 +3675,7 @@ class empenho {
             if ($oEmpNotaEle->erro_status == 0){
 
               $this->sErroMsg  = "Erro[20]  Não foi possivel Alterar nota\n";
-              $this->sErroMsg .= "[Técnico] {$oEmpnotaEle->erro_msg}";
+              $this->sErroMsg .= "[Técnico] {$oEmpNotaEle->erro_msg}";
               throw new exception($this->sErroMsg);
               return false;
 
@@ -4331,7 +4332,8 @@ class empenho {
 
   }
 
-  function alterarDataLancamento($iCodigoLancamento, $dtNovaData) {
+  function alterarDataLancamento($iCodigoLancamento, $dtNovaData, $anlEmp = null)
+  {
 
     if (!db_utils::inTransaction()) {
       throw new Exception("Não há transação aberta.\nProcedimento Cancelado");
@@ -4497,37 +4499,50 @@ class empenho {
           $oLancamentoEmpenho  = $aLancamentosEmpenho[0];
           if (db_strtotime($dtValidar) < db_strtotime($oLancamentoEmpenho->data)) {
 
-            $sErroMensagem  = "Data do estorno do empenho  deve ser MAIOR ou IGUAL a menor data de estorno do empenho.\n";
-            $sErroMensagem .= "Operação cancelada.";
-            throw new Exception($sErroMensagem);
-          }
+                if ($anlEmp) {
+                    $sErroMensagem = "Data do estorno do empenho não pode ser anterior a data de emissão do empenho.\n";
+                    $sErroMensagem .= "Operação cancelada.";
+                } else {
+                    $sErroMensagem = "Data do estorno do empenho deve ser MAIOR ou IGUAL a menor data de estorno do empenho.\n";
+                    $sErroMensagem .= "Operação cancelada.";
+                }
+                throw new Exception($sErroMensagem);
+            }
         }
 
+        if ($anlEmp){
 
+            require_once 'classes/db_scripts_classe.php';
 
-        lancamentoContabil::alterarDataLancamento($iCodigoLancamento, $dtValidar);
+            $oAjustaSaldoContas = new cl_scripts();
+            $oAjustaSaldoContas->alteraDataLancAnulEmp($iCodigoLancamento, $dtValidar);
 
-        /**
-         * Alteramos a data do log de anulação do empenho.
-         */
-        $sWhereAnulado   = "e94_valor       = {$oDadosLancamento->valor} and e94_data = '{$oDadosLancamento->data}'";
-        $sWhereAnulado  .= " and e94_numemp = {$this->numemp}";
+        } else {
 
-        $oDaoEmpAnulado   = db_utils::getDao("empanulado");
-        $sSqlDadosAnulacao = $oDaoEmpAnulado->sql_query(null,"*",null, $sWhereAnulado);
-        $rsDadosAnulacao   = $oDaoEmpAnulado->sql_record($sSqlDadosAnulacao);
-        $aAnulacoes        = db_utils::getCollectionByRecord($rsDadosAnulacao);
+            lancamentoContabil::alterarDataLancamento($iCodigoLancamento, $dtValidar);
 
-        foreach ($aAnulacoes as $oAnulacao) {
+            /**
+             * Alteramos a data do log de anulação do empenho.
+             */
+            $sWhereAnulado   = "e94_valor       = {$oDadosLancamento->valor} and e94_data = '{$oDadosLancamento->data}'";
+            $sWhereAnulado  .= " and e94_numemp = {$this->numemp}";
 
-          $oDaoEmpAnulado->e94_codanu = $oAnulacao->e94_codanu;
-          $oDaoEmpAnulado->e94_data   = $dtValidar;
-          $oDaoEmpAnulado->alterar($oAnulacao->e94_codanu);
-          if ($oDaoEmpAnulado->erro_status == 0) {
+            $oDaoEmpAnulado   = db_utils::getDao("empanulado");
+            $sSqlDadosAnulacao = $oDaoEmpAnulado->sql_query(null,"*",null, $sWhereAnulado);
+            $rsDadosAnulacao   = $oDaoEmpAnulado->sql_record($sSqlDadosAnulacao);
+            $aAnulacoes        = db_utils::getCollectionByRecord($rsDadosAnulacao);
 
-            $sErroMensagem = "Erro ao alterar data da anulação empenho!";
-            throw new Exception($sErroMensagem);
-          }
+            foreach ($aAnulacoes as $oAnulacao) {
+
+              $oDaoEmpAnulado->e94_codanu = $oAnulacao->e94_codanu;
+              $oDaoEmpAnulado->e94_data   = $dtValidar;
+              $oDaoEmpAnulado->alterar($oAnulacao->e94_codanu);
+              if ($oDaoEmpAnulado->erro_status == 0) {
+
+                $sErroMensagem = "Erro ao alterar data da anulação empenho!";
+                throw new Exception($sErroMensagem);
+              }
+            }
         }
 
         break;
@@ -4799,7 +4814,7 @@ class empenho {
     }
   }
 
-  function excluirLancamento($iCodigoLancamento) {
+  function excluirLancamento($iCodigoLancamento, $anlEmp = null) {
 
     if (!db_utils::inTransaction()) {
       throw new Exception("Não há transação aberta.\nProcedimento Cancelado");
@@ -5090,84 +5105,93 @@ class empenho {
 
       case 11: //Estorno
 
-        $sErroMensagem = "";
-        lancamentoContabil::excluirLancamento($iCodigoLancamento);
-        /**
-         * Devemos exclui os itens dessa anulacao e a anulacao
-         */
-        $oDaoEmpanulado     = db_utils::getDao("empanulado");
-        $oDaoEmpanuladoItem = db_utils::getDao("empanuladoitem");
-        $sSqlCodigoAnulacao = $oDaoEmpanulado->sql_query_file(null,"e94_codanu",null, "e94_numemp={$this->numemp}");
-        $rsCodigoAnulacao   = $oDaoEmpanulado->sql_record($sSqlCodigoAnulacao);
-        if ($oDaoEmpanulado->numrows == 0) {
+        if ($anlEmp){
 
-          $sErroMensagem  = "Lançamento contábil de anulação de empenho sem informação da anulacao!";
-          $sErroMensagem .= "\nOperação cancelada.";
-          throw new Exception($sErroMensagem);
-        }
+            require_once 'classes/db_scripts_classe.php';
 
-        $iCodigoAnulacao = db_utils::fieldsMemory($rsCodigoAnulacao, 0)->e94_codanu;
-        /**
-         * excluimos todos os itens anulados
-         */
-        $oDaoEmpanuladoItem->excluir(null, "e37_empanulado = {$iCodigoAnulacao}");
-        if ($oDaoEmpanuladoItem->erro_status == 0) {
+            $oAjustaSaldoContas = new cl_scripts();
+            $oAjustaSaldoContas->excluiAnulacaoEmp($iCodigoLancamento);
 
-          $sErroMensagem  = "Erro ao excluir informações dos itens anulados.\n";
-          $sErroMensagem .= "Operação cancelada.\n[ET]\n - {$oDaoEmpanuladoItem->erro_msg}";
-          throw new Exception($sErroMensagem);
-        }
+        } else {
 
-        /**
-         * Excluimos da tabela empanuladoele
-         */
-        $oDaoEmpanuladoEle = db_utils::getDao("empanuladoele");
-        @$oDaoEmpanuladoEle->excluir($iCodigoAnulacao,null);
-        if ($oDaoEmpanuladoEle->erro_status == 0) {
+            lancamentoContabil::excluirLancamento($iCodigoLancamento);
+            /**
+             * Devemos exclui os itens dessa anulacao e a anulacao
+             */
+            $oDaoEmpanulado = db_utils::getDao("empanulado");
+            $oDaoEmpanuladoItem = db_utils::getDao("empanuladoitem");
+            $sSqlCodigoAnulacao = $oDaoEmpanulado->sql_query_file(null, "e94_codanu", null, "e94_numemp={$this->numemp}");
+            $rsCodigoAnulacao = $oDaoEmpanulado->sql_record($sSqlCodigoAnulacao);
+            if ($oDaoEmpanulado->numrows == 0) {
 
-          $sErroMensagem  = "Erro ao excluir informações da anulação do empenho.\n";
-          $sErroMensagem .= "Operação cancelada.\n[ET]\n - {$oDaoEmpanuladoEle->erro_msg}";
-          throw new Exception($sErroMensagem);
-        }
+                $sErroMensagem = "Lançamento contábil de anulação de empenho sem informação da anulacao!";
+                $sErroMensagem .= "\nOperação cancelada.";
+                throw new Exception($sErroMensagem);
+            }
 
-        /**
-         * Excluimos da tabela empanulado
-         */
+            $iCodigoAnulacao = db_utils::fieldsMemory($rsCodigoAnulacao, 0)->e94_codanu;
+            /**
+             * excluimos todos os itens anulados
+             */
+            $oDaoEmpanuladoItem->excluir(null, "e37_empanulado = {$iCodigoAnulacao}");
+            if ($oDaoEmpanuladoItem->erro_status == 0) {
 
-        $oDaoEmpanulado->excluir($iCodigoAnulacao);
-        if ($oDaoEmpanulado->erro_status == 0) {
+                $sErroMensagem = "Erro ao excluir informações dos itens anulados.\n";
+                $sErroMensagem .= "Operação cancelada.\n[ET]\n - {$oDaoEmpanuladoItem->erro_msg}";
+                throw new Exception($sErroMensagem);
+            }
 
-          $sErroMensagem  = "Erro ao excluir informações da anulação do empenho.\n";
-          $sErroMensagem .= "Operação cancelada.\n[ET]\n - {$oDaoEmpanulado->erro_msg}";
-          throw new Exception($sErroMensagem);
-        }
+            /**
+             * Excluimos da tabela empanuladoele
+             */
+            $oDaoEmpanuladoEle = db_utils::getDao("empanuladoele");
+            @$oDaoEmpanuladoEle->excluir($iCodigoAnulacao, null);
+            if ($oDaoEmpanuladoEle->erro_status == 0) {
 
-        /**
-         * Modificamos o valor estornado nas tabelas empenho, e empelemento
-         */
-        $this->getDados($this->numemp);
-        $oDaoEmpempenho = db_utils::getDao("empempenho");
-        $oDaoEmpempenho->e60_numemp = $this->numemp;
-        //$sErroMensagem .=  "Empenho:{$this->dadosEmpenho->e60_vlranu} - {$oDadosLancamento->valor}\n";
-        $oDaoEmpempenho->e60_vlranu = "".($this->dadosEmpenho->e60_vlranu - $oDadosLancamento->valor)."";
-        $oDaoEmpempenho->alterar($this->numemp);
-        if ($oDaoEmpempenho->erro_status == 0) {
+                $sErroMensagem = "Erro ao excluir informações da anulação do empenho.\n";
+                $sErroMensagem .= "Operação cancelada.\n[ET]\n - {$oDaoEmpanuladoEle->erro_msg}";
+                throw new Exception($sErroMensagem);
+            }
 
-          $sErroMensagem  = "Erro ao alterar valores do empenho.\n";
-          $sErroMensagem .= "Operação cancelada.\n[ET]\n - {$oDaoEmpempenho->erro_msg}";
-          throw new Exception($sErroMensagem);
-        }
+            /**
+             * Excluimos da tabela empanulado
+             */
 
-        $oDaoEmpElemento             = db_utils::getDao("empelemento");
-        $oDaoEmpElemento->e64_numemp = $this->numemp;
-        $oDaoEmpElemento->e64_vlranu = "".($this->dadosEmpenho->e60_vlranu - $oDadosLancamento->valor)."";
-        //$sErroMensagem .=  "Elemento:{$this->dadosEmpenho->e60_vlranu} - {$oDadosLancamento->valor}\n";
-        $oDaoEmpElemento->alterar($this->numemp, null);
-        if ($oDaoEmpElemento->erro_status == 0) {
+            $oDaoEmpanulado->excluir($iCodigoAnulacao);
+            if ($oDaoEmpanulado->erro_status == 0) {
 
-          $sErroMensagem  = "Erro ao alterar valores do empenho.\n";
-          $sErroMensagem .= "Operação cancelada.\n[ET]\n - {$oDaoEmpElemento->erro_msg}";
-          throw new Exception($sErroMensagem);
+                $sErroMensagem = "Erro ao excluir informações da anulação do empenho.\n";
+                $sErroMensagem .= "Operação cancelada.\n[ET]\n - {$oDaoEmpanulado->erro_msg}";
+                throw new Exception($sErroMensagem);
+            }
+
+            /**
+             * Modificamos o valor estornado nas tabelas empenho, e empelemento
+             */
+            $this->getDados($this->numemp);
+            $oDaoEmpempenho = db_utils::getDao("empempenho");
+            $oDaoEmpempenho->e60_numemp = $this->numemp;
+            //$sErroMensagem .=  "Empenho:{$this->dadosEmpenho->e60_vlranu} - {$oDadosLancamento->valor}\n";
+            $oDaoEmpempenho->e60_vlranu = "" . ($this->dadosEmpenho->e60_vlranu - $oDadosLancamento->valor) . "";
+            $oDaoEmpempenho->alterar($this->numemp);
+            if ($oDaoEmpempenho->erro_status == 0) {
+
+                $sErroMensagem = "Erro ao alterar valores do empenho.\n";
+                $sErroMensagem .= "Operação cancelada.\n[ET]\n - {$oDaoEmpempenho->erro_msg}";
+                throw new Exception($sErroMensagem);
+            }
+
+            $oDaoEmpElemento = db_utils::getDao("empelemento");
+            $oDaoEmpElemento->e64_numemp = $this->numemp;
+            $oDaoEmpElemento->e64_vlranu = "" . ($this->dadosEmpenho->e60_vlranu - $oDadosLancamento->valor) . "";
+            //$sErroMensagem .=  "Elemento:{$this->dadosEmpenho->e60_vlranu} - {$oDadosLancamento->valor}\n";
+            $oDaoEmpElemento->alterar($this->numemp, null);
+            if ($oDaoEmpElemento->erro_status == 0) {
+
+                $sErroMensagem = "Erro ao alterar valores do empenho.\n";
+                $sErroMensagem .= "Operação cancelada.\n[ET]\n - {$oDaoEmpElemento->erro_msg}";
+                throw new Exception($sErroMensagem);
+            }
         }
 
         //throw new Exception($sErroMensagem);
@@ -5438,7 +5462,7 @@ class empenho {
           $oDaoEmpagemovConta->excluir(null,"e98_codmov = {$oMovimento->e81_codmov}");
           if ($oDaoEmpagemovConta->erro_status == 0) {
 
-            $sErroMensagem = "Erro ao excluir conta vinculado ao lançamento.\n[ET]-{$oDaoEmpagemovconta->erro_msg}";
+            $sErroMensagem = "Erro ao excluir conta vinculado ao lançamento.\n[ET]-{$oDaoEmpagemovConta->erro_msg}";
             throw new Exception($sErroMensagem);
           }
           $oDaoEmpagePag->excluir(null,null, "e85_codmov = {$oMovimento->e81_codmov}");
@@ -6389,14 +6413,14 @@ class empenho {
     $sSqlBuscaDocumento = $oDaoConlancam->sql_query_documentos(null, "conhistdoc.*", $sOrdem, $sWhere);
     $rsBuscaDocumento   = $oDaoConlancam->sql_record($sSqlBuscaDocumento);
     if ($oDaoConlancam->erro_status == "0") {
-      throw new Exception("Não foi possível localizar os lançamentos contábeis para o empenho {$this->numemp}.");
+      throw new Exception("Não foi possível localizar os lançamentos contábeis para o empenho {$iSequencialEmpenho}.");
     }
 
     return db_utils::fieldsMemory($rsBuscaDocumento, 0 )->c53_coddoc;
   }
 
   public function buscaUltimoDocumentoExecutadoDoc($iSequencialEmpenho,$iDocumento, $iData) {
-    
+
     try{
 
       $dtValidar = implode("-", array_reverse(explode("/", $iData)));
@@ -6412,7 +6436,7 @@ class empenho {
       if (pg_num_rows($rsDataEncerramento) > 0) {
 
         $dtDataEncerramento = db_utils::fieldsMemory($rsDataEncerramento, 0)->c99_data;
-  
+
         if (db_strtotime($dtValidar) <= db_strtotime($dtDataEncerramento)) {
           throw new Exception("Anulação não pode ser realizada nesta data. O período contábil já foi encerrado para envio do SICOM.");
         }

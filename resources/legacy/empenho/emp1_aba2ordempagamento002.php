@@ -24,7 +24,7 @@
  *  Copia da licenca no diretorio licenca/licenca_en.txt
  *                                licenca/licenca_pt.txt
  */
-require("libs/db_stdlib.php");
+require(modification("libs/db_stdlib.php"));
 require("libs/db_conecta.php");
 include("libs/db_sessoes.php");
 include("libs/db_usuariosonline.php");
@@ -90,15 +90,15 @@ if (isset($alterar)) {
             $liquidacaoAlterado = strtotime($dataLiquidacaoAtual) !== strtotime($dataLiquidacao) ? true : false;
         }
     }
-    
+
     $sSqlConsultaFimPeriodoContabil   = "SELECT * FROM condataconf WHERE c99_anousu = ".db_getsession('DB_anousu')." and c99_instit = ".db_getsession('DB_instit');
     $rsConsultaFimPeriodoContabil     = db_query($sSqlConsultaFimPeriodoContabil);
 
     if (pg_num_rows($rsConsultaFimPeriodoContabil) > 0) {
-      
+
         $oFimPeriodoContabil = db_utils::fieldsMemory($rsConsultaFimPeriodoContabil, 0);
 
-        if ($oFimPeriodoContabil->c99_data != '' 
+        if ($oFimPeriodoContabil->c99_data != ''
         && (($estornoAlterado && db_strtotime($dataEstorno) <= db_strtotime($oFimPeriodoContabil->c99_data))
         || ($liquidacaoAlterado && db_strtotime($dataLiquidacao) <= db_strtotime($oFimPeriodoContabil->c99_data)))) {
 
@@ -181,7 +181,7 @@ if (isset($alterar)) {
     //Altera data liquidação
     if(!$sqlerro && $liquidacaoAlterado){
         $dataLiquidacaoAtual = str_replace('/', '-', $dataLiquidacaoAtual);
-        $dataLiquidacaoAtual = date('Y-m-d', strtotime($dataLiquidacaoAtual)); 
+        $dataLiquidacaoAtual = date('Y-m-d', strtotime($dataLiquidacaoAtual));
         if(strtotime($dataLiquidacao) <= db_getsession("DB_datausu")){
             db_inicio_transacao();
             $sqlAlteraDataOp = $clpagordem->alteraDataOp($e50_codord,$dataLiquidacaoAtual,$dataLiquidacao, date('m',db_getsession('DB_datausu')), $ordemCompra->tipo);
@@ -189,7 +189,7 @@ if (isset($alterar)) {
             db_fim_transacao();
         }else{
             $erro_msg = "Dados da OP não alterados!\nA data da OP não pode ser posterior a data atual.";
-            $sqlerro = true;  
+            $sqlerro = true;
         }
     }
 
@@ -203,12 +203,12 @@ if (isset($alterar)) {
             db_fim_transacao();
         }else{
             $erro_msg = "Dados da OP não alterados!\nA data do estorno não pode ser posterior a data atual.";
-            $sqlerro = true;  
+            $sqlerro = true;
         }
     }
 
     if (!$sqlerro) {
-    
+
         $aEmpenho = explode("/",$e60_codemp);
         $sSql = $clpagordem->sql_query_pagordemele("","substr(o56_elemento,1,7) AS o56_elemento","e50_codord","e60_codemp =  '".$aEmpenho[0]."' and e60_anousu = ".$aEmpenho[1]." and e60_instit = ".db_getsession("DB_instit"));
         $rsElementDesp = db_query($sSql);
@@ -269,7 +269,7 @@ if (isset($alterar)) {
         if($e53_valor != $diariaVlrDespesa){
             $erro_msg_diaria .= "- Valor da Liquidação precisa ser igual ao Valor Liquidado.\n";
             $sqlerroDiaria = true;
-        }          
+        }
 
         if(!$sqlerroDiaria){
 
@@ -390,10 +390,10 @@ if (isset($alterar) && $ct01_codcategoria) {
       $clpagordemEsocial      = new cl_pagordem;
       $where = " e60_codemp =  '".$aEmpenho[0]."' and e60_anousu = ".$aEmpenho[1]." and e60_instit = ".db_getsession("DB_instit");
       $sql = $clpagordemEsocial->sql_record($clpagordemEsocial->sql_query_emp(null,"*",null,$where));
-   
+
       if ($clpagordemEsocial->numrows > 0) {
           $oEsocial= db_utils::fieldsMemory($sql, 0);
-          
+
           $clpagordemEsocial = new cl_pagordem;
           $clpagordemEsocial->e50_retencaoir                = $reinfRetencao;
           $clpagordemEsocial->e50_naturezabemservico        = $naturezaCod;
@@ -407,11 +407,11 @@ if (isset($alterar) && $ct01_codcategoria) {
           if ($competencia && $competencia != "undefined") {
             $clpagordemEsocial->e50_datacompetencia         = formateDateReverse($competencia);
           }
-          
+
           $clpagordemEsocial->alterar($oEsocial->e50_codord,null);
           $erro_msg_esocial = $clpagordemEsocial->erro_status;
 
-      } 
+      }
   }
 
   if($erro_msg_esocial == 1){
@@ -451,7 +451,7 @@ if(isset($alterar)){
 }
 function formateDateReverse(string $date): string
 {
-   
+
     $data_objeto = DateTime::createFromFormat('d/m/Y', $date);
     $data_formatada = $data_objeto->format('Y-m-d');
     return date('Y-m-d', strtotime($data_formatada));

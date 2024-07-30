@@ -190,7 +190,18 @@ class LancamentoAuxiliarEmLiquidacaoMaterialPermanente extends LancamentoAuxilia
     $rsBuscaBem = $oDaoBensNota->sql_record($sSqlBuscaBem);
 
     if ($oDaoBensNota->numrows == 0) {
-      throw new Exception("Bem não encontrado para o empenho {$oLancamento->c75_numemp}");
+      $oDaoBensExcluidos  = db_utils::getDao("bensexcluidos");
+      $sSqlBuscaBem = $oDaoBensExcluidos->sql_query_bens_excluidos( null, 
+                                                          "distinct t136_bens as t52_bem,                     \n"
+                                                          . " (select t43_codlote                \n"
+                                                          . "    from benslote                   \n"
+                                                          . "   where t43_bem = t136_bens) as lote \n", 
+                                                          " t136_bens limit 1", 
+                                                          "e69_numemp = {$oLancamento->c75_numemp}" );
+      $rsBuscaBem = $oDaoBensExcluidos->sql_record($sSqlBuscaBem);
+      if ($oDaoBensExcluidos->numrows == 0) {
+        throw new Exception("Bem não encontrado para o empenho {$oLancamento->c75_numemp}");
+      }
     }
 
     $oDadosBem    = db_utils::fieldsMemory($rsBuscaBem, 0);

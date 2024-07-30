@@ -191,7 +191,11 @@ $clveiculos->rotulo->label("si04_especificacao");
             }
           }
 
-          $campos .= ",veiculos.ve01_quantcapacidad,ve01_codigoant";
+          if (!empty($_SESSION['DB_instit'])) {
+            $sWhereInstituicao .= 'and db_depart.instit = ' . $_SESSION['DB_instit'];
+          }
+
+          $campos .= ",veiculos.ve01_quantcapacidad,ve01_codigoant,db_depart.instit";
 
           //$dbwhere = " (ve36_coddepto = ".db_getsession("DB_coddepto")." or  ve37_coddepto = ".db_getsession("DB_coddepto").") ";
 

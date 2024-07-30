@@ -36,7 +36,6 @@ class UpdateOrCreateAlvaraService
             'q02_numcgm' => $cgmCompany->z01_numcgm,
             'q02_regjuc' => $data->inscricaoMunicipal,
             'q02_inscmu' => $data->inscricaoMunicipal,
-            'q02_dtcada' => date('Y-m-d'),
             'q02_dtinic' => $data->getDataInicioEcidade(),
             'q02_capit' => $data->capitalSocial,
             'q02_cep' => $data->endereco->cep,
@@ -62,7 +61,7 @@ class UpdateOrCreateAlvaraService
 
             return $issbase;
         }
-
+        $attributes['q02_dtcada'] = date('Y-m-d');
         $newIssbase = $this->issbase->create($attributes);
 
         $this->performIssbaseLog($newIssbase->q02_inscr, $actionType, 'INCLUSÃO REALIZADA PELO REDESIM.');

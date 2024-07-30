@@ -270,7 +270,7 @@ try {
             AND rhcargo.rh04_instit = rhpessoalmov.rh02_instit
          INNER JOIN cgm ON cgm.z01_numcgm = rhpessoal.rh01_numcgm
          INNER JOIN rhfuncao ON rhfuncao.rh37_funcao = rhpessoalmov.rh02_funcao
-            AND rhfuncao.rh37_instit = 1
+            AND rhfuncao.rh37_instit = " . db_getsession('DB_instit') . "
          INNER JOIN rhlota ON rhlota.r70_codigo = rhpessoalmov.rh02_lota
             AND rhlota.r70_instit = rhpessoalmov.rh02_instit
          INNER JOIN rhregime ON rhregime.rh30_codreg = rhpessoalmov.rh02_codreg
@@ -305,7 +305,7 @@ try {
   ";
 
     $rsConsulta = db_query($sSQL);
-    $numrows_dados = pg_numrows($aConsulta);
+    $numrows_dados = pg_num_rows($aConsulta);
 
     $aConsulta = db_utils::getCollectionByRecord($rsConsulta);
     //echo '<pre>';print_r($anoControle);print_r($aDias);die;

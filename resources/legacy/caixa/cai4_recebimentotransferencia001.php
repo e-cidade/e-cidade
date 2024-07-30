@@ -71,6 +71,4 @@ $oGet = db_utils::postMemory($_GET);
   oDBViewSlipRecebimento.setAno(<?php echo db_getsession('DB_anousu'); ?>);
   // oDBViewSlipRecebimento.show();
   oDBViewSlipRecebimento.start();
-
-
 </script>

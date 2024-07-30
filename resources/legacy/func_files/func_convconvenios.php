@@ -8,6 +8,7 @@ include("classes/db_convconvenios_classe.php");
 db_postmemory($HTTP_POST_VARS);
 parse_str($HTTP_SERVER_VARS["QUERY_STRING"]);
 $clconvconvenios = new cl_convconvenios;
+
 ?>
 <html>
 <head>
@@ -47,7 +48,12 @@ $clconvconvenios = new cl_convconvenios;
             $sql = $clconvconvenios->sql_query("", "c206_sequencial, c206_instit, c206_nroconvenio, c206_dataassinatura, regexp_replace(c206_objetoconvenio, '[\r|\n]+', '', '') c206_objetoconvenio, c206_datainiciovigencia, c206_datafinalvigencia, c206_vlconvenio, c206_vlcontrapartida, c206_datacadastro, c206_tipocadastro ", "", " c206_tipocadastro = {$iFonte} or c206_tipocadastro = null or c206_tipocadastro = 0 ");
         } else {
             $sql = $clconvconvenios->sql_query();
+            if ($pesquisa_iCodigoRecurso) {
+              $iInstituicao = db_getsession("DB_instit");
+              $sql = $clconvconvenios->sql_query(null," * ",null ,"c206_tipocadastro = {$pesquisa_iCodigoRecurso} and c206_instit = {$iInstituicao}");
+            }
         }
+
         $repassa = array();
         db_lovrot($sql,15,"()","",$funcao_js,"","NoMe",$repassa);
       }else{
@@ -55,7 +61,10 @@ $clconvconvenios = new cl_convconvenios;
            $result = $clconvconvenios->sql_record($clconvconvenios->sql_query($pesquisa_chave, "regexp_replace(c206_objetoconvenio, '[\r|\n]+', '', '') c206_objetoconvenio, c206_tipocadastro"));
           if($clconvconvenios->numrows!=0){
             db_fieldsmemory($result,0);
+            
             echo "<script>".$funcao_js."('$c206_objetoconvenio',false, '$c206_tipocadastro');</script>";
+            if ($c206_tipocadastro != $pesquisa_iCodigoRecurso)
+              echo "<script>".$funcao_js."('Chave(".$pesquisa_chave.") não Encontrado',2);</script>";
           }else{
 	         echo "<script>".$funcao_js."('Chave(".$pesquisa_chave.") não Encontrado',true);</script>";
           }

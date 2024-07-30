@@ -198,16 +198,16 @@ if ($tipo == "l"){
     $whereestrut = " where 1 = 1 ";
   }
   if(isset($frc) && $frc != "") {
-	   $whereestrut .= " and o15_codigo in ($frc) ";
+	   $whereestrut .= " and rh25_recurso in ($frc) ";
      $head7 = "RECURSO : $frc";
   }elseif((isset($rci) && $rci != "" ) && (isset($rcf) && $rcf != "")){
-	   $whereestrut .= " and o15_codigo between $rci and $rcf ";
+	   $whereestrut .= " and rh25_recurso between $rci and $rcf ";
      $head7 = "RECURSO : $rci A $rcf";
 	}else if(isset($rci) && $rci != ""){
-	   $whereestrut .= " and o15_codigo >= $rci ";
+	   $whereestrut .= " and rh25_recurso >= $rci ";
      $head7 = "RECURSO : $rci A 99999";
 	}else if(isset($rcf) && $rcf != ""){
-	   $whereestrut .= " and o15_codigo >= $rcf ";
+	   $whereestrut .= " and rh25_recurso >= $rcf ";
      $head7 = "RECURSO : 0 A $ltf";
 	}else{
      $head7 = "RECURSO : 0  A 9999";
@@ -562,7 +562,7 @@ if ($tipo == "l"){
 
 //echo "<BR><BR> 3.1 $tipo";
 //echo "<BR><BR> 3.2 xxordem --> $xxordem com_quebra --> $com_quebra sql --> $sql <br><br>";
-//echo $sql ;exit;
+// echo $sql ;exit;
 $result = db_query($sql);
 //db_criatabela($result);
 $xxnum = pg_numrows($result);

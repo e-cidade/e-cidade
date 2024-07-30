@@ -54,6 +54,10 @@ include("classes/db_conlancambem_classe.php");
 include("classes/db_bensdepreciacao_classe.php");
 include("classes/db_bensmaterialempempenho_classe.php");
 include("classes/db_bensempnotaitem_classe.php");
+include("classes/db_parametrointegracaopatrimonial_classe.php");
+include("classes/db_bensexcluidos_classe.php");
+require_once("model/empenho/EmpenhoFinanceiro.model.php");
+require_once("model/patrimonio/BemClassificacao.model.php");
 
 
 $clbensmaterialempempenho = new cl_bensmaterialempempenho;
@@ -68,6 +72,8 @@ $clbemfoto                = new cl_bemfoto;
 $clbensmater              = new cl_bensmater;
 $clbensimoveis            = new cl_bensimoveis;
 $clclabens                = new cl_clabens;
+$clhistbemocorrencia      = new cl_histbensocorrencia;
+$clbensdiv = new cl_bensdiv;
 $clbensbaix               = new cl_bensbaix;
 $clbensplaca              = new cl_bensplaca;
 $clhistbemdiv             = new cl_histbemdiv;
@@ -83,85 +89,128 @@ $clbensempnotaitem        = new cl_bensempnotaitem;
 db_postmemory($HTTP_POST_VARS);
 $db_opcao = 33;
 $db_botao = false;
+$mostrarCampo = "none";
 if(isset($excluir)){
   $sqlerro=false;
   db_inicio_transacao();
+  
+  $oDataImplantacao  = new DBDate(date("Y-m-d", db_getsession('DB_datausu')));
+  $oInstituicao      = new Instituicao(db_getsession('DB_instit'));
+  $result1           = $clbensmater->sql_record($clbensmater->sql_query_file(null,"*","","t53_codbem = ".$t52_bem));
+  $numrows           = $clbensmater->numrows;
+  
+  if($numrows>0){
+    db_fieldsmemory($result1, 0);
+  }
 
-    $clbensplaca->excluir('',"t41_bem = $t52_bem");
-    if ($clbensplaca->erro_status == 0) {
-    	$sqlerro=true;
-    	$erro_msg = $clbensplaca->erro_msg;
+  if (ParametroIntegracaoPatrimonial::possuiIntegracaoPatrimonio($oDataImplantacao, $oInstituicao) && $t53_empen > 0) {
+    $mostrarCampo = 1;
+    if ($t52_dtexclusao == '') {
+      $sqlerro=true;
+      $erro_msg = "Campo data exclusão obrigatorio.";
     }
-    if ($sqlerro == false) {
-      $clbensmaterialempempenho->excluir('',"t11_bensmaterial = $t52_bem");
-      if ($clbensmaterialempempenho->erro_status == 0) {
-    	  $sqlerro=true;
-    	  $erro_msg = $clbensmaterialempempenho->erro_msg;
-      }
+    
+    $dtexclusao  = DateTime::createFromFormat('d/m/Y', $t52_dtexclusao);
+    $dtaquisicao = DateTime::createFromFormat('d/m/Y', $t52_dtaqu);
+    if ($dtexclusao < $dtaquisicao) {
+      $sqlerro=true;
+      $erro_msg = "Campo data exclusão deve ser igual ou maior que o campo data da aquisição do bem.";
     }
+  
     if ($sqlerro == false) {
-      $clbensdepreciacao->excluir('',"t44_bens = $t52_bem");
-      if ($clbensdepreciacao->erro_status == 0) {
-    	  $sqlerro=true;
-    	  $erro_msg = $clbensdepreciacao->erro_msg;
-      }
-    }
-    if ($sqlerro == false) {
-      $clbensempnotaitem->excluir('',"e136_bens = $t52_bem");
-      if ($clbensempnotaitem->erro_status == 0) {
-    	  $sqlerro=true;
-    	  $erro_msg = $clbensempnotaitem->erro_msg;
-      }
-    }
-    if ($sqlerro == false) {
-      $clbenslote->excluir('',"t43_bem = $t52_bem");
-      if ($clbenslote->erro_status == 0) {
-    	  $sqlerro=true;
-    	  $erro_msg = $clbenslote->erro_msg;
-      }
-    }
-    if ($sqlerro == false) {
-      $clbensmater->excluir('',"t53_codbem = $t52_bem");
-      if ($clbensmater->erro_status == 0) {
-    	  $sqlerro=true;
-    	  $erro_msg = $clbensmater->erro_msg;
-      }
-    }
-    if ($sqlerro == false) {
-      $clhistbem->excluir('',"t56_codbem = $t52_bem");
-      if ($clhistbem->erro_status == 0) {
-    	  $sqlerro=true;
-    	  $erro_msg = $clhistbem->erro_msg;
-      }
-    }
-    if ($sqlerro == false) {
-      $clbenscedente->excluir('',"t09_bem = $t52_bem");
-      if ($clbenscedente->erro_status == 0) {
-    	  $sqlerro=true;
-    	  $erro_msg = $clbenscedente->erro_msg;
-      }
-    }
-    if ($sqlerro == false) {
-      $clconlancambem->excluir('',"c110_bem = $t52_bem");
-      if ($clconlancambem->erro_status == 0) {
-    	  $sqlerro=true;
-    	  $erro_msg = $clconlancambem->erro_msg;
-      }
-    }
-    if ($sqlerro == false) {
-      $clbens->excluir('',"t52_bem = $t52_bem");
-      if ($clbens->erro_status == 0) {
-    	  $sqlerro=true;
-    	  $erro_msg = $clbens->erro_msg;
-      }
-    }
-    if ($sqlerro == false) {
-        $clbemfoto->excluir('', "t54_numbem = $t52_bem");
-        if ($clbemfoto->erro_status == 0) {
-            $sqlerro=true;
-            $erro_msg = $clbemfoto->erro_msg;
+     
+      $oDaoEmpnotaitem    = db_utils::getDao('empnotaitem');
+      $sWhere             = " e69_numero =  '{$t53_ntfisc}' and e62_numemp = '{$t53_empen}' ";
+      $sSqlNotaLiquidacao = $oDaoEmpnotaitem->sql_query_empenho_item(""," * ","",$sWhere );
+      $rsNotaLiquidacao   = $oDaoEmpnotaitem->sql_record($sSqlNotaLiquidacao);
+
+      $valorLiquidado     = db_utils::fieldsMemory($rsNotaLiquidacao, 0)->e72_vlrliq;
+      $sCampos            = " e60_anousu ";
+      $clempempenho       = new cl_empempenho;
+      $rsEmpenho          = $clempempenho->sql_record($clempempenho->sql_query($t53_empen,$sCampos));
+
+      if ($valorLiquidado > 0) {
+        $sqlerro = true;
+        $erro_msg = "O bem não poderá ser removido, pois a nota fiscal $t53_ntfisc do empenho $t53_empen está liquidada.";
+      } 
+
+      $sSqlConsultaFimPeriodoContabil   = "SELECT * FROM condataconf WHERE c99_anousu = " . db_getsession('DB_anousu') . " and c99_instit = " . db_getsession('DB_instit');
+      $rsConsultaFimPeriodoContabil     = db_query($sSqlConsultaFimPeriodoContabil);
+      if (pg_num_rows($rsConsultaFimPeriodoContabil) > 0) {
+        $oFimPeriodoContabil = db_utils::fieldsMemory($rsConsultaFimPeriodoContabil, 0);
+        $data_objeto = DateTime::createFromFormat('d/m/Y', $t52_dtexclusao);
+        $data_formatada = $data_objeto->format('Y-m-d');
+        if ($oFimPeriodoContabil->c99_data != '' && db_strtotime($data_formatada) <= db_strtotime($oFimPeriodoContabil->c99_data)) {
+          $sqlerro = true;
+          $erro_msg = "Data inferior à data do fim do período contábil.";
         }
+      }
+     
+      if ($sqlerro == false) { 
+  
+        $anoEmpenho = db_utils::fieldsMemory($rsEmpenho, 0)->e60_anousu;
+        $dataObj = DateTime::createFromFormat('d/m/Y', $t52_dtexclusao);
+        $anoEstorno =  $dataObj->format('Y');
+        $iCodigoDocumento =  $anoEstorno == $anoEmpenho ? 209 : 215;
+  
+        $oParametros->iCodigoEmpNotaItem = db_utils::fieldsMemory($rsNotaLiquidacao, 0)->e72_sequencial;
+        $oParametros->iNumeroEmpenho     = db_utils::fieldsMemory($rsNotaLiquidacao, 0)->e62_numemp;
+        $oParametros->nValorNota         = $t52_valaqu;
+        $oParametros->iCodigoNota        = db_utils::fieldsMemory($rsNotaLiquidacao, 0)->e72_codnota;
+        $oParametros->sJustificativa     = "";
+        $oParametros->iClassificacao     = $t64_class;
+        $oParametros->sDescricaoItem     = "";
+        $oParametros->iQuantidadeItem    = db_utils::fieldsMemory($rsNotaLiquidacao, 0)->e72_qtd;
+        $oParametros->dataaquisicao      = $t52_dtaqu;
+        $oParametros->t52_dtexclusao     = $t52_dtexclusao;
+        $oParametros->t52_bem            = $t52_bem;
+        $oParametros->t52_descr          = $t52_descr;
+        $oParametros->t52_ident          = $t52_ident;
+        $oParametros->t53_ntfisc         = $t53_ntfisc;
+        $oParametros->e69_numero         = db_utils::fieldsMemory($rsNotaLiquidacao, 0)->e69_numero;
+
+        if ($sqlerro == false) {
+          if(processarLancamento($iCodigoDocumento,$oParametros->iCodigoEmpNotaItem, $oParametros)) {
+            if ($oDaoEmpnotaitem->numrows > 0) {
+              inserirBensExcluidos($oParametros);
+            }
+            $resultado = excluirBem($t52_bem);
+            if ($resultado['erro']) {
+                $sqlerro = true;
+                $erro_msg = $resultado['mensagem'];
+            } 
+          }
+        }
+      
+      }
+
     }
+  }else {
+
+    $result1           = $clbensmater->sql_record($clbensmater->sql_query_file(null,"*","","t53_codbem = ".$t52_bem));
+    $numrows           = $clbensmater->numrows;
+ 
+    if ($numrows>0) {
+      db_fieldsmemory($result1, 0);
+
+      $oDaoEmpnotaitem    = db_utils::getDao('empnotaitem');
+      $sWhere             = " e69_numero =  '{$t53_ntfisc}' and e62_numemp = '{$t53_empen}' ";
+      $sSqlNotaLiquidacao = $oDaoEmpnotaitem->sql_query_empenho_item(""," * ","",$sWhere );
+      $rsNotaLiquidacao   = $oDaoEmpnotaitem->sql_record($sSqlNotaLiquidacao);
+
+      $oParametros->iCodigoEmpNotaItem = db_utils::fieldsMemory($rsNotaLiquidacao, 0)->e72_sequencial;
+      $oParametros->t52_bem            = $t52_bem;
+      
+      if ($oDaoEmpnotaitem->numrows > 0) {
+        inserirBensExcluidos($oParametros);
+      }
+    }
+    $resultado = excluirBem($t52_bem);
+    if ($resultado['erro']) {
+        $sqlerro = true;
+        $erro_msg = $resultado['mensagem'];
+    }
+  }
 
   db_fim_transacao($sqlerro);
 
@@ -179,6 +228,12 @@ if(isset($excluir)){
    $db_botao = true;
    $result = $clbens->sql_record($clbens->sql_query($chavepesquisa));
    db_fieldsmemory($result,0);
+   $oDataImplantacao  = new DBDate(date("Y-m-d", db_getsession('DB_datausu')));
+   $oInstituicao      = new Instituicao(db_getsession('DB_instit'));
+
+   if (ParametroIntegracaoPatrimonial::possuiIntegracaoPatrimonio($oDataImplantacao, $oInstituicao) && $t53_empen > 0) {
+      $mostrarCampo = 1;
+   } 
 }
 ?>
 <html>
@@ -238,4 +293,154 @@ if(isset($chavepesquisa)){
  if($db_opcao==22||$db_opcao==33){
     echo "<script>document.form1.pesquisar.click();</script>";
  }
+
+ function processarLancamento($iCodigoDocumento, $iCodigoItemNota, $oParametros) 
+ {
+ 
+  $oDataImplantacao  = new DBDate(date("Y-m-d", db_getsession('DB_datausu')));
+  $oInstituicao      = new Instituicao(db_getsession('DB_instit'));
+
+  if ( !ParametroIntegracaoPatrimonial::possuiIntegracaoPatrimonio($oDataImplantacao, $oInstituicao) ) {
+    return false;
+  }
+
+  if ( empty($oParametros->iNumeroEmpenho) ) {
+    throw new Exception('Número de empenho não informado.');
+  }
+
+  $oDaoEmpnotaitem  = db_utils::getDao('empnotaitem');
+  $sSqlNotaLiquidacao = $oDaoEmpnotaitem->sql_query_empenho_item($iCodigoItemNota);
+  $rsNotaLiquidacao = $oDaoEmpnotaitem->sql_record($sSqlNotaLiquidacao);
+
+  if ( $oDaoEmpnotaitem->erro_status == "0" ) {
+    throw new DBException("Erro ao buscar item da nota, item não encontrado: $iCodigoItemNota.");
+  }
+  
+  $iCodigoNotaLiquidacao = db_utils::fieldsMemory($rsNotaLiquidacao, 0)->e72_codnota;
+  $iNumeroNotaLiquidacao = $oParametros->e69_numero;
+  $iCodigoItemEstoque    = db_utils::fieldsMemory($rsNotaLiquidacao, 0)->e72_empempitem;
+
+  $aItensEmpenho = $iCodigoItemEstoque;
+  $dataaquisicao = explode('/',$oParametros->t52_dtexclusao);
+  $oDataEstorno  = $dataaquisicao[2].'-'.$dataaquisicao[1].'-'.$dataaquisicao[0];
+  
+  $oEventoContabil = new EventoContabil($iCodigoDocumento, db_getsession("DB_anousu"));
+
+  $nValorNota = $oParametros->nValorNota;
+ 
+  $sObservacao = "ESTORNO DE LANÇAMENTO EM LIQUIDAÇÃO DO TOMBAMENTO DO BEM {$oParametros->t52_descr}, ";
+  $sObservacao .= " CÓDIGO {$oParametros->t52_bem}, PLACA {$oParametros->t52_ident}, NÚMERO DA NOTA FISCAL {$iNumeroNotaLiquidacao }.";
+
+  if ($oParametros->iClassificacao != "") {
+    $codclass = str_replace('.', '', $oParametros->iClassificacao);    
+    $oDaoClaBens          = db_utils::getDao("clabens");
+    $sWhere               = " clabens.t64_class = '{$codclass}'";
+    $sWhere              .= " and clabens.t64_instit = " . db_getsession("DB_instit");
+    $sSqlClassificacao    = $oDaoClaBens->sql_query_file(null, "*", null, $sWhere);
+    $rsDadosClassificacao = $oDaoClaBens->sql_record($sSqlClassificacao);;
+    if ($oDaoClaBens->numrows > 0) {
+
+      $oDadosClassificacao  = db_utils::fieldsMemory($rsDadosClassificacao, 0);
+      $iCodigoClassificacao = $oDadosClassificacao->t64_codcla;
+      $sClassificacao       = $oDadosClassificacao->t64_class;
+    }  
+  }
+
+  $oEmpenhoFinanceiro = new EmpenhoFinanceiro($oParametros->iNumeroEmpenho);
+  $oContaCorrenteDetalhe = new ContaCorrenteDetalhe();
+  $oContaCorrenteDetalhe->setEmpenho($oEmpenhoFinanceiro);
+  $oContaCorrenteDetalhe->setDotacao($oEmpenhoFinanceiro->getDotacao());
+  $oRecurso = new Recurso($oEmpenhoFinanceiro->getDotacao()->getRecurso());
+  $oContaCorrenteDetalhe->setRecurso($oRecurso);
+  $oLancamentoAuxiliarEmLiquidacao = new LancamentoAuxiliarEmLiquidacaoMaterialPermanente();
+  $oLancamentoAuxiliarEmLiquidacao->setClassificacao(new BemClassificacao($iCodigoClassificacao));
+  $oLancamentoAuxiliarEmLiquidacao->setObservacaoHistorico($sObservacao);
+  $oLancamentoAuxiliarEmLiquidacao->setFavorecido($oEmpenhoFinanceiro->getFornecedor()->getCodigo());
+  $oLancamentoAuxiliarEmLiquidacao->setCodigoElemento($aItensEmpenho);
+  $oLancamentoAuxiliarEmLiquidacao->setNumeroEmpenho($oParametros->iNumeroEmpenho);
+  $oLancamentoAuxiliarEmLiquidacao->setCodigoDotacao($oEmpenhoFinanceiro->getDotacao()->getCodigo());
+  $oLancamentoAuxiliarEmLiquidacao->setCodigoNotaLiquidacao($iCodigoNotaLiquidacao);
+  $oLancamentoAuxiliarEmLiquidacao->setValorTotal($nValorNota);
+  $oLancamentoAuxiliarEmLiquidacao->setContaCorrenteDetalhe($oContaCorrenteDetalhe);
+  $oEventoContabil->executaLancamento($oLancamentoAuxiliarEmLiquidacao,$oDataEstorno);
+
+  return true;
+}
+
+function excluirBem($t52_bem) 
+{
+  global $clbensplaca, $clbensmaterialempempenho, $clbensdepreciacao, $clbensempnotaitem, $clbenslote, $clbensmater, $clhistbem, $clbenscedente, $clconlancambem, $clbens, $clbemfoto,$clhistbemocorrencia,$clbensdiv;
+  
+  $sqlerro = false;
+  $erro_msg = '';
+
+  $entidades = [
+      ['obj' => $clbensplaca, 'campo' => 't41_bem'],
+      ['obj' => $clbensmaterialempempenho, 'campo' => 't11_bensmaterial'],
+      ['obj' => $clbensdepreciacao, 'campo' => 't44_bens'],
+      ['obj' => $clbensempnotaitem, 'campo' => 'e136_bens'],
+      ['obj' => $clbenslote, 'campo' => 't43_bem'],
+      ['obj' => $clbensmater, 'campo' => 't53_codbem'],
+      ['obj' => $clhistbem, 'campo' => 't56_codbem'],
+      ['obj' => $clhistbemocorrencia, 'campo' => 't69_codbem'],
+      ['obj' => $clbensdiv, 'campo' => 't33_bem'],
+      ['obj' => $clbenscedente, 'campo' => 't09_bem'],
+      ['obj' => $clconlancambem, 'campo' => 'c110_bem'],
+      ['obj' => $clbens, 'campo' => 't52_bem'],
+      ['obj' => $clbemfoto, 'campo' => 't54_numbem']
+  ];
+
+  foreach ($entidades as $entidade) {
+      if (!$sqlerro) {
+          $entidade['obj']->excluir('', "{$entidade['campo']} = $t52_bem");
+          if ($entidade['obj']->erro_status == 0) {
+              $sqlerro = true;
+              $erro_msg = $entidade['obj']->erro_msg;
+          }
+      }
+  }
+
+  return ['erro' => $sqlerro, 'mensagem' => $erro_msg];
+}
+
+function inserirBensExcluidos($oDadosEmpnotaitem) 
+{
+  
+    $oBens  = db_utils::getDao("bens");
+    $sSql   = $oBens->sql_query_file(null, '*', null, "t52_bem = {$oDadosEmpnotaitem->t52_bem}");
+    $rsBens = $oBens->sql_record($sSql);
+   
+    if ($oBens->numrows > 0) {
+
+      $oResult = db_utils::fieldsMemory($rsBens, 0);
+  
+      $oDaoBensExcluidos                     = db_utils::getDao("bensexcluidos");
+      $oDaoBensExcluidos->t136_bens          = $oDadosEmpnotaitem->t52_bem;
+      $oDaoBensExcluidos->t136_empnotaitem   = $oDadosEmpnotaitem->iCodigoEmpNotaItem;
+      $oDaoBensExcluidos->t136_numcgm        = $oResult->t52_numcgm;
+      $oDaoBensExcluidos->t136_instit        = $oResult->t52_instit;
+      $oDaoBensExcluidos->t136_depart        = $oResult->t52_depart;
+      $oDaoBensExcluidos->t136_codcla        = $oResult->t52_codcla;
+      $oDaoBensExcluidos->t136_bensmarca     = $oResult->t52_bensmarca;
+      $oDaoBensExcluidos->t136_bensmodelo    = $oResult->t52_bensmodelo;
+      $oDaoBensExcluidos->t136_bensmedida    = $oResult->t52_bensmedida;
+      $oDaoBensExcluidos->t136_descr         = $oResult->t52_descr;
+      $oDaoBensExcluidos->t136_dtaqu         = $oResult->t52_dtaqu;
+      $oDaoBensExcluidos->t136_obs           = $oResult->t52_obs;
+      $oDaoBensExcluidos->t136_valaqu        = $oResult->t52_valaqu;
+      $oDaoBensExcluidos->t136_ident         = $oResult->t52_ident;
+
+      db_inicio_transacao();
+      $oDaoBensExcluidos->incluir(null);
+
+      if ($oDaoBensExcluidos->erro_status == 0) {
+        throw new \Exception($oDaoBensExcluidos->erro_msg);
+        $sqlerro = true;
+      }
+  
+      db_fim_transacao($sqlerro);
+    }  
+
+}
+
 ?>

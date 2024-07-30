@@ -149,7 +149,7 @@ $sheet->setCellValue('O6','Produto');
 
 
 $sheet->getStyle('A6:O6')->applyFromArray($styleItens2);
-$objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(10); 
+$objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(10);
 $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(17);
 $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(17);
 $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(50);
@@ -163,11 +163,11 @@ $objPHPExcel->getActiveSheet()->getColumnDimension('M')->setWidth(17);
 $objPHPExcel->getActiveSheet()->getColumnDimension('G')->setWidth(60);
 $objPHPExcel->getActiveSheet()->getColumnDimension('H')->setWidth(60);
 
-$objPHPExcel->getActiveSheet()->protectCells('A6:O6', 'php');
-$objPHPExcel->getActiveSheet()->getProtection()->setSheet(true); 
+$objPHPExcel->getActiveSheet()->protectCells('A6:O6', '1234');
+$objPHPExcel->getActiveSheet()->getProtection()->setSheet(true);
 
 $sheet->getStyle('A7:O1000')->applyFromArray($styleItens);
-$sheet->getStyle('A7:O1000')->getProtection()->setLocked(PHPExcel_Style_Protection::PROTECTION_UNPROTECTED);    
+$sheet->getStyle('A7:O1000')->getProtection()->setLocked(PHPExcel_Style_Protection::PROTECTION_UNPROTECTED);
 $objPHPExcel->getActiveSheet()->getStyle("B1:B1000")->getNumberFormat()->setFormatCode( PHPExcel_Style_NumberFormat::FORMAT_TEXT );
 
 

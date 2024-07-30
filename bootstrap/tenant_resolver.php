@@ -8,7 +8,7 @@ function resolveTenantDatabase()
 {
 
     if (php_sapi_name() === 'cli') {
-        return;
+        return env('DB_DATABASE', 'forge');
     }
 
     $host   = str_replace('-', '', $_SERVER['HTTP_HOST']);

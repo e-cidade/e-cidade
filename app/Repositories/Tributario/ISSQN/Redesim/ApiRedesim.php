@@ -31,7 +31,7 @@ class ApiRedesim implements IRedesimApi {
 
     /**
      * @param IFilters|null $filters
-     * @return RedesimApiResponse[] | string[]
+     * @return RedesimApiResponse[] | string[] | null
      * @throws BusinessException
      * @throws GuzzleException
      */
@@ -48,11 +48,13 @@ class ApiRedesim implements IRedesimApi {
         $options = $this->createHttpClientOption();
         try {
             $apiResponse = \GuzzleHttp\json_decode($this->client->send($request, $options)->getBody());
-
             if(isset($apiResponse->errorRest)) {
                 throw new \Exception($apiResponse->errorRest->message);
             }
 
+            if (!isset($apiResponse->listaObj)) {
+                return [];
+            }
             /**
              * @var RedesimApiResponse[] | string[] $response
              */

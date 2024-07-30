@@ -31,7 +31,7 @@ class EnviaLicitacaoPcp implements EnviaLicitacaoPcpInterface
 
             return [
                 'success' => 2,
-                'message' => "Erro: ". $resultado->message ,
+                'message' => "Erro: ". $resultado->mensagem ,
             ];
         }
     }

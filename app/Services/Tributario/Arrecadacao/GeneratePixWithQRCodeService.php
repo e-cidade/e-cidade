@@ -21,9 +21,9 @@ class GeneratePixWithQRCodeService
         $response = $provider->generatePixArrecadacaoQrCodes($data);
         RecibopagaQrcodePix::create(
             [
-                'k176_numnov' => $data['k00_numnov'],
-                'k176_numpre' => $data['k00_numpre'],
-                'k176_numpar' => $data['k00_numpar'],
+                'k176_numnov' => $data['k00_numnov'] ?? null,
+                'k176_numpre' => $data['k00_numpre'] ?? null,
+                'k176_numpar' => $data['k00_numpar'] ?? null,
                 'k176_dtcriacao' => (new DateTime($response->timestampCriacaoSolicitacao))->format('Y-m-d'),
                 'k176_qrcode' => $response->qrCode,
                 'k176_hist' => json_encode($response),

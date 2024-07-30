@@ -12,7 +12,6 @@ class Ativid extends LegacyModel
     use LegacyAccount;
 
     public $timestamps = false;
-    public $incrementing = false;
 
     protected $table = 'issqn.ativid';
 

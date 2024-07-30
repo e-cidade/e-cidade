@@ -51,11 +51,6 @@ switch ($oParam->exec) {
             $l202_dataAdjudicacao = DateTime::createFromFormat('d/m/Y', $data);
 
 
-            //Verifica se os fornecedores vencedores estÃo habilitados
-            if (!$clhomologacaoadjudica->validaFornecedoresHabilitados($l202_licitacao)) {
-                throw new Exception("Procedimento abortado. Verifique os fornecedores habilitados.");
-            }
-
             //Verifica data de julgamento da licitação
             if ($dataJulgamentoLicitacao > $l202_dataAdjudicacao) {
                 throw new Exception("Data de Julgamento maior que a Data de Adjudicação");
@@ -475,7 +470,6 @@ switch ($oParam->exec) {
 
             $clhomologacaoadjudica = new cl_homologacaoadjudica();
             $clhomologacaoadjudica->validacaoItensComFornecedorIgual($oParam->iLicitacao, 2, null, $oParam->sCodigoItens);
-
             $clliclicita           = new cl_liclicita();
             $cllicitemobra         = new cl_licitemobra();
             $clparecerlicitacao    = new cl_parecerlicitacao();
@@ -485,6 +479,24 @@ switch ($oParam->exec) {
             $clitenshomologacao    = new cl_itenshomologacao();
             $clliccomissaocgm      = new cl_liccomissaocgm();
             $clsituacaoitemlic     = new cl_situacaoitemlic();
+
+             /**
+             * verificação se todos os forncedores estão habilitados.
+             */
+            $retornoValidacaoFornecedoresHabilitados = $clhomologacaoadjudica->validacaoFornecedoresInabilitados($oParam->iLicitacao,$oParam->sCodigoFornecedores,"homologacao");
+            $oRetorno->exibirhabilitacaofornecedores = false;
+            if ($retornoValidacaoFornecedoresHabilitados !== true) {
+                $oRetorno->exibirhabilitacaofornecedores = true;
+                throw new Exception($retornoValidacaoFornecedoresHabilitados);
+            }
+
+            /**
+             * verificação data de habilitação do fornecedor.
+             */
+            $retornoValidacaoDataHabilitacao = $clhomologacaoadjudica->validacaoDataHabilitacao($oParam->iLicitacao, date('Y-m-d', strtotime(str_replace('/', '-', $oParam->dtHomologacao))),$oParam->sCodigoFornecedores,"homologacao");
+            if ($retornoValidacaoDataHabilitacao !== true) {
+                throw new Exception($retornoValidacaoDataHabilitacao);
+            }
 
             $l202_licitacao = $oParam->iLicitacao;
             $rsDataJulg = $clhomologacaoadjudica->verificadatajulgamento($l202_licitacao);
@@ -511,12 +523,6 @@ switch ($oParam->exec) {
              * VALIDAÇÃO COM EDITAL
              */
             $l20_cadinicial  = db_utils::fieldsMemory($result, 0)->l20_cadinicial;
-
-
-            //Verifica se os fornecedores vencedores estÃo habilitados
-            if (!$clhomologacaoadjudica->validaFornecedoresHabilitados($l202_licitacao)) {
-                throw new Exception("Procedimento abortado. Verifique os fornecedores habilitados.");
-            }
 
             //Verifica data de julgamento da licitação
             if ($l202_datahomologacao < $dataJulgamentoLicitacao) {
@@ -791,9 +797,23 @@ switch ($oParam->exec) {
         $ac16_sequencial = db_utils::fieldsMemory($result, 0)->ac16_sequencial;
 
         try {
-            //Verifica se os fornecedores vencedores estÃo habilitados
-            if (!$clhomologacaoadjudica->validaFornecedoresHabilitados($l202_licitacao)) {
-                throw new Exception("Procedimento abortado. Verifique os fornecedores habilitados.");
+
+            /**
+             * verificação se todos os forncedores estão habilitados.
+             */
+            $retornoValidacaoFornecedoresHabilitados = $clhomologacaoadjudica->validacaoFornecedoresInabilitados($oParam->iLicitacao,$oParam->sCodigoFornecedores,"homologacao");
+            $oRetorno->exibirhabilitacaofornecedores = false;
+            if ($retornoValidacaoFornecedoresHabilitados !== true) {
+                $oRetorno->exibirhabilitacaofornecedores = true;
+                throw new Exception($retornoValidacaoFornecedoresHabilitados);
+            }
+
+            /**
+             * verificação data de habilitação do fornecedor.
+             */
+            $retornoValidacaoDataHabilitacao = $clhomologacaoadjudica->validacaoDataHabilitacao($oParam->iLicitacao, date('Y-m-d', strtotime(str_replace('/', '-', $oParam->dtHomologacao))),$oParam->sCodigoFornecedores,"homologacao");
+            if ($retornoValidacaoDataHabilitacao !== true) {
+                throw new Exception($retornoValidacaoDataHabilitacao);
             }
 
             //Verifica data de julgamento da licitação

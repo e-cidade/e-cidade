@@ -640,6 +640,7 @@ function query_empenhos_total($conta, $data_inicial, $data_final, $data_implanta
     $sql .= "     {$condicao_implantacao} ";
     $sql .= "     OR (k172_dataconciliacao > '{$data_final}' AND corrente.k12_data <= '{$data_final}' )) ";
     $sql .= " AND c69_sequen IS NOT NULL ";
+    $sql .= " AND k105_corgrupotipo != 2 ";
     $sql .= " AND corrente.k12_instit = " . db_getsession("DB_instit");
     $sql .= " AND " . condicao_retencao();
 
@@ -804,7 +805,7 @@ function query_padrao_planilha($conta, $condicao) {
     $sql .= "            corrente.k12_conta as conta, ";
     $sql .= "            corrente.k12_data as data, ";
     $sql .= "            CASE ";
-    $sql .= "                WHEN conlancamdoc.c71_coddoc = 100 OR conlancamdoc.c71_coddoc = 115 THEN c70_valor ";
+    $sql .= "                WHEN conlancamdoc.c71_coddoc = 100 OR conlancamdoc.c71_coddoc = 115 OR conlancamdoc.c71_coddoc = 129 THEN c70_valor ";
     $sql .= "                ELSE -1 * c70_valor ";
     $sql .= "            END as valor_debito, ";
     $sql .= "            0 valor_credito, ";

@@ -217,9 +217,24 @@ if (isset($bAtestoContInt) && $bAtestoContInt == 1) {
                 list($e54_anulad_dia,$e54_anulad_mes,$e54_anulad_ano)= explode('[/.-]',$e54_anulad);
                 $datae54_anulad = $e54_anulad_dia+'/'+$e54_anulad_mes+'/'+$e54_anulad_ano;
             }
-            db_input('e54_anulad',$datae54_anulad,true,'text',3);
+            db_input('e54_anulad',8,$datae54_anulad,true,'text',3);
             ?> </td>
 
+    </tr>
+    <tr>
+        <td align="right" nowrap><?=$Le54_datainclusao?></td>
+        <td align="left" nowrap>
+            <? 
+            $dataInclusao = date('d/m/Y', strtotime($e54_datainclusao));
+            db_input('dataInclusao',8,"",true,'text',3);
+            ?> 
+        </td>
+        <td align="left" nowrap><strong>Hora Inclusão</strong>
+            <?
+            $horaInclusao = date('H:i', strtotime($e54_datainclusao));
+            db_input('horaInclusao',8,"",true,'text',3);
+            ?> 
+        </td>
     </tr>
     <tr>
         <td align="right" nowrap><?=$Lcoddepto?></td>

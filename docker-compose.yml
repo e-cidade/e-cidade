@@ -40,6 +40,7 @@ services:
         POSTGRES_INITDB_ARGS: '--encoding=LATIN1 --lc-collate=pt_BR.ISO-8859-1 --lc-ctype=pt_BR.ISO-8859-1 --lc-messages=pt_BR.ISO-8859-1 --lc-monetary=pt_BR.ISO-8859-1 --lc-numeric=pt_BR.ISO-8859-1 --lc-time=pt_BR.ISO-8859-1'
       volumes:
         - ./docker/scripts/iniciarbd.sql:/docker-entrypoint-initdb.d/iniciarbd.sql
+        - './docker/bd/pgsql:/var/lib/postgresql/data'
       networks:
         - ecidade
       healthcheck:

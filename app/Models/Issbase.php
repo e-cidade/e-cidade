@@ -88,4 +88,17 @@ class Issbase extends LegacyModel
             ->where('q02_inscr', $this->q02_inscr)
             ->exists();
     }
+
+    protected function finishSave(array $options)
+    {
+        $this->updateIssbaseNumeracao();
+        parent::finishSave($options);
+    }
+
+    private function updateIssbaseNumeracao(): void
+    {
+        $lastSequence = $this->newQuery()->max('q02_inscr');
+        IssbaseNumeracao::query()
+            ->updateOrCreate(['q133_sequencial' => 1], ['q133_numeracaoatual' => $lastSequence]);
+    }
 }

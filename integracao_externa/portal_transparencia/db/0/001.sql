@@ -102,6 +102,8 @@ CREATE TABLE empenhos_movimentacoes (
                 data DATE NOT NULL,
                 valor NUMERIC(15,2) DEFAULT 0 NOT NULL,
                 historico TEXT,
+                codord INTEGER,
+                codnota INTEGER,
                 CONSTRAINT empenhos_movimentacoes_id_pk PRIMARY KEY (id)
 );
 COMMENT ON TABLE empenhos_movimentacoes IS 'Cadastro de Movimentações Financeiras do Empenho';
@@ -111,6 +113,8 @@ COMMENT ON COLUMN empenhos_movimentacoes.empenho_id IS 'Código do Empenho da Mo
 COMMENT ON COLUMN empenhos_movimentacoes.data IS 'Data da Movimentação Financeira do Empenho';
 COMMENT ON COLUMN empenhos_movimentacoes.valor IS 'Valor da Movimentação Financeira do Empenho';
 COMMENT ON COLUMN empenhos_movimentacoes.historico IS 'Histórico da Movimentação Financeira do Empenho';
+COMMENT ON COLUMN empenhos_movimentacoes.codord IS 'Código da OP';
+COMMENT ON COLUMN empenhos_movimentacoes.codnota IS 'Código da Nota';
 
 
 ALTER SEQUENCE empenhos_movimentacoes_id_seq OWNED BY empenhos_movimentacoes.id;

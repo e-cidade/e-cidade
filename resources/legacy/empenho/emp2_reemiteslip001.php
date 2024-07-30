@@ -25,7 +25,7 @@
  *                                licenca/licenca_pt.txt
  */
 
-require("libs/db_stdlib.php");
+require_once(modification("libs/db_stdlib.php"));
 require("libs/db_conecta.php");
 include("libs/db_sessoes.php");
 include("libs/db_usuariosonline.php");
@@ -35,6 +35,8 @@ $aux = new cl_arquivo_auxiliar;
 $clrotulo = new rotulocampo;
 $clrotulo->label("k17_codigo");
 db_postmemory($HTTP_POST_VARS);
+require_once("model/protocolo/AssinaturaDigital.model.php");
+$oAssintaraDigital = new AssinaturaDigital();
 ?>
 <html>
 <head>
@@ -104,6 +106,11 @@ db_postmemory($HTTP_POST_VARS);
                             <tr>
                                 <td colspan="4" align="center">
                                     <input name="relatorio" type="button" onclick='js_abre();' value="Imprimir">
+                                    <?php
+                                    if ($oAssintaraDigital->verificaAssituraAtiva()) {
+                                        echo "<input name='imprimirassinado' type='button' value='Imprimir Com Assinatura Digital' onclick='js_solicitarImpressaoComAssinatura();'>";
+                                    }
+                                    ?>
                                 </td>
                             </tr>
                         </table>
@@ -222,12 +229,26 @@ db_postmemory($HTTP_POST_VARS);
         }
 
         if (!error) {
-            jan = window.open('cai1_slip003.php?' + query, '', 'width=' + (screen.availWidth - 5) + ', height=' + (screen.availHeight - 40) +', scrollbars=1,location=0');
+            jan = window.open('cai1_slip003.php?' + query + '&assinar=false', '', 'width=' + (screen.availWidth - 5) + ', height=' + (screen.availHeight - 40) +', scrollbars=1,location=0');
             jan.moveTo(0,0);
             k17_codigo_de.style.backgroundColor = '';
         }
     }
     //--------------------------------
+    function js_solicitarImpressaoComAssinatura() {
+        obj = document.form1;
+        if (obj.k17_codigo_de.value == '') {
+            alert("Selecione um SLIP!");
+            return;
+        }
+        var oParametros = new Object();
+        oParametros.k17_codigo_de = obj.k17_codigo_de.value;
+        oParametros.method = 'post';
+        oParametros.sExecuta = 'imprimirDocumentoAssinadoSlip';
+        window.open('con1_assinaturaDigitalDocumentos.RPC.php?json=' + encodeURIComponent(JSON.stringify(oParametros)), "_blank");
+
+
+    }
 </script>
 </body>
 </html>

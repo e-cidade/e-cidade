@@ -100,6 +100,7 @@ $clrotulo->label("t70_descr");
 $clrotulo->label("pc01_descrmater");
 $clrotulo->label("z01_nome");
 $clrotulo->label("descrdepto");
+$clrotulo->label("e60_numemp");
 
 $oDataAtual   = new DBDate(date("d/m/Y", db_getsession("DB_datausu")));
 $oInstituicao = new Instituicao(db_getsession("DB_instit"));
@@ -419,6 +420,46 @@ $integracao = ParametroIntegracaoPatrimonial::possuiIntegracaoPatrimonio($oDataA
         </tr>
       </table>
     </fieldset>
+    <fieldset id="dadosdomaterial">
+	      <legend class="bold" onclick="js_mostraToogleDadosMaterial();">Dados do Material</legend>
+	      <table>
+	        <tr>
+	          <td><b>Nota Fiscal:</b></td>
+	          <td><? db_input('cod_notafiscal', 43, $It53_ntfisc,true, 'text', 3, '') ?></td>
+	        </tr>
+	        <tr>
+	          <td><b>Empenho do Sistema</b></td>
+	          <td>
+              <?php
+                $aEmp_sistema = array('s' => 'SIM', 'n' => 'NÃO');
+                db_select("emp_sistema", $aEmp_sistema, true, 3, " ", "", "", "0", "");
+                ?>
+            </td>
+	        </tr>
+	        <tr>
+	          <td><b>
+	            <span id="procAdm"><? db_ancora(@$Le60_numemp,"js_pesquisaEmpenho(true);",3) ?></span>
+	            <span id="procAdm1" style="display:none;"><?php echo @$Le60_numemp?>:</span>
+	          </b></td>
+	          <td>
+	            <?
+                db_input('t53_empen', 10, $It53_empen, true, 'text', 3, "");
+              ?>
+              <span id="campoDescricao">
+                <?db_input('z01_nome_empenho',30,$Iz01_nome,true,'text',3,""); ?>
+              </span>
+	          </td>
+	        </tr>
+	        <tr>
+	          <td><b>Ordem de compra:</b></td>
+	          <td><? db_input('cod_ordemdecompra', 10, '', true, 'text', 3, "") ?></td>
+	        </tr>
+	        <tr>
+	          <td><b>Garantia:</b></td>
+	          <td><? db_inputdata('garantia', '', '', '', true, 'text', $db_opcao, ""); ?></td>
+	        </tr>
+	      </table>
+	  </fieldset>
     <fieldset id='observacoes'>
       <legend class='bold'>Observações</legend>
       <?php
@@ -1086,6 +1127,12 @@ $integracao = ParametroIntegracaoPatrimonial::possuiIntegracaoPatrimonio($oDataA
     oObject.t66_sequencial = $F("t66_sequencial");
     oObject.t65_sequencial = $F("t65_sequencial");
     oObject.iCodigoItemNota = $F("iCodigoItemNota");
+    oObject.cod_notafiscal    = $F("cod_notafiscal");
+    oObject.cod_ordemdecompra = $F("cod_ordemdecompra");
+    oObject.emp_sistema       = $F("emp_sistema_select_descr");
+    oObject.t53_empen         = $F("t53_empen");
+    oObject.z01_nome_empenho  = $F("z01_nome_empenho");
+    oObject.garantia          = $F("garantia");
     oObject.contabilizado = encodeURIComponent(tagString($F("contabilizado")));
  
     oObject.obser = encodeURIComponent(tagString($F("obser")));
@@ -1143,7 +1190,7 @@ $integracao = ParametroIntegracaoPatrimonial::possuiIntegracaoPatrimonio($oDataA
         parent.mo_camada('bensimoveis');
 
       } else {
-        parent.mo_camada('bensmater');
+        parent.mo_camada('bensfotos');
 
       }
 
@@ -1408,12 +1455,14 @@ $integracao = ParametroIntegracaoPatrimonial::possuiIntegracaoPatrimonio($oDataA
   // Configura Form
   var oOutrosDados = new DBToogle($('outros-dados'), true);
   var oObservacoes = new DBToogle($('observacoes'), true);
+  var oObservacoes = new DBToogle($('dadosdomaterial'), true);
   $("t67_sequencial").style.width = "50px";
   $("t66_sequencial").style.width = "50px";
   $("t65_sequencial").style.width = "50px";
   $("t67_sequencialdescr").style.width = "150px";
   $("t66_sequencialdescr").style.width = "150px";
   $("t65_sequencialdescr").style.width = "150px";
+  $("emp_sistema_select_descr").style.width = "83px";
 
   function statusAPI(statusbens)
   {
@@ -1429,5 +1478,14 @@ $integracao = ParametroIntegracaoPatrimonial::possuiIntegracaoPatrimonio($oDataA
     } 
    
 
+  }
+
+  function js_mostraToogleDadosMaterial() 
+  {
+
+    if (oDadosImovel.isDisplayed()) {
+
+      oDadosImovel.show(false);
+    }
   }
 </script>

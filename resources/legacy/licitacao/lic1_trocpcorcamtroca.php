@@ -392,7 +392,7 @@ LEFT JOIN pcorcamjulg ON pcorcamjulg.pc24_orcamitem = pcorcamitemlic.pc26_orcami
 AND pcorcamjulg.pc24_orcamforne = pcorcamforne.pc21_orcamforne
 WHERE $sWhereJulgamento
 ORDER BY $ordem";
-//    die($sSqlJulgamento);
+    //die($sSqlJulgamento);
         $res_liclicitemlote = $clliclicitemlote->sql_record($sSqlJulgamento);
         if ($clliclicitemlote->numrows > 0){
 

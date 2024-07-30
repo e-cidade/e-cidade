@@ -81,9 +81,9 @@ class UpdateOrCreateCompanyActivityService
             }
 
             $this->tabativ->newQuery()->updateOrCreate(
-                ['q07_inscr' => $inscricaoRedesim->issbase->q02_inscr, 'q07_ativ' => $ativid->q03_ativ],
+                ['q07_inscr' => $inscricaoRedesim->issbase->q02_inscr, 'q07_seq' => $sequence],
                 [
-                    'q07_seq' => $sequence,
+                    'q07_ativ' => $ativid->q03_ativ,
                     'q07_datain' => $atividade->atividade->inclusao->format('Y-m-d'),
                     'q07_datafi' => $data->getDateEncerramentoEcidade(),
                 ],

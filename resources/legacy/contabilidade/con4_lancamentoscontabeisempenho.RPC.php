@@ -94,17 +94,21 @@ switch ($oParam->exec) {
       $aDatas = diff_data($sDataAnterior, $sDataAtual);
       if (count($aDatas) <= 11) {
 
-        $oRetorno->aviso  = "Antes de confirmar esta operação, é recomendável consulta ao Responsável pela ";
-        $oRetorno->aviso .= "Contabilidade, pois pode haver reflexos no encerramento do bimestre para fins de ";
-        $oRetorno->aviso .= "fechamento do SIAPC/PAD";
+        $oRetorno->aviso  = "Antes de confirmar esta operação, é recomendável consultar o responsável pela ";
+        $oRetorno->aviso .= "Contabilidade, pois pode haver reflexos no SICOM.";
+
         $oRetorno->aviso  = urlencode($oRetorno->aviso);
       }
 
     }
     $oEmpenho = new empenho();
     $oEmpenho->setEmpenho($oParam->iNumEmp);
-    $oRetorno->itens = $oEmpenho->getLancamentosContabeis();
-    break;
+      if ($oParam->anlEmp){
+          $oRetorno->itens = $oEmpenho->getLancamentosContabeis(" c53_tipo = 11 ");
+      } else {
+          $oRetorno->itens = $oEmpenho->getLancamentosContabeis();
+      }
+      break;
 
   case 'alterarLancamento' :
 
@@ -114,7 +118,7 @@ switch ($oParam->exec) {
     try {
 
       db_inicio_transacao();
-      $oEmpenho->alterarDataLancamento($oParam->iCodigo, $oParam->dtData);
+      $oEmpenho->alterarDataLancamento($oParam->iCodigo, $oParam->dtData, $oParam->anlEmp ?? null);
       db_fim_transacao(false);
 
     } catch (Exception $eErro) {
@@ -154,7 +158,7 @@ switch ($oParam->exec) {
       try {
 
         db_inicio_transacao();
-        $oEmpenho->excluirLancamento($oParam->iCodigo);
+        $oEmpenho->excluirLancamento($oParam->iCodigo, $oParam->anlEmp ?? null);
         db_fim_transacao(false);
 
       } catch (Exception $eErro) {

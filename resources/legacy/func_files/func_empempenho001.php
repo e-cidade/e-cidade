@@ -25,10 +25,10 @@
  *                                licenca/licenca_pt.txt
  */
 
-require_once("libs/db_stdlib.php");
-require_once('libs/db_utils.php');
-require_once("libs/db_conecta.php");
-require_once("libs/db_sessoes.php");
+require_once(modification("libs/db_stdlib.php"));
+require_once(modification('libs/db_utils.php'));
+require_once(modification("libs/db_conecta.php"));
+require_once(modification("libs/db_sessoes.php"));
 require_once("libs/db_usuariosonline.php");
 require_once("dbforms/db_funcoes.php");
 require_once("model/Dotacao.model.php");
@@ -46,9 +46,12 @@ require_once("classes/db_empempitem_classe.php");
 require_once("classes/db_empempenhonl_classe.php");
 require_once('classes/db_empresto_classe.php');
 require_once("dbforms/verticalTab.widget.php");
+require_once("model/protocolo/AssinaturaDigital.model.php");
 
 db_postmemory($HTTP_POST_VARS);
 parse_str($HTTP_SERVER_VARS["QUERY_STRING"]);
+
+$oAssinaturaDigital = new AssinaturaDigital();
 
 $clempempenho   = new cl_empempenho;
 $clempempenhonl = new cl_empempenhonl;
@@ -210,11 +213,18 @@ if (isset($e60_numemp) and $e60_numemp != "") {
 
                 <td nowrap="nowrap" class='valores'>
                     <?
+                    if($e60_id_documento_assinado){
+                     echo "<a href=".$oAssinaturaDigital->getUrlBaseUrlFile().$oAssinaturaDigital->getUrlArquivo().$e60_id_documento_assinado." target='_blank' >";
+                    }
                     echo "{$e60_codemp}/{$e60_anousu}";
                     if ($e60_anousu != db_getsession("DB_anousu")) {
                         echo $sRestos;
                     }
+                    if($e60_id_documento_assinado) {
+                        echo "</a>";
+                    }
                     ?>
+
                 </td>
 
                 <?  //-----------  dotacão

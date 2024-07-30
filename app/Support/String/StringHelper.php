@@ -2,6 +2,8 @@
 
 namespace App\Support\String;
 
+use DateTime;
+
 class StringHelper
 {
     public static function removeAccent(string $string): string
@@ -60,6 +62,9 @@ class StringHelper
             case "object":
 
                 foreach ($entrada as $chave => $valor) {
+                    if($entrada->{$chave} instanceof DateTime) {
+                        $entrada->{$chave} = $entrada->{$chave}->format('Y-m-d H:i');
+                    }
                     $entrada->{$chave} = self::formatStringRecursive($valor, $callback);
                 }
                 break;

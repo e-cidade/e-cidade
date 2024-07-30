@@ -201,7 +201,7 @@ $db_opcao_inf=1;
   </td>
   </tr>
   <tr>
-  <td colspan="2"> 
+  <td colspan="2">
  <fieldset id='esocial'><legend><b>eSocial</b></legend>
  <table >
  <tr>
@@ -210,10 +210,10 @@ $db_opcao_inf=1;
                 <td colspan="4">
                 <?
                   $aIncide = array('1'=>'Sim', '2'=>'Não');
-                  db_select('aIncide', $aIncide, true, 1, "onchange='mensagemesocial()'"); 
+                  db_select('aIncide', $aIncide, true, 1, "onchange='mensagemesocial()'");
                 ?>
                 </td>
-        </tr>     
+        </tr>
         <tr>
                   <td id='cattrab'><?=db_ancora('<b>Categoria do Trabalhador:</b>',"js_pesquisaCatTrabalhador(true)",1)?></td>
                   <td id='cattrab1'><? db_input('ct01_codcategoria', 15, $Ict01_codcategoria, true, 'text', 1,"onchange='js_pesquisaCatTrabalhador(false)'"); ?> </td>
@@ -225,10 +225,10 @@ $db_opcao_inf=1;
                 <td colspan="4">
                 <?
                   $multiplosvinculos = array(''=>'Selecione','1'=>'Sim', '2'=>'Não');
-                  db_select('multiplosvinculos', $multiplosvinculos, true, 1, "onchange='validarVinculos()'"); 
+                  db_select('multiplosvinculos', $multiplosvinculos, true, 1, "onchange='validarVinculos()'");
                 ?>
                 </td>
-        </tr>    
+        </tr>
 
         <tr>
                 <td id='idcontri'>
@@ -239,7 +239,7 @@ $db_opcao_inf=1;
                   '2'=>'2 - O declarante aplica a alíquota de desconto do segurado sobre a diferença entre o limite máximo do salário de contribuição e a remuneração de outra empresa para as quais o trabalhador informou que houve o desconto',
                   '3'=>'3 - O declarante não realiza desconto do segurado, uma vez que houve desconto sobre o limite máximo de salário de contribuição em outra empresa',
                   );
-                  db_select('contribuicaoPrev', $aContribuicao, true, 1, ""); 
+                  db_select('contribuicaoPrev', $aContribuicao, true, 1, "");
                 ?>
                 </td>
         </tr>
@@ -275,14 +275,14 @@ $db_opcao_inf=1;
                   </td>
                   <td id='idcompetencia2'>
                     <?
-                      db_inputdata('competencia',@$ac10_datamovimento_dia, 
-                                                        @$ac10_datamovimento_mes, 
+                      db_inputdata('competencia',@$ac10_datamovimento_dia,
+                                                        @$ac10_datamovimento_mes,
                                                         @$ac10_datamovimento_ano, true, 'text', $db_opcao, 'style="width: 99px"');
                     ?>
                   </td>
                   <td>&nbsp;</td>
-        </tr>                
-  </table>      
+        </tr>
+  </table>
  </fieldset>
  <tr>
   <td colspan="2">
@@ -330,14 +330,14 @@ $db_opcao_inf=1;
    <table width="100%">
         <tr>
           <td id='opcredito' style='display:none'>
-          <?        
-          db_textarea('informacaoop',4,128,0,true,'text',1,"");       
+          <?
+          db_textarea('informacaoop',4,128,0,true,'text',1,"");
           ?>
           </td>
           <tr >
           <td id='ophisotrico' style='display:none'>
           <?
-          db_textarea('historico',4,128,0,true,'',1,"" );         
+          db_textarea('historico',4,128,0,true,'',1,"" );
           ?>
           </td>
         </tr>
@@ -385,11 +385,11 @@ function casasdecimais(escolha){
           document.form1.valorremuneracao.value = document.form1.valorremuneracao.value.substring(0, valorremuneracao)+virgula.substring(0,3);
          }if(escolha == '2' && valordesconto > 0){
           var virgula = document.form1.valordesconto.value.substring(valordesconto + 0);
-          document.form1.valordesconto.value = document.form1.valordesconto.value.substring(0, valordesconto)+virgula.substring(0,3);              
-         }                     
+          document.form1.valordesconto.value = document.form1.valordesconto.value.substring(0, valordesconto)+virgula.substring(0,3);
+         }
 }
 
-function validarVinculos(){ 
+function validarVinculos(){
   if(document.form1.multiplosvinculos.value == '1'){
       document.getElementById('idcontri').style.display = "table-cell";
       document.getElementById('contribuicaoPrev').style.display = "table-cell";
@@ -431,7 +431,7 @@ function validarVinculos(){
       document.form1.contribuicaoPrev.value= '';
   }
 }
-                
+
 function mensagemesocial(){
   if(document.form1.aIncide.value == '2'){
     var r=confirm("Tem certeza de que não há incidência de contribuição previdenciária para este prestador? ");
@@ -455,7 +455,7 @@ function mensagemesocial(){
       document.getElementById('vlrremuneracao').style.display = "none";
       document.getElementById('vlrremuneracao1').style.display = "none";
       document.getElementById('vlrdesconto').style.display = "none";
-      document.getElementById('vlrdesconto1').style.display = "none";      
+      document.getElementById('vlrdesconto1').style.display = "none";
       document.getElementById('multiplosvinculos').style.display = "none";
       document.getElementById('idvinculos').style.display = "none";
       document.form1.numempresa.value = '';
@@ -507,7 +507,7 @@ function mensagemesocial(){
       document.getElementById('vlrdesconto1').style.display = "none";
       document.getElementById('idcontri').style.display = "none";
       document.getElementById('contribuicaoPrev').style.display = "none";
-         
+
 function js_marca(){
 
 	 obj = document.getElementById('mtodos');
@@ -554,12 +554,12 @@ function js_consultaEmpenho(iEmpenho,operacao){
 /* Extensão CotaMensalLiquidacao - pt 3 */
 
  /**
-  * Preenche o formulário com os dados do empenho   
+  * Preenche o formulário com os dados do empenho
   */
   var opcaoReinf = 0
-function js_saida(oAjax){  
+function js_saida(oAjax){
    document.form1.reset();
-   js_removeObj("msgBox"); 
+   js_removeObj("msgBox");
 
     var iNumEmpOld = $F('e60_numemp');
     obj  = eval("("+oAjax.responseText+")");
@@ -578,12 +578,12 @@ function js_saida(oAjax){
     $('e60_vlranu').value = obj.e60_vlranu;
     $('e60_vlrpag').value = obj.e60_vlrpag;
     $('e60_vlrliq').value = obj.e60_vlrliq;
-    $('informacaoop').value  = obj.e60_informacaoop.urlDecode(); 
-       
+    $('informacaoop').value  = obj.e60_informacaoop.urlDecode();
+
     if(obj.e60_informacaoop){
       $('historico').value  = obj.e60_informacaoop.urlDecode();}
     else{
-      $('historico').value  = obj.e60_resumo.urlDecode();   
+      $('historico').value  = obj.e60_resumo.urlDecode();
     }
     $('saldo_disp').value = obj.saldo_dis;
     $('sEstrutElemento').value = obj.sEstrutural;
@@ -593,7 +593,7 @@ function js_saida(oAjax){
     estrutural            = obj.sEstrutural;
     desdobramento         = obj.sDesdobramento;
     obrigaDiaria          = obj.obrigaDiaria == 't' ? true : false;
-    $('e50_compdesp').value = ''; 
+    $('e50_compdesp').value = '';
     $('e83_conta').value    = '';
     $('e83_descr').value    = '';
     $('e83_codtipo').value  = '';
@@ -613,18 +613,18 @@ function js_saida(oAjax){
       document.getElementById('ophisotrico').style.display = "table-cell";
     }
     var db_opcao = "<?php print $op; ?>";
-   
-    if(db_opcao != '3' && obj.Tipofornec == 'cpf'  &&  !(desdobramento.substr(0, 3) == '331' || desdobramento.substr(0, 3) == '345' 
-                                                      || desdobramento.substr(0, 3) == '346' || desdobramento.substr(0, 7) == '3339018' 
-                                                      || desdobramento.substr(0, 7) == '3339019' || desdobramento.substr(0, 7) == '3339014' 
-                                                      || desdobramento.substr(0, 7) == '3339008' || desdobramento.substr(0, 7) == '3339059' 
+
+    if(db_opcao != '3' && obj.Tipofornec == 'cpf'  &&  !(desdobramento.substr(0, 3) == '331' || desdobramento.substr(0, 3) == '345'
+                                                      || desdobramento.substr(0, 3) == '346' || desdobramento.substr(0, 7) == '3339018'
+                                                      || desdobramento.substr(0, 7) == '3339019' || desdobramento.substr(0, 7) == '3339014'
+                                                      || desdobramento.substr(0, 7) == '3339008' || desdobramento.substr(0, 7) == '3339059'
                                                       || desdobramento.substr(0, 7) == '3339046' || desdobramento.substr(0, 7) == '3339048'
-                                                      || desdobramento.substr(0, 7) == '3339049' || desdobramento == '333903602' 
-                                                      || desdobramento == '333903603' || desdobramento == '333903607' || desdobramento == '333903608' 
-                                                      || desdobramento == '333903609' || desdobramento == '333903614' || desdobramento == '333903640' 
+                                                      || desdobramento.substr(0, 7) == '3339049' || desdobramento == '333903602'
+                                                      || desdobramento == '333903603' || desdobramento == '333903607' || desdobramento == '333903608'
+                                                      || desdobramento == '333903609' || desdobramento == '333903614' || desdobramento == '333903640'
                                                       || desdobramento == '333903641')){
-      tipodesdobramento = 1;  
-      opcao = 1;                                 
+      tipodesdobramento = 1;
+      opcao = 1;
       document.getElementById('esocial').style.display = "table-cell";
     }else{
       document.getElementById('esocial').style.display = "none";
@@ -633,11 +633,11 @@ function js_saida(oAjax){
     }
     if(db_opcao != '3' && (obj.Tipofornec == 'cnpj' && !(desdobramento.substr(0, 3) == '331' || desdobramento.substr(0, 3) == '345' || desdobramento.substr(0, 3) == '346'
                                   || desdobramento.substr(0, 3) == '332' || desdobramento.substr(0, 7) == '3335041' || desdobramento.substr(0, 7) == '3333041'
-                                  || desdobramento.substr(0, 7) == '3337041' || desdobramento.substr(0, 7) == '3339008' || desdobramento.substr(0, 7) == '3339041' 
-                                  || desdobramento.substr(0, 7) == '3339043' || desdobramento.substr(0, 7) == '3339045' || desdobramento.substr(0, 7) == '3339046' 
-                                  || desdobramento.substr(0, 7) == '3339047' || desdobramento.substr(0, 7) == '3339048' || desdobramento.substr(0, 7) == '3339049' 
-                                  || desdobramento.substr(0, 7) == '3339059' || desdobramento.substr(0, 7) == '3339086' || desdobramento.substr(0, 5) == '33371' 
-                                  || desdobramento.substr(0, 5) == '34471' || desdobramento.substr(0, 7) == '3335043')) 
+                                  || desdobramento.substr(0, 7) == '3337041' || desdobramento.substr(0, 7) == '3339008' || desdobramento.substr(0, 7) == '3339041'
+                                  || desdobramento.substr(0, 7) == '3339043' || desdobramento.substr(0, 7) == '3339045' || desdobramento.substr(0, 7) == '3339046'
+                                  || desdobramento.substr(0, 7) == '3339047' || desdobramento.substr(0, 7) == '3339048' || desdobramento.substr(0, 7) == '3339049'
+                                  || desdobramento.substr(0, 7) == '3339059' || desdobramento.substr(0, 7) == '3339086' || desdobramento.substr(0, 5) == '33371'
+                                  || desdobramento.substr(0, 5) == '34471' || desdobramento.substr(0, 7) == '3335043'))
                                   || (obj.Tipofornec == 'cpf' && desdobramento == '333903614')){
       $('reinf').style.display = "table-cell";
       js_validarEstabelecimentos(true);
@@ -651,12 +651,12 @@ function js_saida(oAjax){
       $('reinf').style.display = "none";
       opcaoReinf = 3;
     }
-    
+
     const desdobramentoDiaria = desdobramento.substr(5, 2);
     if((desdobramentoDiaria == '14' || desdobramentoDiaria == '33') && obrigaDiaria == true && iOperacao === 1){
       $('diariaFieldset').style.display = "table-cell";
       $('diariaViajante').value = js_decodeUrl(obj.z01_nome);
-    
+
       let oParam        = new Object();
       oParam.exec     = 'consultaMatricula';
       oParam.iNumCgm    = obj.e60_numcgm;
@@ -682,9 +682,9 @@ function js_saida(oAjax){
 
       oDBViewNotasPendentes = new DBViewNotasPendentes('oDBViewNotasPendentes');
       oDBViewNotasPendentes.setCodigoNota(obj.aItensPendentesPatrimonio);
-  	  oDBViewNotasPendentes.show();  
+  	  oDBViewNotasPendentes.show();
     }
- 
+
     if (obj.numnotas > 0) {
 
       for (var i = 0; i < obj.data.length; i++) {
@@ -693,7 +693,7 @@ function js_saida(oAjax){
         if (obj.data[i].libera == 'disabled') {
           sClassName = ' disabled ';
         }
- 
+
         if (in_array(obj.data[i].e69_codnota, obj.aItensPendentesPatrimonio)) {
           sClassName = ' disabled ';
         }
@@ -737,7 +737,7 @@ function js_saida(oAjax){
           saida += " class='chkmarca' name='chk" + obj.data[i].e69_codnota + "'";
           saida += " id='chk" + obj.data[i].e69_codnota + "' value='" + obj.data[i].e69_codnota + "' "+sClassName+"></td>";
           saida += "<td class='linhagrid' style='text-align:center'>" + iCodOrd + "</td>";
-          
+
           saida += "<td class='linhagrid' style='text-align:center' id='numero"+obj.data[i].e69_codnota+"' >" +obj.data[i].m72_codordem + "</td>";
           saida += "<td class='linhagrid' style='text-align:center'><b>"
           saida += "<a href='' onclick='js_consultaNota("+obj.data[i].e69_codnota+");return false'>";
@@ -754,7 +754,7 @@ function js_saida(oAjax){
             saida += "   onclick='js_lancarRetencao("+obj.data[i].e69_codnota+",\""+iCodOrd+"\",\""+obj.data[i].e70_valor+"\");";
             saida += "return false;'>"+nValorRetencao+"</a>";
           } else {
-            saida += nValorRetencao; 
+            saida += nValorRetencao;
           }
           saida += "</td></tr>";
 
@@ -856,7 +856,7 @@ function js_liquidar(metodo){
         alert("Campo Categoria do trabalhador na qual houve a remuneração Obrigatorio")
         return false;
     }
-    
+
     if(!document.form1.valorremuneracao.value &&  opcao != '3' && (document.form1.contribuicaoPrev.value == '1' || document.form1.contribuicaoPrev.value == '2' || document.form1.contribuicaoPrev.value == '3') &&  obj.Tipofornec =='cpf' && tipodesdobramento == '1' ){
         alert("Campo Valor da Remuneração Obrigatorio")
         return false;
@@ -897,7 +897,7 @@ function js_liquidar(metodo){
   }
 
   const aNaturezasCnpj = ['10','19'];
-  if(obj.Tipofornec =='cnpj' && (aNaturezasCnpj.includes(($('naturezaCod').value).substr(0,2))) &&  opcaoReinf != '3'){  
+  if(obj.Tipofornec =='cnpj' && (aNaturezasCnpj.includes(($('naturezaCod').value).substr(0,2))) &&  opcaoReinf != '3'){
     alert("A natureza do rendimento é incompatível com o tipo de credor CNPJ")
     return false;
   }
@@ -956,7 +956,7 @@ function js_liquidar(metodo){
       return false;
     }
   }
-  
+
   if(iOperacao === 2){
     if($F('dataEstorno') == ''){
       alert('Campo Data de Estorno obrigatório!');
@@ -974,7 +974,7 @@ function js_liquidar(metodo){
        aNotas.push(itens[i].value);
       }
     }
-    
+
     if(aNotas.length > 1 && obrigaDiaria == true && iOperacao === 1){
       alert("Não é possível realizar liquidação de mais de uma nota quando há Diárias");
       return false;
@@ -994,7 +994,7 @@ function js_liquidar(metodo){
       alert("Não é possível realizar liquidação de mais de uma nota quando há Retenção Realizada por Terceiros");
       return false;
     }
-    
+
     $('pesquisar').disabled = true;
     $('confirmar').disabled = true;
    if (aNotas.length != 0){
@@ -1014,17 +1014,17 @@ function js_liquidar(metodo){
        /* Extensão CotaMensalLiquidacao - pt 5 */
      }
      js_divCarregando(sMensagem, "msgLiq");
-    
+
      var oParam        = new Object();
      oParam.method     = metodo;
      oParam.iEmpenho   = $F('e60_numemp');
      oParam.notas      = aNotas;
      oParam.informacaoop  = encodeURIComponent($F('informacaoop'));
-          
+
      if(obj.e60_informacaoop){
         oParam.historico  = encodeURIComponent($F('informacaoop'));
      }
-     else{   
+     else{
         oParam.historico  = encodeURIComponent($F('historico'));
      }
 
@@ -1043,7 +1043,7 @@ function js_liquidar(metodo){
      oParam.valordesconto = encodeURIComponent($F('valordesconto'));
      oParam.competencia = $F('competencia');
      oParam.e50_retencaoir = $F('reinfRetencao');
-     oParam.e50_naturezabemservico = $F('naturezaCod');     
+     oParam.e50_naturezabemservico = $F('naturezaCod');
      if(iOperacao === 1){
       oParam.dDataLiquidacao = $F('dataLiquidacao');
       oParam.dDataVencimento = $F('dataVencimento');
@@ -1089,7 +1089,7 @@ function js_saidaLiquidacao(oAjax){
   js_validarEstabelecimentos(true);
 
   //Inclui Diaria
-  
+
   if(iOperacao === 1 && obj.erro == 1){
     const desdobramentoDiaria = desdobramento.substr(5, 2);
     if((desdobramentoDiaria == '14' || desdobramentoDiaria == '33') && obrigaDiaria == true){
@@ -1140,14 +1140,14 @@ function js_saidaLiquidacao(oAjax){
        alert(mensagem);
     }
     if (obj.erro == 1){
-       if (document.getElementById('emitedocumento') && $('emitedocumento').checked) {
+       if (!obj.estorno) {
          js_emitir(obj.sOrdensGeradas);
        }
        lPesquisaFunc = false;
        js_consultaEmpenho($F('e60_numemp'),<?=$operacao?>);
 
         document.form1.ct01_codcategoria.value = '';
-        document.form1.ct01_descricaocategoria.value = ''; 
+        document.form1.ct01_descricaocategoria.value = '';
         document.form1.contribuicaoPrev.value = '';
         document.form1.ct01_codcategoriaremuneracao.value = '';
         document.form1.ct01_descricaocategoriaremuneracao.value = '';
@@ -1274,12 +1274,6 @@ function js_consultaNota(iCodNota) {
   js_OpenJanelaIframe('CurrentWindow.corpo', 'db_iframe_nota', 'emp2_consultanotas002.php?e69_codnota='+iCodNota, 'Pesquisa Dados da Nota', true);
 }
 
-function js_emitir(codordem){
-
-  jan = window.open('emp2_emitenotaliq002.php?codordem='+codordem,'','width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0');
-  jan.moveTo(0,0);
-}
-
 function js_lancarRetencao(iCodNota, iCodOrd, nValor){
 
    var iNumEmp  = $F('e60_numemp');
@@ -1365,7 +1359,7 @@ function js_importarHistorico(){
     for (i = 0;i < itens.length;i++){
       if (itens[i].checked == true){
          aNotas.push(itens[i].value);
-      } 
+      }
     }
 
     if(aNotas.length === 0){

@@ -291,6 +291,10 @@ class CreditoCompensacao extends Credito {
       $nTotalReciboPaga = $oRecibo->getTotalRecibo();
       $nValorRestanteCompensacao = $nTotalReciboPaga - $this->getValorCompensacao();
 
+      if ($nValorRestanteCompensacao > 0 and $nValorRestanteCompensacao < sizeof($this->getDebitos())) {
+          throw new BusinessException("Valor da Compensação é inválido, pois resta em aberto um valor inferior a tolerância mínima de 1 real por débito");
+      }
+
       /**
        * Pagamento Total dos Débitos
        */

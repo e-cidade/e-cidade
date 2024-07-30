@@ -233,11 +233,39 @@ class Bem {
 
     if ($oDaoBem->numrows == 0) {
 
-      $sMensagemErro  = "Bem não encontrado pelo código {$iCodigoBem}\n\nPossiveis causas: \n";
-      $sMensagemErro .= " - Classificação não configurada, verifique as contas.\n";
-      $sMensagemErro .= " - Placa não encontrada.\n";
-      $sMensagemErro .= " - Bem não cadastrado.";
-      throw new Exception($sMensagemErro);
+      $oDaoBemExcluido  = db_utils::getDao("bensexcluidos");
+      $sSqlSituacaoBem  = "(select t56_situac ";
+      $sSqlSituacaoBem .= "   from histbem  ";
+      $sSqlSituacaoBem .= "  where t56_codbem = t136_bens ";
+      $sSqlSituacaoBem .= "  order by t56_histbem desc limit 1) as situacao,";
+  
+      $sSqlCodigoPlaca  = "(select t41_codigo ";
+      $sSqlCodigoPlaca .= "   from bensplaca ";
+      $sSqlCodigoPlaca .= "  where t41_bem = t136_bens ";
+      $sSqlCodigoPlaca .= "  order by t41_codigo desc limit 1) as codigoplaca, ";
+  
+      $sSqlCodigoTransf = "(select t95_codtran ";
+      $sSqlCodigoTransf.= "   from benstransfcodigo ";
+      $sSqlCodigoTransf.= "  where t95_codbem = t136_bens ";
+      $sSqlCodigoTransf.= "  order by t95_codtran desc limit 1) as codtransf";
+
+      $sSqlCampos       = "   t136_bens as t52_bem, t136_descr as t52_descr, t136_empnotaitem ,t136_numcgm as t52_numcgm ,
+                              t136_instit as t52_instit, t136_depart as t52_depart,t136_codcla as t52_codcla, t136_bensmarca as t52_bensmarca ,
+                              t136_bensmodelo as t52_bensmodelo, t136_bensmedida as t52_bensmedida , t136_descr as t52_descr ,
+                              t136_dtaqu as t52_dtaqu , t136_obs   as t52_obs ,t136_valaqu as t52_valaqu, t136_ident as t52_ident ";
+  
+      $sSqlDadosBensExcluidos    = $oDaoBemExcluido->sql_query_dados_bens_excluidos($iCodigoBem, "$sSqlCampos,{$sSqlSituacaoBem} {$sSqlCodigoPlaca} {$sSqlCodigoTransf}", "t44_ultimaavaliacao desc");
+      
+      $rsDadosBem      = $oDaoBemExcluido->sql_record($sSqlDadosBensExcluidos);
+
+      if ($oDaoBemExcluido->numrows == 0) {
+
+        $sMensagemErro  = "Bem não encontrado pelo código {$iCodigoBem}\n\nPossiveis causas: \n";
+        $sMensagemErro .= " - Classificação não configurada, verifique as contas.\n";
+        $sMensagemErro .= " - Placa não encontrada.\n";
+        $sMensagemErro .= " - Bem não cadastrado.";
+        throw new Exception($sMensagemErro);
+      }
     }
 
     $oDadosBem = db_utils::fieldsMemory($rsDadosBem, 0);

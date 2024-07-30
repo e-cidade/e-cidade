@@ -1018,4 +1018,10 @@ class cl_liclicitem
 
         return $sql;
     }
+
+    public function queryOrdemItens($l20_codigo){
+        return "SELECT COALESCE(MAX(l21_ordem) + 1, 1) AS l21_ordem
+                    FROM liclicitem
+                    WHERE l21_codliclicita = {$l20_codigo}";
+    }
 }

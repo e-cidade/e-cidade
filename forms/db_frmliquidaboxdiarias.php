@@ -124,6 +124,11 @@
   $('e140_horainicial').addEventListener('blur', function () {js_validaHora('e140_horainicial')});
   $('e140_horafinal').addEventListener('blur', function () {js_validaHora('e140_horafinal')});
 
+  document.getElementById("e140_objetivo").addEventListener("input", function() {
+    var campoTexto = this;
+    campoTexto.value = campoTexto.value.replace(/[^a-zA-Z0-9À-ÖØ-öø-ÿ '~^]/g, '');
+  });
+  
   function js_validaData(campo) {
     let dtAutorizacao = $F('e140_dtautorizacao');
     let e140_dtinicial = $F('e140_dtinicial');

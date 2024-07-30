@@ -67,6 +67,8 @@ class cl_caiparametro
     var $k29_orctiporecfundeb = 0;
     var $k29_cotaunicafundeb = 'f';
     var $k29_liquidacaodataanterior = 'f';
+    var $k29_estrutcontacorrente = null; 
+    var $k29_estrutcontaaplicacao = null; 
     // cria propriedade com as variaveis do arquivo
     var $campos = "
                  k29_instit = int4 = Instituição
@@ -84,6 +86,8 @@ class cl_caiparametro
                  k29_orctiporecfundeb = int4 = Recurso Fundeb
                  k29_cotaunicafundeb = bool = Conta única FUNDEB
                  k29_liquidacaodataanterior = bool = Liquidação c/ data anterior a última liquidação
+                 k29_estrutcontacorrente = text = Último Estrutural de Conta Corrente 
+                 k29_estrutcontaaplicacao = text = Último Estrutural de Conta Aplicação
                  ";
     //funcao construtor da classe
     function cl_caiparametro()
@@ -144,6 +148,9 @@ class cl_caiparametro
             $this->k29_cotaunicafundeb = ($this->k29_cotaunicafundeb == "f" ? @$GLOBALS["HTTP_POST_VARS"]["k29_cotaunicafundeb"] : $this->k29_cotaunicafundeb);
             $this->k29_liquidacaodataanterior = ($this->k29_liquidacaodataanterior == "f" ? @$GLOBALS["HTTP_POST_VARS"]["k29_liquidacaodataanterior"] : $this->k29_liquidacaodataanterior);
             $this->k29_orctiporecfundeb = ($this->k29_orctiporecfundeb == "" ? @$GLOBALS["HTTP_POST_VARS"]["k29_orctiporecfundeb"] : $this->k29_orctiporecfundeb);
+            $this->k29_estrutcontacorrente = ($this->k29_estrutcontacorrente == "" ? @$GLOBALS["HTTP_POST_VARS"]["k29_estrutcontacorrente"] : $this->k29_estrutcontacorrente);
+            $this->k29_estrutcontaaplicacao = ($this->k29_estrutcontaaplicacao == "" ? @$GLOBALS["HTTP_POST_VARS"]["k29_estrutcontaaplicacao"] : $this->k29_estrutcontaaplicacao);
+            
         } else {
             $this->k29_instit = ($this->k29_instit == "" ? @$GLOBALS["HTTP_POST_VARS"]["k29_instit"] : $this->k29_instit);
         }
@@ -270,6 +277,8 @@ class cl_caiparametro
                                       ,k29_cotaunicafundeb
                                       ,k29_liquidacaodataanterior
                                       ,k29_exibeobservacao
+                                      ,k29_estrutcontacorrente 
+                                      ,k29_estrutcontaaplicacao
                        )
                 values (
                                 $this->k29_instit
@@ -287,6 +296,8 @@ class cl_caiparametro
                                ,$this->k29_cotaunicafundeb
                                ,$this->k29_liquidacaodataanterior
                                ,$this->k29_exibeobservacao
+                               ,$this->k29_estrutcontacorrente 
+                               ,$this->k29_estrutcontaaplicacao
                       )";
         $result = db_query($sql);
         if ($result == false) {
@@ -525,6 +536,22 @@ class cl_caiparametro
                 return false;
             }
         }
+        if (trim($this->k29_estrutcontacorrente) == null) {
+            $sql  .= $virgula . " k29_estrutcontacorrente = null ";
+            $virgula = ",";
+        } elseif (trim($this->k29_estrutcontacorrente) != "" || isset($GLOBALS["HTTP_POST_VARS"]["k29_estrutcontacorrente"])) {
+            $sql  .= $virgula . " k29_estrutcontacorrente = '$this->k29_estrutcontacorrente' ";
+            $virgula = ",";
+        }
+
+        if (trim($this->k29_estrutcontaaplicacao) == null) {
+            $sql  .= $virgula . " k29_estrutcontaaplicacao = null ";
+            $virgula = ",";
+        } elseif (trim($this->k29_estrutcontaaplicacao) != "" || isset($GLOBALS["HTTP_POST_VARS"]["k29_estrutcontaaplicacao"])) {
+            $sql  .= $virgula . " k29_estrutcontaaplicacao = '$this->k29_estrutcontaaplicacao' ";
+            $virgula = ",";
+        }
+ 
         $sql .= " where ";
         if ($k29_instit != null) {
             $sql .= " k29_instit = $this->k29_instit";

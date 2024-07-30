@@ -179,7 +179,7 @@ $sql = "select
         order by $xxordem";
 
 // INICIO TRATAMENTO CALCULO DE EXCECAO POR RECURSO
-if ($tipo == 'R' && $separar == 1) {
+if (($tipo == 'R' && $separar == 1) || ($tipo == 'R' && $tipoEmpenho == 1 && $folha != 'r20')) {
 
     // query que busca matriculas que não possuem descontos, apenas proventos
     $sqlProventosUnic = "select distinct g1." . $folha . "_regist as matriculaunic,
@@ -567,6 +567,352 @@ if ($tipo == 'R' && $separar == 1) {
         $ultimamatricula = $item->matricula;
     }
 
+if ($tipo == 'R' && $tipoEmpenho == 1 && $folha != 'r20') {
+    $instit = db_getsession('DB_instit');
+    $sql = "SELECT * from
+                (select
+                    COUNT(*) over (partition by rh02_lota) as qtdlota,
+                    STRING_AGG(CASE WHEN rh25_codlotavinc IS NULL THEN rh72_sequencial::TEXT END,', ') over (partition by rh02_lota) as sequenciais,
+                    rh72_sequencial as empenho_principal,
+                    rh72_recurso as recurso,
+                    rh02_lota as lotacao,
+                    rh73_valor as valor,
+                    rh25_codlotavinc
+                from
+                    (
+                    select
+                        rh72_sequencial,
+                        rh25_codlotavinc,
+                        rh72_recurso,
+                        rh02_lota,
+                        round(sum(case when rh73_pd = 2 then rh73_valor *-1 else rh73_valor end),
+                        2) as rh73_valor
+                    from
+                        rhempenhofolha
+                    inner join rhempenhofolharhemprubrica on
+                        rh81_rhempenhofolha = rh72_sequencial
+                    inner join rhempenhofolharubrica on
+                        rh73_sequencial = rh81_rhempenhofolharubrica
+                    inner join rhpessoalmov on
+                        rh73_seqpes = rh02_seqpes
+                        and rh73_instit = rh02_instit
+                    left join rhempenhofolhaempenho on
+                        rh72_sequencial = rh76_rhempenhofolha
+                    left join rhlotavinc on
+                        rh02_lota = rh25_codigo
+                        and rh02_anousu = rh25_anousu
+                        and rh72_projativ = rh25_projativ
+                        and rh72_recurso = rh25_recurso
+                        and rh25_codlotavinc = (
+                        select
+                            rh28_codlotavinc
+                        from
+                            rhlotavincele
+                        where
+                            rh25_codlotavinc = rh28_codlotavinc
+                            and rh72_codele = rh28_codelenov)
+                    where
+                        rh72_tipoempenho = 1
+                        and rh73_instit = {$instit}
+                        and rh73_tiporubrica = 1
+                        and rh72_anousu = {$ano}
+                        and rh72_mesusu = {$mes}";
+                        if ($folha == 'r48' && isset($semest)) {
+                            $sql .= " and rh72_seqcompl = {$semest} ";
+                        } else {
+                            $sql .= " and rh72_seqcompl = 0 ";
+                        }
+                        $sql .= " and rh72_siglaarq = '{$folha}'
+                    group by
+                        rh72_sequencial,
+                        rh02_lota,
+                        rh25_codlotavinc,
+                        rh72_recurso) as x
+                where
+                    rh73_valor <> 0
+                order by
+                rh72_sequencial ) as y
+            where
+                qtdlota > 1
+                and rh25_codlotavinc is not null";
+    $aResult = db_utils::getCollectionByRecord(db_query($sql), false, false, true);
+    $semDescontoLotacao = '';
+    $aDescontoPorRecurso = array();
+    foreach ($aResult as &$oRegistro) {
+        $semDescontoLotacao .= urldecode($oRegistro->lotacao).',';
+        
+        $sqlDescontos = "SELECT 
+                            rh72_siglaarq, 
+                            rh72_anousu, 
+                            rh72_mesusu, 
+                            rh78_retencaotiporec,
+                            round(sum(rh73_valor), 2) as valorretencao,
+                            ROUND(
+                            (select 
+                                SUM(SUM(rh73_valor)) OVER () 
+                            from rhempenhofolha 
+                                inner join rhempenhofolharhemprubrica on rh81_rhempenhofolha = rh72_sequencial 
+                                inner join rhempenhofolharubrica on rh73_sequencial = rh81_rhempenhofolharubrica
+                                inner join rhpessoalmov on rh73_seqpes = rh02_seqpes and rh73_instit = rh02_instit 
+                                inner join  rhempenhofolharubricaretencao on rh78_rhempenhofolharubrica = rh73_sequencial 
+                            where 
+                                rh02_lota = {$oRegistro->lotacao}
+                                and rh72_tipoempenho = 1
+                                and rh73_tiporubrica = 2
+                                and rh73_pd          = 2
+                                and rh72_anousu = {$ano}
+                                and rh72_mesusu = {$mes}
+                            group by 
+                                rh72_siglaarq,  
+                                rh72_mesusu, 
+                                rh72_anousu, 
+                                rh78_retencaotiporec limit 1), 2) AS total_valorretencao
+                        from rhempenhofolha 
+                            inner join rhempenhofolharhemprubrica on rh81_rhempenhofolha = rh72_sequencial 
+                            inner join rhempenhofolharubrica on rh73_sequencial = rh81_rhempenhofolharubrica
+                            inner join rhpessoalmov on rh73_seqpes = rh02_seqpes and rh73_instit = rh02_instit 
+                            inner join  rhempenhofolharubricaretencao on rh78_rhempenhofolharubrica = rh73_sequencial 
+                        where 
+                            rh02_lota = {$oRegistro->lotacao} 
+                            and rh72_sequencial in (".urldecode($oRegistro->sequenciais).")
+                            and rh72_tipoempenho = 1
+                            and rh73_tiporubrica = 2
+                            and rh73_pd          = 2
+                            and rh72_anousu = {$ano}
+                            and rh72_mesusu = {$mes}
+                        group by rh72_siglaarq,  
+                            rh72_mesusu, 
+                            rh72_anousu, 
+                            rh78_retencaotiporec
+                        order by valorretencao DESC";
+        $rsDescontos = db_utils::getCollectionByRecord(db_query($sqlDescontos), false, false, true);
+
+        if ((float)$oRegistro->valor < (float)$rsDescontos[0]->total_valorretencao){	
+            $sqlRetencoes = "SELECT
+                                rh78_retencaotiporec,
+                                round(sum(rh73_valor), 2) as valorretencao
+                            from rhempenhofolha 
+                                inner join rhempenhofolharhemprubrica on rh81_rhempenhofolha = rh72_sequencial 
+                                inner join rhempenhofolharubrica on rh73_sequencial = rh81_rhempenhofolharubrica
+                                inner join rhpessoalmov on rh73_seqpes = rh02_seqpes and rh73_instit = rh02_instit 
+                                inner join  rhempenhofolharubricaretencao on rh78_rhempenhofolharubrica = rh73_sequencial 
+                            where 
+                                rh02_lota = {$oRegistro->lotacao}
+                                and rh72_tipoempenho = 1
+                                and rh73_tiporubrica = 2
+                                and rh73_pd          = 2
+                                and rh72_anousu = {$ano}
+                                and rh72_mesusu = {$mes}
+                            group by 
+                                rh72_siglaarq,  
+                                rh72_mesusu, 
+                                rh72_anousu, 
+                                rh78_retencaotiporec
+                            order by valorretencao DESC";
+            $rsRetencoes = db_utils::getCollectionByRecord(db_query($sqlRetencoes), false, false, true);
+            $aRetencoesLotacao = [];
+            $iSumRetencao = 0;
+
+            foreach ($rsRetencoes as $oRetencao) {
+                if ($iSumRetencao + $oRetencao->valorretencao >= $oRegistro->valor) {
+                    $aRetencoesLotacao = array_merge($aRetencoesLotacao, array_slice($rsRetencoes, array_search($oRetencao, $rsRetencoes)));
+                    break;
+                }
+                $sqlDescontoPrincipal = "SELECT
+                                            rh30_codreg,
+                                            rh72_recurso,
+                                            rh72_sequencial,
+                                            round(sum(rh73_valor), 2) as valorretencao
+                                        from rhempenhofolha 
+                                            inner join rhempenhofolharhemprubrica on rh81_rhempenhofolha = rh72_sequencial 
+                                            inner join rhempenhofolharubrica on rh73_sequencial = rh81_rhempenhofolharubrica
+                                            inner join rhpessoalmov on rh73_seqpes = rh02_seqpes and rh73_instit = rh02_instit 
+                                            inner join rhempenhofolharubricaretencao on rh78_rhempenhofolharubrica = rh73_sequencial
+                                            inner join rhregime on rh30_codreg = rh02_codreg and rh30_instit = rh02_instit
+                                        where
+                                            rh72_tipoempenho = 1
+                                            and rh73_tiporubrica = 2
+                                            and rh73_pd          = 2
+                                            and rh72_anousu = {$ano}
+                                            and rh72_mesusu = {$mes}
+                                            and rh72_siglaarq = '{$folha}'
+                                            and rh78_retencaotiporec = {$oRetencao->rh78_retencaotiporec}
+                                            and rh72_sequencial in (".urldecode($oRegistro->sequenciais).")
+                                            and rh02_lota = $oRegistro->lotacao
+                                        group by
+                                            rh30_codreg,
+                                            rh72_sequencial,
+                                            rh72_recurso";
+                foreach( db_utils::getCollectionByRecord(db_query($sqlDescontoPrincipal), false, false, true) as $registros){
+                if ($aDescontoPorRecurso[$oRegistro->recurso][$registros->rh72_recurso][$registros->rh30_codreg]) {
+                        $aDescontoPorRecurso[$oRegistro->recurso][$registros->rh72_recurso][$registros->rh30_codreg] += $registros->valorretencao;
+                    } else {
+                        $aDescontoPorRecurso[$oRegistro->recurso][$registros->rh72_recurso][$registros->rh30_codreg] = $registros->valorretencao;
+                    }
+                }
+                $iSumRetencao += $oRetencao->valorretencao;
+            }
+            if (count($aRetencoesLotacao) > 0){
+                $sqlSecundarioRecurso = "SELECT 
+                                            rh72_recurso,
+                                            rh72_sequencial, 
+                                            round(sum(case when rh73_pd = 2 then rh73_valor *-1 else rh73_valor end),2) as rh73_valor 
+                                        from rhempenhofolha
+                                            inner join rhempenhofolharhemprubrica on rh81_rhempenhofolha = rh72_sequencial
+                                            inner join rhempenhofolharubrica on rh73_sequencial = rh81_rhempenhofolharubrica
+                                            inner join rhpessoalmov on rh73_seqpes = rh02_seqpes and rh73_instit = rh02_instit
+                                        where 
+                                            rh02_lota = {$oRegistro->lotacao}
+                                            and rh72_tipoempenho = 1
+                                            and rh73_instit = {$instit}
+                                            and rh73_tiporubrica = 1
+                                            and rh72_anousu = {$ano}
+                                            and rh72_mesusu = {$mes}
+                                            and rh72_sequencial <> {$oRegistro->empenho_principal} ";
+                                            if ($folha == 'r48' && isset($semest)) {
+                                                $sqlSecundarioRecurso .= " and rh72_seqcompl = {$semest} ";
+                                            } else {
+                                                $sqlSecundarioRecurso .= " and rh72_seqcompl = 0 ";
+                                            }
+                                            $sqlSecundarioRecurso .= " and rh72_siglaarq = '{$folha}'
+                                        group by
+                                            rh72_sequencial
+                                        order by rh73_valor desc limit 1";
+                $oSecundario = db_utils::fieldsMemory(db_query($sqlSecundarioRecurso), 0);
+                $sqlSecundarioSequenciais = "SELECT
+                                                STRING_AGG(rh72_sequencial::text, ', ') over (partition by rh02_lota) as sequenciais
+                                            from rhempenhofolha
+                                                inner join rhempenhofolharhemprubrica on rh81_rhempenhofolha = rh72_sequencial
+                                                inner join rhempenhofolharubrica on rh73_sequencial = rh81_rhempenhofolharubrica
+                                                inner join rhpessoalmov on rh73_seqpes = rh02_seqpes and rh73_instit = rh02_instit                            
+                                            where 
+                                                rh02_lota = {$oRegistro->lotacao}
+                                                and rh72_tipoempenho = 1
+                                                and rh73_instit = {$instit}
+                                                and rh73_tiporubrica = 1
+                                                and rh72_anousu = {$ano}
+                                                and rh72_mesusu = {$mes}
+                                                and rh72_sequencial <> {$oSecundario->rh72_sequencial} ";
+                                                if ($folha == 'r48' && isset($semest)) {
+                                                    $sqlSecundarioSequenciais .= " and rh72_seqcompl = {$semest} ";
+                                                } else {
+                                                    $sqlSecundarioSequenciais .= " and rh72_seqcompl = 0 ";
+                                                }
+                                                $sqlSecundarioSequenciais .= " and rh72_siglaarq = '{$folha}'
+                                            group by rh02_lota,rh72_sequencial limit 1";
+                $sSequenciaisLotacao = db_utils::fieldsMemory(db_query($sqlSecundarioSequenciais), 0)->sequenciais;
+
+                foreach ($aRetencoesLotacao as $oRetencao) {
+                    $sqlDescontoSecundario = "SELECT
+                                                rh30_codreg,
+                                                rh72_recurso,
+                                                rh72_sequencial,
+                                                round(sum(rh73_valor),2) as valorretencao
+                                            from rhempenhofolha 
+                                                inner join rhempenhofolharhemprubrica on rh81_rhempenhofolha = rh72_sequencial 
+                                                inner join rhempenhofolharubrica on rh73_sequencial = rh81_rhempenhofolharubrica
+                                                inner join rhpessoalmov on rh73_seqpes = rh02_seqpes and rh73_instit = rh02_instit 
+                                                inner join rhempenhofolharubricaretencao on rh78_rhempenhofolharubrica = rh73_sequencial
+                                                inner join rhregime on rh30_codreg = rh02_codreg and rh30_instit = rh02_instit
+                                            where 
+                                                rh02_lota = {$oRegistro->lotacao}
+                                                and rh72_tipoempenho = 1
+                                                and rh73_tiporubrica = 2
+                                                and rh73_pd          = 2
+                                                and rh72_anousu = {$ano}
+                                                and rh72_mesusu = {$mes}
+                                                and rh72_siglaarq = '{$folha}'
+                                                and rh78_retencaotiporec = {$oRetencao->rh78_retencaotiporec}
+                                                and rh72_sequencial in ({$sSequenciaisLotacao})
+                                            group by
+                                                rh30_codreg,
+                                                rh72_sequencial,
+                                                rh72_recurso";
+                    foreach( db_utils::getCollectionByRecord(db_query($sqlDescontoSecundario), false, false, true) as $registros){
+                        if ($aDescontoPorRecurso[$oSecundario->rh72_recurso][$registros->rh72_recurso][$registros->rh30_codreg]) {
+                            $aDescontoPorRecurso[$oSecundario->rh72_recurso][$registros->rh72_recurso][$registros->rh30_codreg] += $registros->valorretencao;
+                        } else {
+                            $aDescontoPorRecurso[$oSecundario->rh72_recurso][$registros->rh72_recurso][$registros->rh30_codreg] = $registros->valorretencao;
+                        }
+                    }
+                }
+            }
+        } else {
+            foreach ($rsDescontos as $oRetencao) {
+                $sqlDesconto = "SELECT
+                                    rh30_codreg,
+                                    rh72_recurso,
+                                    rh72_sequencial,
+                                    round(sum(rh73_valor), 2) as valorretencao
+                                from rhempenhofolha 
+                                    inner join rhempenhofolharhemprubrica on rh81_rhempenhofolha = rh72_sequencial 
+                                    inner join rhempenhofolharubrica on rh73_sequencial = rh81_rhempenhofolharubrica
+                                    inner join rhpessoalmov on rh73_seqpes = rh02_seqpes and rh73_instit = rh02_instit 
+                                    inner join rhempenhofolharubricaretencao on rh78_rhempenhofolharubrica = rh73_sequencial
+                                    inner join rhregime on rh30_codreg = rh02_codreg and rh30_instit = rh02_instit
+                                where
+                                    rh72_tipoempenho = 1
+                                    and rh73_tiporubrica = 2
+                                    and rh73_pd          = 2
+                                    and rh72_anousu = {$ano}
+                                    and rh72_mesusu = {$mes}
+                                    and rh72_siglaarq = '{$folha}'
+                                    and rh78_retencaotiporec = {$oRetencao->rh78_retencaotiporec}
+                                    and rh72_sequencial in (".urldecode($oRegistro->sequenciais).")
+                                    and rh02_lota = $oRegistro->lotacao
+                                group by
+                                    rh30_codreg,
+                                    rh72_sequencial,
+                                    rh72_recurso";
+                foreach(db_utils::getCollectionByRecord(db_query($sqlDesconto), false, false, true) as $registros){
+                    if ($aDescontoPorRecurso[$oRegistro->recurso][$registros->rh72_recurso][$registros->rh30_codreg]) {
+                        $aDescontoPorRecurso[$oRegistro->recurso][$registros->rh72_recurso][$registros->rh30_codreg] += $registros->valorretencao;
+                    } else {
+                        $aDescontoPorRecurso[$oRegistro->recurso][$registros->rh72_recurso][$registros->rh30_codreg] = $registros->valorretencao;
+                    }
+                }
+            }
+        }
+    }
+    $aDescontosAdc = array();
+    $aDescontosSub = array();
+    foreach($aDescontoPorRecurso as $sRecursoAdc => $aDescRec){
+        foreach ($aDescRec as $sRecursoSub => $descRec) {
+            foreach($descRec as $codReg => $desc){
+                $oDesconto = new stdClass;
+                $oDesconto->codigoRegime = $codReg;
+                $oDesconto->valorDesconto = $desc;
+
+                $oDescontoAdc = clone $oDesconto;
+                $oDescontoAdc->recursoAdicionado = $sRecursoAdc;
+                $aDescontosAdc[] = $oDescontoAdc;
+
+                $oDescontoSub = clone $oDesconto;
+                $oDescontoSub->recursoSubtraido = $sRecursoSub;
+                $aDescontosSub[] = $oDescontoSub;
+            }
+        }
+    }
+
+    foreach($aDescontosAdc as $oDesc) {
+        foreach($aRecurso as &$rec) {
+            if ($oDesc->recursoAdicionado == $rec->recurso && $oDesc->codigoRegime == $rec->codregime) {
+                $rec->valordescfinal += $oDesc->valorDesconto;
+                break;
+            }
+        }
+    }
+
+    foreach($aDescontosSub as $oDesc) {
+        foreach($aRecurso as &$rec) {
+            if ($oDesc->recursoSubtraido == $rec->recurso && $oDesc->codigoRegime == $rec->codregime) {
+                $rec->valordescfinal -= $oDesc->valorDesconto;
+                break;
+            }
+        }
+    }
+}
+
     $aResult = array();
 
     // agrupa array por recurso e separa por codreg
@@ -621,7 +967,7 @@ $total_func_g = 0;
 $troca       = 1;
 
 //emitir dados apenas quando for por recurso e com exceção sim
-if ($tipo == 'R' && $separar == 1) {
+if (($tipo == 'R' && $separar == 1) || ($tipo == 'R' && $tipoEmpenho == 1 && $folha != 'r20')) {
     foreach ($aResult as $recurso => $codregimes) {
         if ($pdf->gety() > $pdf->h - 30 || $troca != 0) {
             $pdf->addpage();

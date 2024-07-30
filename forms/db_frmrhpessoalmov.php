@@ -2135,11 +2135,16 @@ if (isset($db_opcaoal)) {
             }
 
             function js_verificatipoapos(value) {
-                let rh01_admiss = '<?= $rh01_admiss ?>';
-                let opcoesbeneficio = document.getElementById('rh02_tipobeneficio').options;
+                const rh01_admiss = new Date('<?= $rh01_admiss ?>T00:00:00');
+                const dataBase = new Date('2021-11-21T00:00:00');
+                const opcoesbeneficio = document.getElementById('rh02_tipobeneficio').options;
                 document.getElementById('tipobeneficio').style.display = '';
+                document.getElementById('tipo7').style.display = 'none';
+                if (value == 7) {
+                    document.getElementById('tipo7').style.display = '';
+                }
 
-                if (value == 2 || value == 3 || value == 5 && rh01_admiss >= '2021-11-21') {
+                if ([2, 3, 5].include(value) && rh01_admiss.getTime() >= dataBase.getTime()) {
                     opcoesbeneficio.length = 0;
                     opcoesbeneficio.add(new Option('Selecione', '0'));
                     opcoesbeneficio.add(new Option('Aposentadoria por idade e tempo de contribuição - Proventos com integralidade, revisão pela paridade', '0101'));
@@ -2152,7 +2157,7 @@ if (isset($db_opcaoal)) {
                     opcoesbeneficio.add(new Option('Aposentadoria de professor - Proventos pela média, reajuste manter valor real', '0108'));
                 }
 
-                if (value == 6 && rh01_admiss >= '2021-11-21') {
+                if (value == 6 && rh01_admiss.getTime() >= dataBase.getTime()) {
                     opcoesbeneficio.length = 0;
                     opcoesbeneficio.add(new Option('Selecione', '0'));
                     opcoesbeneficio.add(new Option('Aposentadoria especial - Risco', '0201'));
@@ -2160,7 +2165,7 @@ if (isset($db_opcaoal)) {
                     opcoesbeneficio.add(new Option('Aposentadoria da pessoa com deficiência', '0203'));
                 }
 
-                if (value == 4 && rh01_admiss >= '2021-11-21') {
+                if (value == 4 && rh01_admiss.getTime() >= dataBase.getTime()) {
                     opcoesbeneficio.length = 0;
                     opcoesbeneficio.add(new Option('Selecione', '0'));
                     opcoesbeneficio.add(new Option('Aposentadoria por invalidez - Proventos com integralidade, revisão pela paridade', '0301'));
@@ -2169,7 +2174,7 @@ if (isset($db_opcaoal)) {
                     opcoesbeneficio.add(new Option('Aposentadoria por invalidez - Proventos proporcionais calculado sobre a média, reajuste manter valor real', '0304'));
                 }
 
-                if (value == 1 && rh01_admiss >= '2021-11-21') {
+                if (value == 1 && rh01_admiss.getTime() >= dataBase.getTime()) {
                     opcoesbeneficio.length = 0;
                     opcoesbeneficio.add(new Option('Selecione', '0'));
                     opcoesbeneficio.add(new Option('Pensão por morte (art. 40, § 7º, da CF/1988)', '0601'));
@@ -2177,8 +2182,7 @@ if (isset($db_opcaoal)) {
                     opcoesbeneficio.add(new Option('Pensão por morte com paridade, decorrente do art. 3º da EC 47/2005', '0603'));
 
                 }
-                console.log(value);
-                if (value && rh01_admiss < '2021-11-21') {
+                if (value && rh01_admiss.getTime() < dataBase.getTime()) {
                     opcoesbeneficio.length = 0;
                     opcoesbeneficio.add(new Option('Selecione', '0'));
                     opcoesbeneficio.add(new Option('Aposentadoria sem paridade concedida antes da obrigatoriedade de envio dos eventos não periódicos para entes públicos no eSocial', '0801'));
@@ -2193,19 +2197,12 @@ if (isset($db_opcaoal)) {
                     opcoesbeneficio.add(new Option('Aposentadoria de parlamentar - Plano próprio', '0810'));
                     opcoesbeneficio.add(new Option('Aposentadoria de servidor vinculado ao Poder Legislativo - Plano próprio', '0811'));
                     opcoesbeneficio.add(new Option('Pensão por morte - Plano próprio', '0812'));
-                    if (value == 7) {
-                        document.getElementById('tipo7').style.display = '';
-                    } else {
-                        document.getElementById('tipo7').style.display = 'none';
-                    }
-                } else if (value == 7) {
-                    document.getElementById('tipo7').style.display = '';
+                }
+                if (value == 7 && rh01_admiss.getTime() >= dataBase.getTime()) {
                     opcoesbeneficio.length = 0;
                     opcoesbeneficio.add(new Option('Selecione', '0'));
                     opcoesbeneficio.add(new Option('Pensão especial sem vínculo previdenciário', '1001'));
                     opcoesbeneficio.add(new Option('Outros benefícios sem vínculo previdenciário', '1009'));
-                } else {
-                    document.getElementById('tipo7').style.display = 'none';
                 }
             }
 

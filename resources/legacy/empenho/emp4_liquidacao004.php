@@ -322,7 +322,7 @@ switch ($objJson->method) {
         }else{
             $dDataVencimento = null;
         }
-        
+
         ////////////////////////////////////
 
         if (isset($objJson->z01_credor) && !empty($objJson->z01_credor)) {
@@ -341,7 +341,7 @@ switch ($objJson->method) {
 
             if (@pg_num_rows($rsLiquidados) > 0) {
                 db_fieldsmemory($rsLiquidados, 0);
-            
+
                 if ($oParam->e30_liquidacaodataanterior == 'f') {
                     if (date("Y-m-d", strtotime($dDataLiquidacao)) < date("Y-m-d", strtotime($dtultimaliquidacao))) {
                         throw new Exception("Não é permitido liquidar com data anterior ao último lançamento de liquidação.");
@@ -426,7 +426,7 @@ switch ($objJson->method) {
 
         if (@pg_num_rows($rsLiquidados) > 0)
             db_fieldsmemory($rsLiquidados, 0);
-        
+
         if ($oParam->e30_liquidacaodataanterior == 'f') {
             if (date("Y-m-d", strtotime($dDataLiquidacao)) < date("Y-m-d", strtotime($dtultimaliquidacao))) {
                 $chave = false;
@@ -715,7 +715,7 @@ switch ($objJson->method) {
             $iStatus = 2;
         } else {
             $objEmpenho->setRecriarSaldo($objJson->lRecriarReserva);
-            $objEmpenho->anularEmpenho(
+            $iCodAnu = $objEmpenho->anularEmpenho(
                 $objJson->itensAnulados,
                 $objJson->nValor,
                 $objJson->sMotivo,
@@ -871,7 +871,7 @@ switch ($objJson->method) {
             $iStatus = 1;
         }
 
-        echo $json->encode(array("mensagem" => $nMensagem, "status" => $iStatus));
+        echo $json->encode(array("mensagem" => $nMensagem, "status" => $iStatus, 'iCodAnu' => $iCodAnu));
 
         break;
 

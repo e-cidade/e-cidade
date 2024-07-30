@@ -1,0 +1,29 @@
+<?xml version='1.0' ?>
+<consulta distinct="false">
+  <campos>
+    <campo campo="vencimento_debito"                            label="vencimento_debito"    />
+    <campo campo="efetivo_pagamento"                           label="efetivo_pagamento"        />
+  </campos>
+  <from tabela="(
+  select
+  k00_dtvenc as vencimento_debito,
+  null as efetivo_pagamento
+  from arrecad
+  where k00_numpre = $numpre and k00_numpar = $numpar
+  union
+  select
+  arrecant.k00_dtvenc as vencimento_debito,
+  k00_dtpaga as efetivo_pagamento
+  from arrecant
+  inner join arrepaga on arrecant.k00_numpre = arrepaga.k00_numpre and arrecant.k00_numpar = arrepaga.k00_numpar
+  where arrecant.k00_numpre = $numpre and arrecant.k00_numpar = $numpar
+  ) as dados_numpre_numpar"/>
+  <juncoes>
+  </juncoes>
+  <filtros>
+    <filtro label="numpre"   condicao = "1 = 1" obrigatorio="true"  />
+    <filtro label="numpar"   condicao = "1 = 1" obrigatorio="true"  />
+  </filtros>
+  <agrupamento />
+  <ordenacao />
+</consulta>

@@ -121,7 +121,7 @@ function js_emitir() {
                 (screen.height-100)+",width="+(screen.width-100);
 
   if (iGuia != "") {
-    window.open('reciboitbi.php?itbi='+iGuia+'&tipoguia='+iTipo,"",sParam);
+    window.open('resources/legacy/itbi/reciboitbi.php?itbi='+iGuia+'&tipoguia='+iTipo,"",sParam);
     return true;
   } else {
     alert('Escolha uma guia para emissão!')

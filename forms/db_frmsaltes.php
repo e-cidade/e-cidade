@@ -96,6 +96,17 @@ $oRotulo->label("coddepto");
                     ?>
                   </td>
                 </tr>
+                <tr style="display: <?php echo $mostrarCampo2; ?>;">
+                  <td>
+                    <b>Data da Reativação da Conta:</b>
+                  </td>
+                  <td>
+                    <?
+                      @list($k13_dtreativacaoconta_dia,$k13_dtreativacaoconta_mes,$k13_dtreativacaoconta_ano)= explode("/",$k13_dtreativacaoconta);
+                      db_inputdata('k13_dtreativacaoconta',@$k13_dtreativacaoconta_dia,@$k13_dtreativacaoconta_mes,@$k13_dtreativacaoconta_ano,true,'text',$db_opcao,"style='background-color:#E6E4F1'");
+                      ?>
+                  </td>
+                </tr>
               </table>
             </fieldset>
 

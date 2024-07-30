@@ -54,6 +54,7 @@ require_once (modification("classes/db_solordemtransf_classe.php"));
 require_once (modification("classes/db_procandam_classe.php"));
 require_once (modification("classes/db_empempenhonl_classe.php"));
 require_once (modification("libs/db_sql.php"));
+require_once("model/protocolo/AssinaturaDigital.model.php");
 
 
 $clpcparam = new cl_pcparam;
@@ -274,7 +275,7 @@ if (!empty($iElemento)) {
 
 $dtDataUsu = $dDataMovimento == null ? date("Y-m-d", db_getsession('DB_datausu')) : $dDataMovimento;
 if(isset($incluir)) {
-  // Data do sistema
+    // Data do sistema
 
     $anoUsu = db_getsession("DB_anousu");
     $sWhere = "e56_autori = " . $e54_autori . " and e56_anousu = " . $anoUsu;
@@ -282,41 +283,41 @@ if(isset($incluir)) {
     $numrows = $clempautidot->numrows;
     if ($numrows > 0) {
         db_fieldsmemory($result, 0);
-    }	
+    }
 
     $result  = $clempempaut->sql_record($clempempaut->sql_query_empenho(null, " e60_tipodespesa , e60_esferaemendaparlamentar , e60_emendaparlamentar ",null, " e61_autori = $chavepesquisa"));
     $numrows = $clempempaut->numrows;
     if ($numrows > 0) {
         db_fieldsmemory($result, 0);
-    }	
+    }
 
     $oCodigoAcompanhamento = new ControleOrcamentario();
     $oCodigoAcompanhamento->setTipoDespesa($e60_tipodespesa);
     $oCodigoAcompanhamento->setFonte($o58_codigo);
     $oCodigoAcompanhamento->setEmendaParlamentar($e60_emendaparlamentar);
-    $oCodigoAcompanhamento->setEsferaEmendaParlamentar($e60_esferaemendaparlamentar);       
+    $oCodigoAcompanhamento->setEsferaEmendaParlamentar($e60_esferaemendaparlamentar);
     $oCodigoAcompanhamento->setDeParaFonteCompleta();
     $e60_codco = $oCodigoAcompanhamento->getCodigoParaEmpenho();
 
-  $clcondataconf = new cl_condataconf;
+    $clcondataconf = new cl_condataconf;
 
-  $result = db_query($clcondataconf->sql_query_file(db_getsession('DB_anousu'),db_getsession('DB_instit')));
-  $c99_data = db_utils::fieldsMemory($result, 0)->c99_data;
+    $result = db_query($clcondataconf->sql_query_file(db_getsession('DB_anousu'),db_getsession('DB_instit')));
+    $c99_data = db_utils::fieldsMemory($result, 0)->c99_data;
 
-  if(strtotime($dtDataUsu) <= strtotime($c99_data)){
+    if(strtotime($dtDataUsu) <= strtotime($c99_data)){
 
-    $erro_msg  = "Não foi possível incluir os lançamentos do evento contabil.\n\n";
-    $erro_msg .= "Erro Técnico: ";
-    $erro_sql   = "Valores lançamentos (".pg_result(db_query('select max(c69_sequen)+1 from conlancamval'),0,0).") nao Incluído. Inclusao Abortada.";
-    $erro_msg   .= "Usuário: \\n\\n ".$erro_sql." \\n\\n";
-    $erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n "));
-    $erro_msg   .=  " ERRO: DATA DO ENCERRAMENTO CONTÁBIL. LIMITE: {$c99_data} \\n\\n";
-    $erro_status = "0";
+        $erro_msg  = "Não foi possível incluir os lançamentos do evento contabil.\n\n";
+        $erro_msg .= "Erro Técnico: ";
+        $erro_sql   = "Valores lançamentos (".pg_result(db_query('select max(c69_sequen)+1 from conlancamval'),0,0).") nao Incluído. Inclusao Abortada.";
+        $erro_msg   .= "Usuário: \\n\\n ".$erro_sql." \\n\\n";
+        $erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n "));
+        $erro_msg   .=  " ERRO: DATA DO ENCERRAMENTO CONTÁBIL. LIMITE: {$c99_data} \\n\\n";
+        $erro_status = "0";
 
-    unset($incluir);
-    db_msgbox($erro_msg);
+        unset($incluir);
+        db_msgbox($erro_msg);
 
-  }
+    }
 
 
     /* Ocorrência 2630
@@ -324,19 +325,19 @@ if(isset($incluir)) {
      * 1. Validar impedimento para geração de autorizações/empenhos com data anterior a data de homologação
      * 2. Validar impedimento para geração de autorizações de empenhos de licitações que não estejam homologadas.
      */
-  $sSqlLicitacao = "select e54_emiss
+    $sSqlLicitacao = "select e54_emiss
                           from empautoriza
                           inner join liclicita  on ltrim(((string_to_array(e54_numerl, '/'))[1])::varchar,'0') = l20_numero::varchar AND l20_anousu::varchar = ((string_to_array(e54_numerl, '/'))[2])::varchar
                           where e54_autori = {$e54_autori} limit 1";
 
     if(pg_num_rows(db_query($sSqlLicitacao))) {
 
-      if (strtotime(db_utils::fieldsMemory(db_query($sSqlLicitacao), 0)->e54_emiss) > strtotime($dDataMovimento)) {
+        if (strtotime(db_utils::fieldsMemory(db_query($sSqlLicitacao), 0)->e54_emiss) > strtotime($dDataMovimento)) {
 
-        db_msgbox("Não é permitido emitir empenhos de licitações cuja data da autorização (".date("d/m/Y",strtotime(db_utils::fieldsMemory(db_query($sSqlLicitacao), 0)->e54_emiss)) .") seja maior que a data de emissão do empenho (".$e60_emiss.").");
-        db_redireciona("emp4_empempenho004.php");
+            db_msgbox("Não é permitido emitir empenhos de licitações cuja data da autorização (".date("d/m/Y",strtotime(db_utils::fieldsMemory(db_query($sSqlLicitacao), 0)->e54_emiss)) .") seja maior que a data de emissão do empenho (".$e60_emiss.").");
+            db_redireciona("emp4_empempenho004.php");
 
-      }
+        }
 
     }
 
@@ -392,15 +393,15 @@ if(isset($incluir)) {
 
             for ($w = 0; $w < pg_numrows($result_tran); $w++) {
 
-              db_fieldsmemory($result_tran, $w);
-              $recebetransf = recprocandsol($p62_codtran);
+                db_fieldsmemory($result_tran, $w);
+                $recebetransf = recprocandsol($p62_codtran);
 
-              if ($recebetransf == true) {
+                if ($recebetransf == true) {
 
-                $sqlerro = true;
-                break;
+                    $sqlerro = true;
+                    break;
 
-              }
+                }
 
             }
 
@@ -444,9 +445,9 @@ if(isset($incluir)) {
 
     if ($clempempaut->numrows > 0) {
 
-      db_fieldsmemory($resdiftot, 0);
-      $erro_msg = "Valor total dos itens diferente do valor total da autorização. Vlr. da Autorização: $e54_valor - Vlr. Total dos Itens: $e55_vltot ";
-      $sqlerro  = true;
+        db_fieldsmemory($resdiftot, 0);
+        $erro_msg = "Valor total dos itens diferente do valor total da autorização. Vlr. da Autorização: $e54_valor - Vlr. Total dos Itens: $e55_vltot ";
+        $sqlerro  = true;
 
     }
 
@@ -470,8 +471,8 @@ if(isset($incluir)) {
     $arr_seqtranslr = $cltranslan->arr_seqtranslr;
 
     if (count($arr_credito) == 0) {
-      $sqlerro  = true;
-      $erro_msg = "Não existem transações cadastradas para esta instituição.";
+        $sqlerro  = true;
+        $erro_msg = "Não existem transações cadastradas para esta instituição.";
     }
 
     //final
@@ -589,9 +590,9 @@ if(isset($incluir)) {
         }
 
         $dados = (object) array(
-          'tabela' => 'empautidot',
-          'campo'  => 'e56_autori',
-          'sigla'  => 'e56'
+            'tabela' => 'empautidot',
+            'campo'  => 'e56_autori',
+            'sigla'  => 'e56'
         );
 
         $veConvMSC = $clempempenho->verificaConvenioSicomMSC($e54_autori, $anousu, $dados);
@@ -604,16 +605,16 @@ if(isset($incluir)) {
 
         if ($veConvMSC > 0) {
 
-          $rsResult = $clconvconvenios->sql_record("select c206_sequencial from convconvenios where c206_sequencial = $e60_numconvenio");
+            $rsResult = $clconvconvenios->sql_record("select c206_sequencial from convconvenios where c206_sequencial = $e60_numconvenio");
 
-          if (!$rsResult) {
-            $sqlerro  = true;
+            if (!$rsResult) {
+                $sqlerro  = true;
 
-            $erro_msg  = "Inclusão Abortada!\n";
-            $erro_msg .= "É obrigatório informar o convênio para os empenhos de fontes:\n";
-            $erro_msg .= $fontesMsg;
+                $erro_msg  = "Inclusão Abortada!\n";
+                $erro_msg .= "É obrigatório informar o convênio para os empenhos de fontes:\n";
+                $erro_msg .= $fontesMsg;
 
-        }
+            }
 
         }
 
@@ -693,7 +694,7 @@ if(isset($incluir)) {
 
             if ( ($tipoinstit == 5 || $tipoinstit == 6) &&
                 (in_array(substr($o56_elemento, 0 , -4), $aElementosDesdobramento) || (in_array(substr($o56_elemento, 0 , -6), $aElementos) && db_getsession("DB_anousu") >= 2021) )
-                ) {
+            ) {
                 if($e60_tipodespesa != 0) {
                     $clempempenho->e60_tipodespesa = $e60_tipodespesa;
                     $sqlerro = false;
@@ -932,11 +933,11 @@ if(isset($incluir)) {
     }
 
 
-      /*rotina que inclui na tabela empefdreinf*/
-      if ($sqlerro == false) {
+    /*rotina que inclui na tabela empefdreinf*/
+    if ($sqlerro == false) {
         $clempefdreinf->efd60_aquisicaoprodrural = $efd60_aquisicaoprodrural;
         $clempefdreinf->efd60_prodoptacp = $efd60_prodoptacp;
-        
+
         if ($efd60_cessaomaoobra == 2) {
             $clempefdreinf->efd60_cessaomaoobra = $efd60_cessaomaoobra;
             $clempefdreinf->efd60_possuicno = $efd60_possuicno;
@@ -945,7 +946,7 @@ if(isset($incluir)) {
             $clempefdreinf->efd60_prescontricprb = $efd60_prescontricprb;
             $clempefdreinf->efd60_tiposervico = $efd60_tiposervico;
         }
-        
+
         if($clempefdreinf->numrows>0){
             $clempefdreinf->alterar($e60_numemp);
         } else {
@@ -1128,7 +1129,7 @@ if(isset($incluir)) {
                 $oLancamentoAuxiliar->setContaCorrenteDetalhe($oContaCorrenteDetalhe);
                 $oEventoContabil->executaLancamento($oLancamentoAuxiliar, $dDataMovimento);
 
-                 /**
+                /**
                  * Valida parametro de integracao da contabilidade com contratos
                  */
                 // após 2021 este lançamento será feito no modulo de contratos.
@@ -1321,8 +1322,18 @@ if(isset($incluir)) {
     /**[Extensao Ordenador Despesa] inclusao_ordenador*/
 
     db_fim_transacao($sqlerro);
-
-
+//    if ($sqlerro == false) {
+//        /** Solicita assinatura empenho  */
+//        $oAssintaraDigital = new AssinaturaDigital();
+//        if ($oAssintaraDigital->verificaAssituraAtiva()) {
+//            try {
+//                $oAssintaraDigital->solicitaAssinaturaEmpenho($oEmpenhoFinanceiro->getNumero());
+//            } catch (Exception $eErro) {
+//                $sqlerro = true;
+//                db_msgbox($eErro);
+//            }
+//        }
+//    }
     $db_opcao = 1;
     $db_botao = true;
 }else if(isset($chavepesquisa)){
@@ -1379,46 +1390,46 @@ if(isset($incluir)) {
 
 }
 ?>
-<html>
-<head>
-    <title>DBSeller Inform&aacute;tica Ltda - P&aacute;gina Inicial</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-    <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
-    <script language="JavaScript" type="text/javascript" src="scripts/strings.js"></script>
-    <script language="JavaScript" type="text/javascript" src="scripts/prototype.js"></script>
-    <script language="JavaScript" type="text/javascript" src="scripts/classes/empenho/ViewCotasMensais.js"></script>
-    <script language="JavaScript" type="text/javascript" src="scripts/widgets/dbtextField.widget.js"></script>
-    <script language="JavaScript" type="text/javascript" src="scripts/datagrid.widget.js"></script>
-    <script language="JavaScript" type="text/javascript" src="scripts/AjaxRequest.js"></script>
-    <script language="JavaScript" type="text/javascript" src="scripts/widgets/windowAux.widget.js"></script>
-    <script language="JavaScript" type="text/javascript" src="scripts/widgets/dbmessageBoard.widget.js"></script>
-    <link href="estilos.css" rel="stylesheet" type="text/css">
-</head>
-<body style="background-color:#CCCCCC; margin-top:30px;" >
-<center>
-    <?php
-    require_once(Modification::getFile("forms/db_frmempempenhonota.php"));
-    ?>
-</center>
-</body>
-</html>
+    <html>
+    <head>
+        <title>DBSeller Inform&aacute;tica Ltda - P&aacute;gina Inicial</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+        <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
+        <script language="JavaScript" type="text/javascript" src="scripts/strings.js"></script>
+        <script language="JavaScript" type="text/javascript" src="scripts/prototype.js"></script>
+        <script language="JavaScript" type="text/javascript" src="scripts/classes/empenho/ViewCotasMensais.js"></script>
+        <script language="JavaScript" type="text/javascript" src="scripts/widgets/dbtextField.widget.js"></script>
+        <script language="JavaScript" type="text/javascript" src="scripts/datagrid.widget.js"></script>
+        <script language="JavaScript" type="text/javascript" src="scripts/AjaxRequest.js"></script>
+        <script language="JavaScript" type="text/javascript" src="scripts/widgets/windowAux.widget.js"></script>
+        <script language="JavaScript" type="text/javascript" src="scripts/widgets/dbmessageBoard.widget.js"></script>
+        <link href="estilos.css" rel="stylesheet" type="text/css">
+    </head>
+    <body style="background-color:#CCCCCC; margin-top:30px;" >
+    <center>
+        <?php
+        require_once(Modification::getFile("forms/db_frmempempenhonota.php"));
+        ?>
+    </center>
+    </body>
+    </html>
 
-<script>
-    function js_emiteEmpenho(iNumEmp) {
+    <script>
+        function js_emiteEmpenho(iNumEmp) {
 
-        jan = window.open('emp2_emitenotaemp002.php?e60_numemp='+iNumEmp, '','width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0');
-        jan.moveTo(0,0);
+            jan = window.open('emp2_emitenotaemp002.php?e60_numemp='+iNumEmp, '','width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0');
+            jan.moveTo(0,0);
 
-        document.form1.incluir.disabled = true;
-        document.form1.op.disabled = true;
-    }
+            document.form1.incluir.disabled = true;
+            document.form1.op.disabled = true;
+        }
 
-    function js_naoImprimir() {
+        function js_naoImprimir() {
 
-        document.form1.incluir.disabled = true;
-        document.form1.op.disabled = true;
-    }
-</script>
+            document.form1.incluir.disabled = true;
+            document.form1.op.disabled = true;
+        }
+    </script>
 
 <?
 if($alertar_retencao == true){

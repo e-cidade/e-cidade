@@ -44,7 +44,7 @@ class cl_esocialenvio
                  rh213_msgretorno = text = Mensagem de Retorno
                  rh213_dataprocessamento = date = Data Processamento
                  rh213_ambienteenvio = int4 = Ambiente de Envio
-                 rh213_protocolo = int4 = Número do Protocolo
+                 rh213_protocolo = int4 = NÃºmero do Protocolo
                  ";
     //funcao construtor da classe
     public function __construct()
@@ -183,8 +183,8 @@ class cl_esocialenvio
         } else {
             $result = db_query("select last_value from esocialenvio_rh213_sequencial_seq");
             if (($result != false) && (pg_result($result, 0, 0) < $rh213_sequencial)) {
-                $this->erro_sql = " Campo rh213_sequencial maior que último número da sequencia.";
-                $this->erro_banco = "Sequencia menor que este número.";
+                $this->erro_sql = " Campo rh213_sequencial maior que Ãºltimo nÃºmero da sequencia.";
+                $this->erro_banco = "Sequencia menor que este nÃºmero.";
                 $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
                 $this->erro_msg   .=  str_replace('"', "", str_replace("'", "", "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
                 $this->erro_status = "0";
@@ -673,5 +673,46 @@ class cl_esocialenvio
             $this->numrows_excluir = 0;
             return false;
         }
+    }
+
+    public function deleteErros()
+    {
+        $this->erro_status = "1";
+
+        // SQL para selecionar os registros a serem excluídos
+        $sql = "SELECT rh213_sequencial FROM esocialenvio
+                LEFT JOIN esocialrecibo ON rh213_sequencial = rh215_esocialenvio 
+                WHERE rh213_empregador = (SELECT numcgm FROM db_config WHERE codigo = " . db_getsession("DB_instit") . ")
+                AND rh213_situacao = " . self::SITUACAO_ERRO_ENVIO . "
+                AND rh215_esocialenvio IS NULL"; // Adiciona condição para verificar se não há dados na tabela esocialrecibo
+
+        $rsQuery = db_query($sql);
+        //db_criatabela($rsQuery);exit;
+
+        if (!$rsQuery) {
+            throw new Exception(pg_last_error());
+        }
+
+        // Inicia uma transação
+        db_inicio_transacao();
+
+        for ($iCont = 0;$iCont < pg_num_rows($rsQuery); $iCont++) {
+            $dados = db_utils::fieldsMemory($rsQuery,$iCont);
+            $sqlDelete = "DELETE FROM esocialenvio WHERE rh213_sequencial = {$dados->rh213_sequencial}";
+            $result = db_query($sqlDelete);
+            if ($result == false) {
+                $this->erro_banco = str_replace("\n", "", @pg_last_error());
+                $this->erro_sql   = "Falha ao excluir registro com erro. Exclusão Abortada.\\n";
+                $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+                $this->erro_msg   .=  str_replace('"', "", str_replace("'", "", "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+                $this->erro_status = "0";
+                $this->numrows_excluir = 0;
+                return false;
+            }
+        }
+
+        db_fim_transacao(); // Conclui a transação se tudo ocorreu bem
+
+        return true; // Retorna verdadeiro se a exclusão foi bem-sucedida
     }
 }

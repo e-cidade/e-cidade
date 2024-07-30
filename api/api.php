@@ -16,6 +16,8 @@ require_once(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'bootstrap.php');
 
 require_once(modification("libs/db_conn.php"));
 
+$env = parse_ini_file(dirname(__DIR__) . DIRECTORY_SEPARATOR . ".env");
+Registry::set('app.env', $env);
 // @todo Revisar essa logica
 // Criamos um request fake para poder utilizar o recursos dos modifications.
 
@@ -49,15 +51,20 @@ if (!ini_get('register_globals')) {
 }
 
 // app authentication
-$app->before(function (Request $request, Application $app) {
+$app->before(function (Request $request, Application $app) use ($env) {
+
+    if (!$env) {
+        throw new AccessDeniedHttpException('Arquivo .env não encontrado.');
+    }
+
     Registry::get('app.request')->session()->start();
     $_SESSION['DB_login'] = 'dbseller';
     $_SESSION['DB_id_usuario'] = '1';
-    $_SESSION['DB_servidor'] = $DB_SERVIDOR ?? 'localhost';
-    $_SESSION['DB_base'] = $DB_BASE ?? 'pmburitizeiro';
-    $_SESSION['DB_user'] = $DB_USUARIO ?? 'dbportal';
-    $_SESSION['DB_porta'] = $DB_PORTA ?? '5432';
-    $_SESSION['DB_senha'] = $DB_SENHA ?? 'dbportal';
+    $_SESSION['DB_servidor'] = $DB_SERVIDOR ?? $env['DB_SERVIDOR'];
+    $_SESSION['DB_base'] = $DB_BASE ?? $env['DB_BASE'];
+    $_SESSION['DB_user'] = $DB_USUARIO ?? $env['DB_USUARIO'];
+    $_SESSION['DB_porta'] = $DB_PORTA ?? $env['DB_PORTA'];
+    $_SESSION['DB_senha'] = $DB_SENHA ?? $env['DB_SENHA'];
     $_SESSION['DB_administrador'] = '1';
     $_SESSION['DB_modulo'] = '578';
     $_SESSION['DB_nome_modulo'] = 'Configurações';

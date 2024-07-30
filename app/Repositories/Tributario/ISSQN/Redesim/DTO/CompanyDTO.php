@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Tributario\ISSQN\Redesim\DTO;
 
+use App\Support\String\StringHelper;
 use DateTime;
 
 class CompanyDTO extends BaseDTO
@@ -32,16 +33,16 @@ class CompanyDTO extends BaseDTO
 
     public string $telefone = '';
 
-    public string $codigoNaturezaJuridica;
+    public ?string $codigoNaturezaJuridica = '';
 
     /**
      * @var DateRangeDTO[]
      */
-    public array $periodosMEI;
+    public ?array $periodosMEI = [];
 
-    public bool $simples;
+    public ?bool $simples = false;
 
-    public bool $mei;
+    public ?bool $mei = false;
 
     public string $nomeFantasia = '';
 
@@ -54,11 +55,11 @@ class CompanyDTO extends BaseDTO
     /**
      * @var CompanyActivityDTO[]
      */
-    public array $atividades;
+    public ?array $atividades = [];
 
     public CompanyAdressDTO $endereco;
 
-    public string $inscricaoMunicipal;
+    public ?string $inscricaoMunicipal = '';
 
     /**
      * Número no órgão de registro
@@ -75,26 +76,26 @@ class CompanyDTO extends BaseDTO
     /**
      * @var CompanyPartnerDTO[]
      */
-    public array $socios;
+    public ?array $socios = [];
 
     /**
      * Município
      * @var string
      */
-    public string $cliente;
+    public ?string $cliente = '';
 
     public DateTime $dataCnpj;
 
     /**
      * @var DateRangeDTO[]
      */
-    public array $periodosSimples;
+    public array $periodosSimples = [];
 
     public DateTime $inclusao;
 
-    public string $cpfCnpj;
+    public string $cpfCnpj = '';
 
-    public string $razaoSocial;
+    public string $razaoSocial = '';
 
     public ?float $capitalSocial = null;
 
@@ -108,11 +109,19 @@ class CompanyDTO extends BaseDTO
 
     public float $areaUtilizada = 0;
 
+    /**
+     * Used in CreateRedesimLogService to store the original data
+     * @var array
+     */
+    public array $originalData = [];
+
     public function __construct(array $data)
     {
         if (empty($data)) {
             return;
         }
+
+        $this->originalData = $data;
 
         foreach ($data as $attribute => $value) {
 
@@ -142,6 +151,10 @@ class CompanyDTO extends BaseDTO
                     $companyPartners[] = new CompanyPartnerDTO((array)$value[$i]);
                 }
                 $value = $companyPartners;
+            }
+
+            if (in_array($attribute, ['razaoSocial','nomeFantasia'])) {
+                $value = \DBString::removerCaracteresEspeciais($value);
             }
 
             $this->$attribute = $value;

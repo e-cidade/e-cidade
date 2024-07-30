@@ -49,6 +49,8 @@ $clrotulo->label("e40_codhist");
 $clrotulo->label("e40_historico");
 $clrotulo->label("e60_emiss");
 $clrotulo->label("e60_emiss");
+require_once("model/protocolo/AssinaturaDigital.model.php");
+$oAssintaraDigital = new AssinaturaDigital();
 if (isset($e57_codhist)) {
     $query = "select e40_descr from emphist where e40_codhist = $e57_codhist";
     $resultado = db_query($query);
@@ -162,7 +164,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
         db_input('lLiquidaMaterialConsumo', 10, "", true, 'hidden', 3);
         db_input('iElemento', 20, "", true, 'hidden', 3);
         db_input('e60_numemp', 20, "", true, 'hidden', 3);
-        db_input('e60_codco', 20,"" , true, 'hidden', 3);  
+        db_input('e60_codco', 20,"" , true, 'hidden', 3);
         ?>
 
         <center>
@@ -456,167 +458,167 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                     </td>
                 </tr>
                 <?php if (substr($aCodele[0],0,6) == '339030') { ?>
-                <tr id="trAquisicaoProducaoRural">
-                    <td nowrap title="Aquisição de Produção Rural ">
-                        <strong>Aquisição de Produção Rural :</strong>
-                    </td>
-                    <td> 
-                        <?
-                         $arr  = array(
-                            '0' => '0 - Não se aplica',
-                            '1' => '1 - Aquisição de produção de produtor rural pessoa física ou segurado especial em geral',
-                            '2' => '2 - Aquisição de produção de produtor rural pessoa física ou segurado especial em geral por entidade executora do Programa de Aquisição de Alimentos PAA',
-                            '4' => '4 - Aquisição de produção de produtor rural pessoa física ou segurado especial em geral Produção isenta (Lei 13.606/2018)',
-                            '5' => '5 - Aquisição de produção de produtor rural pessoa física ou segurado especial em geral por entidade executora do PAA Produção isenta (Lei 13.606/2018)',
-                            '7' => '7 - Aquisição de produção de produtor rural pessoa física ou segurado especial para fins de exportação',
-
-                        );
-                        if (strlen($z01_cgccpf) == 14 ) {
+                    <tr id="trAquisicaoProducaoRural">
+                        <td nowrap title="Aquisição de Produção Rural ">
+                            <strong>Aquisição de Produção Rural :</strong>
+                        </td>
+                        <td>
+                            <?
                             $arr  = array(
                                 '0' => '0 - Não se aplica',
-                                '3' => '3 - Aquisição de produção de produtor rural pessoa jurídica por entidade executora do PAA',
-                                '6' => '6 - Aquisição de produção de produtor rural pessoa jurídica por entidade executora do PAA Produção isenta (Lei 13.606/2018)',
+                                '1' => '1 - Aquisição de produção de produtor rural pessoa física ou segurado especial em geral',
+                                '2' => '2 - Aquisição de produção de produtor rural pessoa física ou segurado especial em geral por entidade executora do Programa de Aquisição de Alimentos PAA',
+                                '4' => '4 - Aquisição de produção de produtor rural pessoa física ou segurado especial em geral Produção isenta (Lei 13.606/2018)',
+                                '5' => '5 - Aquisição de produção de produtor rural pessoa física ou segurado especial em geral por entidade executora do PAA Produção isenta (Lei 13.606/2018)',
+                                '7' => '7 - Aquisição de produção de produtor rural pessoa física ou segurado especial para fins de exportação',
+
                             );
-                           
-                        }    
-                       
-                        db_select("efd60_aquisicaoprodrural", $arr, true, 1, "onchange='showRowProdutorRural(this);'");
-                        ?>
-                    </td>
-                </tr>
-                <tr id="trProdutoroptacp" style="display: none;">
-                                <td nowrap title="O Produtor Rural opta pela CP sobre a folha">
-                                <strong>O Produtor Rural opta pela CP sobre a folha:</strong>
-                                </td>
-                                <td>
-                                <?
+                            if (strlen($z01_cgccpf) == 14 ) {
                                 $arr  = array(
-                                    '1' => 'Não',
-                                    '2' => 'Sim'
+                                    '0' => '0 - Não se aplica',
+                                    '3' => '3 - Aquisição de produção de produtor rural pessoa jurídica por entidade executora do PAA',
+                                    '6' => '6 - Aquisição de produção de produtor rural pessoa jurídica por entidade executora do PAA Produção isenta (Lei 13.606/2018)',
                                 );
-                                db_select("efd60_prodoptacp", $arr, true, 1);
-                                ?>
-                                </td>
-                            </tr>
-              <?php } ?>      
+
+                            }
+
+                            db_select("efd60_aquisicaoprodrural", $arr, true, 1, "onchange='showRowProdutorRural(this);'");
+                            ?>
+                        </td>
+                    </tr>
+                    <tr id="trProdutoroptacp" style="display: none;">
+                        <td nowrap title="O Produtor Rural opta pela CP sobre a folha">
+                            <strong>O Produtor Rural opta pela CP sobre a folha:</strong>
+                        </td>
+                        <td>
+                            <?
+                            $arr  = array(
+                                '1' => 'Não',
+                                '2' => 'Sim'
+                            );
+                            db_select("efd60_prodoptacp", $arr, true, 1);
+                            ?>
+                        </td>
+                    </tr>
+                <?php } ?>
                 <tr id="reinf">
                     <td id="reinftd" colspan="1">
                         <fieldset style="width:73.5%" >
-                        <legend><strong>EFD-REINF</strong></legend>
+                            <legend><strong>EFD-REINF</strong></legend>
                             <table >
-                            <tr id="trCNO">
-                                <td nowrap title="Possui Cadastro Nacional de Obras (CNO)">
-                                <strong>Possui Cadastro Nacional de Obras (CNO):</strong>
-                                </td>
-                                <td>
-                                <?
-                                $arr  = array(
-                                    '0' => 'Selecione',
-                                    '1' => 'Sim',
-                                    '2' => 'Não'
-                                );
-                                db_select("efd60_possuicno", $arr, true, 1,"onchange='showRowCNO(this);'");
-                                ?>
-                                </td>
-                            </tr>
-                            <tr id="trNumCno" style="display: none;">
-                                <td nowrap title="Número do CNO">
-                                <b>Número do CNO:</b>
-                                </td>
-                                <td>
-                                <?php
-                                db_input('efd60_numcno', 12, $Iefd60_numcno, true, 'text', 1);
-                                
-                                ?>
-                                <script>
-                                    function formatAndLimitCNO() {
-                                    var cnoInput = document.getElementById('efd60_numcno');
-                                    cnoInput.value = cnoInput.value.replace(/\D/g, '') 
-                                        .slice(0, 12) 
-                                        .replace(/(\d{2})(\d{3})(\d{5})(\d{2})/, '$1.$2.$3/$4'); 
-                                    }
-                                    document.getElementById('efd60_numcno').addEventListener('input', formatAndLimitCNO);
-                                </script>
-                                </td>
-                            </tr>
-                            <tr id="trIndicativoPrestServicos">
-                                <td nowrap title="Possui Cadastro Nacional de Obras (CNO)">
-                                <strong>Indicativo de Prestação de Serviços em Obra de Construção Civil:</strong>
-                                </td>
-                                <td>
-                                <?
-                                $arr  = array(
-                                    '' =>  'Selecione',
-                                    '0' => '0 - Não é obra de construção civil ou não está sujeita a matrícula de obra',
-                                    '1' => '1 - É obra de construção civil, modalidade empreitada total',
-                                    '2' => '2 - É obra de construção civil, modalidade empreitada parcial.'
-                                );
-                                db_select("efd60_indprestservico", $arr, true, 1);
-                                ?>
-                                </td>
-                            </tr>
-                            <tr id="trPrestContrCPRB: ">
-                                <td nowrap title="Prestador é contribuinte da CPRB">
-                                <strong>Prestador é contribuinte da CPRB:</strong>
-                                </td>
-                                <td>
-                                <?
-                                $arr  = array(
-                                    '' => 'Selecione',
-                                    '0' => '0 - Não é contribuinte da CPRB retenção de 11%',
-                                    '1' => '1 - É contribuinte da CPRB retenção de 3,5%.'
-                                );
-                                db_select("efd60_prescontricprb", $arr, true, 1);
-                                ?>
-                                </td>
-                            </tr>
-                            <tr id="trTipoServico: ">
-                                <td nowrap title=" Tipo de Serviço">
-                                <strong> Tipo de Serviço:</strong>
-                                </td>
-                                <td>
-                                <?
-                                $arr = array(
-                                    ''=> 'Selecione',
-                                    '100000001'=> '100000001 - Limpeza, conservação ou zeladoria',
-                                    '100000002'=> '100000002 - Vigilância ou segurança',
-                                    '100000003'=> '100000003 - Construção civil',
-                                    '100000004'=> '100000004 - Serviços de natureza rural',
-                                    '100000005'=> '100000005 - Digitação',
-                                    '100000006'=> '100000006 - Preparação de dados para processamento',
-                                    '100000007'=> '100000007 - Acabamento',
-                                    '100000008'=> '100000008 - Embalagem',
-                                    '100000009'=> '100000009 - Acondicionamento',
-                                    '100000010'=> '100000010 - Cobrança',
-                                    '100000011'=> '100000011 - Coleta ou reciclagem de lixo ou de resíduos',
-                                    '100000012'=> '100000012 - Copa',
-                                    '100000013'=> '100000013 - Hotelaria',
-                                    '100000014'=> '100000014 - Corte ou ligação de serviços públicos',
-                                    '100000015'=> '100000015 - Distribuição',
-                                    '100000016'=> '100000016 - Treinamento e ensino',
-                                    '100000017'=> '100000017 - Entrega de contas e de documentos',
-                                    '100000018'=> '100000018 - Ligação de medidores',
-                                    '100000019'=> '100000019 - Leitura de medidores',
-                                    '100000020'=> '100000020 - Manutenção de instalações, de máquinas ou de equipamentos',
-                                    '100000021'=> '100000021 - Montagem',
-                                    '100000022'=> '100000022 - Operação de máquinas, de equipamentos e de veículos',
-                                    '100000023'=> '100000023 - Operação de pedágio ou de terminal de transporte',
-                                    '100000024'=> '100000024 - Operação de transporte de passageiros',
-                                    '100000025'=> '100000025 - Portaria, recepção ou ascensorista',
-                                    '100000026'=> '100000026 - Recepção, triagem ou movimentação de materiais',
-                                    '100000027'=> '100000027 - Promoção de vendas ou de eventos',
-                                    '100000028'=> '100000028 - Secretaria e expediente',
-                                    '100000029'=> '100000029 - Saúde',
-                                    '100000030'=> '100000030 - Telefonia ou telemarketing',
-                                    '100000031'=> '100000031 - Trabalho temporário na forma da Lei nº 6.019, de janeiro de 1974'
-                                      );
-                                
-                                db_select("efd60_tiposervico", $arr, true, 1);
-                                ?>
-                                </td>
-                            </tr>
+                                <tr id="trCNO">
+                                    <td nowrap title="Possui Cadastro Nacional de Obras (CNO)">
+                                        <strong>Possui Cadastro Nacional de Obras (CNO):</strong>
+                                    </td>
+                                    <td>
+                                        <?
+                                        $arr  = array(
+                                            '0' => 'Selecione',
+                                            '1' => 'Sim',
+                                            '2' => 'Não'
+                                        );
+                                        db_select("efd60_possuicno", $arr, true, 1,"onchange='showRowCNO(this);'");
+                                        ?>
+                                    </td>
+                                </tr>
+                                <tr id="trNumCno" style="display: none;">
+                                    <td nowrap title="Número do CNO">
+                                        <b>Número do CNO:</b>
+                                    </td>
+                                    <td>
+                                        <?php
+                                        db_input('efd60_numcno', 12, $Iefd60_numcno, true, 'text', 1);
+
+                                        ?>
+                                        <script>
+                                            function formatAndLimitCNO() {
+                                                var cnoInput = document.getElementById('efd60_numcno');
+                                                cnoInput.value = cnoInput.value.replace(/\D/g, '')
+                                                    .slice(0, 12)
+                                                    .replace(/(\d{2})(\d{3})(\d{5})(\d{2})/, '$1.$2.$3/$4');
+                                            }
+                                            document.getElementById('efd60_numcno').addEventListener('input', formatAndLimitCNO);
+                                        </script>
+                                    </td>
+                                </tr>
+                                <tr id="trIndicativoPrestServicos">
+                                    <td nowrap title="Possui Cadastro Nacional de Obras (CNO)">
+                                        <strong>Indicativo de Prestação de Serviços em Obra de Construção Civil:</strong>
+                                    </td>
+                                    <td>
+                                        <?
+                                        $arr  = array(
+                                            '' =>  'Selecione',
+                                            '0' => '0 - Não é obra de construção civil ou não está sujeita a matrícula de obra',
+                                            '1' => '1 - É obra de construção civil, modalidade empreitada total',
+                                            '2' => '2 - É obra de construção civil, modalidade empreitada parcial.'
+                                        );
+                                        db_select("efd60_indprestservico", $arr, true, 1);
+                                        ?>
+                                    </td>
+                                </tr>
+                                <tr id="trPrestContrCPRB: ">
+                                    <td nowrap title="Prestador é contribuinte da CPRB">
+                                        <strong>Prestador é contribuinte da CPRB:</strong>
+                                    </td>
+                                    <td>
+                                        <?
+                                        $arr  = array(
+                                            '' => 'Selecione',
+                                            '0' => '0 - Não é contribuinte da CPRB retenção de 11%',
+                                            '1' => '1 - É contribuinte da CPRB retenção de 3,5%.'
+                                        );
+                                        db_select("efd60_prescontricprb", $arr, true, 1);
+                                        ?>
+                                    </td>
+                                </tr>
+                                <tr id="trTipoServico: ">
+                                    <td nowrap title=" Tipo de Serviço">
+                                        <strong> Tipo de Serviço:</strong>
+                                    </td>
+                                    <td>
+                                        <?
+                                        $arr = array(
+                                            ''=> 'Selecione',
+                                            '100000001'=> '100000001 - Limpeza, conservação ou zeladoria',
+                                            '100000002'=> '100000002 - Vigilância ou segurança',
+                                            '100000003'=> '100000003 - Construção civil',
+                                            '100000004'=> '100000004 - Serviços de natureza rural',
+                                            '100000005'=> '100000005 - Digitação',
+                                            '100000006'=> '100000006 - Preparação de dados para processamento',
+                                            '100000007'=> '100000007 - Acabamento',
+                                            '100000008'=> '100000008 - Embalagem',
+                                            '100000009'=> '100000009 - Acondicionamento',
+                                            '100000010'=> '100000010 - Cobrança',
+                                            '100000011'=> '100000011 - Coleta ou reciclagem de lixo ou de resíduos',
+                                            '100000012'=> '100000012 - Copa',
+                                            '100000013'=> '100000013 - Hotelaria',
+                                            '100000014'=> '100000014 - Corte ou ligação de serviços públicos',
+                                            '100000015'=> '100000015 - Distribuição',
+                                            '100000016'=> '100000016 - Treinamento e ensino',
+                                            '100000017'=> '100000017 - Entrega de contas e de documentos',
+                                            '100000018'=> '100000018 - Ligação de medidores',
+                                            '100000019'=> '100000019 - Leitura de medidores',
+                                            '100000020'=> '100000020 - Manutenção de instalações, de máquinas ou de equipamentos',
+                                            '100000021'=> '100000021 - Montagem',
+                                            '100000022'=> '100000022 - Operação de máquinas, de equipamentos e de veículos',
+                                            '100000023'=> '100000023 - Operação de pedágio ou de terminal de transporte',
+                                            '100000024'=> '100000024 - Operação de transporte de passageiros',
+                                            '100000025'=> '100000025 - Portaria, recepção ou ascensorista',
+                                            '100000026'=> '100000026 - Recepção, triagem ou movimentação de materiais',
+                                            '100000027'=> '100000027 - Promoção de vendas ou de eventos',
+                                            '100000028'=> '100000028 - Secretaria e expediente',
+                                            '100000029'=> '100000029 - Saúde',
+                                            '100000030'=> '100000030 - Telefonia ou telemarketing',
+                                            '100000031'=> '100000031 - Trabalho temporário na forma da Lei nº 6.019, de janeiro de 1974'
+                                        );
+
+                                        db_select("efd60_tiposervico", $arr, true, 1);
+                                        ?>
+                                    </td>
+                                </tr>
                             </table>
-                    </td>    
+                    </td>
                 </tr>
                 <!-- Campos referentes ao sicom 2023 - OC19656 -->
                 <tr id="trEmendaParlamentar" style="display: none;">
@@ -670,22 +672,22 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                     </td>
                 </tr>
                 <?php
-                    $elementosemp = array('91');
-                    if(in_array(substr($aCodele[0],4,2), $elementosemp)){
-                ?>     
-                        <tr>
-                            <td nowrap title="Data da Sentença Judicial:">
-                                <strong>Data da Sentença Judicial:</strong>
-                            </td>
-                            <td>
-                                <?
-                                db_inputData('e60_datasentenca', @$e60_datasentenca_dia, @$e60_datasentenca_mes, @$e60_datasentenca_ano, true, 'text', $db_opcao);
-                                ?>
-                            </td>
-                        </tr>   
-                <?php          
-                    }
-                ?>    
+                $elementosemp = array('91');
+                if(in_array(substr($aCodele[0],4,2), $elementosemp)){
+                    ?>
+                    <tr>
+                        <td nowrap title="Data da Sentença Judicial:">
+                            <strong>Data da Sentença Judicial:</strong>
+                        </td>
+                        <td>
+                            <?
+                            db_inputData('e60_datasentenca', @$e60_datasentenca_dia, @$e60_datasentenca_mes, @$e60_datasentenca_ano, true, 'text', $db_opcao);
+                            ?>
+                        </td>
+                    </tr>
+                    <?php
+                }
+                ?>
                 <tr>
                     <td nowrap title="<?= @$Te54_destin ?>">
                         <?= @$Le54_destin ?>
@@ -756,10 +758,10 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                         <fieldset style="width:655px">
                             <legend><b>Informações da OP</b></legend>
                             <?php
-                                if (empty($e50_obs)) {
-                                    $e50_obs = $e54_resumo;
-                                }
-                                db_textarea('e50_obs', 3, 109, $Ie54_resumo, true, 'text', $db_opcao, "", "e50_obs");
+                            if (empty($e50_obs)) {
+                                $e50_obs = $e54_resumo;
+                            }
+                            db_textarea('e50_obs', 3, 109, $Ie54_resumo, true, 'text', $db_opcao, "", "e50_obs");
                             ?>
                         </fieldset>
                     </td>
@@ -768,11 +770,11 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                 $anousu = db_getsession("DB_anousu");
 
                 if ($anousu > 2007) {
-                ?>
+                    ?>
                     <tr style="display: none;">
                         <td nowrap title="<?= @$Te54_concarpeculiar ?>"><?
-                                                                        db_ancora(@$Le54_concarpeculiar, "js_pesquisae54_concarpeculiar(true);", $db_opcao);
-                                                                        ?></td>
+                            db_ancora(@$Le54_concarpeculiar, "js_pesquisae54_concarpeculiar(true);", $db_opcao);
+                            ?></td>
                         <td>
                             <?
                             if (isset($concarpeculiar) && trim(@$concarpeculiar) != "") {
@@ -784,50 +786,53 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                             ?>
                         </td>
                     </tr>
-                <?
+                    <?
                 } else {
                     $e54_concarpeculiar = 0;
                     db_input("e54_concarpeculiar", 10, 0, true, "hidden", 3, "");
                 }
                 ?>
 
-               
+
                 <!--
                 <tr>
                     <td nowrap title="<? //= @$Te60_convenio
-                                        ?>">
+                ?>">
                         <? //= @$Le60_convenio
-                        ?>
+                ?>
                     </td>
                     <td>
                         <?
-                        /*$aConvenio = array('2' => 'Não', '1' => 'Sim');
-                        db_select('e60_convenio', $aConvenio, true, $db_opcao, "");*/
-                        ?>
+                /*$aConvenio = array('2' => 'Não', '1' => 'Sim');
+                db_select('e60_convenio', $aConvenio, true, $db_opcao, "");*/
+                ?>
                     </td>
                 </tr>
                 -->
                 <!--
                 <tr>
                     <td nowrap title="<? //= @$Te60_dataconvenio
-                                        ?>">
+                ?>">
                         <? //= @$Le60_dataconvenio
-                        ?>
+                ?>
                     </td>
                     <td>
                         <?
-                        //db_inputData('e60_dataconvenio',@$e60_dataconvenio_dia, @$e60_dataconvenio_mes,@$e60_dataconvenio_ano, true, 'text', $db_opcao);
-                        ?>
+                //db_inputData('e60_dataconvenio',@$e60_dataconvenio_dia, @$e60_dataconvenio_mes,@$e60_dataconvenio_ano, true, 'text', $db_opcao);
+                ?>
                     </td>
                 </tr>-->
-            
+
             </table>
             <input name="<?= ($db_opcao == 1 ? "incluir" : ($db_opcao == 2 || $db_opcao == 22 ? "alterar" : "excluir")) ?>" type="submit" id="db_opcao" onclick='return js_valida()' ; value="<?= ($db_opcao == 1 || $db_opcao == 33 ? "Empenhar e imprimir" : ($db_opcao == 2 || $db_opcao == 22 ? "Alterar" : "Excluir")) ?>" "<?= ($db_botao == false ? "disabled" : ($db_disab == false ? "disabled" : "")) ?>">
 
-            <? if ($db_opcao == 1) { ?>
-                <input name="op" type="button" value="Empenhar e não imprimir" "<?= ($db_disab == false ? "disabled" : "") ?>" onclick="return js_naoimprimir();">
-            <? } ?>
-
+            <?php
+            if (!$oAssintaraDigital->verificaAssituraAtiva()) {
+                 if ($db_opcao == 1) {
+                    echo "<input name='op' type='button' value='Empenhar e não imprimir' onclick='return js_naoimprimir()';>";
+                 }
+            }
+            ?>
             <input name="lanc" type="button" id="lanc" value="Lançar autorizações" onclick="parent.location.href='emp1_empautoriza001.php';">
 
             <?php $lDisable = empty($e60_numemp) ? "disabled" : ''; ?>
@@ -910,72 +915,72 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
     }
 </style>
 
-<script> 
+<script>
     var lEsferaEmendaParlamentar = 'f';
     var bEmendaParlamentar = false;
     var bEsferaEmendaParlamentar = false;
     showForm(document.form1.efd60_cessaomaoobra.value );
 
     window.onload = function () {
-    let codigoTipoCompra =  $F('e54_codcom');
+        let codigoTipoCompra =  $F('e54_codcom');
 
-    if (codigoTipoCompra) {
-        js_divCarregando('Aguarde, carregando informaes...', 'msgbox');
-        js_verificaTipoCompra(codigoTipoCompra, 'js_handleTipoAutorizacao');
-    }
+        if (codigoTipoCompra) {
+            js_divCarregando('Aguarde, carregando informaes...', 'msgbox');
+            js_verificaTipoCompra(codigoTipoCompra, 'js_handleTipoAutorizacao');
+        }
 
-}
-function showForm(selectElement) 
-{  
-    var valor = selectElement
-    if (selectElement.value) {
-        valor = selectElement.value
     }
-    
-    var formreinf = document.getElementById('reinf');
-    var formreinftd = document.getElementById('reinftd');
-  
-    if (valor === '2') {
-        formreinf.style.display = "table-row";
-        formreinftd.colSpan = 5;
-    } else {
-        formreinf.style.display = "none";
-        formreinftd.colSpan = 1;
-        document.form1.efd60_possuicno.value = 0;
-        document.form1.efd60_numcno.value = '';
+    function showForm(selectElement)
+    {
+        var valor = selectElement
+        if (selectElement.value) {
+            valor = selectElement.value
+        }
+
+        var formreinf = document.getElementById('reinf');
+        var formreinftd = document.getElementById('reinftd');
+
+        if (valor === '2') {
+            formreinf.style.display = "table-row";
+            formreinftd.colSpan = 5;
+        } else {
+            formreinf.style.display = "none";
+            formreinftd.colSpan = 1;
+            document.form1.efd60_possuicno.value = 0;
+            document.form1.efd60_numcno.value = '';
+            document.form1.efd60_indprestservico.value = '';
+            document.form1.efd60_prescontricprb.value = '';
+            document.form1.efd60_tiposervico.value = '';
+        }
+    }
+    function showRowCNO(selectElement)
+    {
+        var rowNumCno = document.getElementById('trNumCno');
         document.form1.efd60_indprestservico.value = '';
-        document.form1.efd60_prescontricprb.value = '';
-        document.form1.efd60_tiposervico.value = '';
+        if (selectElement.value == '1') {
+            rowNumCno.style.display = "table-row";
+        } else {
+            rowNumCno.style.display = "none";
+            document.form1.efd60_numcno.value = '';
+            if (selectElement.value == '2') {
+                document.form1.efd60_indprestservico.value = 0;
+            }
+        }
     }
-}
-function showRowCNO(selectElement) 
-{
-    var rowNumCno = document.getElementById('trNumCno');
-    document.form1.efd60_indprestservico.value = '';
-    if (selectElement.value == '1') {
-        rowNumCno.style.display = "table-row";
-    } else {
-        rowNumCno.style.display = "none";
-        document.form1.efd60_numcno.value = '';
-        if (selectElement.value == '2') {
-            document.form1.efd60_indprestservico.value = 0;
-        }    
+    function showRowProdutorRural(selectElement)
+    {
+        valor = selectElement.value;
+        var rowProdutorRural = document.getElementById('trProdutoroptacp');
+        if (valor != '0') {
+            rowProdutorRural.style.display = "table-row";
+            document.form1.efd60_prodoptacp.value = '1';
+        } else {
+            rowProdutorRural.style.display = "none";
+            document.form1.efd60_prodoptacp.value = '0';
+        }
     }
-}
-function showRowProdutorRural(selectElement) 
-{
-    valor = selectElement.value;
-    var rowProdutorRural = document.getElementById('trProdutoroptacp');
-    if (valor != '0') {
-        rowProdutorRural.style.display = "table-row";
-        document.form1.efd60_prodoptacp.value = '1';
-    } else {
-        rowProdutorRural.style.display = "none";
-        document.form1.efd60_prodoptacp.value = '0';
-    }
-}
-function js_verificaTipoCompra(codigoTipoCompra, funcaoRetorno) {
-    let sUrlRPC = 'com4_tipocompra.RPC.php';
+    function js_verificaTipoCompra(codigoTipoCompra, funcaoRetorno) {
+        let sUrlRPC = 'com4_tipocompra.RPC.php';
         const oParam = new Object();
         oParam.sExecucao = 'getTipocompratribunal';
         oParam.Codtipocom = codigoTipoCompra;
@@ -985,31 +990,31 @@ function js_verificaTipoCompra(codigoTipoCompra, funcaoRetorno) {
             parameters: 'json=' + Object.toJSON(oParam),
             onComplete: window[funcaoRetorno]
         });
-}
-
-function js_handleTipoAutorizacao(oAjax) {
-    oRetorno = eval("(" + oAjax.responseText + ")");
-
-    if (oRetorno.tipocompratribunal != 13) {
-        js_desabilitaTipoCompra();
     }
-    js_removeObj('msgbox');
-}
 
-function js_desabilitaTipoCompra() {
+    function js_handleTipoAutorizacao(oAjax) {
+        oRetorno = eval("(" + oAjax.responseText + ")");
 
-    const e54_codcom = document.querySelector('#e54_codcom');
-    const e54_codcomdescr = document.querySelector('#e54_codcomdescr');
+        if (oRetorno.tipocompratribunal != 13) {
+            js_desabilitaTipoCompra();
+        }
+        js_removeObj('msgbox');
+    }
 
-    let atributos = "background-color:#DEB887; pointer-events: none; touch-action: none;";
+    function js_desabilitaTipoCompra() {
 
-    e54_codcom.style.cssText = atributos;
-    e54_codcom.setAttribute('readonly', 'true');
+        const e54_codcom = document.querySelector('#e54_codcom');
+        const e54_codcomdescr = document.querySelector('#e54_codcomdescr');
 
-    let atributos2 = "background-color:#DEB887; pointer-events: none; touch-action: none; width: 58%; ";
-    e54_codcomdescr.style.cssText = atributos2;
-    e54_codcomdescr.setAttribute('readonly', 'true');
-}
+        let atributos = "background-color:#DEB887; pointer-events: none; touch-action: none;";
+
+        e54_codcom.style.cssText = atributos;
+        e54_codcom.setAttribute('readonly', 'true');
+
+        let atributos2 = "background-color:#DEB887; pointer-events: none; touch-action: none; width: 58%; ";
+        e54_codcomdescr.style.cssText = atributos2;
+        e54_codcomdescr.setAttribute('readonly', 'true');
+    }
 
 
     function js_verificaresfera() {
@@ -1234,9 +1239,9 @@ function js_desabilitaTipoCompra() {
             alert("Usuário: Para este elemento é obrigatório informar a data da sentença judicial.")
             return false;
         }
-     
+
         if (document.form1.efd60_cessaomaoobra.value == 2) {
-            
+
             if (document.form1.efd60_possuicno.value == 0) {
                 alert("Campo Possui Cadastro Nacional de Obras (CNO) nao Informado.")
                 return false;
@@ -1256,8 +1261,8 @@ function js_desabilitaTipoCompra() {
             if (!document.form1.efd60_indprestservico.value) {
                 alert("Campo Indicativo de Prestação de Serviços em Obra de Construção Civil nao Informado.")
                 return false;
-            } 
-            
+            }
+
             if (!document.form1.efd60_prescontricprb.value) {
                 alert("Campo  Prestador é contribuinte da CPRB nao Informado.")
                 return false;
@@ -1267,7 +1272,7 @@ function js_desabilitaTipoCompra() {
                 alert("Campo  Tipo de Serviço nao Informado.")
                 return false;
             }
-        }     
+        }
 
         if (document.form1.e60_resumo.value == '') {
             alert("Campo Resumo nao Informado.")
@@ -1478,14 +1483,14 @@ function js_desabilitaTipoCompra() {
         }
         js_reload(document.querySelector('#e54_codcom').value);
     }
-     /**
+    /**
      * Ajustes no layout
      */
-     var elemento           = document.getElementById("e54_tipol");
-     var aquisicaoprodrural = document.getElementById("efd60_aquisicaoprodrural");
-     var prodoptacp         = document.getElementById("efd60_prodoptacp");
+    var elemento           = document.getElementById("e54_tipol");
+    var aquisicaoprodrural = document.getElementById("efd60_aquisicaoprodrural");
+    var prodoptacp         = document.getElementById("efd60_prodoptacp");
 
-     if (elemento !== null) {   
+    if (elemento !== null) {
         $('efd60_possuicno').style.width = "99%";
         $('efd60_numcno').style.width = "99%";
         $('efd60_indprestservico').style.width = "99%";
@@ -1520,18 +1525,18 @@ function js_desabilitaTipoCompra() {
         $('e56_codele2').style.width = "51.5%";
         $('e60_tipodespesa').style.width = "68.6%";
         $('efd60_cessaomaoobra').style.width = "68.6%";
-        $('e60_emendaparlamentar').style.width = "68.6%"; 
-        $('e60_esferaemendaparlamentar').style.width = "68.6%"; 
+        $('e60_emendaparlamentar').style.width = "68.6%";
+        $('e60_esferaemendaparlamentar').style.width = "68.6%";
         $('e60_datasentenca').style.width = "10%";
-        
-     } else {
+
+    } else {
         $('efd60_possuicno').style.width = "99%";
         $('efd60_numcno').style.width = "99%";
         $('efd60_indprestservico').style.width = "99%";
         $('efd60_prescontricprb').style.width = "99%";
         $('efd60_tiposervico').style.width = "99%";
         if (prodoptacp !== null) {
-           $('efd60_prodoptacp').style.width = "68.6%";
+            $('efd60_prodoptacp').style.width = "68.6%";
         }
         $('e54_destin').style.width = "68.6%";
         $('e60_numconvenio').style.width = "10%";
@@ -1556,11 +1561,11 @@ function js_desabilitaTipoCompra() {
         $('e60_codemp').style.width = "10%";
         $('e54_autori').style.width = "10%";
         $('e54_numcgm').style.width = "10%";
-        $('z01_nome').style.width = "58%";   
-        $('e60_emendaparlamentar').style.width = "68.6%"; 
-        $('e60_esferaemendaparlamentar').style.width = "68.6%"; 
+        $('z01_nome').style.width = "58%";
+        $('e60_emendaparlamentar').style.width = "68.6%";
+        $('e60_esferaemendaparlamentar').style.width = "68.6%";
         if (aquisicaoprodrural !== null) {
             $('efd60_aquisicaoprodrural').style.width = "68.6%";
         }
-     }
+    }
 </script>

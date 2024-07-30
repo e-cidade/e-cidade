@@ -20,7 +20,7 @@ class RelatorioInscricoes extends FpdfBaseReports
     /**
      * @var string
      */
-    private string $descricaoRelatorio = "INSCRIÇÕES GERADAS A PARTIR DA REDESIM";
+    private string $descricaoRelatorio = "INSCRIÇÕES GERADAS/ATUALIZADAS A PARTIR DA REDESIM";
 
     /**
      * @var Collection<InscricaoRedesim>
@@ -129,26 +129,29 @@ class RelatorioInscricoes extends FpdfBaseReports
         $this->setfont('arial', '', 9);
 
         $altura = 62;
+        $pageBreakLimit = 9;
+        $pageBreakCount = 1;
 
         /**
          * @var InscricaoRedesim $oInscricaoRedesim
          */
         foreach ($this->inscricoesRedesim as $oInscricaoRedesim) {
+            $iFill = ($pageBreakCount % 2 == 0 ) ? 0 : 1;
             $this->setY($altura);
             $this->setX(10);
-            $this->Cell(35, 5, $oInscricaoRedesim->q179_inscricao, 1, 0, "C");
+            $this->Cell(35, 5, $oInscricaoRedesim->q179_inscricao, 1, 0, "C", $iFill);
 
             $this->setY($altura);
             $this->setX(45);
-            $this->Cell(33, 5, db_formatar($oInscricaoRedesim->issBase->cgm->z01_cgccpf, "cnpj"), 1, 0, "C");
+            $this->Cell(33, 5, db_formatar($oInscricaoRedesim->issBase->cgm->z01_cgccpf, "cnpj"), 1, 0, "C", $iFill);
 
             $this->setY($altura);
             $this->setX(78);
-            $this->Cell(171, 5, substr($oInscricaoRedesim->issBase->cgm->z01_nome, 0, 25), 1, 0, "L");
+            $this->Cell(171, 5, substr($oInscricaoRedesim->issBase->cgm->z01_nome, 0, 25), 1, 0, "L", $iFill);
 
             $this->setY($altura);
             $this->setX(249);
-            $this->Cell(40, 5, DBDate::converter($oInscricaoRedesim->issBase->q02_dtinic), 1, 0, "C");
+            $this->Cell(40, 5, DBDate::converter($oInscricaoRedesim->issBase->q02_dtinic), 1, 0, "C", $iFill);
 
             $this->setY($altura + 5);
             $this->setX(10);
@@ -157,7 +160,7 @@ class RelatorioInscricoes extends FpdfBaseReports
             $sNumeroRua = trim($oInscricaoRedesim->q02_numero);
             $sNomeBairro = trim($oInscricaoRedesim->j13_descr);
             $sRua = "{$sTipoRua} {$sNomeRua}, {$sNumeroRua}, {$sNomeBairro}";
-            $this->Cell(139, 5, substr($sRua, 0, 65), 1, 0, "L");
+            $this->Cell(139, 5, substr($sRua, 0, 65), 1, 0, "L", $iFill);
 
             $this->setY($altura + 5);
             $this->setX(149);
@@ -167,10 +170,18 @@ class RelatorioInscricoes extends FpdfBaseReports
                 substr("{$oInscricaoRedesim->q03_ativ} - {$oInscricaoRedesim->q03_descr}", 0, 70),
                 1,
                 0,
-                "L"
+                "L",
+                $iFill
             );
 
+            if($pageBreakCount === $pageBreakLimit) {
+                $pageBreakCount = 1;
+                $this->AddPage("L");
+                $altura = 38;
+                continue;
+            }
             $altura += 5 + 9;
+            $pageBreakCount++;
         }
     }
 }

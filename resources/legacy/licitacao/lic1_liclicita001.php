@@ -97,6 +97,7 @@ if ($l12_numeracaomanual == 't' && !isset($incluir)) {
 if (isset($incluir)) {
 
 	$oPost = db_utils::postmemory($_POST);
+
 	$sqlerro    = false;
 	// ID's do l03_pctipocompratribunal com base no l20_codtipocom escolhido pelo usurio
 	$sSql = $clcflicita->sql_query_file((int)$oPost->l20_codtipocom, 'distinct(l03_pctipocompratribunal)');
@@ -154,12 +155,12 @@ if (isset($incluir)) {
 	$oParamLicicita = db_stdClass::getParametro('licitaparam', array(db_getsession("DB_instit")));
 	$l12_pncp = $oParamLicicita[0]->l12_pncp;
 
-	if ($l20_leidalicitacao == 1 && $l12_pncp == 't') {
-		if ($oPost->l212_codigo == 0) {
-			$erro_msg .= 'Campo Amparo Legal não informado\n\n';
-			$sqlerro = true;
-		}
-	}
+	// if ($l20_leidalicitacao == 1 && $l12_pncp == 't') {
+	// 	if ($oPost->l212_codigo == 0) {
+	// 		$erro_msg .= 'Campo Amparo Legal não informado\n\n';
+	// 		$sqlerro = true;
+	// 	}
+	// }
 
 	if ($l20_categoriaprocesso == 0 && $l12_pncp == 't') {
 		$erro_msg .= 'Campo categoria do processo não informado\n\n';
@@ -407,14 +408,14 @@ if (isset($incluir)) {
 			}
 		}
 
-		if ($modalidade_tribunal == 52 || $modalidade_tribunal == 53) {
+		if (in_array($modalidade_tribunal, [52, 53]) && $l20_leidalicitacao == "2") {
 
 			$verifica = $clliclicita->verificaMembrosModalidade("pregao", $l20_equipepregao);
 			if (!$verifica) {
 				$erro_msg = "Para as modalidades Pregao presencial e Pregao eletronico  necessario\nque a Comissao de Licitacao tenham os tipos Pregoeiro e Membro da Equipe de Apoio";
 				$sqlerro = true;
 			}
-		} else if ($modalidade_tribunal == 48 || $modalidade_tribunal == 49 || $modalidade_tribunal == 50) {
+		} else if (in_array($modalidade_tribunal, [48, 49, 50]) && $l20_leidalicitacao == "2") {
 
 			$verifica = $clliclicita->verificaMembrosModalidade("outros", $l20_equipepregao);
 			if (!$verifica) {
@@ -457,6 +458,18 @@ if (isset($incluir)) {
 				$l20_criterioadjudicacao = "null";
 			}
 		}
+		if(($l20_tipoprocesso == '5' || $l20_tipoprocesso == '6') && $l20_criterioadjudicacaodispensa == '0'){
+
+			$erro_msg = 'O campo critério de adjudicação é de preenchimento obrigatório"';
+			$nomeCampo = 'l20_criteriodeadjudicacaodispensa';
+			$sqlerro = true;
+		}
+
+		if($l20_tipoprocesso == '1' && $l20_dispensaporvalor == "" && $l20_leidalicitacao == '1'){
+            $erro_msg = 'O campo Dispensa por valor é de preenchimento obrigatório';
+            $nomeCampo = 'l20_dispensaporvalor';
+            $sqlerro = true;
+        }
 
 		if($l20_tipoprocesso == "5" || $l20_tipoprocesso == "6"){
 			$clliclicita->l20_usaregistropreco = "t";
@@ -479,8 +492,13 @@ if (isset($incluir)) {
 			$clliclicita->l20_anousu      	  =  $anousu;
 			$clliclicita->l20_licsituacao = '0';
 			$clliclicita->l20_instit      = db_getsession("DB_instit");
+			$clliclicita->l20_tipliticacao = $l20_tipliticacao;
 
-			$clliclicita->l20_criterioadjudicacao = $l20_criterioadjudicacao; //OC3770
+			if($l20_criterioadjudicacaodispensa != '0'){
+                $clliclicita->l20_criterioadjudicacao   = $l20_criterioadjudicacaodispensa;
+            }else{
+                $clliclicita->l20_criterioadjudicacao   = $l20_criterioadjudicacao;
+            }
 			$clliclicita->l20_justificativapncp = $l20_justificativapncp;
 			$clliclicita->l20_categoriaprocesso = $l20_categoriaprocesso;
 			$clliclicita->l20_receita = $l20_receita;

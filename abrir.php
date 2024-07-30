@@ -421,9 +421,7 @@ if (pg_numrows($result) == 0 or pg_numrows($result1) == 0) {
 
       if (age.indexOf("Firefox") != -1) {
         debugger;
-        console.log('aquiiii');
         jan = window.open('inicio.php?uso=<?= $DB_login ?>&janelaWidth=' + sizeWidth + '&janelaHeight=' + sizeHeight, wname, 'width=' + sizeWidth + ',height=' + sizeHeight + ',fullscreen=1,toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=1,resizable=0');
-        console.log(jan);
         jan.moveTo(0, 0);
       } else if (nav.indexOf('Microsoft') != -1) {
 

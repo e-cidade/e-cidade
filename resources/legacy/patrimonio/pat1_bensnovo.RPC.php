@@ -370,6 +370,11 @@ switch ($oParam->exec) {
       }
 
       $oParam->obser = trim($oParam->obser);
+
+      if (empty($oParam->garantia)) {
+        throw new Exception("Informe a garantia.");
+      }
+
       if (empty($oParam->obser)) {
         throw new Exception("Informe a observação do lançamento.");
       }
@@ -392,7 +397,42 @@ switch ($oParam->exec) {
       if ($clabens->t64_bemtipos == 2) {
         $oRetorno->clabens = 2;
       }
+     
+      if ($oParam->emp_sistema == "SIM") {
+        $sqlerro=false;
+        if($sqlerro==false){
+          db_inicio_transacao();
+          $codbem = $oBem->getCodigoBem();
+          $clbensmater = new cl_bensmater;
+          $clbensmater->t53_codbem = $codbem; 
+          $clbensmater->t53_ntfisc = $oParam->cod_notafiscal; 
+          $clbensmater->t53_ordem  = $oParam->cod_ordemdecompra; 
+          $clbensmater->t53_garant = $oParam->garantia;
+          $clbensmater->t53_empen  = $oParam->t53_empen;
+          $clbensmater->incluir($oBem->getCodigoBem());
 
+          if($clbensmater->erro_status==0){
+            $sqlerro=true;
+            throw new Exception($clbensmater->erro_msg);
+          }
+          db_fim_transacao($sqlerro);
+        }
+        if ($sqlerro == false) {
+
+              db_inicio_transacao();
+              $clbensmatemp = new cl_bensmaterialempempenho;
+              $clbensmatemp->t11_bensmaterial = $oBem->getCodigoBem();
+              $clbensmatemp->t11_empempenho   = $oParam->t53_empen;
+              $clbensmatemp->incluir(null);
+              if ($clbensmatemp->erro_status == 0) {
+                $sqlerro=true;
+                throw new Exception($clbensmatemp->erro_msg);
+              } 
+              
+              db_fim_transacao($sqlerro);
+        } 
+           
+      }
       $oRetorno->dados->t52_bem = $oBem->getCodigoBem();
       $oRetorno->statusbens = $statusbens;
     } catch (Exception $oException) {

@@ -2,33 +2,6 @@
 require_once 'model/relatorios/Relatorio.php';
 require("libs/db_utils.php");
 
-function definicaoValorUnitarioePercentual($pc80_criterioadjudicacao,$si02_tabela,$si02_taxa,&$valorUnitario,&$percentual)
-{
-
-    if($pc80_criterioadjudicacao == 1 && $si02_tabela == "t"){
-        $valorUnitario = 0;
-        $valorUnitario = $valorUnitario > 0 ? "R$ $valorUnitario" : "-";
-        return true;
-    }
-
-    if($pc80_criterioadjudicacao == 1 && $si02_tabela == "f"){
-        $percentual->mediapercentual = "-";
-        return true;
-    }
-
-    if($pc80_criterioadjudicacao == 2 && $si02_taxa == "t"){
-        $valorUnitario = 0;
-        $valorUnitario = $valorUnitario > 0 ? "R$ $valorUnitario" : "-";
-        return true;
-    }
-    
-    if($pc80_criterioadjudicacao == 2 && $si02_taxa == "f"){
-        $percentual = "-";
-        return true;
-
-    }
-}
-
 parse_str($HTTP_SERVER_VARS['QUERY_STRING']); //
 db_postmemory($HTTP_POST_VARS);
 $oGet = db_utils::postmemory($_GET);
@@ -318,7 +291,7 @@ else pc01_descrmater||'. '||pc01_complmater end as pc01_descrmater
                 }else{
                     $oDadosDaLinha->quantidade = $oResult->si02_qtditem;
                 }
-                $oDadosDaLinha->mediapercentual = number_format($oResult->si02_mediapercentual, 2) . "%";
+                $oDadosDaLinha->percentual = number_format($oResult->si02_vlpercreferencia, 2) . "%";
                 $oDadosDaLinha->unidadeDeMedida = $oResult1->m61_abrev;
                 $oDadosDaLinha->total = number_format($oResult->si02_vltotalprecoreferencia, 2, ",", ".");
             
@@ -333,10 +306,10 @@ else pc01_descrmater||'. '||pc01_complmater end as pc01_descrmater
                 }else{
                     $oDadosDaLinha->quantidade = $oResult->si02_qtditem;
                 }
-                if ($oResult->si02_mediapercentual == 0) {
-                    $oDadosDaLinha->mediapercentual = "";
+                if ($oResult->si02_vlpercreferencia == 0) {
+                    $oDadosDaLinha->percentual = "";
                 } else {
-                    $oDadosDaLinha->mediapercentual = number_format($oResult->si02_mediapercentual, 2) . "%";
+                    $oDadosDaLinha->percentual = number_format($oResult->si02_vlpercreferencia, 2) . "%";
                 }
                 $oDadosDaLinha->unidadeDeMedida = $oResult1->m61_abrev;
                 
@@ -348,22 +321,23 @@ else pc01_descrmater||'. '||pc01_complmater end as pc01_descrmater
             $controle++;
             $sqencia++;
 
-            definicaoValorUnitarioePercentual($pc80_criterioadjudicacao,$oResult->si02_tabela,$oResult->si02_taxa,$oDadosDaLinha->valorUnitario,$oDadosDaLinha->mediapercentual);
+            $oDadosDaLinha->percentual = ($oResult->si02_tabela == "t" || $oResult->si02_taxa == "t") ? $oDadosDaLinha->percentual : "-";
+            $oDadosDaLinha->valorUnitario = ($oResult->si02_tabela == "t" || $oResult->si02_taxa == "t") ? "-" : "R$ " . $oDadosDaLinha->valorUnitario;
 
             if ($pc80_criterioadjudicacao == 2 || $pc80_criterioadjudicacao == 1) {
                 echo "$oDadosDaLinha->seq;";
                 echo "$oDadosDaLinha->item;";
                 echo "$oDadosDaLinha->descricao;";
-                echo "R$ $oDadosDaLinha->valorUnitario;";
+                echo "$oDadosDaLinha->valorUnitario;";
                 echo "$oDadosDaLinha->quantidade;";
                 echo "$oDadosDaLinha->unidadeDeMedida;";
-                echo "$oDadosDaLinha->mediapercentual;";
+                echo "$oDadosDaLinha->percentual;";
                 echo "R$ $oDadosDaLinha->total;\n";
             } else {
                 echo "$oDadosDaLinha->seq;";
                 echo "$oDadosDaLinha->item;";
                 echo "$oDadosDaLinha->descricao;";
-                echo "R$ $oDadosDaLinha->valorUnitario;";
+                echo "$oDadosDaLinha->valorUnitario;";
                 echo "$oDadosDaLinha->quantidade;";
                 echo "$oDadosDaLinha->unidadeDeMedida;";
                 echo "R$ $oDadosDaLinha->total;\n";
@@ -437,6 +411,7 @@ else pc01_descrmater||'. '||pc01_complmater end as pc01_descrmater
         si02_tabela,
         si02_taxa,
         si02_mediapercentual,
+        si02_vlpercreferencia,
         si01_justificativa
         FROM pcprocitem
         JOIN solicitem ON pc11_codigo=pc81_solicitem
@@ -499,12 +474,13 @@ else pc01_descrmater||'. '||pc01_complmater end as pc01_descrmater
             $oDadosDaLinha->unidadeDeMedida = $oResult->m61_abrev;
             $oDadosDaLinha->total = number_format($lTotal, 2, ",", ".");
 
-            definicaoValorUnitarioePercentual($pc80_criterioadjudicacao,$oResult->si02_tabela,$oResult->si02_taxa,$oDadosDaLinha->valorUnitario,$oDadosDaLinha->mediapercentual);
+            $oDadosDaLinha->percentual = ($oResult->si02_tabela == "t" || $oResult->si02_taxa == "t") ? $oDadosDaLinha->percentual : "-";
+            $oDadosDaLinha->valorUnitario = ($oResult->si02_tabela == "t" || $oResult->si02_taxa == "t") ? "-" : "R$ " . $oDadosDaLinha->valorUnitario;
 
             echo "$oDadosDaLinha->seq;";
             echo "$oDadosDaLinha->item;";
             echo "$oDadosDaLinha->descricao;";
-            echo "R$ $oDadosDaLinha->valorUnitario;";
+            echo "$oDadosDaLinha->valorUnitario;";
             echo "$oDadosDaLinha->quantidade;";
             echo "$oDadosDaLinha->unidadeDeMedida;";
             echo "R$ $oDadosDaLinha->total;\n";

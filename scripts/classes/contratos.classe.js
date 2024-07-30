@@ -57,7 +57,7 @@ contrato = function () {
         if ($F('ac16_origem') == 1) {
             sTitulo = "Processo de compras";
         } else {
-            sTitulo = "Licitações";
+            sTitulo = "Licitaï¿½ï¿½es";
         }
         var iLarguraJanela = 1200;
         var iAlturaJanela  = document.body.clientHeight;
@@ -76,7 +76,7 @@ contrato = function () {
         oJanela.setContent(sContent);
         oMessageBoard = new DBMessageBoard('messageboardlicitacao',
             sTitulo +" vencidas por "+$F('nomecontratado'),
-            'Escolha as licitações que farão parte do contrato',
+            'Escolha as licitaï¿½ï¿½es que farï¿½o parte do contrato',
             $('windowwndLicitacoesVencidas_content')
         );
         oJanela.setShutDownFunction(function() {
@@ -123,7 +123,7 @@ contrato = function () {
 
         oGridDados.setCellWidth(new Array("5%", "4%", "60%", "11%", "10%"));
         oGridDados.setCellAlign(new Array("right", "right", "left", "right", "right"));
-        oGridDados.setHeader(new Array("Código","Número", "Objeto", "Número do Exercício", "Data da Inclusão"));
+        oGridDados.setHeader(new Array("Cï¿½digo","Nï¿½mero", "Objeto", "Nï¿½mero do Exercï¿½cio", "Data da Inclusï¿½o"));
         oGridDados.show($('cntDados'));
 
 
@@ -198,7 +198,7 @@ contrato = function () {
             me.setPropertiesCss();
         } else {
 
-            oGridDados.setStatus("Não foram Encontrados registros");
+            oGridDados.setStatus("Nï¿½o foram Encontrados registros");
         }
     };
 
@@ -229,13 +229,13 @@ contrato = function () {
 
         if (aItensSelecionados.length == 0) {
 
-            alert('Não foram selecionados nenhum item.');
+            alert('Nï¿½o foram selecionados nenhum item.');
             return false;
         } else {
 
             if (aItensSelecionados.length > 1) {
 
-                alert("Permitida Seleção de Somente um Julgamento!!");
+                alert("Permitida Seleï¿½ï¿½o de Somente um Julgamento!!");
                 return false;
             }
 
@@ -421,6 +421,12 @@ contrato = function () {
         var sDescricaoreajuste        = $F('ac16_descricaoreajuste');
         var sDescricaoindice          = $F('ac16_descricaoindice');
         var iVigenciaIndeterminada    = $F('ac16_vigenciaindeterminada');
+        var iTipoPagamento              = $F('ac16_tipopagamento');
+        var iNumeroParcela              = $F('ac16_numparcela');
+        var iValorParcela               = $F('ac16_vlrparcela');
+        var sIdentificarCipi            = $F('ac16_identificadorcipi');
+        var sUrlCipi                    = $F('ac16_urlcipi');
+        var sInformacoesComplementares  = $F('ac16_infcomplementares');
 
         vigenciaIsVisible = document.getElementById('tr_vigenciaindeterminada').style.display;
 
@@ -432,41 +438,41 @@ contrato = function () {
         /* Novas validaï¿½ï¿½es para atender o SICOM */
 
         if(iReajuste==0){
-            alert("Usuário: Campo Possui Critério de Reajuste não informado.");
+            alert("Usuï¿½rio: Campo Possui Critï¿½rio de Reajuste nï¿½o informado.");
             $('ac16_reajuste').focus();
             return false;
         }else if(iReajuste==1){
             if(iCriterioreajuste==0){
-                alert("Usuário: Campo Critério de Reajuste não informado.");
+                alert("Usuï¿½rio: Campo Critï¿½rio de Reajuste nï¿½o informado.");
                 $('ac16_criterioreajuste').focus();
                 return false;
             }
             if(dtReajuste==""){
-                alert("Usuário: Campo Data Base de Reajuste não informado.");
+                alert("Usuï¿½rio: Campo Data Base de Reajuste nï¿½o informado.");
                 $('ac16_datareajuste').focus();
                 return false;
             }
             if(sPeriodoreajuste==""){
-                alert("Usuário: Campo Período de Reajuste não informado.");
+                alert("Usuï¿½rio: Campo Perï¿½odo de Reajuste nï¿½o informado.");
                 $('ac16_periodoreajuste').focus();
                 return false;
             }
             if(iCriterioreajuste==1){
                 if(iIndicereajuste==0){
-                    alert("Usuário: Campo Índice de Reajuste não informado.");
+                    alert("Usuï¿½rio: Campo ï¿½ndice de Reajuste nï¿½o informado.");
                     $('ac16_indicereajuste').focus();
                     return false;
                 }
                 if(iIndicereajuste==6){
                     if(sDescricaoindice==""){
-                        alert("Usuário: Campo Descrição do Índice não informado.");
+                        alert("Usuï¿½rio: Campo Descriï¿½ï¿½o do ï¿½ndice nï¿½o informado.");
                         $('ac16_descricaoindice').focus();
                         return false;
                     }
                 }
             }else{
                 if(sDescricaoreajuste==0){
-                    alert("Usuário: Campo Descrição de Reajuste não informado.");
+                    alert("Usuï¿½rio: Campo Descriï¿½ï¿½o de Reajuste nï¿½o informado.");
                     $('ac16_descricaoreajuste').focus();
                     return false;
                 }
@@ -476,19 +482,19 @@ contrato = function () {
         }
         if(iOrigem == '3') {
             if ((iTipoOrigem == '2' || iTipoOrigem == '3') && !iLicitacao) {
-                alert('Informe uma Licitação.');
+                alert('Informe uma Licitaï¿½ï¿½o.');
                 $('ac16_licitacao').focus();
                 return false;
             }
 
             if(iTipoOrigem == '4' && !iAdesaoregpreco){
-                alert('Informe uma Adesão de Registro de Preço.');
+                alert('Informe uma Adesï¿½o de Registro de Preï¿½o.');
                 $('ac16_adesaoregpreco').focus();
                 return false;
             }
 
             if(['5', '6', '7', '8', '9'].includes(iTipoOrigem) && !iLicoutroorgao){
-                alert('Informe uma Licitação por Outro orgão.');
+                alert('Informe uma Licitaï¿½ï¿½o por Outro orgï¿½o.');
                 $('ac16_licoutroorgao').focus();
                 return false;
             }
@@ -515,7 +521,7 @@ contrato = function () {
         }
         if (iNumero == "") {
 
-            alert('Informe o número do acordo.');
+            alert('Informe o nï¿½mero do acordo.');
             $('ac16_numeroacordo').focus();
             return false;
         }
@@ -529,7 +535,7 @@ contrato = function () {
 
         if (iDepartamentoResponsavel == "") {
 
-            alert('Informe o Departamento Responsável.');
+            alert('Informe o Departamento Responsï¿½vel.');
             $('ac16_deptoresponsavel').focus();
             return false;
         }
@@ -543,7 +549,7 @@ contrato = function () {
         }
         if (dtInicio == "") {
 
-            alert('Informe a data de início do Contrato.');
+            alert('Informe a data de inï¿½cio do Contrato.');
             $('ac16_datainicio').focus();
             return false;
         }
@@ -585,26 +591,31 @@ contrato = function () {
         }
 
       if(iGrupoContrato == 1 && iQtdPeriodoVigencia == ""){
-            alert('Unid.Execução/Entrega não informado.');
+            alert('Unid.Execuï¿½ï¿½o/Entrega nï¿½o informado.');
             $('ac16_qtdperiodo').focus();
             return false;
       }
       if(iGrupoContrato == 2 && iQtdPeriodoVigencia == ""){
-            alert('Unid.Execução/Entrega não informado.');
+            alert('Unid.Execuï¿½ï¿½o/Entrega nï¿½o informado.');
             $('ac16_qtdperiodo').focus();
             return false;
       }
       if(iGrupoContrato == 3 && iQtdPeriodoVigencia == ""){
-            alert('Unid.Execução/Entrega não informado.');
+            alert('Unid.Execuï¿½ï¿½o/Entrega nï¿½o informado.');
             $('ac16_qtdperiodo').focus();
             return false;
       }
       if(iGrupoContrato == 7 && iQtdPeriodoVigencia == ""){
-            alert('Unid.Execução/Entrega não informado.');
+            alert('Unid.Execuï¿½ï¿½o/Entrega nï¿½o informado.');
             $('ac16_qtdperiodo').focus();
             return false;
       }
 
+        if (iTipoPagamento == 0) {
+            alert('Informe o tipo de pagamento.');
+            $('ac16_tipopagamento').focus();
+            return false;
+        }
 
         var oParam      = new Object();
         oParam.exec     = "salvarContrato";
@@ -645,6 +656,13 @@ contrato = function () {
         oParam.contrato.sDescricaoindice          = encodeURIComponent(tagString(sDescricaoindice));
         oParam.contrato.sPeriodoreajuste          = sPeriodoreajuste;
         oParam.contrato.iVigenciaIndeterminada    = iVigenciaIndeterminada;
+        oParam.contrato.iTipoPagamento              = iTipoPagamento;
+        oParam.contrato.iNumeroParcela              = iNumeroParcela;
+        oParam.contrato.iValorParcela               = iValorParcela;
+        oParam.contrato.sIdentificarCipi            = sIdentificarCipi;
+        oParam.contrato.sUrlCipi                    = sUrlCipi;
+        oParam.contrato.sInformacoesComplementares  = sInformacoesComplementares;
+
         js_divCarregando('Aguarde, salvando dados do contrato','msgbox');
         var oAjax   = new Ajax.Request(
             sURL,
@@ -843,6 +861,18 @@ contrato = function () {
                     $('trdescricaoindicereajuste').style.display = '';
                 }
             }
+
+            if (oRetorno.contrato.iTipoPagamento == 2) {
+                document.getElementById('trNumeroParcela').style.display = '';
+                document.getElementById('trValorParcela').style.display = '';
+            }
+
+            document.getElementById('ac16_tipopagamento').value = oRetorno.contrato.iTipoPagamento;
+            document.getElementById('ac16_numparcela').value = oRetorno.contrato.iNumeroParcela;
+            document.getElementById('ac16_vlrparcela').value = oRetorno.contrato.iValorParcela;
+            document.getElementById('ac16_identificadorcipi').value = oRetorno.contrato.sIdentificarCipi;
+            document.getElementById('ac16_urlcipi').value = oRetorno.contrato.sUrlCipi;
+            document.getElementById('ac16_infcomplementares').value = oRetorno.contrato.sInformacoesComplementares;
             
             js_verificatipoorigem();
             js_pesquisaac16_acordogrupo(false);
@@ -874,7 +904,7 @@ contrato = function () {
     };
 
     /**
-     * Verifica se deve mostrar o valor para alteração ou não
+     * Verifica se deve mostrar o valor para alteraï¿½ï¿½o ou nï¿½o
      */
     this.mostraValorAcordo = function() {
 

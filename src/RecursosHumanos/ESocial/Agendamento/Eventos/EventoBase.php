@@ -24,6 +24,62 @@ abstract class EventoBase
     protected $iniValid;
 
     /**
+     * modo
+     *
+     * @var string
+     */
+    protected $modo;
+
+    /**
+     * dt_alteracao
+     *
+     * @var string
+     */
+    protected $dt_alteracao;
+
+    /**
+     * indapuracao
+     *
+     * @var string
+     */
+    protected $indapuracao;
+
+    /**
+     * tppgto
+     *
+     * @var string
+     */
+    protected $tppgto;
+
+    /**
+     * tpevento
+     *
+     * @var string
+     */
+    protected $tpevento;
+
+    /**
+     * tpevento
+     *
+     * @var string
+     */
+    protected $transDCTFWeb;
+
+    /**
+     * tpevento
+     *
+     * @var string
+     */
+    protected $evtpgtos;
+
+    /**
+     * tpevento
+     *
+     * @var string
+     */
+    protected $aDadosExclusao;
+
+    /**
      *
      * @param \stdClass $dados
      */

@@ -26,7 +26,9 @@ class cl_pcorcamfornelic {
    var $pc31_liclicitatipoempresa = 0;
    var $pc31_regata = 0; 
    var $pc31_renunrecurso = 0;
-   var $pc31_liclicita = 0; 
+   var $pc31_liclicita = 0;
+   var $pc31_representante = null; 
+   var $pc31_cpf = null;
    // cria propriedade com as variaveis do arquivo 
    var $campos = "
                  pc31_orcamforne = int8 = Código do orcamento deste fornecedor 
@@ -36,7 +38,9 @@ class cl_pcorcamfornelic {
                  pc31_liclicitatipoempresa = int4 = Tipo da Empresa
                  pc31_regata = int8 = Reg. Ata presença 
                  pc31_renunrecurso = int8 = Renuncia de Recurso
-                 pc31_liclicita = int8 = Código da Licitação 
+                 pc31_liclicita = int8 = Código da Licitação
+                 pc31_representante = varchar(100) = Representante
+                 pc31_cpf = varchar(11) = cpf 
                  ";
    //funcao construtor da classe 
    function cl_pcorcamfornelic() { 
@@ -71,6 +75,9 @@ class cl_pcorcamfornelic {
        $this->pc31_regata = ($this->pc31_regata == ""?@$GLOBALS["HTTP_POST_VARS"]["pc31_regata"]:$this->pc31_regata);
        $this->pc31_renunrecurso = ($this->pc31_renunrecurso == ""?@$GLOBALS["HTTP_POST_VARS"]["pc31_renunrecurso"]:$this->pc31_renunrecurso);
        $this->pc31_liclicita = ($this->pc31_liclicita == ""?@$GLOBALS["HTTP_POST_VARS"]["pc31_liclicita"]:$this->pc31_liclicita);
+       $this->pc31_representante = ($this->pc31_representante == ""?@$GLOBALS["HTTP_POST_VARS"]["pc31_representante"]:$this->pc31_representante);
+       $this->pc31_cpf = ($this->pc31_cpf == ""?@$GLOBALS["HTTP_POST_VARS"]["pc31_cpf"]:$this->pc31_cpf);
+
      }else{
        $this->pc31_orcamforne = ($this->pc31_orcamforne == ""?@$GLOBALS["HTTP_POST_VARS"]["pc31_orcamforne"]:$this->pc31_orcamforne);
      }
@@ -149,7 +156,9 @@ class cl_pcorcamfornelic {
                                       ,pc31_liclicitatipoempresa
                                       ,pc31_regata 
                                       ,pc31_renunrecurso
-                                      ,pc31_liclicita 
+                                      ,pc31_liclicita
+                                      ,pc31_representante
+                                      ,pc31_cpf 
                        )
                 values (
                                 $this->pc31_orcamforne 
@@ -159,7 +168,9 @@ class cl_pcorcamfornelic {
                                ,$this->pc31_liclicitatipoempresa
                                ,$this->pc31_regata 
                                ,$this->pc31_renunrecurso
-                               ,$this->pc31_liclicita 
+                               ,$this->pc31_liclicita
+                               ,".($this->pc31_representante == "null" || $this->pc31_representante == ""?"null":"'".$this->pc31_representante."'")." 
+                               ,".($this->pc31_cpf == "null" || $this->pc31_cpf == ""?"null":"'".$this->pc31_cpf."'")."  
                       )";
      $result = db_query($sql); 
      if($result==false){ 

@@ -33,10 +33,13 @@ class UpdateOrCreateActivityService
             ->where('q71_estrutural', 'like', "%{$data->getCnaeEstruturalEcidade()}")
             ->first();
 
-        if(!$cnae->exists()) {
-            $this->cnae->q71_estrutural = $data->getCnaeEstruturalEcidade();
-            $this->cnae->q71_descr = $data->getDescricaoEcidade();
-            $this->cnae->save();
+        if($cnae === null || !$cnae->exists()) {
+            $cnae = $this->cnae->newQuery()->create(
+                [
+                    'q71_estrutural' => $data->getCnaeEstruturalEcidade(),
+                    'q71_descr' => $data->getDescricaoEcidade(),
+                ]
+            );
         }
 
         $cnaeAnalitica = $this->cnaeAnalitica->newQuery()->firstOrCreate(
@@ -48,11 +51,12 @@ class UpdateOrCreateActivityService
             return;
         }
 
-        $this->ativid->q03_descr = $data->getDescricaoEcidade();
-        $this->ativid->save();
+        $ativid = $this->ativid->newQuery()->create(
+            ['q03_descr' => $data->getDescricaoEcidade()]
+        );
 
         $this->atividcnae->q74_cnaeanalitica = $cnaeAnalitica->q72_sequencial;
-        $this->atividcnae->q74_ativid = $this->ativid->q03_ativ;
+        $this->atividcnae->q74_ativid =$ativid->q03_ativ;
         $this->atividcnae->save();
     }
 }

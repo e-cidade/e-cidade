@@ -143,6 +143,11 @@ $rotulo->label("z01_cgccpf");
 
         $filtroempelemento = "";
         if (!isset($pesquisa_chave)) {
+
+          if ($_GET['vlranu']) {
+              $vlranu = " and e60_vlranu > 0 ";
+          }
+
           $campos = "empempenho.e60_numemp,
           e60_emiss,
           empempenho.e60_codemp,
@@ -166,6 +171,12 @@ $rotulo->label("z01_cgccpf");
           ";
           $campos = " distinct " . $campos;
           $dbwhere = " e60_instit = " . db_getsession("DB_instit");
+
+          if ($vlranu){
+              $anoSessao = db_getsession("DB_anousu");
+              $dbwhere .= $vlranu;
+              $dbwhere .= " and e60_numemp in (select c75_numemp from conlancamemp where date_part('year', c75_data)::int4 = $anoSessao)";
+          }
 
           if ($inclusaoordemcompra == true) {
 
@@ -358,6 +369,12 @@ $rotulo->label("z01_cgccpf");
             }
             if (isset($chave_e60_numemp) && !empty($chave_e60_numemp)) {
               $dbwhere .= " AND e60_numemp=$chave_e60_numemp ";
+            }
+
+            if ($vlranu){
+                 $anoSessao = db_getsession("DB_anousu");
+                 $dbwhere .= $vlranu;
+                 $dbwhere .= " and e60_numemp in (select c75_numemp from conlancamemp where date_part('year', c75_data)::int4 = $anoSessao)";
             }
 
 

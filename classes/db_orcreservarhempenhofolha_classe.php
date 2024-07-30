@@ -45,11 +45,13 @@ class cl_orcreservarhempenhofolha {
    var $o120_sequencial = 0; 
    var $o120_orcreserva = 0; 
    var $o120_rhempenhofolha = 0; 
+   var $o120_lota = null;
    // cria propriedade com as variaveis do arquivo 
    var $campos = "
                  o120_sequencial = int4 = Código da Reserva 
                  o120_orcreserva = int8 = Código da Reserva 
                  o120_rhempenhofolha = int4 = Código Empenho 
+                 o120_lota = int8 = Lotação 
                  ";
    //funcao construtor da classe 
    function cl_orcreservarhempenhofolha() { 
@@ -72,6 +74,7 @@ class cl_orcreservarhempenhofolha {
        $this->o120_sequencial = ($this->o120_sequencial == ""?@$GLOBALS["HTTP_POST_VARS"]["o120_sequencial"]:$this->o120_sequencial);
        $this->o120_orcreserva = ($this->o120_orcreserva == ""?@$GLOBALS["HTTP_POST_VARS"]["o120_orcreserva"]:$this->o120_orcreserva);
        $this->o120_rhempenhofolha = ($this->o120_rhempenhofolha == ""?@$GLOBALS["HTTP_POST_VARS"]["o120_rhempenhofolha"]:$this->o120_rhempenhofolha);
+       $this->o120_lota = ($this->o120_lota == ""?@$GLOBALS["HTTP_POST_VARS"]["o120_lota"]:$this->o120_lota);
      }else{
        $this->o120_sequencial = ($this->o120_sequencial == ""?@$GLOBALS["HTTP_POST_VARS"]["o120_sequencial"]:$this->o120_sequencial);
      }
@@ -129,15 +132,20 @@ class cl_orcreservarhempenhofolha {
        $this->erro_status = "0";
        return false;
      }
+     if ($this->o120_lota == null || $this->o120_lota == "") {
+      $this->o120_lota = 'null';
+     }
      $sql = "insert into orcreservarhempenhofolha(
                                        o120_sequencial 
                                       ,o120_orcreserva 
                                       ,o120_rhempenhofolha 
+                                      ,o120_lota
                        )
                 values (
                                 $this->o120_sequencial 
                                ,$this->o120_orcreserva 
                                ,$this->o120_rhempenhofolha 
+                               ,$this->o120_lota
                       )";
      $result = db_query($sql); 
      if($result==false){ 

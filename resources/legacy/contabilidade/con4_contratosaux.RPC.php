@@ -679,6 +679,12 @@ switch ($oParam->exec) {
                 $oContrato->setDescricaoReajuste($oParam->contrato->sDescricaoreajuste);
                 $oContrato->setDescricaoIndice($oParam->contrato->sDescricaoindice);
                 $oContrato->setVigenciaIndeterminada($oParam->contrato->iVigenciaIndeterminada);
+                $oContrato->setTipoPagamento($oParam->contrato->iTipoPagamento);
+                $oContrato->setNumeroParcela($oParam->contrato->iNumeroParcela);
+                $oContrato->setValorParcela($oParam->contrato->iValorParcela);
+                $oContrato->setIdentificarCipi($oParam->contrato->sIdentificarCipi);
+                $oContrato->setUrlCipi($oParam->contrato->sUrlCipi);
+                $oContrato->setInformacoesComplementares($oParam->contrato->sInformacoesComplementares);
                 $oContrato->save();
 
                 /*
@@ -878,7 +884,12 @@ switch ($oParam->exec) {
             $oDadosContrato->iIndicereajuste              = $oContrato->getIndiceReajuste();
             $oDadosContrato->sDescricaoreajuste           = urlencode($oContrato->getDescricaoReajuste());
             $oDadosContrato->sDescricaoindice             = urlencode($oContrato->getDescricaoIndice());
-
+            $oDadosContrato->iTipoPagamento               = $oContrato->getTipoPagamento();
+            $oDadosContrato->iNumeroParcela               = $oContrato->getNumeroParcela();
+            $oDadosContrato->iValorParcela                = $oContrato->getValorParcela();
+            $oDadosContrato->sIdentificarCipi             = $oContrato->getIdentificarCipi();
+            $oDadosContrato->sUrlCipi                     = $oContrato->getUrlCipi();
+            $oDadosContrato->sInformacoesComplementares   = $oContrato->getInformacoesComplementares();
             $oRetorno->contrato = $oDadosContrato;
         } catch (Exception $eErro) {
 

@@ -27,6 +27,9 @@ use App\Services\Tributario\ISSQN\Redesim\Alvara\UpdateOrCreateCompanyActivitySe
 use App\Services\Tributario\ISSQN\Redesim\Alvara\UpdateOrCreateCompanyAddress;
 use App\Services\Tributario\ISSQN\Redesim\Alvara\UpdateOrCreateCompanyPartnerService;
 use BusinessException;
+use DBString;
+use Exception;
+use Throwable;
 
 class RedesimApiService
 {
@@ -67,6 +70,7 @@ class RedesimApiService
 
     /**
      * @throws BusinessException
+     * @throws Throwable
      */
     public function execute(CompanyDTO $data)
     {
@@ -176,23 +180,18 @@ class RedesimApiService
      * @param Issbase $issbase
      * @param CompanyDTO $data
      * @return void
+     * @throws Throwable
      */
     public function createAlvaraRedesim(Issbase $issbase, CompanyDTO $data): void
     {
-        $inscricaoRedesim = $this->inscricaoRedesim
-            ->newQuery()
-            ->where('q179_inscricao', $issbase->q02_inscr)
-            ->first();
-
-        if (empty($inscricaoRedesim)) {
-            $this->inscricaoRedesim->fill(
+        $this->inscricaoRedesim
+            ->insert(
                 [
                     'q179_inscricao' => $issbase->q02_inscr,
                     'q179_inscricaoredesim' => $data->inscricaoMunicipal,
-                    'q179_dadosregistro' => json_encode(\DBString::utf8_encode_all($data))
+                    'q179_dadosregistro' => json_encode(DBString::utf8_encode_all($data->originalData), JSON_UNESCAPED_UNICODE)
                 ]
-            )->save();
-        }
+            );
     }
 
     /**

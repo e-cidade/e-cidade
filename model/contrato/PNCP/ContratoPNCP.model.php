@@ -43,8 +43,8 @@ class ContratoPNCP extends ModeloBasePNCP
             'codigoUnidade'                            => $this->getUndCompradora(),
             'objetoContrato'                           => $oDado->objetocontrato,
             'valorInicial'                             => $oDado->valorinicial,
-            'numeroParcelas'                           => 1,
-            'valorParcela'                             => $oDado->valorparcela,
+            'numeroParcelas'                           => $oDado->numeroparcelas,
+            'valorParcela'                             => $oDado->valorparcela == '' ? $oDado->valorglobal : $oDado->valorparcela,
             'valorGlobal'                              => $oDado->valorglobal,
             'dataAssinatura'                           => $oDado->dataassinatura,
             'dataVigenciaInicio'                       => $oDado->datavigenciainicio,
@@ -83,6 +83,7 @@ class ContratoPNCP extends ModeloBasePNCP
             'dataVigenciaInicio'                       => $oDado->datavigenciainicio,
             'dataVigenciaFim'                          => $oDado->datavigenciafim,
             'valorAcumulado'                           => $oDado->valorAcumulado,
+            'justificativa'                            => $oDado->justificativaPncp,
         );
 
         $oDadosAPI = $aDadosAPI;
@@ -277,6 +278,45 @@ class ContratoPNCP extends ModeloBasePNCP
         return array($retorno[24], $retorno[17], $retorno[18]);
     }
 
+    public function enviarAnexoEmpenho($oEmpempenhopncp, $empAnexo)
+    {
+        $token = $this->login();
+
+        //aqui sera necessario informar o cnpj da instituicao de envio
+        $cnpj = substr($oEmpempenhopncp->e213_numerocontrolepncp, 0, 14);
+
+        $url = $this->envs['URL'] . "orgaos/" . $cnpj . "/contratos" . "/" . $oEmpempenhopncp->e213_ano . "/" . $oEmpempenhopncp->e213_sequencialpncp . "/arquivos";
+
+        $cfile = new \CURLFile("tmp/{$empAnexo->e100_titulo}");
+
+        $arquivo = array(
+            'arquivo' =>  $cfile
+        );
+
+        $chpncp      = curl_init($url);
+
+        $headers = array(
+            'Content-Type: multipart/form-data',
+            'Authorization: ' . $token,
+            'Titulo-Documento: ' . $empAnexo->e100_titulo,
+            'Tipo-Documento-Id:' . $empAnexo->e100_tipoanexo
+        );
+
+        $optionspncp = $this->getParancurl('POST',$arquivo,$headers,false,true);
+
+        curl_setopt_array($chpncp, $optionspncp);
+        $contentpncp = curl_exec($chpncp);
+
+        curl_close($chpncp);
+
+
+        $retorno = explode(':', $contentpncp);
+
+        if (substr($retorno[0], 7, 3) == 201)
+            return array($retorno[5] . $retorno[6], substr($retorno[0], 7, 3));
+        return array($retorno[24], $retorno[17], $retorno[18]);
+    }
+
     public function excluirArquivoContrato($dados)
     {
 
@@ -287,6 +327,36 @@ class ContratoPNCP extends ModeloBasePNCP
 
         $url = $this->envs['URL'] . "orgaos/" . $cnpj . "/contratos" . "/" . $dados->ac214_ano . "/" . $dados->ac214_sequencialpncp . "/arquivos" . "/" . $dados->ac214_sequencialarquivo;
 
+        $justificativa = '{"justificativa":"Excluindo arquivo do PNCP"}';
+
+        $chpncp      = curl_init($url);
+
+        $headers = array(
+            'Content-Type: application/json',
+            'Authorization: ' . $token,
+        );
+
+        $optionspncp = $this->getParancurl('DELETE',$justificativa,$headers,false,false);
+
+        curl_setopt_array($chpncp, $optionspncp);
+        $contentpncp = curl_exec($chpncp);
+
+        curl_close($chpncp);
+
+        $retorno = json_decode($contentpncp);
+
+        return $retorno;
+    }
+
+    public function excluirAnexoEmpenho($oEmpempenhopncp,$sequencialArquivo)
+    {
+
+        $token = $this->login();
+
+        //aqui sera necessario informar o cnpj da instituicao de envio
+        $cnpj = substr($oEmpempenhopncp->e213_numerocontrolepncp, 0, 14);
+
+        $url = $this->envs['URL'] . "orgaos/" . $cnpj . "/contratos" . "/" . $oEmpempenhopncp->e213_ano . "/" . $oEmpempenhopncp->e213_sequencialpncp . "/arquivos" . "/" . $sequencialArquivo;
         $justificativa = '{"justificativa":"Excluindo arquivo do PNCP"}';
 
         $chpncp      = curl_init($url);

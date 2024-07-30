@@ -168,7 +168,7 @@ class cl_habilitacaoforn {
       }
      if($this->verifica_habilitados($this->l206_licitacao,$this->l206_fornecedor) == true){
          $this->erro_sql = "O Fornecedor já está Habilitado";
-         $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+         $this->erro_msg   = "Usuário:  ".$this->erro_sql;
          $this->erro_status = "0";
          return false;
      }
@@ -181,6 +181,14 @@ class cl_habilitacaoforn {
        $this->erro_status = "0";
        return false;
      }
+     if($this->l206_datahab == null ){
+      $this->erro_sql = " Campo Data de Habilitação não Informado.";
+      $this->erro_campo = "l206_datahab";
+      $this->erro_banco = "";
+      $this->erro_msg   = "Usuário: " .$this->erro_sql;
+      $this->erro_status = "0";
+      return false;
+    }
      if($this->l206_licitacao == null ){
        $this->erro_sql = " Campo Código Licitação nao Informado.";
        $this->erro_campo = "l206_licitacao";
@@ -253,8 +261,7 @@ class cl_habilitacaoforn {
          $this->erro_sql = " Campo Data de Validade deve ser maior ou igual a Data Habilitação.";
          $this->erro_campo = "l206_datavalidadeinss_dia";
          $this->erro_banco = "";
-         $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-         $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+         $this->erro_msg   = "Usuário: ".$this->erro_sql." ";
          $this->erro_status = "0";
          return false;
        }
@@ -292,8 +299,7 @@ class cl_habilitacaoforn {
          $this->erro_sql = " Campo Data de Validade deve ser maior ou igual a Data Habilitação.";
          $this->erro_campo = "l206_datavalidadefgts_dia";
          $this->erro_banco = "";
-         $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-         $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+         $this->erro_msg   = "Usuário: ".$this->erro_sql;
          $this->erro_status = "0";
          return false;
        }
@@ -329,8 +335,7 @@ class cl_habilitacaoforn {
        $this->erro_sql = " Campo Data de Validade deve ser maior ou igual a Data Habilitação.";
        $this->erro_campo = "l206_datavalidadecndt_dia";
        $this->erro_banco = "";
-       $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-       $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+       $this->erro_msg   = "Usuário: ".$this->erro_sql;
        $this->erro_status = "0";
        return false;
      }
@@ -422,27 +427,6 @@ class cl_habilitacaoforn {
      $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
      $this->erro_status = "1";
      $this->numrows_incluir= pg_affected_rows($result);
-     $resaco = $this->sql_record($this->sql_query_file($this->l206_sequencial));
-     if(($resaco!=false)||($this->numrows!=0)){
-       $resac = db_query("select nextval('db_acount_id_acount_seq') as acount");
-       $acount = pg_result($resac,0,0);
-       $resac = db_query("insert into db_acountacesso values($acount,".db_getsession("DB_acessado").")");
-       $resac = db_query("insert into db_acountkey values($acount,2009482,'$this->l206_sequencial','I')");
-       $resac = db_query("insert into db_acount values($acount,2010232,2009482,'','".AddSlashes(pg_result($resaco,0,'l206_sequencial'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-       $resac = db_query("insert into db_acount values($acount,2010232,2009483,'','".AddSlashes(pg_result($resaco,0,'l206_fornecedor'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-       $resac = db_query("insert into db_acount values($acount,2010232,2009543,'','".AddSlashes(pg_result($resaco,0,'l206_licitacao'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-       $resac = db_query("insert into db_acount values($acount,2010232,2009544,'','".AddSlashes(pg_result($resaco,0,'l206_representante'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-       $resac = db_query("insert into db_acount values($acount,2010232,2009545,'','".AddSlashes(pg_result($resaco,0,'l206_datahab'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-       $resac = db_query("insert into db_acount values($acount,2010232,2009566,'','".AddSlashes(pg_result($resaco,0,'l206_numcertidaoinss'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-       $resac = db_query("insert into db_acount values($acount,2010232,2009567,'','".AddSlashes(pg_result($resaco,0,'l206_dataemissaoinss'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-       $resac = db_query("insert into db_acount values($acount,2010232,2009568,'','".AddSlashes(pg_result($resaco,0,'l206_datavalidadeinss'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-       $resac = db_query("insert into db_acount values($acount,2010232,2009569,'','".AddSlashes(pg_result($resaco,0,'l206_numcertidaofgts'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-       $resac = db_query("insert into db_acount values($acount,2010232,2009570,'','".AddSlashes(pg_result($resaco,0,'l206_dataemissaofgts'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-       $resac = db_query("insert into db_acount values($acount,2010232,2009571,'','".AddSlashes(pg_result($resaco,0,'l206_datavalidadefgts'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-       $resac = db_query("insert into db_acount values($acount,2010232,2009572,'','".AddSlashes(pg_result($resaco,0,'l206_numcertidaocndt'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-       $resac = db_query("insert into db_acount values($acount,2010232,2009573,'','".AddSlashes(pg_result($resaco,0,'l206_dataemissaocndt'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-       $resac = db_query("insert into db_acount values($acount,2010232,2009574,'','".AddSlashes(pg_result($resaco,0,'l206_datavalidadecndt'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-     }
      return true;
    }
    // funcao para alteracao
@@ -464,6 +448,14 @@ class cl_habilitacaoforn {
          return false;
        }
      }
+     if($this->l206_datahab == null ){
+      $this->erro_sql = " Campo Data de Habilitação não Informado.";
+      $this->erro_campo = "l206_datahab";
+      $this->erro_banco = "";
+      $this->erro_msg   = "Usuário: ".$this->erro_sql;
+      $this->erro_status = "0";
+      return false;
+    }
      if(trim($this->l206_fornecedor)!="" || isset($GLOBALS["HTTP_POST_VARS"]["l206_fornecedor"])){
        $sql  .= $virgula." l206_fornecedor = $this->l206_fornecedor ";
        $virgula = ",";
@@ -533,15 +525,9 @@ class cl_habilitacaoforn {
      if(trim($this->l206_numcertidaoinss)!="" || isset($GLOBALS["HTTP_POST_VARS"]["l206_numcertidaoinss"])){
        $sql  .= $virgula." l206_numcertidaoinss = '$this->l206_numcertidaoinss' ";
        $virgula = ",";
-       // if(trim($this->l206_numcertidaoinss) == null && $this->fisica_juridica == 'j'){
-       //   $this->erro_sql = " Campo Número Certidão INSS nao Informado.";
-       //   $this->erro_campo = "l206_numcertidaoinss";
-       //   $this->erro_banco = "";
-       //   $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-       //   $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
-       //   $this->erro_status = "0";
-       //   return false;
-       // }
+     }else {
+      $sql  .= $virgula." l206_numcertidaoinss = null ";
+      $virgula = ",";
      }
      if(trim($this->l206_dataemissaoinss)!="" || isset($GLOBALS["HTTP_POST_VARS"]["l206_dataemissaoinss_dia"]) &&  ($GLOBALS["HTTP_POST_VARS"]["l206_dataemissaoinss_dia"] !="") ){
        $sql  .= $virgula." l206_dataemissaoinss = '$this->l206_dataemissaoinss' ";
@@ -556,19 +542,8 @@ class cl_habilitacaoforn {
        //   return false;
        // }
      }     else{
-       if(isset($GLOBALS["HTTP_POST_VARS"]["l206_dataemissaoinss_dia"])){
          $sql  .= $virgula." l206_dataemissaoinss = null ";
          $virgula = ",";
-         // if(trim($this->l206_dataemissaoinss) == null && $this->fisica_juridica == 'j'){
-         //   $this->erro_sql = " Campo Data Emissão nao Informado.";
-         //   $this->erro_campo = "l206_dataemissaoinss_dia";
-         //   $this->erro_banco = "";
-         //   $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-         //   $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
-         //   $this->erro_status = "0";
-         //   return false;
-         // }
-       }
      }
 
      if(trim($this->l206_datavalidadeinss)!="" || isset($GLOBALS["HTTP_POST_VARS"]["l206_datavalidadeinss_dia"]) &&  ($GLOBALS["HTTP_POST_VARS"]["l206_datavalidadeinss_dia"] !="") ){
@@ -584,42 +559,24 @@ class cl_habilitacaoforn {
        //   return false;
        // }
      }     else{
-       if(isset($GLOBALS["HTTP_POST_VARS"]["l206_datavalidadeinss_dia"])){
          $sql  .= $virgula." l206_datavalidadeinss = null ";
          $virgula = ",";
-         // if(trim($this->l206_datavalidadeinss) == null && $this->fisica_juridica == 'j'){
-         //   $this->erro_sql = " Campo Data de Validade nao Informado.";
-         //   $this->erro_campo = "l206_datavalidadeinss_dia";
-         //   $this->erro_banco = "";
-         //   $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-         //   $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
-         //   $this->erro_status = "0";
-         //   return false;
-         // }
-       }
      }
      if($this->l206_datavalidadeinss != '')
       if($this->l206_datavalidadeinss < $this->l206_datahab && $this->fisica_juridica == 'j') {
          $this->erro_sql = " Campo Data de Validade deve ser maior ou igual a Data Habilitação.";
          $this->erro_campo = "l206_datavalidadeinss_dia";
          $this->erro_banco = "";
-         $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-         $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+         $this->erro_msg   = "Usuário: ".$this->erro_sql;
          $this->erro_status = "0";
          return false;
        }
      if(trim($this->l206_numcertidaofgts)!="" || isset($GLOBALS["HTTP_POST_VARS"]["l206_numcertidaofgts"])){
        $sql  .= $virgula." l206_numcertidaofgts = '$this->l206_numcertidaofgts' ";
        $virgula = ",";
-       // if(trim($this->l206_numcertidaofgts) == null && $this->fisica_juridica == 'j'){
-       //   $this->erro_sql = " Campo Número Certidão FGTS nao Informado.";
-       //   $this->erro_campo = "l206_numcertidaofgts";
-       //   $this->erro_banco = "";
-       //   $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-       //   $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
-       //   $this->erro_status = "0";
-       //   return false;
-       // }
+     }else{
+      $sql  .= $virgula." l206_numcertidaofgts = null ";
+      $virgula = ",";
      }
      if(trim($this->l206_dataemissaofgts)!="" || isset($GLOBALS["HTTP_POST_VARS"]["l206_dataemissaofgts_dia"]) &&  ($GLOBALS["HTTP_POST_VARS"]["l206_dataemissaofgts_dia"] !="") ){
        $sql  .= $virgula." l206_dataemissaofgts = '$this->l206_dataemissaofgts' ";
@@ -634,19 +591,8 @@ class cl_habilitacaoforn {
        //   return false;
        // }
      }     else{
-       if(isset($GLOBALS["HTTP_POST_VARS"]["l206_dataemissaofgts_dia"])){
          $sql  .= $virgula." l206_dataemissaofgts = null ";
          $virgula = ",";
-         // if(trim($this->l206_dataemissaofgts) == null && $this->fisica_juridica == 'j'){
-         //   $this->erro_sql = " Campo Data Emissão nao Informado.";
-         //   $this->erro_campo = "l206_dataemissaofgts_dia";
-         //   $this->erro_banco = "";
-         //   $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-         //   $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
-         //   $this->erro_status = "0";
-         //   return false;
-         // }
-       }
      }
      if(trim($this->l206_datavalidadefgts)!="" || isset($GLOBALS["HTTP_POST_VARS"]["l206_datavalidadefgts_dia"]) &&  ($GLOBALS["HTTP_POST_VARS"]["l206_datavalidadefgts_dia"] !="") ){
        $sql  .= $virgula." l206_datavalidadefgts = '$this->l206_datavalidadefgts' ";
@@ -661,43 +607,24 @@ class cl_habilitacaoforn {
        //   return false;
        // }
      }     else{
-       if(isset($GLOBALS["HTTP_POST_VARS"]["l206_datavalidadefgts_dia"])){
          $sql  .= $virgula." l206_datavalidadefgts = null ";
          $virgula = ",";
-         // if(trim($this->l206_datavalidadefgts) == null && $this->fisica_juridica == 'j'){
-         //   $this->erro_sql = " Campo Data de Validade nao Informado.";
-         //   $this->erro_campo = "l206_datavalidadefgts_dia";
-         //   $this->erro_banco = "";
-         //   $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-         //   $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
-         //   $this->erro_status = "0";
-         //   return false;
-         // }
-       }
      }
      if($this->l206_datavalidadefgts != '')
       if($this->l206_datavalidadefgts < $this->l206_datahab && $this->fisica_juridica == 'j'){
          $this->erro_sql = " Campo Data de Validade deve ser maior ou igual a Data Habilitação.";
          $this->erro_campo = "l206_datavalidadefgts_dia";
          $this->erro_banco = "";
-         $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-         $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+         $this->erro_msg   = "Usuário: ".$this->erro_sql;
          $this->erro_status = "0";
          return false;
       }
      if(trim($this->l206_numcertidaocndt)!="" || isset($GLOBALS["HTTP_POST_VARS"]["l206_numcertidaocndt"])){
        $sql  .= $virgula." l206_numcertidaocndt = '$this->l206_numcertidaocndt' ";
        $virgula = ",";
-       // if(trim($this->l206_numcertidaocndt) == null && $this->fisica_juridica == 'j'){
-       //   $this->erro_sql = " Campo Número Certidão CNDT nao Informado.";
-       //   $this->erro_campo = "l206_numcertidaocndt";
-       //   $this->erro_banco = "";
-       //   $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-       //   $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
-       //   $this->erro_status = "0";
-       //   return false;
-       //   $this->l206_numcertidaocndt = '';
-       // }
+     } else {
+        $sql  .= $virgula." l206_numcertidaocndt = null ";
+        $virgula = ",";
      }
      if(trim($this->l206_dataemissaocndt)!="" || isset($GLOBALS["HTTP_POST_VARS"]["l206_dataemissaocndt_dia"]) &&  ($GLOBALS["HTTP_POST_VARS"]["l206_dataemissaocndt_dia"] !="") ){
        $sql  .= $virgula." l206_dataemissaocndt = '$this->l206_dataemissaocndt' ";
@@ -713,20 +640,8 @@ class cl_habilitacaoforn {
        //   $this->l206_dataemissaocndt = '';
        // }
      }     else{
-       if(isset($GLOBALS["HTTP_POST_VARS"]["l206_dataemissaocndt_dia"])){
          $sql  .= $virgula." l206_dataemissaocndt = null ";
          $virgula = ",";
-         // if(trim($this->l206_dataemissaocndt) == null && $this->fisica_juridica == 'j'){
-         //   $this->erro_sql = " Campo Data Emissão nao Informado.";
-         //   $this->erro_campo = "l206_dataemissaocndt_dia";
-         //   $this->erro_banco = "";
-         //   $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-         //   $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
-         //   $this->erro_status = "0";
-         //   return false;
-         //   $this->l206_dataemissaocndt = '';
-         // }
-       }
      }
      if(trim($this->l206_datavalidadecndt)!="" || isset($GLOBALS["HTTP_POST_VARS"]["l206_datavalidadecndt_dia"]) &&  ($GLOBALS["HTTP_POST_VARS"]["l206_datavalidadecndt_dia"] !="") ){
        $sql  .= $virgula." l206_datavalidadecndt = '$this->l206_datavalidadecndt' ";
@@ -742,20 +657,8 @@ class cl_habilitacaoforn {
        //   $this->l206_datavalidadecndt = '';
        // }
      }     else{
-       if(isset($GLOBALS["HTTP_POST_VARS"]["l206_datavalidadecndt_dia"])){
          $sql  .= $virgula." l206_datavalidadecndt = null ";
          $virgula = ",";
-         // if(trim($this->l206_datavalidadecndt) == null && $this->fisica_juridica == 'j'){
-         //   $this->erro_sql = " Campo Data de Validade nao Informado.";
-         //   $this->erro_campo = "l206_datavalidadecndt_dia";
-         //   $this->erro_banco = "";
-         //   $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-         //   $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
-         //   $this->erro_status = "0";
-         //   return false;
-         //   $this->l206_datavalidadecndt = '';
-         // }
-       }
      }
 
      if($this->l206_datavalidadecndt != '')
@@ -763,8 +666,7 @@ class cl_habilitacaoforn {
          $this->erro_sql = " Campo Data de Validade deve ser maior ou igual a Data Habilitação.";
          $this->erro_campo = "l206_datavalidadecndt_dia";
          $this->erro_banco = "";
-         $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-         $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+         $this->erro_msg   = "Usuário: ".$this->erro_sql;
          $this->erro_status = "0";
          return false;
          $this->l206_datavalidadecndt = '';
@@ -772,43 +674,6 @@ class cl_habilitacaoforn {
      $sql .= " where ";
      if($l206_sequencial!=null){
        $sql .= " l206_sequencial = $this->l206_sequencial";
-     }
-     $resaco = $this->sql_record($this->sql_query_file($this->l206_sequencial));
-     if($this->numrows>0){
-       for($conresaco=0;$conresaco<$this->numrows;$conresaco++){
-         $resac = db_query("select nextval('db_acount_id_acount_seq') as acount");
-         $acount = pg_result($resac,0,0);
-         $resac = db_query("insert into db_acountacesso values($acount,".db_getsession("DB_acessado").")");
-         $resac = db_query("insert into db_acountkey values($acount,2009482,'$this->l206_sequencial','A')");
-         if(isset($GLOBALS["HTTP_POST_VARS"]["l206_sequencial"]) || $this->l206_sequencial != "")
-           $resac = db_query("insert into db_acount values($acount,2010232,2009482,'".AddSlashes(pg_result($resaco,$conresaco,'l206_sequencial'))."','$this->l206_sequencial',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         if(isset($GLOBALS["HTTP_POST_VARS"]["l206_fornecedor"]) || $this->l206_fornecedor != "")
-           $resac = db_query("insert into db_acount values($acount,2010232,2009483,'".AddSlashes(pg_result($resaco,$conresaco,'l206_fornecedor'))."','$this->l206_fornecedor',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         if(isset($GLOBALS["HTTP_POST_VARS"]["l206_licitacao"]) || $this->l206_licitacao != "")
-           $resac = db_query("insert into db_acount values($acount,2010232,2009543,'".AddSlashes(pg_result($resaco,$conresaco,'l206_licitacao'))."','$this->l206_licitacao',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         if(isset($GLOBALS["HTTP_POST_VARS"]["l206_representante"]) || $this->l206_representante != "")
-           $resac = db_query("insert into db_acount values($acount,2010232,2009544,'".AddSlashes(pg_result($resaco,$conresaco,'l206_representante'))."','$this->l206_representante',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         if(isset($GLOBALS["HTTP_POST_VARS"]["l206_datahab"]) || $this->l206_datahab != "")
-           $resac = db_query("insert into db_acount values($acount,2010232,2009545,'".AddSlashes(pg_result($resaco,$conresaco,'l206_datahab'))."','$this->l206_datahab',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         if(isset($GLOBALS["HTTP_POST_VARS"]["l206_numcertidaoinss"]) || $this->l206_numcertidaoinss != "")
-           $resac = db_query("insert into db_acount values($acount,2010232,2009566,'".AddSlashes(pg_result($resaco,$conresaco,'l206_numcertidaoinss'))."','$this->l206_numcertidaoinss',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         if(isset($GLOBALS["HTTP_POST_VARS"]["l206_dataemissaoinss"]) || $this->l206_dataemissaoinss != "")
-           $resac = db_query("insert into db_acount values($acount,2010232,2009567,'".AddSlashes(pg_result($resaco,$conresaco,'l206_dataemissaoinss'))."','$this->l206_dataemissaoinss',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         if(isset($GLOBALS["HTTP_POST_VARS"]["l206_datavalidadeinss"]) || $this->l206_datavalidadeinss != "")
-           $resac = db_query("insert into db_acount values($acount,2010232,2009568,'".AddSlashes(pg_result($resaco,$conresaco,'l206_datavalidadeinss'))."','$this->l206_datavalidadeinss',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         if(isset($GLOBALS["HTTP_POST_VARS"]["l206_numcertidaofgts"]) || $this->l206_numcertidaofgts != "")
-           $resac = db_query("insert into db_acount values($acount,2010232,2009569,'".AddSlashes(pg_result($resaco,$conresaco,'l206_numcertidaofgts'))."','$this->l206_numcertidaofgts',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         if(isset($GLOBALS["HTTP_POST_VARS"]["l206_dataemissaofgts"]) || $this->l206_dataemissaofgts != "")
-           $resac = db_query("insert into db_acount values($acount,2010232,2009570,'".AddSlashes(pg_result($resaco,$conresaco,'l206_dataemissaofgts'))."','$this->l206_dataemissaofgts',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         if(isset($GLOBALS["HTTP_POST_VARS"]["l206_datavalidadefgts"]) || $this->l206_datavalidadefgts != "")
-           $resac = db_query("insert into db_acount values($acount,2010232,2009571,'".AddSlashes(pg_result($resaco,$conresaco,'l206_datavalidadefgts'))."','$this->l206_datavalidadefgts',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         if(isset($GLOBALS["HTTP_POST_VARS"]["l206_numcertidaocndt"]) || $this->l206_numcertidaocndt != "")
-           $resac = db_query("insert into db_acount values($acount,2010232,2009572,'".AddSlashes(pg_result($resaco,$conresaco,'l206_numcertidaocndt'))."','$this->l206_numcertidaocndt',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         if(isset($GLOBALS["HTTP_POST_VARS"]["l206_dataemissaocndt"]) || $this->l206_dataemissaocndt != "")
-           $resac = db_query("insert into db_acount values($acount,2010232,2009573,'".AddSlashes(pg_result($resaco,$conresaco,'l206_dataemissaocndt'))."','$this->l206_dataemissaocndt',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         if(isset($GLOBALS["HTTP_POST_VARS"]["l206_datavalidadecndt"]) || $this->l206_datavalidadecndt != "")
-           $resac = db_query("insert into db_acount values($acount,2010232,2009574,'".AddSlashes(pg_result($resaco,$conresaco,'l206_datavalidadecndt'))."','$this->l206_datavalidadecndt',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-       }
      }
      $result = db_query($sql);
      if($result==false){
@@ -844,33 +709,7 @@ class cl_habilitacaoforn {
    }
    // funcao para exclusao
    function excluir ($l206_sequencial=null,$dbwhere=null) {
-     if($dbwhere==null || $dbwhere==""){
-       $resaco = $this->sql_record($this->sql_query_file($l206_sequencial));
-     }else{
-       $resaco = $this->sql_record($this->sql_query_file(null,"*",null,$dbwhere));
-     }
-     if(($resaco!=false)||($this->numrows!=0)){
-       for($iresaco=0;$iresaco<$this->numrows;$iresaco++){
-         $resac = db_query("select nextval('db_acount_id_acount_seq') as acount");
-         $acount = pg_result($resac,0,0);
-         $resac = db_query("insert into db_acountacesso values($acount,".db_getsession("DB_acessado").")");
-         $resac = db_query("insert into db_acountkey values($acount,2009482,'$l206_sequencial','E')");
-         $resac = db_query("insert into db_acount values($acount,2010232,2009482,'','".AddSlashes(pg_result($resaco,$iresaco,'l206_sequencial'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         $resac = db_query("insert into db_acount values($acount,2010232,2009483,'','".AddSlashes(pg_result($resaco,$iresaco,'l206_fornecedor'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         $resac = db_query("insert into db_acount values($acount,2010232,2009543,'','".AddSlashes(pg_result($resaco,$iresaco,'l206_licitacao'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         $resac = db_query("insert into db_acount values($acount,2010232,2009544,'','".AddSlashes(pg_result($resaco,$iresaco,'l206_representante'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         $resac = db_query("insert into db_acount values($acount,2010232,2009545,'','".AddSlashes(pg_result($resaco,$iresaco,'l206_datahab'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         $resac = db_query("insert into db_acount values($acount,2010232,2009566,'','".AddSlashes(pg_result($resaco,$iresaco,'l206_numcertidaoinss'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         $resac = db_query("insert into db_acount values($acount,2010232,2009567,'','".AddSlashes(pg_result($resaco,$iresaco,'l206_dataemissaoinss'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         $resac = db_query("insert into db_acount values($acount,2010232,2009568,'','".AddSlashes(pg_result($resaco,$iresaco,'l206_datavalidadeinss'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         $resac = db_query("insert into db_acount values($acount,2010232,2009569,'','".AddSlashes(pg_result($resaco,$iresaco,'l206_numcertidaofgts'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         $resac = db_query("insert into db_acount values($acount,2010232,2009570,'','".AddSlashes(pg_result($resaco,$iresaco,'l206_dataemissaofgts'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         $resac = db_query("insert into db_acount values($acount,2010232,2009571,'','".AddSlashes(pg_result($resaco,$iresaco,'l206_datavalidadefgts'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         $resac = db_query("insert into db_acount values($acount,2010232,2009572,'','".AddSlashes(pg_result($resaco,$iresaco,'l206_numcertidaocndt'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         $resac = db_query("insert into db_acount values($acount,2010232,2009573,'','".AddSlashes(pg_result($resaco,$iresaco,'l206_dataemissaocndt'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         $resac = db_query("insert into db_acount values($acount,2010232,2009574,'','".AddSlashes(pg_result($resaco,$iresaco,'l206_datavalidadecndt'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-       }
-     }
+
      $sql = " delete from habilitacaoforn
                     where ";
      $sql2 = "";
@@ -1037,6 +876,36 @@ class cl_habilitacaoforn {
       } else{
         return false;
     }
+  }
+
+  function sqlFornecedoresParaHabilitar($codigoLicitacao){
+    return $sSql = "
+    select pc21_numcgm,z01_nome from pcorcamfornelic
+    inner join pcorcamforne on pc31_orcamforne = pc21_orcamforne
+    inner join cgm on z01_numcgm = pc21_numcgm
+    where pc31_liclicita = $codigoLicitacao and pc21_numcgm not in
+    (select l206_fornecedor from habilitacaoforn where l206_licitacao = $codigoLicitacao )";
+  }
+
+  function verificacaoDispensaInexibilidade($codigoLicitacao,$codigoFornecedor){
+    $bloquearCampos = false;
+    $rsCodigoTribunal = db_query("select l03_pctipocompratribunal from liclicita inner join cflicita on cflicita.l03_codigo = liclicita.l20_codtipocom where l20_codigo = $codigoLicitacao;");
+    $codigoTribunal = db_utils::fieldsMemory($rsCodigoTribunal, 0)->l03_pctipocompratribunal;
+    $rsCgm = db_query("select case WHEN LENGTH(z01_cgccpf) = 11 THEN 'cpf' ELSE 'cnpj' END  As cpfcnpj from cgm where z01_numcgm = $codigoFornecedor;");
+    $cpfcnpj = db_utils::fieldsMemory($rsCgm, 0)->cpfcnpj;
+    if($cpfcnpj == "cpf" && in_array($codigoTribunal, array(100,101,102,103))){
+      $bloquearCampos = true;
+      return $bloquearCampos;
+    }
+
+    return $bloquearCampos;
+  }
+
+  function todosFornecedoresDaLicitacao($codigoLicitacao){
+    return "select pc21_numcgm,z01_nome from pcorcamfornelic
+    inner join pcorcamforne on pc31_orcamforne = pc21_orcamforne
+    inner join cgm on z01_numcgm = pc21_numcgm
+    where pc31_liclicita = $codigoLicitacao ";
   }
 }
 ?>

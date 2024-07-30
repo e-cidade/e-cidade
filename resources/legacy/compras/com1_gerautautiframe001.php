@@ -363,8 +363,8 @@ if (isset ($incluir)) {
   			$clempautoriza->e54_codtipo        = $e54_codtipo;
   			$clempautoriza->e54_instit         = $e54_instit;
   			$clempautoriza->e54_depto          = db_getsession("DB_coddepto");
-        $clempautoriza->e54_concarpeculiar = "000";
-
+			$clempautoriza->e54_concarpeculiar = "000";
+			$clempautoriza->e54_datainclusao = date('Y-m-d H:i:s.v', db_getsession("DB_datausu"));
   			$clempautoriza->incluir(null);
   			$e54_autori = $clempautoriza->e54_autori;
   			$erro_msg   = $clempautoriza->erro_msg;

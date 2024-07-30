@@ -149,6 +149,7 @@ db_app::load("prototype.js");
                     ?>
                 </td>
             </tr>
+           
 
             <tr>
                 <td>
@@ -216,6 +217,34 @@ db_app::load("prototype.js");
 
             </table>
         </fieldset>
+        <br />
+        <fieldset style="width: 97%; border-left: none; border-right: none; border-bottom: none;">
+            <legend class="bold">Manutenção de Estrutural</legend>
+
+            <table>
+            <tr>
+                <td class="bold">
+                    Último Estrutural de Conta Corrente:
+                </td>
+                <td>
+                    <?
+                       db_input('k29_estrutcontacorrente', 15, $Ik29_estrutcontacorrente, true, 'text', $db_opcao, "onkeyup=\"validateLengthAndNumber(this)\"","", "","",15);
+                    ?>
+                </td>
+            </tr>
+            <tr>
+                <td class="bold">
+                    Último Estrutural de Conta Aplicação: 
+                </td>
+                <td>
+                    <?
+                       db_input('k29_estrutcontaaplicacao', 15, $Ik29_estrutcontaaplicacao, true, 'text', $db_opcao, "onkeyup=\"validateLengthAndNumber(this)\"","", "", "",15);
+                    ?>
+                </td>
+            </tr>
+
+            </table>
+        </fieldset>
 
     </fieldset>
 
@@ -233,6 +262,16 @@ db_app::load("prototype.js");
     $('k29_contassemmovimento').style.width = '155px';
     $('k29_chqduplicado').style.width = '110px';
     $('tipo_transmissao').style.width = '110px';
+
+    function validateLengthAndNumber(input) 
+    {
+        const regex = /^\d{15}$/;
+        if (!regex.test(input.value)) {
+            input.setCustomValidity("O campo deve conter exatamente 15 números.");
+        } else {
+            input.setCustomValidity("");
+        }
+    }
 
     function js_pesquisaRecurso(lMostraWindow) {
 

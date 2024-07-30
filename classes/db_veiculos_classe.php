@@ -1162,6 +1162,7 @@ class cl_veiculos
     } else if ($dbwhere != "") {
       $sql2 = " where $dbwhere";
     }
+    $sql2 .= " and db_depart.instit = " . $_SESSION['DB_instit'];
     $sql .= $sql2;
     if ($ordem != null) {
       $sql .= " order by ";

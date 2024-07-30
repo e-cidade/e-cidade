@@ -49,6 +49,9 @@ class Acordo
     const CONTRATO_HOMOLOGADO = 4;
     const CONTRATO_PARALISADO = 5;
 
+    const CONFORME_DEMANDA = 1;
+    const MENSAL = 2;
+
     /**
      * Caminho das mensagens do model
      */
@@ -344,6 +347,48 @@ class Acordo
      * @var integer
      */
     private $iTipoUnidadeTempoVigencia;
+
+    /**
+     * Tipo de numero acordo
+     * @var string
+     */
+    private $sTipoPagamento;
+
+    /**
+     * Tipo de Pagamento
+     * @var integer
+     */
+    private $iTipoPagamento;
+
+    /**
+     * Número de Parcela
+     * @var integer
+     */
+    private $iNumeroParcela;
+
+    /**
+     * Valor da Parcela
+     * @var float
+     */
+    private $iValorParcela;
+
+    /**
+     * Identificar CIPI
+     * @var string
+     */
+    private $sIdentificarCipi;
+
+    /**
+     * Url CIPI
+     * @var string
+     */
+    private $sUrlCipi;
+
+    /**
+     * Informações Complementares
+     * @var string
+     */
+    private $sInformacoesComplementares;
 
     /**
      * Categoria do acordo
@@ -814,10 +859,17 @@ class Acordo
                 } else {
                     $this->setLicitacao($oDadosAcordo->e54_numerl);
                 }
+                
                 $this->setiAdesaoregpreco($oDadosAcordo->ac16_adesaoregpreco);
                 $this->setiLicoutroorgao($oDadosAcordo->ac16_licoutroorgao);
                 $this->setModalidade($oDadosAcordo->modalidade);
                 $this->setTipo($oDadosAcordo->tipo);
+                $this->setTipoPagamento($oDadosAcordo->ac16_tipopagamento);
+                $this->setNumeroParcela($oDadosAcordo->ac16_numparcela);
+                $this->setValorParcela($oDadosAcordo->ac16_vlrparcela);
+                $this->setIdentificarCipi($oDadosAcordo->ac16_identificadorcipi);
+                $this->setUrlCipi($oDadosAcordo->ac16_urlcipi);
+                $this->setInformacoesComplementares($oDadosAcordo->ac16_infcomplementares);
 
                 $this->iQtdPeriodoVigencia       = $oDadosAcordo->ac16_qtdperiodo;
                 $this->iTipoUnidadeTempoVigencia = $oDadosAcordo->ac16_tipounidtempoperiodo;
@@ -1896,6 +1948,12 @@ class Acordo
         $oDaoAcordo->ac16_descricaoreajuste        = $this->getDescricaoReajuste();
         $oDaoAcordo->ac16_descricaoindice          = $this->getDescricaoIndice();
         $oDaoAcordo->ac16_vigenciaindeterminada    = $this->getVigenciaIndeterminada();
+        $oDaoAcordo->ac16_tipopagamento            = $this->getTipoPagamento();
+        $oDaoAcordo->ac16_numparcela               = $this->getNumeroParcela();
+        $oDaoAcordo->ac16_vlrparcela               = $this->getValorParcela();
+        $oDaoAcordo->ac16_identificadorcipi        = $this->getIdentificarCipi();
+        $oDaoAcordo->ac16_urlcipi                  = $this->getUrlCipi();
+        $oDaoAcordo->ac16_infcomplementares        = $this->getInformacoesComplementares();
         $iCodigoAcordo                             = $this->getCodigoAcordo();
 
         /**
@@ -1904,7 +1962,6 @@ class Acordo
 
         if (!empty($iCodigoAcordo)) {
             $oDaoAcordo->ac16_sequencial = $this->getCodigoAcordo();
-
             $oDaoAcordo->alterar($this->getCodigoAcordo());
             if ($oDaoAcordo->erro_status == 0) {
                 throw new Exception("Erro ao salvar acordos.\nErro: {$oDaoAcordo->erro_msg}");
@@ -2495,6 +2552,7 @@ class Acordo
                 $oAutorizacaoEmpenho->setValor($nValorAutorizacao);
                 $oAutorizacaoEmpenho->setSAdesaoregpreco($oDadosAutorizacao->iSequencial);
                 $oAutorizacaoEmpenho->setDataAutorizacao($oDadosAutorizacao->sDataEmissao);
+                $oAutorizacaoEmpenho->setSLicoutrosorgaos($oDadosAutorizacao->codigoLicitacaoOutroOrgao);
 
                 $iSeq        = 1;
                 $nValorTotal = 0;
@@ -3424,11 +3482,16 @@ class Acordo
 
         $oValorContrato = $this->getValoresItens();
         $nValorAtual    = $oValorContrato->valoratual;
+        $tipoPagamento = $this->getTipoPagamento();
 
         $oDaoAcordo                   = new cl_acordo();
         $oDaoAcordo->ac16_sequencial  = $this->getCodigoAcordo();
         $oDaoAcordo->ac16_valor       = $nValorAtual;
         $oDaoAcordo->ac16_semvigencia = $vigencia;
+        if($tipoPagamento === self::CONFORME_DEMANDA) {
+            $oDaoAcordo->ac16_tipopagamento = $tipoPagamento;
+            $oDaoAcordo->ac16_vlrparcela = $nValorAtual;
+        }
         $oDaoAcordo->alterar($oDaoAcordo->ac16_sequencial);
         if ($oDaoAcordo->erro_status == 0) {
 
@@ -3771,6 +3834,63 @@ class Acordo
     }
 
     /**
+     * Seta a forma que será o pagamento do contrato, valores: 
+     * 0 - Selecione 
+     * 1 - Conforme Demanda 
+     * 2 - Mensal
+     * @param integer $iTipoPagamento
+     */
+    public function setTipoPagamento($iTipoPagamento)
+    {
+        $this->iTipoPagamento = $iTipoPagamento;
+    }
+
+    /**
+     * Seta a quantidade de parcelas que será pago o contrato
+     * @param integer $iNumeroParcela
+     */
+    public function setNumeroParcela($iNumeroParcela)
+    {
+        $this->iNumeroParcela = $iNumeroParcela;
+    }
+
+    /**
+     * Seta o valor de cada parcela
+     * @param integer $iValorParcela
+     */
+    public function setValorParcela($iValorParcela)
+    {
+        $this->iValorParcela = $iValorParcela;
+    }
+
+    /**
+     * Seta o identificador do CIPI
+     * @param integer $sIdentificarCipi
+     */
+    public function setIdentificarCipi($sIdentificarCipi)
+    {
+        $this->sIdentificarCipi = $sIdentificarCipi;
+    }
+
+    /**
+     * Seta a URL do CIPI
+     * @param integer $iValorParcela
+     */
+    public function setUrlCipi($sUrlCipi)
+    {
+        $this->sUrlCipi = $sUrlCipi;
+    }
+
+    /**
+     * Seta as informações complementares
+     * @param integer $sInformacoesComplementares
+     */
+    public function setInformacoesComplementares($sInformacoesComplementares)
+    {
+        $this->sInformacoesComplementares = $sInformacoesComplementares;
+    }
+
+    /**
      * Seta a categoria do Acordo
      * @param integer $iCategoriaAcordo
      */
@@ -3798,6 +3918,63 @@ class Acordo
     {
 
         return $this->iTipoUnidadeTempoVigencia;
+    }
+
+    /**
+     * Retorna a forma que será o pagamento do contrato, valores: 
+     * 0 - Selecione 
+     * 1 - Conforme Demanda 
+     * 2 - Mensal
+     * @param integer $iTipoPagamento
+     */
+    public function getTipoPagamento()
+    {
+        return $this->iTipoPagamento;
+    }
+
+    /**
+     * Retorna a quantidade de parcelas que será pago o contrato
+     * @param integer $iNumeroParcela
+     */
+    public function getNumeroParcela()
+    {
+        return $this->iNumeroParcela;
+    }
+
+    /**
+     * Retorna o valor de cada parcela
+     * @param integer $iValorParcela
+     */
+    public function getValorParcela()
+    {
+        return $this->iValorParcela;
+    }
+
+    /**
+     * Retorna o identificador do CIPI
+     * @param integer $sIdentificarCipi
+     */
+    public function getIdentificarCipi()
+    {
+        return $this->sIdentificarCipi;
+    }
+
+    /**
+     * Retorna a URL do CIPI
+     * @param integer $iValorParcela
+     */
+    public function getUrlCipi()
+    {
+        return $this->sUrlCipi;
+    }
+
+    /**
+     * Retorna as informações complementares
+     * @param integer $sInformacoesComplementares
+     */
+    public function getInformacoesComplementares()
+    {
+        return $this->sInformacoesComplementares;
     }
 
     /**

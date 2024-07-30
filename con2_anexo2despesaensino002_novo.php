@@ -682,12 +682,59 @@ ob_start();
                             <td class="text-row" style="text-align: left; border-left: 1px SOLID #000000;">9 - RESTOS A PAGAR DE EXERCÍCIOS ANTERIORES SEM DISPONIBILIDADE FINANCEIRA PAGOS NO EXERCÍCIO ATUAL (CONSULTA 932.736)</td>
                             <td class="text-row" style="text-align: right; border-right: 1px SOLID #000000;">
                                 <?php
-                                    $oReceitaeDespesaEnsino->setDataInicial($dtini);
-                                    $oReceitaeDespesaEnsino->setDataFinal($dtfim);
-                                    $oReceitaeDespesaEnsino->setInstits($instits);
-                                    $nValorRecursoTotal = $oReceitaeDespesaEnsino->getLinha10RestoaPagarSemDis();
-                                    $nTotalAplicadoEntrada = $nTotalAplicadoEntrada + $nValorRecursoTotal;
-                                    echo db_formatar($nValorRecursoTotal, "f");
+                                $sFonte = ("'101','201','15000001','25000001'");
+                                $where = " c61_instit in ({$instits}) and c61_codigo in ($sFonte) ";
+                                $result = db_planocontassaldo_matriz(db_getsession("DB_anousu"), $dtini, $dtfim, false, $where,'',0);
+
+                                for ($x = 0; $x < pg_numrows($result); $x++) {
+                                    db_fieldsmemory($result, $x);
+                                    if(substr($estrutural,1,14) == '00000000000000'){
+                                        if($sinal_anterior == "C")
+                                            $total_anterior -= $saldo_anterior;
+                                        else {
+                                            $total_anterior += $saldo_anterior;
+                                        }
+                                    }
+                                }
+
+                                $nValorRecursoImposto = $total_anterior;
+                                $sele_work = " e60_instit in ({$instits}) ";
+                                $sele_work1       = " and e91_recurso in ($sFonte)";
+                                $sql_where_externo = " where $sele_work ";
+                                $sql_order = " order by e91_recurso, e91_numemp ";
+                                
+                                $clempresto = new cl_empresto;
+                                $sqlempresto = $clempresto->sql_rp_novo(db_getsession("DB_anousu"), $sele_work, $dtini, $dtfim, $sele_work1, $sql_where_externo, $sql_order);
+                                $res = $clempresto->sql_record($sqlempresto);
+                             
+                                if ($clempresto->numrows == 0) {
+                                    db_redireciona("db_erros.php?fechar=true&db_erro=Sem movimentação de restos a pagar.");
+                                    exit;
+                                }
+                                $rows = $clempresto->numrows;
+                                $total_rp_n_proc = 0;
+                                $total_rp_proc = 0;
+                                for ($x = 0; $x < $rows; $x++) {
+                                    db_fieldsmemory($res, $x);
+                                    $total_mov_liqui += $e91_vlremp;
+                                    $total_mov_pagmento += $vlrpag;
+                                    $total_mov_pagnproc += $vlrpagnproc;
+                                }
+                                $nValorRecursoFundeb101 = $total_mov_pagmento + $total_mov_pagnproc - $nValorRecursoImposto;
+                                $oReceitaeDespesaEnsino->setFontes(array('136','236','17180000','27180000'));
+                                $oReceitaeDespesaEnsino->setDataInicial($dtini);
+                                $oReceitaeDespesaEnsino->setDataFinal($dtfim);
+                                $oReceitaeDespesaEnsino->setInstits($instits);
+                                $nValorRecursoFundeb136 = $oReceitaeDespesaEnsino->getRestosSemDisponilibidadeFundeb(array('136','236','17180000','27180000'), $dtini, $dtfim, $instits);
+                                 
+                                $oReceitaeDespesaEnsino->setFontes(array("'15020001','25020001'"));
+                                $oReceitaeDespesaEnsino->setDataInicial($dtini);
+                                $oReceitaeDespesaEnsino->setDataFinal($dtfim);
+                                $oReceitaeDespesaEnsino->setInstits($instits);
+                                $nValorRecursoFundeb118_119 = $oReceitaeDespesaEnsino->getRestosSemDisponilibidadeFundeb();
+                                $nValorRecursoTotal     = $nValorRecursoFundeb101 + $nValorRecursoFundeb136 + $nValorRecursoFundeb118_119;
+                                $nTotalAplicadoEntrada  = $nTotalAplicadoEntrada + $nValorRecursoTotal;
+                                echo db_formatar($nValorRecursoTotal, "f");
                                 ?>
                             </td>
                         </tr>
@@ -695,12 +742,7 @@ ob_start();
                             <td class="text-row" style="text-align: left; border-left: 1px SOLID #000000; padding-left: 20px;">9.1 - RECURSOS DE IMPOSTOS</td>
                             <td class="text-row" style="text-align: right; border-right: 1px SOLID #000000;">
                                 <?php
-                                    $oReceitaeDespesaEnsino->setFontes(array("'15000001'", "'25000001'"));
-                                    $oReceitaeDespesaEnsino->setDataInicial($dtini);
-                                    $oReceitaeDespesaEnsino->setDataFinal($dtfim);
-                                    $oReceitaeDespesaEnsino->setInstits($instits);
-                                    $nValorRecursoImposto = $oReceitaeDespesaEnsino->getRestosSemDisponilibidadeFundeb();
-                                    echo db_formatar($nValorRecursoImposto, "f");
+                                    echo db_formatar($nValorRecursoFundeb101, "f");
                                 ?>
                             </td>
                         </tr>
@@ -708,12 +750,7 @@ ob_start();
                             <td class="text-row" style="text-align: left; border-left: 1px SOLID #000000; padding-left: 20px;">9.2 - RECUSOS DO AUXÍLIO FINANCEIRO - OUTORGA CRÉDITO TRIBUTÁRIO ICMS - ART. 5º, INCISO V, EC Nº 123/2022</td>
                             <td class="text-row" style="text-align: right; border-right: 1px SOLID #000000;">
                                 <?php
-                                    $oReceitaeDespesaEnsino->setFontes(array('136','236','17180000','27180000'));
-                                    $oReceitaeDespesaEnsino->setDataInicial($dtini);
-                                    $oReceitaeDespesaEnsino->setDataFinal($dtfim);
-                                    $oReceitaeDespesaEnsino->setInstits($instits);
-                                    $nValorRecursoImposto = $oReceitaeDespesaEnsino->getRestosSemDisponilibidadeFundeb(array('136','236','17180000','27180000'), $dtini, $dtfim, $instits);
-                                    echo db_formatar($nValorRecursoFundeb, "f");
+                                    echo db_formatar($nValorRecursoFundeb136, "f");
                                 ?>
                             </td>
                         </tr>
@@ -721,12 +758,7 @@ ob_start();
                             <td class="text-row" style="text-align: left; border-left: 1px SOLID #000000; padding-left: 20px;">9.3 - RECURSOS NÃO VINCULADOS DA COMPENSAÇÃO DE IMPOSTOS - ARTIGO 9º DA LC 141/2012</td>
                             <td class="text-row" style="text-align: right; border-right: 1px SOLID #000000;">
                                 <?php
-                                    $oReceitaeDespesaEnsino->setFontes(array("'15020001','25020001'"));
-                                    $oReceitaeDespesaEnsino->setDataInicial($dtini);
-                                    $oReceitaeDespesaEnsino->setDataFinal($dtfim);
-                                    $oReceitaeDespesaEnsino->setInstits($instits);
-                                    $nValorRecursoImposto = $oReceitaeDespesaEnsino->getRestosSemDisponilibidadeFundeb();
-                                    echo db_formatar($nValorRecursoFundeb, "f");
+                                    echo db_formatar($nValorRecursoFundeb118_119, "f");
                                 ?>
                             </td>
                         </tr>

@@ -5,7 +5,6 @@ namespace App\Repositories\Tributario\ISSQN\Redesim\Alvara;
 use App\Repositories\Tributario\ISSQN\Redesim\Contracts\IFilters;
 use App\Repositories\Tributario\ISSQN\Redesim\Contracts\IRedesimApiSettings;
 use App\Repositories\Tributario\ISSQN\Redesim\DTO\CompanyDTO;
-use App\Support\String\StringHelper;
 use BusinessException;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
@@ -30,8 +29,12 @@ class ObterEmpresas extends Leitura
         $response = null;
         $result = parent::post($filters);
 
+        if(empty($result)) {
+            return [];
+        }
+
         foreach ($result as $item) {
-            $response[] = new CompanyDTO((array)StringHelper::utf8_decode_all($item->dados));
+            $response[] = new CompanyDTO((array)$item->dados);
         }
         return $response;
     }

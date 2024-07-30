@@ -214,6 +214,7 @@ class cl_rubricasesocial {
      }
      $sql .= " from rubricasesocial ";
      $sql .= " INNER JOIN baserubricasesocial ON rubricasesocial.e990_sequencial = baserubricasesocial.e991_rubricasesocial";
+     $sql .= " INNER JOIN rhrubricas ON baserubricasesocial.e991_rubricas = rhrubricas.rh27_rubric AND rh27_instit = ".db_getsession("DB_instit");
      $sql2 = "";
      if($dbwhere==""){
        if( $e990_sequencial != "" && $e990_sequencial != null){
@@ -267,6 +268,44 @@ class cl_rubricasesocial {
        }
      }
      return $sql;
+  }
+
+  /**
+   * Buscar rubricas especiais para serem usadas no esocial e sicom
+   *
+   * @param string $rubrica
+   * @param string $tipo
+   * @return array
+   */
+  function buscarDadosRubricaEspecial($rubrica, $tipo) {
+    $rsRubEspeciais = db_query($this->sql_query(null, "e990_sequencial,e990_descricao,rh27_rubric,rh27_descr", null, "baserubricasesocial.e991_rubricas = '{$rubrica}' AND e990_sequencial IN ('1000','5001','1020','1016')"));
+    if (pg_num_rows($rsRubEspeciais) > 0) {
+      $oRubEspeciais = db_utils::fieldsMemory($rsRubEspeciais);
+      switch ($oRubEspeciais->e990_sequencial) {
+        case '1000':
+          $rubricaEspecial = '9000';
+          $descricao = 'Saldo de Salário na Rescisão';
+          break;
+        case '5001':
+          $rubricaEspecial = '9001';
+          $descricao = '13º Salário na Rescisão';
+          break;
+        case ('1020' || '1016') && $tipo == 'P':
+          $rubricaEspecial = '9002';
+          $descricao = 'Férias Proporcional na Rescisão';
+          break;
+        case ('1020' || '1016') && $tipo == 'V':
+          $rubricaEspecial = '9003';
+          $descricao = 'Férias Vencidas na Rescisão';
+          break;
+        
+        default:
+          $rubricaEspecial = $rubrica;
+          $descricao = $oRubEspeciais->rh27_descr;
+          break;
+      }
+      return ['rubrica' => $rubricaEspecial, 'descricao' => $descricao];
+    }
   }
 }
 ?>

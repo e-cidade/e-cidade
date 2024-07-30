@@ -723,7 +723,7 @@ if (isset ($processar)) {
             break;
 
           default :
-            throw new Exception("Documento não processado por está rotina.");
+            throw new Exception("Documento não reprocessado por esta rotina.");
 
         }
 

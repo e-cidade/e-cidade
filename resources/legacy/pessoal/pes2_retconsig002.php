@@ -38,7 +38,7 @@ $clgerasql->inicio_rh = false;
 
 parse_str($HTTP_SERVER_VARS['QUERY_STRING']);
 
-$dbwhere = " rh23_rubric is null and 1=1 ";
+$dbwhere = " rh23_rubric is null ";
 $dbwhererubs = "";
 
 if(trim($recrs) != ""){
@@ -66,9 +66,9 @@ for($i=0; $i<6; $i++){
                $headPontos .= (trim($varSQL) != "" ? ", " : "") . "Salário";
                $varSQL .= (trim($varSQL) != "" ? " union all" : "") . " ( " . $clgerasql->gerador_sql(
                                                                                                    "r14", $ano, $mes, null, null,
-                                                                                                   "#s#_rubric, #s#_valor, #s#_regist, #s#_pd, #s#_anousu, #s#_mesusu",
+                                                                                                   "#s#_rubric, #s#_valor as valor, #s#_regist, #s#_pd, #s#_anousu, #s#_mesusu",
                                                                                                    "#s#_rubric",
-                                                                                                   "#s#_pd <> 3 " . $dbwhererubs
+                                                                                                   "#s#_pd <> 3 " . $dbwhererubs . "group by #s#_rubric, #s#_regist, #s#_pd, #s#_anousu, #s#_mesusu",null,'',0,true
                                                                                                   ) . " ) ";
                $sigla = (isset($sigla) ? $sigla : "r14");
                break;
@@ -76,9 +76,9 @@ for($i=0; $i<6; $i++){
                $headPontos .= (trim($varSQL) != "" ? ", " : "") . "Adiantamento";
                $varSQL .= (trim($varSQL) != "" ? " union all" : "") . " ( " . $clgerasql->gerador_sql(
                                                                                                    "r22", $ano, $mes, null, null,
-                                                                                                   "#s#_rubric, #s#_valor, #s#_regist, #s#_pd, #s#_anousu, #s#_mesusu",
+                                                                                                   "#s#_rubric, #s#_valor as valor, #s#_regist, #s#_pd, #s#_anousu, #s#_mesusu",
                                                                                                    "#s#_rubric",
-                                                                                                   "#s#_pd <> 3" . $dbwhererubs
+                                                                                                   "#s#_pd <> 3" . $dbwhererubs . "group by #s#_rubric, #s#_regist, #s#_pd, #s#_anousu, #s#_mesusu",null,'',0,true
                                                                                                   ) . " ) ";
                $sigla = (isset($sigla) ? $sigla : "r22");
                break;
@@ -86,9 +86,9 @@ for($i=0; $i<6; $i++){
                $headPontos .= (trim($varSQL) != "" ? ", " : "") . "Férias";
                $varSQL .= (trim($varSQL) != "" ? " union all " : "") . " ( " . $clgerasql->gerador_sql(
                                                                                                    "r31", $ano, $mes, null, null,
-                                                                                                   "#s#_rubric, #s#_valor, #s#_regist, #s#_pd, #s#_anousu, #s#_mesusu",
+                                                                                                   "#s#_rubric, #s#_valor as valor, #s#_regist, #s#_pd, #s#_anousu, #s#_mesusu",
                                                                                                    "#s#_rubric",
-                                                                                                   "#s#_pd <> 3 " . $dbwhererubs
+                                                                                                   "#s#_pd <> 3 " . $dbwhererubs . "group by #s#_rubric, #s#_regist, #s#_pd, #s#_anousu, #s#_mesusu",null,'',0,true
                                                                                                   ) . " ) ";
                $sigla = (isset($sigla) ? $sigla : "r31");
                break;
@@ -96,9 +96,9 @@ for($i=0; $i<6; $i++){
                $headPontos .= (trim($varSQL) != "" ? ", " : "") . "Rescisão";
                $varSQL .= (trim($varSQL) != "" ? " union all " : "") . " ( " . $clgerasql->gerador_sql(
                                                                                                    "r20", $ano, $mes, null, null,
-                                                                                                   "#s#_rubric, #s#_valor, #s#_regist, #s#_pd, #s#_anousu, #s#_mesusu",
+                                                                                                   "#s#_rubric, #s#_valor as valor, #s#_regist, #s#_pd, #s#_anousu, #s#_mesusu",
                                                                                                    "#s#_rubric",
-                                                                                                   "#s#_pd <> 3 " . $dbwhererubs
+                                                                                                   "#s#_pd <> 3 " . $dbwhererubs . "group by #s#_rubric, #s#_regist, #s#_pd, #s#_anousu, #s#_mesusu",null,'',0,true 
                                                                                                   ) . " ) ";
                $sigla = (isset($sigla) ? $sigla : "r20");
                break;
@@ -106,9 +106,9 @@ for($i=0; $i<6; $i++){
                $headPontos .= (trim($varSQL) != "" ? ", " : "") . "Saldo do 13o.";
                $varSQL .= (trim($varSQL) != "" ? " union all " : "") . " ( " . $clgerasql->gerador_sql(
                                                                                                    "r35", $ano, $mes, null, null,
-                                                                                                   "#s#_rubric, #s#_valor, #s#_regist, #s#_pd, #s#_anousu, #s#_mesusu",
+                                                                                                   "#s#_rubric, #s#_valor as valor, #s#_regist, #s#_pd, #s#_anousu, #s#_mesusu",
                                                                                                    "#s#_rubric",
-                                                                                                   "#s#_pd <> 3 " . $dbwhererubs
+                                                                                                   "#s#_pd <> 3 " . $dbwhererubs . "group by #s#_rubric, #s#_regist, #s#_pd, #s#_anousu, #s#_mesusu",null,'',0,true
                                                                                                   ) . " ) ";
                $sigla = (isset($sigla) ? $sigla : "r35");
                break;
@@ -116,9 +116,9 @@ for($i=0; $i<6; $i++){
                $headPontos .= (trim($varSQL) != "" ? ", " : "") . "Complementar";
                $varSQL .= (trim($varSQL) != "" ? " union all " : "") . " ( " . $clgerasql->gerador_sql(
                                                                                                    "r48", $ano, $mes, null, null,
-                                                                                                   "#s#_rubric, #s#_valor, #s#_regist, #s#_pd, #s#_anousu, #s#_mesusu",
+                                                                                                   "#s#_rubric, #s#_valor as valor, #s#_regist, #s#_pd, #s#_anousu, #s#_mesusu",
                                                                                                    "#s#_rubric",
-                                                                                                   "#s#_pd <> 3 " . $dbwhererubs
+                                                                                                   "#s#_pd <> 3 " . $dbwhererubs . "group by #s#_rubric, #s#_regist, #s#_pd, #s#_anousu, #s#_mesusu",null,'',0,true
                                                                                                   ) . " ) ";
                $sigla = (isset($sigla) ? $sigla : "r48");
                break;
@@ -149,23 +149,42 @@ $clgerasql->subsqlmes = $sigla."_mesusu";
 $clgerasql->subsqlreg = $sigla."_regist";
 $clgerasql->subsqlrub = $sigla."_rubric";
 $clgerasql->trancaGer = true;
-$sqlFinal = $clgerasql->gerador_sql("",
+$dbwhere .= " and (rh72_sequencial is not null or (rh73_sequencial is null and rh72_sequencial is null)) ";
+$sqlFinal = $clgerasql->gerador_sql($sigla,
                                     $ano, $mes, null, null,
-                                    "rh25_recurso,
+                                    "coalesce(rh72_recurso,rh25_recurso) as rh25_recurso,
                                      o15_descr,
                                      rh27_descr,
 				                             ".$sigla."_pd as tipo,
                                      ".$sigla."_rubric as rubrica,
-                                     round(sum(".$sigla."_valor),2) as valor",
-                                    $sigla."_rubric, rh25_recurso",
+                                     round(sum(coalesce(rh73_valor, valor)),2) as valor",
+                                    $sigla."_rubric, rh72_recurso",
                                     $dbwhere .
                                     "group by rh25_recurso,
+                                              rh72_recurso,
                                               o15_descr,
 					                                    ".$sigla."_pd,
                                               ".$sigla."_rubric,
-                                              rh27_descr"
+                                              rh27_descr",null,'',0,true
                                    );
-
+$sqlFinal = "SELECT
+              rh25_recurso,
+              o15_descr,
+              rh27_descr,
+              tipo,
+              rubrica,
+              sum(valor) as valor
+             from ({$sqlFinal}) x
+             group by
+              rh25_recurso,
+	            o15_descr,
+	            rh27_descr,
+	            tipo,
+	            rubrica
+             order by
+              rubrica,
+              rh25_recurso";
+                                
 $result = $clgerasql->sql_record($sqlFinal);
 if($result === false || ($result !== false && $clgerasql->numrows_exec == 0)){
    db_redireciona('db_erros.php?fechar=true&db_erro=Não existem dados no período de '.$mes.' / '.$ano);
@@ -209,18 +228,18 @@ for($x = 0; $x < pg_numrows($result);$x++){
 
   if($rubri_ant != $rubrica || $proxpag == true){
     if($rubri_ant != $rubrica && $rubri_ant != ""){
-      $pdf->setfont('arial','b',5);
+      $pdf->setfont('arial','b',6);
       $pdf->cell(165,$alt,"Total da rubrica ",0,0,"R",1);
       $pdf->cell( 25,$alt,db_formatar($total_rub, "f"),0,1,"R",1);
       $pdf->ln(2);
       $total_rub = 0;
       $cor = 0;
     }
-    $pdf->setfont('arial','',5);
+    $pdf->setfont('arial','',6);
     $pdf->cell(15,$alt,$rubrica,0,0,"C",$cor);
     $pdf->cell(75,$alt,$rh27_descr,0,0,"L",$cor);
   }else{
-    $pdf->setfont('arial','',5);
+    $pdf->setfont('arial','',6);
     $pdf->cell(15,$alt,"",0,0,"C",$cor);
     $pdf->cell(75,$alt,"",0,0,"L",$cor);
   }
@@ -231,36 +250,43 @@ for($x = 0; $x < pg_numrows($result);$x++){
   // print_r($valor);
   
   if($tipo == 1){
-    $total_ger -= $valor;
+    $total_familia += $valor;
   }else if ($tipo == 2){
-    $total_ger += $valor;
+    $total_retencoes += $valor;
   }
   $rubri_ant = $rubrica;
   $proxpag = false;
 }
 $pdf->ln(3);
-$pdf->setfont('arial','B',7);
+$pdf->setfont('arial','B',6);
 $pdf->cell(165,$alt,"Total da rubrica ",0,0,"R",1); 
 $pdf->cell( 25,$alt,db_formatar($total_rub, "f"),0,1,"R",1);
 $pdf->ln(1);
 $pdf->setfont('arial','B',8);
-$pdf->cell(165,$alt,"Total geral ","T",0,"R",1);
-$pdf->cell( 25,$alt,db_formatar($total_ger, "f"),"T",1,"R",1);
+$pdf->cell(165,$alt,"Total Retenções e Consignações","T",0,"R",1);
+$pdf->cell( 25,$alt,db_formatar($total_retencoes, "f"),"T",1,"R",1);
+$pdf->ln(1);
+$pdf->setfont('arial','B',8);
+$pdf->cell(165,$alt,"Total Salário Família e Maternidade","",0,"R",1);
+$pdf->cell( 25,$alt,db_formatar($total_familia, "f"),"",1,"R",1);
+$pdf->ln(1);
+$pdf->setfont('arial','B',8);
+$pdf->cell(165,$alt,"Total geral ","",0,"R",1);
+$pdf->cell( 25,$alt,db_formatar($total_familia + $total_retencoes, "f"),"",1,"R",1);
 
 
 if($totaliza == 's') {
-  $sqlFinal = $clgerasql->gerador_sql("",
+  $clgerasql->usar_rec_folha = true;
+  $sqlFinal = $clgerasql->gerador_sql($sigla,
                                     $ano, $mes, null, null,
-                                    "rh25_recurso,
+                                    "coalesce(rh72_recurso,rh25_recurso) as recurso,
                                      o15_descr,
-                                     round(sum(case when ".$sigla."_pd = 2 then ".$sigla."_valor
-                                                    when ".$sigla."_pd = 1 then ".$sigla."_valor *(-1) end ),2) as valor",
-                                    "rh25_recurso , o15_descr",
+                                     round(sum(coalesce(rh73_valor,valor)),2) as valor",
+                                    "recurso , o15_descr",
                                     $dbwhere .
-                                    "group by rh25_recurso,
-                                              o15_descr"
+                                    "group by recurso,
+                                              o15_descr",null,'',0,true
                                    );
-  // print_r($sqlFinal);die();  
   $result = $clgerasql->sql_record($sqlFinal);
   $pdf->setfont('arial','B',9);
   if($pdf->gety() > $pdf->h - 30 || $troca != 0 ){
@@ -274,7 +300,7 @@ if($totaliza == 's') {
     if($pdf->gety() > $pdf->h - 30 || $troca != 0 ){
       $pdf->addpage();
     }
-    $pdf->cell(150,$alt,$rh25_recurso . " - " .$o15_descr,0,0,"L",$cor,'','.');
+    $pdf->cell(150,$alt,abs($recurso) . " - " .$o15_descr,0,0,"L",$cor,'','.');
     $pdf->cell(25,$alt,db_formatar($valor,"f"),0,1,"R",$cor);
   }
 }

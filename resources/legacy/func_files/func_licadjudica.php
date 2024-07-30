@@ -154,17 +154,6 @@ $sWhereContratos = " and 1 = 1 ";
 //            $sWhereContratos .= " and (case when l20_naturezaobjeto in (1, 7) and l20_cadinicial in (1, 2) then false
 //                                      else true end) ";
 
-            /**
-             * ValidaFornecedor:
-             * Quando for passado por URL o parametro validafornecedor, só irá retornar licitações que possuem fornecedores habilitados.
-             * @see ocorrência 2278
-             */
-
-            if ($validafornecedor == "1"){
-                $whereHab = " and exists (select 1 from habilitacaoforn where l206_licitacao = liclicita.l20_codigo) ";
-                $whereHab .= "AND l03_pctipocompratribunal NOT IN (100,101,102,103)";
-            }
-
             if(!isset($pesquisa_chave)){
 
                 if(isset($campos)==false){

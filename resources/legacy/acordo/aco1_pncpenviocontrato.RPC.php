@@ -132,6 +132,17 @@ switch ($oParam->exec) {
         }
         break;
 
+    case 'AdicionarJustificativaPncp':
+        $clContrato  = db_utils::getDao("acordo");
+        try {
+            $oRetornoStatus = $clContrato->adicionarJustificativasPncp($oParam->aContratos, $oParam->justificativa);
+            $oRetorno->message = urlencode($oRetornoStatus->erro_sql);
+        } catch (Exception $eErro) {
+            $oRetorno->status  = 2;
+            $oRetorno->message = urlencode($eErro->getMessage());
+        }
+        break;
+
     case 'ExcluirContrato':
 
         $clContrato  = db_utils::getDao("acordo");

@@ -30,6 +30,7 @@ function updateRedesimSettings(Request $request): string
                     'q180_client_id' => $data['q180_client_id'],
                     'q180_vendor_id' => $data['q180_vendor_id'],
                     'q180_access_key' => $data['q180_access_key'],
+                    'q180_active' => $data['q180_active'],
                 ]
             );
     } catch (Exception $exception) {
@@ -60,6 +61,7 @@ function postRedesimSettings(Request $request): string
                 'q180_client_id' => $data['q180_client_id'],
                 'q180_vendor_id' => $data['q180_vendor_id'],
                 'q180_access_key' => $data['q180_access_key'],
+                'q180_active' => $data['q180_active'],
             ]
         );
     } catch (Exception $exception) {
@@ -101,6 +103,17 @@ $data = $redesimSettings->all()->first();
                 <tr>
                     <th style="width: 50%"></th>
                     <th style="width: 50%"></th>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Ativo:</strong>
+                    </td>
+                    <td>
+                        <select required id="q180_active" name="q180_active">
+                            <option <?=!$data->q180_active ? 'selected' : ''?> value="false">Não</option>
+                            <option <?=$data->q180_active ? 'selected' : ''?> value="true">Sim</option>
+                        </select>
+                    </td>
                 </tr>
                 <tr>
                     <td>

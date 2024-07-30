@@ -155,9 +155,9 @@ class db_utils
         if ($lInstanciaClasse) {
 
             /**
-     //  * @TODO modificar Eval por Chamada Dinamica
-     //  * $sNomeClasse = "cl_{$sClasse}";
-     //  * $objRet      = new  {$sNomeClasse};
+             * @TODO modificar Eval por Chamada Dinamica
+             * $sNomeClasse = "cl_{$sClasse}";
+             * $objRet      = new  {$sNomeClasse};
              */
             eval("\$objRet = new cl_{$sClasse};");
             return $objRet;

@@ -6,7 +6,7 @@ use App\Repositories\Tributario\ISSQN\Redesim\Filters\BaseFilters;
 
 class ObterEmpresasFilter extends BaseFilters
 {
-    public string $cpfCnpj;
+    public ?string $cpfCnpj = null;
 
     public function toArray(): array
     {

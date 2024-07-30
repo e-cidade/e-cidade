@@ -79,6 +79,9 @@ function js_emite(){
   if(document.form1.separar){
     qry += "&separar="+document.form1.separar.value;
   }
+  if(document.form1.tipoEmpenho){
+    qry += "&tipoEmpenho="+document.form1.tipoEmpenho.value;
+  }
 //alert(qry);
   jan = window.open('pes2_resumoporvinculo002.php?'+qry,'','width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0 ');
   jan.moveTo(0,0);
@@ -264,7 +267,7 @@ function js_emite(){
         </td>
       </tr>
       <? if(isset($tipo) && $tipo == "R"){?>
-      <tr >
+      <tr id="linhaSeparar" >
         <td align="right" nowrap title="separar" ><strong>Separar Exceções :</strong>
         </td>
         
@@ -272,6 +275,16 @@ function js_emite(){
           <?
           $s = array(0 => "Não",1 => "Sim");
           db_select('separar',$s,true,4,"");
+          ?>
+        </td>
+      </tr>
+      <tr >
+        <td align="right" nowrap title="tipoEmpenho" ><strong>Tipo de Empenho :</strong>
+        </td>        
+        <td align="left">
+          <?
+          $t = array(2 => "Dotação",1 => "Lotação");
+          db_select('tipoEmpenho',$t,true,4,'onchange="js_validaTipo()"');
           ?>
         </td>
       </tr>
@@ -387,6 +400,14 @@ function js_mostratabdesc1(chave1,chave2){
      db_iframe.hide();
 }
 
+function js_validaTipo() {
+  if ($('tipoEmpenho').value == 1) {
+    document.form1.separar.value = 0;
+    $('linhaSeparar').style.display = 'none';
+  } else {
+    $('linhaSeparar').style.display = 'table-row';
+  }
+}
 </script>
 
 

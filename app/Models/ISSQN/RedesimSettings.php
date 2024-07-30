@@ -19,6 +19,7 @@ class RedesimSettings extends LegacyModel
         'q180_url_api',
         'q180_client_id',
         'q180_vendor_id',
-        'q180_access_key'
+        'q180_access_key',
+        'q180_active'
     ];
 }

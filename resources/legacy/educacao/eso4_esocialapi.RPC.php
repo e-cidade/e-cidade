@@ -433,6 +433,10 @@ try {
             $oRetorno->sMessage = "Dados das Rúbricas agendados para envio.";
 
             break;
+        case "apagarErros":
+            $clesocialenvio = db_utils::getDao("esocialenvio");
+            $oRetorno->lUpdate = $clesocialenvio->deleteErros();
+            break;
     }
 } catch (Exception $eErro) {
     if (db_utils::inTransaction()) {

@@ -530,6 +530,7 @@ try {
     $oTBEmpenhosItens              = new tableDataManager($connDestino, 'empenhos_itens'              , 'id', true, 500);
     $oTBEmpenhosProcessos          = new tableDataManager($connDestino, 'empenhos_processos'          , 'id', true, 500);
     $oTBEmpenhosMovimentacoes      = new tableDataManager($connDestino, 'empenhos_movimentacoes'      , 'id', true, 500);
+    $oTBEmpDiarias                 = new tableDataManager($connDestino, 'empenhos_diarias'            , 'id', true, 500);
     $oTBEmpenhosMovimentacoesTipos = new tableDataManager($connDestino, 'empenhos_movimentacoes_tipos', 'id', true, 500);
     $oTBGlossarios                 = new tableDataManager($connDestino, 'glossarios'                  , 'id', true, 500);
     $oTBGlossariosTipos            = new tableDataManager($connDestino, 'glossarios_tipos'            , 'id', true, 500);
@@ -2374,14 +2375,24 @@ try {
     $sSqlEmpenhoMovimentacao .= "        conlancamemp.c75_numemp AS codempenho,                                     ";
     $sSqlEmpenhoMovimentacao .= "        c70_data AS DATA,                                                          ";
     $sSqlEmpenhoMovimentacao .= "        c70_valor AS valor,                                                        ";
-    $sSqlEmpenhoMovimentacao .= "        c72_complem AS historico                                                   ";
+    $sSqlEmpenhoMovimentacao .= "        c72_complem AS historico,                                                  ";
+    $sSqlEmpenhoMovimentacao .= "        c75_codlan AS codlan,                                                      ";
+    $sSqlEmpenhoMovimentacao .= "        e50_codord as codord,                                                      ";
+    $sSqlEmpenhoMovimentacao .= "        e69_codnota as codnota                                                     ";
     $sSqlEmpenhoMovimentacao .= " FROM conlancamemp                                                                 ";
     $sSqlEmpenhoMovimentacao .= " INNER JOIN conlancam ON conlancam.c70_codlan = conlancamemp.c75_codlan            ";
     $sSqlEmpenhoMovimentacao .= " INNER JOIN conlancamdoc ON conlancamdoc.c71_codlan = conlancamemp.c75_codlan      ";
     $sSqlEmpenhoMovimentacao .= " INNER JOIN conhistdoc ON conhistdoc.c53_coddoc = conlancamdoc.c71_coddoc          ";
-    $sSqlEmpenhoMovimentacao .= " LEFT  JOIN conlancamcompl ON conlancamcompl.c72_codlan = conlancamemp.c75_codlan  ";
-    $sSqlEmpenhoMovimentacao .= " WHERE EXISTS ( SELECT * FROM empempitem JOIN empempenho ON e62_numemp = e60_numemp";
-    $sSqlEmpenhoMovimentacao .= "                WHERE empempitem.e62_numemp = conlancamemp.c75_numemp              ";
+    $sSqlEmpenhoMovimentacao .= " LEFT JOIN conlancamcompl ON conlancamcompl.c72_codlan = conlancamemp.c75_codlan  ";
+    $sSqlEmpenhoMovimentacao .= " LEFT JOIN conlancamnota ON  c66_codlan = c70_codlan                               ";
+    $sSqlEmpenhoMovimentacao .= " LEFT JOIN conlancamord ON c80_codlan = c70_codlan                                 ";
+    $sSqlEmpenhoMovimentacao .= " LEFT JOIN empnota ON c66_codnota = e69_codnota                                    ";
+	$sSqlEmpenhoMovimentacao .= " LEFT OUTER JOIN conlancampag ON c82_codlan = c70_codlan                          ";
+    $sSqlEmpenhoMovimentacao .= " LEFT JOIN conplanoreduz ON c61_reduz = conlancampag.c82_reduz and c61_anousu = c70_anousu ";
+    $sSqlEmpenhoMovimentacao .= " LEFT JOIN conplano ON c60_codcon = conplanoreduz.c61_codcon and c60_anousu = c61_anousu   ";
+    $sSqlEmpenhoMovimentacao .= " LEFT JOIN pagordem ON e50_codord = c80_codord                                             ";
+    $sSqlEmpenhoMovimentacao .= " WHERE EXISTS ( SELECT * FROM empempitem JOIN empempenho ON e62_numemp = e60_numemp        ";
+    $sSqlEmpenhoMovimentacao .= "                WHERE empempitem.e62_numemp = conlancamemp.c75_numemp                      ";
 
     if (!empty($institParam)){
       $sSqlEmpenhoMovimentacao .= "                AND empempenho.e60_instit IN ({$institParam})                        ";
@@ -2467,6 +2478,84 @@ try {
 
     // FIM MOVIMENTAES EMPENHOS *************************************************************************************//
 
+    // EMPENHOS DIARIAS  *******************************************************************************************************//
+
+        db_logTitulo(" IMPORTA EMPENHOS DIARIAS",$sArquivoLog,$iParamLog);
+
+        /**
+         * Consulta diarias dos empenhos na base de origem
+         */
+    
+        $sSqlEmpDiaria =  "select e140_codord AS codord,                              ";      
+        $sSqlEmpDiaria .= "	      e140_dtautorizacao AS dtautorizacao, 		          ";
+        $sSqlEmpDiaria .= "	      e140_matricula AS matricula, 		                  ";
+        $sSqlEmpDiaria .= "	      e140_cargo AS cargo, 		                          ";
+        $sSqlEmpDiaria .= "	      e140_dtinicial AS dtinicial, 		                  ";
+        $sSqlEmpDiaria .= "	      e140_dtfinal AS dtfinal, 		                      ";
+        $sSqlEmpDiaria .= "	      e140_origem AS origem, 		                      ";
+        $sSqlEmpDiaria .= "	      e140_destino AS destino, 		                      ";
+        $sSqlEmpDiaria .= "	      e140_qtddiarias AS qtddiarias, 		              ";
+        $sSqlEmpDiaria .= "	      e140_vrldiariauni AS vrldiariauni, 		          ";
+        $sSqlEmpDiaria .= "	      e140_transporte AS transporte, 		              ";
+        $sSqlEmpDiaria .= "	      e140_vlrtransport AS vlrtransport, 		          ";
+        $sSqlEmpDiaria .= "	      e140_objetivo AS objetivo,                          ";    
+        $sSqlEmpDiaria .= "	      e140_horainicial AS horainicial, 		              ";
+        $sSqlEmpDiaria .= "	      e140_horafinal AS horafinal, 		                  ";
+        $sSqlEmpDiaria .= "	      e140_qtdhospedagens AS qtdhospedagens,              ";
+        $sSqlEmpDiaria .= "	      e140_vrlhospedagemuni AS vrlhospedagemuni, 		  ";
+        $sSqlEmpDiaria .= "	      e140_qtddiariaspernoite AS qtddiariaspernoite, 	  ";	
+        $sSqlEmpDiaria .= "	      e140_vrldiariaspernoiteuni AS vrldiariaspernoiteuni,";
+        $sSqlEmpDiaria .= "	      e50_numemp AS codempenho,                           ";                                                   
+        $sSqlEmpDiaria .= "	      e69_codnota AS codnota                              ";  
+        $sSqlEmpDiaria .= "   from empdiaria                                          ";
+        $sSqlEmpDiaria .= "  JOIN pagordem ON empdiaria.e140_codord = pagordem.e50_codord ";
+        $sSqlEmpDiaria .= "  LEFT JOIN conlancamord ON e50_codord = c80_codord        "; 
+        $sSqlEmpDiaria .= "  LEFT JOIN conlancam ON c80_codlan = c70_codlan           ";                  
+        $sSqlEmpDiaria .= "  LEFT JOIN conlancamnota ON  c66_codlan = c70_codlan      ";
+        $sSqlEmpDiaria .= "  LEFT JOIN empnota ON c66_codnota = e69_codnota           ";  
+
+        $rsEmpDiaria    = db_query($connOrigem,$sSqlEmpDiaria);
+        $iRowsEmpDiaria = pg_num_rows($rsEmpDiaria);
+    
+        if ( $iRowsEmpDiaria ==  0 ) {
+            throw new Exception('Nenhuma Diaria encontrado!');
+        }
+    
+        db_logNumReg($iRowsEmpDiaria,$sArquivoLog,$iParamLog);
+    
+        /**
+         *  Insere os registros na base de destino atravs do mtodo insertValue da classe TableDataManager que quando
+         *  atinge o nmero determinado de registros ( informado na assinatura da classe )  executado automticamente
+         *  o mtodo persist que insere fisicamente os registros na base de dados atravs do COPY.
+         */
+        for ( $iInd=0; $iInd < $iRowsEmpDiaria; $iInd++ ) {
+    
+            $oEmpDiaria = db_utils::fieldsMemory($rsEmpDiaria,$iInd);
+    
+            logProcessamento($iInd,$iRowsEmpDiaria,$iParamLog);
+    
+            $oTBEmpDiarias->setByLineOfDBUtils($oEmpDiaria);
+    
+            try {
+                $oTBEmpDiarias->insertValue();
+            } catch ( Exception $eException ) {
+                throw new Exception("ERRO-0: {$eException->getMessage()}");
+            }
+    
+        }
+    
+        /**
+         *  Aps o loop  executado manualmente o mtodo persist para que sejam inserido os registros restantes
+         *  ( mesmo que no tenha atingido o nmero mximo do bloco de registros )
+         */
+        try {
+            $oTBEmpDiarias->persist();
+        } catch ( Exception $eException ) {
+            throw new Exception("ERRO-0: {$eException->getMessage()}");
+        }
+    
+    // FIM EMPENHOS DIARIAS ***************************************************************************************************//
+    
     // SERVIDORES *********************************** //
 
     db_logTitulo(" IMPORTA SERVIDORES", $sArquivoLog, $iParamLog);
@@ -2489,7 +2578,8 @@ try {
     $sSqlServidores .= "       rh01_admiss as admissao,                              ";
     $sSqlServidores .= "       rh05_recis  as rescisao,                              ";
     $sSqlServidores .= "       codigo      as instituicao,                           ";
-    $sSqlServidores .= "       rh01_instit as instit_servidor                        ";
+    $sSqlServidores .= "       rh01_instit as instit_servidor,                       ";
+    $sSqlServidores .= "       rh02_hrssem as horas_semanais                         ";
     $sSqlServidores .= "  from rhpessoal                                             ";
     $sSqlServidores .= "       inner join rhpessoalmov on rh02_regist = rh01_regist  ";
     $sSqlServidores .= "       inner join rhfuncao     on rh37_funcao = rh02_funcao  ";
@@ -2590,9 +2680,10 @@ try {
     $sSqlMovimentacaoServidor .= "        lotacao,                                                          ";
     $sSqlMovimentacaoServidor .= "        localtrabalho,                                                    ";
     $sSqlMovimentacaoServidor .= "        vinculo,                                                          ";
-    $sSqlMovimentacaoServidor .= "        salario_base                                                      ";
+    $sSqlMovimentacaoServidor .= "        salario_base,                                                     ";
+    $sSqlMovimentacaoServidor .= "        horas_semanais                                                    ";
     $sSqlMovimentacaoServidor .= "    from dados_servidor                                                   ";
-    $sSqlMovimentacaoServidor .= "    group by servidor_id, ano, mes, cargo, lotacao, localtrabalho, vinculo, salario_base ";
+    $sSqlMovimentacaoServidor .= "    group by servidor_id, ano, mes, cargo, lotacao, localtrabalho, vinculo, salario_base, horas_semanais ";
 
     $rsServidoresMovimentacao  = db_query($connOrigem, $sSqlMovimentacaoServidor);
 

@@ -40,6 +40,9 @@ $clrotulo->label("e60_convenio");
 $clrotulo->label("e60_numconvenio");
 $clrotulo->label("e60_dataconvenio");
 $clrotulo->label("e60_datasentenca");
+require_once("model/protocolo/AssinaturaDigital.model.php");
+
+$AssinaturaDigital = new AssinaturaDigital();
 
 $aDataEmpenho = explode("-", $e60_emiss);
 ?>
@@ -59,7 +62,7 @@ $aDataEmpenho = explode("-", $e60_emiss);
                     db_input('e60_codemp',10,$Ie60_codemp,true,'text',3);
                     ?>
                     <b>Data Empenho:</b>
-                        <? 
+                        <?
                         db_inputdata("data_empenho",$aDataEmpenho[2], $aDataEmpenho[1], $aDataEmpenho[0], true, "text", 2);
                         ?>
                         <input type="hidden" name="data_empenho_alterado" value="false">
@@ -106,14 +109,14 @@ $aDataEmpenho = explode("-", $e60_emiss);
                             $dop='3';
                         }
                         ?>
-                     
+
                 </td>
-            </tr>    
+            </tr>
             <tr>
                 <td nowrap title="<?=@$Te60_numerol?>">
                     <?=@$Le60_numerol?>
                 </td>
-                <td>            
+                <td>
                         <?
                         db_input('e60_numerol',10,$Ie60_numerol,true,'text',$dop);
                         ?>
@@ -183,7 +186,7 @@ $aDataEmpenho = explode("-", $e60_emiss);
                     $ldesconto = true;
                 }
             }
-            
+
                 ?>
                 <tr>
                     <td nowrap title="Desdobramentos">
@@ -277,7 +280,7 @@ $aDataEmpenho = explode("-", $e60_emiss);
                     <td nowrap title="Aquisição de Produção Rural ">
                         <strong>Aquisição de Produção Rural :</strong>
                     </td>
-                    <td> 
+                    <td>
                         <?
                          $arr  = array(
                             '0' => '0 - Não se aplica',
@@ -294,9 +297,9 @@ $aDataEmpenho = explode("-", $e60_emiss);
                                 '3' => '3 - Aquisição de produção de produtor rural pessoa jurídica por entidade executora do PAA',
                                 '6' => '6 - Aquisição de produção de produtor rural pessoa jurídica por entidade executora do PAA Produção isenta (Lei 13.606/2018)',
                             );
-                           
-                        }    
-                       
+
+                        }
+
                         db_select("efd60_aquisicaoprodrural", $arr, true, 1, "onchange='showRowProdutorRural(this);'");
                         ?>
                     </td>
@@ -315,7 +318,7 @@ $aDataEmpenho = explode("-", $e60_emiss);
                                 ?>
                                 </td>
                             </tr>
-               <?php } ?>   
+               <?php } ?>
                 <tr id="reinf">
                     <td id="reinftd" colspan="1">
                         <fieldset style="width:84%" >
@@ -343,14 +346,14 @@ $aDataEmpenho = explode("-", $e60_emiss);
                                 <td>
                                 <?php
                                 db_input('efd60_numcno', 12, $Iefd60_numcno, true, 'text', 1);
-                                
+
                                 ?>
                                 <script>
                                     function formatAndLimitCNO() {
                                     var cnoInput = document.getElementById('efd60_numcno');
-                                    cnoInput.value = cnoInput.value.replace(/\D/g, '') 
-                                        .slice(0, 12) 
-                                        .replace(/(\d{2})(\d{3})(\d{5})(\d{2})/, '$1.$2.$3/$4'); 
+                                    cnoInput.value = cnoInput.value.replace(/\D/g, '')
+                                        .slice(0, 12)
+                                        .replace(/(\d{2})(\d{3})(\d{5})(\d{2})/, '$1.$2.$3/$4');
                                     }
                                     document.getElementById('efd60_numcno').addEventListener('input', formatAndLimitCNO);
                                 </script>
@@ -427,13 +430,13 @@ $aDataEmpenho = explode("-", $e60_emiss);
                                     '100000030'=> '100000030 - Telefonia ou telemarketing',
                                     '100000031'=> '100000031 - Trabalho temporário na forma da Lei nº 6.019, de janeiro de 1974'
                                       );
-                                
+
                                 db_select("efd60_tiposervico", $arr, true, 1);
                                 ?>
                                 </td>
                             </tr>
                             </table>
-                    </td>    
+                    </td>
                 </tr>
            <!-- Campos referentes ao sicom 2023 - OC20029  -->
            <tr id="trEmendaParlamentar" style="display: none;">
@@ -443,8 +446,8 @@ $aDataEmpenho = explode("-", $e60_emiss);
                 <td>
                     <?
                         $arr  = array(
-                            '0' => 'Selecione', 
-                            '1' => '1 - Emenda Parlamentar Individual', 
+                            '0' => 'Selecione',
+                            '1' => '1 - Emenda Parlamentar Individual',
                             '2' => '2 - Emenda Parlamentar de Bancada ou Bloco',
                             '3' => '3 - Não se aplica',
                             '4' => '4 - Emenda Não Impositiva');
@@ -461,8 +464,8 @@ $aDataEmpenho = explode("-", $e60_emiss);
                 <td>
                     <?
                         $arr  = array(
-                            '0' => 'Selecione', 
-                            '1' => '1 - Unio', 
+                            '0' => 'Selecione',
+                            '1' => '1 - Unio',
                             '2' => '2 - Estados');
 
                         db_select("e60_esferaemendaparlamentar", $arr, true, 1);
@@ -634,7 +637,12 @@ $aDataEmpenho = explode("-", $e60_emiss);
 
         </table>
     </center>
+
     <input name="alterar" type="submit" id="db_opcao" value="Alterar" <?=($db_botao==false?"disabled":"")?> onclick='return js_valida()' ; >
+
+    <? if ($AssinaturaDigital->verificaAssituraAtiva()) { ?>
+        <input name="alterar" type="submit" id="db_opcao" value="Solicitar Nova Assinatura Digital" <?=($db_botao==false?"disabled":"")?> onclick='return js_emiteEmpenho( <?=$e60_numemp?>)' ; >
+    <? } ?>
 
     <input type="button" id="btnLancarCotasMensais" value="Manutenção de Cotas Mensais" onclick="manutencaoCotasMensais()" />
 
@@ -661,16 +669,16 @@ $aDataEmpenho = explode("-", $e60_emiss);
         }
     }
 
-    function showForm(selectElement) 
-    {  
+    function showForm(selectElement)
+    {
         var valor = selectElement
         if (selectElement.value) {
             valor = selectElement.value
         }
-        
+
         var formreinf = document.getElementById('reinf');
         var formreinftd = document.getElementById('reinftd');
-    
+
         if (valor === '2') {
             formreinf.style.display = "table-row";
             formreinftd.colSpan = 5;
@@ -684,7 +692,7 @@ $aDataEmpenho = explode("-", $e60_emiss);
             document.form1.efd60_tiposervico.value = '';
         }
     }
-    function showRowCNO(selectElement) 
+    function showRowCNO(selectElement)
     {
         var valor = selectElement
         if (selectElement.value) {
@@ -698,10 +706,10 @@ $aDataEmpenho = explode("-", $e60_emiss);
             document.form1.efd60_numcno.value = '';
             if (valor == '2') {
                 document.form1.efd60_indprestservico.value = 0;
-            }    
+            }
         }
     }
-    function showRowProdutorRural(selectElement) 
+    function showRowProdutorRural(selectElement)
     {
         var valor = selectElement
         if (selectElement.value) {
@@ -720,7 +728,7 @@ $aDataEmpenho = explode("-", $e60_emiss);
     function js_valida()
     {
         if (document.form1.efd60_cessaomaoobra.value == 2) {
-            
+
             if (document.form1.efd60_possuicno.value == 0) {
                 alert("Campo Possui Cadastro Nacional de Obras (CNO) nao Informado.")
                 return false;
@@ -740,8 +748,8 @@ $aDataEmpenho = explode("-", $e60_emiss);
             if (!document.form1.efd60_indprestservico.value) {
                 alert("Campo Indicativo de Prestação de Serviços em Obra de Construção Civil nao Informado.")
                 return false;
-            } 
-            
+            }
+
             if (!document.form1.efd60_prescontricprb.value) {
                 alert("Campo  Prestador é contribuinte da CPRB nao Informado.")
                 return false;
@@ -751,7 +759,7 @@ $aDataEmpenho = explode("-", $e60_emiss);
                 alert("Campo  Tipo de Serviço nao Informado.")
                 return false;
             }
-        }     
+        }
     }
 
     /*===========================================
@@ -858,7 +866,7 @@ $aDataEmpenho = explode("-", $e60_emiss);
                     var oRetorno = eval("("+oAjax.responseText+")");
 
                     lEsferaEmendaParlamentar = oRetorno.lEsferaEmendaParlamentar;
-  
+
                     js_verificaresfera();
                     if (oRetorno.lEmendaParlamentar) {
                         $('trEmendaParlamentar').style.display = '';
@@ -932,7 +940,7 @@ $aDataEmpenho = explode("-", $e60_emiss);
     function js_historico_alterado(){
         document.getElementById("historico_alterado").value = true;
     }
-    
+
     showForm(document.form1.efd60_cessaomaoobra.value );
          /**
      * Ajustes no layout
@@ -953,7 +961,7 @@ $aDataEmpenho = explode("-", $e60_emiss);
         $("e44_tipo_select_descr").style.width = "80.4%";
         $('e60_tipodespesa').style.width = "80.4%";
         $('efd60_cessaomaoobra').style.width = "80.4%";
-        $('e60_emendaparlamentar').style.width = "80.4%"; 
+        $('e60_emendaparlamentar').style.width = "80.4%";
         $("e60_destin").style.width       = "80.4%";
         $('e54_gestaut').style.width = "15%";
         $('e60_resumo').style.width = "100%";
@@ -984,7 +992,7 @@ $aDataEmpenho = explode("-", $e60_emiss);
         if ($("e56_codele")) {
             $("e56_codele").style.width       = "58.5%";
         }
-    
+
     showRowCNO(document.form1.efd60_possuicno.value);
     if ($("efd60_aquisicaoprodrural").value) {
         showRowProdutorRural(document.form1.efd60_aquisicaoprodrural.value);

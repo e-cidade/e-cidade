@@ -12,7 +12,15 @@
     <div class="topbar">
 
       <div class="user-nav">
-
+        <div class="dropdown user-nav-item settings" id="lista-documentos">
+            <div class="dropdown-toggle icon-document">
+                <?php
+                if ($this->countDocumentos > 0) {
+                    echo "<div class='notify'>{$this->countDocumentos}</div>";
+                }
+                ?>
+            </div>
+        </div>
         <div data-type="dropdown" class="dropdown user-nav-item settings">
 
           <div class="dropdown-toggle icon-config"></div>
@@ -26,6 +34,8 @@
         </div>
 
         <div data-type="dropdown" class="dropdown user-nav-item user">
+
+
 
           <div class="dropdown-toggle">
             <span class="user-name"><?php echo $this->usuarioSistema->getLogin(); ?></span>
@@ -157,8 +167,19 @@
     <script type="text/javascript">
       var ECIDADE_REQUEST_PATH = '<?php echo ECIDADE_REQUEST_PATH; ?>';
       var ECIDADE_DESKTOP = true;
+      const btnDocumentos = document.getElementById("lista-documentos");
+      btnDocumentos.addEventListener('click', () => {
+          var oParams = {
+              action: 'con1_assinaturadigitaldocumentos.php',
+              iInstitId: 1, // Instituição
+              iAreaId: 4, // Area Patrimonial
+              iModuloId: 604, // Módulo Protocolo
+              lAtalhoDesktop: true
+          }
+          Desktop.Window.create('Lista de Documentos', oParams);
+          document.querySelector("#lista-documentos .icon-document").innerHTML = "";
+      });
     </script>
     <?php echo $this->document->renderScripts(); ?>
-
   </body>
 </html>

@@ -47,12 +47,12 @@ db_postmemory($HTTP_GET_VARS);
 $oGet = db_utils::postMemory($_GET);
 
 $where = " ";
-if(trim($selecao) != ""){
-  $result_selecao = $clselecao->sql_record($clselecao->sql_query_file($selecao,db_getsession("DB_instit")));
-  if($clselecao->numrows > 0){
+if (trim($selecao) != "") {
+  $result_selecao = $clselecao->sql_record($clselecao->sql_query_file($selecao, db_getsession("DB_instit")));
+  if ($clselecao->numrows > 0) {
     db_fieldsmemory($result_selecao, 0);
-    $where = " and ".$r44_where;
-    $head8 = "SELEÇÃO: ".$selecao." - ".$r44_descr;
+    $where = " and " . $r44_where;
+    $head8 = "SELEÇÃO: " . $selecao . " - " . $r44_descr;
   }
 }
 
@@ -61,15 +61,15 @@ if(trim($selecao) != ""){
 $lQuebraLote = false;
 
 $res_cfpess = $clcfpess->sql_record($clcfpess->sql_query_file($ano, $mes, db_getsession("DB_instit")));
-db_fieldsmemory($res_cfpess,0);
+db_fieldsmemory($res_cfpess, 0);
 
-$res_prev = $clinssirf->sql_record($clinssirf->sql_query_file(null,null,"r33_ppatro,r33_nome,r33_rubmat","r33_nome limit 1","r33_anousu = $ano and r33_mesusu = $mes and r33_codtab = $prev+2 and r33_instit=".db_getsession("DB_instit")));
-db_fieldsmemory($res_prev,0);
+$res_prev = $clinssirf->sql_record($clinssirf->sql_query_file(null, null, "r33_ppatro,r33_nome,r33_rubmat", "r33_nome limit 1", "r33_anousu = $ano and r33_mesusu = $mes and r33_codtab = $prev+2 and r33_instit=" . db_getsession("DB_instit")));
+db_fieldsmemory($res_prev, 0);
 
 $mater_ferias = $r33_rubmat + 2000;
 $mater_13     = $r33_rubmat + 4000;
 
-$sql_in = $clrhbasesr->sql_query_file("B995",null,"rh33_rubric::char(4)");
+$sql_in = $clrhbasesr->sql_query_file("B995", null, "rh33_rubric::char(4)");
 
 $gera_sql = new cl_gera_sql_folha;
 $gera_sql->usar_atv  = true;
@@ -86,105 +86,103 @@ $headinfo = "";
 $dborderby = "z01_nome";
 
 $rubricas_selecionadas = "''";
-if(isset($R918)){
-  $rubricas_selecionadas.= ", 'R918'";
+if (isset($R918)) {
+  $rubricas_selecionadas .= ", 'R918'";
 }
-if(isset($R919)){
-  $rubricas_selecionadas.= ", 'R919'";
+if (isset($R919)) {
+  $rubricas_selecionadas .= ", 'R919'";
 }
-if(isset($R920)){
-  $rubricas_selecionadas.= ", 'R920'";
+if (isset($R920)) {
+  $rubricas_selecionadas .= ", 'R920'";
 }
 
-$rubricas_selecionadas = str_replace("'',","",$rubricas_selecionadas);
+$rubricas_selecionadas = str_replace("'',", "", $rubricas_selecionadas);
 
 // Verifica Rubricas e se tem ou nao Calculo
-if(isset($calc) && $calc<>2) {
+if (isset($calc) && $calc <> 2) {
 
   $dbwhere = "
             (
-                #s#_rubric in ('".$r33_rubmat."','".$mater_ferias."','".$mater_13."','R990','R993','R985', 'R986', 'R987' ".($rubricas_selecionadas != "" ? "," : "").$rubricas_selecionadas.") 
+                #s#_rubric in ('" . $r33_rubmat . "','" . $mater_ferias . "','" . $mater_13 . "','R990','R993','R985', 'R986', 'R987' " . ($rubricas_selecionadas != "" ? "," : "") . $rubricas_selecionadas . ") 
              or #s#_rubric in (select r09_rubric 
                                from basesr 
                                where r09_base = 'B995' 
-                                 and r09_anousu = ".$ano."
-                                 and r09_mesusu = ".$mes."
+                                 and r09_anousu = " . $ano . "
+                                 and r09_mesusu = " . $mes . "
                               ) ";
 
-  if(isset($calc) && $calc==3) {
+  if (isset($calc) && $calc == 3) {
     $dbwhere .= " or #s#_rubric is null ";
   }
 
   $dbwhere .= " ) ";
-
 } else {
   $dbwhere = " #s#_rubric is null ";
-
 }
 
-  if($selrec) {
-    $lQuebraLote = true;
-    $where .= " and r70_estrut between '0' and '9999' and ( o15_codigo in ($selrec))";
-    $head2.= "RECURSO(s) SELECIONADO(s): $selrec";
-  }
-  if(isset($ori) && trim($ori) != "" && isset($orf) && trim($orf) != ""){
-    // Se for por intervalos e vier órgão inicial e final
-    $lQuebraLote = true;
-    $where = "and  o40_orgao between ".$ori." and ".$orf;
-    $head2.= "ÓRGÃO: DE ".$ori." A ".$orf;
-  }else if(isset($ori) && trim($ori) != ""){
-    // Se for por intervalos e vier somente órgão inicial
-    $lQuebraLote = true;
-    $where = " and o40_orgao >= ".$ori;
-    $head2.= " ÓRGÃO:  SUPERIORES A ".$ori;
-  }else if(isset($orf) && trim($orf) != ""){
-    // Se for por intervalos e vier somente órgão final
-    $lQuebraLote = true;
-    $where = " and o40_orgao <= ".$orf;
-    $head2.= " ÓRGÃO: INFERIORES A ".$orf;
-  }else if(isset($for) && trim($for) != ""){
-    // Se for por selecionados
-    $lQuebraLote = true;
-    $where = " and o40_orgao in (".$for.") ";
-    $head2.= " ÓRGÃO SELECIONADO(s): $for";
-  }
+if ($selrec) {
+  $lQuebraLote = true;
+  $where .= " and r70_estrut between '0' and '9999' and ( o15_codigo in ($selrec))";
+  $head2 .= "RECURSO(s) SELECIONADO(s): $selrec";
+}
+if (isset($ori) && trim($ori) != "" && isset($orf) && trim($orf) != "") {
+  // Se for por intervalos e vier órgão inicial e final
+  $lQuebraLote = true;
+  $where = "and  o40_orgao between " . $ori . " and " . $orf;
+  $head2 .= "ÓRGÃO: DE " . $ori . " A " . $orf;
+} else if (isset($ori) && trim($ori) != "") {
+  // Se for por intervalos e vier somente órgão inicial
+  $lQuebraLote = true;
+  $where = " and o40_orgao >= " . $ori;
+  $head2 .= " ÓRGÃO:  SUPERIORES A " . $ori;
+} else if (isset($orf) && trim($orf) != "") {
+  // Se for por intervalos e vier somente órgão final
+  $lQuebraLote = true;
+  $where = " and o40_orgao <= " . $orf;
+  $head2 .= " ÓRGÃO: INFERIORES A " . $orf;
+} else if (isset($for) && trim($for) != "") {
+  // Se for por selecionados
+  $lQuebraLote = true;
+  $where = " and o40_orgao in (" . $for . ") ";
+  $head2 .= " ÓRGÃO SELECIONADO(s): $for";
+}
 
 
 
 
 // Tabela de Previdencia
-$dbwhere .= " and rh02_tbprev = ".$prev." ".$where;
+$dbwhere .= " and rh02_tbprev = " . $prev . " " . $where;
 
 
-if(isset($lotaci) && trim($lotaci) != "" && isset($lotacf) && trim($lotacf) != ""){
+if (isset($lotaci) && trim($lotaci) != "" && isset($lotacf) && trim($lotacf) != "") {
   $lQuebraLote = true;
   $dborderby = "r70_estrut, z01_nome";
-  $dbwhere.= " and r70_estrut between '".$lotaci."' and '".$lotacf."' ";
-  $headinfo = "LOTAÇÕES COM ESTRUTURAL ENTRE: ".$lotaci." E ".$lotacf;
-}else if(isset($lotaci) && trim($lotaci) != ""){
+  $dbwhere .= " and r70_estrut between '" . $lotaci . "' and '" . $lotacf . "' ";
+  $headinfo = "LOTAÇÕES COM ESTRUTURAL ENTRE: " . $lotaci . " E " . $lotacf;
+} else if (isset($lotaci) && trim($lotaci) != "") {
   $lQuebraLote = true;
   $dborderby = "r70_estrut, z01_nome";
-  $dbwhere.= " and r70_estrut >= '".$lotaci."' ";
-  $headinfo = "LOTAÇÕES COM ESTRUTURAL POSTERIORES A ".$lotaci;
-}else if(isset($lotacf) && trim($lotacf) != ""){
+  $dbwhere .= " and r70_estrut >= '" . $lotaci . "' ";
+  $headinfo = "LOTAÇÕES COM ESTRUTURAL POSTERIORES A " . $lotaci;
+} else if (isset($lotacf) && trim($lotacf) != "") {
   $lQuebraLote = true;
   $dborderby = "r70_estrut, z01_nome";
-  $dbwhere.= " and r70_estrut <= '".$lotacf."' ";
-  $headinfo = "LOTAÇÕES COM ESTRUTURAL ANTERIORES A ".$lotacf;
-}else if(isset($sellot) && trim($sellot) != ""){
+  $dbwhere .= " and r70_estrut <= '" . $lotacf . "' ";
+  $headinfo = "LOTAÇÕES COM ESTRUTURAL ANTERIORES A " . $lotacf;
+} else if (isset($sellot) && trim($sellot) != "") {
   $lQuebraLote = true;
   $dborderby = "r70_estrut, z01_nome";
-  $dbwhere.= " and r70_estrut in ('".str_replace(",","','",$sellot)."')";
+  $dbwhere .= " and r70_estrut in ('" . str_replace(",", "','", $sellot) . "')";
   $headinfo = "LOTAÇÕES COM ESTRUTURAIS SELECIONADOS ";
-}else if((isset($lotaci) && trim($lotaci) == "" && isset($lotacf) && trim($lotacf) == "") || (isset($sellot) && trim($sellot) == "")){
+} else if ((isset($lotaci) && trim($lotaci) == "" && isset($lotacf) && trim($lotacf) == "") || (isset($sellot) && trim($sellot) == "")) {
   $lQuebraLote = true;
   $dborderby = "r70_estrut, z01_nome";
   $headinfo = "ORDENAÇÃO POR LOTAÇÕES";
 }
 
 
-if($codreg != ''){
-  $dbwhere.= " and rh30_codreg in ($codreg)";
+if ($codreg != '') {
+  $dbwhere .= " and rh30_codreg in ($codreg)";
 }
 
 /*
@@ -193,41 +191,42 @@ if($codreg != ''){
  * opcoes colocadas no array $aFolhas
  */
 
-$aDadosPrev = Array();
+$aDadosPrev = array();
+$aFolhas = array($tfol);
 if ($tfol == 'todas') {
-  $aFolhas = array ('r14',
-                    'r48',
-                    'r35',
-                    'r20'
+  $aFolhas = array(
+    'r14',
+    'r48',
+    'r35',
+    'r20'
   );
-} else {
-  $aFolhas = array ($tfol);
 }
 
 /**
  * Se folha for complementar e semeste for maior que 0, passamos o numero da complementar no sql, o r48_semest
  */
-if ( $tfol == 'r48' && !empty($oGet->complementar) && $oGet->complementar > 0 ) {
+if ($tfol == 'r48' && !empty($oGet->complementar) && $oGet->complementar > 0) {
   $dbwhere .= " and r48_semest = " . $oGet->complementar;
 }
 
-if ( $filtro == 0 || $filtro == 1 ) {
+if ($filtro == 0 || $filtro == 1) {
 
 
   for ($i = 0; $i < sizeof($aFolhas); $i++) {
 
-    $sql = $gera_sql->gerador_sql($aFolhas[$i],
-                                  $ano,
-                                  $mes,
-                                  null,
-                                  null,
-                                  "
-                                   rh01_regist, z01_nome, rh30_regime, r70_codigo, r70_descr, r70_estrut,
-                                   sum(case when #s#_rubric in (".$rubricas_selecionadas.")
+    $sql = $gera_sql->gerador_sql(
+      $aFolhas[$i],
+      $ano,
+      $mes,
+      null,
+      null,
+      "
+                                   rh01_regist, z01_nome, z01_cgccpf, rh30_regime, r70_codigo, r70_descr, r70_estrut,
+                                   sum(case when #s#_rubric in (" . $rubricas_selecionadas . ")
                                             then #s#_quant
                                             else 0
                                        end) as quantsf,
-                                   sum(case when #s#_rubric in (".$rubricas_selecionadas.")
+                                   sum(case when #s#_rubric in (" . $rubricas_selecionadas . ")
                                             then #s#_valor
                                             else 0
                                        end) as valsf,
@@ -243,7 +242,7 @@ if ( $filtro == 0 || $filtro == 1 ) {
                                             then #s#_valor
                                             else 0
                                        end) as R993,
-                                   sum(case when #s#_rubric in ('".$r33_rubmat."', '".$mater_ferias."','".$mater_13."' )
+                                   sum(case when #s#_rubric in ('" . $r33_rubmat . "', '" . $mater_ferias . "','" . $mater_13 . "' )
                                             then #s#_valor
                                             else 0
                                        end) as mater,
@@ -252,12 +251,12 @@ if ( $filtro == 0 || $filtro == 1 ) {
                                             else 0
                                        end) as ded_inss
                                   ",
-                                  $dborderby,
-                                  $dbwhere.
+      $dborderby,
+      $dbwhere .
+        "
+                                   group by rh01_regist, z01_nome, z01_cgccpf, rh30_regime, r70_codigo, r70_descr, r70_estrut
                                   "
-                                   group by rh01_regist, z01_nome, rh30_regime, r70_codigo, r70_descr, r70_estrut
-                                  "
-                                 );
+    );
 
     //echo $sql;exit;
     $rsDadosPrev = db_query($sql);
@@ -270,45 +269,48 @@ if ( $filtro == 0 || $filtro == 1 ) {
      * SE FOR TODAS , TESTARA O VALOR DE TODAS OPCOES DE FOLHAS ANTES DE SAIR SEM NENHUM RESULTADO
      */
     if ($tfol != 'todas') {
-      if($xxnum == 0){
-        db_redireciona('db_erros.php?fechar=true&db_erro=Não existem cálculos para o período de '.$mes.' / '.$ano);
+      if ($xxnum == 0) {
+        db_redireciona('db_erros.php?fechar=true&db_erro=Não existem cálculos para o período de ' . $mes . ' / ' . $ano);
       }
     }
 
     $iLinhasPrev = pg_num_rows($rsDadosPrev);
 
-    for ( $iInd = 0; $iInd < $iLinhasPrev; $iInd++ ){
+    for ($iInd = 0; $iInd < $iLinhasPrev; $iInd++) {
 
-      $oDadosPrev = db_utils::fieldsMemory($rsDadosPrev,$iInd);
+      $oDadosPrev = db_utils::fieldsMemory($rsDadosPrev, $iInd);
 
       $oDadosRegist = new stdClass();
       $oDadosRegist->sNome   = $oDadosPrev->z01_nome;
+      $oDadosRegist->sCPF    = $oDadosPrev->z01_cgccpf;
       $oDadosRegist->iRegime = $oDadosPrev->rh30_regime;
       $oDadosRegist->iFil    = $oDadosPrev->quantsf;
 
-      if($oDadosPrev->r990 > 0){
+      if ($oDadosPrev->r990 > 0) {
         $nBase = $oDadosPrev->r990;
       } else {
         $nBase = $oDadosPrev->r992;
       }
 
-      if ( $lQuebraLote == 'l') {
-        $sAgrupa = $oDadosPrev->r70_codigo." - ".$oDadosPrev->r70_descr." (".$oDadosPrev->r70_estrut.")";
+      if ($lQuebraLote == 'l') {
+        $sAgrupa = $oDadosPrev->r70_codigo . " - " . $oDadosPrev->r70_descr . " (" . $oDadosPrev->r70_estrut . ")";
       } else {
         $sAgrupa = 0;
       }
 
-      if ( isset($aDadosPrev[$sAgrupa][$oDadosPrev->rh01_regist]) &&
-                 $aDadosPrev[$sAgrupa][$oDadosPrev->rh01_regist]->iRegime == $oDadosPrev->rh30_regime &&
-                 $aDadosPrev[$sAgrupa][$oDadosPrev->rh01_regist]->iFil    == $oDadosPrev->quantsf ) {
+      if (
+        isset($aDadosPrev[$sAgrupa][$oDadosPrev->rh01_regist]) &&
+        $aDadosPrev[$sAgrupa][$oDadosPrev->rh01_regist]->iRegime == $oDadosPrev->rh30_regime &&
+        $aDadosPrev[$sAgrupa][$oDadosPrev->rh01_regist]->iFil    == $oDadosPrev->quantsf
+      ) {
 
         $aDadosPrev[$sAgrupa][$oDadosPrev->rh01_regist]->nSalarioFamilia     += $oDadosPrev->valsf;
         $aDadosPrev[$sAgrupa][$oDadosPrev->rh01_regist]->nSalarioMaternidade += $oDadosPrev->mater;
         $aDadosPrev[$sAgrupa][$oDadosPrev->rh01_regist]->nBase               += $nBase;
         $aDadosPrev[$sAgrupa][$oDadosPrev->rh01_regist]->nDesconto           += $oDadosPrev->r993;
         $aDadosPrev[$sAgrupa][$oDadosPrev->rh01_regist]->nDeducao            += $oDadosPrev->ded_inss;
-        $aDadosPrev[$sAgrupa][$oDadosPrev->rh01_regist]->nPatronal           += round($nBase/100*$r33_ppatro, 2);
-        $aDadosPrev[$sAgrupa][$oDadosPrev->rh01_regist]->nAliquota           += round($nBase/100*$campoextra, 2);
+        $aDadosPrev[$sAgrupa][$oDadosPrev->rh01_regist]->nPatronal           += round($nBase / 100 * $r33_ppatro, 2);
+        $aDadosPrev[$sAgrupa][$oDadosPrev->rh01_regist]->nAliquota           += round($nBase / 100 * $campoextra, 2);
       } else {
 
         $oDadosRegist->nSalarioFamilia     = $oDadosPrev->valsf;
@@ -316,8 +318,8 @@ if ( $filtro == 0 || $filtro == 1 ) {
         $oDadosRegist->nBase               = $nBase;
         $oDadosRegist->nDesconto           = $oDadosPrev->r993;
         $oDadosRegist->nDeducao            = $oDadosPrev->ded_inss;
-        $oDadosRegist->nPatronal           = round($nBase/100*$r33_ppatro, 2);
-        $oDadosRegist->nAliquota           = round($nBase/100*$campoextra, 2);
+        $oDadosRegist->nPatronal           = round($nBase / 100 * $r33_ppatro, 2);
+        $oDadosRegist->nAliquota           = round($nBase / 100 * $campoextra, 2);
 
         $aDadosPrev[$sAgrupa][$oDadosPrev->rh01_regist] = $oDadosRegist;
       }
@@ -325,23 +327,25 @@ if ( $filtro == 0 || $filtro == 1 ) {
   }
 }
 
-if ( ( $filtro == 0 || $filtro == 2 ) && $tfol == 'r14' ) {
+if (($filtro == 0 || $filtro == 2) && $tfol == 'r14') {
 
   $sWhereAutonomo   = "     rh90_anousu = {$ano} ";
   $sWhereAutonomo  .= " and rh90_mesusu = {$mes} ";
   $sWhereAutonomo  .= " and rh90_ativa is true   ";
-  $sSqlAutonomos    = $clrhautonomolanc->sql_query_sefip(null,
-                                                        "rhautonomolanc.*,z01_nome",
-                                                        null,
-                                                        $sWhereAutonomo);
+  $sSqlAutonomos    = $clrhautonomolanc->sql_query_sefip(
+    null,
+    "rhautonomolanc.*,z01_nome",
+    null,
+    $sWhereAutonomo
+  );
 
   $rsDadosAutonomos = $clrhautonomolanc->sql_record($sSqlAutonomos);
   $iLinhasAutonomos = $clrhautonomolanc->numrows;
 
 
-  for ( $iInd = 0; $iInd < $iLinhasAutonomos; $iInd++ ){
+  for ($iInd = 0; $iInd < $iLinhasAutonomos; $iInd++) {
 
-    $oDadosAutonomo = db_utils::fieldsMemory($rsDadosAutonomos,$iInd);
+    $oDadosAutonomo = db_utils::fieldsMemory($rsDadosAutonomos, $iInd);
 
     $oDadosRegist = new stdClass();
     $oDadosRegist->sNome               = $oDadosAutonomo->z01_nome;
@@ -353,18 +357,18 @@ if ( ( $filtro == 0 || $filtro == 2 ) && $tfol == 'r14' ) {
 
     $sAgrupa = 'Autônomos';
 
-    if ( isset($aDadosPrev[$sAgrupa][$oDadosAutonomo->rh89_numcgm]) ) {
+    if (isset($aDadosPrev[$sAgrupa][$oDadosAutonomo->rh89_numcgm])) {
 
       $aDadosPrev[$sAgrupa][$oDadosAutonomo->rh89_numcgm]->nBase     += $oDadosAutonomo->rh89_valorserv;
       $aDadosPrev[$sAgrupa][$oDadosAutonomo->rh89_numcgm]->nDesconto += $oDadosAutonomo->rh89_valorretinss;
-      $aDadosPrev[$sAgrupa][$oDadosAutonomo->rh89_numcgm]->nPatronal += ($oDadosAutonomo->rh89_valorserv/100*20);
-      $aDadosPrev[$sAgrupa][$oDadosAutonomo->rh89_numcgm]->nAliquota += ($oDadosAutonomo->rh89_valorserv/100*$campoextra);
+      $aDadosPrev[$sAgrupa][$oDadosAutonomo->rh89_numcgm]->nPatronal += ($oDadosAutonomo->rh89_valorserv / 100 * 20);
+      $aDadosPrev[$sAgrupa][$oDadosAutonomo->rh89_numcgm]->nAliquota += ($oDadosAutonomo->rh89_valorserv / 100 * $campoextra);
     } else {
 
       $oDadosRegist->nBase     = $oDadosAutonomo->rh89_valorserv;
       $oDadosRegist->nDesconto = $oDadosAutonomo->rh89_valorretinss;
-      $oDadosRegist->nPatronal = ($oDadosAutonomo->rh89_valorserv/100*20);
-      $oDadosRegist->nAliquota = ($oDadosAutonomo->rh89_valorserv/100*$campoextra);
+      $oDadosRegist->nPatronal = ($oDadosAutonomo->rh89_valorserv / 100 * 20);
+      $oDadosRegist->nAliquota = ($oDadosAutonomo->rh89_valorserv / 100 * $campoextra);
 
       $aDadosPrev[$sAgrupa][$oDadosAutonomo->rh89_numcgm] = $oDadosRegist;
     }
@@ -372,36 +376,36 @@ if ( ( $filtro == 0 || $filtro == 2 ) && $tfol == 'r14' ) {
 }
 
 //if ($tfol != 'todas') {
-  if ( count($aDadosPrev) == 0 ) {
-    db_redireciona('db_erros.php?fechar=true&db_erro=Nenhum registro encontrado!');
-  }
+if (count($aDadosPrev) == 0) {
+  db_redireciona('db_erros.php?fechar=true&db_erro=Nenhum registro encontrado!');
+}
 //}
 
-if($tfol == 'r14'){
+if ($tfol == 'r14') {
   $head6 = 'ARQUIVO: SALÁRIO';
-}else if($tfol == 'r48'){
+} else if ($tfol == 'r48') {
   $head6 = 'ARQUIVO: COMPLEMENTAR';
-}else if($tfol == 'r35'){
+} else if ($tfol == 'r35') {
   $head6 = 'ARQUIVO: 13. SALÁRIO';
-}else if($tfol == 'todas'){
+} else if ($tfol == 'todas') {
   $head6 = 'ARQUIVO: Todas Folhas';
-}else{
+} else {
   $head6 = 'ARQUIVO: RESCISÃO';
 }
 
 $head6 .= "    CÁLCULO: ";
-$head6 .= ($calc==1)?"Com Cálculo":($calc==2?"Sem Cálculo":"Todos");
+$head6 .= ($calc == 1) ? "Com Cálculo" : ($calc == 2 ? "Sem Cálculo" : "Todos");
 
-$head3 = "RELATÓRIO ".strtoupper($r33_nome);
-$head5 = "PATRONAL: ".$r33_ppatro."%";
-$head7 = "PERÍODO: ".$mes." / ".$ano;
+$head3 = "RELATÓRIO " . strtoupper($r33_nome);
+$head5 = "PATRONAL: " . $r33_ppatro . "%";
+$head7 = "PERÍODO: " . $mes . " / " . $ano;
 $head8 = $headinfo;
 
 $oPdf = new PDF();
 $oPdf->Open();
 $oPdf->AliasNbPages();
 $oPdf->setfillcolor(235);
-$oPdf->setfont('arial','b',8);
+$oPdf->setfont('arial', 'b', 8);
 
 $iPre      = 1;
 $iAlt      = 4;
@@ -419,7 +423,7 @@ $aTotalGeral['nAliquota']           = 0;
 $lPrimeiro = true;
 
 
-foreach ( $aDadosPrev as $sAgrupa => $aDadosRegist ) {
+foreach ($aDadosPrev as $sAgrupa => $aDadosRegist) {
 
   $aSubTotal['nSalarioFamilia']     = 0;
   $aSubTotal['nSalarioMaternidade'] = 0;
@@ -429,72 +433,74 @@ foreach ( $aDadosPrev as $sAgrupa => $aDadosRegist ) {
   $aSubTotal['nPatronal']           = 0;
   $aSubTotal['nAliquota']           = 0;
 
-  if ( $oPdf->gety() > $oPdf->h - 30 || $lPrimeiro || $quebra_pagina == "s" ) {
+  if ($oPdf->gety() > $oPdf->h - 30 || $lPrimeiro || $quebra_pagina == "s") {
 
-    $oPdf->addpage();
-    $oPdf->setfont('arial','b',8);
+    $oPdf->addpage('L');
+    $oPdf->setfont('arial', 'b', 8);
 
-    $oPdf->cell(15,$iAlt,'MATRIC'             ,1,0,"C",1);
-    $oPdf->cell(60,$iAlt,'NOME DO FUNCIONÁRIO',1,0,"C",1);
-    $oPdf->cell(10,$iAlt,'REG'                ,1,0,"C",1);
-    $oPdf->cell(10,$iAlt,'FIL'                ,1,0,"C",1);
-    $oPdf->cell(20,$iAlt,'SAL.FAM.'           ,1,0,"C",1);
-    $oPdf->cell(20,$iAlt,'MATERN.'            ,1,0,"C",1);
-    $oPdf->cell(20,$iAlt,'BASE'               ,1,0,"C",1);
-    $oPdf->cell(20,$iAlt,'DESCONTO'           ,1,1,"C",1);
+    $oPdf->cell(20, $iAlt, 'MATRIC', 1, 0, "C", 1);
+    $oPdf->cell(30, $iAlt, 'CPF', 1, 0, "C", 1);
+    $oPdf->cell(80, $iAlt, 'NOME DO FUNCIONÁRIO', 1, 0, "C", 1);
+    $oPdf->cell(15, $iAlt, 'REG', 1, 0, "C", 1);
+    $oPdf->cell(15, $iAlt, 'FIL', 1, 0, "C", 1);
+    $oPdf->cell(30, $iAlt, 'SAL.FAM.', 1, 0, "C", 1);
+    $oPdf->cell(30, $iAlt, 'MATERN.', 1, 0, "C", 1);
+    $oPdf->cell(30, $iAlt, 'BASE', 1, 0, "C", 1);
+    $oPdf->cell(30, $iAlt, 'DESCONTO', 1, 1, "C", 1);
 
 
     $lPrimeiro = false;
   }
 
-  if ( $lQuebraLote == 'l' || $sAgrupa == 'Autônomos' ) {
+  if ($lQuebraLote == 'l' || $sAgrupa == 'Autônomos') {
 
-    $oPdf->setfont('arial','b',8);
+    $oPdf->setfont('arial', 'b', 8);
     $oPdf->ln(3);
-    $oPdf->cell(175,$iAlt,$sAgrupa,1,1,"L",1);
+    $oPdf->cell(280, $iAlt, $sAgrupa, 1, 1, "L", 1);
     $oPdf->ln(1);
   }
 
-  foreach ( $aDadosRegist as $iRegist => $oDadosRegist ) {
+  foreach ($aDadosRegist as $iRegist => $oDadosRegist) {
 
 
-    if ( $oPdf->gety() > $oPdf->h - 30 ) {
+    if ($oPdf->gety() > $oPdf->h - 30) {
 
-      $oPdf->addpage();
-      $oPdf->setfont('arial','b',8);
+      $oPdf->addpage('L');
+      $oPdf->setfont('arial', 'b', 8);
 
-      $oPdf->cell(15,$iAlt,'MATRIC'             ,1,0,"C",1);
-      $oPdf->cell(60,$iAlt,'NOME DO FUNCIONÁRIO',1,0,"C",1);
-      $oPdf->cell(10,$iAlt,'REG'                ,1,0,"C",1);
-      $oPdf->cell(10,$iAlt,'FIL'                ,1,0,"C",1);
-      $oPdf->cell(20,$iAlt,'SAL.FAM.'           ,1,0,"C",1);
-      $oPdf->cell(20,$iAlt,'MATERN.'            ,1,0,"C",1);
-      $oPdf->cell(20,$iAlt,'BASE'               ,1,0,"C",1);
-      $oPdf->cell(20,$iAlt,'DESCONTO'           ,1,1,"C",1);
+      $oPdf->cell(20, $iAlt, 'MATRIC', 1, 0, "C", 1);
+      $oPdf->cell(30, $iAlt, 'CPF', 1, 0, "C", 1);
+      $oPdf->cell(80, $iAlt, 'NOME DO FUNCIONÁRIO', 1, 0, "C", 1);
+      $oPdf->cell(15, $iAlt, 'REG', 1, 0, "C", 1);
+      $oPdf->cell(15, $iAlt, 'FIL', 1, 0, "C", 1);
+      $oPdf->cell(30, $iAlt, 'SAL.FAM.', 1, 0, "C", 1);
+      $oPdf->cell(30, $iAlt, 'MATERN.', 1, 0, "C", 1);
+      $oPdf->cell(30, $iAlt, 'BASE', 1, 0, "C", 1);
+      $oPdf->cell(30, $iAlt, 'DESCONTO', 1, 1, "C", 1);
 
-      if ( $lQuebraLote == 'l' || $sAgrupa == 'Autônomos' ) {
+      if ($lQuebraLote == 'l' || $sAgrupa == 'Autônomos') {
         $oPdf->ln(3);
-        $oPdf->cell(175,$iAlt,$sAgrupa,1,1,"L",1);
+        $oPdf->cell(280, $iAlt, $sAgrupa, 1, 1, "L", 1);
       }
-
     }
 
-    if ( $iPre == 0 ) {
+    if ($iPre == 0) {
       $iPre = 1;
     } else {
       $iPre = 0;
     }
 
-    $oPdf->setfont('arial','',7);
+    $oPdf->setfont('arial', '', 7);
 
-    $oPdf->cell(15,$iAlt,$iRegist                                           ,0,0,"C",$iPre);
-    $oPdf->cell(60,$iAlt,$oDadosRegist->sNome                               ,0,0,"L",$iPre);
-    $oPdf->cell(10,$iAlt,$oDadosRegist->iRegime                             ,0,0,"R",$iPre);
-    $oPdf->cell(10,$iAlt,$oDadosRegist->iFil                                ,0,0,"R",$iPre);
-    $oPdf->cell(20,$iAlt,db_formatar($oDadosRegist->nSalarioFamilia    ,'f'),0,0,"R",$iPre);
-    $oPdf->cell(20,$iAlt,db_formatar($oDadosRegist->nSalarioMaternidade,'f'),0,0,"R",$iPre);
-    $oPdf->cell(20,$iAlt,db_formatar($oDadosRegist->nBase              ,'f'),0,0,"R",$iPre);
-    $oPdf->cell(20,$iAlt,db_formatar($oDadosRegist->nDesconto          ,'f'),0,1,"R",$iPre);
+    $oPdf->cell(20, $iAlt, $iRegist, 0, 0, "R", $iPre);
+    $oPdf->cell(30, $iAlt, db_formatar($oDadosRegist->sCPF, 'cpf'), 0, 0, "C", $iPre);
+    $oPdf->cell(80, $iAlt, $oDadosRegist->sNome, 0, 0, "L", $iPre);
+    $oPdf->cell(15, $iAlt, $oDadosRegist->iRegime, 0, 0, "R", $iPre);
+    $oPdf->cell(15, $iAlt, $oDadosRegist->iFil, 0, 0, "R", $iPre);
+    $oPdf->cell(30, $iAlt, db_formatar($oDadosRegist->nSalarioFamilia, 'f'), 0, 0, "R", $iPre);
+    $oPdf->cell(30, $iAlt, db_formatar($oDadosRegist->nSalarioMaternidade, 'f'), 0, 0, "R", $iPre);
+    $oPdf->cell(30, $iAlt, db_formatar($oDadosRegist->nBase, 'f'), 0, 0, "R", $iPre);
+    $oPdf->cell(30, $iAlt, db_formatar($oDadosRegist->nDesconto, 'f'), 0, 1, "R", $iPre);
 
     $aSubTotal['nSalarioFamilia']       += $oDadosRegist->nSalarioFamilia;
     $aSubTotal['nSalarioMaternidade']   += $oDadosRegist->nSalarioMaternidade;
@@ -510,62 +516,60 @@ foreach ( $aDadosPrev as $sAgrupa => $aDadosRegist ) {
     $aTotalGeral['nDesconto']           += $oDadosRegist->nDesconto;
     $aTotalGeral['nPatronal']           += $oDadosRegist->nPatronal;
     $aTotalGeral['nAliquota']           += $oDadosRegist->nAliquota;
-
   }
 
   $iTotalRegistros += count($aDadosRegist);
 
-  if ( $lQuebraLote == 'l' || $sAgrupa == 'Autônomos' ) {
+  if ($lQuebraLote == 'l' || $sAgrupa == 'Autônomos') {
 
     $oPdf->ln(1);
-    $oPdf->cell(95,$iAlt,'TOTAL : '.count($aDadosRegist).' FUNCIONÁRIOS '  ,"T",0,"R",0);
-    $oPdf->cell(20,$iAlt,db_formatar($aSubTotal['nSalarioFamilia']    ,'f'),"T",0,"R",0);
-    $oPdf->cell(20,$iAlt,db_formatar($aSubTotal['nSalarioMaternidade'],'f'),"T",0,"R",0);
-    $oPdf->cell(20,$iAlt,db_formatar($aSubTotal['nBase']              ,'f'),"T",0,"R",0);
-    $oPdf->cell(20,$iAlt,db_formatar($aSubTotal['nDesconto']          ,'f'),"T",1,"R",0);
+    $oPdf->cell(160, $iAlt, 'TOTAL : ' . count($aDadosRegist) . ' FUNCIONÁRIOS ', "T", 0, "R", 0);
+    $oPdf->cell(30, $iAlt, db_formatar($aSubTotal['nSalarioFamilia'], 'f'), "T", 0, "R", 0);
+    $oPdf->cell(30, $iAlt, db_formatar($aSubTotal['nSalarioMaternidade'], 'f'), "T", 0, "R", 0);
+    $oPdf->cell(30, $iAlt, db_formatar($aSubTotal['nBase'], 'f'), "T", 0, "R", 0);
+    $oPdf->cell(30, $iAlt, db_formatar($aSubTotal['nDesconto'], 'f'), "T", 1, "R", 0);
 
     $oPdf->ln(3);
-    $oPdf->cell(36,6,'DEDUÇÕES .... :  '.db_formatar($aSubTotal['nDeducao'] ,'f'),0,0,"R",0);
-    $oPdf->cell(50,6,'BASE BRUTA .. :  '.db_formatar($aSubTotal['nBase']    ,'f'),0,0,"R",0);
-    $oPdf->cell(50,6,'PERC.PATRONAL :  '.db_formatar($aSubTotal['nPatronal'],'f'),0,0,"R",0);
-    $oPdf->cell(40,6,'ALIQUOTA :  '.db_formatar($aSubTotal['nAliquota'],'f'),0,1,"R",0);
+    $oPdf->cell(140, 6, 'DEDUÇÕES .... :  ' . db_formatar($aSubTotal['nDeducao'], 'f'), 0, 0, "R", 0);
+    $oPdf->cell(50, 6, 'BASE BRUTA .. :  ' . db_formatar($aSubTotal['nBase'], 'f'), 0, 0, "R", 0);
+    $oPdf->cell(50, 6, 'PERC.PATRONAL :  ' . db_formatar($aSubTotal['nPatronal'], 'f'), 0, 0, "R", 0);
+    $oPdf->cell(40, 6, 'ALIQUOTA :  ' . db_formatar($aSubTotal['nAliquota'], 'f'), 0, 1, "R", 0);
 
-    $nPatronalIndividualQuebra += round($aSubTotal['nPatronal'],2);
+    $nPatronalIndividualQuebra += round($aSubTotal['nPatronal'], 2);
 
-    if( $prev != $r11_tbprev ){
-      $oPdf->cell(50,6,'',0,0,"R",0);
-      $oPdf->cell(50,6,'TX. ADMIN   :  '.db_formatar(($aSubTotal['nBase']/100*$r11_txadm ),'f'),0,0,"R",0);
-      $oPdf->cell(50,6,'TOTAL       :  '.db_formatar(($aSubTotal['nBase']/100*$r11_txadm )+$aSubTotal['nPatronal']+$aSubTotal['nDesconto']+$aSubTotal['nAliquota'],'f'),0,1,"R",0);
+    if ($prev != $r11_tbprev) {
+      $oPdf->cell(50, 6, '', 0, 0, "R", 0);
+      $oPdf->cell(50, 6, 'TX. ADMIN   :  ' . db_formatar(($aSubTotal['nBase'] / 100 * $r11_txadm), 'f'), 0, 0, "R", 0);
+      $oPdf->cell(50, 6, 'TOTAL       :  ' . db_formatar(($aSubTotal['nBase'] / 100 * $r11_txadm) + $aSubTotal['nPatronal'] + $aSubTotal['nDesconto'] + $aSubTotal['nAliquota'], 'f'), 0, 1, "R", 0);
     }
   }
 }
 
 $oPdf->ln(3);
-$oPdf->setfont('arial','b',8);
-$oPdf->cell(95,$iAlt,"TOTAL GERAL: {$iTotalRegistros} FUNCIONÁRIOS "     ,"T",0,"C",0);
-$oPdf->cell(20,$iAlt,db_formatar($aTotalGeral['nSalarioFamilia']    ,'f'),"T",0,"R",0);
-$oPdf->cell(20,$iAlt,db_formatar($aTotalGeral['nSalarioMaternidade'],'f'),"T",0,"R",0);
-$oPdf->cell(20,$iAlt,db_formatar($aTotalGeral['nBase']              ,'f'),"T",0,"R",0);
-$oPdf->cell(20,$iAlt,db_formatar($aTotalGeral['nDesconto']          ,'f'),"T",1,"R",0);
+$oPdf->setfont('arial', 'b', 8);
+$oPdf->cell(160, $iAlt, "TOTAL GERAL: {$iTotalRegistros} FUNCIONÁRIOS ", "T", 0, "C", 0);
+$oPdf->cell(30, $iAlt, db_formatar($aTotalGeral['nSalarioFamilia'], 'f'), "T", 0, "R", 0);
+$oPdf->cell(30, $iAlt, db_formatar($aTotalGeral['nSalarioMaternidade'], 'f'), "T", 0, "R", 0);
+$oPdf->cell(30, $iAlt, db_formatar($aTotalGeral['nBase'], 'f'), "T", 0, "R", 0);
+$oPdf->cell(30, $iAlt, db_formatar($aTotalGeral['nDesconto'], 'f'), "T", 1, "R", 0);
 
 $oPdf->ln(3);
-$oPdf->cell(36,6,'DEDUÇÕES .... :  '.db_formatar($aTotalGeral['nDeducao']   ,'f'),0,0,"R",0);
-$oPdf->cell(50,6,'BASE BRUTA .. :  '.db_formatar($aTotalGeral['nBase']      ,'f'),0,0,"R",0);
-$oPdf->cell(50,6,'PERC.PATRONAL :  '.db_formatar($aTotalGeral['nPatronal']  ,'f'),0,0,"R",0);
-$oPdf->cell(40,6,'ALIQUOTA :  '.db_formatar($aTotalGeral['nAliquota']  ,'f'),0,1,"R",0);
+$oPdf->cell(140, 6, 'DEDUÇÕES .... :  ' . db_formatar($aTotalGeral['nDeducao'], 'f'), 0, 0, "R", 0);
+$oPdf->cell(50, 6, 'BASE BRUTA .. :  ' . db_formatar($aTotalGeral['nBase'], 'f'), 0, 0, "R", 0);
+$oPdf->cell(50, 6, 'PERC.PATRONAL :  ' . db_formatar($aTotalGeral['nPatronal'], 'f'), 0, 0, "R", 0);
+$oPdf->cell(40, 6, 'ALIQUOTA :  ' . db_formatar($aTotalGeral['nAliquota'], 'f'), 0, 1, "R", 0);
 
 
-if ( $nPatronalIndividualQuebra == 0 ) {
-  $oPdf->cell(50,6,'PERC.PATRONAL :  '.db_formatar($aTotalGeral['nPatronal']  ,'f'),0,1,"R",0);
+if ($nPatronalIndividualQuebra == 0) {
+  $oPdf->cell(50, 6, 'PERC.PATRONAL :  ' . db_formatar($aTotalGeral['nPatronal'], 'f'), 0, 1, "R", 0);
 } else {
-  $oPdf->cell(50,6,'PERC.PATRONAL :  '.db_formatar($nPatronalIndividualQuebra ,'f'),0,1,"R",0);
+  $oPdf->cell(50, 6, 'PERC.PATRONAL :  ' . db_formatar($nPatronalIndividualQuebra, 'f'), 0, 1, "R", 0);
 }
 
-if( $prev != $r11_tbprev){
-  $oPdf->cell(50,6,'',0,0,"R",0);
-  $oPdf->cell(50,6,'TX. ADMIN   :  '.db_formatar(($aTotalGeral['nBase']/100*$r11_txadm ),'f'),0,0,"R",0);
-  $oPdf->cell(50,6,'TOTAL       :  '.db_formatar(($aTotalGeral['nBase']/100*$r11_txadm )+$aTotalGeral['nPatronal']+$aTotalGeral['nDesconto']+$aTotalGeral['nAliquota'],'f'),0,1,"R",0);
+if ($prev != $r11_tbprev) {
+  $oPdf->cell(50, 6, '', 0, 0, "R", 0);
+  $oPdf->cell(50, 6, 'TX. ADMIN   :  ' . db_formatar(($aTotalGeral['nBase'] / 100 * $r11_txadm), 'f'), 0, 0, "R", 0);
+  $oPdf->cell(50, 6, 'TOTAL       :  ' . db_formatar(($aTotalGeral['nBase'] / 100 * $r11_txadm) + $aTotalGeral['nPatronal'] + $aTotalGeral['nDesconto'] + $aTotalGeral['nAliquota'], 'f'), 0, 1, "R", 0);
 }
 
 $oPdf->Output();
-?>

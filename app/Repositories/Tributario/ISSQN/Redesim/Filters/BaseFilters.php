@@ -9,27 +9,43 @@ class BaseFilters implements IFilters
 {
     /**
      * Paginação utilizada quando houver mais de 100 registros
-     * @var int
+     * @var ?int
      */
-    public int $pagina;
+    public ?int $pagina = null;
 
     /**
      * Filtra registros incluídos a partir dessa data
-     * @var DateTime
+     * @var ?DateTime
      */
-    public DateTime $dataInicio;
+    public ?DateTime $dataInicio = null;
 
     /**
      * Filtra registros incluídos até essa data
-     * @var DateTime
+     * @var ?DateTime
      */
-    public DateTime $dataTermino;
+    public ?DateTime $dataTermino = null;
 
     /**
      * Filtro de pesquisa
-     * @var int
+     * @var ?int
      */
-    public int $id;
+    public ?int $id = null;
+
+    public function __construct(array $data = null)
+    {
+
+        if ($data === null) {
+            return;
+        }
+
+        foreach ($data as $attribute => $value) {
+            if (in_array($attribute, ['dataInicio', 'dataTermino'])) {
+                $value = $this->formatDateBr($value);
+            }
+
+            $this->$attribute = $value;
+        }
+    }
 
     public function toJson(): string
     {
@@ -57,6 +73,17 @@ class BaseFilters implements IFilters
         }
 
         return $array;
+    }
+
+    public function formatDateBr(string $value): DateTime
+    {
+        $value = DateTime::createFromFormat('d/m/Y H:i', $value);
+
+        if (!$value) {
+            $value = (new DateTime())->format('d/m/Y H:i');
+        }
+
+        return $value;
     }
 
 }

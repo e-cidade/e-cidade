@@ -61,6 +61,10 @@ class cl_saltes
   var $k13_dtimplantacao_mes = null;
   var $k13_dtimplantacao_ano = null;
   var $k13_dtimplantacao = null;
+  var $k13_dtreativacaoconta_dia = null;
+  var $k13_dtreativacaoconta_mes = null;
+  var $k13_dtreativacaoconta_ano = null;
+  var $k13_dtreativacaoconta = null;
   // cria propriedade com as variaveis do arquivo
   var $campos = "
                  k13_conta = int4 = Código Conta
@@ -72,6 +76,7 @@ class cl_saltes
                  k13_datvlr = date = Data Atualizaï¿½ï¿½o
                  k13_limite = date = Data Limite
                  k13_dtimplantacao = date = Data da Implantaï¿½ï¿½o da Conta
+                 k13_dtreativacaoconta = date = Data da Reativação da Conta
                  ";
   //funcao construtor da classe
   function cl_saltes()
@@ -124,6 +129,14 @@ class cl_saltes
           $this->k13_dtimplantacao = $this->k13_dtimplantacao_ano . "-" . $this->k13_dtimplantacao_mes . "-" . $this->k13_dtimplantacao_dia;
         }
       }
+      if ($this->k13_dtreativacaoconta == "") {
+        $this->k13_dtreativacaoconta_dia = ($this->k13_dtreativacaoconta_dia == "" ? @$GLOBALS["HTTP_POST_VARS"]["k13_dtreativacaoconta_dia"] : $this->k13_dtreativacaoconta_dia);
+        $this->k13_dtreativacaoconta_mes = ($this->k13_dtreativacaoconta_mes == "" ? @$GLOBALS["HTTP_POST_VARS"]["k13_dtreativacaoconta_mes"] : $this->k13_dtreativacaoconta_mes);
+        $this->k13_dtreativacaoconta_ano = ($this->k13_dtreativacaoconta_ano == "" ? @$GLOBALS["HTTP_POST_VARS"]["k13_dtreativacaoconta_ano"] : $this->k13_dtreativacaoconta_ano);
+        if ($this->k13_dtreativacaoconta_dia != "") {
+          $this->k13_dtreativacaoconta = $this->k13_dtreativacaoconta_ano . "-" . $this->k13_dtreativacaoconta_mes . "-" . $this->k13_dtreativacaoconta_dia;
+        }
+      }
     } else {
       $this->k13_conta = ($this->k13_conta == "" ? @$GLOBALS["HTTP_POST_VARS"]["k13_conta"] : $this->k13_conta);
     }
@@ -165,6 +178,10 @@ class cl_saltes
     if ($this->k13_limite == null) {
       $this->k13_limite = "null";
     }
+    if ($this->k13_dtreativacaoconta == null) {
+      $this->k13_dtreativacaoconta = "null";
+    }
+
     if ($this->k13_dtimplantacao == null) {
       $this->erro_sql = " Campo Data da Implantaï¿½ï¿½o da Conta nao Informado.";
       $this->erro_campo = "k13_dtimplantacao_dia";
@@ -193,6 +210,7 @@ class cl_saltes
                                       ,k13_datvlr
                                       ,k13_limite
                                       ,k13_dtimplantacao
+                                      ,k13_dtreativacaoconta
                        )
                 values (
                                 $this->k13_conta
@@ -204,6 +222,8 @@ class cl_saltes
                                ," . ($this->k13_datvlr == "null" || $this->k13_datvlr == "" ? "null" : "'" . $this->k13_datvlr . "'") . "
                                ," . ($this->k13_limite == "null" || $this->k13_limite == "" ? "null" : "'" . $this->k13_limite . "'") . "
                                ," . ($this->k13_dtimplantacao == "null" || $this->k13_dtimplantacao == "" ? "null" : "'" . $this->k13_dtimplantacao . "'") . "
+                               ," . ($this->k13_dtreativacaoconta == "null" || $this->k13_dtreativacaoconta == "" ? "null" : "'" . $this->k13_dtreativacaoconta . "'") . "
+
                       )";
     $result = db_query($sql);
     if ($result == false) {
@@ -331,6 +351,15 @@ class cl_saltes
     } else {
       if (isset($GLOBALS["HTTP_POST_VARS"]["k13_limite_dia"])) {
         $sql  .= $virgula . " k13_limite = null ";
+        $virgula = ",";
+      }
+    }
+    if (trim($this->k13_dtreativacaoconta) != "" || isset($GLOBALS["HTTP_POST_VARS"]["k13_dtreativacaoconta_dia"]) &&  ($GLOBALS["HTTP_POST_VARS"]["k13_dtreativacaoconta_dia"] != "")) {
+      $sql  .= $virgula . " k13_dtreativacaoconta = '$this->k13_dtreativacaoconta' ";
+      $virgula = ",";
+    } else {
+      if (isset($GLOBALS["HTTP_POST_VARS"]["k13_dtreativacaoconta_dia"])) {
+        $sql  .= $virgula . " k13_dtreativacaoconta = null ";
         $virgula = ",";
       }
     }

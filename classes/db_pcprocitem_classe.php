@@ -389,6 +389,27 @@ class cl_pcprocitem {
      }
      return $sql;
   }
+
+  function queryGetItens($pc81_codproc)
+  {
+    return "
+            SELECT pc01_codmater,pc11_seq,pc01_descrmater,pc01_complmater,pc11_quant,m61_descr,pc11_reservado,pc81_codprocitem
+            FROM pcprocitem
+            inner join solicitem on pc11_codigo = pc81_solicitem
+            inner join solicitempcmater on pc16_solicitem = pc11_codigo
+            inner join solicitemunid on pc17_codigo = pc11_codigo
+            inner join matunid on m61_codmatunid = pc17_unid
+            inner join pcmater on pc01_codmater = pc16_codmater
+            WHERE pc81_codproc = $pc81_codproc
+    ";
+  }
+
+  function queryItensOnLiclicitem($pc81_codproc, $l21_codliclicita){
+      return "SELECT *
+              FROM liclicitem
+        inner join pcprocitem on pc81_codprocitem = l21_codpcprocitem
+        WHERE l21_codliclicita = $l21_codliclicita and pc81_codproc = $pc81_codproc";
+  }
    function sql_query_autitem ( $pc81_codprocitem=null,$campos="*",$ordem=null,$dbwhere=""){
      $sql = "select ";
      if($campos != "*" ){

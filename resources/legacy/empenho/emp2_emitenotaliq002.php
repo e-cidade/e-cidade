@@ -38,14 +38,14 @@ require_once("classes/db_emite_nota_liq.php");
 require_once("classes/db_empdiaria_classe.php");
 require_once("classes/db_rhpessoal_classe.php");
 require_once("model/orcamento/ControleOrcamentario.model.php");
-
+require_once("model/protocolo/AssinaturaDigital.model.php");
 /*
  * Configurações GED
 */
 require_once ("integracao_externa/ged/GerenciadorEletronicoDocumento.model.php");
 require_once ("integracao_externa/ged/GerenciadorEletronicoDocumentoConfiguracao.model.php");
 require_once ("libs/exceptions/BusinessException.php");
-
+$assinar = "true";
 $oGet           = db_utils::postMemory($_GET);
 $clpagordem     = new cl_pagordem;
 $clpagordemele  = new cl_pagordemele;
@@ -59,6 +59,11 @@ $sFornecedor = null;
 if ( isset($oGet) && !empty($oGet) ) {
   $sFornecedor = !empty($oGet->aFornecedor) ? $oGet->aFornecedor : null;
 }
+if($oGet->assinar == "false"){
+
+    $assinar = $oGet->assinar;
+}
+$oAssintaraDigital =  new AssinaturaDigital();
 $e50_codord = $codordem;
 $oConfiguracaoGed = GerenciadorEletronicoDocumentoConfiguracao::getInstance();
 if ($oConfiguracaoGed->utilizaGED()) {
@@ -435,7 +440,21 @@ for($i = 0;$i < $clpagordem->numrows;$i++){
 
 
 
-if ($oConfiguracaoGed->utilizaGED()) {
+if($oAssintaraDigital->verificaAssituraAtiva() && $assinar == "true"){
+
+    try {
+        $sInstituicao = str_replace( " ", "_", strtoupper($oAssintaraDigital->removerAcentos($nomeinstabrev)));
+        $lqd = "$e60_codemp-$e50_numliquidacao";
+        $nomeDocumento = "LIQUIDACAO_{$e60_codemp}_{$e60_anousu}_LQD_{$lqd}_OP_{$e50_codord}_{$sInstituicao}.pdf";
+        $pdf1->objpdf->Output("tmp/$nomeDocumento", false, true);
+        $oAssintaraDigital->gerarArquivoBase64($nomeDocumento);
+        $oAssintaraDigital->assinarLiquidacao($e60_numemp, $e71_codnota, $e60_coddot, $e60_anousu,  $e50_data, $nomeDocumento, "LIQUIDACAO EMP {$e60_codemp}/{$e60_anousu} LQD {$lqd} OP {$e50_codord}");
+        $pdf1->objpdf->Output();
+    } catch (Exception $eErro) {
+        db_redireciona("db_erros.php?fechar=true&db_erro=".$eErro->getMessage());
+    }
+
+} else if ($oConfiguracaoGed->utilizaGED()) {
 
   try {
 

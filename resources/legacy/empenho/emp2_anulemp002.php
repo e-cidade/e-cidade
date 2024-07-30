@@ -34,14 +34,21 @@ require_once("classes/db_empanulado_classe.php");
 require_once("classes/db_empanuladoele_classe.php");
 require_once("classes/db_pcforneconpad_classe.php");
 require_once("libs/db_liborcamento.php");
+require_once("model/protocolo/AssinaturaDigital.model.php");
 
 $clempparametro	    = new cl_empparametro;
 $clempanulado	      = new cl_empanulado;
 $cldb_pcforneconpad = new cl_pcforneconpad;
 $clempanuladoele    = new cl_empanuladoele;
 $atual              = 0;
+$assinarLocal = "false";
 parse_str($HTTP_SERVER_VARS['QUERY_STRING']);
+$oAssintaraDigital =  new AssinaturaDigital();
+$oGet = db_utils::postMemory($_GET);
+if($oGet->assinar=='true'){
 
+    $assinarLocal = "true";
+}
 $where1 = '';
 if(isset($e94_codanu)) {
 
@@ -196,7 +203,7 @@ for($i = 0;$i < pg_numrows($result02);$i++){
    $sqlitens .= "                m61_descr,";
    $sqlitens .= "                db_usuarios.*,";
    $sqlitens .= "                orcelemento.*,";
-   $sqlitens .= "                pcmater.*    ";                                                                       
+   $sqlitens .= "                pcmater.*    ";
    $sqlitens .= "                from empanuladoele";
    $sqlitens .= "                inner join empanulado      on e94_codanu            = e95_codanu            ";
    $sqlitens .= "                inner join empanuladoitem  on e37_empanulado        = e94_codanu            ";
@@ -207,9 +214,9 @@ for($i = 0;$i < pg_numrows($result02);$i++){
    $sqlitens .= "                left join empempaut        on e60_numemp           = e61_numemp             ";
    $sqlitens .= "                left join empautoriza      on e61_autori           = e54_autori             ";
    $sqlitens .= "                left join empautitem       on e54_autori           = e55_autori             ";
-   $sqlitens .= "                                           and e62_item = e55_item                          ";  
+   $sqlitens .= "                                           and e62_item = e55_item                          ";
    $sqlitens .= "                left join matunid          on e55_unid             = m61_codmatunid         ";
-   //FIM - OC19614   
+   //FIM - OC19614
    /*OC4401*/
    $sqlitens .= "                LEFT JOIN db_usuarios ON db_usuarios.id_usuario = e94_id_usuario            ";
    /*FIM - OC4401*/
@@ -300,4 +307,21 @@ for($i = 0;$i < pg_numrows($result02);$i++){
 
    $pdf1->imprime();
 }
-$pdf1->objpdf->Output();
+
+if($oAssintaraDigital->verificaAssituraAtiva() && $assinarLocal == "true"){
+    try {
+        $sInstituicao = str_replace( " ", "_", strtoupper($nomeinstabrev));
+        $nomeDocumento = "ANULACAO_EMPENHO_{$e60_codemp}_{$e60_anousu}_{$e94_codanu}_{$sInstituicao}.pdf";
+        $pdf1->objpdf->Output("tmp/$nomeDocumento", false, true);
+        $oAssintaraDigital->gerarArquivoBase64($nomeDocumento);
+        $oAssintaraDigital->assinarAnulacaoEmpenho($e94_codanu, $e60_coddot, $e60_anousu,  $e94_data, $nomeDocumento, "ANULACAO EMP {$e60_codemp}/{$e60_anousu} ANL {$e94_codanu}");
+        $pdf1->objpdf->Output();
+    } catch (Exception $eErro) {
+        db_redireciona("db_erros.php?fechar=true&db_erro=".$eErro->getMessage());
+    }
+
+}else {
+
+    $pdf1->objpdf->Output();
+
+}

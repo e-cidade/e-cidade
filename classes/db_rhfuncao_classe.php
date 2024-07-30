@@ -99,6 +99,7 @@ class cl_rhfuncao {
             $this->rh37_ativo = ($this->rh37_ativo == "f"?@$GLOBALS["HTTP_POST_VARS"]["rh37_ativo"]:$this->rh37_ativo);
             $this->rh37_funcaogrupo = ($this->rh37_funcaogrupo == ""?@$GLOBALS["HTTP_POST_VARS"]["rh37_funcaogrupo"]:$this->rh37_funcaogrupo);
             $this->rh37_atividadedocargo = ($this->rh37_atividadedocargo == ""?@$GLOBALS["HTTP_POST_VARS"]["rh37_atividadedocargo"]:$this->rh37_atividadedocargo);
+            $this->rh37_exerceatividade = ($this->rh37_exerceatividade == ""?@$GLOBALS["HTTP_POST_VARS"]["rh37_exerceatividade"]:$this->rh37_exerceatividade);
             $this->rh37_dedicacaoexc = ($this->rh37_dedicacaoexc == ""?@$GLOBALS["HTTP_POST_VARS"]["rh37_dedicacaoexc"]:$this->rh37_dedicacaoexc);
             
         }else{

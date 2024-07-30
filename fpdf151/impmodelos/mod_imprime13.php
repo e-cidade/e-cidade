@@ -8,15 +8,6 @@ $pagina = 1;
 $xlin   = 20;
 $xcol   = 4;
 
-$imprimevalidmin = "false";
-//verifica validade minima
-for ($j = 0; $j < $this->linhasdositens; $j++) {
-    $oItens = db_utils::fieldsmemory($this->recorddositens, $j);
-    if ($oItens->pc01_validademinima == "t") {
-        $imprimevalidmin = "true";
-    }
-}
-
 
 // Caixa externa
 $this->objpdf->setfillcolor(245);
@@ -28,7 +19,7 @@ $this->objpdf->Setfont('Arial', 'B', 6.5);
 $oDaoDbConfig    = db_utils::getDao("db_config");
 $sLogo           = $oDaoDbConfig->getParametrosInstituicao()->logo;
 
-$this->objpdf->Image('imagens/files/' . $this->logo, 5, $xlin - 18, 25); //.$this->logo
+$this->objpdf->Image('imagens/files/' . $this->logo, 5, 3, 12); //.$this->logo
 $this->objpdf->text(130, $xlin - 15, "ORÇAMENTO N" . CHR(176));
 $this->objpdf->text(185, $xlin - 15, db_formatar($this->orccodigo, 's', '0', 6, 'e'));
 $this->objpdf->text(130, $xlin - 11, $this->labdados . CHR(176));
@@ -207,9 +198,6 @@ $this->objpdf->rect($xcol + 24, $xlin + $getdoy, 15, 6, 2, 'DF', '12');
 $this->objpdf->rect($xcol + 39, $xlin + $getdoy, 18, 6, 2, 'DF', '12');
 $this->objpdf->rect($xcol + 57, $xlin + $getdoy, 70, 6, 2, 'DF', '12');
 $this->objpdf->rect($xcol + 127, $xlin + $getdoy, 37, 6, 2, 'DF', '12');
-if ($imprimevalidmin == "true") {
-    $this->objpdf->rect($xcol + 141, $xlin + $getdoy, 23, 6, 2, 'DF', '12');
-}
 $this->objpdf->rect($xcol + 164, $xlin + $getdoy, 19, 6, 2, 'DF', '12');
 $this->objpdf->rect($xcol + 183, $xlin + $getdoy, 19, 6, 2, 'DF', '12');
 
@@ -250,17 +238,8 @@ $this->objpdf->rect($xcol + 57, $xlin + $getdoy + 6, 70, $alturaini, 2, 'DF', '3
 
 // Caixa das marcas
 //$this->objpdf->rect($xcol+115,$xlin+$getdoy+6,49,$alturaini,2,'DF','34');
-if ($imprimevalidmin == "true") {
 
-    $this->objpdf->rect($xcol + 127, $xlin + $getdoy + 6, 37, $alturaini, 2, 'DF', '34');
-} else {
-    $this->objpdf->rect($xcol + 127, $xlin + $getdoy + 6, 37, $alturaini, 2, 'DF', '34');
-}
-
-// Caixa dos validade minima
-if ($imprimevalidmin == "true") {
-    $this->objpdf->rect($xcol + 141, $xlin + $getdoy + 6, 23, $alturaini, 2, 'DF', '34');
-}
+$this->objpdf->rect($xcol + 127, $xlin + $getdoy + 6, 37, $alturaini, 2, 'DF', '34');
 
 // Caixa dos valores unitários
 $this->objpdf->rect($xcol + 164, $xlin + $getdoy + 6, 19, $alturaini, 2, 'DF', '34');
@@ -280,15 +259,7 @@ $this->objpdf->text($xcol +   15, $xlin + $getdoy + 4, 'ITEM');
 $this->objpdf->text($xcol +  26, $xlin + $getdoy + 4, 'QUANT');
 $this->objpdf->text($xcol +  41, $xlin + $getdoy + 4, 'UNIDADE');
 $this->objpdf->text($xcol +  74, $xlin + $getdoy + 4, 'MATERIAL OU SERVIÇO');
-if ($imprimevalidmin == "true") {
-    $this->objpdf->text($xcol + 135, $xlin + $getdoy + 4, 'MARCA');
-} else {
-    $this->objpdf->text($xcol + 140, $xlin + $getdoy + 4, 'MARCA');
-}
-
-if ($imprimevalidmin == "true") {
-    $this->objpdf->text($xcol + 155, $xlin + $getdoy + 4, 'VALIDAD. MIN.');
-}
+$this->objpdf->text($xcol + 140, $xlin + $getdoy + 4, 'MARCA');
 $this->objpdf->text($xcol + 167, $xlin + $getdoy + 4, 'VLR UNIT.');
 $this->objpdf->text($xcol + 186, $xlin + $getdoy + 4, 'VLR TOT.');
 
@@ -348,10 +319,6 @@ for ($ii = 0; $ii < $this->linhasdositens; $ii++) {
     $dist = 4;
     if (trim($codunid) != "") {
         $unid = trim(substr($unid, 0, 10));
-        if ($susaquant == "t") {
-            $unid  .= " \n$quantunid UNIDADES\n";
-            //$resumo = str_replace("\n","",$resumo);
-        }
     } else if ($servico == "t") {
         $unid = "SERVIÇO";
     }
@@ -421,9 +388,6 @@ for ($ii = 0; $ii < $this->linhasdositens; $ii++) {
         $this->objpdf->rect($xcol + 39, $xlin + 54, 18, 6, 2, 'DF', '12');
         $this->objpdf->rect($xcol + 57, $xlin + 54, 70, 6, 2, 'DF', '12');
         $this->objpdf->rect($xcol + 127, $xlin + 54, 37, 6, 2, 'DF', '12');
-        if ($imprimevalidmin == "true") {
-            $this->objpdf->rect($xcol + 141, $xlin + 54, 23, 6, 2, 'DF', '12');
-        }
         $this->objpdf->rect($xcol + 164, $xlin + 54, 19, 6, 2, 'DF', '12');
         $this->objpdf->rect($xcol + 183, $xlin + 54, 19, 6, 2, 'DF', '12');
 
@@ -434,9 +398,6 @@ for ($ii = 0; $ii < $this->linhasdositens; $ii++) {
         $this->objpdf->rect($xcol + 39, $xlin + 54, 18, ($linha - 25), 2, 'DF', '34');
         $this->objpdf->rect($xcol + 57, $xlin + 54, 70, ($linha - 25), 2, 'DF', '34');
         $this->objpdf->rect($xcol + 127, $xlin + 54, 37, ($linha - 25), 2, 'DF', '34');
-        if ($imprimevalidmin == "true") {
-            $this->objpdf->rect($xcol + 141, $xlin + 54, 23, 6, 2, 'DF', '12');
-        }
         $this->objpdf->rect($xcol + 164, $xlin + 54, 19, ($linha - 25), 2, 'DF', '34');
         $this->objpdf->rect($xcol + 183, $xlin + 54, 19, ($linha - 25), 2, 'DF', '34');
 
@@ -449,15 +410,7 @@ for ($ii = 0; $ii < $this->linhasdositens; $ii++) {
         $this->objpdf->text($xcol +  26, $xlin + 58, 'QUANT');
         $this->objpdf->text($xcol +  41, $xlin + 58, 'UNIDADE');
         $this->objpdf->text($xcol +  74, $xlin + 58, 'MATERIAL OU SERVIÇO');
-        if ($imprimevalidmin == "true") {
-            $this->objpdf->text($xcol + 135, $xlin + 58, 'MARCA');
-        } else {
-            $this->objpdf->text($xcol + 140, $xlin + 58, 'MARCA');
-        }
-
-        if ($imprimevalidmin == "true") {
-            $this->objpdf->text($xcol + 155, $xlin + 58, 'VALIDAD. MIN.');
-        }
+        $this->objpdf->text($xcol + 140, $xlin + 58, 'MARCA');
         $this->objpdf->text($xcol + 167, $xlin + 58, 'VLR UNIT.');
         $this->objpdf->text($xcol + 186, $xlin + 58, 'VLR TOT.');
 

@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  *     E-cidade Software Publico para Gestao Municipal
  *  Copyright (C) 2013  DBselller Servicos de Informatica
@@ -25,12 +25,14 @@
  *                                licenca/licenca_pt.txt
  */
 
-require_once("libs/db_stdlib.php");
+require_once(modification("libs/db_stdlib.php"));
 require_once("libs/db_conecta.php");
 require_once("libs/db_sessoes.php");
 require_once("libs/db_usuariosonline.php");
 require_once("dbforms/db_classesgenericas.php");
 require_once("dbforms/db_funcoes.php");
+require_once("model/protocolo/AssinaturaDigital.model.php");
+$oAssintaraDigital =  new AssinaturaDigital();
 $aux = new cl_arquivo_auxiliar;
 $clrotulo = new rotulocampo;
 $clrotulo->label("e60_numemp");
@@ -43,10 +45,15 @@ $db_opcao = 1;
     <title>DBSeller Inform&aacute;tica Ltda - P&aacute;gina Inicial</title>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <meta http-equiv="Expires" CONTENT="0">
+    <?
+    db_app::load("AjaxRequest.js");
+    ?>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.16.0/pdf-lib.js"></script>
     <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
     <script language="JavaScript" type="text/javascript" src="scripts/prototype.js"></script>
     <link href="estilos.css" rel="stylesheet" type="text/css">
     <script>
+        var sRpcAssinaturaDigital = 'con1_assinaturaDigitalDocumentos.RPC.php';
         function js_abre() {
             obj = document.form1;
 
@@ -89,6 +96,7 @@ $db_opcao = 1;
 
                 query += "&dtInicial=" + $F('dtini') + "&dtFinal=" + $F('dtfim');
                 query += "&tipos=" + $F('tipos');
+                query += "&assinar=false"
                 // console.log(query);
                 jan = window.open('emp2_emitenotaemp002.php?' + query,
                     '',
@@ -96,6 +104,59 @@ $db_opcao = 1;
                 jan.moveTo(0, 0);
             }
         }
+        function js_solicitarImpressaoComAssinatura() {
+            obj = document.form1;
+            var oParametros = new Object();
+
+            listacgm = "";
+
+            for (x = 0; x < obj.lista.length; x++) {
+                listacgm += vir + obj.lista.options[x].value;
+                vir = ",";
+            }
+
+            oParametros.listacgm = listacgm;
+            oParametros.ver = obj.ver.value;
+
+            if (obj.e60_numemp.value != '') {
+                oParametros.e60_numemp=obj.e60_numemp.value;
+            } else if (obj.e60_codemp.value != '' && obj.e60_codemp_fim.value != '') {
+                oParametros.e60_codemp=obj.e60_codemp.value;
+                if (Number(obj.e60_codemp.value) > Number(obj.e60_codemp_fim.value)) {
+                    alert("Empenho inicial maior que o empenho final. Verifique!");
+                    return false;
+                }
+                oParametros.e60_codemp_fim=obj.e60_codemp_fim.value;
+            } else if (obj.e60_codemp.value != '') {
+                oParametros.e60_codemp=obj.e60_codemp.value;
+            } else {
+                if ((obj.dtini_dia.value != '') && (obj.dtini_dia.value != '') && (obj.dtini_mes.value != '')) {
+                    var sDtini = obj.dtini.value.split("/");
+                    oParametros.dtini_dia= sDtini[0];
+                    oParametros.dtini_mes= sDtini[1];
+                    oParametros.dtini_ano= sDtini[2];
+                }
+                if ((obj.dtfim_dia.value != '') && (obj.dtfim_mes.value != '') && (obj.dtfim_ano.value != '')) {
+                    var sDtfim = obj.dtfim.value.split("/");
+                    oParametros.dtfim_dia=sDtfim[0];
+                    oParametros.dtfim_mes=sDtfim[1];
+                    oParametros.dtfim_ano=sDtfim[2];
+                }
+            }
+            if (!oParametros.e60_numemp && !oParametros.e60_codemp && !oParametros.dtini_dia  && !oParametros.dtfim_dia) {
+                alert("Selecione algum numero de empenho ou indique o período!");
+            } else {
+
+                oParametros.dtInicial=$F('dtini');
+                oParametros.dtFinal=$F('dtfim');
+                oParametros.tipos=$F('tipos');
+                oParametros.assinar='false';
+                oParametros.sExecuta = 'assinarImprimirDocumentoAssinado';
+                window.open(sRpcAssinaturaDigital+'?json='+encodeURIComponent(JSON.stringify(oParametros)), "_blank");
+
+            }
+        }
+
     </script>
     <style>
         #e60_codemp {
@@ -145,7 +206,7 @@ $db_opcao = 1;
                             </tr>
                             <tr>
                                 <td nowrap width="50%">
-                                    <?
+                                    <?php
                                     // $aux = new cl_arquivo_auxiliar;
                                     $aux->cabecalho      = "<strong>CGM</strong>";
                                     $aux->codigo         = "z01_numcgm"; //chave de retorno da func
@@ -170,20 +231,20 @@ $db_opcao = 1;
                             </tr>
                             <tr>
                                 <td>
-                                    <? db_ancora(@$Le60_codemp, "js_pesquisae60_codemp(true);", 1); ?>
+                                    <?php db_ancora(@$Le60_codemp, "js_pesquisae60_codemp(true);", 1); ?>
                                 </td>
                                 <td>
-                                    <? db_input('e60_codemp', 13, $Ie60_codemp, true, 'text', $db_opcao, " onchange='js_pesquisae60_codemp(false);'", "e60_codemp")  ?>
+                                    <?php db_input('e60_codemp', 13, $Ie60_codemp, true, 'text', $db_opcao, " onchange='js_pesquisae60_codemp(false);'", "e60_codemp")  ?>
                                     <strong> à </strong>
-                                    <? db_input('e60_codemp', 13, $Ie60_codemp, true, 'text', $db_opcao, "", "e60_codemp_fim")  ?>
+                                    <?php db_input('e60_codemp', 13, $Ie60_codemp, true, 'text', $db_opcao, "", "e60_codemp_fim")  ?>
                                 </td>
                             </tr>
                             <tr>
                                 <td nowrap title="<?= @$Te60_numemp ?>">
-                                    <? db_ancora(@$Le60_numemp, "js_pesquisae60_numemp(true);", 1); ?>
+                                    <?php db_ancora(@$Le60_numemp, "js_pesquisae60_numemp(true);", 1); ?>
                                 </td>
                                 <td>
-                                    <? db_input('e60_numemp', 15, $Ie60_numemp, true, 'text', $db_opcao, " onchange='js_pesquisae60_numemp(false);'")  ?>
+                                    <?php db_input('e60_numemp', 15, $Ie60_numemp, true, 'text', $db_opcao, " onchange='js_pesquisae60_numemp(false);'")  ?>
                                 </td>
                             </tr>
                             <tr>
@@ -191,7 +252,7 @@ $db_opcao = 1;
                                     <strong> Período:</strong>
                                 </td>
                                 <td>
-                                    <?
+                                    <?php
                                     db_inputdata('dtini', @$dia, @$mes, @$ano, true, 'text', 1, "");
                                     echo " à ";
                                     db_inputdata('dtfim', @$dia, @$mes, @$ano, true, 'text', 1, "");
@@ -216,11 +277,16 @@ $db_opcao = 1;
         </tr>
         <tr>
             <td align='center'>
-                <input name='pesquisar' type='button' value='Consultar' onclick='js_abre();'>
+                <input name='pesquisar' type='button' value='Imprimir' onclick='js_abre();'>
+                <?php
+                    if($oAssintaraDigital->verificaAssituraAtiva()) {
+                        echo  "<input name='pesquisar' type='button' value='Imprimir Com Assinatura Digital' onclick='js_solicitarImpressaoComAssinatura();'>";
+                    }
+                ?>
             </td>
         </tr>
     </table>
-    <?
+    <?php
     db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsession("DB_anousu"), db_getsession("DB_instit"));
     ?>
 </body>

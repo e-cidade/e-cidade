@@ -14,6 +14,23 @@ class ParticipanteFabrica
     {
         $participante = new Participante;
         $participante->setCnpj($dados['CNPJ']);
+        if(empty($dados['RepresentanteLegal'])){
+            $representante = [];
+            $representante['Nome'] = $dados['RazaoSocial'];
+            $representante['CPF'] = $dados['CPF'];
+            $representante['Telefone'] = $dados['Telefone'];
+            $representante['Endereco'] = $dados['Endereco'];
+            $representante['Numero'] = $dados['Numero'];
+            $representante['Complemento'] = $dados['Complemento'];
+            $representante['Cidade'] = $dados['Cidade'];
+            $representante['CEP'] = $dados['CEP'];
+            $representante['DataCadastro'] = $dados['DataCadastro'];
+            $representante['DataHomologacao'] = $dados['DataHomologacao'];
+            $representante['CD_MUNICIPIO_IBGE'] = $dados['CD_MUNICIPIO_IBGE'];
+            $representante['UF'] = $dados['UF'];
+            $dados['RepresentanteLegal'] = $representante;
+            $participante->setCnpj($dados['CPF']);
+        }
         $participante->setRepresentanteLegal($dados['RepresentanteLegal']['Nome']);
         $participante->setRazaoSocial($dados['RazaoSocial']);
         return $participante;

@@ -29,16 +29,19 @@ require_once("fpdf151/scpdf.php");
 require_once("fpdf151/impcarne.php");
 require_once("classes/db_saltes_classe.php");
 require_once("fpdf151/assinatura.php");
-
+require_once("model/protocolo/AssinaturaDigital.model.php");
 
 $clsaltes = new cl_saltes;
-
+$assinar = "true";
 parse_str(base64_decode($HTTP_SERVER_VARS['QUERY_STRING']));
-
+$oGet           = db_utils::postMemory($_GET);
 $motivo = "";
 // Dados
 $classinatura = new cl_assinatura;
-
+if($oGet->assinar == "false"){
+    $assinar = $oGet->assinar;
+}
+$oAssintaraDigital =  new AssinaturaDigital();
 if (USE_PCASP) {
 
     $sql = "select k152_sequencial,
@@ -309,7 +312,24 @@ try {
 
     $pdf->objpdf->AliasNbPages();
     $pdf->imprime();
-    $pdf->objpdf->Output();
+
+    if($oAssintaraDigital->verificaAssituraAtiva() && $assinar == "true"){
+
+        try {
+            $sInstituicao = str_replace( " ", "_", strtoupper($nomeinstabrev));
+            $nomeDocumento = "SLIP_{$numslip}_{$sInstituicao}.pdf";
+            $pdf->objpdf->Output("tmp/$nomeDocumento", false, true);
+            $oAssintaraDigital->gerarArquivoBase64($nomeDocumento);
+            $oAssintaraDigital->assinarSlip($numslip, $k17_data, $nomeDocumento);
+            $pdf->objpdf->Output();
+        } catch (Exception $eErro) {
+            db_redireciona("db_erros.php?fechar=true&db_erro=".$eErro->getMessage());
+        }
+
+    }else {
+
+        $pdf->objpdf->Output();
+    }
 } catch (Exception $oErro) {
     $sErro = str_replace("\n", '\n', $oErro->getMessage());
 

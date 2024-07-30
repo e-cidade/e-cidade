@@ -6,15 +6,15 @@ use DateTime;
 
 class CompanyPartnerDTO extends BaseDTO
 {
-    public string $cpf;
+    public string $cpf = '';
 
-    public DateTime $inicio;
+    public ?DateTime $inicio = null;
 
     public ?DateTime $fim = null;
 
-    public bool $representanteLegal;
+    public bool $representanteLegal = false;
 
-    public string $nome;
+    public string $nome = '';
 
     public DateTime $inclusao;
 
@@ -38,9 +38,18 @@ class CompanyPartnerDTO extends BaseDTO
                 $value = $this->formatDateBr($value);
             }
 
+            if ($attribute === 'endereco') {
+                $value = new CompanyPartnerAdressDTO((array)$value);
+            }
+
             if ($attribute === 'participacao') {
                 $value = (float) $value;
             }
+
+            if ($attribute === 'nome') {
+                $value = \DBString::removerCaracteresEspeciais($value);
+            }
+
             $this->$attribute = $value;
         }
     }

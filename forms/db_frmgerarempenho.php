@@ -93,6 +93,16 @@ $clrotulo->label('DBtxt25');
     	</td>
     </tr>
 
+	<tr id="trTipoEmpenho">
+		<td><strong>Tipo de Empenho:</strong></td>
+		<td>
+			<?
+				$aTipos = array("1" => "Dotação", "2" => "Lotação");
+				db_select('tipoEmpenho',$aTipos,true,4, " style='width: 150px;'");
+			?>
+		</td>
+	</tr>
+
     <tr style="display: none;" id="ComboContainer">
       <td align='left' title="Número da folha de pagamento">
         <strong>Número:</strong>
@@ -351,7 +361,15 @@ js_montaCombo();
         js_consultaFolhaSuplementar();
       }
 
-    }
+    } 
+	
+	if ($F('tipo') == '1' && ($F('ponto') == 'r14' || $F('ponto') == 'r48' || $F('ponto') == 'r35')) {
+	  	$('trTipoEmpenho').style.display = 'table-row';
+		$('tipoEmpenho').disabled = false;
+	} else {
+		$('trTipoEmpenho').style.display = 'none';
+		$('tipoEmpenho').disabled = true;
+	}
 
 	  /**
 	   * Tipo previdência.
@@ -397,6 +415,11 @@ js_montaCombo();
   }
 
   function js_verifica(){
+
+	if ($F('tipo') == 1 && $F('tipoEmpenho') == 0) {
+    	alert('Tipo de Empenho não informado!');
+    	return false;
+	}
 
     if ( $F('anofolha') == '' || $F('mesfolha') == '' ) {
     	alert('Ano / Mês não informado!');
@@ -535,6 +558,10 @@ function js_getQueryTela(sMethod) {
 	 oParam.sPrevidencia = sSelecionados;
  }
 
+ if ($F('tipo') == 1 && $('tipoEmpenho').disabled == false){
+	oParam.iTipoEmpenho = $F('tipoEmpenho');
+ }
+
  return Object.toJSON(oParam);
 
 }
@@ -615,7 +642,7 @@ function js_montaGrid() {
     $('ComboContainer').style.display     = 'none';
     $('sDataInicial').value               = '';
     $('sDataFinal').value                 = '';
-
+	$('filtroRescisao').style.display = 'none';
   }
 
 js_montaGrid();

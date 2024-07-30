@@ -278,7 +278,12 @@ if ($x->consultarDataDoSistema == true) {
                                             ?>
                                         </td>
                                     </tr>
-
+                                    <tr style="display:none;">      
+                                        <td>                                       
+                                            <?
+                                                db_input('e54_licoutrosorgaos', 16, $Ie54_licoutrosorgaos, true, 'text', $dop, "", "", "", "", 16);
+                                            ?> 
+                                        </td>
                                     <tr>
                                         <td nowrap title="<?= @$Te54_codtipo ?>">
                                             <?= $Le54_codtipo ?>
@@ -1464,6 +1469,7 @@ if ($x->consultarDataDoSistema == true) {
             oParam.dados.iCaracteristicaPeculiar = $F("iSequenciaCaracteristica");
             oParam.dados.tipoempenho = $F('e54_codtipo');
             oParam.dados.sDataEmissao = document.getElementById('e54_emissao').value;
+            oParam.dados.codigoLicitacaoOutroOrgao = $F('e54_licoutrosorgaos');
         }
 
         for (var i = 0; i < aItens.length; i++) {
@@ -1638,6 +1644,7 @@ if ($x->consultarDataDoSistema == true) {
         $('e54_codcom').value = oRetorno.sTipo;
         $('e54_codcomdescr').value = oRetorno.sTipo;
         $('e54_nummodalidade').value = oRetorno.iNumModalidade;
+        $('e54_licoutrosorgaos').value = oRetorno.sLicitacaooutroorgao;
         if (oRetorno.sTipoOrigem == 4) {
             $('e54_adesaoregpreco').value = oRetorno.sAdesaoRegPreco;
         } else {

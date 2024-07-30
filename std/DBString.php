@@ -754,6 +754,10 @@ abstract class DBString {
       case "object":
 
         foreach ($entrada as $chave => $valor) {
+            if($entrada->{$chave} instanceof DateTime) {
+                $object = $entrada->{$chave};
+                $valor = $object->format('d/m/Y H:i');
+            }
           $entrada->{$chave} = self::formatStringRecursive($valor, $callback);
         }
         break;

@@ -76,6 +76,11 @@ class Auth implements IAuth
             if (empty($e->getResponse())) {
                 throw new BusinessException($message . ' Detalhes: ' . utf8_decode($e->getMessage()));
             }
+
+            if ($e->getResponse()->getStatusCode() === 500) {
+                throw new BusinessException($message . ' Detalhes: ' . $e->getMessage());
+            }
+
             $error = \GuzzleHttp\json_decode($e->getResponse()->getBody()->getContents());
 
             if (in_array($e->getResponse()->getStatusCode(), [401, 403])) {

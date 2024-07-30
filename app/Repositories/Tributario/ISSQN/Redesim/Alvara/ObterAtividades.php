@@ -34,6 +34,10 @@ class ObterAtividades extends Leitura
          */
         $result = parent::post($filters);
 
+        if(empty($result)) {
+            return [];
+        }
+
         foreach ($result as $item) {
             $response[] = new ActivityDTO((array)$item->dados);
         }

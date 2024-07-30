@@ -439,6 +439,7 @@ $pdf1->agentes_nocivos  = $agentes_nocivos;
 $pdf1->atu_monetaria    = 0;
 $pdf1->juros            = 0;
 $pdf1->previdencia      = strtoupper($tipo == 's' ? $descr_nome : $descr_nome . ' S/ 13º');
+$pdf1->selecao          = $selecao . " - " . $r44_descr;
 $pdf1->imprime();
 
 $pdf1->objpdf->output();

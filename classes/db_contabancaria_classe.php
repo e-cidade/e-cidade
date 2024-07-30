@@ -709,6 +709,48 @@ class cl_contabancaria
         }
         return $sql;
     }
+    function sql_query_cadcontanovo($db83_sequencial = null, $campos = "*", $ordem = null, $dbwhere = "")
+    {
+        $sql = "select ";
+        if ($campos != "*") {
+            $campos_sql = split("#", $campos);
+            $virgula = "";
+            for ($i = 0; $i < sizeof($campos_sql); $i++) {
+                $sql .= $virgula . $campos_sql[$i];
+                $virgula = ",";
+            }
+        } else {
+            $sql .= $campos;
+        }
+        $sql .= " from contabancaria ";
+        $sql .= "      inner join conplanocontabancaria on db83_sequencial = c56_contabancaria";
+        $sql .= "      inner join conplanoreduz  on c56_codcon = c61_codcon";
+        $sql .= "      inner join saltes on k13_reduz = c61_reduz";
+        $sql .= "      inner join orctiporec on o15_codigo = c61_codigo";
+        $sql .= "      inner join bancoagencia  on  bancoagencia.db89_sequencial = contabancaria.db83_bancoagencia";
+        $sql .= "      inner join db_bancos  on  db_bancos.db90_codban = bancoagencia.db89_db_bancos";
+        $sql .= "      left  join db_operacaodecredito on op01_sequencial = db83_codigoopcredito";
+        $sql .= "      left  join convconvenios on convconvenios.c206_sequencial = contabancaria.db83_numconvenio";
+        $sql2 = "";
+        if ($dbwhere == "") {
+            if ($db83_sequencial != null) {
+                $sql2 .= " where contabancaria.db83_sequencial = $db83_sequencial ";
+            }
+        } else if ($dbwhere != "") {
+            $sql2 = " where $dbwhere";
+        }
+        $sql .= $sql2;
+        if ($ordem != null) {
+            $sql .= " order by ";
+            $campos_sql = split("#", $ordem);
+            $virgula = "";
+            for ($i = 0; $i < sizeof($campos_sql); $i++) {
+                $sql .= $virgula . $campos_sql[$i];
+                $virgula = ",";
+            }
+        }
+        return $sql;
+    }
     // funcao do sql
     function sql_query_file($db83_sequencial = null, $campos = "*", $ordem = null, $dbwhere = "")
     {

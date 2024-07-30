@@ -35,39 +35,39 @@ parse_str($HTTP_SERVER_VARS['QUERY_STRING']);
 $sql_prev = "select r33_ppatro,r33_nome from inssirf 
                  where r33_anousu = $ano 
 								   and r33_mesusu = $mes 
-									 and r33_instit = ".db_getsession("DB_instit")."
+									 and r33_instit = " . db_getsession("DB_instit") . "
 									 and r33_codtab = $prev+2 limit 1;";
-$res_prev = pg_query($sql_prev);
-db_fieldsmemory($res_prev,0);
+$res_prev = db_query($sql_prev);
+$dadosPrevidencia  = db_utils::fieldsMemory($res_prev, 0);
 
-$head3 = "RELATÓRIO ".strtoupper($r33_nome);
-$head4 = "PERÍODO  : ".$mes." / ".$ano;
+$head3 = "RELATÓRIO " . strtoupper($dadosPrevidencia->r33_nome);
+$head4 = "PERÍODO  : " . $mes . " / " . $ano;
 
-if($ordem == 'A'){
+if ($ordem == 'A') {
   $xordem = ' order by z01_nome';
-}else{
+} else {
   $xordem = ' order by r14_regist';
 }
 
-if($sembase == 'S'){
+if ($sembase == 'S') {
   $xsembase = '';
-}else{
+} else {
   $xsembase = ' and base > 0 ';
 }
 //echo '<br> vinculo --> '.$vinculo;
-if($vinculo == 'A'){
+if ($vinculo == 'A') {
   $where_vinc = " and rh30_vinculo = 'A'";
   $head7 = 'VINCULO : ATIVOS';
-}elseif($vinculo == 'I'){
+} elseif ($vinculo == 'I') {
   $where_vinc = " and rh30_vinculo = 'I'";
   $head7 = 'VINCULO : INATIVOS';
-}elseif($vinculo == 'P'){
+} elseif ($vinculo == 'P') {
   $where_vinc = " and rh30_vinculo = 'P'";
   $head7 = 'VINCULO : PENSIONISTAS';
-}elseif($vinculo == 'IP'){
+} elseif ($vinculo == 'IP') {
   $where_vinc = " and rh30_vinculo <> 'A'";
   $head7 = 'VINCULO : INATIVOS/PENSIONISTAS';
-}else{
+} else {
   $where_vinc = '';
   $head7 = 'VINCULO : TODOS';
 }
@@ -75,20 +75,20 @@ if($vinculo == 'A'){
 
 $rubric = 'R993';
 $aArquivo = array();
-if($folha == 'r14'){
-  $head5 = "PATRONAL : ".$r33_ppatro."% - SALÁRIO";
+if ($folha == 'r14') {
+  $head5 = "PATRONAL : " . $dadosPrevidencia->r33_ppatro . "% - SALÁRIO";
   $aArquivo[$folha] = 'gerfsal';
-}elseif($folha == 'r35'){
-  $head5 = "PATRONAL : ".$r33_ppatro."% - 13o. SALÁRIO";
+} elseif ($folha == 'r35') {
+  $head5 = "PATRONAL : " . $dadosPrevidencia->r33_ppatro . "% - 13o. SALÁRIO";
   $aArquivo[$folha] = 'gerfs13';
-}elseif($folha == 'r48'){
-  $head5 = "PATRONAL : ".$r33_ppatro."% - COMPLEMENTAR";
+} elseif ($folha == 'r48') {
+  $head5 = "PATRONAL : " . $dadosPrevidencia->r33_ppatro . "% - COMPLEMENTAR";
   $aArquivo[$folha] = 'gerfcom';
-}elseif($folha == 'r20'){
-  $head5 = "PATRONAL : ".$r33_ppatro."% - RESCISÃO";
+} elseif ($folha == 'r20') {
+  $head5 = "PATRONAL : " . $dadosPrevidencia->r33_ppatro . "% - RESCISÃO";
   $aArquivo[$folha] = 'gerfres';
-}elseif($folha == 'todas'){
-  $head5 = "PATRONAL : ".$r33_ppatro."% - TODOS";
+} elseif ($folha == 'todas') {
+  $head5 = "PATRONAL : " . $dadosPrevidencia->r33_ppatro . "% - TODOS";
   $aArquivo = array(
     "r14" => "gerfsal",
     "r35" => "gerfs13",
@@ -107,7 +107,7 @@ $sJoinFolha = "(select r14_regist as r14_regist,
 $aJoinFolha = array();
 foreach ($aArquivo as $sigla => $arquivo) {
   $aJoinFolha[] = " 
-   select ".$sigla."_regist as r14_regist,
+   select " . $sigla . "_regist as r14_regist,
            sum( case when {$sigla}_pd = 1                            then {$sigla}_valor else 0 end ) as proventos,
            sum( case when {$sigla}_rubric = 'R992'                   then {$sigla}_valor else 0 end ) as base,
            sum( case when {$sigla}_rubric = '$rubric'                then {$sigla}_valor else 0 end ) as segurado
@@ -117,22 +117,23 @@ foreach ($aArquivo as $sigla => $arquivo) {
    and     {$sigla}_instit = $instit
    group by {$sigla}_regist";
 }
-$sJoinFolha .= implode(" UNION ", $aJoinFolha).") AS valores group by r14_regist) AS x";
+$sJoinFolha .= implode(" UNION ", $aJoinFolha) . ") AS valores group by r14_regist) AS x";
 
 $sAliquota = "";
 if (!empty($campoextra)) {
   $sAliquota = "round(base/100*$campoextra,2) as aliquotacomp, ";
 }
-   $sql = "
+$sql = "
  
    select z01_nome,
+          z01_cgccpf,
           r14_regist,
           round(proventos,2) as proventos, 
           round(base,2) as base, 
           round(segurado,2) as segurado ,
-          round(base/100*$r33_ppatro,2) as patronal, 
+          round(base/100*$dadosPrevidencia->r33_ppatro,2) as patronal, 
           {$sAliquota}
-          round((base/100*$r33_ppatro) + segurado,2) as total
+          round((base/100*$dadosPrevidencia->r33_ppatro) + segurado,2) as total
    from 
    {$sJoinFolha}
     inner join rhpessoal on r14_regist = rh01_regist
@@ -151,83 +152,82 @@ if (!empty($campoextra)) {
          ";
 //  echo $sql ; exit;
 
-  $result = pg_exec($sql);
-  $xxnum = pg_numrows($result);
-  if ($xxnum == 0){
-     db_redireciona('db_erros.php?fechar=true&db_erro=No existem clculos para o perodo de '.$mes.' / '.$ano);
-  
+$result = db_query($sql);
+$xxnum = pg_num_rows($result);
+if ($xxnum == 0) {
+  db_redireciona('db_erros.php?fechar=true&db_erro=No existem clculos para o perodo de ' . $mes . ' / ' . $ano);
+}
+
+$pdf = new PDF();
+$pdf->Open();
+$pdf->AliasNbPages();
+$total = 0;
+$pdf->setfillcolor(235);
+$pdf->setfont('arial', 'b', 8);
+$troca      = 1;
+$alt        = 4;
+$total_fun  = 0;
+$total_prov = 0;
+$total_seg  = 0;
+$total_base = 0;
+$total_patro = 0;
+$total_aliquotacomp = 0;
+$total_total = 0;
+
+for ($x = 0; $x < pg_num_rows($result); $x++) {
+  $dadosServidor = db_utils::fieldsMemory($result, $x);
+  if ($pdf->gety() > $pdf->h - 30 || $troca != 0) {
+    $pdf->addpage("L");
+    $pdf->setfont('arial', 'b', 8);
+    $pdf->cell(20, $alt, 'MATRIC', 1, 0, "C", 1);
+    $pdf->cell(30, $alt, 'CPF', 1, 0, "C", 1);
+    $pdf->cell(80, $alt, 'NOME DO FUNCIONÁRIO', 1, 0, "C", 1);
+    $pdf->cell(30, $alt, 'BRUTO', 1, 0, "C", 1);
+    $pdf->cell(30, $alt, 'BASE', 1, 0, "C", 1);
+    $pdf->cell(30, $alt, 'SEGURADO', 1, 0, "C", 1);
+    $pdf->cell(30, $alt, 'PATRON', 1, 0, "C", 1);
+    if (!empty($campoextra)) {
+      $pdf->cell(30, $alt, 'ALÍQUOTA', 1, 0, "C", 1);
+    }
+    $pdf->cell(30, $alt, 'TOTAL', 1, 1, "C", 1);
+    $troca = 0;
+    $pre = 1;
   }
-  
-  $pdf = new PDF(); 
-  $pdf->Open(); 
-  $pdf->AliasNbPages(); 
-  $total = 0;
-  $pdf->setfillcolor(235);
-  $pdf->setfont('arial','b',8);
-  $troca      = 1;
-  $alt        = 4;
-  $total_fun  = 0;
-  $total_prov = 0;
-  $total_seg  = 0;
-  $total_base = 0;
-  $total_patro= 0;
-  $total_aliquotacomp = 0;
-  $total_total= 0;
-  
-  for($x = 0; $x < pg_numrows($result);$x++){
-     db_fieldsmemory($result,$x);
-     if ($pdf->gety() > $pdf->h - 30 || $troca != 0 ){
-        $pdf->addpage();
-        $pdf->setfont('arial','b',8);
-        $pdf->cell(15,$alt,'MATRIC',1,0,"C",1);
-        $pdf->cell(60,$alt,'NOME DO FUNCIONÁRIO',1,0,"C",1);
-        $pdf->cell(20,$alt,'BRUTO',1,0,"C",1);
-        $pdf->cell(20,$alt,'BASE',1,0,"C",1);
-        $pdf->cell(20,$alt,'SEGURADO',1,0,"C",1);
-        $pdf->cell(20,$alt,'PATRON',1,0,"C",1);
-        if (!empty($campoextra)) {
-          $pdf->cell(20,$alt,'ALÍQUOTA',1,0,"C",1);
-        }
-        $pdf->cell(20,$alt,'TOTAL',1,1,"C",1);
-        $troca = 0;
-        $pre = 1;
-     }
-     if($pre == 1){
-       $pre = 0;
-     }else{
-       $pre = 1;
-     }
-     $pdf->setfont('arial','',7);
-     $pdf->cell(15,$alt,$r14_regist,0,0,"C",$pre);
-     $pdf->cell(60,$alt,$z01_nome,0,0,"L",$pre);
-     $pdf->cell(20,$alt,db_formatar($proventos,'f'),0,0,"R",$pre);
-     $pdf->cell(20,$alt,db_formatar($base,'f'),0,0,"R",$pre);
-     $pdf->cell(20,$alt,db_formatar($segurado,'f'),0,0,"R",$pre);
-     $pdf->cell(20,$alt,db_formatar($patronal,'f'),0,0,"R",$pre);
-     if (!empty($campoextra)) {
-       $pdf->cell(20,$alt,db_formatar($aliquotacomp,'f'),0,0,"R",$pre);
-     }
-     $pdf->cell(20,$alt,db_formatar($total,'f'),0,1,"R",$pre);
-     $total_fun   += 1;
-     $total_prov  += $proventos;
-     $total_base  += $base ;
-     $total_seg   += $segurado ;
-     $total_patro += $patronal;
-     if (!empty($campoextra)) {
-       $total_aliquotacomp += $aliquotacomp;
-     }
-     $total_total += $total;
+  if ($pre == 1) {
+    $pre = 0;
+  } else {
+    $pre = 1;
   }
-  $pdf->setfont('arial','b',8);
-  $pdf->cell(75,$alt,'TOTAL :  '.$total_fun.' FUNCIONÁRIOS ',"T",0,"C",0);
-  $pdf->cell(20,$alt,db_formatar($total_prov,'f'),"T",0,"C",0);
-  $pdf->cell(20,$alt,db_formatar($total_base,'f'),"T",0,"C",0);
-  $pdf->cell(20,$alt,db_formatar($total_seg,'f'),"T",0,"C",0);
-  $pdf->cell(20,$alt,db_formatar($total_patro,'f'),"T",0,"C",0);
+  $pdf->setfont('arial', '', 7);
+  $pdf->cell(20, $alt, $dadosServidor->r14_regist, 0, 0, "R", $pre);
+  $pdf->cell(30, $alt, db_formatar($dadosServidor->z01_cgccpf, "cpf"), 0, 0, "C", $pre);
+  $pdf->cell(80, $alt, $dadosServidor->z01_nome, 0, 0, "L", $pre);
+  $pdf->cell(30, $alt, db_formatar($dadosServidor->proventos, 'f'), 0, 0, "R", $pre);
+  $pdf->cell(30, $alt, db_formatar($dadosServidor->base, 'f'), 0, 0, "R", $pre);
+  $pdf->cell(30, $alt, db_formatar($dadosServidor->segurado, 'f'), 0, 0, "R", $pre);
+  $pdf->cell(30, $alt, db_formatar($dadosServidor->patronal, 'f'), 0, 0, "R", $pre);
   if (!empty($campoextra)) {
-    $pdf->cell(20,$alt,db_formatar($total_aliquotacomp,'f'),"T",0,"C",0);
+    $pdf->cell(30, $alt, db_formatar($dadosServidor->aliquotacomp, 'f'), 0, 0, "R", $pre);
   }
-  $pdf->cell(20,$alt,db_formatar($total_total,'f'),"T",1,"C",0);
-  $pdf->Output();
-     
-  ?>
+  $pdf->cell(30, $alt, db_formatar($dadosServidor->total, 'f'), 0, 1, "R", $pre);
+  $total_fun   += 1;
+  $total_prov  += $dadosServidor->proventos;
+  $total_base  += $dadosServidor->base;
+  $total_seg   += $dadosServidor->segurado;
+  $total_patro += $dadosServidor->patronal;
+  if (!empty($campoextra)) {
+    $total_aliquotacomp += $dadosServidor->aliquotacomp;
+  }
+  $total_total += $dadosServidor->total;
+}
+$pdf->setfont('arial', 'b', 8);
+$pdf->cell(135, $alt, 'TOTAL :  ' . $total_fun . ' FUNCIONÁRIOS ', "T", 0, "C", 0);
+$pdf->cell(30, $alt, db_formatar($total_prov, 'f'), "T", 0, "C", 0);
+$pdf->cell(30, $alt, db_formatar($total_base, 'f'), "T", 0, "C", 0);
+$pdf->cell(30, $alt, db_formatar($total_seg, 'f'), "T", 0, "C", 0);
+$pdf->cell(30, $alt, db_formatar($total_patro, 'f'), "T", 0, "C", 0);
+if (!empty($campoextra)) {
+  $pdf->cell(30, $alt, db_formatar($total_aliquotacomp, 'f'), "T", 0, "C", 0);
+}
+$pdf->cell(30, $alt, db_formatar($total_total, 'f'), "T", 1, "C", 0);
+$pdf->Output();

@@ -618,6 +618,106 @@ db_app::load("dbtextFieldData.widget.js");
                 <td>&nbsp;</td>
               </tr>
               <tr>
+                <td colspan="2">
+                    <fieldset>
+                        <legend>
+                            <b>Dados complementares PNCP</b>
+                        </legend>
+                        <table cellpadding="0" border="0" width="100%" class="table-dados-complementares-pncp">
+                            <tr id="trTipoPagamento">
+                                <td 
+                                  nowrap
+                                  title="
+                                    Tipo de pagamento dos dados complementares para o pncp 
+                                
+                                    Campo:ac16_tipopagamento
+                                  "
+                                >
+                                  <strong>Tipo de Pagamento:</strong>
+                                </td>
+                                <td>
+                                  <?php
+                                    $aTipoPagamento = array("Selecione", "Conforme demanda", "Mensal");
+                                    db_select('ac16_tipopagamento', $aTipoPagamento, true, $db_opcao, "onchange='js_alteracaoTipoPagamento(this.value)';", "");
+                                  ?>
+                                </td>
+                            </tr>
+
+                            <tr id='trNumeroParcela' style="display: none;">
+                              <td 
+                                nowrap
+                                title="
+                                  Número de parcela dos dados complementares para o pncp 
+                              
+                                  Campo:ac16_numparcela
+                                "
+                              >
+                                <strong>Número de Parcela:</strong>
+                              </td>
+                              <td><?php db_input('ac16_numparcela', 10, true, true, 'int', $db_opcao); ?></td>
+                            </tr>
+
+                            <tr id='trValorParcela' style="display: none;">
+                              <td 
+                                nowrap
+                                title="
+                                  Valor da parcela dos dados complementares para o pncp 
+                              
+                                  Campo:ac16_vlrparcela
+                                "
+                              >
+                                <strong>Valor da Parcela:</strong>
+                              </td>
+                              <td><?php db_input('ac16_vlrparcela', 10, true, true, 'float', $db_opcao); ?></td>
+                            </tr>
+
+                            <tr>
+                              <td
+                                nowrap
+                                title="
+                                    Url do CIPI dos dados complementares para o pncp 
+                                
+                                    Campo:ac16_urlcipi
+                                "
+                              >
+                                <strong>Url CIPI:</strong>
+                              </td>
+                              <td><?php db_input('ac16_urlcipi', 17, false, true, 'text', $db_opcao, "", "", "#E6E4F1", "", "14"); ?></td>
+                            </tr>
+
+                            <tr>
+                              <td 
+                                nowrap 
+                                title="
+                                  Identificador do CIPI para os dados complementares do pncp
+                                  
+                                  Campo:ac16_identificadorcipi
+                                "
+                              >
+                                <strong>Identificar CIPI:</strong>
+                              </td>
+                              <td><?php db_textarea('ac16_identificadorcipi', 3, 51, false, true, 'text', $db_opcao, "", "", "#E6E4F1", "512"); ?></td>
+                            </tr>
+
+                            <tr>
+                              <td 
+                                nowrap
+                                title="
+                                    Descrição das informações complementares para o pncp 
+                                
+                                    Campo:ac16_infcomplementares
+                                "
+                              >
+                              <td><?php db_textarea('ac16_infcomplementares', 3, 51, false, true, 'text', $db_opcao, "", "", "#E6E4F1", "5120"); ?></td>
+                            </tr>
+                        </table>
+                    </fieldset>
+                </td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+            </tr>
+              <tr>
                 <td nowrap title="<?= @$Tac16_objeto ?>" colspan="2">
                   <fieldset>
                     <legend><?= @$Lac16_objeto ?></legend>
@@ -1831,5 +1931,20 @@ db_app::load("dbtextFieldData.widget.js");
       document.getElementsByClassName('vigencia_final')[0].style.display = '';
       document.getElementsByClassName('vigencia_final')[1].style.display = '';
 
+    }
+
+    function js_alteracaoTipoPagamento(tipoPagamento) {
+      if(tipoPagamento == 0 || tipoPagamento == 1) {
+        document.getElementById('trNumeroParcela').style.display = 'none';
+        document.getElementById('ac16_numparcela').value = "";
+        
+        document.getElementById('trValorParcela').style.display = 'none';
+        document.getElementById('ac16_vlrparcela').value = "";
+      } else {
+        document.getElementById('trNumeroParcela').style.display = '';
+        document.getElementById('trValorParcela').style.display = '';
+      }
+
+      return;
     }
 </script>

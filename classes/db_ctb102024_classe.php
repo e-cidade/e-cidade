@@ -777,13 +777,18 @@ class cl_ctb102024
                   LEFT JOIN contabancaria ON c56_contabancaria = db83_sequencial
                   LEFT JOIN convconvenios ON db83_numconvenio = c206_sequencial
                   LEFT JOIN infocomplementaresinstit ON si09_instit = c61_instit";
+    
+    
+    $date = new DateTime($dataFinal);
+    $datames = $date->format('m');
+    $dataano = $date->format('Y');
 
     if ($ano == 2024 && $mes == 1) {
-      $sSqlGeral .= " WHERE (k13_limite IS NULL OR k13_limite >= '$dataFinal')
+      $sSqlGeral .= " WHERE (k13_limite IS NULL OR (EXTRACT(MONTH FROM k13_limite) >= {$datames} and EXTRACT(YEAR FROM k13_limite) >= {$dataano}))
                AND c61_instit = {$instit} 
                ORDER BY CASE WHEN c61_codtce IS NOT NULL THEN c61_codtce ELSE k13_reduz END ASC";
     } else {
-      $sSqlGeral .= " WHERE (k13_limite IS NULL OR k13_limite >= '$dataFinal')
+      $sSqlGeral .= " WHERE (k13_limite IS NULL OR (EXTRACT(MONTH FROM k13_limite) >= {$datames} and EXTRACT(YEAR FROM k13_limite) >= {$dataano}))
           AND (date_part('MONTH',k13_dtimplantacao) <= '$mes' OR date_part('YEAR',k13_dtimplantacao) < {$ano})
           AND c61_instit = {$instit} 
           ORDER BY CASE WHEN c61_codtce IS NOT NULL THEN c61_codtce ELSE k13_reduz END ASC";

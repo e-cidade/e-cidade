@@ -106,15 +106,15 @@ if (isset($recrs) && trim($recrs) != "")  {
 	$sWhere1 .= " WHERE recurso in ($recrs) ";
 }
 
-$sQuery = "select rh73_rubric, 
+$sQuery = "SELECT rh73_rubric, 
 									rh27_descr,
 									recurso, 
-									o15_descr, 
+									substr(o15_descr, 0, 33) as o15_descr, 
 									round(sum(rh73_valor),2) as valor 
 						from (SELECT  rh73_rubric, 
 													rh27_descr,
 													rh73_valor,
-													case when rh72_recurso is null then rh79_recurso else rh72_recurso end as recurso 
+													COALESCE(rh72_recurso, rh79_recurso) AS recurso
 										from rhempenhofolharubrica 
 										inner join rhrubricas on rh73_rubric = rh27_rubric and rh73_instit = rh27_instit 
 										left join rhempenhofolharhemprubrica on rh81_rhempenhofolharubrica = rh73_sequencial 
@@ -122,7 +122,7 @@ $sQuery = "select rh73_rubric,
 										left join rhslipfolharhemprubrica on rh80_rhempenhofolharubrica = rh73_sequencial 
 										left join rhslipfolha on rh80_rhslipfolha = rh79_sequencial										
 										
-										where $sWhere ) as x 
+										where $sWhere) as x 
 								inner join orctiporec on recurso = o15_codigo 
 								$sWhere1 group by rh73_rubric,rh27_descr, recurso,o15_descr order by rh73_rubric,recurso
 								";

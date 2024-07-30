@@ -230,6 +230,63 @@ class Veiculo {
     return $nUltimaMedida;
   }
 
+  public function getMedidaUsoAnterior($data, $hora)
+  {
+    $sql = "
+    SELECT *
+    FROM (
+            (SELECT ve70_dtabast AS DATA,
+                    ve70_hora AS hora,
+                    ve70_medida AS ultimamedida,
+                    'ABASTECIMENTO' AS tipo
+            FROM veicabast
+            WHERE ve70_veiculos = 564
+                 AND to_timestamp((ve70_dtabast||' '||ve70_hora)::text, 'YYYY-MM-DD HH24:MI') <= to_timestamp('{$data} {$hora}'::text, 'YYYY-MM-DD HH24:MI')
+                 AND NOT EXISTS
+                     (SELECT 1
+                      FROM veicabastanu
+                      WHERE ve74_veicabast = ve70_codigo)
+            ORDER BY ve70_dtabast DESC, ve70_hora DESC, ve70_codigo DESC
+            LIMIT 1)
+            UNION ALL
+                (SELECT ve62_dtmanut AS DATA,
+                        ve62_hora AS hora,
+                        ve62_medida AS ultimamedida,
+                        'MANUTENCAO' AS tipo
+                 FROM veicmanut
+                 WHERE ve62_veiculos = 564
+                     AND to_timestamp((ve62_dtmanut||' '||ve62_hora)::text, 'YYYY-MM-DD HH24:MI') <= to_timestamp('{$data} {$hora}'::text, 'YYYY-MM-DD HH24:MI')
+                 ORDER BY ve62_dtmanut DESC, ve62_hora DESC, ve62_codigo DESC
+                 LIMIT 1)
+            UNION ALL
+              (SELECT ve61_datadevol AS DATA,
+                      ve61_horadevol AS hora,
+                      ve61_medidadevol AS ultimamedida,
+                      'DEVOLUCAO' AS tipo
+               FROM veicdevolucao
+               INNER JOIN veicretirada ON ve60_codigo = ve61_veicretirada
+               WHERE ve60_veiculo = 564
+                   AND to_timestamp((ve61_datadevol||' '||ve61_horadevol)::text, 'YYYY-MM-DD HH24:MI') <= to_timestamp('{$data} {$hora}'::text, 'YYYY-MM-DD HH24:MI')
+               ORDER BY ve61_datadevol DESC, ve61_horadevol DESC, ve61_codigo DESC
+               LIMIT 1)
+            UNION ALL
+              (SELECT ve60_datasaida AS DATA,
+                      ve60_horasaida AS hora,
+                      ve60_medidasaida AS ultimamedida,
+                      'RETIRADA' AS tipo
+               FROM veicretirada
+               WHERE ve60_veiculo = 564
+                   AND to_timestamp((ve60_datasaida||' '||ve60_horasaida)::text, 'YYYY-MM-DD HH24:MI') <= to_timestamp('{$data} {$hora}'::text, 'YYYY-MM-DD HH24:MI')
+               ORDER BY ve60_datasaida DESC, ve60_horasaida DESC, ve60_codigo DESC
+               LIMIT 1)) AS w
+            ORDER BY 1 DESC,
+                     2 DESC,
+                     3 DESC
+            LIMIT 1;
+    ";
+    return $sql;
+  }
+
   /**
    * Retorna a marca do veiculo
    * @return MarcaVeiculo

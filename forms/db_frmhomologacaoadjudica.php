@@ -114,6 +114,7 @@ db_app::load("estilos.css, grid.style.css");
         ?>
         <input type="button" value="Pesquisar" onclick="js_pesquisal202_licitacao(true);">
         <input type="button" value="Gerar Relatório" onclick="js_gerarRelatorio(true);">
+        <input id="habilitacaofornecedor" style="display:none;" type="button" value="Habilitar Fornecedores" onclick='redirecionamentoHabilitacaoFornecedor();' /> 
     </div>
     <br>
     <fieldset>
@@ -437,6 +438,8 @@ db_app::load("estilos.css, grid.style.css");
         oParam.aItens = new Array();
         oParam.exec = "homologarLicitacao";
         oParam.sCodigoItens = "";
+        oParam.sCodigoFornecedores = "";
+
         for (var i = 0; i < aItens.length; i++) {
 
             with(aItens[i]) {
@@ -444,11 +447,13 @@ db_app::load("estilos.css, grid.style.css");
                 oItem.codigo = aCells[0].getValue();
                 oItem.fornecedor = aCells[5].getValue();
                 oParam.sCodigoItens += aCells[0].getValue() + ",";
+                oParam.sCodigoFornecedores += aCells[5].getValue() + ",";
                 oParam.aItens.push(oItem);
             }
         }
 
         oParam.sCodigoItens = oParam.sCodigoItens.substring(0, oParam.sCodigoItens.length - 1);
+        oParam.sCodigoFornecedores = oParam.sCodigoFornecedores.substring(0, oParam.sCodigoFornecedores.length - 1);
 
         js_divCarregando('Aguarde, Homologando Licitacao', 'msgBox');
         var oAjax = new Ajax.Request(
@@ -492,12 +497,27 @@ db_app::load("estilos.css, grid.style.css");
             document.getElementById('trdatareferencia').style.display = '';
         }
 
+        if(oRetorno.exibirhabilitacaofornecedores){
+            document.getElementById('habilitacaofornecedor').style.display = '';
+        }
+
         alert(oRetorno.message.urlDecode());
         return;
         
     }
 
     function js_alterarHomologacao() {
+
+
+
+        let sCodigoFornecedores = "";
+
+        for(var i = 0; i < oGridItens.aRows.length; i++){
+            sCodigoFornecedores += oGridItens.aRows[i].aCells[4].content + ",";
+        }
+
+        sCodigoFornecedores = sCodigoFornecedores.substring(0, sCodigoFornecedores.length - 1);
+
         var oParam = new Object();
         oParam.iLicitacao = $F('l202_licitacao');
         oParam.dtHomologacao = $F('l202_datahomologacao');
@@ -505,6 +525,7 @@ db_app::load("estilos.css, grid.style.css");
         oParam.respHomologcodigo = $F('respHomologcodigo');
         oParam.dataReferencia = $F('l202_datareferencia');
         oParam.possuiDataReferencia = document.getElementById('trdatareferencia').style.display == "none" ? false : true;
+        oParam.sCodigoFornecedores = sCodigoFornecedores;
         
         if (oParam.respHomologcodigo == "") {
             alert('Campo Responsável pela Homologação não informado');
@@ -539,6 +560,10 @@ db_app::load("estilos.css, grid.style.css");
 
         if (oRetorno.periodosicomencerrado) {
             document.getElementById('trdatareferencia').style.display = '';
+        }
+
+        if(oRetorno.exibirhabilitacaofornecedores){
+            document.getElementById('habilitacaofornecedor').style.display = '';
         }
 
         alert(oRetorno.message.urlDecode());
@@ -632,6 +657,23 @@ db_app::load("estilos.css, grid.style.css");
         document.getElementById(varNumCampo).value = chave1;
         document.getElementById(varNomeCampo).value = chave2;
         db_iframe_cgm.hide();
+    }
+
+    function redirecionamentoHabilitacaoFornecedor(){
+
+          let oParams = {
+            action: `lic1_habilitacaofornecedor.php`,
+            iInstitId: top.jQuery('#instituicoes span.active').data('id'),
+            iAreaId: 4,
+            iModuloId: 381
+          }
+
+          let title = 'Procedimentos > Habilitação de Fornecedores';
+
+          Desktop.Window.create(title, oParams);
+          //var $menu = $('#menu');
+          //$menu.trigger('menu.close');
+
     }
 
     js_showGrid();

@@ -676,8 +676,59 @@ ob_start();
                    $oReceitaeDespesaEnsino->setInstits($instits);
                    $nTotalAplicadoEntrada += $oReceitaeDespesaEnsino->getLinha7DespesasCusteadaSuperavitDoFundeb();
                    $nTotalAplicadoEntrada += $oReceitaeDespesaEnsino->getLinha8RestosaPagarInscritosFonte101();
-                   $nTotalAplicadoEntrada += $oReceitaeDespesaEnsino->getLinha10RestoaPagarSemDis();
 
+                   $sFonte = ("'101','201','15000001','25000001'");
+                   $where = " c61_instit in ({$instits}) and c61_codigo in ($sFonte) ";
+                   $result = db_planocontassaldo_matriz(db_getsession("DB_anousu"), $dtini, $dtfim, false, $where,'',0);
+
+                   for ($x = 0; $x < pg_numrows($result); $x++) {
+                       db_fieldsmemory($result, $x);
+                       if(substr($estrutural,1,14) == '00000000000000'){
+                           if($sinal_anterior == "C")
+                               $total_anterior -= $saldo_anterior;
+                           else {
+                               $total_anterior += $saldo_anterior;
+                           }
+                       }
+                   }
+
+                   $nValorRecursoImposto = $total_anterior;
+                   $sele_work = " e60_instit in ({$instits}) ";
+                   $sele_work1       = " and e91_recurso in ($sFonte)";
+                   $sql_where_externo = " where $sele_work ";
+                   $sql_order = " order by e91_recurso, e91_numemp ";
+                   
+                   $clempresto = new cl_empresto;
+                   $sqlempresto = $clempresto->sql_rp_novo(db_getsession("DB_anousu"), $sele_work, $dtini, $dtfim, $sele_work1, $sql_where_externo, $sql_order);
+                   $res = $clempresto->sql_record($sqlempresto);
+                
+                   if ($clempresto->numrows == 0) {
+                       db_redireciona("db_erros.php?fechar=true&db_erro=Sem movimentação de restos a pagar.");
+                       exit;
+                   }
+                   $rows = $clempresto->numrows;
+                   $total_rp_n_proc = 0;
+                   $total_rp_proc = 0;
+                   for ($x = 0; $x < $rows; $x++) {
+                       db_fieldsmemory($res, $x);
+                       $total_mov_liqui += $e91_vlremp;
+                       $total_mov_pagmento += $vlrpag;
+                       $total_mov_pagnproc += $vlrpagnproc;
+                   }
+                   $nValorRecursoFundeb101 = $total_mov_pagmento + $total_mov_pagnproc - $nValorRecursoImposto;
+                   $oReceitaeDespesaEnsino->setFontes(array('136','236','17180000','27180000'));
+                   $oReceitaeDespesaEnsino->setDataInicial($dtini);
+                   $oReceitaeDespesaEnsino->setDataFinal($dtfim);
+                   $oReceitaeDespesaEnsino->setInstits($instits);
+                   $nValorRecursoFundeb136 = $oReceitaeDespesaEnsino->getRestosSemDisponilibidadeFundeb(array('136','236','17180000','27180000'), $dtini, $dtfim, $instits);
+                    
+                   $oReceitaeDespesaEnsino->setFontes(array("'15020001','25020001'"));
+                   $oReceitaeDespesaEnsino->setDataInicial($dtini);
+                   $oReceitaeDespesaEnsino->setDataFinal($dtfim);
+                   $oReceitaeDespesaEnsino->setInstits($instits);
+                   $nValorRecursoFundeb118_119 = $oReceitaeDespesaEnsino->getRestosSemDisponilibidadeFundeb();
+                   $nTotalAplicadoEntrada     += $nValorRecursoFundeb101 + $nValorRecursoFundeb136 + $nValorRecursoFundeb118_119;
+                                
                    $nTotalReceitasRecebidasFundeb = 0;
                    $nContribuicaoFundeb = 0;
 

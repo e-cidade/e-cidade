@@ -45,11 +45,15 @@ class cl_rhempenhofolharhemprubrica {
    var $rh81_sequencial = 0; 
    var $rh81_rhempenhofolha = 0; 
    var $rh81_rhempenhofolharubrica = 0; 
+   var $rh81_lancamento = 0; 
+   var $rh81_lota = 0; 
    // cria propriedade com as variaveis do arquivo 
    var $campos = "
                  rh81_sequencial = int4 = Sequencial 
                  rh81_rhempenhofolha = int4 = rhempenhofolha 
                  rh81_rhempenhofolharubrica = int4 = rhempenhofolharubrica 
+                 rh81_lancamento = int8 = Lançada no Empenho 
+                 rh81_lota = int8 = Lotação 
                  ";
    //funcao construtor da classe 
    function cl_rhempenhofolharhemprubrica() { 
@@ -72,6 +76,8 @@ class cl_rhempenhofolharhemprubrica {
        $this->rh81_sequencial = ($this->rh81_sequencial == ""?@$GLOBALS["HTTP_POST_VARS"]["rh81_sequencial"]:$this->rh81_sequencial);
        $this->rh81_rhempenhofolha = ($this->rh81_rhempenhofolha == ""?@$GLOBALS["HTTP_POST_VARS"]["rh81_rhempenhofolha"]:$this->rh81_rhempenhofolha);
        $this->rh81_rhempenhofolharubrica = ($this->rh81_rhempenhofolharubrica == ""?@$GLOBALS["HTTP_POST_VARS"]["rh81_rhempenhofolharubrica"]:$this->rh81_rhempenhofolharubrica);
+       $this->rh81_lancamento = ($this->rh81_lancamento == ""?@$GLOBALS["HTTP_POST_VARS"]["rh81_lancamento"]:$this->rh81_lancamento);
+       $this->rh81_lota = ($this->rh81_lota == ""?@$GLOBALS["HTTP_POST_VARS"]["rh81_lota"]:$this->rh81_lota);
      }else{
        $this->rh81_sequencial = ($this->rh81_sequencial == ""?@$GLOBALS["HTTP_POST_VARS"]["rh81_sequencial"]:$this->rh81_sequencial);
      }
@@ -129,15 +135,25 @@ class cl_rhempenhofolharhemprubrica {
        $this->erro_status = "0";
        return false;
      }
+     if ($this->rh81_lancamento == null || $this->rh81_lancamento == "") {
+      $this->rh81_lancamento = 'null';
+     }
+     if ($this->rh81_lota == null || $this->rh81_lota == "") {
+      $this->rh81_lota = 'null';
+     }
      $sql = "insert into rhempenhofolharhemprubrica(
                                        rh81_sequencial 
                                       ,rh81_rhempenhofolha 
                                       ,rh81_rhempenhofolharubrica 
+                                      ,rh81_lancamento
+                                      ,rh81_lota
                        )
                 values (
                                 $this->rh81_sequencial 
                                ,$this->rh81_rhempenhofolha 
                                ,$this->rh81_rhempenhofolharubrica 
+                               ,$this->rh81_lancamento
+                               ,$this->rh81_lota
                       )";
      $result = db_query($sql); 
      if($result==false){ 
@@ -219,25 +235,33 @@ class cl_rhempenhofolharhemprubrica {
          return false;
        }
      }
+     if(trim($this->rh81_lancamento)!="" || isset($GLOBALS["HTTP_POST_VARS"]["rh81_lancamento"])){ 
+      $sql  .= $virgula." rh81_lancamento = $this->rh81_lancamento ";
+      $virgula = ",";
+    }
+    if(trim($this->rh81_lota)!="" || isset($GLOBALS["HTTP_POST_VARS"]["rh81_lota"])){ 
+      $sql  .= $virgula." rh81_lota = $this->rh81_lota ";
+      $virgula = ",";
+    }
      $sql .= " where ";
      if($rh81_sequencial!=null){
-       $sql .= " rh81_sequencial = $this->rh81_sequencial";
+       $sql .= " rh81_sequencial = $rh81_sequencial";
      }
-     $resaco = $this->sql_record($this->sql_query_file($this->rh81_sequencial));
-     if($this->numrows>0){
-       for($conresaco=0;$conresaco<$this->numrows;$conresaco++){
-         $resac = db_query("select nextval('db_acount_id_acount_seq') as acount");
-         $acount = pg_result($resac,0,0);
-         $resac = db_query("insert into db_acountacesso values($acount,".db_getsession("DB_acessado").")");
-         $resac = db_query("insert into db_acountkey values($acount,14412,'$this->rh81_sequencial','A')");
-         if(isset($GLOBALS["HTTP_POST_VARS"]["rh81_sequencial"]) || $this->rh81_sequencial != "")
-           $resac = db_query("insert into db_acount values($acount,2543,14412,'".AddSlashes(pg_result($resaco,$conresaco,'rh81_sequencial'))."','$this->rh81_sequencial',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         if(isset($GLOBALS["HTTP_POST_VARS"]["rh81_rhempenhofolha"]) || $this->rh81_rhempenhofolha != "")
-           $resac = db_query("insert into db_acount values($acount,2543,14414,'".AddSlashes(pg_result($resaco,$conresaco,'rh81_rhempenhofolha'))."','$this->rh81_rhempenhofolha',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-         if(isset($GLOBALS["HTTP_POST_VARS"]["rh81_rhempenhofolharubrica"]) || $this->rh81_rhempenhofolharubrica != "")
-           $resac = db_query("insert into db_acount values($acount,2543,14413,'".AddSlashes(pg_result($resaco,$conresaco,'rh81_rhempenhofolharubrica'))."','$this->rh81_rhempenhofolharubrica',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-       }
-     }
+    //  $resaco = $this->sql_record($this->sql_query_file($this->rh81_sequencial));
+    //  if($this->numrows>0){
+    //    for($conresaco=0;$conresaco<$this->numrows;$conresaco++){
+    //      $resac = db_query("select nextval('db_acount_id_acount_seq') as acount");
+    //      $acount = pg_result($resac,0,0);
+    //      $resac = db_query("insert into db_acountacesso values($acount,".db_getsession("DB_acessado").")");
+    //      $resac = db_query("insert into db_acountkey values($acount,14412,'$this->rh81_sequencial','A')");
+    //      if(isset($GLOBALS["HTTP_POST_VARS"]["rh81_sequencial"]) || $this->rh81_sequencial != "")
+    //        $resac = db_query("insert into db_acount values($acount,2543,14412,'".AddSlashes(pg_result($resaco,$conresaco,'rh81_sequencial'))."','$this->rh81_sequencial',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+    //      if(isset($GLOBALS["HTTP_POST_VARS"]["rh81_rhempenhofolha"]) || $this->rh81_rhempenhofolha != "")
+    //        $resac = db_query("insert into db_acount values($acount,2543,14414,'".AddSlashes(pg_result($resaco,$conresaco,'rh81_rhempenhofolha'))."','$this->rh81_rhempenhofolha',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+    //      if(isset($GLOBALS["HTTP_POST_VARS"]["rh81_rhempenhofolharubrica"]) || $this->rh81_rhempenhofolharubrica != "")
+    //        $resac = db_query("insert into db_acount values($acount,2543,14413,'".AddSlashes(pg_result($resaco,$conresaco,'rh81_rhempenhofolharubrica'))."','$this->rh81_rhempenhofolharubrica',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+    //    }
+    //  }
      $result = db_query($sql);
      if($result==false){ 
        $this->erro_banco = str_replace("\n","",@pg_last_error());

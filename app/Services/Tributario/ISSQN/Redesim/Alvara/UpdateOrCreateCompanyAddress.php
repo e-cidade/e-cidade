@@ -57,7 +57,7 @@ class UpdateOrCreateCompanyAddress
                 throw new BusinessException('Empresa não cadastrada no e-Cidade: ' . $data->cpfCnpj);
             }
 
-            $rua = $this->rua->nome($data->endereco->logradouro)->first();
+            $rua = $this->rua->nome($data->endereco->getLogradouroEcidadeFormat())->first();
 
             if (empty($rua)) {
                 $rua = $this->createRua($data);
@@ -102,7 +102,7 @@ class UpdateOrCreateCompanyAddress
     public function createRua(CompanyDTO $data)
     {
         return $this->rua->newQuery()->create(
-            ['j14_nome' => $data->endereco->logradouro]
+            ['j14_nome' => $data->endereco->getLogradouroEcidadeFormat()]
         );
     }
 

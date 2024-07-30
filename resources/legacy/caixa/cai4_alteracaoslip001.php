@@ -1,11 +1,13 @@
 <?PHP
-require_once("libs/db_stdlib.php");
+require_once(modification("libs/db_stdlib.php"));
 require_once("libs/db_conecta.php");
 require_once("libs/db_sessoes.php");
 require_once("libs/db_usuariosonline.php");
 require_once("dbforms/db_funcoes.php");
 require_once("libs/db_app.utils.php");
 require_once("libs/db_utils.php");
+require_once("model/protocolo/AssinaturaDigital.model.php");
+$oAssintaraDigital =  new AssinaturaDigital();
 db_postmemory($HTTP_POST_VARS);
 
 db_app::load("scripts.js");
@@ -22,7 +24,7 @@ db_app::load("widgets/dbmessageBoard.widget.js");
 db_app::load("dbcomboBox.widget.js");
 db_app::load("widgets/DBToogle.widget.js");
 db_app::load("dbtextFieldData.widget.js");
-db_app::load("arrays.js"); 
+db_app::load("arrays.js");
 
 $oPost = db_utils::postMemory($_POST);
 $oGet  = db_utils::postMemory($_GET);
@@ -140,7 +142,8 @@ function js_retornoGetDados(oAjax) {
 	}
 
   $('ctnSlipPagamento').innerHTML = "";
-  oDBViewSlipPagamento = new DBViewSlipPagamento("oDBViewSlipPagamento", oRetorno.iTipoOperacao, 1, $('ctnSlipPagamento'), null, lComponenteReadOnly);
+  var bAssinar = '<?php echo $oAssintaraDigital->verificaAssituraAtiva() ?>';
+  oDBViewSlipPagamento = new DBViewSlipPagamento("oDBViewSlipPagamento", oRetorno.iTipoOperacao, 1, $('ctnSlipPagamento'), null, lComponenteReadOnly, bAssinar);
   oDBViewSlipPagamento.setAno('<?php echo db_getsession('DB_anousu');?>');
   oDBViewSlipPagamento.setAlteracao(true);
   oDBViewSlipPagamento.show();

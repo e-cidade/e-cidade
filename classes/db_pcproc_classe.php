@@ -1016,7 +1016,6 @@ class cl_pcproc
     return $sql;
   }
 
-
   function sql_query_usudepart($pc80_codproc = null, $campos = "*", $ordem = null, $dbwhere = "")
   {
     $sql = "select ";
@@ -1143,7 +1142,6 @@ class cl_pcproc
     }
     return $sql;
   }
-
 
   public function sql_query_gerautproc($pc80_codproc = null, $campos = "*", $ordem = null, $dbwhere = "")
   {
@@ -1297,7 +1295,6 @@ class cl_pcproc
     return $sql;
   }
 
-
   function sql_query_empenho($pc80_codproc = null, $campos = "*", $ordem = null, $dbwhere = "")
   {
     $sql = "select ";
@@ -1431,7 +1428,6 @@ class cl_pcproc
     }
     return $sql;
   }
-
 
   public function sql_query_pncp($pc80_codproc = null)
   {
@@ -1634,6 +1630,8 @@ class cl_pcproc
                             matunid.m61_descr AS unidadeMedida,
                             solicitem.pc11_vlrun AS valorUnitarioEstimado,
                             pcproc.pc80_tipoprocesso AS criterioJulgamentoId,
+                            pcproc.pc80_modalidadecontratacao as modalidadeid,
+                            pc23_orcamforne,
                             pcmater.pc01_codmater,
                             solicitem.pc11_numero,
                             solicitem.pc11_reservado,
@@ -1801,6 +1799,67 @@ class cl_pcproc
 
   }
 
+  public function queryProcessodeComprasLicitacao()
+  {
+      $sql = " SELECT DISTINCT pc80_codproc
+                FROM pcproc
+                INNER JOIN db_usuarios ON db_usuarios.id_usuario = pcproc.pc80_usuario
+                INNER JOIN db_depart ON db_depart.coddepto = pcproc.pc80_depto
+                INNER JOIN pcprocitem ON pcproc.pc80_codproc = pcprocitem.pc81_codproc
+                LEFT JOIN empautitem ON empautitem.e55_sequen = pcprocitem.pc81_codprocitem
+                LEFT JOIN empautoriza ON empautoriza.e54_autori = empautitem.e55_autori
+                LEFT JOIN solicitem ON solicitem.pc11_codigo = pcprocitem.pc81_solicitem
+                LEFT JOIN solicita ON solicita.pc10_numero = solicitem.pc11_numero
+                LEFT JOIN solicitaregistropreco ON solicita.pc10_numero = solicitaregistropreco.pc54_solicita
+                WHERE (e55_sequen IS NULL
+                       OR (e55_sequen IS NOT NULL
+                           AND e54_anulad IS NOT NULL))
+                    AND pc10_instit = 1
+                    AND pc10_solicitacaotipo IN(1,2,8)
+                    AND pc80_situacao = 2
+                    AND NOT EXISTS
+                        (SELECT 1
+                         FROM acordopcprocitem
+                         INNER JOIN acordoitem ON ac23_acordoitem = ac20_sequencial
+                         INNER JOIN acordoposicao ON ac20_acordoposicao = ac26_sequencial
+                         INNER JOIN acordo ON ac26_acordo = ac16_sequencial
+                         WHERE ac23_pcprocitem = pc81_codprocitem
+                             AND (ac16_acordosituacao NOT IN (2,3)))
+                    AND pc80_codproc IN
+                        (SELECT si01_processocompra
+                         FROM precoreferencia)
+                    AND pc80_data <= '2024-06-24'
+                    AND pc80_criterioadjudicacao = 3
+                    AND NOT EXISTS
+                        (SELECT *
+                         FROM liclicitem
+                         INNER JOIN pcprocitem ON pc81_codprocitem = l21_codpcprocitem
+                         WHERE pc81_codproc = pc80_codproc)
+                    AND pc80_codproc NOT IN
+                        (SELECT l213_processodecompras
+                         FROM liccontrolepncp
+                         WHERE l213_processodecompras IS NOT NULL)
+                    AND NOT EXISTS
+                        (SELECT 1
+                         FROM empautitempcprocitem
+                         WHERE e73_pcprocitem = pc81_codprocitem)
+                    AND pc80_codproc NOT IN
+                        (SELECT si06_processocompra
+                         FROM adesaoregprecos)
+                    AND pc80_dispvalor = 'f'
+                ORDER BY pc80_codproc
+      ";
+      return $sql;
+  }
+
+  public function queryProcessosdeComprasVinculados($l20_codigo)
+  {
+      return "select distinct pc81_codproc from liclicitem
+            inner join pcprocitem on pc81_codprocitem = l21_codpcprocitem
+            where l21_codliclicita = $l20_codigo
+            ";
+  }
+
   public function queryDadosAutorizacao($pc80_codproc){
 
     $tipoSolicitacao = $this->getTipoSolicitacao($pc80_codproc);
@@ -1832,5 +1891,15 @@ class cl_pcproc
     left join cflicita on l03_codigo = l20_codtipocom
     where pc80_codproc = $pc80_codproc limit 1";
 
+  }
+
+  public function getDadosProcessoCompras($pc80_codproc)
+  {
+    return "SELECT *
+                    FROM pcproc
+                    INNER JOIN db_usuarios ON db_usuarios.id_usuario = pcproc.pc80_usuario
+                    INNER JOIN db_depart ON db_depart.coddepto = pcproc.pc80_depto
+                    AND db_depart.instit = 1
+                    WHERE pcproc.pc80_codproc = $pc80_codproc";
   }
 }

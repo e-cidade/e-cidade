@@ -14,6 +14,8 @@ class IssCadSimplesBaixa extends LegacyModel
 
     protected $primaryKey = 'q39_sequencial';
 
+    protected string $sequenceName = 'isscadsimplebaixa_q39_sequencial_seq';
+
     protected $fillable = [
         'q39_sequencial',
         'q39_isscadsimples',

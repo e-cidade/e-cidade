@@ -76,16 +76,16 @@ class LancamentoAuxiliarFactory {
       break;
 
       case "208" :
+      case "209" :
       case "214" :
+      case "215" :
         return LancamentoAuxiliarEmLiquidacaoMaterialPermanente::getInstance($iLancamento);
       break;
       
-      case "209" :
       case "210" :
       case "211" :
       case "212" :
       case "213" :
-      case "215" :
         return LancamentoAuxiliarEmpenhoEmLiquidacaoMaterialAlmoxarifado::getInstance($iLancamento);
       break;
 

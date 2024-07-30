@@ -46,7 +46,7 @@ try {
             $oRetorno->lShow = false;
             $oDaoRhlotavinc = db_utils::getDao('rhlotavinc');
             $rsRhlotavinc = $oDaoRhlotavinc->sql_record($oDaoRhlotavinc->sql_query_file(null, "rh25_recurso", null, "rh25_codigo = {$oParam->iLotacao} AND rh25_anousu = " . db_getsession("DB_anousu")));
-            if (in_array(db_utils::fieldsMemory($rsRhlotavinc, 0)->rh25_recurso, array('118', '1118', '218', '166', '266', '119', '1119', '219', '167', '267', '101'))) {
+            if (in_array(db_utils::fieldsMemory($rsRhlotavinc, 0)->rh25_recurso, array('118', '1118', '218', '166', '266', '119', '1119', '219', '167', '267', '15400007', '25400007', '15420007', '25420007', '15400000', '25400000', '15420000', '25420000'))) {
                 $oRetorno->lShow = true;
             }
             break;

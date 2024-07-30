@@ -36,7 +36,6 @@ require_once("classes/db_cgmalt_classe.php");
 require_once("classes/db_pcforneconpad_classe.php");
 require_once("classes/db_emite_nota_empenho.php");
 require_once("model/orcamento/ControleOrcamentario.model.php");
-
 /*
  * Configurações GED
 */
@@ -44,8 +43,18 @@ require_once("integracao_externa/ged/GerenciadorEletronicoDocumento.model.php");
 require_once("integracao_externa/ged/GerenciadorEletronicoDocumentoConfiguracao.model.php");
 require_once("libs/exceptions/BusinessException.php");
 
+require_once("model/protocolo/AssinaturaDigital.model.php");
+
+$assinar = "true";
 $oGet = db_utils::postMemory($_GET);
+
 $oConfiguracaoGed = GerenciadorEletronicoDocumentoConfiguracao::getInstance();
+if($oGet->assinar == "false"){
+
+    $assinar = $oGet->assinar;
+}
+$oAssintaraDigital =  new AssinaturaDigital();
+
 if ($oConfiguracaoGed->utilizaGED()) {
 
     if (!empty($oGet->dtInicial) || !empty($oGet->dtFinal)) {
@@ -71,7 +80,7 @@ parse_str($HTTP_SERVER_VARS['QUERY_STRING']);
 $head3 = "CADASTRO DE CÓDIGOS";
 //$head5 = "PERÍODO : ".$mes." / ".$ano;
 
-$sqlpref  = "select db_config.*, cgm.z01_incest as inscricaoestadualinstituicao ";
+$sqlpref  = "select db_config.*, cgm.z01_incest as inscricaoestadualinstituicao, nomeinstabrev ";
 $sqlpref .= "  from db_config                                                     ";
 $sqlpref .= " inner join cgm on cgm.z01_numcgm = db_config.numcgm                 ";
 $sqlpref .=    "	where codigo = " . db_getsession("DB_instit");
@@ -127,7 +136,7 @@ if (isset($listacgm) && $listacgm != '') {
 }
 
 $sqlemp = $clemite_nota_emp->get_sql_empenho(db_getsession("DB_anousu"), db_getsession("DB_instit"), $dbwhere);
-
+//echo $sqlemp;
 $result = db_query($sqlemp);
  //db_criatabela($result);exit;
 
@@ -409,7 +418,7 @@ for ($i = 0; $i < pg_numrows($result); $i++) {
     $clControleOrc = new ControleOrcamentario;
     $e60_codco = $e60_codco == null ? '0000' : $e60_codco;
     $clControleOrc->setCodCO($e60_codco);
-    
+
     $pdf1->codco  = $e60_codco.' - '.$clControleOrc->getDescricaoResumoCO();
 
     $sql  = "select c61_codcon
@@ -441,9 +450,21 @@ for ($i = 0; $i < pg_numrows($result); $i++) {
     $pdf1->texto            = "";
     $pdf1->imprime();
 }
-//include("fpdf151/geraarquivo.php");
 
-if ($oConfiguracaoGed->utilizaGED()) {
+if($oAssintaraDigital->verificaAssituraAtiva() && $assinar == "true"){
+
+    try {
+        $sInstituicao = str_replace( " ", "_", strtoupper($nomeinstabrev));
+        $nomeDocumento = "EMPENHO_{$e60_codemp}_{$e60_anousu}_{$sInstituicao}.pdf";
+        $pdf1->objpdf->Output("tmp/$nomeDocumento", false, true);
+        $oAssintaraDigital->gerarArquivoBase64($nomeDocumento);
+        $oAssintaraDigital->assinarEmpenho($e60_numemp, $e60_coddot, $e60_anousu,  $e60_emiss, $nomeDocumento, $e60_codemp."/".$e60_anousu);
+        $pdf1->objpdf->Output();
+    } catch (Exception $eErro) {
+        db_redireciona("db_erros.php?fechar=true&db_erro=".$eErro->getMessage());
+    }
+
+} else if ($oConfiguracaoGed->utilizaGED()) {
 
     try {
 

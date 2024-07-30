@@ -177,7 +177,7 @@ if (isset($incluir)) {
     $clempautoriza->e54_anulad = null;
     $clempautoriza->e54_concarpeculiar = $e54_concarpeculiar;
     $clempautoriza->e54_tipodespesa = $e54_tipodespesa;
-
+    $clempautoriza->e54_datainclusao = date('Y-m-d H:i:s.v', db_getsession("DB_datausu"));
 
     $clempautoriza->incluir(null);
     if ($clempautoriza->erro_status == 0) {

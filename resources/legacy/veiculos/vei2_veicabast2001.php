@@ -239,7 +239,8 @@ function js_mostraveiccadcomb1(chave1,chave2){
       	<td align="right"><b>Central:</b></td>
       	<td>
       		<?php
-      			$rsQueryCentral = pg_query($clveiccadcentral->sql_query(null," ve36_sequencial as id,descrdepto as depto",null,""));
+            $institutoAtual = $_SESSION['DB_instit'];
+      			$rsQueryCentral = pg_query($clveiccadcentral->sql_query(null," ve36_sequencial as id,descrdepto as depto",null,"db_depart.instit = $institutoAtual"));
       			$aValores = array();
       			$aValores['0'] = "Todos";
       			if(pg_num_rows($rsQueryCentral)>0){

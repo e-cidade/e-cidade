@@ -155,9 +155,9 @@ $lValidaRepr = isset($validaRepresentante);
                 $rsParamLic = $cllicitaparam->sql_record($cllicitaparam->sql_query(null, "*", null, "l12_instit = " . db_getsession('DB_instit')));
                 db_fieldsmemory($rsParamLic, 0)->l12_validafornecedor_emailtel;
                 if ($l12_validafornecedor_emailtel == "t") {
-                  echo "<script>" . $funcao_js . "('$pc60_numcgm','$z01_nome','$z01_telef','$z01_email');</script>";
+                  echo "<script>" . $funcao_js . "('$pc60_numcgm','$z01_nome','$z01_telef','$z01_email','$z01_cgccpf');</script>";
                 } else {
-                  echo "<script>" . $funcao_js . "('$pc60_numcgm','$z01_nome',false);</script>";
+                  echo "<script>" . $funcao_js . "('$pc60_numcgm','$z01_nome',false,'$z01_cgccpf');</script>";
                 }
               } else {
                 echo "<script>" . $funcao_js . "('$pc60_dtlanc',false);</script>";

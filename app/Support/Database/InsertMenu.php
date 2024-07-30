@@ -7,6 +7,7 @@ trait InsertMenu
     public function getItemIdByDescr($descricao, $helper = null): array
     {
         $sql = "SELECT id_item FROM db_itensmenu WHERE descricao = '$descricao'";
+
         if ($helper != null){
             $sql .= " AND help = '$helper'";
         }
@@ -21,7 +22,7 @@ trait InsertMenu
 
     public function getMaxMenuId(): array
     {
-        $sql = "SELECT max(id_item) from db_itensmenu";
+        $sql = "SELECT max(id_item) from db_itensmenu"; 
         return $this->fetchRow($sql);
     }
 
@@ -47,6 +48,18 @@ trait InsertMenu
     public function insertMenu($descricaoItemPai, $menusequencia = null, $idModulo = 1, $helperItemPai = null)
     {
         $idItemPai = intval(implode(" ", $this->getItemIdByDescr($descricaoItemPai,$helperItemPai)));
+        $idItemFilho = intval(implode(" ", $this->getMaxMenuId()));
+
+        if ($menusequencia == null){
+            $menusequencia = $this->getNextSeqMenuId($idItemPai);
+        }
+
+        $sql = "INSERT INTO db_menu VALUES ($idItemPai, $idItemFilho, $menusequencia, $idModulo)";
+        $this->executeQuery($sql);
+    }
+
+    public function insertMenuById($idItemPai, $menusequencia = null, $idModulo = 1)
+    {
         $idItemFilho = intval(implode(" ", $this->getMaxMenuId()));
 
         if ($menusequencia == null){

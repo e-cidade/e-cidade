@@ -2164,6 +2164,24 @@ if (count($aParametrosEmpenho) > 0) {
             '',
             'location=0'
         );
+        js_enviarAssinatura(sListaOrdem, sListaMovimento);
+    }
+
+    function js_enviarAssinatura(sListaOrdem, sListaMovimento) {
+        var oParametros = new Object();
+        oParametros.sOrdens = sListaOrdem;
+        oParametros.sMovimentos = sListaMovimento;
+        oParametros.sExecuta = 'enviarOrdemaPagamentoAssinatura';
+        oParametros.method = 'post';
+        new AjaxRequest(
+            'con1_assinaturaDigitalDocumentos.RPC.php',
+            oParametros,
+            function (oRetorno) {
+                if (oRetorno.erro) {
+                    alert ("Erro ao enviar documentos para assinatura");
+                }
+            }
+        ).execute();
     }
 
     function verificaCadastroAutenticadora() {

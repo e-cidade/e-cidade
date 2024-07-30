@@ -245,3 +245,10 @@ fieldset.separator textarea:not([rel='ignore-css']){
 .caixaalta {
   text-transform: capitalize;
 }
+
+.div-centralizada {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

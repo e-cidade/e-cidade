@@ -38,18 +38,19 @@ Registry::get('app.config')->merge(array(
     'php.error_reporting' => E_ALL & ~E_DEPRECATED & ~E_STRICT,
 
     'app.api' => array(
-        'centraldeajuda' => '',
+        'centraldeajuda' => 'http://centraldeajuda.dbseller.com.br/help/api/index.php/',
         'esocial' => array(
-            'url' => '', // informe a api do eSocial. ESTE IP E DA MAQUINA DE ROBSON. LEMBRAR DE MUDAR.
+            'url' => 'http://34.95.213.240/sped-esocial/', // informe a api do eSocial. ESTE IP E DA MAQUINA DE ROBSON. LEMBRAR DE MUDAR.
+            //'url' => 'http://10.251.27.76/sped-esocial-2.5/',
             'login' => '', // login do cliente
             'password' => '' // senha do cliente
         )
     ),
 
     // 'app.proxy' => array(
-    //     'http'  => '', // e.g. 
-    //     'https' => '', // e.g. 
-    //     'tcp'   => ''  // e.g. 
+    //     'http'  => '172.16.212.254:3128', // e.g. 172.16.212.254:3128
+    //     'https' => '172.16.212.254:3128', // e.g. 192.168.0.1:3128
+    //     'tcp'   => '172.16.212.254:3128'  // e.g. 192.168.0.1:3128
     // ),
 
     'app.request.session.attachOn' => '*.php',

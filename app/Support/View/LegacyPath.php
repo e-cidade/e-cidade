@@ -109,7 +109,7 @@ trait LegacyPath
 
         for ($i = 0; $i < strlen($fileName); $i++){
             $caracter = $fileName[$i];
-            if (is_numeric($caracter)) {
+            if (!strpos($fileName, '_') || is_numeric($caracter)) {
                 $hasNumeric = true;
                 break;
             }
@@ -123,6 +123,10 @@ trait LegacyPath
 
         if (!$hasNumeric && !$hasUnderscore) {
             $prefix = explode($fileName, '.')[0];
+        }
+
+        if(strlen($prefix) > 3){
+            $prefix = substr($prefix, 0,3);
         }
 
         return $prefix;

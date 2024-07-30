@@ -462,6 +462,17 @@ if($db_opcao == 1 || (isset($tipo_inclui)&&trim($tipo_inclui)!="")){
        ?>
     </td>
   </tr>
+  <tr style="display: <?php echo $mostrarCampo; ?>;">
+    <td nowrap title="Data da Exclusão:">
+        <b>Data da Exclusão:</b>
+    </td>
+    <td>
+      <?
+      
+      db_inputdata('t52_dtexclusao',@$t52_dtexclusao_dia,@$t52_dtexclusao_mes,@$t52_dtexclusao_ano,true,'text',1,"");
+      ?>
+    </td>
+  </tr>
   </table>
 
 </fieldset>

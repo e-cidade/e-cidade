@@ -41,8 +41,6 @@ class EventoCargaS2300 implements EventoCargaInterface
      */
     public function execute($matricula = null)
     {
-        $anofolha = db_anofolha();
-        $mesfolha = db_mesfolha();
         $sql = "
     	SELECT distinct
         --trabalhador
@@ -115,7 +113,7 @@ class EventoCargaS2300 implements EventoCargaInterface
                 inner join cadendermunicipiosistema on
                     cadendermunicipiosistema.db125_cadendermunicipio = cadendermunicipio.db72_sequencial
                     and cadendermunicipiosistema.db125_db_sistemaexterno = 4
-                where to_ascii(db72_descricao) = to_ascii(trim((SELECT z01_munic FROM cgm join db_config ON z01_numcgm = numcgm WHERE codigo = fc_getsession('DB_instit')::int))) limit 1))
+                where to_ascii(db72_descricao) = to_ascii(trim((SELECT z01_munic FROM cgm join db_config ON z01_numcgm = numcgm WHERE codigo = " . db_getsession("DB_instit") . "))) limit 1))
                 ) AS codMunic,
             CASE WHEN cgm.z01_uf is null or trim(cgm.z01_uf) = '' then 'MG'
             else cgm.z01_uf end as uf,
@@ -264,7 +262,7 @@ class EventoCargaS2300 implements EventoCargaInterface
         left join rhestagiocurricular on rhpessoal.rh01_regist = h83_regist
         left join rhpessoal as rhpessoalsupervisor on h83_supervisor = rhpessoalsupervisor.rh01_regist
         left join cgm as cgmsupervisor ON cgmsupervisor.z01_numcgm = rhpessoalsupervisor.rh01_numcgm
-        left join inssirf on (r33_codtab::integer-2,r33_anousu,r33_mesusu) = (rh02_tbprev,{$anofolha},{$mesfolha})
+        left join inssirf on (r33_codtab::integer-2,r33_anousu,r33_mesusu) = (rh02_tbprev,{$this->ano},{$this->mes})
         left join rhpesrescisao on rh05_seqpes = rh02_seqpes
         inner join db_config on
         db_config.codigo = rhpessoal.rh01_instit
@@ -274,12 +272,12 @@ class EventoCargaS2300 implements EventoCargaInterface
         AND (
             ( 
             (date_part('year',rhpessoal.rh01_admiss)::varchar || lpad(date_part('month',rhpessoal.rh01_admiss)::varchar,2,'0'))::integer <= 202207
-            and (date_part('year',fc_getsession('DB_datausu')::date)::varchar || lpad(date_part('month',fc_getsession('DB_datausu')::date)::varchar,2,'0'))::integer <= 202207
+            and " . $this->ano . str_pad(strval($this->mes), "0", STR_PAD_LEFT) . " <= 202207
             and (rh05_recis is null or (date_part('year',rh05_recis)::varchar || lpad(date_part('month',rh05_recis)::varchar,2,'0'))::integer > 202207)
             ) or (
-            date_part('month',rhpessoal.rh01_admiss) = date_part('month',fc_getsession('DB_datausu')::date)
-            and date_part('year',rhpessoal.rh01_admiss) = date_part('year',fc_getsession('DB_datausu')::date) 
-            and (date_part('year',fc_getsession('DB_datausu')::date)::varchar || lpad(date_part('month',fc_getsession('DB_datausu')::date)::varchar,2,'0'))::integer > 202207
+            date_part('month',rhpessoal.rh01_admiss) = {$this->mes}
+            and date_part('year',rhpessoal.rh01_admiss) = {$this->ano} 
+            and " . $this->ano . str_pad(strval($this->mes), "0", STR_PAD_LEFT) . " > 202207
             )
             )
     	";

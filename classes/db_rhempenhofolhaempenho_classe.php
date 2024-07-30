@@ -45,11 +45,13 @@ class cl_rhempenhofolhaempenho {
    var $rh76_sequencial = 0; 
    var $rh76_rhempenhofolha = 0; 
    var $rh76_numemp = 0; 
+   var $rh76_lota = null;
    // cria propriedade com as variaveis do arquivo 
    var $campos = "
                  rh76_sequencial = int4 = Código Sequencial 
                  rh76_rhempenhofolha = int4 = Empenho da Folha 
                  rh76_numemp = int4 = Número do Empenho 
+                 rh76_lota = int8 = Lotação 
                  ";
    //funcao construtor da classe 
    function cl_rhempenhofolhaempenho() { 
@@ -72,6 +74,7 @@ class cl_rhempenhofolhaempenho {
        $this->rh76_sequencial = ($this->rh76_sequencial == ""?@$GLOBALS["HTTP_POST_VARS"]["rh76_sequencial"]:$this->rh76_sequencial);
        $this->rh76_rhempenhofolha = ($this->rh76_rhempenhofolha == ""?@$GLOBALS["HTTP_POST_VARS"]["rh76_rhempenhofolha"]:$this->rh76_rhempenhofolha);
        $this->rh76_numemp = ($this->rh76_numemp == ""?@$GLOBALS["HTTP_POST_VARS"]["rh76_numemp"]:$this->rh76_numemp);
+       $this->rh76_lota = ($this->rh76_lota == ""?@$GLOBALS["HTTP_POST_VARS"]["rh76_lota"]:$this->rh76_lota);
      }else{
        $this->rh76_sequencial = ($this->rh76_sequencial == ""?@$GLOBALS["HTTP_POST_VARS"]["rh76_sequencial"]:$this->rh76_sequencial);
      }
@@ -129,15 +132,20 @@ class cl_rhempenhofolhaempenho {
        $this->erro_status = "0";
        return false;
      }
+     if ($this->rh76_lota == null || $this->rh76_lota == "") {
+      $this->rh76_lota = 'null';
+     }
      $sql = "insert into rhempenhofolhaempenho(
                                        rh76_sequencial 
                                       ,rh76_rhempenhofolha 
                                       ,rh76_numemp 
+                                      ,rh76_lota 
                        )
                 values (
                                 $this->rh76_sequencial 
                                ,$this->rh76_rhempenhofolha 
                                ,$this->rh76_numemp 
+                               ,$this->rh76_lota
                       )";
      $result = db_query($sql); 
      if($result==false){ 

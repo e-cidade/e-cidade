@@ -137,9 +137,7 @@ if (isset($incluir)) {
   if (strlen($cgm) > 11) {
     echo "<script>alert('O CGM selecionado deverá ser de Pessoa Física.');</script>";
   }
-  else if (empty($count) && $l200_tipoparecer != "2") {
-    echo "<script>alert('Inclusão abortada. Verifique os fornecedores habilitados!');</script>";
-  } else {
+   else {
       db_inicio_transacao();
       $clparecerlicitacao->incluir($l200_sequencial);  
       db_fim_transacao();

@@ -66,13 +66,13 @@ db_fieldsmemory($resultpref,0);
 
 $pdf = new scpdf();
 $pdf->Open();
-$pdfOrdemPagamento = new db_impcarne($pdf,'7');
+$pdfOrdemPagamento = new db_impcarne($pdf,'7_alt');
 $pdfOrdemPagamento->objpdf->SetTextColor(0,0,0);
 
 $pdfEmpenho = new db_impcarne($pdf, '6');
 $pdfEmpenho->objpdf->SetTextColor(0,0,0);
 
-$sCampos        = 'e50_codord, e71_codnota, e60_numemp, e60_codemp';
+$sCampos        = 'e50_codord, e71_codnota, e60_numemp, e60_codemp, e60_codco';
 $sSqlPagordem   = $clpagordem->sql_query_notaliquidacao('', $sCampos,' e50_codord ', $sWhere);
 $result         = $clpagordem->sql_record($sSqlPagordem);
 
@@ -153,6 +153,7 @@ for ($i = 0;$i < pg_numrows($result); $i++) {
     $pdfOrdemPagamento->crccontador         = $crc;
     $pdfOrdemPagamento->controleinterno     = $controleinterno;
 
+    $pdfOrdemPagamento->numliquidacao       = $e50_numliquidacao;
     $pdfOrdemPagamento->numeronota          = $e69_numero;
     $pdfOrdemPagamento->datanota            = $e69_dtnota;
     $pdfOrdemPagamento->valor_ordem         = '';
@@ -197,6 +198,7 @@ for ($i = 0;$i < pg_numrows($result); $i++) {
     $pdfOrdemPagamento->saldo_ant           = $e60_salant;
     $pdfOrdemPagamento->empenhado           = $e60_vlremp;
     $pdfOrdemPagamento->empenho_anulado     = $e60_vlranu;
+    $pdfOrdemPagamento->codemp              = $e60_codemp;
     $pdfOrdemPagamento->numemp              = $e60_codemp.'/'.$e60_anousu;
     $pdfOrdemPagamento->orgao               = $o58_orgao;
     $pdfOrdemPagamento->descr_orgao         = $o40_descr;
@@ -219,6 +221,12 @@ for ($i = 0;$i < pg_numrows($result); $i++) {
     $pdfOrdemPagamento->texto		        = db_getsession("DB_login").'  -  '.date("d-m-Y",db_getsession("DB_datausu")).'    '.db_hora(db_getsession("DB_datausu"));
     $pdfOrdemPagamento->telef               = $z01_telef;
     $pdfOrdemPagamento->fax                 = $z01_numero;
+
+    $clControleOrc = new ControleOrcamentario;
+    $e60_codco = $e60_codco == null ? '0000' : $e60_codco;
+    $clControleOrc->setCodCO($e60_codco);
+    
+    $pdfOrdemPagamento->codco  = $e60_codco.' - '.$clControleOrc->getDescricaoResumoCO();
 
     /**
     * Variáveis utilizadas na assinatura. Sómente utilizada na impressão por movimento

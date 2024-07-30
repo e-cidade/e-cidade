@@ -129,7 +129,7 @@ if (isset($l20_codigo)) {
 
     if (!empty($l20_codigo)) {
 
-        $sCampos  = "DISTINCT pc81_codprocitem,pc23_vlrun, pc11_seq, pc11_codigo, pc11_quant, pc11_vlrun, m61_descr, pc01_codmater, pc01_descrmater, pc11_resum";
+        $sCampos  = "DISTINCT pc81_codprocitem,pc23_vlrun, pc11_seq, pc11_codigo, pc11_quant, pc11_vlrun, m61_descr, pc01_codmater, pc01_descrmater, pc11_resum,pc21_numcgm";
 
         $joinPrecoReferencia = false;
         if (in_array($l03_pctipocompratribunal, array(102, 103))) {
@@ -169,13 +169,14 @@ if (isset($l20_codigo)) {
                         <td class="table_header" style="width: 72px">Valor Unitário</td>
                     <?php endif; ?>
                     <td class="table_header" style="width: 125px">Quantidade Licitada</td>
+                    <td class="table_header" style="width: 125px; display:none;">Fornecedor</td>
                 </tr>
                 <?php foreach ($aItensLicitacao as $key => $aItem) :
                     $iItem = $aItem->pc81_codprocitem;
                 ?>
                     <tr class="DBgrid">
                         <td class="table_header" style="width: <?= !$valorUnitario ? '58px' : '32px' ?>">
-                            <input type="checkbox" class="marca_itens[<?= $iItem ?>]" name="aItonsMarcados" value="<?= $iItem ?>" id="<?= $iItem ?>">
+                            <input data-fornecedor="<?= $aItem->pc21_numcgm ?>" type="checkbox" class="marca_itens[<?= $iItem ?>]" name="aItonsMarcados" value="<?= $iItem ?>" id="<?= $iItem ?>">
                         </td>
         
                         <td class="linhagrid" style="width: <?= !$valorUnitario ? '74px' : '44px' ?>">
@@ -184,7 +185,7 @@ if (isset($l20_codigo)) {
                         </td>
         
                         <td class="linhagrid" style="width: <?= !$valorUnitario ? '92px' : '52px' ?>">
-                            <?= $aItem->pc81_codprocitem ?>
+                            <?= $aItem->pc81_codprocitem . $aItem->pc21_numcgm ?>
                             <input type="hidden" name="" value="<?= $aItem->pc81_codprocitem ?>" id="<?= $iItem ?>">
                         </td>
         
@@ -209,13 +210,17 @@ if (isset($l20_codigo)) {
                             <?= $aItem->pc11_quant ?>
                             <input type="hidden" name="" value="<?= $aItem->pc11_quant ?>" id="<?= $iItem ?>">
                         </td>
+                        <td class="linhagrid" style="display:none;">
+                            <?= $aItem->pc21_numcgm ?>
+                            <input type="hidden" name="" value="<?= $aItem->pc21_numcgm ?>" id="<?= $iItem ?>">
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             </table>
         <?php } ?>
     
         </div>
-        <div style="margin-left: 25%;">
+        <div style="margin-left:25%;margin-top:10px;">
             <?php if ($db_opcao == 11 || $db_opcao == 1) : ?>
                 <input name="Incluir" type="submit" id="incluir" value="Incluir">
             <?php elseif ($db_opcao == 22 || $db_opcao == 2) : ?>
@@ -224,7 +229,9 @@ if (isset($l20_codigo)) {
                 <input name="Excluir" type="button" id="excluir" value="Excluir" onclick="js_EHomologacao()">
             <?php endif; ?>
             <input name="pesquisar" type="button" id="pesquisar" value="Pesquisar" onclick="js_pesquisa(<?= $db_opcao == 1 ? false : true ?>);">
+            <input id="habilitacaofornecedor" style="display:none;" type="button" value="Habilitar Fornecedores" onclick='redirecionamentoHabilitacaoFornecedor();' /> 
         </div>
+
 </form>
 
 <script>
@@ -423,6 +430,7 @@ if (isset($l20_codigo)) {
         }
 
         var itensEnviar = [];
+        var sCodigoFornecedores = "";
 
         try {
             itens.forEach(function(item) {
@@ -431,7 +439,9 @@ if (isset($l20_codigo)) {
                     l205_item: coditem,
                 };
                 itensEnviar.push(novoItem);
+                sCodigoFornecedores += item.getAttribute("data-fornecedor") + ",";
             });
+            sCodigoFornecedores = sCodigoFornecedores.substring(0, sCodigoFornecedores.length - 1);
             salvarCredAjax({
                 exec: 'salvarHomo',
                 licitacao: document.getElementById('l20_codigo').value,
@@ -440,6 +450,7 @@ if (isset($l20_codigo)) {
                 l20_veicdivulgacao: document.getElementById('l20_veicdivulgacao').value,
                 respRaticodigo: document.getElementById('respRaticodigo').value,
                 respPubliccodigo: document.getElementById('respPubliccodigo').value,
+                sCodigoFornecedores : sCodigoFornecedores,
                 // l20_justificativa          : document.getElementById('l20_justificativa').value,
                 // l20_razao                  : document.getElementById('l20_razao').value,
                 itens: itensEnviar,
@@ -464,6 +475,9 @@ if (isset($l20_codigo)) {
 
     function retornoAjax(res) {
         var response = JSON.parse(res.responseText);
+        if(response.exibirhabilitacaofornecedores){
+            document.getElementById('habilitacaofornecedor').style.display = '';
+        }
         if (response.status != 1) {
             alert(response.message.urlDecode());
         } else if (response.erro == false) {
@@ -500,6 +514,7 @@ if (isset($l20_codigo)) {
         }
 
         var itensEnviar = [];
+        var sCodigoFornecedores = "";
 
         try {
             itens.forEach(function(item) {
@@ -508,7 +523,9 @@ if (isset($l20_codigo)) {
                     l205_item: coditem,
                 };
                 itensEnviar.push(novoItem);
+                sCodigoFornecedores += item.getAttribute("data-fornecedor") + ",";
             });
+            sCodigoFornecedores = sCodigoFornecedores.substring(0, sCodigoFornecedores.length - 1);
             aHomoAjax({
                 exec: 'alterarHomo',
                 licitacao: document.getElementById('l20_codigo').value,
@@ -517,6 +534,8 @@ if (isset($l20_codigo)) {
                 l20_veicdivulgacao: document.getElementById('l20_veicdivulgacao').value,
                 respRaticodigo: document.getElementById('respRaticodigo').value,
                 respPubliccodigo: document.getElementById('respPubliccodigo').value,
+                sCodigoFornecedores : sCodigoFornecedores,
+
                 // l20_justificativa          : document.getElementById('l20_justificativa').value,
                 // l20_razao                  : document.getElementById('l20_razao').value,
                 itens: itensEnviar,
@@ -541,7 +560,9 @@ if (isset($l20_codigo)) {
 
     function oRetornoAjax(res) {
         var response = JSON.parse(res.responseText);
-
+        if(response.exibirhabilitacaofornecedores){
+            document.getElementById('habilitacaofornecedor').style.display = '';
+        }
         if (response.status == 2) {
             alert(response.message.urlDecode());
         } else if (response.erro == false) {
@@ -704,4 +725,20 @@ if (isset($l20_codigo)) {
         document.getElementById(varNomeCampo).value = chave2;
         db_iframe_cgm.hide();
     }
+
+    function redirecionamentoHabilitacaoFornecedor(){
+
+        let oParams = {
+            action: `lic1_habilitacaofornecedor.php`,
+            iInstitId: top.jQuery('#instituicoes span.active').data('id'),
+            iAreaId: 4,
+            iModuloId: 381
+        }
+
+        let title = 'Procedimentos > Habilitação de Fornecedores';
+
+        Desktop.Window.create(title, oParams);
+
+    }
+
 </script>

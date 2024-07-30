@@ -272,7 +272,7 @@ class cl_homologacaoadjudica
                 }*/
             }
         }
-        
+
         if (trim($this->l202_datareferencia) != "" ) {
             $sql  .= $virgula . " l202_datareferencia = '$this->l202_datareferencia' ";
             $virgula = ",";
@@ -986,5 +986,123 @@ class cl_homologacaoadjudica
         }
 
         if ($sItensInvalidos != "") throw new Exception("Usuário: Inclusão abortada, esta licitação possui itens com o mesmo código e valores unitários divergentes julgados para o mesmo fornecedor." . $sItensInvalidos);
+    }
+
+    /**
+     * Função responsável por verificar se todos os fornecedores ganhadores
+     * (que estão com pontuação 1 na tabela pcorcamjulg) estão habilitados.
+     * @param int $iLicitacao - Código da Licitação.
+     * @return Exception
+     **/
+    function validacaoFornecedoresHabilitados($iCodigoLicitacao){
+        $rsFornecedores = db_query("SELECT DISTINCT l205_fornecedor,z01_nome
+                                        FROM credenciamento
+                                        inner join cgm on z01_numcgm = l205_fornecedor
+                                        WHERE l205_licitacao ={$iCodigoLicitacao}
+                                            AND l205_fornecedor NOT IN
+                                                (SELECT l206_fornecedor
+                                                 FROM habilitacaoforn
+                                                 WHERE l206_licitacao = {$iCodigoLicitacao})");
+        $aFornecedores = db_utils::getCollectionByRecord($rsFornecedores);
+        $sFornecedoresPendentes = "";
+        foreach($aFornecedores as $fornecedor){
+            $sFornecedoresPendentes .= "{$fornecedor->l205_fornecedor} - {$fornecedor->z01_nome}, ";
+        }
+        if ($sFornecedoresPendentes != ""){
+            $mensagemErro = "Usuário: Inclusão abortada. \n O(s) fornecedor(es) $sFornecedoresPendentes não está(ão) habilitado(s).";
+            return $mensagemErro;
+        }
+        return true;
+    }
+
+    /**
+     * Método responsável por verificar se todos os fornecedores referente aos itens selecionados para homologação/publicação estão habiltiados.
+     * @param int $iLicitacao - Código da Licitação.
+     * @param string $sCodigoFornecedores - Código dos fornecedores referente aos itens selecionados.
+     * @param string $sRotina - "ratificacao" ou "homologacao"
+     * @return String or Bool - retorna true em caso de sucesso e String com mensagem de erro caso possua fornecedores inabilitados.
+     **/
+    function validacaoFornecedoresInabilitados($iCodigoLicitacao,$sCodigoFornecedores,$sRotina){
+
+        $aCodigoFornecedores = explode(',', $sCodigoFornecedores);
+        $aCodigoFornecedores = array_unique($aCodigoFornecedores);
+
+        $rsCodigoTipoTribunal = db_query("select * from liclicita inner join cflicita on l03_codigo = l20_codtipocom where l20_codigo = $iCodigoLicitacao");
+        $tipoCompraTribunal = db_utils::fieldsMemory($rsCodigoTipoTribunal, 0)->l03_pctipocompratribunal;
+
+        if(($tipoCompraTribunal == "102" || $tipoCompraTribunal == "103") && $sRotina == "ratificacao"){
+            return true;
+        }
+
+        $sFornecedoresInabilitados = "";
+
+        foreach($aCodigoFornecedores as $iCodigoFornecedor){
+
+            $sSqlValidacaoRatificacao = "select * from habilitacaoforn inner join liclicita on l206_licitacao = l20_codigo inner join cflicita on l03_codigo = l20_codtipocom where l206_licitacao = $iCodigoLicitacao and l206_fornecedor = $iCodigoFornecedor and l03_pctipocompratribunal not in (102,103)";
+            $sSqlValidacaoHomologacao = "select * from habilitacaoforn where l206_licitacao = $iCodigoLicitacao and l206_fornecedor = $iCodigoFornecedor";
+    
+            $sSql = $sRotina == "ratificacao" ? $sSqlValidacaoRatificacao : $sSqlValidacaoHomologacao;
+            $rsFornecedorHabilitado = db_query($sSql);
+            /* Caso não retornar nenhum registro, o fornecedor ainda não está habilitado.*/
+            if(pg_numrows($rsFornecedorHabilitado) == 0){
+                $rsCgm = db_query("select * from cgm where z01_numcgm = $iCodigoFornecedor");
+                $sDescricaoFornecedor = db_utils::fieldsMemory($rsCgm, 0)->z01_nome;
+                $sFornecedoresInabilitados .= "{$iCodigoFornecedor} - $sDescricaoFornecedor, ";
+            }
+        }
+
+        if ($sFornecedoresInabilitados != ""){
+            $mensagemErro = "Usuário: Inclusão abortada. \n O(s) fornecedor(es) $sFornecedoresInabilitados não está(ão) habilitado(s).";
+            return $mensagemErro;
+        }
+
+        return true;
+
+    }
+
+    /** O método verifica se os fornecedores possuem a data de habilitação maior que a data de homologação/publicação.
+     * @param int $iCodigoLicitacao - Código da Licitação.
+     * @param string $sDataHomologacao - Data de Homologação.
+     * @param string $sCodigoFornecedores - Código dos fornecedores referente aos itens selecionados.
+     * @param string $sRotina - "ratificacao" ou "homologacao"
+     * @return String or Bool
+     **/
+    function validacaoDataHabilitacao($iCodigoLicitacao,$sDataHomologacao,$sCodigoFornecedores,$sRotina){
+        $rsFornecedores = db_query("select * from liclicita inner join cflicita on l03_codigo = l20_codtipocom inner join habilitacaoforn on l206_licitacao = l20_codigo inner join cgm on z01_numcgm = l206_fornecedor where l20_codigo = $iCodigoLicitacao and l03_pctipocompratribunal not in (102,103) and l206_datahab > '$sDataHomologacao' and l206_fornecedor in ($sCodigoFornecedores)");
+        $aFornecedores = db_utils::getCollectionByRecord($rsFornecedores);
+        $sFornecedoresPendentes = "";
+        foreach($aFornecedores as $fornecedor){
+            $sFornecedoresPendentes .= "{$fornecedor->l206_fornecedor} - {$fornecedor->z01_nome}, ";
+        }
+        if ($sFornecedoresPendentes != "" && $sRotina == "homologacao"){
+            $mensagemErro = "Usuário: Inclusão abortada. \n O(s) fornecedor(es) $sFornecedoresPendentes possuem a data de habilitação maior que a data de homologação.";
+            return $mensagemErro;
+        }
+        if ($sFornecedoresPendentes != "" && $sRotina == "ratificacao"){
+            $mensagemErro = "Usuário: Inclusão abortada. \n O(s) fornecedor(es) $sFornecedoresPendentes possuem a data de habilitação maior que a data de publicação de ratificação.";
+            return $mensagemErro;
+        }
+        return true;
+    }
+
+    /** O método verifica se existe fornecedor(es) credenciados para a licitação informada, caso o tipo de compra do tribunal seja 102/103
+     * @param int $iCodigoLicitacao - Código da Licitação.
+     * @return Bool
+     **/
+    function validacaoCredenciamento($iCodigoLicitacao){
+
+        $rsCodigoTipoTribunal = db_query("select * from liclicita inner join cflicita on l03_codigo = l20_codtipocom where l20_codigo = $iCodigoLicitacao");
+        $tipoCompraTribunal = db_utils::fieldsMemory($rsCodigoTipoTribunal, 0)->l03_pctipocompratribunal;
+        if($tipoCompraTribunal == "102" || $tipoCompraTribunal == "103"){
+
+            $rsCredenciados = db_query("select * from credenciamento inner join liclicita on l205_licitacao = l20_codigo where l205_licitacao = $iCodigoLicitacao");
+
+            if(pg_numrows($rsCredenciados) == 0){
+                return false;
+            }
+        }
+
+        return true;
+
     }
 }

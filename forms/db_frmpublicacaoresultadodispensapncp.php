@@ -20,7 +20,7 @@ db_app::load("estilos.css, grid.style.css");
         <tr>
             <td>
                 <?
-                db_ancora('Dispensa:', "js_pesquisapc80_codproc(true);", $db_opcao);
+                db_ancora('Contratação direta:', "js_pesquisapc80_codproc(true);", $db_opcao);
                 ?>
             </td>
             <td>

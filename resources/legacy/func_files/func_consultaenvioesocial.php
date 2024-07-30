@@ -79,6 +79,7 @@ $iInstit = db_getsession("DB_instit");
                                 <input name="pesquisar" type="submit" id="pesquisar2" value="Pesquisar" onclick="return js_valida(arguments[0])">
                                 <input name="limpar" type="reset" id="limpar" value="Limpar">
                                 <input name="Fechar" type="button" id="fechar" value="Fechar" onClick="parent.db_iframe_arquivo_retorno.hide();">
+                                <input name="Apagar" type="button" id="apagar" value="Apagar Erros">
                             </td>
                         </tr>
                     </table>
@@ -122,6 +123,8 @@ $iInstit = db_getsession("DB_instit");
     var consultaTimeOut;
 
     function js_consultar() {
+        
+        js_removeObj('msgBox');
 
         oParam.exec = 'consultar';
         var oAjax = new Ajax.Request(
@@ -137,7 +140,8 @@ $iInstit = db_getsession("DB_instit");
 
         var oRetorno = eval("(" + oAjax.responseText + ")");
         if (oRetorno.lUpdate === true) {
-            consultaTimeOut = setTimeout("location.reload()", 10000);
+            //]consultaTimeOut = setTimeout("location.reload()", 10000);
+            //location.reload();
         }
     }
 
@@ -177,6 +181,25 @@ $iInstit = db_getsession("DB_instit");
                     }
                 }
             });
+
+            let btnApagarErros = document.getElementById('apagar');
+
+            btnApagarErros.addEventListener('click', function(event){
+                
+                js_divCarregando("Apagando os erros.\nAguarde ...", 'msgBox');
+                
+                oParam.exec = 'apagarErros';
+                
+                var oAjax = new Ajax.Request(
+                    sUrlRPC, {
+                        method: 'post',
+                        parameters: 'json=' + Object.toJSON(oParam),
+                        onComplete: js_consultar
+                    }
+                );
+                
+            });
+
     });
 
     function copyTextToClipboard(text) {

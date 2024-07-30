@@ -47,9 +47,9 @@ $clsql = new cl_gera_sql_folha;
 $db_opcao = 1;
 $db_botao = true;
 $sqlerro = false;
-$anofolha = db_anofolha();
-$mesfolha = db_mesfolha();
-if(isset($r95_regist) && !isset($incluir)) {
+$ano = db_getsession("DB_anousu");
+$mes = date("m", db_getsession("DB_datausu"));
+if (isset($r95_regist) && !isset($incluir)) {
 
   $result = $clcadferiaspremio->sql_record($clcadferiaspremio->sql_query_matricula_cgm($r95_regist, "rh01_regist, z01_nome, rh01_admiss"));
   $oDadosServidor = db_utils::fieldsMemory($result, 0);
@@ -59,27 +59,31 @@ if(isset($r95_regist) && !isset($incluir)) {
   $oPeriodoAquisitivo = new DateTime((!empty($oFeriasPremio->r95_peraf) ? $oFeriasPremio->r95_peraf : $oDadosServidor->rh01_admiss));
   $z01_nome = $oDadosServidor->z01_nome;
 
-  $r95_perai = mktime(0,0,0,$oPeriodoAquisitivo->format('m'),$oPeriodoAquisitivo->format('d'),$oPeriodoAquisitivo->format('Y'));
+  $r95_perai = mktime(0, 0, 0, $oPeriodoAquisitivo->format('m'), $oPeriodoAquisitivo->format('d'), $oPeriodoAquisitivo->format('Y'));
   $r95_perai_dia = $oPeriodoAquisitivo->format('d');
-  $r95_perai_mes = $oPeriodoAquisitivo->format('m'); 
+  $r95_perai_mes = $oPeriodoAquisitivo->format('m');
   $r95_perai_ano = $oPeriodoAquisitivo->format('Y');
 
   $oPeriodoAquisitivo->add(new DateInterval("P5Y"));
-  $r95_peraf = mktime(0,0,0,$oPeriodoAquisitivo->format('m'),$oPeriodoAquisitivo->format('d'),$oPeriodoAquisitivo->format('Y'));
+  $r95_peraf = mktime(0, 0, 0, $oPeriodoAquisitivo->format('m'), $oPeriodoAquisitivo->format('d'), $oPeriodoAquisitivo->format('Y'));
   $r95_peraf_dia = $oPeriodoAquisitivo->format('d');
   $r95_peraf_mes = $oPeriodoAquisitivo->format('m');
   $r95_peraf_ano = $oPeriodoAquisitivo->format('Y');
 
   if ($sqlerro == false) {
-    $result_rescisao = $clrhpesrescisao->sql_record($clrhpesrescisao->sql_query_ngeraferias(null,"*","",
-                                  "rh02_regist = $r95_regist and rh02_anousu = $anofolha and rh02_mesusu = $mesfolha"));
-    if($clrhpesrescisao->numrows > 0) {
+    $result_rescisao = $clrhpesrescisao->sql_record($clrhpesrescisao->sql_query_ngeraferias(
+      null,
+      "*",
+      "",
+      "rh02_regist = $r95_regist and rh02_anousu = $ano and rh02_mesusu = $mes"
+    ));
+    if ($clrhpesrescisao->numrows > 0) {
       $sqlerro = true;
       db_msgbox("Funcionário rescindiu contrato.");
     }
   }
 }
-if(isset($incluir)) {
+if (isset($incluir)) {
 
   db_inicio_transacao();
   $aMatriculas = array();
@@ -92,13 +96,13 @@ if(isset($incluir)) {
       db_msgbox("Erro ao buscar seleção.");
     }
     if ($sqlerro == false) {
-      $sql = $clsql->gerador_sql("", $anofolha, $mesfolha, null, null, " rh01_regist ", "rh01_regist", db_utils::fieldsMemory($result, 0)->r44_where);
+      $sql = $clsql->gerador_sql("", $ano, $mes, null, null, " rh01_regist ", "rh01_regist", db_utils::fieldsMemory($result, 0)->r44_where);
       $result = $clsql->sql_record($sql);
-      if ($result == false){
+      if ($result == false) {
         $sqlerro = true;
         db_msgbox("Erro ao buscar matrículas por seleção.");
       } else {
-        for ($iCont=0; $iCont < pg_num_rows($result); $iCont++) { 
+        for ($iCont = 0; $iCont < pg_num_rows($result); $iCont++) {
           $aMatriculas[] = db_utils::fieldsMemory($result, $iCont)->rh01_regist;
         }
       }
@@ -107,11 +111,20 @@ if(isset($incluir)) {
 
 
   foreach ($aMatriculas as $matricula) {
-    
-    $result = $clcadferiaspremio->sql_record($clcadferiaspremio->sql_query_file(null, "*", null, "r95_regist = {$matricula} and r95_mesusu = {$mesfolha} and r95_anousu = {$anofolha}"));
-
     $r95_per1i_banco = "{$r95_per1i_ano}-{$r95_per1i_mes}-{$r95_per1i_dia}";
     $r95_per1f_banco = "{$r95_per1f_ano}-{$r95_per1f_mes}-{$r95_per1f_dia}";
+    $result = $clcadferiaspremio->sql_record($clcadferiaspremio->sql_query_file(null, "*", null, "r95_regist = {$matricula} and (
+      (r95_per1i between '{$r95_per1i_banco}' and '{$r95_per1f_banco}') OR 
+      (r95_per1f between '{$r95_per1i_banco}' and '{$r95_per1f_banco}') OR
+      ('{$r95_per1i_banco}' between r95_per1i and r95_per1f) OR
+      ('{$r95_per1f_banco}' between r95_per1i and r95_per1f) 
+    )"));
+    if ($clcadferiaspremio->numrows > 0) {
+      $sqlerro = true;
+      db_msgbox("Já existem férias prêmio lançadas neste período para a matrícula {$matricula}.");
+      break;
+    }
+
     $result = $clcadferia->sql_record($clcadferia->sql_query_file(null, "*", null, "r30_regist = {$matricula} and ((
       (r30_per1i between '{$r95_per1i_banco}' and '{$r95_per1f_banco}') OR 
       (r30_per1f between '{$r95_per1i_banco}' and '{$r95_per1f_banco}') OR
@@ -123,9 +136,9 @@ if(isset($incluir)) {
       ('{$r95_per1i_banco}' between r30_per2i and r30_per2f) OR
       ('{$r95_per1f_banco}' between r30_per2i and r30_per2f)
     ))"));
-    if ($clcadferiaspremio->numrows > 0 || $clcadferia->numrows > 0) {
+    if ($clcadferia->numrows > 0) {
       $sqlerro = true;
-      db_msgbox("Já existem férias lançadas neste período para a matrícula {$matricula}.");
+      db_msgbox("Já existem férias normais lançadas neste período para a matrícula {$matricula}.");
       break;
     }
     if ($sqlerro == false) {
@@ -140,13 +153,13 @@ if(isset($incluir)) {
         $clcadferiaspremio->r95_regist = $matricula;
       }
       $ndiasMatricula = $r95_ndias;
-      $anofolha = db_anofolha();
-      $mesfolha = db_mesfolha();
+      $ano = db_getsession("DB_anousu");
+      $mes = date("m", db_getsession("DB_datausu"));
       while ($ndiasMatricula > 0) {
-        $oData = new DateTime("$anofolha-$mesfolha-01");
+        $oData = new DateTime("$ano-$mes-01");
         $oData->modify("last day of this month");
-        if ($mesfolha == db_mesfolha()) {
-          $ndias = $oData->format('d')-($r95_per1i_dia-1);
+        if ($mes == db_mesfolha()) {
+          $ndias = $oData->format('d') - ($r95_per1i_dia - 1);
         } else if ($ndiasMatricula > $oData->format('d')) {
           $ndias = $oData->format('d');
         } else {
@@ -154,18 +167,18 @@ if(isset($incluir)) {
         }
         $ndiasMatricula -= $ndias;
         $clcadferiaspremio->r95_ndias = $ndias;
-        $clcadferiaspremio->r95_anousu = $anofolha;
-        $clcadferiaspremio->r95_mesusu = $mesfolha;
+        $clcadferiaspremio->r95_anousu = $ano;
+        $clcadferiaspremio->r95_mesusu = $mes;
         $clcadferiaspremio->incluir(null);
         if ($clcadferiaspremio->erro_status == "0") {
           $sqlerro = true;
-          db_msgbox("Erro ao incluir matrícula {$matricula}. ".$clcadferiaspremio->erro_msg);
+          db_msgbox("Erro ao incluir matrícula {$matricula}. " . $clcadferiaspremio->erro_msg);
           break;
         }
-        $mesfolha++;
-        if ($mesfolha > 12) {
-          $mesfolha = 1;
-          $anofolha++; 
+        $mes++;
+        if ($mes > 12) {
+          $mes = 1;
+          $ano++;
         }
       }
       if ($sqlerro == true) {
@@ -177,49 +190,52 @@ if(isset($incluir)) {
 }
 ?>
 <html>
+
 <head>
-<title>DBSeller Inform&aacute;tica Ltda - P&aacute;gina Inicial</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<meta http-equiv="Expires" CONTENT="0">
-<script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
-<script language="JavaScript" type="text/javascript" src="scripts/prototype.js"></script>
-<script language="JavaScript" type="text/javascript" src="scripts/strings.js"></script>
-<script language="JavaScrpit" type="text/javascript" src="scripts/classes/DBViewFormularioFolha/ValidarFolhaPagamento.js"></script>
-<script language="JavaScript" type="text/javascript" src="scripts/widgets/windowAux.widget.js"></script>
-<script language="JavaScript" type="text/javascript" src="scripts/widgets/dbmessageBoard.widget.js"></script>
-<script language="JavaScript" type="text/javascript" src="scripts/datagrid.widget.js"></script>
-<link href="estilos.css" rel="stylesheet" type="text/css">
-<link href="estilos/grid.style.css" rel="stylesheet" type="text/css">
+  <title>DBSeller Inform&aacute;tica Ltda - P&aacute;gina Inicial</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta http-equiv="Expires" CONTENT="0">
+  <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
+  <script language="JavaScript" type="text/javascript" src="scripts/prototype.js"></script>
+  <script language="JavaScript" type="text/javascript" src="scripts/strings.js"></script>
+  <script language="JavaScrpit" type="text/javascript" src="scripts/classes/DBViewFormularioFolha/ValidarFolhaPagamento.js"></script>
+  <script language="JavaScript" type="text/javascript" src="scripts/widgets/windowAux.widget.js"></script>
+  <script language="JavaScript" type="text/javascript" src="scripts/widgets/dbmessageBoard.widget.js"></script>
+  <script language="JavaScript" type="text/javascript" src="scripts/datagrid.widget.js"></script>
+  <link href="estilos.css" rel="stylesheet" type="text/css">
+  <link href="estilos/grid.style.css" rel="stylesheet" type="text/css">
 </head>
-<body bgcolor=#CCCCCC leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="a=1" >
-<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#5786B2">
-  <tr> 
-    <td width="360" height="18">&nbsp;</td>
-    <td width="263">&nbsp;</td>
-    <td width="25">&nbsp;</td>
-    <td width="140">&nbsp;</td>
-  </tr>
-</table>
-<table width="100%" border="0" cellspacing="0" cellpadding="0">
-  <tr> 
-    <td height="430" align="left" valign="top" bgcolor="#CCCCCC"> 
-      <center>
-        <?
-        include("forms/db_frmcadferiaspremio001.php");
-        ?>
-      </center>
-    </td>
-  </tr>
-</table>
-<?
-db_menu(db_getsession("DB_id_usuario"),db_getsession("DB_modulo"),db_getsession("DB_anousu"),db_getsession("DB_instit"));
-?>
+
+<body bgcolor=#CCCCCC leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="a=1">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#5786B2">
+    <tr>
+      <td width="360" height="18">&nbsp;</td>
+      <td width="263">&nbsp;</td>
+      <td width="25">&nbsp;</td>
+      <td width="140">&nbsp;</td>
+    </tr>
+  </table>
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td height="430" align="left" valign="top" bgcolor="#CCCCCC">
+        <center>
+          <?
+          include("forms/db_frmcadferiaspremio001.php");
+          ?>
+        </center>
+      </td>
+    </tr>
+  </table>
+  <?
+  db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsession("DB_anousu"), db_getsession("DB_instit"));
+  ?>
 </body>
+
 </html>
 <?
 if (isset($incluir) && $sqlerro == false) {
-    db_msgbox("Inclusão efetuada com sucesso.");
-    echo "<script>location.href = 'pes4_cadferiaspremio001.php';</script>";
+  db_msgbox("Inclusão efetuada com sucesso.");
+  echo "<script>location.href = 'pes4_cadferiaspremio001.php';</script>";
 } else if ($sqlerro == true) {
   echo "<script>location.href = 'pes4_cadferiaspremio001.php';</script>";
 }

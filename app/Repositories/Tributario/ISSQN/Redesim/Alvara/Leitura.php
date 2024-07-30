@@ -30,6 +30,10 @@ class Leitura extends ApiRedesim
              */
             $listaObj = parent::post($filters);
 
+            if(empty($listaObj)) {
+                return [];
+            }
+
             foreach ($listaObj as $item) {
 
                 $redesimApiresponse = new RedesimApiResponse();

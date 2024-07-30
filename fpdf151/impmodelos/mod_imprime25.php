@@ -21,8 +21,8 @@ for ($i = 0; $i < 2; $i++) {
     $this->objpdf->Setfont('Arial', '', 9);
 
     $this->objpdf->rect($xcol + 35, $xlin, 77, 45);
-    $this->objpdf->Setfont('Arial', '', 5);
-    $this->objpdf->text($xcol + 36, $xlin + 2, '1 - Carimbo Padronizado do CGC');
+    $this->objpdf->Setfont('Arial', 'b', 8);
+    $this->objpdf->text($xcol + 36, $xlin + 4,$this->selecao);
 
     $this->objpdf->rect($xcol + 2, $xlin + 50, 110, $alt);
     $this->objpdf->Setfont('Arial', '', 5);

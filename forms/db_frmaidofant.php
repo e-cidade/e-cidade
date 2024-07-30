@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  *     E-cidade Software Publico para Gestao Municipal
  *  Copyright (C) 2014  DBselller Servicos de Informatica
@@ -24,7 +24,6 @@
  *  Copia da licenca no diretorio licenca/licenca_en.txt
  *                                licenca/licenca_pt.txt
  */
-chdir("..");
 
 require_once("libs/db_stdlib.php");
 require_once("libs/db_conecta.php");
@@ -36,65 +35,67 @@ require_once("dbforms/db_funcoes.php");
 parse_str($HTTP_SERVER_VARS["QUERY_STRING"]);
 db_postmemory($HTTP_POST_VARS);
 
-$claidof = new cl_aidof;
+$claidof = new cl_aidof();
 
 $claidof->rotulo->label();
 
-$clrotulo = new rotulocampo;
+$clrotulo = new rotulocampo();
 $clrotulo->label("q09_descr");
 
 ?>
 <html>
 <head>
-<title>DBSeller Inform&aacute;tica Ltda - P&aacute;gina Inicial</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<meta http-equiv="Expires" CONTENT="0">
-<script language="JavaScript" type="text/javascript" src="../scripts/scripts.js"></script>
-<link href="../estilos.css" rel="stylesheet" type="text/css">
-<script>
-</script>
+    <title>DBSeller Inform&aacute;tica Ltda - P&aacute;gina Inicial</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <meta http-equiv="Expires" CONTENT="0">
+    <script language="JavaScript" type="text/javascript" src="../scripts/scripts.js"></script>
+    <link href="../estilos.css" rel="stylesheet" type="text/css">
+    <script>
+    </script>
 
-<style>
-<?$cor="#999999"?>
-.bordas{
-         border: 2px solid #cccccc;
-         border-top-color: <?=$cor?>;
-         border-right-color: <?=$cor?>;
-         border-bottom-color: <?=$cor?>;
-         background-color: #999999;
-}
-<?$cor="999999"?>
-.bordas_corp{
-         border: 1px solid #cccccc;
-         border-right-color: <?=$cor?>;
-         border-bottom-color: <?=$cor?>;
-}
-.bordas_corp2{
-         border: 1px solid #cccccc;
-         border-right-color: <?=$cor?>;
-         border-bottom-color: <?=$cor?>;
-         background-color: red;
-}
-</style>
+    <style>
+        <?php $cor="#999999"?>
+        .bordas {
+            border: 2px solid #cccccc;
+            border-top-color: <?=$cor?>;
+            border-right-color: <?=$cor?>;
+            border-bottom-color: <?=$cor?>;
+            background-color: #999999;
+        }
+
+        <?php $cor="999999"?>
+        .bordas_corp {
+            border: 1px solid #cccccc;
+            border-right-color: <?=$cor?>;
+            border-bottom-color: <?=$cor?>;
+        }
+
+        .bordas_corp2 {
+            border: 1px solid #cccccc;
+            border-right-color: <?=$cor?>;
+            border-bottom-color: <?=$cor?>;
+            background-color: red;
+        }
+    </style>
 </head>
 <body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
-<table  border="0" cellspacing="0" cellpadding="0" width='100%'>
-  <tr>
-    <td  align="left" valign="top" bgcolor="#CCCCCC">
-      <form name='form1'>
-      <center>
-<table border='1' cellspacing="0" cellpadding="0">
-  <?php
+<table border="0" cellspacing="0" cellpadding="0" width='100%'>
+    <tr>
+        <td align="left" valign="top" bgcolor="#CCCCCC">
+            <form name='form1'>
+                <center>
+                    <table border='1' cellspacing="0" cellpadding="0">
+                        <?php
 
-    if ( !empty($inscr) ) {
-      $result = $claidof->sql_record($claidof->sql_query(null,"*","y08_codigo","y08_inscr=$inscr"));
-    }
+                        if (!empty($inscr)) {
+                            $result = $claidof->sql_record($claidof->sql_query(null, "*", "y08_codigo", "y08_inscr=$inscr"));
+                        }
 
-    $numrows= $claidof->numrows;
+                        $numrows = $claidof->numrows;
 
-   if($numrows>0){
-     echo"<b>AIDOF's Liberados(por inscrição)</b>";
-     echo "<tr class='bordas'>
+                        if ($numrows > 0) {
+                            echo "<b>AIDOF's Liberados(por inscrição)</b>";
+                            echo "<tr class='bordas'>
 	      <td class='bordas' align='center'><b><small>$RLy08_codigo  </small></b></td>
 		  <td class='bordas' align='center'><b><small>$RLy08_nota  </small></b></td>
 		  <td class='bordas' align='center'><b><small>Descr. nota  </small></b></td>
@@ -106,19 +107,19 @@ $clrotulo->label("q09_descr");
 	      <td class='bordas' align='center'><b><small>$RLy08_obs </small></b></td>
 	      <td class='bordas' align='center'><b><small>$RLy08_numcgm  </small></b></td>
 	       <td class='bordas' align='center'><b><small>$RLy08_cancel  </small></b></td>";
-     echo "</tr>";
-   }else if ($numrows == 0){
-     echo "<br><br><br><b>Nenhum registro encontrado...</b>";
-   }
-   for($i=0; $i<$numrows; $i++){
-     db_fieldsmemory($result,$i,true);
-     $bordas_corp="bordas_corp";
-     $cancel="Não";
-     if ($y08_cancel=="t"){
-     	$cancel="Sim";
-     	$bordas_corp="bordas_corp2";
-     }
-     echo "<tr>
+                            echo "</tr>";
+                        } else if ($numrows == 0) {
+                            echo "<br><br><br><b>Nenhum registro encontrado...</b>";
+                        }
+                        for ($i = 0; $i < $numrows; $i++) {
+                            db_fieldsmemory($result, $i, true);
+                            $bordas_corp = "bordas_corp";
+                            $cancel = "Não";
+                            if ($y08_cancel == "t") {
+                                $cancel = "Sim";
+                                $bordas_corp = "bordas_corp2";
+                            }
+                            echo "<tr>
 
              <td class='$bordas_corp' align='center'><small>$y08_codigo  </small></td>
 <td class='$bordas_corp' align='center'><small>$y08_nota </small></td>
@@ -133,13 +134,13 @@ $clrotulo->label("q09_descr");
 		 <td class='$bordas_corp' align='center'><small>$cancel  </small></td>
 	   </tr>
 	     ";
-   }
-?>
- </table>
-     </form>
-     </center>
-    </td>
-  </tr>
+                        }
+                        ?>
+                    </table>
+            </form>
+            </center>
+        </td>
+    </tr>
 </table>
 </body>
 </html>

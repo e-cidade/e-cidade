@@ -69,6 +69,7 @@ $oGet = db_utils::postMemory($_GET);
   oDBViewSlipPagamento.show();
   oDBViewSlipPagamento.setPCASPAtivo('<?php echo db_getsession('DB_use_pcasp');?>');
   oDBViewSlipPagamento.start();
+
 </script>
 <style>
   td {

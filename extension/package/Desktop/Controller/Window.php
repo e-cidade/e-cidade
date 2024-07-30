@@ -106,7 +106,9 @@ class Window extends Controller {
       return $this->render();
     }
 
+    // Remoção temporária de validação para possibilitar redirecionamento em uma aba diferente.
     // valida se usuario tem permissao para acessar rotina pelo anousu
+
 
     $idMenu = $menuModel->getMenuArquivo($this->request, $get->get('action'));
 

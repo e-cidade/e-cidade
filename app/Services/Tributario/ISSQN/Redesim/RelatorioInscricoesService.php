@@ -18,8 +18,9 @@ class RelatorioInscricoesService extends RelatorioInscricoes
     {
         $this->validate();
 
-        $aInscricoesRedesim = InscricaoRedesim::with('issBase.cgm')
-            ->betweenDataCadastroInscricao($this->dataInicio, $this->dataFim)
+        $aInscricoesRedesim = InscricaoRedesim::query()
+            ->join('issbase', 'q02_inscr', 'q179_inscricao')
+            ->join('cgm', 'z01_numcgm', 'q02_numcgm')
             ->join("ativprinc", "q88_inscr", "q179_inscricao")
             ->join("tabativ", function ($join) {
                 $join->on("tabativ.q07_inscr", "ativprinc.q88_inscr");
@@ -31,6 +32,9 @@ class RelatorioInscricoesService extends RelatorioInscricoes
             ->leftJoin("ruastipo", "j88_codigo", "j14_tipo")
             ->join("issbairro", "q13_inscr", "q179_inscricao")
             ->join("bairro", "j13_codi", "q13_bairro")
+            ->join('redesim_log', 'z01_cgccpf', 'q190_cpfcnpj')
+            ->whereRaw("TO_CHAR(q190_data, 'YYYY-MM-DD') BETWEEN ? AND ?", [$this->dataInicio, $this->dataFim])
+            ->limit(25)
             ->get();
 
         $this->setInscricoes($aInscricoesRedesim);

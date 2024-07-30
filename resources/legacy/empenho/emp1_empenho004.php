@@ -70,6 +70,7 @@ if(isset($incluir)){
   $clempautoriza->e54_telef  = '';
   $clempautoriza->e54_numsol = '';
   $clempautoriza->e54_anulad = null;
+  $clempautoriza->e54_datainclusao = date('Y-m-d H:i:s.v', db_getsession("DB_datausu"));
   $clempautoriza->incluir(null);
   if($clempautoriza->erro_status==0){
     $sqlerro=true;

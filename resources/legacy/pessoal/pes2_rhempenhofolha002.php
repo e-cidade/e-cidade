@@ -74,6 +74,7 @@ $sSqlEmpenhos  .= "       rh72_siglaarq,                                        
 $sSqlEmpenhos  .= "       rh72_concarpeculiar,                                                                      ";
 $sSqlEmpenhos  .= "       e60_codemp,                                                                               ";
 $sSqlEmpenhos  .= "       e60_anousu,                                                                               ";
+$sSqlEmpenhos  .= "       rh76_lota,                                                                               ";
 $sSqlEmpenhos  .= "       pc01_descrmater,                                                                          ";
 $sSqlEmpenhos  .= "       round(sum(case when rh73_pd = 2 then rh73_valor *-1 else rh73_valor end), 2) as rh73_valor";
 $sSqlEmpenhos  .= "  from rhempenhofolha                                                                            ";
@@ -97,6 +98,7 @@ $sSqlEmpenhos  .= "     and rh73_tiporubrica = 1                                
 $sSqlEmpenhos  .= "     and rh72_anousu      = {$oParam->iAnoFolha}                                                 ";
 $sSqlEmpenhos  .= "     and rh72_mesusu      = {$oParam->iMesFolha}                                                 ";
 $sSqlEmpenhos  .= "     and rh72_siglaarq    = '{$oParam->sSigla}'                                                  ";
+$sSqlEmpenhos  .= "     and case when rh76_lota is not null then rh76_lota = rh02_lota else true end                ";
 $sSqlEmpenhos  .= "     and rh73_instit      = ".db_getsession('DB_instit');
 
 if (!empty($sMatriculas)) {
@@ -131,6 +133,7 @@ $sSqlEmpenhos  .= "            rh72_siglaarq,                                   
 $sSqlEmpenhos  .= "            rh72_concarpeculiar,                                           ";
 $sSqlEmpenhos  .= "            e60_codemp,                                                    ";
 $sSqlEmpenhos  .= "            e60_anousu,                                                    ";
+$sSqlEmpenhos  .= "            rh76_lota,                                                     ";
 $sSqlEmpenhos  .= "            pc01_descrmater                                                ";
 $sSqlEmpenhos  .= " order by   rh72_recurso,rh72_orgao,rh72_unidade,rh72_projativ,o56_elemento";
 
@@ -140,11 +143,11 @@ $aLinhasRelatorio = array();
 
 $rsCfPess        = $oDaoCfpess->sql_record($oDaoCfpess->sql_query_file(db_anofolha(), db_mesfolha(), db_getsession("DB_instit"), "r11_geraretencaoempenho"));
 $lMostraRetencao = db_utils::fieldsMemory($rsCfPess,0)->r11_geraretencaoempenho;
-
+$lLotacao = false;
   foreach($aEmpenhos as $oEmpenho) {
 
       $sSqlDadosRetencao   = "SELECT rh73_rubric,                                                                                         ";
-      $sSqlDadosRetencao  .= "       rh27_descr,                                                                                          ";
+      $sSqlDadosRetencao  .= "       rh27_descr,rh78_retencaotiporec,                                                                                          ";
       $sSqlDadosRetencao  .= "       round(sum(rh73_valor), 2) as valorretencao                                                           ";
       $sSqlDadosRetencao  .= "  from rhempenhofolha                                                                                       ";
       $sSqlDadosRetencao  .= "       inner join rhempenhofolharhemprubrica     on rh81_rhempenhofolha        = rh72_sequencial            ";
@@ -154,13 +157,18 @@ $lMostraRetencao = db_utils::fieldsMemory($rsCfPess,0)->r11_geraretencaoempenho;
       $sSqlDadosRetencao  .= "       inner join  rhempenhofolharubricaretencao on rh78_rhempenhofolharubrica = rh73_sequencial            ";
       $sSqlDadosRetencao  .= "       inner join rhrubricas                     on rh27_rubric                = rh73_rubric                ";
       $sSqlDadosRetencao  .= "                                                and rh73_instit                = rh27_instit                ";
-      $sSqlDadosRetencao  .= "   where rh72_sequencial  = {$oEmpenho->rh72_sequencial}                                                    ";
+      if ($oEmpenho->rh76_lota != null) {
+        $sSqlDadosRetencao  .= "   where rh81_lancamento  = {$oEmpenho->rh72_sequencial} and rh81_lota = {$oEmpenho->rh76_lota}                        ";
+        $lLotacao = true;
+      } else {
+        $sSqlDadosRetencao  .= "   where rh72_sequencial  = {$oEmpenho->rh72_sequencial}                                                    ";
+      }
       $sSqlDadosRetencao  .= "     and rh72_tipoempenho = {$oParam->iTipo}                                                                ";
       $sSqlDadosRetencao  .= "     and rh73_tiporubrica = 2                                                                               ";
-      $sSqlDadosRetencao  .= "     and rh73_pd          = 2                                                                               ";
+      $sSqlDadosRetencao  .= "     and rh73_pd          = 2 and rh72_siglaarq    = '{$oParam->sSigla}'                                                                               ";
       $sSqlDadosRetencao  .= "     and rh73_instit      = ".db_getsession('DB_instit');
       $sSqlDadosRetencao  .= "   group by rh73_rubric,                                                                                    ";
-      $sSqlDadosRetencao  .= "            rh27_descr                                                                                      ";
+      $sSqlDadosRetencao  .= "            rh27_descr,rh78_retencaotiporec                                                                                      ";
       $sSqlDadosRetencao  .= "   order by rh73_rubric                                                                                     ";
 
       $rsDadosEmpenho     = db_query($sSqlDadosRetencao);
@@ -219,5 +227,6 @@ $iAlt   = 4;
 $oDocumentoPDF = new db_impcarne($pdf, $iTipoRelatorio);
 $oDocumentoPDF->lRetencao        = $oParam->lRetencao;
 $oDocumentoPDF->aLinhasRelatorio = $aLinhasRelatorio;
+$oDocumentoPDF->lLotacao = $lLotacao;
 $oDocumentoPDF->imprime();
 $oDocumentoPDF->objpdf->output();

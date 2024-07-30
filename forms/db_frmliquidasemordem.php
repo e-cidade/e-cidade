@@ -109,8 +109,8 @@ if (USE_PCASP) {
                 <td nowrap ><? db_input('e60_coddot', 13, $Ie60_coddot, true, 'text', 3); ?></td>
                 <!-- <td width="20"><?=db_ancora($Lo15_codigo,"",3)?></td> -->
                 <!-- <td></td> -->
-                <td nowrap><? 
-                            db_input('o15_codigo', 5, $Io15_codigo, true, 'hidden', 3); 
+                <td nowrap><?
+                            db_input('o15_codigo', 5, $Io15_codigo, true, 'hidden', 3);
                             db_input('o15_descr', 5, $Io15_descr, true, 'hidden', 3);
                             db_input('estruturalDotacao', 55, 3, true, 'text', 3);?></td>
               </tr>
@@ -131,24 +131,24 @@ if (USE_PCASP) {
                         <?php db_input('z01_numcgm', 13, "", true, 'text', 1, " onchange='js_pesquisaz01_numcgm(false);'", "", "", ""); ?>
                     </div>
                     <div class="credor" hidden='true'>
-                        <? db_input('e49_numcgm', 13, $Ie60_numcgm, true, 'text', 1,"onchange='js_pesquisae49_numcgm(false)'"); ?> 
+                        <? db_input('e49_numcgm', 13, $Ie60_numcgm, true, 'text', 1,"onchange='js_pesquisae49_numcgm(false)'"); ?>
                     </div>
                 </td>
                 <!-- <td></td> -->
                 <td colspan=2>
-                    <div class="cgm_emitente"><? db_input('descricao_emitente', 55, "", true, 'text', 3, 'style="background-color: rgb(222, 184, 135);"');?> </div>    
+                    <div class="cgm_emitente"><? db_input('descricao_emitente', 55, "", true, 'text', 3, 'style="background-color: rgb(222, 184, 135);"');?> </div>
                     <div class="credor" hidden='true'><? db_input('z01_credor', 55, $Iz01_nome, true, 'text', 3, '');?> </div>
                 </td>
               </tr>
               <tr>
                 <td><?db_ancora("<b>Conta Pagadora:</b>","js_pesquisa_contapagadora(true);",1);?></td>
                 <td>
-                    <? 
-                    db_input("e83_conta",13,1,true,"text",4,"onchange='js_pesquisa_contapagadora(false);'"); 
+                    <?
+                    db_input("e83_conta",13,1,true,"text",4,"onchange='js_pesquisa_contapagadora(false);'");
                     ?>
                 </td>
                 <td>
-                    <?    
+                    <?
                     db_input("e83_codtipo",5,1,true,"hidden");
                     ?>
                 <? db_input("e83_descr",55,"",true,"text",3); ?></td>
@@ -167,7 +167,7 @@ if (USE_PCASP) {
               <tr>
               <td nowrap ><b>Nota Fiscal Eletronica: </b></td>
                 <td colspan='2'>
-                
+
                   <?
                   /**
                    * Acrescentado por causa do sicom
@@ -175,7 +175,7 @@ if (USE_PCASP) {
                   $aNfEletronica = array(1 => 'Sim, padrão Estadual ou SINIEF 07/05',2 => 'Sim, chave de acesso municipal ou outra',3 => 'Não',4 => 'Sim, padrão Estadual ou SINIEF 07/05 - Avulsa');
                   db_select('e69_notafiscaleletronica', $aNfEletronica, true, 1, "onchange='js_tipoChave(this.value);'");
                   ?>
-                </td>  
+                </td>
               <tr id='controlepit' style='display: <?=$iControlaPit==1?"":"none"?>'>
                 <td><b>Tipo da Entrada: </b></td>
                 <td colspan="4">
@@ -198,7 +198,7 @@ if (USE_PCASP) {
               <input type="hidden" value="true" name="permitido_Liquidacao" id="permitido_Liquidacao"/>
               <tr>
                 <td nowrap><b>Número da Nota:</b></td>
-                <td colspan='2'><?db_input('e69_numnota', 19, '', true, 'text', 1,"","","","",20); ?>            
+                <td colspan='2'><?db_input('e69_numnota', 19, '', true, 'text', 1,"","","","",20); ?>
                 <!-- OC 12746 -->
                 <b>Número de série: </b>
                 <?
@@ -214,11 +214,11 @@ if (USE_PCASP) {
                   /**
                    * Acrescentado por causa do sicom
                    */
-                  
+
                   ?>
                 </td>
                 </tr>     -->
-              <tr>      
+              <tr>
                 <td nowrap><b>Chave Acesso: </b></td>
                 <td colspan='2'>
                   <?
@@ -239,7 +239,7 @@ if (USE_PCASP) {
                       <?db_inputdata('dataVencimento','','','',true,'text',1)?>
                 </td>
               </tr>
-              <tr>    
+              <tr>
                 <td>
                   <strong>Processo Administrativo:</strong>
                 </td>
@@ -254,7 +254,7 @@ if (USE_PCASP) {
                   <?db_inputData('e50_compdesp', '', '', '', true, 'text', 1); ?>
                   <input type="hidden" name="sEstrutElemento" id="sEstrutElemento"/>
                 </td>
-            </tr>  
+            </tr>
 
               <!--[Extensao OrdenadorDespesa] inclusao_ordenador-->
 
@@ -274,7 +274,7 @@ if (USE_PCASP) {
           </fieldset>
         </td>
       </tr>
-      <td colspan="2"> 
+      <td colspan="2">
  <fieldset id='esocial'><legend><b>eSocial</b></legend>
  <table ><tr>
                 <td>
@@ -282,10 +282,10 @@ if (USE_PCASP) {
                 <td colspan="4">
                 <?
                   $aIncide = array('1'=>'Sim', '2'=>'Não');
-                  db_select('aIncide', $aIncide, true, 1, "onchange='mensagemesocial()'"); 
+                  db_select('aIncide', $aIncide, true, 1, "onchange='mensagemesocial()'");
                 ?>
                 </td>
-        </tr>  
+        </tr>
         <tr>
                   <td id='cattrab'><?=db_ancora('<b>Categoria do Trabalhador:</b>',"js_pesquisaCatTrabalhador(true)",1)?></td>
                   <td id='cattrab1'><? db_input('ct01_codcategoria', 15, $Ict01_codcategoria, true, 'text', 1,"onchange='js_pesquisaCatTrabalhador(false)'"); ?> </td>
@@ -297,10 +297,10 @@ if (USE_PCASP) {
                 <td colspan="4">
                 <?
                   $multiplosvinculos = array(''=>'Selecione','1'=>'Sim', '2'=>'Não');
-                  db_select('multiplosvinculos', $multiplosvinculos, true, 1, "onchange='validarVinculos()'"); 
+                  db_select('multiplosvinculos', $multiplosvinculos, true, 1, "onchange='validarVinculos()'");
                 ?>
                 </td>
-        </tr>  
+        </tr>
         <tr>
                 <td id='idcontri'>
                 <strong>Indicador de Desconto da Contribuição Previdenciária:</strong>
@@ -310,7 +310,7 @@ if (USE_PCASP) {
                   '2'=>'2 - O declarante aplica a alíquota de desconto do segurado sobre a diferença entre o limite máximo do salário de contribuição e a remuneração de outra empresa para as quais o trabalhador informou que houve o desconto',
                   '3'=>'3 - O declarante não realiza desconto do segurado, uma vez que houve desconto sobre o limite máximo de salário de contribuição em outra empresa',
                   );
-                  db_select('contribuicaoPrev', $aContribuicao, true, 1, ""); 
+                  db_select('contribuicaoPrev', $aContribuicao, true, 1, "");
                 ?>
                 </td>
         </tr>
@@ -324,7 +324,7 @@ if (USE_PCASP) {
                   <td id='catremuneracao1'><? db_input('ct01_codcategoriaremuneracao', 15, $Ict01_codcategoriaremuneracao, true, 'text', 1,"onchange='js_pesquisaCatTrabalhadorremuneracao(false)'"); ?> </td>
                   <td id='catremuneracao2'><? db_input('ct01_descricaocategoriaremuneracao', 48, $Ict01_descricaocategoriaremuneracao, true, 'text', 3, '');?></td>
         </tr>
-        
+
 
         <tr>
                   <td id='vlrremuneracao'><strong>Valor da Remuneração:</strong></td>
@@ -348,14 +348,14 @@ if (USE_PCASP) {
                   </td>
                   <td id='idcompetencia2'>
                     <?
-                      db_inputdata('competencia',@$ac10_datamovimento_dia, 
-                                                        @$ac10_datamovimento_mes, 
+                      db_inputdata('competencia',@$ac10_datamovimento_dia,
+                                                        @$ac10_datamovimento_mes,
                                                         @$ac10_datamovimento_ano, true, 'text', $db_opcao, 'style="width: 99px"');
                     ?>
                   </td>
                   <td>&nbsp;</td>
-        </tr>                
-  </table>      
+        </tr>
+  </table>
  </fieldset>
   <tr>
     <td colspan='2'>
@@ -364,12 +364,12 @@ if (USE_PCASP) {
   </tr>
   <tr>
     <td colspan='2'>
-      <?include("forms/db_frmliquidaboxdiarias.php");?> 
+      <?include("forms/db_frmliquidaboxdiarias.php");?>
     </td>
   </tr>
     <tr>
       <td colspan="2">
-        <fieldset><legend><b>&nbsp;Itens&nbsp;</b></legend>  
+        <fieldset><legend><b>&nbsp;Itens&nbsp;</b></legend>
             <div style='border:2px inset white'>
               <table  cellspacing=0 cellpadding=0 width='100%' >
                 <tr>
@@ -412,7 +412,7 @@ if (USE_PCASP) {
       </tr>
       <tr>
         <td colspan='2' >
-          <fieldset ><legend><b>&nbsp;Histórico&nbsp;</b></legend>  
+          <fieldset ><legend><b>&nbsp;Histórico&nbsp;</b></legend>
             <table>
             <tr>
                 <td id='opcredito' style="display: none">
@@ -518,7 +518,7 @@ if (USE_PCASP) {
             </tr>
             <tr>
               <td  nowrap>
-                <b>Valor ICMS Substituto:</b> 
+                <b>Valor ICMS Substituto:</b>
               </td>
               <td  nowrap>
                 <?
@@ -539,10 +539,10 @@ if (USE_PCASP) {
 </center>
 <script>
   var oDBToogleDiarias = new DBToogle('diariaFieldset', false);
-  document.getElementById("e69_notafiscaleletronica").style.width="99.5%"; 
+  document.getElementById("e69_notafiscaleletronica").style.width="99.5%";
   document.getElementById("e69_dtnota").style.width="80px";
   document.getElementById("e69_nfserie").style.width="85px";
-  
+
   iTipoControle = <?=$iTipoControleCustos;?>;
   iControlaPit  = <?=$iControlaPit?>;
   function dataFormatada(date){
@@ -557,7 +557,7 @@ if (USE_PCASP) {
     jan = window.open('emp2_emitenotaliq002.php?codordem='+codordem,'','width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0');
     jan.moveTo(0,0);
   }
-  function js_pesquisa(){    
+  function js_pesquisa(){
     document.form1.reset();
     js_OpenJanelaIframe('top.corpo','db_iframe_empempenho','func_empempenho.php?funcao_js=parent.js_preenchepesquisa|e60_numemp|si172_nrocontrato|si172_datafinalvigencia|si174_novadatatermino','Pesquisa',true);
   }
@@ -591,10 +591,10 @@ if (USE_PCASP) {
           document.form1.valorremuneracao.value = document.form1.valorremuneracao.value.substring(0, valorremuneracao)+virgula.substring(0,3);
          }if(escolha == '2' && valordesconto > 0){
           var virgula = document.form1.valordesconto.value.substring(valordesconto + 0);
-          document.form1.valordesconto.value = document.form1.valordesconto.value.substring(0, valordesconto)+virgula.substring(0,3);              
-         }                     
+          document.form1.valordesconto.value = document.form1.valordesconto.value.substring(0, valordesconto)+virgula.substring(0,3);
+         }
 }
-function validarVinculos(){ 
+function validarVinculos(){
   if(document.form1.multiplosvinculos.value == '1'){
       document.getElementById('idcontri').style.display = "table-cell";
       document.getElementById('contribuicaoPrev').style.display = "table-cell";
@@ -710,7 +710,7 @@ function validarVinculos(){
       document.getElementById('vlrdesconto1').style.display = "none";
       document.getElementById('idcontri').style.display = "none";
       document.getElementById('contribuicaoPrev').style.display = "none";
-   
+
   function js_marca(){
 
     obj = document.getElementById('mtodos');
@@ -813,12 +813,12 @@ function validarVinculos(){
     }
 
     /**
-     * Exibe aviso dos grupos 7,8,9 e 10 de desdobramentos de consumo imediato 
+     * Exibe aviso dos grupos 7,8,9 e 10 de desdobramentos de consumo imediato
      */
     if (obj.e60_numemp != iEmpenho && (lUsaPCASP == true || lUsaPCASP == 'true')) {
 
       /**
-       * Para nao exibir mais de uma vez 
+       * Para nao exibir mais de uma vez
        */
       if (obj.oGrupoElemento.iGrupo != "") {
 
@@ -857,20 +857,20 @@ function validarVinculos(){
     $('e60_vlranu').value  = obj.e60_vlranu;
     $('e60_vlrpag').value  = obj.e60_vlrpag;
     $('e60_vlrliq').value  = obj.e60_vlrliq;
- 
+
     if(obj.e60_informacaoop != null || obj.e60_informacaoop !=""){
       $('informacaoop').value   = obj.e60_informacaoop.urlDecode();
       if (!obj.e60_resumo){
         $('historico').value   = obj.e60_informacaoop.urlDecode();
       }else{
         $('historico').value   = obj.e60_resumo.urlDecode();
-      }       
+      }
     }
     else{
       $('informacaoop').value   = obj.e60_resumo.urlDecode();
       $('historico').value   = obj.e60_resumo.urlDecode();
     }
-  
+
     $('saldodis').value    = obj.saldo_dis;
     $('e69_numnota').value = '';
     $('sEstrutElemento').value = obj.sEstrutural;
@@ -895,7 +895,7 @@ function validarVinculos(){
       lBloquearItens = true;
     }
 
-    if(obj.e60_informacaoop){ 
+    if(obj.e60_informacaoop){
       document.getElementById('opcredito').style.display = "table-cell";
       document.getElementById('ophisotrico').style.display = "none";
     } else {
@@ -904,18 +904,18 @@ function validarVinculos(){
     }
 
     var db_opcao = "<?php print $op; ?>";
-   
-    if(db_opcao != '3' && obj.Tipofornec == 'cpf'  &&  !(desdobramento.substr(0, 3) == '331' || desdobramento.substr(0, 3) == '345' 
-                                                      || desdobramento.substr(0, 3) == '346' || desdobramento.substr(0, 7) == '3339018' 
-                                                      || desdobramento.substr(0, 7) == '3339019' || desdobramento.substr(0, 7) == '3339014' 
-                                                      || desdobramento.substr(0, 7) == '3339008' || desdobramento.substr(0, 7) == '3339059' 
+
+    if(db_opcao != '3' && obj.Tipofornec == 'cpf'  &&  !(desdobramento.substr(0, 3) == '331' || desdobramento.substr(0, 3) == '345'
+                                                      || desdobramento.substr(0, 3) == '346' || desdobramento.substr(0, 7) == '3339018'
+                                                      || desdobramento.substr(0, 7) == '3339019' || desdobramento.substr(0, 7) == '3339014'
+                                                      || desdobramento.substr(0, 7) == '3339008' || desdobramento.substr(0, 7) == '3339059'
                                                       || desdobramento.substr(0, 7) == '3339046' || desdobramento.substr(0, 7) == '3339048'
-                                                      || desdobramento.substr(0, 7) == '3339049' || desdobramento == '333903602' 
-                                                      || desdobramento == '333903603' || desdobramento == '333903607' || desdobramento == '333903608' 
-                                                      || desdobramento == '333903609' || desdobramento == '333903614' || desdobramento == '333903640' 
+                                                      || desdobramento.substr(0, 7) == '3339049' || desdobramento == '333903602'
+                                                      || desdobramento == '333903603' || desdobramento == '333903607' || desdobramento == '333903608'
+                                                      || desdobramento == '333903609' || desdobramento == '333903614' || desdobramento == '333903640'
                                                       || desdobramento == '333903641')){
-     tipodesdobramento = 1;  
-     opcao = 1;                                 
+     tipodesdobramento = 1;
+     opcao = 1;
      document.getElementById('esocial').style.display = "table-cell";
    }else{
      document.getElementById('esocial').style.display = "none";
@@ -924,11 +924,11 @@ function validarVinculos(){
    }
      if(db_opcao != '3' && (obj.Tipofornec == 'cnpj' && !(desdobramento.substr(0, 3) == '331' || desdobramento.substr(0, 3) == '345' || desdobramento.substr(0, 3) == '346'
                                   || desdobramento.substr(0, 3) == '332' || desdobramento.substr(0, 7) == '3335041' || desdobramento.substr(0, 7) == '3333041'
-                                  || desdobramento.substr(0, 7) == '3337041' || desdobramento.substr(0, 7) == '3339008' || desdobramento.substr(0, 7) == '3339041' 
-                                  || desdobramento.substr(0, 7) == '3339043' || desdobramento.substr(0, 7) == '3339045' || desdobramento.substr(0, 7) == '3339046' 
-                                  || desdobramento.substr(0, 7) == '3339047' || desdobramento.substr(0, 7) == '3339048' || desdobramento.substr(0, 7) == '3339049' 
-                                  || desdobramento.substr(0, 7) == '3339059' || desdobramento.substr(0, 7) == '3339086' || desdobramento.substr(0, 5) == '33371' 
-                                  || desdobramento.substr(0, 5) == '34471' || desdobramento.substr(0, 7) == '3335043')) 
+                                  || desdobramento.substr(0, 7) == '3337041' || desdobramento.substr(0, 7) == '3339008' || desdobramento.substr(0, 7) == '3339041'
+                                  || desdobramento.substr(0, 7) == '3339043' || desdobramento.substr(0, 7) == '3339045' || desdobramento.substr(0, 7) == '3339046'
+                                  || desdobramento.substr(0, 7) == '3339047' || desdobramento.substr(0, 7) == '3339048' || desdobramento.substr(0, 7) == '3339049'
+                                  || desdobramento.substr(0, 7) == '3339059' || desdobramento.substr(0, 7) == '3339086' || desdobramento.substr(0, 5) == '33371'
+                                  || desdobramento.substr(0, 5) == '34471' || desdobramento.substr(0, 7) == '3335043'))
                                   || (obj.Tipofornec == 'cpf' && desdobramento == '333903614')){
       $('reinf').style.display = "table-cell";
       js_validarEstabelecimentos(true);
@@ -936,7 +936,7 @@ function validarVinculos(){
         $('naturezaCod').value = '13002';
         $('naturezaDesc').value = 'Rendimentos de Aluguéis, Locação ou Sublocação';
         $('reinfRetencao').value = 'sim';
-      } 
+      }
       opcaoReinf = 1;
     }else{
       $('reinf').style.display = "none";
@@ -1172,7 +1172,7 @@ function validarVinculos(){
       return false;
     }
 
-  if(document.form1.aIncide.value == 1){ 
+  if(document.form1.aIncide.value == 1){
    if(opcao != '3' && !document.form1.ct01_codcategoria.value &&  obj.Tipofornec =='cpf' && tipodesdobramento == '1' ){
       alert("Campo Categoria do Trabalhador Obrigatorio")
       return false;
@@ -1233,7 +1233,7 @@ function validarVinculos(){
   }
 
   const aNaturezasCnpj = ['10','19'];
-  if(obj.Tipofornec =='cnpj' && (aNaturezasCnpj.includes(($('naturezaCod').value).substr(0,2))) &&  opcaoReinf != '3'){  
+  if(obj.Tipofornec =='cnpj' && (aNaturezasCnpj.includes(($('naturezaCod').value).substr(0,2))) &&  opcaoReinf != '3'){
     alert("A natureza do rendimento é incompatível com o tipo de credor CNPJ")
     return false;
   }
@@ -1331,9 +1331,9 @@ function validarVinculos(){
         /*
          * controlamos se deve ser solicitado o centro de custo para o item.
          * iTipoControle = 2 Uso Obrigatorio.
-         *                 1 uso nao obrigatorio 
-         *                  0 Nao usa  
-         */  
+         *                 1 uso nao obrigatorio
+         *                  0 Nao usa
+         */
         if (iTipoControle  == 2  ) {
 
           if ($('cc08_sequencial'+itens[i].value).innerHTML.trim() == "") {
@@ -1350,7 +1350,7 @@ function validarVinculos(){
         }
 
         /*
- 
+
         JSON escrito manualmente. Alterado para objeto Javascript e então passado para o RPC com o Object.toJSON()
 
         notas += sV+'{"sequen":"'+itens[i].value+'","quantidade":"'+$F('qtdesol'+itens[i].value)+'","vlrtot":"';
@@ -1451,7 +1451,7 @@ function validarVinculos(){
           return false;
         }
       }
-    
+
     if ($F('permitido_Liquidacao') == 'false') {
         alert("Não é permitido liquidar com data anterior ao último lançamento de liquidação.");
         $('confirmar').disabled = true;
@@ -1487,26 +1487,26 @@ function validarVinculos(){
       oParam.iEmpenho   = $F('e60_numemp');
       oParam.iCgmEmitente = $F('z01_numcgm');
       oParam.notas      = aNotas;
-     
+
       if(encodeURIComponent(tagString($F("informacaoop"))) != '' || encodeURIComponent(tagString($F("informacaoop"))) != null){
         if(encodeURIComponent(tagString($F("informacaoop"))) != ''){
-          oParam.historico  = encodeURIComponent(tagString($F("informacaoop")));;//encodeURIComponent($F('historico')); 
+          oParam.historico  = encodeURIComponent(tagString($F("informacaoop")));;//encodeURIComponent($F('historico'));
           oParam.informacaoop  = encodeURIComponent(tagString($F("informacaoop")));;//encodeURIComponent($F('informacaoop'));
         }else{
-          oParam.historico  = encodeURIComponent(tagString($F("historico")));;//encodeURIComponent($F('historico')); 
+          oParam.historico  = encodeURIComponent(tagString($F("historico")));;//encodeURIComponent($F('historico'));
           oParam.informacaoop  = encodeURIComponent(tagString($F("historico")));;//encodeURIComponent($F('informacaoop'));
       }}else{
-        oParam.historico  = encodeURIComponent(tagString($F("historico")));;//encodeURIComponent($F('historico')); 
+        oParam.historico  = encodeURIComponent(tagString($F("historico")));;//encodeURIComponent($F('historico'));
         oParam.informacaoop  = encodeURIComponent(tagString($F("historico")));;//encodeURIComponent($F('informacaoop'));
       }
-           
+
       oParam.pars       = $F('e60_numemp');
       oParam.z01_credor = $F('e49_numcgm');
       oParam.cgm = $F('e60_numcgm');
       oParam.e03_numeroprocesso = encodeURIComponent($F('e03_numeroprocesso'));
       oParam.verificaChave = 1;
       oParam.e50_compdesp = $F('e50_compdesp');
-      oParam.e83_codtipo  = $F('e83_codtipo'); 
+      oParam.e83_codtipo  = $F('e83_codtipo');
       oParam.cattrabalhador = encodeURIComponent($F('ct01_codcategoria'));
       oParam.numempresa = encodeURIComponent($F('numempresa'));
       oParam.contribuicaoPrev = $F('contribuicaoPrev');
@@ -1518,7 +1518,7 @@ function validarVinculos(){
       oParam.e50_naturezabemservico = $F('naturezaCod');
       oParam.dDataLiquidacao = $F('dataLiquidacao');
       oParam.dDataVencimento = $F('dataVencimento');
- 
+
       var oInfoNota                      = new Object();
       oInfoNota.iCfop                = iCfop;
       oInfoNota.iTipoDocumentoFiscal = iTipoDocumentoFiscal;
@@ -1616,10 +1616,10 @@ function validarVinculos(){
     }
     if (obj.erro ==1){
 
-      if (confirm("A Ordem de Pagamento "+obj.e50_codord+" foi gerada.\nDeseja Visualiza-la?")){
-        js_emitir(obj.e50_codord);
-        iCodigoOrdemPagamento = obj.e50_codord;
-      }
+      //if (confirm("A Ordem de Pagamento "+obj.e50_codord+" foi gerada.\nDeseja Visualiza-la?")){
+    js_emitir(obj.e50_codord);
+    iCodigoOrdemPagamento = obj.e50_codord;
+      //}
 
       js_consultaEmpenho($F('e60_numemp'),<?=$operacao?>);
       $('retencoes').disabled = false;
@@ -1628,17 +1628,17 @@ function validarVinculos(){
       $('e69_codnota').value  = obj.iCodNota;
 
       document.form1.ct01_codcategoria.value = '';
-      document.form1.ct01_descricaocategoria.value = ''; 
+      document.form1.ct01_descricaocategoria.value = '';
       document.form1.contribuicaoPrev.value = '';
       document.form1.ct01_codcategoriaremuneracao.value = '';
-      document.form1.ct01_descricaocategoriaremuneracao.value = '';   
+      document.form1.ct01_descricaocategoriaremuneracao.value = '';
       document.form1.numempresa.value = '';
       document.form1.nomeempresa.value = '';
       document.form1.valorremuneracao.value = '';
       document.form1.valordesconto.value = '';
       document.form1.competencia.value = '';
     }
-  
+
   }
 
   function js_calculaValor(id,tipo,fraciona,servico){
@@ -1828,7 +1828,7 @@ function js_mostraCatTrabalhadorremuneracao1(chave1,chave2){
   db_iframe_cgm.hide();
 }
   function js_pesquisae49_numcgm(mostra){
-    
+
     if(mostra==true){
       js_OpenJanelaIframe('CurrentWindow.corpo','db_iframe_cgm','func_nome.php?funcao_js=parent.js_mostracgm1|z01_numcgm|z01_nome',
         'Consulta CGM',true);
@@ -2110,15 +2110,15 @@ function js_mostraCatTrabalhadorremuneracao1(chave1,chave2){
   }
 
     function js_pesquisa_contapagadora(mostra) {
-	
+
         if (mostra==true) {
             js_OpenJanelaIframe('top.corpo','db_iframe_empagetipo','func_empagetipo.php?e60_numemp='+$('e60_numemp').value+'&funcao_js=parent.js_mostracontapagadora1|e83_codtipo|e83_conta|e83_descr','Pesquisa',true);
         } else {
-        
-            if ($('e83_conta').value != '') { 
+
+            if ($('e83_conta').value != '') {
                 js_OpenJanelaIframe('top.corpo','db_iframe_empagetipo','func_empagetipo.php?pesquisa_chave='+$('e83_conta').value+'&e60_numemp='+$('e60_numemp').value+'&e83_conta='+$('e83_conta').value+'&funcao_js=parent.js_mostracontapagadora','Pesquisa',false);
             } else {
-                $('e83_descr').value    = ''; 
+                $('e83_descr').value    = '';
                 $('e83_codtipo').value  = '';
             }
         }
@@ -2126,23 +2126,23 @@ function js_mostraCatTrabalhadorremuneracao1(chave1,chave2){
     }
 
     function js_mostracontapagadora(chave1,chave2,erro) {
-        
-        $('e83_descr').value    = chave1; 
-        $('e83_codtipo').value  = chave2; 
-        if (erro == true) { 
-            
-            $('e83_codtipo').value  = ''; 
+
+        $('e83_descr').value    = chave1;
+        $('e83_codtipo').value  = chave2;
+        if (erro == true) {
+
+            $('e83_codtipo').value  = '';
             $('e83_conta').value    = '';
-            $('e83_codtipo').focus(); 
+            $('e83_codtipo').focus();
 
         }
-    
+
     }
 
     function js_mostracontapagadora1(chave1,chave2,chave3) {
-            
-        $('e83_codtipo').value  = chave1;  
-        $('e83_conta').value    = chave2;  
+
+        $('e83_codtipo').value  = chave1;
+        $('e83_conta').value    = chave2;
         $('e83_descr').value    = chave3;
         db_iframe_empagetipo.hide();
 

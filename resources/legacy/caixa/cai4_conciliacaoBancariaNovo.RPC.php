@@ -1228,7 +1228,7 @@ function query_padrao_rec($conta, $condicao)
                   corrente.k12_conta as conta,
                   corrente.k12_data as data,
                   CASE
-                      WHEN conlancamdoc.c71_coddoc = 100 OR conlancamdoc.c71_coddoc = 115 THEN c70_valor
+                      WHEN conlancamdoc.c71_coddoc = 100 OR conlancamdoc.c71_coddoc = 115 OR conlancamdoc.c71_coddoc = 129 THEN c70_valor
                       ELSE -1 * c70_valor
                   END as valor_debito,
                   0 valor_credito,

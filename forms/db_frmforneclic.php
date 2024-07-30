@@ -71,11 +71,15 @@ if (isset($db_opcaoal)) {
     #pc31_liclicitatipoempresa,
     #pc31_regata,
     #pc31_renunrecurso {
-        width: 78px;
+        width: 68px;
     }
 
-    #pc31_liclicitatipoempresadescr {
-        width: 290px;
+    #pc31_liclicitatipoempresadescr,#z01_nome {
+        width: 282px;
+    }
+
+    #pc31_representante {
+        width: 354;
     }
 
     #pc31_nomeretira {
@@ -86,9 +90,11 @@ if (isset($db_opcaoal)) {
         width: 103px;
     }
 </style>
-<form name="form1" method="post" action="">
+<form name="form1" method="post" action="" id="form1">
     <center>
         <br>
+        <fieldset style="width:700px;">
+        <legend><b>Fornecedor</legend>
         <table border="0">
             <tr>
                 <td align="right" nowrap title="<?= @$Tl20_codigo ?>">
@@ -102,8 +108,16 @@ if (isset($db_opcaoal)) {
                     db_input('l20_codigo', 8, $Il20_codigo, true, 'text', 3)
                     ?>
                 </td>
+                <td align="right" nowrap title="<?= @$Tpc21_codorc ?>">
+                    <b>Orçamento:</b>
+                </td>
+                <td>
+                    <?
+                    db_input('pc20_codorc', 14, $Ipc21_codorc, true, 'text', 3)
+                    ?>
+                </td>
             </tr>
-            <tr>
+            <tr style="display:none;">
                 <td align="right" nowrap title="<?= @$Tpc21_orcamforne ?>">
                     <?= @$Lpc21_orcamforne ?>
                 </td>
@@ -114,19 +128,9 @@ if (isset($db_opcaoal)) {
                 </td>
             </tr>
             <tr>
-                <td align="right" nowrap title="<?= @$Tpc21_codorc ?>">
-                    <?= @$Lpc21_codorc ?>
-                </td>
-                <td>
-                    <?
-                    db_input('pc20_codorc', 8, $Ipc21_codorc, true, 'text', 3)
-                    ?>
-                </td>
-            </tr>
-            <tr>
                 <td align="right" nowrap title="<?= @$Tpc21_numcgm ?>">
                     <?
-                    db_ancora(@$Lpc21_numcgm, "js_pesquisapc21_numcgm(true);", $db_opcao);
+                    db_ancora("Fornecedor", "js_pesquisapc21_numcgm(true);", $db_opcao);
                     ?>
                 </td>
                 <td>
@@ -135,6 +139,32 @@ if (isset($db_opcaoal)) {
                     ?>
                     <?
                     db_input('z01_nome', 40, $Iz01_nome, true, 'text', 3);
+                    ?>
+                </td>
+                <td align="right" nowrap title="<?= @$Tpc21_codorc ?>">
+                    <b>CPF/CNPJ:</b>
+                </td>
+                <td>
+                    <?
+                    db_input('cpfcnpj', 14, $cpfcnpj, true, 'text', 3)
+                    ?>
+                </td>
+            </tr>
+            <tr>
+                <td align="right" nowrap title="Representante">
+                    <b>Representante:</b>
+                </td>
+                <td>
+                    <?
+                    db_input('pc31_representante',51,0,true,'text',$db_opcao,"","","#E6E4F1")
+                    ?>
+                </td>
+                <td align="right" nowrap title="<?= @$Tpc21_codorc ?>">
+                    <b>CPF:</b>
+                </td>
+                <td>
+                    <?
+                    db_input('pc31_cpf', 11, 1, true, 'text', 1,"","","#E6E4F1")
                     ?>
                 </td>
             </tr>
@@ -152,7 +182,7 @@ if (isset($db_opcaoal)) {
                 </td>
             </tr>
             </tr>
-            <tr>
+            <tr style="display:none;">
                 <td align="right" nowrap title="<?= @$Tl22_dtretira ?>">
                     <?= @$Lpc31_dtretira ?>
                 </td>
@@ -169,7 +199,7 @@ if (isset($db_opcaoal)) {
                     db_input('pc31_horaretira', 8, $Ipc31_horaretira, true, 'text', $db_opcao, ""); ?>
                 </td>
             </tr>
-            <tr>
+            <tr style="display:none;">
                 <td align="right" nowrap title="<?= @$Tpc31_nomeretira ?>">
                     <?= @$Lpc31_nomeretira ?>
                 </td>
@@ -206,7 +236,7 @@ if (isset($db_opcaoal)) {
                 </td>
             </tr>
 
-            <td colspan="2" align="center">
+            <td colspan="4" align="center">
                 <?
 
                 $sWhere = "1!=1";
@@ -223,15 +253,7 @@ if (isset($db_opcaoal)) {
 
                         $resultTipocom = $clliclicita->sql_record($clliclicita->getTipocomTribunal($l20_codigo));
                         db_fieldsmemory($resultTipocom, 0)->l03_pctipocompratribunal;
-                        if ($clpcorcamforne->numrows > 0) {
-                            $tiposcompra = array(102, 103);
-                            echo "<input name='gera'    type='submit' id='gera'    value='Gerar relatório' onclick='js_gerarel();' " . ($db_botao == false ? "disabled" : "") . ">&nbsp;";
-                            echo "<input name='gerarxlsbranco' type='button' id='gerarxlsbranco' value='xls em Branco' onclick='js_gerarxlsbranco()'>&nbsp";
 
-                            if (!in_array($l03_pctipocompratribunal, $tiposcompra)) {
-                                echo "<input name='lancval' type='button' id='lancval' value='Lançar valores'  onclick='CurrentWindow.corpo.document.location.href=\"lic1_orcamlancval001.php?l20_codigo=$l20_codigo&pc20_codorc=$pc20_codorc\"' " . ($db_botao == false ? "disabled" : "") . ">";
-                            }
-                        }
                     }
                     // $result_sugersol = $clpcsugforn->sql_record($clpcsugforn->sql_query_solsugforne(null," z01_numcgm "));
                 }
@@ -239,12 +261,28 @@ if (isset($db_opcaoal)) {
                     $db_botao = true;
                 }
                 ?>
-                <input name="<?= ($db_opcao == 1 ? "incluir" : ($db_opcao == 2 || $db_opcao == 22 ? "alterar" : "excluir")) ?>" type="submit" id="db_opcao" value="<?= ($db_opcao == 1 ? "Incluir" : ($db_opcao == 2 || $db_opcao == 22 ? "Alterar" : "Excluir")) ?>" <?= ($db_botao == false ? "disabled" : "") ?>>
-                <input name="pesquisar" type="button" id="pesquisar" value="Pesquisar" onclick="js_pesquisa();">
-                <input name="novo" type="button" id="cancelar" value="Novo" onclick="js_cancelar();" <?= ($db_opcao == 1 || isset($db_opcaoal) ? "style='visibility:hidden;'" : "") ?>>
+            
             </td>
             </tr>
         </table>
+        </fieldset>
+        <div style="margin-top:20px; margin-bottom:20px;">
+            <input name="<?= ($db_opcao == 1 ? "incluir" : ($db_opcao == 2 || $db_opcao == 22 ? "alterar" : "excluir")) ?>" type="submit" id="db_opcao" value="<?= ($db_opcao == 1 ? "Incluir" : ($db_opcao == 2 || $db_opcao == 22 ? "Alterar" : "Excluir")) ?>" <?= ($db_botao == false ? "disabled" : "") ?>>
+                <?php 
+                    if ($clpcorcamforne->numrows > 0) {
+                    $tiposcompra = array(102, 103);
+                    if (!in_array($l03_pctipocompratribunal, $tiposcompra)) {
+                        echo "<input name='lancval' type='button' id='lancval' value='Lançar valores'  onclick='CurrentWindow.corpo.document.location.href=\"lic1_orcamlancval001.php?l20_codigo=$l20_codigo&pc20_codorc=$pc20_codorc\"' " . ($db_botao == false ? "disabled" : "") . ">&nbsp";
+                    }
+                    echo "<input name='gera'    type='submit' id='gera'    value='Gerar relatório' onclick='js_gerarel();' " . ($db_botao == false ? "disabled" : "") . ">&nbsp;";
+                    echo "<input name='gerarxlsbranco' type='button' id='gerarxlsbranco' value='xls em Branco' onclick='js_gerarxlsbranco()'>&nbsp";
+                    }
+                ?>
+                <input name="pesquisar" type="button" id="pesquisar" value="Pesquisar" onclick="js_pesquisa();">
+                <input name="habilitacao" type="button" value="Habilitação de Fornecedores" onclick="redirecionamentoHabilitacaoFornecedor();">
+                <input name="novo" type="button" id="cancelar" value="Novo" onclick="js_cancelar();" <?= ($db_opcao == 1 || isset($db_opcaoal) ? "style='display:none;'" : "") ?>>
+
+        </div>
         <table>
             <tr>
                 <td valign="top" align="center">
@@ -301,7 +339,7 @@ if (isset($db_opcaoal)) {
 
     function js_pesquisapc21_numcgm(mostra) {
         if (mostra == true) {
-            js_OpenJanelaIframe('', 'func_nome', 'func_pcforne.php?validaRepresentante=true&orderName=true&funcao_js=parent.js_mostracgm1|pc60_numcgm|z01_nome|z01_telef|z01_email', 'Pesquisa', true);
+            js_OpenJanelaIframe('', 'func_nome', 'func_pcforne.php?validaRepresentante=true&orderName=true&funcao_js=parent.js_mostracgm1|pc60_numcgm|z01_nome|z01_telef|z01_email|z01_cgccpf', 'Pesquisa', true);
             return true;
         }
         if (document.form1.pc21_numcgm.value != '') {
@@ -309,15 +347,18 @@ if (isset($db_opcaoal)) {
             return true;
         }
         document.form1.z01_nome.value = '';
+        document.form1.cpfcnpj.value = '';
     }
 
-    function js_mostracgm(chave, chave2, z01_telef, z01_email) {
+    function js_mostracgm(chave, chave2, chave3, chave4,chave5) {
 
-        if ((z01_telef.trim() == '' || z01_email.trim() == '') && $('l12_validafornecedor_emailtel').value == 't') {
-            alert("Usuário: Inclusão abortada. O Fornecedor selecionado não possui Email e Telefone no seu cadastro.");
-            $('pc21_numcgm').value = '';
-            $('z01_nome').value = '';
-            return false;
+        if($('l12_validafornecedor_emailtel').value == 't'){
+            if ((chave3.trim() == '' || chave4.trim() == '')) {
+                alert("Usuário: Inclusão abortada. O Fornecedor selecionado não possui Email e Telefone no seu cadastro.");
+                $('pc21_numcgm').value = '';
+                $('z01_nome').value = '';
+                return false;
+            }
         }
 
         if (chave2 == true) {
@@ -326,12 +367,13 @@ if (isset($db_opcaoal)) {
             document.form1.z01_nome.value = chave;
             return false;
         }
+        document.form1.cpfcnpj.value = $('l12_validafornecedor_emailtel').value == 't' ? chave5 : chave4;
         document.form1.z01_nome.value = chave2;
 
         js_verificaFornecedor();
     }
 
-    function js_mostracgm1(pc21_numcgm, z01_nome, z01_telef, z01_email) {
+    function js_mostracgm1(pc21_numcgm, z01_nome, z01_telef, z01_email,z01_cgccpf) {
         if ((z01_telef.trim() == '' || z01_email.trim() == '') && $('l12_validafornecedor_emailtel').value == 't') {
             alert("Usuário: Inclusão abortada. O Fornecedor selecionado não possui Email e Telefone no seu cadastro.");
             $('pc21_numcgm').value = '';
@@ -339,6 +381,7 @@ if (isset($db_opcaoal)) {
         }
         document.form1.pc21_numcgm.value = pc21_numcgm;
         document.form1.z01_nome.value = z01_nome;
+        document.form1.cpfcnpj.value = z01_cgccpf;
         func_nome.hide();
 
         js_verificaFornecedor();
@@ -391,4 +434,35 @@ if (isset($db_opcaoal)) {
 
         var oRetorno = eval("(" + oAjax.responseText + ")");
     }
+    
+    function resetarCampos(){
+        document.getElementById('pc31_representante').value = "";
+        document.getElementById('pc31_cpf').value = ""; 
+        document.getElementById('cpfcnpj').value = "";  
+        document.getElementById('pc31_regata').value = "1";
+        document.getElementById('pc31_renunrecurso').value = "1";
+        document.getElementById('pc31_liclicitatipoempresa').value = "1";
+
+    }
+
+    function redirecionamentoHabilitacaoFornecedor(){
+
+        if(document.getElementById('l20_codigo').value == ""){
+            return alert("Selecione uma licitação");
+        }
+
+        let oParams = {
+            action: `lic1_habilitacaofornecedor.php`,
+            iInstitId: top.jQuery('#instituicoes span.active').data('id'),
+            iAreaId: 4,
+            iModuloId: 381
+        }
+
+        let title = 'Procedimentos > Habilitação de Fornecedores';
+
+        Desktop.Window.create(title, oParams);
+        menu.trigger('menu.close');
+
+    }
+
 </script>

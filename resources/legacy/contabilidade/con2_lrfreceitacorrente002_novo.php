@@ -156,10 +156,12 @@ $receitas[26][0] = "  Compensação Financ. entre Regimes Previdência";
 $receitas[27][0] = "  Rendimentos de Aplicações de Rec. Previdenciários";
 $receitas[28][0] = "  Dedução de Receita para Formação do FUNDEB";
 $receitas[29][0] = " RECEITA CORRENTE LÍQUIDA (RCL)";
-$receitas[30][0] = "  ( - ) Transf. obrigatórias da União relativas às emendas";
+$receitas[30][0] = "  ( - ) Transf. obrig. da União relativas às emendas";
 $receitas[31][0] = " RCL DOS LIMITES DE ENDIVIDAMENTO";
-$receitas[32][0] = "  ( - ) Transf. obrigatórias da União relativas às emendas";
-$receitas[33][0] = " RCL DOS LIMITES DA DESPESA COM PESSOAL";
+$receitas[32][0] = "  ( - ) Transf. obrig. da União relativas às emendas";
+$receitas[33][0] = "  ( - ) Transf. da União relativas a remuneração dos ag.";
+$receitas[34][0] = "  ( - ) Outras Deduções Constitucionais ou Legais";
+$receitas[35][0] = " RCL DOS LIMITES DA DESPESA COM PESSOAL";
 
 //NATUREZAS
 $iptu = array('4111250', '491111250', '492111250', '493111250', '496111250', '498111250', '499111250');
@@ -194,11 +196,11 @@ if (!isset($arqinclude)) {
   $pdf->AliasNbPages();
   $pdf->setfillcolor(235);
   $pdf->setfont('arial', '', 6);
-  $alt            = 4;
+  $alt = 3.9;
   $cl = 16.5;
   $clEspec = 54;
-  $bold = array(1, 2, 8, 9, 12, 13, 14, 15, 23, 24, 29, 31, 33);
-  $preencCelula = array(24, 29, 31, 33);
+  $bold = array(1, 2, 8, 9, 12, 13, 14, 15, 23, 24, 29, 31, 35);
+  $preencCelula = array(24, 29, 31, 35);
   $fonteNumeroGrande = 14;
 
   if ($tipo_relatorio == 'arrecadado') {
@@ -461,38 +463,25 @@ if (!isset($arqinclude)) {
             $receitas[28][14] += ($row->saldo_prevadic_acum * -1);
           }
         }
-        // Transf. obrigatórias da União relativas às emendas individuais
-        if (calculaReceita($row->o57_fonte, $transfIndividuais)) {
-          if ($mes == 1) {
-            $receitas[30][14] += $row->saldo_inicial;
-          }
-          if ($i == 12) {
-            $receitas[30][14] += $row->saldo_prevadic_acum;
-          }
-        }
-        // Transf. obrigatórias da União relativas às emendas de bancada
+        //Transferências da União relativas a remuneração dos agentes comunitários de saúde
         if (calculaReceita($row->o57_fonte, array('4171')) && $row->o70_codigo == 16040000) {
-          $receitas[32][$i] += $row->saldo_arrecadado;
+          $receitas[33][$i] += $row->saldo_arrecadado;
           if ($mes == 1) {
-            $receitas[32][14] += $row->saldo_inicial;
+            $receitas[33][14] += $row->saldo_inicial;
           }
           if ($i == 12) {
-            $receitas[32][14] += $row->saldo_prevadic_acum;
+            $receitas[33][14] += $row->saldo_prevadic_acum;
           }
-        }
-        if (calculaReceita($row->o57_fonte, $transfBancada)) {
-          if ($i == 12) {
-            $receitas[32][14] += $row->saldo_prevadic_acum;
-          }
-        }
+        }        
       }
       // Transf. obrigatórias da União relativas às emendas individuais
       $aSaldoArrecadadoEmendaIndividuais = getSaldoArrecadadoEmendaParlamentarRelatorioReceita($dataInicial, $dataFinal, array(1));
-      $receitas[30][$i] = $aSaldoArrecadadoEmendaIndividuais[0];
-
+      $receitas[30][$i] = $aSaldoArrecadadoEmendaIndividuais[0] ? $aSaldoArrecadadoEmendaIndividuais[0] : 0;
       // Transf. obrigatórias da União relativas às emendas de bancada
       $aSaldoArrecadadoEmendaBancada = getSaldoArrecadadoEmendaParlamentarRelatorioReceita($dataInicial, $dataFinal, array(2), false, array(16040000));
-      $receitas[32][$i] += $aSaldoArrecadadoEmendaBancada[0];
+      $receitas[32][$i] = $aSaldoArrecadadoEmendaBancada[0] ? $aSaldoArrecadadoEmendaBancada[0] : 0;
+      //Outras Deduções Constitucionais ou Legais
+      $receitas[34][$i] = 0;
 
       //TOTALIZADORES
       //Outros Impostos, Taxas e Contribuições de Melhoria
@@ -516,13 +505,19 @@ if (!isset($arqinclude)) {
       //RCL DOS LIMITES DE ENDIVIDAMENTO
       $receitas[31][$i]  = $receitas[29][$i] - $receitas[30][$i];
       //RCL DOS LIMITES DA DESPESA COM PESSOAL
-      $receitas[33][$i]  = $receitas[31][$i] - $receitas[32][$i];
+      $receitas[35][$i]  = $receitas[31][$i] - $receitas[32][$i] - $receitas[33][$i] - $receitas[34][$i];
 
       db_inicio_transacao();
       db_query("drop table if exists work_receita");
       db_fim_transacao(false);
     }
     //PREVISAO ATUALIZADA TOTALIZADORES 
+    // Transf. obrigatórias da União relativas às emendas individuais
+    $receitas[30][14] = 0;
+    // Transf. obrigatórias da União relativas às emendas de bancada
+    $receitas[32][14] = 0;
+    //Outras Deduções Constitucionais ou Legais
+    $receitas[34][14] = 0;
     //Outros Impostos, Taxas e Contribuições de Melhoria
     $receitas[7][14] -= ($receitas[3][14] + $receitas[4][14] + $receitas[5][14] + $receitas[6][14]);
     //Impostos, taxas e Contribuições de Melhoria
@@ -544,14 +539,14 @@ if (!isset($arqinclude)) {
     //RCL DOS LIMITES DE ENDIVIDAMENTO
     $receitas[31][14] = $receitas[29][14] - $receitas[30][14];
     //RCL DOS LIMITES DA DESPESA COM PESSOAL
-    $receitas[33][14] = $receitas[31][14] - $receitas[32][14];
+    $receitas[35][14] = $receitas[31][14] - $receitas[32][14] - $receitas[33][14] - $receitas[34][14];
 
     $pdf->cell($cl, $alt, "", 'BR', 0, "C", 0);
     $pdf->cell($cl, $alt, "ATUALIZADA", 'BR', 0, "C", 0);
     $pdf->setfont('arial', '', 6);
     $pdf->ln();
 
-    for ($j = 1; $j <= 33; $j++) {
+    for ($j = 1; $j <= 35; $j++) {
       if (in_array($j, $bold)) {
         $fonte = 'B';
       } else {
@@ -564,7 +559,7 @@ if (!isset($arqinclude)) {
         $pdf->SetFillColor(255, 255, 255);
       }
       $pdf->setfont('arial', $fonte, 6);
-      $pdf->cell($clEspec, $alt, $receitas[$j][0], $j == 33 ? 'RBL' : 'RL', 0, "L", 1);
+      $pdf->cell($clEspec, $alt, $receitas[$j][0], $j == 35 ? 'RBL' : 'RL', 0, "L", 1);
       $totalMes = 0;
       for ($i = 1; $i <= 14; $i++) {
         $pdf->setfont('arial', $fonte, 6);
@@ -573,8 +568,7 @@ if (!isset($arqinclude)) {
           if (strlen($valor) > $fonteNumeroGrande) {
             $pdf->setfont('arial', $fonte, 5);
           }
-
-          $pdf->cell($cl, $alt, $valor, $j == 33 ? 'RB' : 'R', 0, "R", 1);
+          $pdf->cell($cl, $alt, $valor, $j == 35 ? 'RB' : 'R', 0, "R", 1);
           $totalMes += $receitas[$j][$i];
         } else if ($i == 13) {
           $totalMes = trim(db_formatar($totalMes, 'f'));
@@ -582,32 +576,34 @@ if (!isset($arqinclude)) {
             $pdf->setfont('arial', $fonte, 5);
           }
 
-          $pdf->cell($cl, $alt, $totalMes, $j == 33 ? 'RB' : 'R', 0, "R", 1);
+          $pdf->cell($cl, $alt, $totalMes, $j == 35 ? 'RB' : 'R', 0, "R", 1);
         } else {
           if (strlen($valor) > $fonteNumeroGrande) {
             $pdf->setfont('arial', $fonte, 5);
           }
 
-          $pdf->cell($cl, $alt, $valor, $j == 33 ? 'RB' : 'R', 0, "R", 1);
+          $pdf->cell($cl, $alt, $valor, $j == 35 ? 'RB' : 'R', 0, "R", 1);
         }
       }
       $pdf->ln();
       if ($j == 30) {
-        $pdf->cell($clEspec, 3, "  individuais", 'RL', 0, "L", 1);
+        $pdf->cell($clEspec, 2, "  individuais", 'RL', 0, "L", 1);
         for ($k = 1; $k <= 14; $k++) {
-          $pdf->cell($cl, 3, "", 'R', 0, "R", 1);
+          $pdf->cell($cl, 2, "", 'R', 0, "R", 1);
         }
         $pdf->ln();
       }
       if ($j == 32) {
-        $pdf->cell($clEspec, 3, "  de bancada e ao vencimento dos agentes comunitários", 'RL', 0, "L", 1);
+        $pdf->cell($clEspec, 2, "  de bancada", 'RL', 0, "L", 1);
         for ($k = 1; $k <= 14; $k++) {
-          $pdf->cell($cl, 3, "", 'R', 0, "R", 1);
+          $pdf->cell($cl, 2, "", 'R', 0, "R", 1);
         }
         $pdf->ln();
-        $pdf->cell($clEspec, 3, " de saúde e de combate às endemias", 'RL', 0, "L", 1);
+      }
+      if ($j == 33) {
+        $pdf->cell($clEspec, 2, " comunitários de saúde e de combate às endemias", 'RL', 0, "L", 1);
         for ($k = 1; $k <= 14; $k++) {
-          $pdf->cell($cl, 3, "", 'R', 0, "R", 1);
+          $pdf->cell($cl, 2, "", 'R', 0, "R", 1);
         }
         $pdf->ln();
       }
@@ -734,18 +730,17 @@ if (!isset($arqinclude)) {
       if (calculaReceita($row->o57_fonte, $deducaoFundeb)) {
         $receitas[28][1] += ($row->saldo_inicial * -1);
       }
-      // Transf. obrigatórias da União relativas às emendas individuais
-      if (calculaReceita($row->o57_fonte, $transfIndividuais)) {
-        $receitas[30][1] += $row->saldo_inicial;
-      }
-      // Transf. obrigatórias da União relativas às emendas de bancada
+      //Transferências da União relativas a remuneração dos agentes comunitários de saúde
       if (calculaReceita($row->o57_fonte, array('4171')) && $row->o70_codigo == 16040000) {
-        $receitas[32][1] += $row->saldo_inicial;
-      }
-      if (calculaReceita($row->o57_fonte, $transfBancada)) {
-        $receitas[32][1] += $row->saldo_inicial;
-      }
+        $receitas[33][1] += $row->saldo_arrecadado;
+      }  
     }
+    // Transf. obrigatórias da União relativas às emendas individuais
+    $receitas[30][1] = 0;
+    // Transf. obrigatórias da União relativas às emendas de bancada
+    $receitas[32][1] = 0;
+    //Outras Deduções Constitucionais ou Legais
+    $receitas[34][1] = 0;
 
     //TOTALIZADORES
     //Outros Impostos, Taxas e Contribuições de Melhoria
@@ -769,9 +764,9 @@ if (!isset($arqinclude)) {
     //RCL DOS LIMITES DE ENDIVIDAMENTO
     $receitas[31][1]  = $receitas[29][1] - $receitas[30][1];
     //RCL DOS LIMITES DA DESPESA COM PESSOAL
-    $receitas[33][1]  = $receitas[31][1] - $receitas[32][1];
+    $receitas[35][1]  = $receitas[31][1] - $receitas[32][1] - $receitas[33][1] - $receitas[34][1];
 
-    for ($j = 1; $j <= 33; $j++) {
+    for ($j = 1; $j <= 35; $j++) {
       if (in_array($j, $bold)) {
         $fonte = 'B';
       } else {
@@ -791,18 +786,20 @@ if (!isset($arqinclude)) {
         $pdf->setfont('arial', $fonte, 6);
         $pdf->cell($clEspec, $alt, '  ( - ) Transf. obrigatórias da União relativas às emendas individuais', 'RL', 0, "L", 1);
       } else if ($j == 32) {
-        $pdf->setfont('arial', $fonte, 5);
-        $pdf->cell($clEspec, $alt, '  ( - ) Transf. obrigatórias da União relativas às emendas de bancada e ao vencimento dos agentes comunitários de saúde e de combate às endemias', 'RL', 0, "L", 1);
         $pdf->setfont('arial', $fonte, 6);
+        $pdf->cell($clEspec, $alt, '  ( - ) Transf. obrigatórias da União relativas às emendas de bancada', 'RL', 0, "L", 1);
+      } else if ($j == 33) {
+        $pdf->setfont('arial', $fonte, 6);
+        $pdf->cell($clEspec, $alt, '  ( - ) Transf. obrigatórias da União relativas a remuneração dos agentes comunitários de saúde e de combate às endemias', 'RL', 0, "L", 1);
       } else {
         $pdf->setfont('arial', $fonte, 6);
-        $pdf->cell($clEspec, $alt, $receitas[$j][0], $j == 33 ? 'RBL' : 'RL', 0, "L", 1);
+        $pdf->cell($clEspec, $alt, $receitas[$j][0], $j == 35 ? 'RBL' : 'RL', 0, "L", 1);
       }
       $valor = trim(db_formatar($receitas[$j][1], 'f'));
       if (strlen($valor) > $fonteNumeroGrande) {
         $pdf->setfont('arial', $fonte, 5);
       }
-      $pdf->cell($cl, $alt, $valor, $j == 33 ? 'RBL' : 'RL', 0, "R", 1);
+      $pdf->cell($cl, $alt, $valor, $j == 35 ? 'RBL' : 'RL', 0, "R", 1);
       $pdf->ln();
       $pdf->setX($espaçamento);
     }

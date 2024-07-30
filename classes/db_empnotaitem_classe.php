@@ -583,5 +583,81 @@ class cl_empnotaitem {
     }
     return $sql;
   }
+
+  function sql_query_estorno($e72_sequencial = null, $fields = "*", $order = null, $where = "") 
+  {
+
+    $sql = "SELECT ";
+    
+    if ($fields != "*") {
+        $fieldsArray = explode("#", $fields);
+        $sql .= implode(",", $fieldsArray);
+    } else {
+        $sql .= $fields;
+    }
+    
+    $sql .= " FROM empnotaitem AS eni ";
+    $sql .= " INNER JOIN empempitem AS eei ON eei.e62_sequencial = eni.e72_empempitem ";
+    $sql .= " INNER JOIN empnota AS en ON en.e69_codnota = eni.e72_codnota ";
+    $sql .= " INNER JOIN conlancamemp AS cle ON cle.c75_numemp = eei.e62_numemp ";
+    $sql .= " INNER JOIN conlancam AS cl ON cl.c70_codlan = cle.c75_codlan ";
+    $sql .= " INNER JOIN conlancamordem AS clo ON clo.c03_codlan = cl.c70_codlan ";
+    $sql .= " LEFT OUTER JOIN conlancampag AS clp ON clp.c82_codlan = cl.c70_codlan ";
+    $sql .= " INNER JOIN conlancamdoc AS cld ON cld.c71_codlan = cl.c70_codlan ";
+    
+    if ($where == "") {
+        if ($e72_sequencial != null) {
+            $sql .= "WHERE eni.e72_sequencial = $e72_sequencial ";
+        }
+    } else {
+        $sql .= "WHERE $where ";
+    }
+    
+    if ($order != null) {
+        $orderArray = explode("#", $order);
+        $sql .= "ORDER BY " . implode(",", $orderArray);
+    }
+    
+    return $sql;
+  }
+  function sql_query_dados_material ( $e72_sequencial=null,$campos="*",$ordem=null,$dbwhere=""){
+    $sql = "select ";
+    if($campos != "*" ){
+      $campos_sql = explode("#",$campos);
+      $virgula = "";
+      for($i=0;$i<sizeof($campos_sql);$i++){
+        $sql .= $virgula.$campos_sql[$i];
+        $virgula = ",";
+      }
+    }else{
+      $sql .= $campos;
+    }
+    $sql .= " from empnotaitem ";
+    $sql .= "      INNER JOIN empempitem ON empempitem.e62_sequencial = empnotaitem.e72_empempitem";
+    $sql .= "      INNER JOIN empnota ON empnota.e69_codnota = empnotaitem.e72_codnota    ";
+    $sql .= "      INNER JOIN empnotaord ON empnotaord.m72_codnota = empnota.e69_codnota  ";
+    $sql .= "      INNER JOIN empempenho ON empempenho.e60_numemp = empempitem.e62_numemp ";
+    $sql .= "      LEFT JOIN  cgm on cgm.z01_numcgm = empempenho.e60_numcgm               ";
+    $sql2 = "";
+    if($dbwhere==""){
+      if($e72_sequencial!=null ){
+        $sql2 .= " where empnotaitem.e72_sequencial = $e72_sequencial ";
+      }
+    }else if($dbwhere != ""){
+      $sql2 = " where $dbwhere";
+    }
+    $sql .= $sql2;
+    if($ordem != null ){
+      $sql .= " order by ";
+      $campos_sql = explode("#",$ordem);
+      $virgula = "";
+      for($i=0;$i<sizeof($campos_sql);$i++){
+        $sql .= $virgula.$campos_sql[$i];
+        $virgula = ",";
+      }
+    }
+    return $sql;
+  }
+
 }
 ?>

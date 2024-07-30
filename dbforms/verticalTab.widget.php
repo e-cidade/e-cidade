@@ -42,9 +42,9 @@ class verticalTab {
 
   /**
    * tamanho da tabviem;
-   * @var integer
+   * @var string
    */
-  private $iHeight = 300;
+  private $sHeight = '300';
 
   /**
    * Width da coluna de Opções em % (percentual)
@@ -61,27 +61,30 @@ class verticalTab {
    *Controla a renderização do objeto;
   */
   private $sRender = null;
+
+  private $cssClass = '';
   /**
    * metodo construtor da classe
    * @param string  $sName              Nome da tabview
-   * @param integer $iHeight            altura da tabview.
+   * @param string $sHeight            altura da tabview.
    * @param integer $iWidthColunaOpcoes largura do container de opções em % (percentual)
    * @return void;
    */
 
-  function __construct($sName = "tabview1", $iHeight = 300, $iWidthColunaOpcoes = 20) {
+  function __construct($sName = "tabview1", $sHeight = 300, $iWidthColunaOpcoes = 20, $cssClass = '') {
 
     if ($sName != '' ) {
       $this->sName = $sName;
     }else{
       die('<b>Erro:</b> parametro $sName nao pode ser vazio. ');
     }
-    $this->iHeight = $iHeight;
+    $this->sHeight = $sHeight;
     $this->iWidthColunaOpcoes = $iWidthColunaOpcoes;
+    $this->cssClass = $cssClass;
   }
   /**
    * adiciona nova aba.
-   * @param $saName nome ou conjunto de Abas. Pode ser passado um array com as abas;
+   * @param string $saName nome ou conjunto de Abas. Pode ser passado um array com as abas;
    * @param [string $sLabel label da aba]
    * @param [string $sTarget programa a se executado. somente e requerido se $sName nao e um conjunto]
    * @param [bool $lActive define se aba esta ativa, ou nao]
@@ -170,13 +173,13 @@ class verticalTab {
        }
      }
 
-     $this->sRender  = "<table width='100%' cellspacing='0'>\n";
+     $this->sRender  = "<table class='{$this->cssClass}' width='100%' cellspacing='0'>\n";
      $this->sRender .= "  <tr>\n";
      $this->sRender .= "    <td width='{$this->iWidthColunaOpcoes}%' valign='top' height='100%' rowspan='2'>\n";
      $this->sRender .= $sAbas;
      $this->sRender .= "    </td>\n";
      $this->sRender .= "    <td valign='top' height='100%' style='border:1px inset #cccccc'>\n ";
-     $this->sRender .= "      <iframe height='{$this->iHeight}' name='{$this->sName}Detalhes'\n";
+     $this->sRender .= "      <iframe height='{$this->sHeight}' name='{$this->sName}Detalhes'\n";
      $this->sRender .= "              frameborder='0' width='100%'\n";
      $this->sRender .= "      src='{$this->aAbas[0]["sUrl"]}'\n";
      $this->sRender .= "      style='background-color:#CCCCCC;'>\n";

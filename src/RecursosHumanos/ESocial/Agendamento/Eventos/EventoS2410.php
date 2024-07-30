@@ -30,9 +30,6 @@ class EventoS2410 extends EventoBase
     public function montarDados()
     {
         $aDadosAPI = array();
-        // echo '<pre>';
-        // print_r($this->dados);
-        // exit;
 
         $iSequencial = 1;
         foreach ($this->dados as $oDados) {
@@ -63,7 +60,7 @@ class EventoS2410 extends EventoBase
 
             $oDadosAPI->evtCdBenIn->indDecJud           = $oDados->inddecjud;
 
-            if ($oDados->rh02_rhtipoapos != 7 && intval($oDados->rh01_admiss_ano . str_pad($oDados->rh01_admiss_mes, 2, "0", STR_PAD_LEFT) > 202211)) {
+            if ($oDados->rh02_rhtipoapos != 7 && intval($oDados->rh01_admiss_ano . str_pad($oDados->rh01_admiss_mes, 2, "0", STR_PAD_LEFT) > 202111)) {
                 if ($oDados->rh30_vinculo == 'P') {
                     $oDadosAPI->evtCdBenIn->infopenmorte->tpPenMorte  = $oDados->tppenmorte;
                 }
@@ -77,9 +74,6 @@ class EventoS2410 extends EventoBase
             $aDadosAPI[] = $oDadosAPI;
             $iSequencial++;
         }
-        // echo '<pre>';
-        // print_r($aDadosAPI);
-        // exit;
         return $aDadosAPI;
     }
 }

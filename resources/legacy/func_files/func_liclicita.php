@@ -158,7 +158,7 @@ $sWhereContratos = " and 1 = 1 ";
                         <tr>
                             <td colspan="2" align="center">
                                 <input name="pesquisar" type="submit" id="pesquisar2" value="Pesquisar">
-                                <input name="limpar" type="reset" id="limpar" value="Limpar">
+                                <input name="limpar" type="button" id="limpar" value="Limpar" onClick="js_limparCampos();">
                                 <input name="Fechar" type="button" id="fechar" value="Fechar" onClick="parent.db_iframe_liclicita.hide();">
                             </td>
                         </tr>
@@ -266,6 +266,12 @@ $sWhereContratos = " and 1 = 1 ";
                     $dbwhere .= " l03_pctipocompratribunal IN (102,103) AND ";
                 }
 
+                if(isset($habilitacaofornecedor)){
+                    $dbwhere .= "l20_licsituacao in (0, 1,10,13)
+                    and ((pc50_pctipocompratribunal in (102,103) and l20_dtlimitecredenciamento is null)
+                       or (pc50_pctipocompratribunal in (102,103) and l20_dtlimitecredenciamento >= '".date("Y-m-d", db_getsession("DB_datausu"))."' ) or pc50_pctipocompratribunal not in (102,103))  and";
+                }
+
                 if (!isset($pesquisa_chave)) {
 
                     if (isset($campos) == false) {
@@ -276,10 +282,6 @@ $sWhereContratos = " and 1 = 1 ";
                             $campos = "liclicita.*, liclicitasituacao.l11_sequencial";
                         }
                     }
-
-
-
-
 
                     if ($dispensas) {
                         $campos = "distinct liclicita.l20_codigo,
@@ -485,7 +487,7 @@ $sWhereContratos = " and 1 = 1 ";
                             ORDER BY l20_codigo
                         ";
                     }
-                    
+
                     $aRepassa = array();
                     db_lovrot($sql . ' desc ', 15, "()", "", $funcao_js, null, 'NoMe', $aRepassa, false);
                 } else {
@@ -648,6 +650,17 @@ $sWhereContratos = " and 1 = 1 ";
     if (typeof document.getElementsByName("l20_dtpubratificacao")[0] !== 'undefined') {
         document.getElementsByName("l20_dtpubratificacao")[0].value = "Publicação";
     }
+
+    function js_limparCampos(){
+
+        document.form2.chave_l20_codigo.value = "";
+        document.form2.chave_l20_edital.value = "";
+        document.form2.chave_l20_numero.value = "";
+        document.form2.chave_l03_descr.value = "";
+        document.form2.l20_anousu.value = "";
+        
+    }
+
 </script>
 <?
 if (!isset($pesquisa_chave)) {

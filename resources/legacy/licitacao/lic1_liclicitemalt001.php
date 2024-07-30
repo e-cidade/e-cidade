@@ -338,7 +338,7 @@ if (!$sqlerro && $codprocesso) {
                 $oDaoSolicitemEle->excluir($oSolicitemReservado->pc11_codigo);
                 $sqlerro = $oDaoSolicitemEle->erro_status == '0' ? true : false;
                 if ($sqlerro){
-                     $erro_msg = $oDaoSolicitemEle->erro_msg;
+                    $erro_msg = $oDaoSolicitemEle->erro_msg;
                 }
             }
         }
@@ -635,25 +635,25 @@ $db_botao = true;
 </head>
 
 <body bgcolor=#CCCCCC leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="a=1">
-    <table width="790" border="0" cellpadding="0" cellspacing="0">
-        <tr>
-            <td width="360" height="18">&nbsp;</td>
-            <td width="263">&nbsp;</td>
-            <td width="25">&nbsp;</td>
-            <td width="140">&nbsp;</td>
-        </tr>
-    </table>
-    <table width="790" border="0" cellspacing="0" cellpadding="0" style="margin:0 auto;">
-        <tr>
-            <td height="430" align="left" valign="top" bgcolor="#CCCCCC">
-                <center>
-                    <?
-                    include("forms/db_frmliclicitemalt.php");
-                    ?>
-                </center>
-            </td>
-        </tr>
-    </table>
+<table width="790" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td width="360" height="18">&nbsp;</td>
+        <td width="263">&nbsp;</td>
+        <td width="25">&nbsp;</td>
+        <td width="140">&nbsp;</td>
+    </tr>
+</table>
+<table width="790" border="0" cellspacing="0" cellpadding="0" style="margin:0 auto;">
+    <tr>
+        <td height="430" align="left" valign="top" bgcolor="#CCCCCC">
+            <center>
+                <?
+                include("forms/db_frmliclicitemalt.php");
+                ?>
+            </center>
+        </td>
+    </tr>
+</table>
 </body>
 
 </html>

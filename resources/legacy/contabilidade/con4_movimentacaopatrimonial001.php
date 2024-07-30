@@ -56,7 +56,7 @@ $db_opcao             = 1;
 $oGet                 = db_utils::postMemory($_GET);
 $sTitulo              = 'Movimentação Patrimonial';
 $aCodigoDocumentos    = array(
-    204, 205, 206, 207, 208, 210, 211, 212, 213, 214, 215,
+    204, 205, 206, 207, 208, 209,210, 211, 212, 213, 214, 215,
     400, 401, 402, 403, 404,
     700, 701, 702, 703, 704
   );
@@ -287,7 +287,7 @@ function js_retornoProcessar(oAjax) {
 
   alert(sMensagem);
 
-  if ($('iDocumento').value == 208 && oRetorno.iStatus == 2 && oRetorno.iLote != null) {
+  if (($('iDocumento').value == 209 || $('iDocumento').value == 208) && oRetorno.iStatus == 2 && oRetorno.iLote != null) {
 
     if ( confirm(_M(CAMINHO_MENSAGEM_TELA + "relatorio_lote")) ) {
       jan = window.open('pat2_bensporlote002.php?lote='+ oRetorno.iLote, '', 'width=' + (screen.availWidth-5) + ',height=' + (screen.availHeight-40) + ',scrollbars=1,location=0' );

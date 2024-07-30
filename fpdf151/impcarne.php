@@ -189,6 +189,8 @@ class db_impcarne extends cl_assinatura
 
     public $atualizaquant = true;
 
+    public $selecao = null;
+    
     // MODELO 56  - CAPA DO CARNE DE IPTU OU ISSQN
     public $cepcapa = null;
     public $dados1 = null;

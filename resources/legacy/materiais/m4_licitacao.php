@@ -693,6 +693,17 @@ if (isset($alterar)) {
                       ?>
                     </td>
                   </tr>
+                  <tr style="display: <?php if($l20_tipoprocesso != "1") echo "none;"; ?>" >
+                    <td nowrap title="<?= @$Tl_dispensaporvalor ?>">
+                        <strong><?= "Dispensa por Valor:" ?></strong>
+                    </td>
+                    <td>
+                    <?php
+                      $aDispensaPorValor = array("t" => "Sim", "f" => "Não");
+                      db_select("l20_dispensaporvalor", $aDispensaPorValor, true,"");
+                    ?>
+                    </td>
+                  </tr>
 
                   <?php
 

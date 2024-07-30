@@ -25,7 +25,7 @@
  *                                licenca/licenca_pt.txt
  */
 
-require_once("libs/db_stdlib.php");
+require_once(modification("libs/db_stdlib.php"));
 require_once("libs/db_utils.php");
 require_once("libs/db_conecta.php");
 require_once("libs/db_sessoes.php");
@@ -82,7 +82,7 @@ $clempelemento	  = new cl_empelemento;
 $clempempitem			= new cl_empempitem;
 $clempnotaele           = new cl_empnotaele;
 $clempnota           = new cl_empnota;
-$clempefdreinf       = new cl_empefdreinf; 
+$clempefdreinf       = new cl_empefdreinf;
 
 parse_str($HTTP_SERVER_VARS["QUERY_STRING"]);
 db_postmemory($HTTP_POST_VARS);
@@ -93,7 +93,7 @@ if(isset($alterar)){
     if($sqlerro==false){
 
         $result=$clempefdreinf->sql_record($clempefdreinf->sql_query_file($e60_numemp));
-    
+
         $clempefdreinf->efd60_cessaomaoobra = $efd60_cessaomaoobra;
         $clempefdreinf->efd60_aquisicaoprodrural = $efd60_aquisicaoprodrural;
         $clempefdreinf->efd60_possuicno = $efd60_possuicno;
@@ -102,7 +102,7 @@ if(isset($alterar)){
         $clempefdreinf->efd60_prescontricprb = $efd60_prescontricprb;
         $clempefdreinf->efd60_tiposervico = $efd60_tiposervico;
         $clempefdreinf->efd60_prodoptacp = $efd60_prodoptacp;
-        
+
         if($clempefdreinf->numrows>0){
             $clempefdreinf->alterar($e60_numemp);
         } else {
@@ -112,8 +112,8 @@ if(isset($alterar)){
             $clempefdreinf->efd60_instit = db_getsession("DB_instit");
             $clempefdreinf->incluir($e60_numemp);
         }
-    
-        
+
+
         if ($clempefdreinf->erro_status == 0) {
             $sqlerro = true;
             $erro_msg = $clempefdreinf->erro_msg;
@@ -125,7 +125,7 @@ if(isset($alterar)){
     $sqlerro=false;
     $db_botao = true;
     db_inicio_transacao();
-    /*rotina de incluir  na tabela empempenho*/    
+    /*rotina de incluir  na tabela empempenho*/
     $e60_emiss_ano = date('Y',strtotime($e60_emiss));
     $e60_emiss_mes = date('m', strtotime($e60_emiss));
     $dataAlterada = false;
@@ -149,24 +149,24 @@ if(isset($alterar)){
 
     //Verifica se o periodo contabil esta encerrado na data do empenho
     $sSqlConsultaFimPeriodoContabil   = "SELECT * FROM condataconf WHERE c99_anousu = ".$data_empenho_ano." and c99_instit = ".db_getsession('DB_instit');
-    $rsConsultaFimPeriodoContabil     = db_query($sSqlConsultaFimPeriodoContabil);    
+    $rsConsultaFimPeriodoContabil     = db_query($sSqlConsultaFimPeriodoContabil);
 
     if($sqlerro == false){
         if (pg_num_rows($rsConsultaFimPeriodoContabil) > 0) {
-            
+
             $oFimPeriodoContabil = db_utils::fieldsMemory($rsConsultaFimPeriodoContabil, 0);
-            
-            if ($oFimPeriodoContabil->c99_data != '' && 
-            (db_strtotime($e60_emiss) <= db_strtotime($oFimPeriodoContabil->c99_data) || 
+
+            if ($oFimPeriodoContabil->c99_data != '' &&
+            (db_strtotime($e60_emiss) <= db_strtotime($oFimPeriodoContabil->c99_data) ||
             db_strtotime($data_empenho) <= db_strtotime($oFimPeriodoContabil->c99_data))) {
                 $erro_msg = "Período contábil encerrado. Apenas os dados para EFD-Reinf foram atualizados.";
                 $sqlerro = true;
             }
-            
+
         }
-        
+
     }
-    
+
     //Verifica se é empenho de prestação de contas
     if($sqlerro == false && isset($e44_tipo)){
         if($e44_tipo == 4){
@@ -178,11 +178,11 @@ if(isset($alterar)){
     //Verifica se a data nova é posterior ao lançamento contabil mais antigo
     if($sqlerro == false && $dataAlterada){
         $sql = "SELECT DISTINCT c70_data, c71_coddoc
-            FROM conlancam 
+            FROM conlancam
             INNER JOIN conlancamval ON c69_codlan = c70_codlan
-            INNER JOIN conlancamdoc ON c71_codlan = c70_codlan  
-            INNER JOIN conhistdoc   ON c71_coddoc = c53_coddoc  
-            INNER JOIN conlancamemp ON c75_codlan = c70_codlan  
+            INNER JOIN conlancamdoc ON c71_codlan = c70_codlan
+            INNER JOIN conhistdoc   ON c71_coddoc = c53_coddoc
+            INNER JOIN conlancamemp ON c75_codlan = c70_codlan
             WHERE c75_numemp = {$e60_numemp} AND c71_coddoc NOT IN (1, 410)
             ORDER BY c70_data ASC
             ";
@@ -201,11 +201,11 @@ if(isset($alterar)){
         $tipoSaldo = 2; //Saldo do mês
         if ($data_empenho_mes === $e60_emiss_mes){
             $tipoSaldo = 3;//Saldo do dia
-        } 
+        }
         $result = db_dotacaosaldo(8,2,$tipoSaldo,true," o58_coddot = $e60_coddot and o58_anousu = $e60_emiss_ano",$e60_emiss_ano,$data_empenho,$data_empenho);
         $result = pg_fetch_assoc($result);
-        $saldoDotacao = $result['atual_menos_reservado'];            
-        if($saldoDotacao < $e60_vlremp){                
+        $saldoDotacao = $result['atual_menos_reservado'];
+        if($saldoDotacao < $e60_vlremp){
             $erro_msg = "Alteração não realizada! A dotação não possui saldo nesta data.";
             $sqlerro = true;
         }
@@ -218,7 +218,7 @@ if(isset($alterar)){
             db_query($sqlAlteraData);
         }else{
             $erro_msg = "Alteração não realizada! A data do empenho não pode ser posterior a data atual.";
-            $sqlerro = true;  
+            $sqlerro = true;
         }
     }
 
@@ -267,22 +267,22 @@ if(isset($alterar)){
     $numrows = $clempautidot->numrows;
     if ($numrows > 0) {
         db_fieldsmemory($result, 0);
-    }	
+    }
 
     $result  = $clempempaut->sql_record($clempempaut->sql_query_empenho(null, " e60_tipodespesa , e60_esferaemendaparlamentar , e60_emendaparlamentar ",null, " e61_autori = $e54_autori"));
     $numrows = $clempempaut->numrows;
     if ($numrows > 0) {
         db_fieldsmemory($result, 0);
-    }	
+    }
 
     $oCodigoAcompanhamento = new ControleOrcamentario();
     $oCodigoAcompanhamento->setTipoDespesa($e60_tipodespesa);
     $oCodigoAcompanhamento->setFonte($o58_codigo);
     $oCodigoAcompanhamento->setEmendaParlamentar($e60_emendaparlamentar);
-    $oCodigoAcompanhamento->setEsferaEmendaParlamentar($e60_esferaemendaparlamentar);       
+    $oCodigoAcompanhamento->setEsferaEmendaParlamentar($e60_esferaemendaparlamentar);
     $oCodigoAcompanhamento->setDeParaFonteCompleta();
     $e60_codco = $oCodigoAcompanhamento->getCodigoParaEmpenho();
-    
+
     $clempempenho->e60_codco = $e60_codco;
     $clempempenho->alterar($e60_numemp);
     if($clempempenho->erro_status == 0) {
@@ -372,7 +372,7 @@ if(isset($alterar)){
     }
 
     if ($sqlerro==false && isset($e68_numemp) && $e68_numemp == "s") {
-        
+
         $oDaoEmpenhoNl->e68_numemp = $e60_numemp;
         $oDaoEmpenhoNl->e68_data   = date("Y-m-d",db_getsession("DB_datausu"));
         $oDaoEmpenhoNl->incluir(null);
@@ -410,9 +410,9 @@ if(isset($alterar)){
 
                 $clempnotaele->e70_codele = $e56_codele;
                 $clempnotaele->e70_codnota = $e69_codnota;
-                
+
                 $clempnotaele->alterar($oRow->e69_codnota);
-                
+
                 if($clempnotaele->erro_status=="0"){
                     $sqlerro=true;
                     $erro_msg = $clempnotaele->erro_msg;
@@ -503,15 +503,15 @@ if(isset($alterar)){
             db_fieldsmemory($result,0);
         }
     }
-    
+
     if ($sqlerro==false) {
         $erro_msg = "Alteração realizada com sucesso!";
     }
-    
+
     /**[Extensao Ordenador Despesa] inclusao_ordenador*/
 
     db_fim_transacao($sqlerro);
-  
+
     // atualiza o campo do gestor do empenho
     if (isset($e54_gestaut) && isset($e54_autori) && !empty($e54_gestaut)) {
         if($gestor_alterado === 'true'){
@@ -531,7 +531,7 @@ if(isset($alterar)){
     if(isset($e60_informacaoop)){
         if($historico_alterado === 'true'){
             $clempempenho->e60_informacaoop = $e60_informacaoop;
-            $result = $clempempenho->alteraHistorico($e60_numemp);        
+            $result = $clempempenho->alteraHistorico($e60_numemp);
             if($result){
                 if(isset($msgCampoAlterado)){
                     $msgCampoAlterado .= " - Histórico da OP\n";
@@ -596,6 +596,20 @@ if(isset($alterar)){
 </center>
 </body>
 </html>
+<script>
+    function js_emiteEmpenho(iNumEmp) {
+
+        if (!confirm("Esse procedimento invalidará as assinaturas já realizadas. Deseja continuar?")) {
+            return;
+        }
+
+        jan = window.open('emp2_emitenotaemp002.php?e60_numemp='+iNumEmp+'&assinar=true', '','width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0');
+        jan.moveTo(0,0);
+
+        document.form1.incluir.disabled = true;
+        document.form1.op.disabled = true;
+    }
+</script>
 <?php
 if(isset($alterar)){
     if($sqlerro == true){
@@ -606,7 +620,7 @@ if(isset($alterar)){
         }
     }else{
         db_msgbox($erro_msg);
-        db_redireciona('emp1_aba1empempenho002.php');
+//        db_redireciona('emp1_aba1empempenho002.php');
     }
 }
 

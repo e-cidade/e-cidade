@@ -752,4 +752,30 @@ class cl_orcfontes {
     return $sSqlReceita;
   }
 
+    /**
+     * @param string $sCampos
+     * @param string $sOrdem
+     * @param string $sJoin
+     * @param string $sWhere
+     * @return string
+     */
+    public function sqlDuplicaOrcfontesOrcamento($sCampos = "*", $sOrdem = null, $sJoin = "", $sWhere = null)
+  {
+        $sqlReceita = "SELECT {$sCampos} FROM orcfontes ";
+
+        if ($sJoin != ""){
+            $sqlReceita .= $sJoin;
+        }
+
+        if ($sWhere != ""){
+            $sqlReceita .= " WHERE {$sWhere}";
+        }
+
+        if (!empty($sOrdem)) {
+            $sqlReceita .= " ORDER BY {$sOrdem}";
+        }
+
+        return $sqlReceita;
+  }
+
 }

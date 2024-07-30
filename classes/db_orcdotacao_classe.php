@@ -339,7 +339,7 @@ class cl_orcdotacao {
      return true;
    }
    // funcao para alteracao
-   function alterar ($o58_anousu=null,$o58_coddot=null) {
+   function alterar ($o58_anousu=null,$o58_coddot=null, $lLog=null) {
       $this->atualizacampos();
      $sql = " update orcdotacao set ";
      $virgula = "";
@@ -535,52 +535,55 @@ class cl_orcdotacao {
        }
      }
      $sql .= " where ";
-     if($o58_anousu!=null){
-       $sql .= " o58_anousu = $this->o58_anousu";
+     if($o58_anousu != null){
+       $sql .= " o58_anousu = $o58_anousu";
      }
-     if($o58_coddot!=null){
-       $sql .= " and  o58_coddot = $this->o58_coddot";
+     if($o58_coddot != null){
+       $sql .= " and  o58_coddot = $o58_coddot";
      }
+     if ($lLog == null) {
      $resaco = $this->sql_record($this->sql_query_file($this->o58_anousu,$this->o58_coddot));
      if($this->numrows>0){
        for($conresaco=0;$conresaco<$this->numrows;$conresaco++){
          $resac = db_query("select nextval('db_acount_id_acount_seq') as acount");
          $acount = pg_result($resac,0,0);
-         $resac = db_query("insert into db_acountacesso values($acount,".db_getsession("DB_acessado").")");
-         $resac = db_query("insert into db_acountkey values($acount,5285,'$this->o58_anousu','A')");
-         $resac = db_query("insert into db_acountkey values($acount,5286,'$this->o58_coddot','A')");
+         $resac  = "insert into db_acountacesso values($acount,".db_getsession("DB_acessado").");";
+         $resac .= "insert into db_acountkey values($acount,5285,'$this->o58_anousu','A');";
+         $resac .= "insert into db_acountkey values($acount,5286,'$this->o58_coddot','A');";
          if(isset($GLOBALS["HTTP_POST_VARS"]["o58_anousu"]) || $this->o58_anousu != "")
-           $resac = db_query("insert into db_acount values($acount,758,5285,'".AddSlashes(pg_result($resaco,$conresaco,'o58_anousu'))."','$this->o58_anousu',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+           $resac .= "insert into db_acount values($acount,758,5285,'".AddSlashes(pg_result($resaco,$conresaco,'o58_anousu'))."','$this->o58_anousu',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').");";
          if(isset($GLOBALS["HTTP_POST_VARS"]["o58_coddot"]) || $this->o58_coddot != "")
-           $resac = db_query("insert into db_acount values($acount,758,5286,'".AddSlashes(pg_result($resaco,$conresaco,'o58_coddot'))."','$this->o58_coddot',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+           $resac .= "insert into db_acount values($acount,758,5286,'".AddSlashes(pg_result($resaco,$conresaco,'o58_coddot'))."','$this->o58_coddot',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').");";
          if(isset($GLOBALS["HTTP_POST_VARS"]["o58_orgao"]) || $this->o58_orgao != "")
-           $resac = db_query("insert into db_acount values($acount,758,5287,'".AddSlashes(pg_result($resaco,$conresaco,'o58_orgao'))."','$this->o58_orgao',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+           $resac .= "insert into db_acount values($acount,758,5287,'".AddSlashes(pg_result($resaco,$conresaco,'o58_orgao'))."','$this->o58_orgao',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').");";
          if(isset($GLOBALS["HTTP_POST_VARS"]["o58_unidade"]) || $this->o58_unidade != "")
-           $resac = db_query("insert into db_acount values($acount,758,5288,'".AddSlashes(pg_result($resaco,$conresaco,'o58_unidade'))."','$this->o58_unidade',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+           $resac .= "insert into db_acount values($acount,758,5288,'".AddSlashes(pg_result($resaco,$conresaco,'o58_unidade'))."','$this->o58_unidade',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').");";
          if(isset($GLOBALS["HTTP_POST_VARS"]["o58_funcao"]) || $this->o58_funcao != "")
-           $resac = db_query("insert into db_acount values($acount,758,5289,'".AddSlashes(pg_result($resaco,$conresaco,'o58_funcao'))."','$this->o58_funcao',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+           $resac .= "insert into db_acount values($acount,758,5289,'".AddSlashes(pg_result($resaco,$conresaco,'o58_funcao'))."','$this->o58_funcao',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').");";
          if(isset($GLOBALS["HTTP_POST_VARS"]["o58_subfuncao"]) || $this->o58_subfuncao != "")
-           $resac = db_query("insert into db_acount values($acount,758,5290,'".AddSlashes(pg_result($resaco,$conresaco,'o58_subfuncao'))."','$this->o58_subfuncao',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+           $resac .= "insert into db_acount values($acount,758,5290,'".AddSlashes(pg_result($resaco,$conresaco,'o58_subfuncao'))."','$this->o58_subfuncao',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').");";
          if(isset($GLOBALS["HTTP_POST_VARS"]["o58_programa"]) || $this->o58_programa != "")
-           $resac = db_query("insert into db_acount values($acount,758,5291,'".AddSlashes(pg_result($resaco,$conresaco,'o58_programa'))."','$this->o58_programa',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+           $resac .= "insert into db_acount values($acount,758,5291,'".AddSlashes(pg_result($resaco,$conresaco,'o58_programa'))."','$this->o58_programa',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').");";
          if(isset($GLOBALS["HTTP_POST_VARS"]["o58_projativ"]) || $this->o58_projativ != "")
-           $resac = db_query("insert into db_acount values($acount,758,5292,'".AddSlashes(pg_result($resaco,$conresaco,'o58_projativ'))."','$this->o58_projativ',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+           $resac .= "insert into db_acount values($acount,758,5292,'".AddSlashes(pg_result($resaco,$conresaco,'o58_projativ'))."','$this->o58_projativ',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').");";
          if(isset($GLOBALS["HTTP_POST_VARS"]["o58_codele"]) || $this->o58_codele != "")
-           $resac = db_query("insert into db_acount values($acount,758,5293,'".AddSlashes(pg_result($resaco,$conresaco,'o58_codele'))."','$this->o58_codele',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+           $resac .= "insert into db_acount values($acount,758,5293,'".AddSlashes(pg_result($resaco,$conresaco,'o58_codele'))."','$this->o58_codele',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').");";
          if(isset($GLOBALS["HTTP_POST_VARS"]["o58_codigo"]) || $this->o58_codigo != "")
-           $resac = db_query("insert into db_acount values($acount,758,5294,'".AddSlashes(pg_result($resaco,$conresaco,'o58_codigo'))."','$this->o58_codigo',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+           $resac .= "insert into db_acount values($acount,758,5294,'".AddSlashes(pg_result($resaco,$conresaco,'o58_codigo'))."','$this->o58_codigo',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').");";
          if(isset($GLOBALS["HTTP_POST_VARS"]["o58_valor"]) || $this->o58_valor != "")
-           $resac = db_query("insert into db_acount values($acount,758,5295,'".AddSlashes(pg_result($resaco,$conresaco,'o58_valor'))."','$this->o58_valor',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+           $resac .= "insert into db_acount values($acount,758,5295,'".AddSlashes(pg_result($resaco,$conresaco,'o58_valor'))."','$this->o58_valor',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').");";
          if(isset($GLOBALS["HTTP_POST_VARS"]["o58_instit"]) || $this->o58_instit != "")
-           $resac = db_query("insert into db_acount values($acount,758,5296,'".AddSlashes(pg_result($resaco,$conresaco,'o58_instit'))."','$this->o58_instit',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+           $resac .= "insert into db_acount values($acount,758,5296,'".AddSlashes(pg_result($resaco,$conresaco,'o58_instit'))."','$this->o58_instit',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').");";
          if(isset($GLOBALS["HTTP_POST_VARS"]["o58_localizadorgastos"]) || $this->o58_localizadorgastos != "")
-           $resac = db_query("insert into db_acount values($acount,758,14520,'".AddSlashes(pg_result($resaco,$conresaco,'o58_localizadorgastos'))."','$this->o58_localizadorgastos',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+           $resac .= "insert into db_acount values($acount,758,14520,'".AddSlashes(pg_result($resaco,$conresaco,'o58_localizadorgastos'))."','$this->o58_localizadorgastos',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').");";
          if(isset($GLOBALS["HTTP_POST_VARS"]["o58_datacriacao"]) || $this->o58_datacriacao != "")
-           $resac = db_query("insert into db_acount values($acount,758,17691,'".AddSlashes(pg_result($resaco,$conresaco,'o58_datacriacao'))."','$this->o58_datacriacao',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+           $resac .= "insert into db_acount values($acount,758,17691,'".AddSlashes(pg_result($resaco,$conresaco,'o58_datacriacao'))."','$this->o58_datacriacao',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').");";
          if(isset($GLOBALS["HTTP_POST_VARS"]["o58_concarpeculiar"]) || $this->o58_concarpeculiar != "")
-           $resac = db_query("insert into db_acount values($acount,758,18157,'".AddSlashes(pg_result($resaco,$conresaco,'o58_concarpeculiar'))."','$this->o58_concarpeculiar',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+           $resac .= "insert into db_acount values($acount,758,18157,'".AddSlashes(pg_result($resaco,$conresaco,'o58_concarpeculiar'))."','$this->o58_concarpeculiar',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').");";
+          db_query($resac);
        }
      }
+    }
      $result = db_query($sql);
      if($result==false){
        $this->erro_banco = str_replace("\n","",@pg_last_error());

@@ -140,8 +140,9 @@ class cl_emite_nota_liq {
                     from pagordemele
                     inner join pagordem on pagordem.e50_codord = pagordemele.e53_codord
                     inner join empempenho on empempenho.e60_numemp = pagordem.e50_numemp
-                    left join orcelemento on orcelemento.o56_codele = pagordemele.e53_codele and orcelemento.o56_anousu = empempenho.e60_anousu
-		            left join empelemento on empelemento.e64_numemp = empempenho.e60_numemp and orcelemento.o56_codele = empelemento.e64_codele
+                    inner join empelemento on empelemento.e64_numemp = empempenho.e60_numemp	
+                    inner join orcelemento on orcelemento.o56_codele = empelemento.e64_codele
+                    and orcelemento.o56_anousu = empempenho.e60_anousu
 		            where pagordemele.e53_codord = {$e50_codord} ";
 
         if ($e50_data){

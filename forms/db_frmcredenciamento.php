@@ -18,7 +18,7 @@ $cliframe_seleciona = new cl_iframe_seleciona;
                 <td>
                     <?
                     $sWhere  = "l206_licitacao=".@$l20_codigo;
-                    $result_forn = $clhabilitacaoforn->sql_record($clhabilitacaoforn->sql_query(null,"l206_fornecedor,z01_nome","",$sWhere));
+                    $result_forn = $clhabilitacaoforn->sql_record($clhabilitacaoforn->todosFornecedoresDaLicitacao($l20_codigo));
                     db_selectrecord("l205_fornecedor",$result_forn,true,$db_opcao,"","","","","BuscarCredenciamento(this.value)");
                     ?>
                 </td>

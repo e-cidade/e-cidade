@@ -368,21 +368,31 @@ db_input('o15_descr',55,$Io15_descr,true,'text',3,'')
     </td>
     <td> 
    <?
+   if ($db_opcao == 1){
+      $cllocalizadorgastos = new cl_ppasubtitulolocalizadorgasto;
+      $result = $cllocalizadorgastos->sql_record($cllocalizadorgastos->sql_query(null,'*',null,'o11_codigo = 3'));
+      if ($result){
+        $result = db_utils::fieldsMemory($result, 0);
+        $o58_localizadorgastos = $result->o11_codigo;
+        $o11_descricao = $result->o11_descricao;
+      }
+    }
    db_input('o58_localizadorgastos',11,$Io58_localizadorgastos,true,'text',$db_opcaoNovo,"onchange='js_pesquisao58_localizadorgastos(false);'");  
    db_input('o11_descricao',55,$Io11_descricao,true,'text',3,'');
     ?>
     </td>
   </tr>
   <tr>
-    <td nowrap title="<?=@$To58_concarpeculiar?>">
+    <td nowrap title="<?=@$To58_concarpeculiar?>" style="display:none">
        <?
        db_ancora(@$Lo58_concarpeculiar,"js_pesquisao58_concarpeculiar(true);",$db_opcaoNovo,"","o58_concarpeculiarancora");
        ?>
     </td>
     <td> 
    <?
-   db_input('o58_concarpeculiar',11,$Io58_concarpeculiar,true,'text',$db_opcaoNovo,"onchange='js_pesquisao58_concarpeculiar(false);'");  
-   db_input('c58_descr',55,$Ic58_descr,true,'text',3,'');
+   $o58_concarpeculiar = '000';
+   db_input('o58_concarpeculiar',11,$Io58_concarpeculiar,true,'hidden',$db_opcaoNovo,"onchange='js_pesquisao58_concarpeculiar(false);'");  
+   db_input('c58_descr',55,$Ic58_descr,true,'hidden',3,'');
     ?>
     </td>
     </tr>
@@ -405,6 +415,9 @@ db_input('o15_descr',55,$Io15_descr,true,'text',3,'')
   <input name="pesquisar" type="button" id="pesquisar" value="Pesquisar" onclick="js_pesquisa();">
 </form>
 <script>
+  // document.form1.o58_localizadorgastos.value = 3;
+  // js_pesquisao58_localizadorgastos(false)
+
   function js_pesquisao58_orgao(mostra) {
     if (mostra == true) {
       js_OpenJanelaIframe('CurrentWindow.corpo.iframe_orcdotacao', 'db_iframe_orcorgao', 'func_orcorgao.php?funcao_js=parent.js_mostraorcorgao1|o40_orgao|o40_descr', 'Pesquisa', true);

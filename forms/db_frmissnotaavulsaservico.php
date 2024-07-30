@@ -8,14 +8,16 @@ $clrotulo->label("q51_sequencial");
 
 #recupera a inscrição municipal utilizada no registro da nota
 $id_nota = $get->q51_sequencial;
-$sqlPrestador = "select q51_inscr from issnotaavulsa where q51_sequencial = $id_nota";
+$arrayNotas = array();
+$sqlPrestador = "select q51_inscr, q51_dtemiss  from issnotaavulsa where q51_sequencial = $id_nota";
 $resultPrestador = db_utils::fieldsMemory(db_query($sqlPrestador), 0);
 $id_inscricao = $resultPrestador->q51_inscr;
-$arrayNotas = array();
+$data_emissao = $resultPrestador->q51_dtemiss;
+$d = explode('-', $data_emissao);
 
 #competencia atual e o max de dias que existe no mês
-$ano = date("Y");
-$mes = date("m");
+$ano = $d[0];
+$mes = $d[1];
 $maxDias = cal_days_in_month(CAL_GREGORIAN, $mes, $ano);
 
 #recupera as notas já emitidas durante o periodo
@@ -37,12 +39,25 @@ for($i = 0; $i < pg_num_rows($resultNotas); $i++) {
     $sqlNotaCancelada = "select * from issnotaavulsacanc where q63_issnotaavulsa = $id_nota";
     $resultNotasCancelada = db_query($sqlNotaCancelada);
 
-    if(pg_num_rows($resultNotasServico) > 0 && pg_num_rows($resultNotasCancelada) == 0){
-        $objNotas = db_utils::fieldsMemory($resultNotasServico, 0);
-        $arrayNotas['valores'][] = $objNotas->q62_vlruni;
-        $arrayNotas['valor'] += $objNotas->q62_vlruni;
-        $arrayNotas['deducao'] += $objNotas->q62_deducaoinss;
-        $arrayNotas['soma_irrf'] += $objNotas->q62_vlrirrf;
+    $sqlTomador = "select * from (select cgm.*, null as q02_inscr, q61_numcgm, q53_sequencial, q53_dtservico from issnotaavulsatomador inner join issnotaavulsatomadorcgm on q53_sequencial = q61_issnotaavulsatomador 
+    inner join cgm on cgm.z01_numcgm = q61_numcgm where issnotaavulsatomador.q53_issnotaavulsa = $id_nota union select cgm.*, q02_inscr, null as q61_numcgm, q53_sequencial, q53_dtservico from issnotaavulsatomador 
+    inner join issnotaavulsatomadorinscr on q53_sequencial = q54_issnotaavulsatomador inner join issbase on 
+    q02_inscr = q54_inscr inner join cgm on q02_numcgm = z01_numcgm where issnotaavulsatomador.q53_issnotaavulsa = $id_nota ) as x";
+
+    if(pg_num_rows($resultNotasServico) > 0 && pg_num_rows($resultNotasCancelada) == 0)
+    {
+        $resultTomador = db_query($sqlTomador);
+        $objTomador =  db_utils::fieldsMemory($resultTomador, 0);
+        $tomador = strtoupper($objTomador->z01_nome);
+
+        if(strpos($tomador, 'PREFEITURA') !== false){
+            $objNotas = db_utils::fieldsMemory($resultNotasServico, 0);
+            $arrayNotas['valores'][] = $objNotas->q62_vlruni;
+            $arrayNotas['id'][] = $id_nota;
+            $arrayNotas['valor'] += $objNotas->q62_vlruni;
+            $arrayNotas['deducao'] += $objNotas->q62_deducaoinss;
+            $arrayNotas['soma_irrf'] += $objNotas->q62_vlrirrf;
+        }
     }
 }
 
@@ -140,16 +155,16 @@ function baseCalculoFixo($valorNota){
             $valor = 0;
             break;
         case ($valorNota >= 2112.00) && ($valorNota <= 2826.65):
-            $valor = 158.4;
+            $valor = 169.44;
             break;
         case ($valorNota >= 2826.66) && ($valorNota <= 3751.05):
-            $valor = 370.4;
+            $valor = 381.44;
             break;
         case ($valorNota >= 3751.06) && ($valorNota <= 4664.68):
-            $valor = 651.73;
+            $valor = 662.77;
             break;
         case ($valorNota > 4664.68):
-            $valor = 884.96;
+            $valor = 896.00;
             break;
     }
 
@@ -957,16 +972,16 @@ $aTiposRetencoesINSS = array(
                 valor = 0;
             }
             if ((valorNota >= 2112.01) && (valorNota <= 2826.65)){
-                valor = 158.4;
+                valor = 169.44;
             }
             if ((valorNota >= 2826.66) && (valorNota <= 3751.05)){
-                valor = 370.4;
+                valor = 381.44;
             }
             if ((valorNota >= 3751.06) && (valorNota <= 4664.68)){
-                valor = 651.73;
+                valor = 662.77;
             }
             if ((valorNota > 4664.68)){
-                valor = 884.96;
+                valor = 896.00;
             }
         return valor;
     }

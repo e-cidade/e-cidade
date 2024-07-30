@@ -600,5 +600,50 @@ class cl_empanulado {
      }
      return $sql;
   }
+
+  function sql_query_anulacaoEmp ( $e94_codanu=null,$campos="*",$ordem=null,$dbwhere=""){
+    $sql = "SELECT ";
+    if($campos != "*" ){
+      $campos_sql = explode("#",$campos);
+      $virgula = "";
+      for($i=0;$i<sizeof($campos_sql);$i++){
+        $sql .= $virgula.$campos_sql[$i];
+        $virgula = ",";
+      }
+    }else{
+      $sql .= $campos;
+    }
+    $sql .= " FROM empanulado ";
+    $sql .= " INNER JOIN empempenho ON empempenho.e60_numemp = empanulado.e94_numemp";
+    $sql .= " INNER JOIN empanuladotipo ON empanuladotipo.e38_sequencial = empanulado.e94_empanuladotipo";
+    $sql .= " INNER JOIN empanuladoele ON e95_codanu = e94_codanu";
+    $sql .= " INNER JOIN empanuladoitem ON e37_empanulado = e94_codanu";
+    $sql .= " INNER JOIN conlancamemp ON e60_numemp = c75_numemp";
+    $sql .= " INNER JOIN cgm ON cgm.z01_numcgm = empempenho.e60_numcgm";
+    $sql .= " INNER JOIN db_config ON db_config.codigo = empempenho.e60_instit";
+    $sql .= " INNER JOIN orcdotacao ON orcdotacao.o58_anousu = empempenho.e60_anousu and  orcdotacao.o58_coddot = empempenho.e60_coddot";
+    $sql .= " INNER JOIN pctipocompra ON pctipocompra.pc50_codcom = empempenho.e60_codcom";
+    $sql .= " INNER JOIN emptipo ON emptipo.e41_codtipo = empempenho.e60_codtipo";
+    $sql .= " INNER JOIN concarpeculiar ON concarpeculiar.c58_sequencial = empempenho.e60_concarpeculiar";
+    $sql2 = "";
+    if($dbwhere==""){
+      if($e94_codanu!=null ){
+        $sql2 .= " WHERE empanulado.e94_codanu = $e94_codanu ";
+      }
+    }else if($dbwhere != ""){
+      $sql2 = " WHERE $dbwhere";
+    }
+    $sql .= $sql2;
+    if($ordem != null ){
+      $sql .= " ORDER BY ";
+      $campos_sql = explode("#",$ordem);
+      $virgula = "";
+      for($i=0;$i<sizeof($campos_sql);$i++){
+        $sql .= $virgula.$campos_sql[$i];
+        $virgula = ",";
+      }
+    }
+    return $sql;
+  }
 }
 ?>

@@ -411,7 +411,7 @@ try {
           $oLancamentoAuxiliar = LancamentoAuxiliarFactory::getInstance($iDocumento, $oDadosConlancam->c70_codlan);
         } catch (Exception $e) {
 
-          if ($e->getCode() == 208) {
+          if ($e->getCode() == 208 || $e->getCode() == 209) {
             $oRetorno->iLote = $e->iLote;
           }
 

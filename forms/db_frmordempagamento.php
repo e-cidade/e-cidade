@@ -1,3 +1,8 @@
+<?php
+require_once("model/protocolo/AssinaturaDigital.model.php");
+
+$AssinaturaDigital = new AssinaturaDigital();
+?>
 <style>
     .divDadosOp {
         display: flex;
@@ -17,7 +22,7 @@
             <td>
                 <fieldset class="fieldsetDadosOp">
                     <legend>Dados da OP</legend>
-                    <table>              
+                    <table>
                         <tr>
                             <td>
                                 <?= @$Le60_codemp ?>
@@ -197,7 +202,7 @@
                 db_input('e140_sequencial', 50, "", true, 'hidden', 3);
                 db_input('desdobramentoDiaria', 50, "", true, 'hidden', 3);
                 db_input('salvarDiaria', 50, "", true, 'hidden', 3);
-                include("forms/db_frmliquidaboxdiarias.php"); 
+                include("forms/db_frmliquidaboxdiarias.php");
                 ?>
             </td>
         </tr>
@@ -206,6 +211,9 @@
     <div style="margin-top: 10px;">
 
         <input name="alterar" type="button" id="db_opcao" value="Alterar" onclick="js_alterar()">
+        <? if ($AssinaturaDigital->verificaAssituraAtiva()) { ?>
+            <input name="alterar" type="button" id="db_opcao" value="Solicitar Nova Assinatura Digital" onclick="return js_emiteLiquidacaoOrdem(<?= $e50_codord ?>)"  >
+        <? } ?>
         <input name="pesquisar" type="button" id="pesquisar" value="Pesquisar OP" onclick="pesquisaOrdemPagamento()">
 
     </div>
@@ -265,7 +273,7 @@
     }
 
     function js_pesquisae50_getordem(e60_codemp) {
-        
+
         js_OpenJanelaIframe(
             '',
             'db_iframe_alteracaoop',
@@ -283,12 +291,12 @@
         return ("0" + data.getDate()).substr(-2) + "/" + ("0" + (data.getMonth() + 1)).substr(-2) + "/" + data.getFullYear();
     }
 
-    function js_mostraordem(e50_codord, e50_obs, e50_compdesp, elemento, e50_data, e60_numemp, data_anulacao, e53_valor, e50_retencaoir, e50_naturezabemservico, e53_vlranu, e53_vlrpag) {        
-        
+    function js_mostraordem(e50_codord, e50_obs, e50_compdesp, elemento, e50_data, e60_numemp, data_anulacao, e53_valor, e50_retencaoir, e50_naturezabemservico, e53_vlranu, e53_vlrpag) {
+
         $('e60_numemp').value = e60_numemp;
         $('e50_codord').value = e50_codord;
         $('e53_valor').value = e53_valor;
-        
+
         $('e53_vlranu').value = e53_vlranu;
         $('e53_vlrpag').value = e53_vlrpag;
         $('historicoOp').value = e50_obs;
@@ -335,8 +343,8 @@
         db_iframe_alteracaoop.hide();
         var tipodesdobramento = "<?php print $tipodesdobramento; ?>";
         if (tipodesdobramento == 1) {
-            js_verificaEsocial(e50_codord);          
-        } 
+            js_verificaEsocial(e50_codord);
+        }
     }
 
     $('e140_dtautorizacao').size = 8;
@@ -364,5 +372,13 @@
             elemento.style.color = 'black'
         });
     });
+
+    function js_emiteLiquidacaoOrdem(codordem) {
+        if (!confirm("Esse procedimento invalidará as assinaturas já realizadas. Deseja continuar?")) {
+            return;
+        }
+        jan = window.open('emp2_emitenotaliq002.php?codordem='+$('e50_codord').getValue()+'&assinar=true', '','width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0');
+        jan.moveTo(0,0);
+    }
 
 </script>

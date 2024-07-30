@@ -9,19 +9,19 @@ use ECidade\Api\V1\Providers\ConfiguracaoControllerProvider;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 
-class APIServiceProvider implements ServiceProviderInterface {
+class APIServiceProvider implements ServiceProviderInterface
+{
 
-  public function register(Application $app) {
-    // Podemos pegar a lógica de registro dos middlewares da aplicação para que seja definido aqui.
-  }
+    public function register(Application $app)
+    {
+    }
 
-  public function boot(Application $app) {
-
-    $prefix = $app['ecidade_api.mount_prefix'];
-    $app->mount($prefix . "/protocolo", new ProtocoloControllerProvider());
-    $app->mount($prefix . "/configuracao", new ConfiguracaoControllerProvider());
-    $app->mount($prefix . '/pix', new ApiPixProvider());
-    $app->mount($prefix . '/redesim', new ApiRedesimProvider());
-  }
-
+    public function boot(Application $app)
+    {
+        $prefix = $app['ecidade_api.mount_prefix'];
+        $app->mount($prefix . "/protocolo", new ProtocoloControllerProvider());
+        $app->mount($prefix . "/configuracao", new ConfiguracaoControllerProvider());
+        $app->mount($prefix . '/pix', new ApiPixProvider());
+        $app->mount($prefix . '/redesim', new ApiRedesimProvider());
+    }
 }

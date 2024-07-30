@@ -110,7 +110,7 @@ $clbancoagencia->rotulo->label("db89_codagencia");
             $result = $clbancoagencia->sql_record($clbancoagencia->sql_query($pesquisa_chave));
             if($clbancoagencia->numrows!=0){
               db_fieldsmemory($result,0);
-              echo "<script>".$funcao_js."('$db89_codagencia','$db89_digito',false);</script>";
+              echo "<script>".$funcao_js."('$db89_codagencia','$db89_digito','$db90_codban',false);</script>";
             } else {
               echo "<script>".$funcao_js."('','',true);</script>";
             }

@@ -12,13 +12,10 @@ class CnaeAnalitica extends LegacyModel
     use LegacyAccount;
 
     public $timestamps = false;
-    public $incrementing = false;
 
     protected $table = 'issqn.cnaeanalitica';
 
     protected $primaryKey = 'q72_sequencial';
-
-    protected string $sequenceName = "issqn.cnaeanalitica_q72_sequencial_seq";
 
     protected $fillable = [
         'q72_cnae',

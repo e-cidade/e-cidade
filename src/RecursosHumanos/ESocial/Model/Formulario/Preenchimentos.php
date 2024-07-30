@@ -378,7 +378,7 @@ class Preenchimentos
              inner join cadenderpais       on  db70_sequencial  = db71_cadenderpais
              inner join cadenderruaruastipo on db85_cadenderrua = db74_sequencial
              inner join ruastipo           on  j88_codigo       = db85_ruastipo
-            where z01_numcgm = intcgm.z01_numcgm limit 1) as tpLograd,
+            where cgm.z01_numcgm = intcgm.z01_numcgm limit 1) as tpLograd,
                 z01_ender as dscLograd,
                 z01_numero  as nrLograd,
                 z01_compl as complemento,
@@ -795,6 +795,8 @@ class Preenchimentos
      */
     public function buscarPreenchimentoS2410($codigoFormulario, $matricula = null)
     {
+        $anousu = db_getsession("DB_anousu");
+        $mesusu = date("m", db_getsession("DB_datausu"));
         $sql = "SELECT cgm.z01_cgccpf AS cpfbenef,
        rh01_matorgaobeneficio AS matricula,
        rh01_cnpjrespmatricula AS cnpjorigem,
@@ -828,10 +830,10 @@ class Preenchimentos
        rh02_rhtipoapos
 FROM rhpessoal
 INNER JOIN cgm ON cgm.z01_numcgm = rhpessoal.rh01_numcgm
-LEFT JOIN rhpessoalmov ON rh02_anousu = fc_getsession('DB_anousu')::int
-AND rh02_mesusu = date_part('month', fc_getsession('DB_datausu')::date)
+LEFT JOIN rhpessoalmov ON rh02_anousu = $anousu
+AND rh02_mesusu = $mesusu
 AND rh02_regist = rh01_regist
-AND rh02_instit = fc_getsession('DB_instit')::int
+AND rh02_instit = " . db_getsession("DB_instit") . "
 LEFT JOIN rhpesrescisao ON rh02_seqpes = rh05_seqpes
 LEFT JOIN rhregime ON rhregime.rh30_codreg = rhpessoalmov.rh02_codreg
 LEFT JOIN rescisao ON rescisao.r59_anousu = rhpessoalmov.rh02_anousu
@@ -843,15 +845,23 @@ LEFT JOIN cgm instituidor ON instituidor.z01_numcgm = rh02_cgminstituidor
 inner join db_config on
                             db_config.codigo = rhpessoal.rh01_instit
 WHERE rh30_vinculo IN ('I',
-                       'P')
-  AND (date_part('month', rh01_admiss) = date_part('month', fc_getsession('DB_datausu')::date) AND date_part('year', rh01_admiss) = fc_getsession('DB_anousu')::int)
-  AND r59_anousu IS NULL ";
+                       'P')";
         if ($matricula != null) {
             $sql .= " and rh01_regist in ($matricula) ";
         }
+        $sql .= "and (
+            (
+            (date_part('year',rhpessoal.rh01_admiss)::varchar || lpad(date_part('month',rhpessoal.rh01_admiss)::varchar,2,'0'))::integer <= 202207
+            and ($anousu || lpad($mesusu,2,'0'))::integer <= 202207
+            and (rh05_recis is null or (date_part('year',rh05_recis)::varchar || lpad(date_part('month',rh05_recis)::varchar,2,'0'))::integer > 202207)
+            ) or (
+            date_part('month',rhpessoal.rh01_admiss) = $mesusu
+            and date_part('year',rhpessoal.rh01_admiss) = $anousu
+            and ($anousu || lpad($mesusu,2,'0'))::integer > 202207
+            )
+        ) order by cgm.z01_nome asc";
 
         $rs = \db_query($sql);
-
         if (!$rs) {
             throw new \Exception("Erro ao buscar os preenchimentos do S2410");
         }
@@ -869,19 +879,15 @@ WHERE rh30_vinculo IN ('I',
      */
     public function buscarPreenchimentoS1200($codigoFormulario, $matricula = null, $cgm = null, $tipoevento = null)
     {
-        $anofolha = db_anofolha();
-        $mesfolha = db_mesfolha();
-        if (empty($mesfolha)) {
-            $anofolha = db_getsession("DB_anousu");
-            $mesfolha = date("m", db_getsession("DB_datausu"));
-        }
+        $ano = db_getsession("DB_anousu");
+        $mes = date("m", db_getsession("DB_datausu"));
         if ($tipoevento == 1) {
             $sql = "SELECT distinct z01_cgccpf from rhpessoal
                 left join rhpessoalmov on
-                rh02_anousu = fc_getsession('DB_anousu')::int
-                and rh02_mesusu = date_part('month', fc_getsession('DB_datausu')::date)
+                rh02_anousu = {$ano}
+                and rh02_mesusu = {$mes}
                 and rh02_regist = rh01_regist
-                and rh02_instit = fc_getsession('DB_instit')::int
+                and rh02_instit = " . db_getsession("DB_instit") . "
             inner join cgm on
                 cgm.z01_numcgm = rhpessoal.rh01_numcgm
             left join rhpesrescisao on
@@ -901,9 +907,9 @@ WHERE rh30_vinculo IN ('I',
             left  outer join (
                     SELECT distinct r33_codtab,r33_nome,r33_tiporegime
                                         from inssirf
-                                        where     r33_anousu = $anofolha
-                                            and r33_mesusu = $mesfolha
-                                            and r33_instit = fc_getsession('DB_instit')::int
+                                        where     r33_anousu = $ano
+                                            and r33_mesusu = $mes
+                                            and r33_instit = " . db_getsession("DB_instit") . "
                                     ) as x on r33_codtab = rhpessoalmov.rh02_tbprev+2
                 where (
                     (h13_categoria = '901' and rh30_vinculo = 'A')
@@ -913,8 +919,8 @@ WHERE rh30_vinculo IN ('I',
                     and r33_tiporegime = '1')
                 )
                 and ((rh05_recis is not null
-                and date_part('month', rh05_recis) = date_part('month', fc_getsession('DB_datausu')::date)
-                and date_part('year', rh05_recis) = date_part('year', fc_getsession('DB_datausu')::date)
+                and date_part('month', rh05_recis) = {$mes}
+                and date_part('year', rh05_recis) = {$ano}
                 )
                 or
                 rh05_recis is null
@@ -924,8 +930,6 @@ WHERE rh30_vinculo IN ('I',
                 $sql .= "and cgm.z01_cgccpf in (select z01_cgccpf from cgm join rhpessoal on cgm.z01_numcgm = rhpessoal.rh01_numcgm where rh01_regist in ($matricula)) ";
             }
         } else {
-            $ano = date("Y", db_getsession("DB_datausu"));
-            $mes = date("m", db_getsession("DB_datausu"));
             $data = "$ano-$mes-01";
             $data = new \DateTime($data);
             $data->modify('last day of this month');
@@ -976,7 +980,7 @@ WHERE rh30_vinculo IN ('I',
             where e50_data BETWEEN '$ano-$mes-01' AND '$ano-$mes-$ultimoDiaDoMes'
                 and Length(cgm.z01_cgccpf) like '11'
                 and e50_cattrabalhador is not null
-                and db_config.codigo = fc_getsession('DB_instit')::int
+                and db_config.codigo = " . db_getsession("DB_instit") . "
             ";
             if ($cgm != null) {
                 $sql .= " and cgm.z01_numcgm in ($cgm) ";
@@ -990,7 +994,7 @@ WHERE rh30_vinculo IN ('I',
             throw new \Exception("Erro ao buscar os preenchimentos do S1200");
         }
         /**
-         * @todo busca os empregadores da institui??o e adicona para cada rubriuca
+         * @todo busca os empregadores da instituicao e adicona para cada rubriuca
          */
         return \db_utils::getCollectionByRecord($rs);
     }
@@ -1000,8 +1004,8 @@ WHERE rh30_vinculo IN ('I',
      */
     public function buscarPreenchimentoS1202($codigoFormulario, $matricula = null)
     {
-        $anofolha = db_anofolha();
-        $mesfolha = db_mesfolha();
+        $ano = db_getsession("DB_anousu");
+        $mes = date("m", db_getsession("DB_datausu"));
         $sql = "SELECT distinct z01_cgccpf from rhpessoal
         left join rhpessoalmov on
         rh02_anousu = fc_getsession('DB_anousu')::int
@@ -1027,8 +1031,8 @@ WHERE rh30_vinculo IN ('I',
     left  outer join (
             SELECT distinct r33_codtab,r33_nome,r33_tiporegime
                                 from inssirf
-                                where     r33_anousu = $anofolha
-                                            and r33_mesusu = $mesfolha
+                                where     r33_anousu = $ano
+                                            and r33_mesusu = $mes
                                       and r33_instit = fc_getsession('DB_instit')::int
                                ) as x on r33_codtab = rhpessoalmov.rh02_tbprev+2
                     where h13_categoria in ('301', '302', '303', '305', '306', '309', '410')
@@ -1127,9 +1131,6 @@ WHERE rh30_vinculo IN ('I',
         $ano = date("Y", db_getsession("DB_datausu"));
         $mes = date("m", db_getsession("DB_datausu"));
 
-        $anofolha = db_anofolha();
-        $mesfolha = db_mesfolha();
-
         if ($tipoevento == 1) {
             $sql = "SELECT distinct z01_cgccpf from rhpessoal
             left join rhpessoalmov on
@@ -1152,8 +1153,8 @@ WHERE rh30_vinculo IN ('I',
             left  outer join (
                     SELECT distinct r33_codtab,r33_nome,r33_tiporegime
                                         from inssirf
-                                        where     r33_anousu = $anofolha
-                                            and r33_mesusu = $mesfolha
+                                        where     r33_anousu = $ano
+                                            and r33_mesusu = $mes
                                             and r33_instit = fc_getsession('DB_instit')::int
                                     ) as x on r33_codtab = rhpessoalmov.rh02_tbprev+2
              where 1=1
@@ -1237,11 +1238,8 @@ WHERE rh30_vinculo IN ('I',
      */
     public function buscarPreenchimentoS1299($codigoFormulario, $matricula = null, $cgm = null, $tipoevento = null)
     {
-        $ano = date("Y", db_getsession("DB_datausu"));
+        $ano = db_getsession("DB_anousu");
         $mes = date("m", db_getsession("DB_datausu"));
-
-        $anofolha = db_anofolha();
-        $mesfolha = db_mesfolha();
 
         $sql = "SELECT distinct z01_cgccpf from rhpessoal
             left join rhpessoalmov on
@@ -1264,8 +1262,8 @@ WHERE rh30_vinculo IN ('I',
             left  outer join (
                     SELECT distinct r33_codtab,r33_nome,r33_tiporegime
                                         from inssirf
-                                        where     r33_anousu = $anofolha
-                                            and r33_mesusu = $mesfolha
+                                        where     r33_anousu = $ano
+                                            and r33_mesusu = $mes
                                             and r33_instit = fc_getsession('DB_instit')::int
                                     ) as x on r33_codtab = rhpessoalmov.rh02_tbprev+2
              where 1=1

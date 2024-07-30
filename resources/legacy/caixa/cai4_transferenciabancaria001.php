@@ -40,33 +40,45 @@ require_once("model/contabilidade/RegraLancamentoContabil.model.php");
 $oGet = db_utils::postMemory($_GET);
 ?>
 <html>
+
 <head>
   <title>DBSeller Inform&aacute;tica Ltda - P&aacute;gina Inicial</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
   <meta http-equiv="Expires" CONTENT="0">
   <?php
-    db_app::load("scripts.js, strings.js, estilos.css, prototype.js, datagrid.widget.js, grid.style.css");
-    db_app::load("classes/DBViewSlipPagamento.classe.js, widgets/dbtextField.widget.js, widgets/dbcomboBox.widget.js");
-    db_app::load("dbmessageBoard.widget.js, prototype.js, dbtextField.widget.js, dbcomboBox.widget.js,dbtextFieldData.widget.js");
-    db_app::load("scripts.js, prototype.js, strings.js, arrays.js, dbcomboBox.widget.js,estilos.css"); 
+  db_app::load("scripts.js, strings.js, estilos.css, prototype.js, datagrid.widget.js, grid.style.css");
+  db_app::load("classes/DBViewSlipPagamento.classe.js, widgets/dbtextField.widget.js, widgets/dbcomboBox.widget.js");
+  db_app::load("dbmessageBoard.widget.js, prototype.js, dbtextField.widget.js, dbcomboBox.widget.js,dbtextFieldData.widget.js");
+  db_app::load("scripts.js, prototype.js, strings.js, arrays.js, dbcomboBox.widget.js,estilos.css");
   ?>
 </head>
+
 <body style="background-color: #cccccc; margin-top: 25px;">
   <div align="center">
     <div id="ctnSlipPagamento">
     </div>
   </div>
   <?
-    db_menu(db_getsession("DB_id_usuario"),db_getsession("DB_modulo"),db_getsession("DB_anousu"),db_getsession("DB_instit"));
+  db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsession("DB_anousu"), db_getsession("DB_instit"));
   ?>
 </body>
+
 </html>
 <script>
-
   var oDBViewSlipPagamento = new DBViewSlipPagamento("oDBViewSlipPagamento", 5, 1, $('ctnSlipPagamento'));
   oDBViewSlipPagamento.setAno('<?php echo db_getsession('DB_anousu'); ?>');
   oDBViewSlipPagamento.show();
-  oDBViewSlipPagamento.setPCASPAtivo('<?php echo db_getsession('DB_use_pcasp');?>');
+  oDBViewSlipPagamento.setPCASPAtivo('<?php echo db_getsession('DB_use_pcasp'); ?>');
   oDBViewSlipPagamento.start();
 
+
+  oDBViewSlipPagamento.pesquisaHistorico = function(lMostra) {
+
+    var sUrlHistorico = "func_conhist.php?pesquisa_chave=" + this.oTxtHistoricoInputCodigo.getValue() + "&funcao_js=parent." + this.sNomeInstancia + ".preencheHistorico";
+    if (lMostra) {
+      sUrlHistorico = "func_conhist.php?funcao_js=parent." + this.sNomeInstancia + ".completaHistorico|c50_codhist|c50_descr|c50_descrcompl";
+    }
+    console.log(sUrlHistorico);
+    js_OpenJanelaIframe("", 'db_iframe_conhist', sUrlHistorico, "Pesquisa Histórico", lMostra);
+  };
 </script>

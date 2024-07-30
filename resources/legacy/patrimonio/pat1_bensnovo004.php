@@ -69,6 +69,23 @@ $rsBem = $clBens->sql_record($clBens->sql_query_file(null, '*', null, " c01_modu
 $oBemIntegracao = db_utils::fieldsMemory($rsBem, 0);
 $integracao = $oBemIntegracao->c01_modulo;
 
+$oDaoEmpNotaItem = new cl_empnotaitem();
+$campos = "  empnota.e69_numero AS notafiscal, empempitem.e62_numemp AS seqempenho,
+             empempenho.e60_codemp || '/' || empempenho.e60_anousu AS numerodoempenho,
+             empnotaord.m72_codordem AS ordemdecompra, cgm.z01_nome as nome" ;
+$sSqlBuscaItemNota = $oDaoEmpNotaItem->sql_query_dados_material(null, $campos, null, "e72_sequencial = {$oGet->iCodigoEmpNotaItem}");
+$rsBuscaItemNota   = $oDaoEmpNotaItem->sql_record($sSqlBuscaItemNota);
+
+if ($oDaoEmpNotaItem->numrows > 0) {
+      
+  $oStdDadosItem     = db_utils::fieldsMemory($rsBuscaItemNota, 0);
+  $cod_notafiscal    = $oStdDadosItem->notafiscal;     
+  $cod_ordemdecompra = $oStdDadosItem->ordemdecompra;
+  $emp_sistema       = 's' ;
+  $t53_empen         = $oStdDadosItem->seqempenho;
+  $z01_nome_empenho  = $oStdDadosItem->nome;
+     
+}
 ?>
 
 <html>

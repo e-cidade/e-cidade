@@ -2,7 +2,8 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\URL;
+use App\Contracts\MyServiceInterface;
+use App\Services\MyService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -14,7 +15,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->bind(MyServiceInterface::class, MyService::class);
     }
 
     /**
@@ -24,10 +25,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-
-        if(app()->environment('production')){
-            $this->app['request']->server->set('HTTPS','on');
-            URL::forceScheme('https');
-        }
+        //
     }
 }

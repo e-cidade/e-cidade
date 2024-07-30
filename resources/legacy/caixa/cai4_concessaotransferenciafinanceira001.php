@@ -40,40 +40,63 @@ require_once("model/contabilidade/RegraLancamentoContabil.model.php");
 $oGet = db_utils::postMemory($_GET);
 ?>
 <html>
+
 <head>
-  <title>DBSeller Inform&aacute;tica Ltda - P&aacute;gina Inicial</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-  <meta http-equiv="Expires" CONTENT="0">
-  <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
-  <link href="estilos.css" rel="stylesheet" type="text/css">
-  <?php 
+    <title>DBSeller Inform&aacute;tica Ltda - P&aacute;gina Inicial</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <meta http-equiv="Expires" CONTENT="0">
+    <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
+    <link href="estilos.css" rel="stylesheet" type="text/css">
+    <?php
     db_app::load("scripts.js, strings.js, estilos.css, prototype.js, datagrid.widget.js, grid.style.css");
     db_app::load("classes/DBViewSlipPagamento.classe.js, widgets/dbtextField.widget.js, widgets/dbcomboBox.widget.js");
     db_app::load("dbmessageBoard.widget.js, prototype.js, dbtextField.widget.js, dbcomboBox.widget.js,dbtextFieldData.widget.js");
-    db_app::load("scripts.js, prototype.js, strings.js, arrays.js, dbcomboBox.widget.js,estilos.css"); 
-  ?>
+    db_app::load("scripts.js, prototype.js, strings.js, arrays.js, dbcomboBox.widget.js,estilos.css");
+    ?>
 </head>
+
 <body style="background-color: #cccccc; margin-top: 25px;">
-  <div align="center">
-    <div id="ctnSlipPagamento">
+    <div align="center">
+        <div id="ctnSlipPagamento">
+        </div>
     </div>
-  </div>
-  <? 
-    db_menu(db_getsession("DB_id_usuario"),db_getsession("DB_modulo"),db_getsession("DB_anousu"),db_getsession("DB_instit"));
-  ?>
+    <?
+    db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsession("DB_anousu"), db_getsession("DB_instit"));
+    ?>
 </body>
+
 </html>
 <script>
-  var oDBViewSlipPagamento = new DBViewSlipPagamento("oDBViewSlipPagamento", 1, 1, $('ctnSlipPagamento'));
-  oDBViewSlipPagamento.setAno('<?php echo db_getsession('DB_anousu'); ?>');
-  oDBViewSlipPagamento.show();
-  oDBViewSlipPagamento.setPCASPAtivo('<?php echo db_getsession('DB_use_pcasp');?>');
-  oDBViewSlipPagamento.start();
+    var oDBViewSlipPagamento = new DBViewSlipPagamento("oDBViewSlipPagamento", 1, 1, $('ctnSlipPagamento'));
+    oDBViewSlipPagamento.setAno('<?php echo db_getsession('DB_anousu'); ?>');
+    oDBViewSlipPagamento.show();
+    oDBViewSlipPagamento.setPCASPAtivo('<?php echo db_getsession('DB_use_pcasp'); ?>');
+    oDBViewSlipPagamento.start();
+
+    oDBViewSlipPagamento.pesquisaContaSaltes = function(lMostra, lCredito) {
+        var sFunctionCompleta = "Debito";
+        var sIframe = this.sPesquisaContaDebito;
+        
+        if (lCredito) {
+            sFunctionCompleta = "Credito";
+            sIframe = this.sPesquisaContaCredito;
+        }
+
+        var sObjetoTxtConta = "this.oTxtConta" + sFunctionCompleta + "Codigo";
+        var oTxtConta = eval(sObjetoTxtConta);
+        var oTxtTipo = "04";
+        var sUrlSaltes = "func_saltesreduz.php?pesquisa_chave=" + oTxtConta.getValue() + "&funcao_js=parent." + this.sNomeInstancia + ".preenche" + sFunctionCompleta + "&ver_datalimite=1&tipocontadebito=0&tipocontacredito=1&tipoconta=" + sFunctionCompleta + "&tiposelecione=" + oTxtTipo + "&codigoconta=" + this.oTxtContaDebitoCodigo.getValue(); /* Ocorrencia 2227 */
+ 
+        if (lMostra) {
+            sUrlSaltes = "func_saltesreduz.php?funcao_js=parent." + this.sNomeInstancia + ".completa" + sFunctionCompleta + "|k13_reduz|k13_descr|c60_tipolancamento|c60_subtipolancamento|db83_tipoconta|c61_codigo&ver_datalimite=1&tipocontadebito=0&tipocontacredito=1&tipoconta=" + sFunctionCompleta + "&tiposelecione=" + oTxtTipo + "&codigoconta=" + this.oTxtContaDebitoCodigo.getValue(); /* Ocorrencia 2227 */
+        }
+
+        js_OpenJanelaIframe("", 'db_iframe_' + sIframe, sUrlSaltes, "Pesquisa Contas", lMostra);
+    }
 </script>
 
 <style>
-  td {
-    white-space:nowrap;
-  }  
+    td {
+        white-space: nowrap;
+    }
 </style>
-

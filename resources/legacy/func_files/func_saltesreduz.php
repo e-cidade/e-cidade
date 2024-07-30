@@ -180,12 +180,12 @@ $clsaltes->rotulo->label("k13_reduz");
       if ($tiposelecione == 04){
           if ($tipoconta == "Debito"){
             if ( $tipocontadebito == 1){
-              $dbwhere .= " and db83_tipoconta = ".$tipocontadebito ;
+              $dbwhere .= " and (db83_tipoconta is null or db83_tipoconta = ".$tipocontadebito . ") ";
             }
           }    
           if ($tipoconta == "Credito"){    
             if ( $tipocontacredito == 1){
-              $dbwhere .= " and db83_tipoconta = ".$tipocontacredito ;
+              $dbwhere .= " and (db83_tipoconta is null or db83_tipoconta = ".$tipocontacredito . ") ";
             }
           }  
       }

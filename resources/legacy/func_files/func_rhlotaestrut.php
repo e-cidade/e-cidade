@@ -107,13 +107,13 @@ $clrhlota->rotulo->label("r70_descr");
            }
         }
         if(isset($chave_r70_codigo) && (trim($chave_r70_codigo)!="") ){
-	         $sql = $clrhlota->sql_query(null,$campos,"r70_codigo"," r70_codigo = $chave_r70_codigo $dbwhere ");
+	         $sql = $clrhlota->sql_rhlota_vinc_rec(null,$campos,"r70_codigo"," r70_codigo = $chave_r70_codigo $dbwhere ");
         }else if(isset($chave_r70_descr) && (trim($chave_r70_descr)!="") ){
-	         $sql = $clrhlota->sql_query(null,$campos,"r70_descr"," r70_descr like '$chave_r70_descr%' $dbwhere ");
+	         $sql = $clrhlota->sql_rhlota_vinc_rec(null,$campos,"r70_descr"," r70_descr like '$chave_r70_descr%' $dbwhere ");
         }else if(isset($chave_r70_estrut) && (trim($chave_r70_estrut)!="") ){
-	         $sql = $clrhlota->sql_query(null,$campos,"r70_estrut"," r70_estrut like '$chave_r70_estrut%' $dbwhere ");
+	         $sql = $clrhlota->sql_rhlota_vinc_rec(null,$campos,"r70_estrut"," r70_estrut like '$chave_r70_estrut%' $dbwhere ");
         }else{
-           $sql = $clrhlota->sql_query(null,$campos,"r70_codigo"," 1=1 $dbwhere ");
+           $sql = $clrhlota->sql_rhlota_vinc_rec(null,$campos,"r70_codigo"," 1=1 $dbwhere ");
         }
         // echo $sql;
         db_lovrot($sql,15,"()","",$funcao_js);

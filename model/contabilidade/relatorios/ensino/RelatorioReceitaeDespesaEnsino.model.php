@@ -216,12 +216,12 @@ class RelatorioReceitaeDespesaEnsino
             $sSqlOrder = "";
             $sCampos = " o15_codtri, o15_codigo, sum(vlrpag) as pagorpp, sum(vlrpagnproc) as pagorpnp  ";
             $sSqlWhere = db_getsession('DB_anousu') > 2022 ? " o15_codigo in ($sFonte) group by o15_codtri, o15_codigo " : " o15_codtri in ($sFonte) group by o15_codtri, o15_codigo ";
-            $aEmpRestos = $clEmpResto->getRestosPagarInscritosComDisponibilidadeFin(db_getsession("DB_anousu"), $this->dtini, $this->dtfim, $this->aInstits, $sCampos, $sSqlWhere, $sSqlOrder);
+            $aEmpRestos = $clEmpResto->getRestosPagarInscritosComDisponibilidadeFin(db_getsession("DB_anousu"), $this->dtini, $this->dtfim, $this->instits, $sCampos, $sSqlWhere, $sSqlOrder);
             $nValorRpPago = 0;
             foreach ($aEmpRestos as $oEmpResto) {
                 $nValorRpPago += $oEmpResto->pagorpp + $oEmpResto->pagorpnp;
             }
-            $nTotalAnterior = self::getSaldoPlanoContaFonteFundeb($sFonte, $this->dtini, $this->dtfim, $this->aInstits);
+            $nTotalAnterior = self::getSaldoPlanoContaFonteFundeb($sFonte, $this->dtini, $this->dtfim, $this->instits);
             $nSaldo = 0;
 
             if ($nValorRpPago > $nTotalAnterior) {

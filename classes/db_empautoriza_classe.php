@@ -82,6 +82,7 @@ class cl_empautoriza
     var $e54_tipodespesa = null;
     var $e54_desconto = null;
     var $e54_numerotermo = null;
+    var $e54_datainclusao = null;
     // cria propriedade com as variaveis do arquivo
     var $campos = "
                      e54_autori = int4 = Autorização
@@ -117,6 +118,7 @@ class cl_empautoriza
                      e54_tipoautorizacao = int4 = Tipo de Autorização 1-direta,2-licoutrosorgaos,3-licitacao,4-adesaoregpreco
                      e54_desconto = boolean = Desconto automático
                      e54_numerotermo = int8 = numero do termo
+                     e54_datainclusao = date = Data de Inclusão
                      ";
     //funcao construtor da classe
     function cl_empautoriza()
@@ -185,6 +187,7 @@ class cl_empautoriza
             $this->e54_tipoautorizacao = ($this->e54_tipoautorizacao == "" ? @$GLOBALS["HTTP_POST_VARS"]["e54_tipoautorizacao"] : $this->e54_tipoautorizacao);
             $this->e54_desconto = ($this->e54_desconto == "" ? @$GLOBALS["HTTP_POST_VARS"]["e54_desconto"] : $this->e54_desconto);
             $this->e54_numerotermo = ($this->e54_numerotermo == "" ? @$GLOBALS["HTTP_POST_VARS"]["e54_numerotermo"] : $this->e54_numerotermo);
+            $this->e54_datainclusao = ($this->e54_datainclusao == "" ? @$GLOBALS["HTTP_POST_VARS"]["e54_datainclusao"] : $this->e54_datainclusao);
         } else {
             $this->e54_autori = ($this->e54_autori == "" ? @$GLOBALS["HTTP_POST_VARS"]["e54_autori"] : $this->e54_autori);
         }
@@ -357,6 +360,9 @@ class cl_empautoriza
         if (($this->e54_desconto == null) || ($this->e54_desconto == "")) {
             $this->e54_desconto = 'f';
         }
+        if (($this->e54_datainclusao == null) || ($this->e54_datainclusao == "")) {
+            $this->e54_datainclusao = 'null';
+        }
         $sql = "insert into empautoriza(
                                            e54_autori
                                           ,e54_numcgm
@@ -391,6 +397,7 @@ class cl_empautoriza
                                           ,e54_tipoautorizacao
                                           ,e54_desconto
                                           ,e54_numerotermo
+                                          ,e54_datainclusao
 
                            )
                     values (
@@ -427,6 +434,7 @@ class cl_empautoriza
                                    ," . ($this->e54_tipoautorizacao == "null" || $this->e54_tipoautorizacao == "" ? "null" : "'" . $this->e54_tipoautorizacao . "'") . "
                                    ,'$this->e54_desconto'
                                    ,$this->e54_numerotermo
+                                   ,'$this->e54_datainclusao'
 
                           )";
         $result = db_query($sql);

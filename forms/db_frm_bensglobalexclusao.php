@@ -43,17 +43,30 @@ $sLegendaFieldset = "Excluir";
     <td title=""></td>
     <td>
       <b>Placa Inicial:</b>
+    </td>
+    <td>  
       <?
-        db_input('t52_placaini',8,$t52_placaini,true,"text",2,"");
+        db_input('t52_placaini',10,$t52_placaini,true,"text",2,"");
       ?>
     </td>
     <td>
       <b>Placa Final: </b>
       <?
-        db_input('t52_placafim',8,$t52_placaini,true,"text",2,"");
+        db_input('t52_placafim',10,$t52_placaini,true,"text",2,"");
       ?>
     </td>
   </tr><!-- Placa -->
+  <tr style="display:">
+    <td title=""></td>
+    <td nowrap title="Data da Exclusão:" >
+        <b>Data da Exclusão:</b>
+    </td>
+    <td>
+      <?
+       db_inputdata('t52_dtexclusao',@$t52_dtexclusao_dia,@$t52_dtexclusao_mes,@$t52_dtexclusao_ano,true,'text',1,"");
+      ?>
+    </td>
+  </tr>
 </table>
 
 

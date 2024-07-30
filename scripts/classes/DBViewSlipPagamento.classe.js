@@ -4,7 +4,7 @@
  * @param iTipoTransferencia - Codigo da transferencia (tabela: sliptipooperacao)
  * @param oDivDestino        - Objeto onde este objeto (DBViewSlipPagamento) sera adicionado
  */
- DBViewSlipPagamento = function(sNomeInstancia, iTipoTransferencia, iOpcao, oDivDestino, lInscricaoBaixa, lReadOnly) {
+ DBViewSlipPagamento = function(sNomeInstancia, iTipoTransferencia, iOpcao, oDivDestino, lInscricaoBaixa, lReadOnly, bAssinar) {
 
     var me                          = this;
     me.sNomeInstancia               = sNomeInstancia;
@@ -21,10 +21,12 @@
     me.iTamanhoCampo                = 12;
     me.lAlteracao                   = false;
     me.bTemExercicioDevolucaoDebito = false;
+    me.bAssinaturaAtiva             = bAssinar;
     me.bTemExercicioDevolucaoCredito = false;
     me.iLinhaExercicioDevolucao     = 0;
     me.tipocontadebito              = 0;
     me.tipocontacredito             = 0;
+
 
     if (lReadOnly == null || lReadOnly == 'undefined') {
       me.lReadOnly = false;
@@ -282,14 +284,14 @@
     me.oTxtInstituicaoDestinoCodigo            = new DBTextField('oTxtInstituicaoDestinoCodigo', me.sNomeInstancia+'.oTxtInstituicaoDestinoCodigo', '', me.iTamanhoCampo);
     me.oTxtInstituicaoDestinoCodigo.addEvent('onChange', ";"+me.sNomeInstancia+".pesquisaInstituicaoDestino(false);");
     me.oTxtDescricaoInstituicaoDestino         = new DBTextField('sDescricaoInstituicaoDestino', me.sNomeInstancia+'.oTxtDescricaoInstituicaoDestino', '', 56);
-    
+
     me.oTxtFavorecidoInputCodigo               = new DBTextField('oTxtFavorecidoInputCodigo', me.sNomeInstancia+'.oTxtFavorecidoInputCodigo', '', me.iTamanhoCampo);
     me.oTxtFavorecidoInputCodigo.addEvent('onChange', ";"+me.sNomeInstancia+".pesquisaFavorecido(false);");
     me.oTxtFavorecidoInputDescricao            = new DBTextField('oTxtFavorecidoInputDescricao', me.sNomeInstancia+'.oTxtFavorecidoInputDescricao', '', 56);
     me.oTxtFavorecidoInputDescricao .addEvent("onKeyUp", ";" + me.sNomeInstancia + ".buscaFavorecido(this.value);");
     me.oTxtFavorecidoInputdiv               = new DBTextField("oTxtFavorecidoInputdiv", me.sNomeInstancia + ".oTxtFavorecidoInputdiv",    "", 80);
     me.oTxtFavorecidoInputdiv.addEvent("onKeyUp", ";" + me.sNomeInstancia + "");
-    
+
     me.oTxtCaracteristicaDebitoInputCodigo     = new DBTextField('oTxtCaracteristicaDebitoInputCodigo', me.sNomeInstancia+'.oTxtCaracteristicaDebitoInputCodigo', '', me.iTamanhoCampo);
     me.oTxtCaracteristicaDebitoInputCodigo.addEvent('onChange', ";"+me.sNomeInstancia+".pesquisaCaracteristicaPeculiarDebito(false);");
     me.oTxtCaracteristicaDebitoInputDescricao  = new DBTextField('oTxtCaracteristicaDebitoInputDescricao', me.sNomeInstancia+'.oTxtCaracteristicaDebitoInputDescricao', '', 56);
@@ -307,7 +309,7 @@
 
     me.oTxtContaCreditodiv               = new DBTextField("oTxtContaCreditodiv", me.sNomeInstancia + ".oTxtContaCreditodiv",    "", 80);
     me.oTxtContaCreditodiv.addEvent("onKeyUp", ";" + me.sNomeInstancia + "");
-    
+
     me.oTxtContaDebitoCodigo                   = new DBTextField("oTxtContaDebitoCodigo",     me.sNomeInstancia + ".oTxtContaDebitoCodigo",     "", me.iTamanhoCampo);
     me.oTxtContaDebitoCodigo.addEvent("onChange", ";" + me.sNomeInstancia + ".pesquisaConta" + me.sPesquisaContaDebito + "(false, false);");
     me.oTxtContaDebitoDescricao                = new DBTextField("oTxtContaDebitoDescricao",  me.sNomeInstancia + ".oTxtContaDebitoDescricao",  "", 56);
@@ -315,7 +317,7 @@
 
     me.oTxtContaDebitodiv               = new DBTextField("oTxtContaDebitodiv", me.sNomeInstancia + ".oTxtContaDebitodiv",    "", 80);
     me.oTxtContaDebitodiv.addEvent("onKeyUp", ";" + me.sNomeInstancia + "");
-    
+
     /**
      * Finalidade Pagamento FUNDEB
      */
@@ -339,7 +341,7 @@
     me.oTxtFonteInputCodigo = new DBTextField('oTxtFonteInputCodigo', me.sNomeInstancia+'.oTxtFonteInputCodigo', '', me.iTamanhoCampo);
     me.oTxtFonteInputCodigo.addEvent('onFocus', ";"+me.sNomeInstancia+".pesquisaFonte(false);");
     me.oTxtFonteInputDescricao = new DBTextField('oTxtFonteInputDescricao', me.sNomeInstancia+'.oTxtFonteInputDescricao', '', 56);
-    
+
     me.oTxtNumDocumentoInput                       = new DBTextField('oTxtNumDocumentoInput', me.sNomeInstancia+'.oTxtNumDocumentoInput', '', me.iTamanhoCampo);
     me.oTxtNumDocumentoInput.setMaxLength(15);
 
@@ -347,7 +349,7 @@
     me.oTxtValorInput.addEvent("onKeyPress", "return js_teclas(event,this)");
 
     me.oTxtProcessoInput                       = new DBTextField('oTxtProcessoInput', me.sNomeInstancia+'.oTxtProcessoInput', '', me.iTamanhoCampo);
-    me.oTxtProcessoInput.setMaxLength(15);    
+    me.oTxtProcessoInput.setMaxLength(15);
 
     me.oTxtDataInput                          = new DBTextFieldData('oTxtDataInput', 'oTxtDataInput', null);
 
@@ -363,7 +365,7 @@
     me.oTxtDescricaoInstituicaoDestino.setReadOnly(me.lReadOnly);
     me.oTxtFavorecidoInputCodigo.setReadOnly(me.lReadOnly);
     me.oTxtFavorecidoInputDescricao.setReadOnly(me.lReadOnly);
-    me.oTxtFavorecidoInputdiv.setReadOnly(me.lReadOnly); 
+    me.oTxtFavorecidoInputdiv.setReadOnly(me.lReadOnly);
     me.oTxtCaracteristicaDebitoInputDescricao.setReadOnly(me.lReadOnly);
     me.oTxtCaracteristicaDebitoInputCodigo.setReadOnly(me.lReadOnly);
     me.oTxtCaracteristicaCreditoInputCodigo.setReadOnly(me.lReadOnly);
@@ -371,7 +373,7 @@
     me.oTxtContaCreditoDescricao.setReadOnly(me.lReadOnly);
     me.oTxtContaCreditodiv.setReadOnly(me.lReadOnly);
     me.oTxtContaDebitodiv.setReadOnly(me.lReadOnly);
-    me.oTxtHistoricoInputdiv.setReadOnly(me.lReadOnly);    
+    me.oTxtHistoricoInputdiv.setReadOnly(me.lReadOnly);
     me.oTxtContaCreditoCodigo.setReadOnly(me.lReadOnly);
     me.oTxtContaDebitoCodigo.setReadOnly(me.lReadOnly);
     me.oTxtExercicioCompetenciaDevolucaoInput.setReadOnly(me.lReadOnly);
@@ -381,8 +383,8 @@
     me.oTxtNumDocumentoInput.setReadOnly(me.lReadOnly);
     me.oTxtProcessoInput.setReadOnly(me.lReadOnly);
     me.oTxtValorInput.setReadOnly(me.lReadOnly);
-    me.oTxtDataInput.setReadOnly(me.lReadOnly); 
-    me.oTxtDataEstornoInput.setReadOnly(me.lReadOnly);  
+    me.oTxtDataInput.setReadOnly(me.lReadOnly);
+    me.oTxtDataEstornoInput.setReadOnly(me.lReadOnly);
     me.oTxtCodigoFinalidadeFundeb.setReadOnly(me.lReadOnly);
     me.oTxtDescricaoFinalidadeFundeb.setReadOnly(me.lReadOnly);
 
@@ -440,6 +442,13 @@
     me.oButtonNovo.id              = "btnNovo";
     me.oButtonNovo.name            = "btnNovo";
     me.oButtonNovo.style.marginTop = "10px";
+
+    me.oButtonAssinar                   = document.createElement('input');
+    me.oButtonAssinar.type              = "button";
+    me.oButtonAssinar.value             = "Solicitar Nova Assinatura Digital";
+    me.oButtonAssinar.id                = "btnAssinar";
+    me.oButtonAssinar.name              = "btnAssinar";
+    me.oButtonAssinar.style.marginTop   = "10px";
 
     /**
      * Cria botão para gerar nova baixa
@@ -530,9 +539,9 @@
       var oCellTipoInput = oRowTipo.insertCell(1);
       oCellTipoInput.id = "td_tipo_" + me.sNomeInstancia;
       oCellTipoInput.colSpan  = "3";
-      oCellTipoInput.tabIndex = "1"; 
+      oCellTipoInput.tabIndex = "1";
       oCellTipoInput.setAttribute("nowrap","nowrap");
-         
+
       if (iTipoTransferencia != 5){
           oCellTipoLabel.setAttribute("hidden","hidden");
           oCellTipoInput.setAttribute("hidden","hidden");
@@ -541,7 +550,7 @@
       var selectTipo = document.createElement("select");
       selectTipo.id = "txt_tipo_" + me.sNomeInstancia;
       selectTipo.style.width = "100%";
-          
+
       var options = [
             { value: '', label: 'Selecione' },
             { value: '01', label: '01 - Aplicação Financeira' },
@@ -554,16 +563,16 @@
             { value: '08', label: '08 - Transferência entre contas de fontes diferentes' },
             { value: '09', label: '09 - Transferência da conta caixa para esta conta' },
             { value: '10', label: '10 - Saques' }
-      
+
       ];
-          
+
       options.forEach(function(option) {
           var oTxtTipoInput  = document.createElement("option");
           oTxtTipoInput.value = option.value;
           oTxtTipoInput.text = option.label;
           selectTipo.appendChild(oTxtTipoInput );
       });
-          
+
       oCellTipoInput.appendChild(selectTipo);
 
       selectTipo.style.display = "block";
@@ -574,18 +583,18 @@
 
       selectTipo.addEventListener("keydown", function(event) {
         // Verifica se as teclas pressionadas são as setas para cima ou para baixo
-        if (event.keyCode === 38) { 
-            selectedIndex = Math.max(0, selectedIndex - 1); 
-        } else if (event.keyCode === 40) { 
-            selectedIndex = Math.min(selectTipo.options.length - 1, selectedIndex + 1); 
-        } else if (event.keyCode === 9) { 
+        if (event.keyCode === 38) {
+            selectedIndex = Math.max(0, selectedIndex - 1);
+        } else if (event.keyCode === 40) {
+            selectedIndex = Math.min(selectTipo.options.length - 1, selectedIndex + 1);
+        } else if (event.keyCode === 9) {
              document.getElementById("oTxtContaDebitoDescricao").focus();
-        } 
+        }
         else {
-            return; 
+            return;
         }
         event.keyCode
-        
+
         selectTipo.selectedIndex = selectedIndex;
 
         validaTipo(selectTipo.options[selectedIndex].value);
@@ -600,8 +609,8 @@
     /*
     *  Função para validar o tipo selecionado
     */
-    function validaTipo(valorSelecionado) 
-    {  
+    function validaTipo(valorSelecionado)
+    {
 
         me.oTxtContaDebitoCodigo.setReadOnly(true);
         me.oTxtContaDebitoDescricao.setReadOnly(true);
@@ -620,57 +629,57 @@
             me.oTxtContaDebitoCodigo.setReadOnly(false);
             me.oTxtContaDebitoDescricao.setReadOnly(false);
         }
-        if (valorSelecionado == 01){
+        if (valorSelecionado == 1){
             me.tipocontadebito   = 2;
-            me.tipocontacredito  = 1; 
+            me.tipocontacredito  = 1;
             me.buscaCamposAtivos(9791);
         }
-        if (valorSelecionado == 02){
+        if (valorSelecionado == 2){
             me.tipocontadebito   = 1;
-            me.tipocontacredito  = 2; 
+            me.tipocontacredito  = 2;
             me.buscaCamposAtivos(9792);
         }
-        if (valorSelecionado == 03){
-            me.tipocontadebito   = 1; 
-            me.tipocontacredito  = 1; 
-            me.buscaCamposAtivos(9793);
-        }
-        if (valorSelecionado == 04){
-            me.tipocontadebito   = 1;
-            me.tipocontacredito  = 1; 
-            me.buscaCamposAtivos(9794);
-        }
-        if (valorSelecionado == 05){
-            me.tipocontadebito   = 1; 
-            me.tipocontacredito  = 1; 
-            me.buscaCamposAtivos(9795);
-        }
-        if (valorSelecionado == 06){
-            me.tipocontadebito   = 1; 
-            me.tipocontacredito  = 1; 
-            me.buscaCamposAtivos(9796);
-        }
-        if (valorSelecionado == 07){
-            me.tipocontadebito   = 1; 
-            me.tipocontacredito  = 1; 
-            me.buscaCamposAtivos(9797);
-        }
-        if (valorSelecionado == 08){
+        if (valorSelecionado == 3){
             me.tipocontadebito   = 1;
             me.tipocontacredito  = 1;
-            me.buscaCamposAtivos(9798); 
+            me.buscaCamposAtivos(9793);
         }
-        if (valorSelecionado == 09){
+        if (valorSelecionado == 4){
             me.tipocontadebito   = 1;
-            me.tipocontacredito  = 3; 
+            me.tipocontacredito  = 1;
+            me.buscaCamposAtivos(9794);
+        }
+        if (valorSelecionado == 5){
+            me.tipocontadebito   = 1;
+            me.tipocontacredito  = 1;
+            me.buscaCamposAtivos(9795);
+        }
+        if (valorSelecionado == 6){
+            me.tipocontadebito   = 1;
+            me.tipocontacredito  = 1;
+            me.buscaCamposAtivos(9796);
+        }
+        if (valorSelecionado == 7){
+            me.tipocontadebito   = 1;
+            me.tipocontacredito  = 1;
+            me.buscaCamposAtivos(9797);
+        }
+        if (valorSelecionado == 8){
+            me.tipocontadebito   = 1;
+            me.tipocontacredito  = 1;
+            me.buscaCamposAtivos(9798);
+        }
+        if (valorSelecionado == 9){
+            me.tipocontadebito   = 1;
+            me.tipocontacredito  = 3;
             me.buscaCamposAtivos(9799);
         }
         if (valorSelecionado == 10){
             me.tipocontadebito   = 3;
-            me.tipocontacredito  = 1; 
+            me.tipocontacredito  = 1;
             me.buscaCamposAtivos(9790);
         }
-        
+
     }
 
       /**
@@ -810,7 +819,7 @@
       oCellContaCreditodiv.colSpan  = "8";
       oCellContaCreditodiv.id  = "resultcredito";
       oCellContaCreditodiv.setAttribute("hidden","hidden");
-     
+
       /**
        * Label Fonte
        */
@@ -907,7 +916,7 @@
        oCellHistoricoInputdiv.id  = "resulthistorico";
        oCellHistoricoInputdiv.setAttribute("hidden","hidden");
 
-    
+
       /**
        * Descricao Historico
        */
@@ -950,12 +959,12 @@
        var oCellNumDocumentoLabel           = oRowNumDocumento.insertCell(0);
            oCellNumDocumentoLabel.innerHTML = "<strong>Número do Documento:</strong>";
            me.iMostrarNumDoc  == 's' ? oCellNumDocumentoLabel.setAttribute("nowrap","nowrap") : oCellNumDocumentoLabel.setAttribute("hidden","hidden");
- 
+
        var oCellNumDocumentoInput           = oRowNumDocumento.insertCell(1);
            oCellNumDocumentoInput.colSpan   = "2";
            me.oTxtNumDocumentoInput.show(oCellNumDocumentoInput);
            me.iMostrarNumDoc  == 's' ? oCellNumDocumentoInput.setAttribute("nowrap","nowrap") : oCellNumDocumentoInput.setAttribute("hidden","hidden");
- 
+
       /**
        * Label Valor
        */
@@ -973,7 +982,7 @@
       var oRowData             = oTabela.insertRow(iLinhaTabela); iLinhaTabela++;
       var oCellDataLabel       = oRowData.insertCell(0);
       oCellDataLabel.innerHTML = "<b>Data:</b>";
-      
+
       var oCellDataInput       = oRowData.insertCell(1);
       oCellDataInput.colSpan   = "2";
       oCellDataInput.id        = "td_data_"+me.sNomeInstancia;
@@ -985,7 +994,7 @@
         var oRowDataEstorno      = oTabela.insertRow(iLinhaTabela); iLinhaTabela++;
         var oCellDataEstornoLabel       = oRowDataEstorno.insertCell(0);
         oCellDataEstornoLabel.innerHTML = "<b>Data Estorno:</b>";
-        
+
         var oCellDataEstornoInput       = oRowDataEstorno.insertCell(1);
         oCellDataEstornoInput.colSpan   = "2";
         oCellDataEstornoInput.id        = "td_dataestorno_"+me.sNomeInstancia;
@@ -1039,6 +1048,13 @@
       me.oDivDestino.appendChild(me.oButtonEstornar);
       me.oDivDestino.appendChild(me.oButtonImportar);
       me.oDivDestino.appendChild(me.oButtonNovo);
+
+      if(me.lAlteracao){
+        console.log(me.bAssinaturaAtiva);
+        if(me.bAssinaturaAtiva){
+          me.oDivDestino.appendChild(me.oButtonAssinar);
+        }
+      }
 
       if (me.iOpcao == 1) {
 
@@ -1124,7 +1140,7 @@
      me.validarTipo = function() {
 
       if (empty($("txt_tipo_" + me.sNomeInstancia).value)) {
-        if (iTipoTransferencia == 5){  
+        if (iTipoTransferencia == 5){
           alert("Selecione um Tipo.");
           return false;
         }
@@ -1147,6 +1163,11 @@
       return true;
     };
 
+     me.oButtonAssinar.observe('click', function() {
+       if(confirm("Esse procedimento invalidará as assinaturas já realizadas. Deseja continuar?")){
+        window.open('cai1_slip003.php?&numslip=' + me.oTxtCodigoSlip.getValue(), '', 'location=0');
+       }
+     });
     /**
      * Salva os dados de uma transferencia bancaria
      */
@@ -1178,6 +1199,13 @@
               alert("Fonte não informada.");
               return false;
           }
+
+        if (me.iAno >= 2024) {
+          if (me.oTxtFonteInputCodigo.getValue().length < 4) {
+            alert("Fonte inválida");
+            return false;
+          }
+        }
 
             if (me.temExercicioDevolucao()) {
                 if (me.oTxtExercicioCompetenciaDevolucaoInput.getValue() == "") {
@@ -1211,12 +1239,12 @@
         alert("Informe o histórico para a transferência.");
         return false;
       }
-      
+
       if (me.oTxtDataInput.getValue() == "") {
 
         alert("Informe a Data.");
         return false;
-      } 
+      }
 
       if (me.oTxtValorInput.getValue() == "" || me.oTxtValorInput.getValue() <= 0) {
 
@@ -1265,7 +1293,7 @@
       oParam.sCodigoFinalidadeFundeb        = me.oTxtCodigoFinalidadeFundeb.getValue();
       oParam.k17_numdocumento               = encodeURIComponent(tagString(me.oTxtNumDocumentoInput.getValue())) ;
       oParam.k17_data                       = me.oTxtDataInput.getValue();
-      oParam.k17_tiposelect                 = iTipoTransferencia == 5 ? $("txt_tipo_" + me.sNomeInstancia).value : '' ;  
+      oParam.k17_tiposelect                 = iTipoTransferencia == 5 ? $("txt_tipo_" + me.sNomeInstancia).value : '' ;
       oParam.k145_numeroprocesso            = encodeURIComponent(tagString(me.oTxtProcessoInput.getValue())) ;
 
       if(me.iInscricaoPassivo != null) {
@@ -1300,9 +1328,8 @@
       js_removeObj("msgBox");
       var oRetorno = eval("("+oAjax.responseText+")");
       if (oRetorno.status == 1) {
-
-        if (confirm(oRetorno.message.urlDecode()+" Deseja emitir o documento?")) {
-          window.open('cai1_slip003.php?&numslip='+oRetorno.iCodigoSlip, '', 'location=0');
+        if (!me.lAlteracao) {
+          window.open('cai1_slip003.php?&numslip=' + oRetorno.iCodigoSlip, '', 'location=0');
         }
         me.clearAllFields();
       } else {
@@ -1340,7 +1367,7 @@
       oParam.sMotivo             = encodeURIComponent(tagString(me.getMotivoAnulacao()));
       oParam.k17_codigo          = me.oTxtCodigoSlip.getValue();
       oParam.iCodigoTipoOperacao = me.iTipoTransferencia;
-      oParam.iDataEstorno        = me.oTxtDataEstornoInput.getValue(); 
+      oParam.iDataEstorno        = me.oTxtDataEstornoInput.getValue();
 
       new Ajax.Request(me.sUrlRpc,
                       {method: 'post',
@@ -1383,7 +1410,7 @@
       me.oTxtContaCreditoCodigo.setReadOnly(true);
       me.oTxtContaCreditoDescricao.setReadOnly(true);
     }
-  
+
     /**
      * Lookup de pesquisa conta saltes
      */
@@ -1462,12 +1489,12 @@
           document.getElementById("oTxtContaCreditoDescricao").focus();
       }
       if (iTipoTransferencia == 5){
-        if (($("txt_tipo_" + me.sNomeInstancia).value != 07 && $("txt_tipo_" + me.sNomeInstancia).value != 10) && $("txt_tipo_" + me.sNomeInstancia).value != 08){
+        if (($("txt_tipo_" + me.sNomeInstancia).value != 7 && $("txt_tipo_" + me.sNomeInstancia).value != 10) && $("txt_tipo_" + me.sNomeInstancia).value != 8){
             me.oTxtFonteInputCodigo.setValue(iCodfonte);
             me.oTxtFonteInputCodigo.setReadOnly(true);
-            me.pesquisaFonte(false)   
+            me.pesquisaFonte(false)
         }
-      }  
+      }
       me.mostrarExercicioDevolucao();
 
       var sIframeConta = "db_iframe_" + me.sPesquisaContaDebito;
@@ -1487,18 +1514,21 @@
         document.getElementById("oTxtContaCreditoDescricao").focus();
       }
       if (iTipoTransferencia == 5){
-        if (($("txt_tipo_" + me.sNomeInstancia).value != 07 && $("txt_tipo_" + me.sNomeInstancia).value != 10) && $("txt_tipo_" + me.sNomeInstancia).value != 08){
-          
+        if (($("txt_tipo_" + me.sNomeInstancia).value != 7 && $("txt_tipo_" + me.sNomeInstancia).value != 10) && $("txt_tipo_" + me.sNomeInstancia).value != 8){
+
           me.oTxtFonteInputCodigo.setValue(sCodfonte);
             me.oTxtFonteInputCodigo.setReadOnly(true);
             me.pesquisaFonte(false)
-        }  
-      }  
+        }
+      }
       if (lErro) {
         me.oTxtContaDebitoCodigo.setValue("");
         $(me.oTxtContaDebitoCodigo.sName).focus();
       }
 
+      if(sDescricao.match(/Chave/)){
+        me.oTxtContaDebitoCodigo.setValue("");
+      }
     };
 
     me.completaCredito = function(iReduzido, sDescricao, iTipo, iSubtipo,iTipoconta,iCodfonte) {
@@ -1507,12 +1537,12 @@
       me.oTxtContaCreditoDescricao.setValue(sDescricao);
       me.bTemExercicioDevolucaoCredito = me.bTipoDevolucao(iTipo, iSubtipo);
       if (iTipoTransferencia == 5){
-        if (($("txt_tipo_" + me.sNomeInstancia).value == 07 || $("txt_tipo_" + me.sNomeInstancia).value == 10) && $("txt_tipo_" + me.sNomeInstancia).value != 08){
+        if (($("txt_tipo_" + me.sNomeInstancia).value == 7 || $("txt_tipo_" + me.sNomeInstancia).value == 10) && $("txt_tipo_" + me.sNomeInstancia).value != 8){
           me.oTxtFonteInputCodigo.setValue(iCodfonte);
           me.oTxtFonteInputCodigo.setReadOnly(true);
-          me.pesquisaFonte(false)   
+          me.pesquisaFonte(false)
         }
-      }  
+      }
       me.mostrarExercicioDevolucao();
 
       var sIframeConta = "db_iframe_" + me.sPesquisaContaCredito;
@@ -1523,18 +1553,21 @@
     };
 
     me.preencheCredito = function(sDescricao,iFonte,iReduzido, lErro) {
-
       me.oTxtContaCreditoDescricao.setValue(sDescricao);
       if (iTipoTransferencia == 5){
-        if (($("txt_tipo_" + me.sNomeInstancia).value == 07 || $("txt_tipo_" + me.sNomeInstancia).value == 10) && $("txt_tipo_" + me.sNomeInstancia).value != 08){
+        if (($("txt_tipo_" + me.sNomeInstancia).value == 7 || $("txt_tipo_" + me.sNomeInstancia).value == 10) && $("txt_tipo_" + me.sNomeInstancia).value != 8){
           me.oTxtFonteInputCodigo.setValue(iFonte);
           me.oTxtFonteInputCodigo.setReadOnly(true);
           me.pesquisaFonte(false)
-        }  
-      }  
+        }
+      }
       if (lErro) {
         me.oTxtContaCreditoCodigo.setValue("");
         $(me.oTxtContaCreditoCodigo.sName).focus();
+      }
+
+      if(sDescricao.match(/Chave/)){
+        me.oTxtContaCreditoCodigo.setValue("");
       }
 
       me.verificaRecursoContaCredito();
@@ -1545,7 +1578,7 @@
       let inputField  = 'oTxtContaCreditoDescricao';
       let inputCodigo = 'oTxtContaCreditoCodigo';
       let ulField     = 'resultcredito';
-      me.buscaContas(inputField,inputCodigo,ulField,me.oTxtContaCreditoDescricao.getValue(),1); 
+      me.buscaContas(inputField,inputCodigo,ulField,me.oTxtContaCreditoDescricao.getValue(),1);
 
     }
     me.buscaContasDebito = function()
@@ -1553,43 +1586,43 @@
       let inputField  = 'oTxtContaDebitoDescricao';
       let inputCodigo = 'oTxtContaDebitoCodigo';
       let ulField     = 'resultdebito';
-      me.buscaContas(inputField,inputCodigo,ulField,me.oTxtContaDebitoDescricao.getValue(),2); 
+      me.buscaContas(inputField,inputCodigo,ulField,me.oTxtContaDebitoDescricao.getValue(),2);
     }
     me.buscaHistorico = function()
     {
       let inputField  = 'oTxtHistoricoInputDescricao';
       let inputCodigo = 'oTxtHistoricoInputCodigo';
       let ulField     = 'resulthistorico';
-      me.buscaHistoricoAutoComplete(inputField,inputCodigo,ulField,me.oTxtHistoricoInputDescricao.getValue()); 
+      me.buscaHistoricoAutoComplete(inputField,inputCodigo,ulField,me.oTxtHistoricoInputDescricao.getValue());
     }
     me.buscaFavorecido = function()
     {
       let inputField  = 'oTxtFavorecidoInputDescricao';
       let inputCodigo = 'oTxtFavorecidoInputCodigo';
       let ulField     = 'resultfavorecido';
-      me.buscaFavorecidoAutoComplete(inputField,inputCodigo,ulField,me.oTxtFavorecidoInputDescricao.getValue()); 
+      me.buscaFavorecidoAutoComplete(inputField,inputCodigo,ulField,me.oTxtFavorecidoInputDescricao.getValue());
     }
     me.buscaContas = function(inputField,inputCodigo,ulField,descricao,tipoconta)
-    {    
+    {
         var oParam    = new Object();
-        
+
         if (me.iTipoInclusao == 5){
           oParam.exec   = "verificaContasParaAutoComplete";
-        } 
-        else if ((me.iTipoInclusao == 13 && tipoconta == 2) || 
-                 (me.iTipoInclusao == 11 && tipoconta == 1) || 
-                 (me.iTipoInclusao == 17 && tipoconta == 1) || 
-                 (me.iTipoInclusao == 15 && tipoconta == 2) || 
+        }
+        else if ((me.iTipoInclusao == 13 && tipoconta == 2) ||
+                 (me.iTipoInclusao == 11 && tipoconta == 1) ||
+                 (me.iTipoInclusao == 17 && tipoconta == 1) ||
+                 (me.iTipoInclusao == 15 && tipoconta == 2) ||
                  (me.iTipoInclusao == 7  && tipoconta == 1) ||
                  (me.iTipoInclusao == 9  && tipoconta == 2) ||
                  (me.iTipoInclusao == 1  && tipoconta == 2)
                  ){
           oParam.exec   = "verificaContaEventoContabil";
-        }  
+        }
         else {
           oParam.exec   = "verificaContaGeral";
         }
-        
+
         oParam.iDescricao  = descricao;
         oParam.inputField  = inputField;
         oParam.inputCodigo = inputCodigo;
@@ -1603,25 +1636,25 @@
             me.oTxtContaCreditoCodigo.setReadOnly(false);
             me.oTxtContaCreditoDescricao.setReadOnly(false);
         }
-       
+
         if (tipoconta == 1) {
             oParam.tipodaconta = me.tipocontacredito;
             oParam.codigoconta =  me.oTxtContaDebitoCodigo.getValue();
         }
-       
+
         if(descricao.length == 3){
           js_divCarregando("Aguarde, verificando contas...", "msgBox");
-        };  
+        };
           var oAjax = new Ajax.Request ( "con4_planoContas.RPC.php",
             {method: 'post',
             parameters: 'json='+Object.toJSON(oParam),
             onComplete: me.fillAutoComplete
             });
-        
+
     };
     me.buscaFavorecidoAutoComplete = function(inputField,inputCodigo,ulField,descricao)
     {
-      
+
         var oParam    = new Object();
         oParam.exec   = "verificaFavorecidoAutoComplete";
         oParam.iDescricao  = descricao;
@@ -1630,15 +1663,15 @@
         oParam.ulField     = ulField;
         if(oParam.iDescricao.length == 5){
           js_divCarregando("Aguarde, verificando favorecido...", "msgBox");
-        }  
+        }
         if(oParam.iDescricao.length > 4){
           let oAjax = new Ajax.Request ( "con4_planoContas.RPC.php",
             {method: 'post',
             parameters: 'json='+Object.toJSON(oParam),
             onComplete: me.fillAutoComplete
             });
-        };         
-    }; 
+        };
+    };
     me.buscaHistoricoAutoComplete = function(inputField,inputCodigo,ulField,descricao)
     {
         if (descricao) {
@@ -1651,7 +1684,7 @@
             document.getElementById(inputField).value = '';
             return false;
           }
-        } 
+        }
         var oParam    = new Object();
         oParam.exec   = "verificaHistoricoAutoComplete";
         oParam.iDescricao  = descricao;
@@ -1660,36 +1693,36 @@
         oParam.ulField     = ulField;
         if(oParam.iDescricao.length == 3){
           js_divCarregando("Aguarde, verificando historicos...", "msgBox");
-        };  
+        };
           let oAjax = new Ajax.Request ( "con4_planoContas.RPC.php",
             {method: 'post',
             parameters: 'json='+Object.toJSON(oParam),
             onComplete: me.fillAutoComplete
-            });   
-    }; 
+            });
+    };
 
     me.fillAutoComplete = function(oAjax)
-    {    
+    {
       js_removeObj("msgBox");
      // Importe o arquivo JavaScript que contém o método performsAutoComplete
-      require_once('scripts/classes/autocomplete/AutoComplete.js');  
+      require_once('scripts/classes/autocomplete/AutoComplete.js');
       performsAutoComplete(oAjax);
       if (me.iTipoInclusao == 5) {
         me.fillAutoFields(oAjax);
       }
-                 
+
     }
     me.fillAutoFields = function (oAjax) {
 
       var oRetorno = JSON.parse(oAjax.responseText);
 
       var tiposelect = $("txt_tipo_" + me.sNomeInstancia).value;
-      
+
       window.setTimeout(
          function() {
           var oCodigoContaDebito  = document.getElementById("oTxtContaDebitoCodigo").value;
             if (oRetorno.inputField == 'oTxtContaDebitoDescricao' && oCodigoContaDebito ) {
-        
+
               document.getElementById("oTxtContaCreditoDescricao").focus();
               const tipos = ['01', '02', '03', '04', '05', '06', '09'];
               if (tipos.includes(tiposelect)) {
@@ -1702,7 +1735,7 @@
               }
             }
         }, 2000
-      ); 
+      );
 
       window.setTimeout(
         function() {
@@ -1714,14 +1747,14 @@
                me.pesquisaContaSaltes(false, false);
             }
            }
-       
+
        }, 2000
-     ); 
-      
-      if (tiposelect == 08) {
+     );
+
+      if (tiposelect == 8) {
           me.oTxtFonteInputCodigo.setReadOnly(false);
       }
-    
+
     };
 
     me.buscaFontes = function(codigo)
@@ -1729,16 +1762,16 @@
         var oParam    = new Object();
         oParam.exec   = "buscarFontes";
         oParam.iCodigo = codigo;
-        
-        
+
+
         if (codigo){
           let oAjax = new Ajax.Request ( "con4_planoContas.RPC.php",
             {method: 'post',
             parameters: 'json='+Object.toJSON(oParam),
             onComplete: me.retornoFontes
-            }); 
-          }    
-    }; 
+            });
+          }
+    };
     me.retornoFontes = function(oAjax)
     {
 
@@ -1757,6 +1790,7 @@
       if (lMostra) {
         sUrlHistorico = "func_conhist.php?funcao_js=parent."+me.sNomeInstancia+".completaHistorico|c50_codhist|c50_descr|c50_descrcompl";
       }
+
       js_OpenJanelaIframe("", 'db_iframe_conhist', sUrlHistorico, "Pesquisa Histórico", lMostra);
     };
 
@@ -1767,10 +1801,14 @@
 
       me.oTxtHistoricoInputDescricao.setValue(sDescricao);
       if (sHistorico) {
-        // me.oTxtObservacaoInput.setValue(sHistorico);
+        me.oTxtObservacaoInput.setValue(sHistorico);
       }
       if (lErro) {
         me.oTxtHistoricoInputCodigo.setValue();
+      }
+
+      if(sDescricao.match(/Chave/)){
+        me.oTxtHistoricoInputDescricao.setValue("");
       }
     };
 
@@ -2216,12 +2254,12 @@
         me.oTxtCaracteristicaCreditoInputCodigo.setValue("000");
         me.pesquisaCaracteristicaPeculiarCredito(false);
       }
-      
+
       me.oTxtDataInput.setValue('');
       me.oTxtValorInput.setValue('');
       me.oTxtNumDocumentoInput.setValue('');
       me.oTxtDataEstornoInput.getValue('');
-      
+
     };
 
 
@@ -2283,6 +2321,13 @@
       me.setAno = function (iAno) {
           me.iAno = iAno;
       }
+
+     /**
+      * Seta o ano da sessão
+      */
+     me.setAssina = function (assinaturaAtiva) {
+       me.bAssinaturaAtiva = assinaturaAtiva;
+     }
 
     /**
      * Seta se o PCASP esta ativo
@@ -2452,8 +2497,8 @@
       window.onload = function() {
         document.getElementById("txt_tipo_" + me.sNomeInstancia).focus();
       }
-    } 
-    
+    }
+
     me.buscaCamposAtivos = function(codhist)
     {
         var oParam    = new Object();
@@ -2464,8 +2509,8 @@
             {method: 'post',
             parameters: 'json='+Object.toJSON(oParam),
             onComplete: me.resultCampoAtivo
-            });     
-    }; 
+            });
+    };
     me.resultCampoAtivo = function (oAjax) {
 
       js_removeObj("msgBox");
@@ -2473,7 +2518,7 @@
       me.oTxtHistoricoInputCodigo.setValue(oRetorno.sCodhist);
       var sUrlHistorico = "func_conhist.php?pesquisa_chave="+me.oTxtHistoricoInputCodigo.getValue()+"&funcao_js=parent."+me.sNomeInstancia+".preencheHistorico";
       js_OpenJanelaIframe("", 'db_iframe_conhist', sUrlHistorico, "Pesquisa Histórico", false);
-   
+
    };
 
 };

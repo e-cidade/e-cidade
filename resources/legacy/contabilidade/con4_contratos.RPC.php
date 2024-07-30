@@ -729,6 +729,12 @@ switch ($oParam->exec) {
                     $oParam->contrato->dtTermino = $dataFinal;
                 }
 
+                if($oParam->contrato->iTipoPagamento == 1) {
+                    if($oParam->contrato->iValorParcela != $oParam->contrato->nValorContrato) {
+                        $oParam->contrato->iValorParcela = $oParam->contrato->nValorContrato;
+                    }
+                }
+
                 $oContrato->setDataPublicacao($oParam->contrato->dtPublicacao);
                 $oContrato->setDataInicial($oParam->contrato->dtInicio);
                 $oContrato->setDataFinal($oParam->contrato->dtTermino);
@@ -774,6 +780,12 @@ switch ($oParam->exec) {
                 $oContrato->setDescricaoReajuste(db_stdClass::normalizeStringJsonEscapeString($oParam->contrato->sDescricaoreajuste));
                 $oContrato->setDescricaoIndice(db_stdClass::normalizeStringJsonEscapeString($oParam->contrato->sDescricaoindice));
                 $oContrato->setVigenciaIndeterminada($oParam->contrato->iVigenciaIndeterminada);
+                $oContrato->setTipoPagamento($oParam->contrato->iTipoPagamento);
+                $oContrato->setNumeroParcela($oParam->contrato->iNumeroParcela);
+                $oContrato->setValorParcela($oParam->contrato->iValorParcela);
+                $oContrato->setIdentificarCipi($oParam->contrato->sIdentificarCipi);
+                $oContrato->setUrlCipi($oParam->contrato->sUrlCipi);
+                $oContrato->setInformacoesComplementares($oParam->contrato->sInformacoesComplementares);
                 $oContrato->save();
                 /*
                * verificamos se existe empenhos a serem vinculados na seção
@@ -961,9 +973,15 @@ switch ($oParam->exec) {
             $oDadosContrato->dtReajuste                   = $oContrato->getDataReajuste();
             $oDadosContrato->iIndicereajuste              = $oContrato->getIndiceReajuste();
             $oDadosContrato->sDescricaoreajuste           = urlencode($oContrato->getDescricaoReajuste());
-            $oDadosContrato->sDescricaoindice           = urlencode($oContrato->getDescricaoIndice());
+            $oDadosContrato->sDescricaoindice             = urlencode($oContrato->getDescricaoIndice());
             $oDadosContrato->sPeriodoreajuste             = urlencode($oContrato->getPeriodoreajuste());
             $oDadosContrato->iVigenciaIndeterminada       = $oContrato->getVigenciaIndeterminada();
+            $oDadosContrato->iTipoPagamento               = $oContrato->getTipoPagamento();
+            $oDadosContrato->iNumeroParcela               = $oContrato->getNumeroParcela();
+            $oDadosContrato->iValorParcela                = $oContrato->getValorParcela();
+            $oDadosContrato->sIdentificarCipi             = $oContrato->getIdentificarCipi();
+            $oDadosContrato->sUrlCipi                     = $oContrato->getUrlCipi();
+            $oDadosContrato->sInformacoesComplementares   = $oContrato->getInformacoesComplementares();
             $oRetorno->contrato = $oDadosContrato;
         } catch (Exception $eErro) {
 

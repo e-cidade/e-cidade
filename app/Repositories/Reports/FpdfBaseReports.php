@@ -5,14 +5,20 @@ namespace App\Repositories\Reports;
 require_once 'fpdf151/pdf.php';
 
 use App\Repositories\Contracts\Reports\IReports;
-use FPDF;
+use PDF;
 
-class FpdfBaseReports extends FPDF implements IReports
+class FpdfBaseReports extends PDF implements IReports
 {
 
     private string $file;
     private bool $showFile = false;
     private bool $base64Format = false;
+
+    public function __construct($orientation='P',$unit='mm',$format='A4')
+    {
+        parent::FPDF($orientation='P',$unit='mm',$format='A4');
+        $this->SetAutoPageBreak(false);
+    }
 
     /**
      * @param bool $showFile

@@ -401,7 +401,7 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
                                     </td>
                                 </tr>
 
-                                <tr id='l20_tipliticacao'>
+                                <tr>
 
                                     <td nowrap title="<?= @$Tl20_tipliticacao ?>" id="tipolicitacao">
                                         <strong>Critério de Julgamento: </strong>
@@ -510,6 +510,20 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
                                         ?>
                                     </td>
                                     </tr>
+                                    <tr id="l20_criterioadjudicacao">
+                                    <td id="descontotab">
+                                        <label class="bold">Critério de Adjudicação:</label>
+                                    </td>
+                                    <td>
+                                        <? //OC3770
+                                        if (!isset($l20_criterioadjudicacao) || $l20_criterioadjudicacao == '') {
+                                            $l20_criterioadjudicacao = "";
+                                        }
+                                        $aCriterios = array("3" => "Outros", "1" => "Desconto sobre tabela", "2" => "Menor taxa ou percentual");
+                                        db_select("l20_criterioadjudicacao", $aCriterios, true, '');
+                                        ?>
+                                    </td>
+                                </tr>
                                 <tr id="receita" style="display:none">
                                     <td nowrap title="receita">
                                         <b>Receita: </b>
@@ -1183,7 +1197,7 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
             </tr>
 
 
-            <tr id="l20_criterioadjudicacao">
+            <tr id="l20_criterioadjudicacaodispensa">
                                     <td id="descontotab">
                                         <label class="bold">Critério de Adjudicação:</label>
                                     </td>
@@ -1192,8 +1206,8 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
                                         if (!isset($l20_criterioadjudicacao) || $l20_criterioadjudicacao == '') {
                                             $l20_criterioadjudicacao = "";
                                         }
-                                        $aCriterios = array("3" => "Outros", "1" => "Desconto sobre tabela", "2" => "Menor taxa ou percentual");
-                                        db_select("l20_criterioadjudicacao", $aCriterios, true, '');
+                                        $aCriterios = array("0" => "Selecione","3" => "Outros", "1" => "Desconto sobre tabela", "2" => "Menor taxa ou percentual");
+                                        db_select("l20_criterioadjudicacaodispensa", $aCriterios, true, '');
                                         ?>
                                     </td>
                                 </tr>
@@ -1231,7 +1245,7 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
 
     </center>
 
-    <input name="<?= ($db_opcao == 1 ? 'incluir' : ($db_opcao == 2 || $db_opcao == 22 ? 'alterar' : 'excluir')) ?>" type="submit" id="db_opcao" value="<?= ($db_opcao == 1 ? 'Incluir' : ($db_opcao == 2 || $db_opcao == 22 ? 'Alterar' : 'Excluir')) ?>" <?= ($db_botao == false ? 'disabled' : '') ?> onClick="return js_confirmadatas()">
+    <input name="<?= ($db_opcao == 1 ? 'incluir' : ($db_opcao == 2 || $db_opcao == 22 ? 'alterar' : 'excluir')) ?>" type="submit" id="db_opcao" value="<?= ($db_opcao == 1 ? 'Incluir' : ($db_opcao == 2 || $db_opcao == 22 ? 'Alterar' : 'Excluir')) ?>" <?= ($db_botao == false ? 'disabled' : '') ?> onClick="return js_confirmadatas(codigotribunal)">
     <input name="pesquisar" type="button" id="pesquisar" value="Pesquisar" onclick="js_pesquisa();">
 </form>
 <script>
@@ -1249,6 +1263,10 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
         } else {
             document.getElementById('formacontraleregistropreco').style.display = 'none';
         }
+    });
+
+    $('l20_codtipocomdescr').observe('change', function() {
+        document.getElementById('l20_equipepregao').value = '';
     });
 
     js_busca();
@@ -1382,7 +1400,7 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
             document.getElementById("convite1").style.display = "none";
             if (campo == "CONCURSO") {
                 document.getElementById("l20_tipliticacao").style.display = "none";
-                document.getElementById("licitacao1").style.display = "none";
+                //document.getElementById("licitacao1").style.display = "none";
                 document.getElementById("natureOB").style.display = "none";
                 document.getElementById("natureOB1").style.display = "none";
             } else {
@@ -1432,10 +1450,13 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
 
                 let criterioadjudicacao = <? echo '"' . $l20_criterioadjudicacao . '"';?>;
                 if(tipoprocesso === "5" || tipoprocesso === "6"){
-                    document.getElementById('l20_criterioadjudicacao').value = criterioadjudicacao;
-                    document.getElementById('l20_criterioadjudicacao').style.display = "";
+
+                var selectcriterio = document.form1.l20_criterioadjudicacaodispensa;
+                selectcriterio.value = criterioadjudicacao;
+                    
+                document.getElementById('l20_criterioadjudicacaodispensa').style.display = "";
                 } else {
-                    document.getElementById('l20_criterioadjudicacao').style.display = "none";
+                    document.getElementById('l20_criterioadjudicacaodispensa').style.display = "none";
                 }
             }
 
@@ -1588,7 +1609,6 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
 
     if ($F('l20_equipepregao') != '') {
         let modalidade = document.form1.modalidade_tribunal.value; //document.form1.l20_codtipocomdescr.value;
-
         if (modalidade == 52 || modalidade == 53) {
             verificaMembrosModalidade("pregao");
         } else if (modalidade == 48 || modalidade == 49 || modalidade == 50) {
@@ -1756,6 +1776,15 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
         var oRetorno = eval("(" + oAjax.responseText + ")");
         codigotribunal = oRetorno.l03_pctipocompratribunal;
         presencial = oRetorno.l03_presencial;
+        let criterioadjudicacao = document.getElementById('l20_criterioadjudicacao').value;
+        if(codigotribunal == 100 || codigotribunal == 101 || codigotribunal == 102 || codigotribunal == 103){
+            document.getElementById('l20_criterioadjudicacao').style.display = 'none';
+        }else{
+            document.getElementById('l20_criterioadjudicacao').style.display = '';
+        }
+
+
+
         let lei = document.getElementById('l20_leidalicitacao').value;
 
         var l12_pncp = <? echo '"' . $l12_pncp . '"';      ?>;
@@ -1765,6 +1794,28 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
         } else {
             document.getElementById('justificativapncp').style.display = 'none';
         }
+
+        if (codigotribunal == 100 || codigotribunal == 102 || codigotribunal == 103) {
+             var select = document.getElementById("l20_tipliticacao");
+
+            // Definir o valor padrão para "7"
+            select.value = "7";
+
+            // Esconder as outras opções exceto a opção "7"
+            for (var i = 0; i < select.options.length; i++) {
+                var option = select.options[i];
+                if (option.value !== "7") {
+                option.style.display = "none";
+                }
+            }
+             } else {
+                var select = document.getElementById("l20_tipliticacao");
+
+            for (var i = 0; i < select.options.length; i++) {
+                var option = select.options[i];
+                option.style.display = "";
+                }
+            }
 
         if (l12_pncp == 't') {
             document.getElementById('categoriaprocesso').style.display = '';
@@ -2052,9 +2103,10 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
             equipepregao: $F('l20_equipepregao'),
             modalidade: modalidade
         };
-
+        
         novoAjax(params, function(e) {
             var oRetorno = JSON.parse(e.responseText);
+
             if (oRetorno.validaMod == 0) {
                 if (modalidade == 'pregao') {
                     alert("Para as modalidades Pregão presencial e Pregão eletrônico é necessário\nque a Comissão de Licitação tenham os tipos Pregoeiro e Membro da Equipe de Apoio");
@@ -2062,7 +2114,8 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
                     document.form1.l20_equipepregao.focus();
                     return false;
                 } else if (modalidade == 'outros') {
-                    alert("Para as modalidades Tomada de Preços, Concorrência e Convite é necessário\nque a Comissão de Licitação tenham os tipos Secretário, Presidente e Membro da Equipe de Apoio");
+
+                    alert("Para as modalidades Tomada de Preços, Concorrência e Convite é necessário que a Comissão de Licitação tenham os tipos Secretário, Presidente e Membro da Equipe de Apoio");
                     document.form1.l20_equipepregao.value = "";
                     document.form1.l20_equipepregao.focus();
                     return false;
@@ -2080,9 +2133,11 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
         let aModalidades = {
             52 : "pregao",
             53 : "pregao",
-            48 : "outros",
+            50 : "outros",
             49 : "outros",
-            50 : "outros"
+            51: "outros",
+            54: "outros",
+            110: "outros"
         };
         let descricaoModalidade = aModalidades[codigoModalidade];
         let lei = document.form1.l20_leidalicitacao.value;
@@ -2097,7 +2152,7 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
 
             if(resultadoValidacao == false && descricaoModalidade == "outros"){
                 document.getElementById("l20_equipepregao").value = "";
-                return alert("Usuário: Para as modalidades Tomada de Preços, Concorrência e Convite é necessário que a Comissão de Licitação tenha os tipos Agente de contratação ou Comissão de Contratação.");
+                return alert("Usuário: Para as modalidades Concorrência, Concurso, Leilão e Diálogo competitivo é necessário que a Comissão de Licitação tenha os tipos Agente de contratação ou Comissão de Contratação.");
             }
 
             return;
@@ -2140,8 +2195,7 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
         return valor == codtipocom;
     }
 
-    function js_confirmadatas() {
-
+    function js_confirmadatas(codigotribunal) {
         js_naturezaprocedimento(document.getElementById('l20_tipnaturezaproced').value);
 
         if(document.getElementById('tr_l20_tipnaturezaproced').style.display == 'none'){
@@ -2156,6 +2210,42 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
         if (document.getElementById('l20_edital').value == "0") {
             alert("Usuário: o campo Processo Licitatório: não pode ser preenchido com valor 0");
             return false;
+        }
+
+        var l12_pncp = <? echo '"' . $l12_pncp . '"';      ?>;
+
+        if(l12_pncp == "t"){
+            let tipocriterio = document.getElementById('l20_tipliticacao').value;
+            if(codigotribunal == 54 && tipocriterio !== "5"){
+                alert('Usuário: De acordo com o manual do PNCP, para a modalidade selecionada o critério de julgamento tem que ser 5-Maior Lance.');
+                return false;
+            }
+            if ((codigotribunal == 50) && tipocriterio == "7") {
+                alert('Usuário: De acordo com o manual do PNCP, para a modalidade selecionada o critério de julgamento não poderá ser 7-Não Aplicável');
+                return false;
+            }
+            if (codigotribunal == 51 && (tipocriterio !== "8" && tipocriterio !== "9")) {
+                alert('Usuário: De acordo com o manual do PNCP, para a modalidade selecionada o critério de julgamento tem que ser 8-Melhor Técnica ou 9-Conteúdo artístico.');
+                return false;
+            }
+
+
+            if (codigotribunal == 52 || codigotribunal == 53) {
+                if (!["1", "2", "5"].includes(tipocriterio)) {
+                    alert('Usuário: De acordo com o manual do PNCP, para a modalidade selecionada o critério de julgamento tem que ser 1-Menor Preço, 2-Maior Desconto ou 5-Maior Lance.');
+                    return false;
+                }
+            }
+            if (codigotribunal == 101) {
+                if (!["1", "2", "5", "7"].includes(tipocriterio)) {
+                    alert('Usuário: De acordo com o manual do PNCP, para a modalidade selecionada o critério de julgamento tem que ser 1-Menor Preço, 2-Maior Desconto, 5-Maior Lance ou 7-Não Aplicável.');
+                    return false;
+                }
+            }
+            if (codigotribunal == 110 && tipocriterio == "7") {
+            alert('Usuário: De acordo com o manual do PNCP, para a modalidade selecionada o critério de julgamento não poderá ser 7-Não Aplicável');
+            return false;
+        }
         }
 
         if (document.getElementById('l20_nroedital').value == "0") {
@@ -2210,7 +2300,6 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
             return false;
         }
         */
-
     }
 
     function js_CompararDatas(data1, data2, comparar) {
@@ -2459,11 +2548,11 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
             document.getElementById('tr_tipoprocesso').style.display = "";
         }
             if (lei === '1' && tipoProcesso === "5" || tipoProcesso === "6") {
-            document.getElementById('l20_criterioadjudicacao').style.display = "";
+            document.getElementById('l20_criterioadjudicacaodispensa').style.display = "";
             document.getElementById('l20_usaregistropreco').value = "t";
         }   else {
             document.getElementById('l20_usaregistropreco').value = "f";
-            document.getElementById('l20_criterioadjudicacao').style.display = "none";
+            document.getElementById('l20_criterioadjudicacaodispensa').style.display = "none";
         }
         js_verificatipoprocesso();
     }

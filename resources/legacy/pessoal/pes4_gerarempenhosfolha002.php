@@ -31,14 +31,15 @@
  * @revision $Author: dbmarcos $
  * @version $Revision: 1.42 $
  */
-require("libs/db_stdlib.php");
-require("libs/db_utils.php");
-require("libs/db_app.utils.php");
-require("libs/db_conecta.php");
-include("libs/db_sessoes.php");
-include("libs/db_usuariosonline.php");
-include("dbforms/db_funcoes.php");
-include("libs/JSON.php");
+require_once("model/protocolo/AssinaturaDigital.model.php");
+require_once(modification("libs/db_stdlib.php"));
+require_once("libs/db_utils.php");
+require_once("libs/db_app.utils.php");
+require_once("libs/db_conecta.php");
+require_once("libs/db_sessoes.php");
+require_once("libs/db_usuariosonline.php");
+require_once("dbforms/db_funcoes.php");
+require_once("libs/JSON.php");
 
 $oPost = db_utils::postMemory($_POST);
 
@@ -64,7 +65,7 @@ $oJson   = new Services_JSON();
 $oParam  = $oJson->decode(str_replace("\\","",$_GET["json"]));
 
 $aSiglas = explode(',', $oParam->sSigla);
-
+$oAssintaraDigital =  new AssinaturaDigital();
 /**
  * Verificamos se a rotina foi liberada pela folha
  */
@@ -168,7 +169,7 @@ db_app::load("estilos.css");
      <tr>
        <td colspan='8'>
 
-          <fieldset style="width: 1714px;">
+          <fieldset style="width: 1614px;">
             <legend>
                <strong>Empenhos</strong>
             </legend>
@@ -177,6 +178,23 @@ db_app::load("estilos.css");
                 <td class='table_header' width="35">
                    <img src="imagens/espaco.gif">
                 </td>
+                <? if ($oParam->iTipoEmpenho == 2) {?>
+                <td class='table_header' width="60">
+                  Lotação
+                </td>
+                <?}?>
+                <td class='table_header' width="70">
+                   Dotação
+                </td>
+                <td class='table_header' width="70">
+                   Recurso
+                </td>
+                <td class='table_header' width="120">
+                   Saldo Dotação
+                </td>
+                <td class='table_header' width="120">
+                   Valor Empenho
+                </td>
                 <td class='table_header' width="60">
                    Orgão
                 </td>
@@ -184,34 +202,22 @@ db_app::load("estilos.css");
                    Unidade
                 </td>
                 <td class='table_header' width="70">
-                   Atividade
+                   Função
                 </td>
                 <td class='table_header' width="70">
-                   Recurso
-                </td>
-                <td class='table_header' width="535">
-                   Desdobramento
-                </td>
-                <td class='table_header' width="50">
-                   CP
-                </td>
-                <td class='table_header' width="70">
-                   Dotação
-                </td>
-                <td class='table_header' width="130">
-                   Valor
-                </td>
-                <td class='table_header' width="130">
-                   Saldo Dotação
+                   Subfunção
                 </td>
                 <td class='table_header' width="70">
                    Programa
                 </td>
                 <td class='table_header' width="70">
-                   Função
+                   Atividade
                 </td>
-                <td class='table_header' width="70">
-                   Sub-Função
+                <td class='table_header' width="395">
+                   Desdobramento
+                </td>
+                <td class='table_header' width="50" style="display:none">
+                   CP
                 </td>
                  <td class='table_header' width="14px">
                    <img src='imagens/identacao.gif' border='0'>
@@ -245,6 +251,12 @@ db_app::load("estilos.css");
                 <label for="opporrecurso">Gerar OP Auxiliar Por recurso</label>
               </td>
               <td class='BordasCgm' style="text-align: left">
+                 <strong>Quantidade Empenhos:</strong>
+              </td>
+              <td class='BordasCgm' style="text-align: right;border-right: 2px groove white">
+                <strong><span id='qtdEmpenhos' style='color:blue'>0,00</span></strong>
+              </td>
+              <td class='BordasCgm' style="text-align: left">
                  <strong>Total Bruto:</strong>
               </td>
               <td class='BordasCgm' style="text-align: right;border-right: 2px groove white">
@@ -275,7 +287,14 @@ db_app::load("estilos.css");
           </span>
           <input type='button' onclick="js_gerarEmpenhos()"     id='empenhar'     value='Gerar Empenhos' disabled>
           <input type='button' onclick="js_gerarTotalizacoes()" id='totalizacoes' value='Totalizações' >
-          <input type='button' onclick="js_emiteRelatorioOrdemEmpenho()" id='relatorio' value='Imprimir' disabled>
+            <input type='button' onclick="js_emiteRelatorioOrdemEmpenho()" id='relatorio' value='Imprimir' disabled>
+            <?php
+                if($oAssintaraDigital->verificaAssituraAtiva()){
+                    echo "<input type='button' onclick='js_enivarOrdemEmpenhoAssinatura()' id='assinatura' value='Solicitar Nova Assinatura Digital' disabled>";
+                }
+            ?>
+
+
           <input type='hidden' name='empenhos_financeiros_gerados' id='empenhos_financeiros_gerados' value=''>
         </td>
        </tr>
@@ -505,6 +524,8 @@ switch (oParametros.sSigla) {
 ?>
 sUrl = "pes4_gerarEmpenhoFolhaRPC.php";
 
+sUrlAssinatura = "con1_assinaturaDigitalDocumentos.RPC.php";
+
 function js_init() {
   /**
    * consultamos os empenhos que deve ser gerados
@@ -534,6 +555,7 @@ function js_retornoConsultaEmpenhos(oResponse) {
   if (oRetorno.itens.length > 0) {
     var lReservadoSaldo = true  ;
   }
+  var nQtdEmpenhos   = new Number(0);
   var nValorBruto    = new Number(0);
   var nValorDesconto = new Number(0);
   if (oRetorno.itens.length > 0) {
@@ -549,55 +571,81 @@ function js_retornoConsultaEmpenhos(oResponse) {
     for (var i = 0; i < oRetorno.itens.length; i++) {
 
       with (oRetorno.itens[i]) {
-
-
+        if (oParametros.iTipoEmpenho == 1) {
+          iMarcador = rh72_sequencial
+        } else {
+          iMarcador = i
+        }
         var oRow              = document.createElement("TR");
         oRow.style.height     = "1em";
         oRow.style.fontWeight = "bold";
         oRow.style.cursor     = "default";
         oRow.className        = "empenho";
-        oRow.id               = 'no'+rh72_sequencial;
+        oRow.id               = "no"+iMarcador;
         oRow.setAttribute('estado', 1);
         oRow.setAttribute('rh72_sequencial', rh72_sequencial);
-        oRow.ondblclick = function () {
-           js_alterarDotacao(rh72_sequencial,1,'', rh72_tabprev);
+        if (oParametros.iTipoEmpenho == 2) {
+          oRow.setAttribute('rh02_lota', rh02_lota);
+          if (qtdlota == 1 || rh25_codlotavinc != "") {
+            lRubrica = true;
+          } else {
+            lRubrica = false;
+          }
+          oRow.setAttribute('lRubrica', lRubrica);
         }
+        if (typeof retencoescod != 'undefined') {
+          oRow.setAttribute('retencoescod', retencoescod);
+        }
+        oRow.ondblclick = function (i) {
+           js_alterarDotacao(rh72_sequencial,1,'', rh72_tabprev, i);
+        }.bind(null,i)
+
         var sImagemTree = "plusbottom.gif";
         var iProximoId  = '';
         if (oRetorno.itens[i+1]) {
-          iProximoId = oRetorno.itens[i+1].rh72_sequencial;
+          if (oParametros.iTipoEmpenho == 1) {
+            iProximoId = oRetorno.itens[i+1].rh72_sequencial;
+          } else {
+            iProximoId = i+1;
+          }
         }
+
         if (i+1 == oRetorno.itens.length) {
           sImagemTree   = "plus.gif";
 
         }
         var oCellTree = document.createElement("TD");
-        oCellTree.innerHTML  = "<img id='open"+rh72_sequencial+"' onclick='getEmpenhosFilhos("+rh72_sequencial+", \""+iProximoId+"\")' src='imagens/treeplus.gif' border='0'>";
+        oCellTree.innerHTML  = "<img id='open"+iMarcador+"' onclick='getEmpenhosFilhos("+rh72_sequencial+", \""+iProximoId+"\","+i+")' src='imagens/treeplus.gif' border='0'>";
         oCellTree.align      = "center";
-
-         var oCellOrgao  = document.createElement("TD");
-         oCellOrgao.innerHTML         = "<span id='orgao"+rh72_sequencial+"'>"+rh72_orgao+"</span>";
-         oCellOrgao.style.textAlign   = "center";
-         oCellOrgao.className         = "border";
-
+        if (oParametros.iTipoEmpenho == 2) {
+          var oCellLotacao  = document.createElement("TD");
+          oCellLotacao.innerHTML         = "<span id='lotacao"+iMarcador+"'>"+rh02_lota+"</span>";
+          oCellLotacao.style.textAlign   = "center";
+          oCellLotacao.className         = "border";
+        }
+        var oCellOrgao  = document.createElement("TD");
+        oCellOrgao.innerHTML         = "<span id='orgao"+iMarcador+"'>"+rh72_orgao+"</span>";
+        oCellOrgao.style.textAlign   = "center";
+        oCellOrgao.className         = "border";
+        
          var oCellUnidade             = document.createElement("TD");
-         oCellUnidade.innerHTML       = "<span style='display:none' id='unidade"+rh72_sequencial+"'>"+rh72_unidade+"</span>&nbsp;"+rh72_unidade.urlDecode()+' - '+o41_descr.urlDecode().substr(0,38);
+         oCellUnidade.innerHTML       = "<span style='display:none' id='unidade"+iMarcador+"'>"+rh72_unidade+"</span>&nbsp;"+rh72_unidade.urlDecode()+' - '+o41_descr.urlDecode().substr(0,38);
          oCellUnidade.style.textAlign = 'left';
          oCellUnidade.className       = "border";
 
          var oCellAtividade           = document.createElement("TD");
          oCellAtividade.innerHTML     = rh72_projativ.urlDecode();
          oCellAtividade.className     = "border";
-         oCellAtividade.id            = 'projativ'+rh72_sequencial;
+         oCellAtividade.id            = 'projativ'+iMarcador;
 
          var oCellRecurso             = document.createElement("TD");
          oCellRecurso.style.textAlign = 'right';
          oCellRecurso.innerHTML       = rh72_recurso;
          oCellRecurso.className       = "border";
-         oCellRecurso.id              = 'recurso'+rh72_sequencial;
+         oCellRecurso.id              = 'recurso'+iMarcador;
 
          var oCellElemento             = document.createElement("TD");
-         oCellElemento.innerHTML       = "<span style='display:none' id='elemento"+rh72_sequencial+"'>"+rh72_codele+"</span>&nbsp;"+o56_elemento.urlDecode()+' - '+o56_descr.urlDecode().substr(0,37);
+         oCellElemento.innerHTML       = "<span style='display:none' id='elemento"+iMarcador+"'>"+rh72_codele+"</span>&nbsp;"+o56_elemento.urlDecode()+' - '+o56_descr.urlDecode().substr(0,37);
          oCellElemento.style.textAlign = 'left';
          oCellElemento.className       = "border";
 
@@ -605,10 +653,11 @@ function js_retornoConsultaEmpenhos(oResponse) {
          oCellCaracteristica.innerHTML       = rh72_concarpeculiar.urlDecode();
          oCellCaracteristica.style.textAlign = 'right';
          oCellCaracteristica.className       = "border";
-         oCellCaracteristica.id              = 'caracteristica'+rh72_sequencial;
+         oCellCaracteristica.id              = 'caracteristica'+iMarcador;
+         oCellCaracteristica.style.display   = 'none';
 
          var oCellDotacao              = document.createElement("TD");
-         oCellDotacao.innerHTML        = "<span style='display:none' id='dotacao"+rh72_sequencial+"'>"+rh72_coddot+"</span>";
+         oCellDotacao.innerHTML        = "<span style='display:none' id='dotacao"+iMarcador+"'>"+rh72_coddot+"</span>";
 
          if(rh72_coddot != 0){
           oCellDotacao.innerHTML      += "<a href='#' onclick='js_mostraDotacao("+rh72_coddot+");return false'>"+rh72_coddot.urlDecode()+"</a>";
@@ -623,12 +672,13 @@ function js_retornoConsultaEmpenhos(oResponse) {
          oCellValor.innerHTML       = js_formatar(rh73_valor, 'f');
          oCellValor.style.textAlign = 'right';
          oCellValor.className       = "border";
-         oCellValor.id              = "valor"+rh72_sequencial;
+         oCellValor.id              = "valor"+iMarcador;
          if (o120_orcreserva == "") {
 
            oCellValor.style.color = "red";
            lReservadoSaldo      = false;
          }
+         nQtdEmpenhos++;
          nValorBruto           += new Number(rh73_valor);
          nSaldoDotacao          = new Number(saldodotacao);
          if (o120_orcreserva == "") {
@@ -660,17 +710,17 @@ function js_retornoConsultaEmpenhos(oResponse) {
          }
 
          var oCellPrograma  = document.createElement("TD");
-         oCellPrograma.innerHTML         = "<span id='programa"+rh72_sequencial+"'>"+rh72_programa+"</span>";
+         oCellPrograma.innerHTML         = "<span id='programa"+iMarcador+"'>"+rh72_programa+"</span>";
          oCellPrograma.style.textAlign   = "center";
          oCellPrograma.className         = "border";
 
          var oCellFuncao  = document.createElement("TD");
-         oCellFuncao.innerHTML         = "<span id='funcao"+rh72_sequencial+"'>"+rh72_funcao+"</span>";
+         oCellFuncao.innerHTML         = "<span id='funcao"+iMarcador+"'>"+rh72_funcao+"</span>";
          oCellFuncao.style.textAlign   = "center";
          oCellFuncao.className         = "border";
 
          var oCellSubFuncao  = document.createElement("TD");
-         oCellSubFuncao.innerHTML         = "<span id='subfuncao"+rh72_sequencial+"'>"+rh72_subfuncao+"</span>";
+         oCellSubFuncao.innerHTML         = "<span id='subfuncao"+iMarcador+"'>"+rh72_subfuncao+"</span>";
          oCellSubFuncao.style.textAlign   = "center";
          oCellSubFuncao.className         = "border";
 
@@ -680,19 +730,22 @@ function js_retornoConsultaEmpenhos(oResponse) {
          oCellVazia.style.textAlign  = "left";
 
          oRow.appendChild(oCellTree);
+         if (oParametros.iTipoEmpenho == 2) {
+          oRow.appendChild(oCellLotacao);
+         }
+         oRow.appendChild(oCellDotacao);
+         oRow.appendChild(oCellRecurso);
+         oRow.appendChild(oCellSaldo);
+         oRow.appendChild(oCellSaldo);
+         oRow.appendChild(oCellValor);
          oRow.appendChild(oCellOrgao);
          oRow.appendChild(oCellUnidade);
-         oRow.appendChild(oCellAtividade);
-         oRow.appendChild(oCellRecurso);
-         oRow.appendChild(oCellElemento);
-         oRow.appendChild(oCellCaracteristica);
-         oRow.appendChild(oCellDotacao);
-         oRow.appendChild(oCellValor);
-         oRow.appendChild(oCellSaldo);
-         oRow.appendChild(oCellSaldo);
-         oRow.appendChild(oCellPrograma);
          oRow.appendChild(oCellFuncao);
          oRow.appendChild(oCellSubFuncao);
+         oRow.appendChild(oCellPrograma);
+         oRow.appendChild(oCellAtividade);
+         oRow.appendChild(oCellElemento);
+         oRow.appendChild(oCellCaracteristica);
          oRow.appendChild(oCellVazia);
          $('listaEmpenhos').appendChild(oRow);
 //         /**
@@ -755,19 +808,20 @@ function js_retornoConsultaEmpenhos(oResponse) {
         }
      }
    }
-   $('valorbruto').innerHTML     = "&nbsp;&nbsp;"+js_formatar(nValorBruto, "f");
-   $('valordescontos').innerHTML = "&nbsp;&nbsp;"+js_formatar(nValorDesconto, "f");
-   $('valorliquido').innerHTML   = "&nbsp;&nbsp;"+js_formatar(nValorBruto - nValorDesconto, "f");
+   $('qtdEmpenhos').innerHTML     = "&nbsp;"+nQtdEmpenhos;
+   $('valorbruto').innerHTML     = "&nbsp;"+js_formatar(nValorBruto, "f");
+   $('valordescontos').innerHTML = "&nbsp;"+js_formatar(nValorDesconto, "f");
+   $('valorliquido').innerHTML   = "&nbsp;"+js_formatar(nValorBruto - nValorDesconto, "f");
 
    js_buscaEmpenhosFinanceiros();
 }
 
 function js_buscaEmpenhosFinanceiros() {
-    
+
     oParametros.exec = 'getEmpenhosFinanceiros';
 
     js_divCarregando('Aguarde!', 'msgbox');
-    
+
     var oAjax  = new Ajax.Request(
         sUrl,
         {
@@ -784,31 +838,38 @@ function js_retornoBuscaEmpenhosFinanceiros(oResponse) {
     js_removeObj('msgbox');
 
     oRetorno = eval("("+oResponse.responseText+")");
-    
+
     if (oRetorno.status == 1) {
 
         if (oRetorno.empenhos_financeiros != '') {
             $('empenhos_financeiros_gerados').value = oRetorno.empenhos_financeiros;
             $('relatorio').disabled = false;
+            $('assinatura').disabled = false;
         }
 
     }
 
 }
 
-function getEmpenhosFilhos(iSequencial, iProximoEmpenho) {
+function getEmpenhosFilhos(iSequencial, iProximoEmpenho, iIndex) {
+
+  if (oParametros.iTipoEmpenho == 1) {
+    iMarcador = iSequencial
+  } else {
+    iMarcador = iIndex
+  }
 
   var lConsulta = false;
-  if ($('no'+iSequencial).getAttribute("estado") == 1) {
+  if ($('no'+iMarcador).getAttribute("estado") == 1) {
 
-   $('no'+iSequencial).setAttribute("estado",2);
-   $('open'+iSequencial).src='imagens/treeminus.gif';
+   $('no'+iMarcador).setAttribute("estado",2);
+   $('open'+iMarcador).src='imagens/treeminus.gif';
    lConsulta = true;
 
   } else {
 
-    $('no'+iSequencial).setAttribute("estado",1);
-    $('open'+iSequencial).src='imagens/treeplus.gif';
+    $('no'+iMarcador).setAttribute("estado",1);
+    $('open'+iMarcador).src='imagens/treeplus.gif';
     lConsulta = false;
 
   }
@@ -816,10 +877,14 @@ function getEmpenhosFilhos(iSequencial, iProximoEmpenho) {
    * Buscamos a informacao dos dados por funcionario
    */
   if (lConsulta) {
-
    oParametros.exec            = "getDadosEmpenhoFilho";
    oParametros.iEmpenho        = iSequencial;
    oParametros.iProximoEmpenho = iProximoEmpenho;
+   if (oParametros.iTipoEmpenho == 2) {
+    oParametros.iLotacao = $('no'+iMarcador).getAttribute("rh02_lota");
+    oParametros.iIndex = iMarcador;
+    oParametros.lRubrica = $('no'+iMarcador).getAttribute("lRubrica");
+  }
    var oAjax  = new Ajax.Request(
                                  sUrl,
                                  {
@@ -830,10 +895,10 @@ function getEmpenhosFilhos(iSequencial, iProximoEmpenho) {
                                );
    } else {
 
-     var aListaNos = getElementsByClass("empenhos"+iSequencial);
+     var aListaNos = getElementsByClass("empenhos"+iMarcador);
      for (var i = 0; i < aListaNos.length; i++) {
 
-       var aListaRubricas = getElementsByClass("rubricas"+aListaNos[i].getAttribute('sequencial')+"empenho"+iSequencial);
+       var aListaRubricas = getElementsByClass("rubricas"+aListaNos[i].getAttribute('sequencial')+"empenho"+iMarcador);
        for (j = 0; j < aListaRubricas.length; j++) {
         $('listaEmpenhos').removeChild(aListaRubricas[j]);
        }
@@ -846,13 +911,14 @@ function getEmpenhosFilhos(iSequencial, iProximoEmpenho) {
 function js_retornoGetDadosEmpenhoFilho(oResponse) {
 
   oRetorno  = eval("("+oResponse.responseText+")");
+
   if (oRetorno.status == 1) {
 
     for (var j = 0; j < oRetorno.itens.length; j++) {
 
       with (oRetorno.itens[j]) {
 
-        var sId = new String(rh72_sequencial+""+rh73_seqpes);
+        var sId = new String((oParametros.iTipoEmpenho == 1 ? rh72_sequencial : oRetorno.iIndex)+""+rh73_seqpes);
 
         var oRowFuncionario    = document.createElement("TR");
         oRowFuncionario.style.height  = "1em";
@@ -861,19 +927,19 @@ function js_retornoGetDadosEmpenhoFilho(oResponse) {
         oRowFuncionario.setAttribute("sequencial", rh73_seqpes);
         oRowFuncionario.setAttribute("estado", 1);
         oRowFuncionario.id            = "noempenho"+sId;
-        oRowFuncionario.className     ='empenhos'+rh72_sequencial;
+        oRowFuncionario.className     ='empenhos'+(oParametros.iTipoEmpenho == 1 ? rh72_sequencial : oRetorno.iIndex);
 
 
 
         oRowFuncionario.ondblclick    = function () {
-           js_alterarDotacao(rh72_sequencial, 2, rh73_seqpes, rh72_tabprev);
+           js_alterarDotacao(rh72_sequencial, 2, rh73_seqpes, rh72_tabprev, oRetorno.iIndex);
         }
 
         var oCellTree = document.createElement("TD");
         oCellTree.innerHTML      = "<img src='imagens/identacao.gif' border='0'>";
         oCellTree.align          = "right";
         oCellTree.style.padding  = "0px";
-        oCellTree.innerHTML     += "<img id='openempenho"+sId+"' onclick='js_showRubricas("+rh73_seqpes+", "+rh72_sequencial+")' src='imagens/treeplus.gif' border='0'>";
+        oCellTree.innerHTML     += "<img id='openempenho"+sId+"' onclick='js_showRubricas("+rh73_seqpes+", "+rh72_sequencial+","+oRetorno.iIndex+")' src='imagens/treeplus.gif' border='0'>";
 
         var oCellOrgao  = document.createElement("TD");
         oCellOrgao.innerHTML         = "<img src='imagens/identacao.gif' border='0'>";
@@ -900,7 +966,7 @@ function js_retornoGetDadosEmpenhoFilho(oResponse) {
         oCellValor.innerHTML         = js_formatar(rh73_valor, 'f');
         oCellValor.style.textAlign   = 'right';
         oCellValor.className         = "border";
-        oCellValor.id                = "valor"+rh72_sequencial+""+rh73_seqpes;
+        oCellValor.id                = "valor"+sId;
 
         var oCellSaldo               = document.createElement("TD");
         oCellSaldo.style.textAlign   ='right';
@@ -947,7 +1013,7 @@ function js_retornoGetDadosEmpenhoFilho(oResponse) {
             var oRowRubricas    = document.createElement("TR");
             oRowRubricas.style.height  = "1em";
             oRowRubricas.style.display = "none";
-            oRowRubricas.className     ='rubricas'+rh73_seqpes+'empenho'+rh72_sequencial;
+            oRowRubricas.className     ='rubricas'+rh73_seqpes+'empenho'+(oParametros.iTipoEmpenho == 1 ? rh72_sequencial : oRetorno.iIndex);
 
             var oCellTree        = document.createElement("TD");
             oCellTree.innerHTML  = "<img src='imagens/espaco.gif' border='0'>";
@@ -1007,23 +1073,31 @@ function js_retornoGetDadosEmpenhoFilho(oResponse) {
 }
 
 
-function js_showRubricas(iSequencial, iEmpenho) {
+function js_showRubricas(iSequencial, iEmpenho, iIndex) {
+
+  if (oParametros.iTipoEmpenho == 1) {
+    iMarcador = iEmpenho
+  } else {
+    iMarcador = iIndex
+  }
 
   var lConsulta = false;
-  if ($('noempenho'+iEmpenho+""+iSequencial).getAttribute("estado") == 1) {
+  if ($('noempenho'+iMarcador+""+iSequencial).getAttribute("estado") == 1) {
 
-   $('noempenho'+iEmpenho+""+iSequencial).setAttribute("estado",2);
-   $('openempenho'+iEmpenho+""+iSequencial).src='imagens/treeminus.gif';
+   $('noempenho'+iMarcador+""+iSequencial).setAttribute("estado",2);
+   $('openempenho'+iMarcador+""+iSequencial).src='imagens/treeminus.gif';
    lConsulta = true;
 
   } else {
 
-    $('noempenho'+iEmpenho+""+iSequencial).setAttribute("estado",1);
-    $('openempenho'+iEmpenho+""+iSequencial).src ='imagens/treeplus.gif';
+    $('noempenho'+iMarcador+""+iSequencial).setAttribute("estado",1);
+    $('openempenho'+iMarcador+""+iSequencial).src ='imagens/treeplus.gif';
     lConsulta = false;
 
   }
- var aListaRubricas = getElementsByClass("rubricas"+iSequencial+"empenho"+iEmpenho)
+  
+ var aListaRubricas = getElementsByClass("rubricas"+iSequencial+"empenho"+iMarcador)
+
  aListaRubricas.each(function(oRubrica, id) {
 
    if (lConsulta) {
@@ -1060,14 +1134,19 @@ function getElementsByClass ( searchClass, domNode, tagName) {
 /**
  * busca os dados do empenho e passamos para a tela permitindo o usuário alterar as informacoes
  */
-function js_alterarDotacao(iSequencial, iTipoEmpenho, iSeqPes, iTabPrev) {
+function js_alterarDotacao(iSequencial, iTipoEmpenho, iSeqPes, iTabPrev, iIndex) {
+  if (oParametros.iTipoEmpenho == 1) {
+    iMarcador = iSequencial
+  } else {
+    iMarcador = iIndex
+  }
 
   var el =  document;
   var x  = el.body.getWidth()/3;
   if (iTipoEmpenho == 1) {
-    $('no'+iSequencial).style.backgroundColor="#EFEFEF";
+    $('no'+iMarcador).style.backgroundColor="#EFEFEF";
   } else {
-    $('noempenho'+iSequencial+""+iSeqPes).style.backgroundColor="#EFEFEF";
+    $('noempenho'+iMarcador+""+iSeqPes).style.backgroundColor="#EFEFEF";
     //$('noempenho'+iSeqPes).style.backgroundColor="#E8F2FE";
   }
 
@@ -1077,37 +1156,36 @@ function js_alterarDotacao(iSequencial, iTipoEmpenho, iSeqPes, iTabPrev) {
   if (iTabPrev == null){
     iTabPrev = 0;
   }
-
-  $('rh72_orgao').value = $('orgao'+iSequencial).innerHTML;
+  $('rh72_orgao').value = $('orgao'+iMarcador).innerHTML;
   js_ProcCod_rh72_orgao('rh72_orgao','rh72_orgaodescr');
 
-  iUnidadeOriginal    = $('unidade'+iSequencial).innerHTML;
+  iUnidadeOriginal    = $('unidade'+iMarcador).innerHTML;
   js_getUnidades();
 
-  $('rh72_projativ').value  = $('projativ'+iSequencial+""+iSeqPes).innerHTML;
+  $('rh72_projativ').value  = $('projativ'+iMarcador+""+iSeqPes).innerHTML;
   js_pesquisarh72_projativ(false);
 
-  $('rh72_programa').value  = $('programa'+iSequencial+""+iSeqPes).innerHTML;
-  js_pesquisarh72_projativ(false);
+  $('rh72_programa').value  = $('programa'+iMarcador+""+iSeqPes).innerHTML;
+  js_pesquisarh72_programa(false);
 
-  $('rh72_funcao').value  = $('funcao'+iSequencial+""+iSeqPes).innerHTML;
-  js_pesquisarh72_projativ(false);
+  $('rh72_funcao').value  = $('funcao'+iMarcador+""+iSeqPes).innerHTML;
+  js_pesquisarh72_funcao(false);
 
-  $('rh72_subfuncao').value  = $('subfuncao'+iSequencial+""+iSeqPes).innerHTML;
+  $('rh72_subfuncao').value  = $('subfuncao'+iMarcador+""+iSeqPes).innerHTML;
   js_pesquisarh72_subfuncao(false);
 
-  $('rh72_coddot').value    = $('dotacao'+iSequencial+""+iSeqPes).innerHTML;
-  iDotacaoOriginal          = $('dotacao'+iSequencial+""+iSeqPes).innerHTML;
+  $('rh72_coddot').value    = $('dotacao'+iMarcador+""+iSeqPes).innerHTML;
+  iDotacaoOriginal          = $('dotacao'+iMarcador+""+iSeqPes).innerHTML;
 
-  $('rh72_elemento').value  = $('elemento'+iSequencial+""+iSeqPes).innerHTML;
+  $('rh72_elemento').value  = $('elemento'+iMarcador+""+iSeqPes).innerHTML;
   js_pesquisarh72_elemento(false);
 
-  $('rh72_concarpeculiar').value  = $('caracteristica'+iSequencial+""+iSeqPes).innerHTML;
+  $('rh72_concarpeculiar').value  = $('caracteristica'+iMarcador+""+iSeqPes).innerHTML;
   js_pesquisarh72_concarpeculiar(false);
 
-  $('rh72_recurso').value   = $('recurso'+iSequencial+""+iSeqPes).innerHTML;
+  $('rh72_recurso').value   = $('recurso'+iMarcador+""+iSeqPes).innerHTML;
   js_pesquisac62_codrec(false);
-  $('rh73_valor').value     = $('valor'+iSequencial+""+iSeqPes).innerHTML;
+  $('rh73_valor').value     = $('valor'+iMarcador+""+iSeqPes).innerHTML;
 
   $('modal').style.width                  = document.body.getWidth()+"px";
   $('modal').style.height                 = (document.body.getHeight() - 180)+"px";
@@ -1122,9 +1200,9 @@ function js_alterarDotacao(iSequencial, iTipoEmpenho, iSeqPes, iTabPrev) {
     $('wndAlterarDotacao').style.zIndex     = '0';
     $('modal').style.display                = 'none';
     if (iTipoEmpenho == 1) {
-      $('no'+iSequencial).style.backgroundColor="White";
+      $('no'+iMarcador).style.backgroundColor="White";
     } else {
-      $('noempenho'+iSequencial+""+iSeqPes).style.backgroundColor="white";
+      $('noempenho'+iMarcador+""+iSeqPes).style.backgroundColor="white";
     }
   }
   $('atualizarDotacao').onclick = function() {
@@ -1199,7 +1277,7 @@ function js_pesquisarh72_programa(mostra){
   }else{
      if($('rh72_programa').value != ''){
         js_OpenJanelaIframe('','db_iframe_orcprograma',
-                            'func_orcprojativ.php?pesquisa_chave='+$F('rh72_programa')+'&funcao_js=parent.js_mostraprograma',
+                            'func_orcprograma.php?pesquisa_chave='+$F('rh72_programa')+'&funcao_js=parent.js_mostraprograma',
                             'Programa',
                             false,
                             0,
@@ -1770,6 +1848,9 @@ function js_reservarSaldos() {
 
     var oEmpenhoAdicionar = new Object();
     oEmpenhoAdicionar.rh72_sequencial = oEmpenho.getAttribute('rh72_sequencial');
+    if (oParametros.iTipoEmpenho == 2) {
+      oEmpenhoAdicionar.rh02_lota = oEmpenho.getAttribute('rh02_lota');
+    }
     oParam.aEmpenhos.push(oEmpenhoAdicionar);
 
   });
@@ -1890,6 +1971,13 @@ function js_gerarEmpenhos() {
 
     var oEmpenhoAdicionar = new Object();
     oEmpenhoAdicionar.rh72_sequencial = oEmpenho.getAttribute('rh72_sequencial');
+    if (oParametros.iTipoEmpenho == 2) {
+      oEmpenhoAdicionar.rh02_lota = oEmpenho.getAttribute('rh02_lota');
+      oEmpenhoAdicionar.lRubrica  = oEmpenho.getAttribute('lRubrica');
+      if (typeof oEmpenho.getAttribute('retencoescod') != 'undefined') {
+        oEmpenhoAdicionar.sRetencoes = oEmpenho.getAttribute('retencoescod')
+      }
+    }
     oParam.aEmpenhos.push(oEmpenhoAdicionar);
 
   });
@@ -1920,15 +2008,17 @@ function js_retornoGerarEmpenhos(oRequest) {
   if (oRetorno.status == 1) {
 
     alert('Empenhos Gerados com sucesso\nOrdem Auxiliar Nº'+oRetorno.e42_sequencial);
-    
+
     $('empenhos_financeiros_gerados').value = oRetorno.empenhos_financeiros_gerados;
     $('relatorio').disabled = false;
-    
+    $('assinatura').disabled = false;
+
     js_init();
 
-    if(confirm("Deseja imprimir as ordens de pagamento e os empenhos?")) {        
+    if(confirm("Deseja imprimir as ordens de pagamento e os empenhos?")) {
         js_emiteRelatorioOrdemEmpenho(oRetorno.empenhos_financeiros_gerados);
     }
+
 
   } else {
     alert(oRetorno.message.urlDecode().replace(sExpReg,'\n'));
@@ -1943,14 +2033,48 @@ function js_emiteRelatorioOrdemEmpenho(sEmpenhosGerados = '') {
     }
 
     if (sEmpenhosGerados != '') {
-
         jan = window.open('pes2_rhempenhoordemcomprafolha002.php?sEmpenhosGerados='+sEmpenhosGerados,
                             '',
                             'width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0 ');
         jan.moveTo(0,0);
-
     }
 
+}
+
+function js_enivarOrdemEmpenhoAssinatura(sEmpenhosGerados = '') {
+    if(!confirm('Esse procedimento invalidará as assinaturas já realizadas. Deseja continuar?')){
+        return false;
+    }
+
+    if (sEmpenhosGerados == '') {
+        sEmpenhosGerados = $('empenhos_financeiros_gerados').value;
+    }
+
+    if (sEmpenhosGerados != '') {
+
+        js_divCarregando('Aguarde, Enviando documentos para assinatura','msgbox');
+        var oParam       = new Object();
+        oParam.sExecuta      = "assinarDocumentosFolha";
+        oParam.sEmpenhosGerados   = sEmpenhosGerados;
+        var oAjax  = new Ajax.Request(
+            sUrlAssinatura,
+            {
+                method: 'post',
+                parameters: 'json='+Object.toJSON(oParam),
+                onComplete: js_retornoOrdemEmpenhoAssinatura
+            }
+        );
+    }
+
+}
+function js_retornoOrdemEmpenhoAssinatura(oRequest){
+    js_removeObj('msgbox');
+    var oRetorno = eval("("+oRequest.responseText+")");
+    if (oRetorno.erro) {
+        alert(oRetorno.sMensagem.urlDecode());
+    }else {
+        alert('Empenhos enviados para assinatura com sucesso!');
+    }
 }
 
 function js_gerarTotalizacoes() {

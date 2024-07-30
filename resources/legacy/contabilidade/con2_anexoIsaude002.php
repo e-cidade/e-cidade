@@ -401,11 +401,6 @@ $sqlempresto = $clempresto->sql_rp_novo(db_getsession("DB_anousu"), $sele_work, 
 
 $res = $clempresto->sql_record($sqlempresto);
 
-if ($clempresto->numrows == 0) {
-    db_redireciona("db_erros.php?fechar=true&db_erro=Sem movimentação de restos a pagar.");
-    exit;
-}
-
 $rows = $clempresto->numrows;
 
 //variaveis agrupamentos
@@ -472,17 +467,16 @@ $projativ = "";
 $o55anousu = "";
 $vprojativ = "";
 
-for ($x = 0; $x < $rows; $x++) {
-    db_fieldsmemory($res, $x);
-    $total_rp_proc += ($e91_vlrliq - $e91_vlrpag);
-    $total_rp_nproc += round($vlrpagnproc, 2);
-    $total_mov_pagmento += ($vlrpag + $vlrpagnproc);
-}
-// $total_rp_proc.' ';
-// $total_mov_pagmento.' ';
+if ($clempresto->numrows != 0) {
 
-// $total_anterior.' ';
-// $total_final.' ';
+    for ($x = 0; $x < $rows; $x++) {
+        db_fieldsmemory($res, $x);
+        $total_rp_proc += ($e91_vlrliq - $e91_vlrpag);
+        $total_rp_nproc += round($vlrpagnproc, 2);
+        $total_mov_pagmento += ($vlrpag + $vlrpagnproc);
+    }
+}
+
 /*
 saldo de restos < saldo inicial das contas bancárias -> 0
 pago < saldo inicial das contas bancárias -> 0
@@ -2516,6 +2510,6 @@ ob_start();
 $html = ob_get_contents();
 ob_end_clean();
 $mPDF->WriteHTML(utf8_encode($html));
-$mPDF->Output();
+$mPDF->Output('Anexo I - Saúde', 'I');
 
 ?>

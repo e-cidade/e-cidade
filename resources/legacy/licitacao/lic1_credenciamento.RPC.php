@@ -196,6 +196,36 @@ try {
                 throw new Exception('O período já foi encerrado para envio do SICOM. Verifique os dados do lançamento e entre em contato com o suporte.');
             };
 
+
+            /**
+             * verificação se todos os forncedores estão habilitados.
+             */
+
+            $clhomologacaoadjudica = new cl_homologacaoadjudica();
+            $retornoValidacaoFornecedoresHabilitados = $clhomologacaoadjudica->validacaoFornecedoresInabilitados($oParam->licitacao,$oParam->sCodigoFornecedores,"ratificacao");
+            $oRetorno->exibirhabilitacaofornecedores = false;
+            if ($retornoValidacaoFornecedoresHabilitados !== true) {
+                $oRetorno->exibirhabilitacaofornecedores = true;
+                throw new Exception($retornoValidacaoFornecedoresHabilitados);
+            }
+
+            /**
+             * verificação data de habilitação do fornecedor.
+             */
+            $retornoValidacaoDataHabilitacao = $clhomologacaoadjudica->validacaoDataHabilitacao($oParam->licitacao, date('Y-m-d', strtotime(str_replace('/', '-', $oParam->l20_dtpubratificacao))),$oParam->sCodigoFornecedores,"ratificacao");
+            if ($retornoValidacaoDataHabilitacao !== true) {
+                throw new Exception($retornoValidacaoDataHabilitacao);
+            }
+
+            /**
+             * Verificação credenciados
+             */
+
+            $retornoValidacaoCredenciamento = $clhomologacaoadjudica->validacaoCredenciamento($oParam->licitacao);
+            if($retornoValidacaoCredenciamento == false){
+                throw new Exception("Usuário: Não existe credenciado para nenhum dos itens selecionados. verifique!");
+            }
+
             /**
              * busco o codtipocom
              */
@@ -408,6 +438,35 @@ try {
             if ($datapat >= join('-', array_reverse(explode('/', $oParam->l20_dtpubratificacao)))) {
                 throw new Exception('O período já foi encerrado para envio do SICOM. Verifique os dados do lançamento e entre em contato com o suporte.');
             };
+
+            /**
+             * verificação se todos os forncedores estão habilitados.
+             */
+
+            $clhomologacaoadjudica = new cl_homologacaoadjudica();
+            $retornoValidacaoFornecedoresHabilitados = $clhomologacaoadjudica->validacaoFornecedoresInabilitados($oParam->licitacao,$oParam->sCodigoFornecedores,"ratificacao");
+            $oRetorno->exibirhabilitacaofornecedores = false;
+            if ($retornoValidacaoFornecedoresHabilitados !== true) {
+                $oRetorno->exibirhabilitacaofornecedores = true;
+                throw new Exception($retornoValidacaoFornecedoresHabilitados);
+            }
+
+            /**
+             * verificação data de habilitação do fornecedor.
+             */
+            $retornoValidacaoDataHabilitacao = $clhomologacaoadjudica->validacaoDataHabilitacao($oParam->licitacao, date('Y-m-d', strtotime(str_replace('/', '-', $oParam->l20_dtpubratificacao))),$oParam->sCodigoFornecedores,"ratificacao");
+            if ($retornoValidacaoDataHabilitacao !== true) {
+                throw new Exception($retornoValidacaoDataHabilitacao);
+            }
+
+            /**
+             * Verificação credenciados
+             */
+
+            $retornoValidacaoCredenciamento = $clhomologacaoadjudica->validacaoCredenciamento($oParam->licitacao);
+            if($retornoValidacaoCredenciamento == false){
+                throw new Exception("Usuário: Não existe credenciado para nenhum dos itens selecionados. verifique!");
+            }
 
             /**
              * verifico tipo de compra da licitacao

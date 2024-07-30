@@ -270,6 +270,7 @@ switch ($oParam->exec) {
 
     case 'excluiraviso':
         $clliccontrolepncp = db_utils::getDao("liccontrolepncp");
+        $clliccontrolepncpitens = db_utils::getDao("liccontrolepncpitens");
 
         try {
             foreach ($oParam->aProcesso as $aLicitacao) {
@@ -282,6 +283,7 @@ switch ($oParam->exec) {
                 if ($rsApiPNCP == null) {
                     $clliccontrolepncp->excluir(null, "l213_processodecompras = $aLicitacao->codigo");
                     $clliccontroleanexopncp->excluir_processocompra($aLicitacao->codigo);
+                    $clliccontrolepncpitens->excluir(null, "l214_licitacao = $aLicitacao->codigo");
 
                     $oRetorno->status  = 1;
                     $oRetorno->message = "Excluido com Sucesso !";

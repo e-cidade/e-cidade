@@ -2624,7 +2624,8 @@ class dadosEmpenhoFolha {
     $iFuncao    = $oProjAtivRec->funcao;
     $iSubFuncao = $oProjAtivRec->subfuncao;
     $iPrograma  = $oProjAtivRec->programa;
-    $iRecurso   = $oProjAtivRec->recurso;          
+    $iRecurso   = $oProjAtivRec->recurso;  
+    $iLotaVinc  = $oProjAtivRec->lotavinc;        
           
     if ( $oDaorhLotaVincEle->numrows > 0 ){
             
@@ -2729,6 +2730,7 @@ class dadosEmpenhoFolha {
     $oEstrutural->iRecurso   = $iRecurso;
     $oEstrutural->iElemento  = $iElemento;
     $oEstrutural->iDotacao   = $iDotacao;
+    $oEstrutural->iLotaVinc   = $iLotaVinc;
 
     return $oEstrutural;
     

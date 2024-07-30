@@ -44,6 +44,8 @@ $clsaltesextra         = new cl_saltesextra;
 $db_opcao = 22;
 $db_botao = false;
 $sqlerro = false;
+$mostrarCampo2 = 1;
+$db_opcaonovo = 1;
 if(isset($HTTP_POST_VARS["db_opcao"]) && $HTTP_POST_VARS["db_opcao"]=="Alterar"){
   db_inicio_transacao();
      /**
@@ -60,6 +62,87 @@ if(isset($HTTP_POST_VARS["db_opcao"]) && $HTTP_POST_VARS["db_opcao"]=="Alterar")
 
         }
      }
+     $oDaoConDataConf  = new cl_condataconf();
+     $oDataImplantacao = date('Y-m-d', strtotime(str_replace('/', '-', $k13_dtimplantacao)));
+     $sWhere           = "    c99_data   >= '{$oDataImplantacao}'::date
+                              and c99_instit  = " . db_getsession('DB_instit')." and c99_anousu = " .db_getsession('DB_anousu');
+     $sSqlValidaFechamentoContabilidade = $oDaoConDataConf->sql_query(null, null, '*', null, $sWhere);
+     $rsValidaFechamentoContabilidade   = $oDaoConDataConf->sql_record($sSqlValidaFechamentoContabilidade);
+     db_fieldsmemory($rsValidaFechamentoContabilidade, 0);
+     $data_convertida                   = DateTime::createFromFormat('Y-m-d', $c99_data);
+     if ($c99_data) {
+      $dataEncerramento = $data_convertida->format('d/m/Y');
+     }
+     
+     if ($oDaoConDataConf->numrows > 0) {
+       $periodoEncerrado = 1;
+     }
+
+     if ($periodoEncerrado == 1 && !empty($k13_limite)) {
+      $dateLimite = parseDate($k13_limite);
+      $dateEncerramento = parseDate($dataEncerramento);
+  
+        if ($dateLimite < $dateEncerramento) {
+            $sqlerro                  = true;
+            echo "<script>
+            alert('A data limite informada deverá ser maior que a data de encerramento do período contábil(" . $dataEncerramento . ").');
+            window.history.back(); 
+            </script>";
+        }
+     }
+  
+     if (!empty($k13_limite) && !empty($k13_dtreativacaoconta)) {
+        $sqlerro                  = true;
+        echo "<script>
+        alert('A data da reativação de conta somente poderá ser preenchida se o campo data limite estiver vazio');
+        window.history.back(); 
+        </script>";
+     }
+
+     $clcondataconf     = new cl_condataconf;
+     $resultControle    = $clcondataconf->sql_record($clcondataconf->sql_query_file(db_getsession('DB_anousu'),db_getsession('DB_instit'),'c99_data as dataencerramento'));
+     db_fieldsmemory($resultControle,0);
+     $data_encerramento = DateTime::createFromFormat('Y-m-d', $dataencerramento);  
+     if ($dataencerramento) {
+       $dataencerramentoco = $data_encerramento->format('d/m/Y');
+     } 
+     
+     if (!empty($k13_dtreativacaoconta)) {
+        $dateEncerramento = parseDate($dataencerramentoco);
+        $datereativacaoconta = parseDate($k13_dtreativacaoconta);
+        $dataimplantaoconta = parseDate($db83_dataimplantaoconta);
+      
+        if ($datereativacaoconta < $dateEncerramento) {
+          $sqlerro                  = true;
+          echo "<script>
+          alert('A data da reativação de conta informada deverá ser maior que a data de encerramento do período contábil(" . $dataencerramentoco . ").');
+          window.history.back(); 
+          </script>";           
+        }
+
+
+        if ($datereativacaoconta < $dataimplantaoconta) {
+          $sqlerro                  = true;
+          echo "<script>
+          alert('A data da reativação de conta informada tem que ser maior ou igual a data de implantação.');
+          window.history.back(); 
+          </script>";           
+        }
+      }
+
+      if (!empty($k13_limite)) {
+        $datalimite = parseDate($k13_limite);
+        $dataimplantaoconta = parseDate($db83_dataimplantaoconta);
+      
+        if ($datalimite < $dataimplantaoconta) {
+          $sqlerro                  = true;
+          echo "<script>
+          alert('A data limite informada tem que ser maior ou igual a data de implantação.');
+          window.history.back(); 
+          </script>";           
+        }
+      }
+  
      if (!$sqlerro) {
 
        $db_opcao            = 2;
@@ -168,5 +251,10 @@ if(isset($HTTP_POST_VARS["db_opcao"]) && $HTTP_POST_VARS["db_opcao"]=="Alterar")
 };
 if($db_opcao==22){
   echo "<script>document.form1.pesquisar.click();</script>";
+}
+
+function parseDate($dateString) {
+  $date = DateTime::createFromFormat('d/m/Y', $dateString);
+  return $date;
 }
 ?>

@@ -41,8 +41,6 @@ class EventoCargaS2399 implements EventoCargaInterface
      */
     public function execute($matricula = null)
     {
-        $anofolha = db_anofolha();
-        $mesfolha = db_mesfolha();
         $sql = "
     	SELECT distinct
         rh02_instit AS instituicao,
@@ -113,7 +111,7 @@ class EventoCargaS2399 implements EventoCargaInterface
                 inner join cadendermunicipiosistema on
                     cadendermunicipiosistema.db125_cadendermunicipio = cadendermunicipio.db72_sequencial
                     and cadendermunicipiosistema.db125_db_sistemaexterno = 4
-                where to_ascii(db72_descricao) = to_ascii(trim((SELECT z01_munic FROM cgm join db_config ON z01_numcgm = numcgm WHERE codigo = fc_getsession('DB_instit')::int))) limit 1))
+                where to_ascii(db72_descricao) = to_ascii(trim((SELECT z01_munic FROM cgm join db_config ON z01_numcgm = numcgm WHERE codigo = {$this->instit}))) limit 1))
                 ) AS codMunic,
             CASE WHEN cgm.z01_uf is null or trim(cgm.z01_uf) = '' then 'MG'
             else cgm.z01_uf end as uf,
@@ -200,7 +198,7 @@ class EventoCargaS2399 implements EventoCargaInterface
         left join rhestagiocurricular on rhpessoal.rh01_regist = h83_regist
         left join rhpessoal as rhpessoalsupervisor on h83_supervisor = rhpessoalsupervisor.rh01_regist
         left join cgm as cgmsupervisor ON cgmsupervisor.z01_numcgm = rhpessoalsupervisor.rh01_numcgm
-        left join inssirf on (r33_codtab::integer-2,r33_anousu,r33_mesusu) = (rh02_tbprev,{$anofolha},{$mesfolha})
+        left join inssirf on (r33_codtab::integer-2,r33_anousu,r33_mesusu) = (rh02_tbprev,{$this->ano},{$this->mes})
         left join rhpesrescisao on rh05_seqpes = rh02_seqpes
         LEFT JOIN eventos1020 ON eventos1020.eso08_instit = {$this->instit}
         LEFT JOIN rhinssoutros ON rhpessoalmov.rh02_seqpes = rhinssoutros.rh51_seqpes
@@ -215,7 +213,7 @@ class EventoCargaS2399 implements EventoCargaInterface
         if (!empty($matricula)) {
             $sql .= " AND rhpessoal.rh01_regist in ({$matricula}) ";
         }
-        
+
         $rsResult = \db_query($sql);
         // var_dump($sql);
         // db_criatabela($rsResult);exit;

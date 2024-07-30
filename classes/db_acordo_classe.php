@@ -87,6 +87,12 @@ class cl_acordo
     var $ac16_descricaoreajuste = null;
     var $ac16_descricaoindice = null;
     var $ac16_vigenciaindeterminada = null;
+    var $ac16_tipopagamento = 0;
+    var $ac16_numparcela = null;
+    var $ac16_vlrparcela = null;
+    var $ac16_identificadorcipi = null;
+    var $ac16_urlcipi = null;
+    var $ac16_infcomplementares = null;
     /**
      * A descrição do status do campo ac16_providencia podem ser checados na tabela providencia
      */
@@ -144,6 +150,12 @@ class cl_acordo
     ac16_descricaoreajuste = ;
     ac16_descricaoindice = ;
     ac16_vigenciaindeterminada = bool = Vigência Indeterminada;
+    ac16_tipopagamento = int11 = Tipo de Período de Vigência
+    ac16_numparcela = int11 = Tipo de Período de Vigência
+    ac16_vlrparcela = float8 = Tipo de Período de Vigência
+    ac16_identificadorcipi = varchar(512) = Identificar CIPI
+    ac16_urlcipi = varchar(14) = Url CIPI
+    ac16_infcomplementares = text = Informações Complementares
     ";
     //funcao construtor da classe
     function cl_acordo()
@@ -253,6 +265,7 @@ class cl_acordo
                     $this->ac16_datarescisao = $this->ac16_datarescisao_ano . "-" . $this->ac16_datarescisao_mes . "-" . $this->ac16_datarescisao_dia;
                 }
             }
+
             $this->ac16_valorrescisao = ($this->ac16_valorrescisao === null ? @$GLOBALS["HTTP_POST_VARS"]["ac16_valorrescisao"] : $this->ac16_valorrescisao);
             $this->ac16_licoutroorgao = ($this->ac16_licoutroorgao === null ? @$GLOBALS["HTTP_POST_VARS"]["ac16_licoutroorgao"] : $this->ac16_licoutroorgao);
             $this->ac16_adesaoregpreco = ($this->ac16_adesaoregpreco === null ? @$GLOBALS["HTTP_POST_VARS"]["ac16_adesaoregpreco"] : $this->ac16_adesaoregpreco);
@@ -260,6 +273,12 @@ class cl_acordo
             $this->ac16_providencia = ($this->ac16_providencia === null ? @$GLOBALS["HTTP_POST_VARS"]["ac16_providencia"] : $this->ac16_providencia);
             $this->ac16_datareferencia = ($this->ac16_datareferencia === null ? @$GLOBALS["HTTP_POST_VARS"]["ac16_datareferencia"] : $this->ac16_datareferencia);
             $this->ac16_vigenciaindeterminada = ($this->ac16_vigenciaindeterminada === null ? @$GLOBALS["HTTP_POST_VARS"]["ac16_vigenciaindeterminada"] : $this->ac16_vigenciaindeterminada);
+            $this->ac16_tipopagamento = ($this->ac16_tipopagamento == "" ? @$GLOBALS["HTTP_POST_VARS"]["ac16_tipopagamento"] : $this->ac16_tipopagamento);
+            $this->ac16_numparcela = ($this->ac16_numparcela == "" ? @$GLOBALS["HTTP_POST_VARS"]["ac16_numparcela"] : $this->ac16_numparcela);
+            $this->ac16_vlrparcela = ($this->ac16_vlrparcela == "" ? @$GLOBALS["HTTP_POST_VARS"]["ac16_vlrparcela"] : $this->ac16_vlrparcela);
+            $this->ac16_identificadorcipi = ($this->ac16_identificadorcipi == "" ? @$GLOBALS["HTTP_POST_VARS"]["ac16_identificadorcipi"] : $this->ac16_identificadorcipi);
+            $this->ac16_urlcipi = ($this->ac16_urlcipi == "" ? @$GLOBALS["HTTP_POST_VARS"]["ac16_urlcipi"] : $this->ac16_urlcipi);
+            $this->ac16_infcomplementares = ($this->ac16_infcomplementares == "" ? @$GLOBALS["HTTP_POST_VARS"]["ac16_infcomplementares"] : $this->ac16_infcomplementares);
         } else {
             $this->ac16_sequencial = ($this->ac16_sequencial == "" ? @$GLOBALS["HTTP_POST_VARS"]["ac16_sequencial"] : $this->ac16_sequencial);
         }
@@ -465,6 +484,64 @@ class cl_acordo
             return false;
         }
 
+        if (empty($this->ac16_tipopagamento) || $this->ac16_tipopagamento == 0) {
+            $this->erro_sql = " Campo Tipo Pagamento não informado1.";
+            $this->erro_campo = "ac16_tipopagamento";
+            $this->erro_banco = "";
+            $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+            $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+            $this->erro_status = "0";
+
+            return false;
+        }
+
+        if (!empty($this->ac16_tipopagamento) && $this->ac16_tipopagamento == 2) {
+
+            if (empty($this->ac16_numparcela)) {
+                $this->erro_sql = " Campo Número de Parcela não informado.";
+                $this->erro_campo = "ac16_numparcela";
+                $this->erro_banco = "";
+                $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+                $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+                $this->erro_status = "0";
+
+                return false;
+            }
+
+            if (empty($this->ac16_vlrparcela)) {
+                $this->erro_sql = " Campo Valor da Parcela não informado.";
+                $this->erro_campo = "ac16_vlrparcela";
+                $this->erro_banco = "";
+                $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+                $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+                $this->erro_status = "0";
+
+                return false;
+            }
+
+        } else if (!empty($this->ac16_tipopagamento) && $this->ac16_tipopagamento == 1) {
+
+            $this->ac16_numparcela = 1;
+            $this->ac16_vlrparcela = $this->ac16_vlrparcela;
+
+        }
+
+        if (!empty($this->ac16_urlcipi) && strlen($this->ac16_urlcipi) < 8 || strlen($this->ac16_urlcipi) > 14) {
+            if(strlen($this->ac16_urlcipi) < 8) {
+                $this->erro_sql = "Campo Url CIPI não pode ser menor que 8 caracteres.";
+            } elseif (strlen($this->ac16_urlcipi) > 14) {
+                $this->erro_sql = "Campo Url CIPI não pode ser maior que 14 caracteres.";
+            }
+            
+            $this->erro_campo = "ac16_urlcipi";
+            $this->erro_banco = "";
+            $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+            $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+            $this->erro_status = "0";
+
+            return false;
+        }
+
         if ($this->ac16_acordocategoria == null) {
             $this->ac16_acordocategoria = "0";
         }
@@ -578,6 +655,12 @@ class cl_acordo
      ,ac16_descricaoreajuste
      ,ac16_descricaoindice
      ,ac16_vigenciaindeterminada
+     ,ac16_tipopagamento
+     ,ac16_numparcela
+     ,ac16_vlrparcela
+     ,ac16_identificadorcipi
+     ,ac16_urlcipi
+     ,ac16_infcomplementares
      )
      values (
      $this->ac16_sequencial
@@ -624,6 +707,12 @@ class cl_acordo
      ," . ($this->ac16_descricaoreajuste == "null" || $this->ac16_descricaoreajuste == "" ? 'null' : "'" . $this->ac16_descricaoreajuste . "'") . "
      ," . ($this->ac16_descricaoindice == "null" || $this->ac16_descricaoindice == "" ? 'null' : "'" . $this->ac16_descricaoindice . "'") . "
      ,".($this->ac16_vigenciaindeterminada == "null" || $this->ac16_vigenciaindeterminada == ""?"'false'":"'".$this->ac16_vigenciaindeterminada."'")."
+     ,$this->ac16_tipopagamento
+     ,".($this->ac16_numparcela == "" ? 'null' : $this->ac16_numparcela)."
+     ,".($this->ac16_vlrparcela == "" ? 'null' : $this->ac16_vlrparcela)."
+     ," . ($this->ac16_identificadorcipi == "null" || $this->ac16_identificadorcipi == "" ? "null" : "'" . $this->ac16_identificadorcipi . "'") . "
+     ," . ($this->ac16_urlcipi == "null" || $this->ac16_urlcipi == "" ? "null" : "'" . $this->ac16_urlcipi . "'") . "
+     ," . ($this->ac16_infcomplementares == "null" || $this->ac16_infcomplementares == "" ? "null" : "'" . $this->ac16_infcomplementares . "'") . "
      )";
 
         $result = db_query($sql);
@@ -1002,6 +1091,93 @@ class cl_acordo
             $sql  .= $virgula . " ac16_tipounidtempoperiodo = $this->ac16_tipounidtempoperiodo ";
             $virgula = ",";
         }
+
+        if (trim(!empty($this->ac16_tipopagamento)) || isset($GLOBALS["HTTP_POST_VARS"]["ac16_tipopagamento"])) {
+
+            if (trim($this->ac16_tipopagamento) == "" || $this->ac16_tipopagamento == 0 && isset($GLOBALS["HTTP_POST_VARS"]["ac16_tipopagamento"])) {
+                $this->erro_sql = " Campo Tipo Pagamento não informado.";
+                $this->erro_campo = "ac16_tipopagamento";
+                $this->erro_banco = "";
+                $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+                $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+                $this->erro_status = "0";
+                return false;
+            }
+
+            $sql  .= $virgula . " ac16_tipopagamento = $this->ac16_tipopagamento ";
+            $virgula = ",";
+
+        }
+
+        if (trim(!empty($this->ac16_tipopagamento)) && $this->ac16_tipopagamento == 2 || isset($GLOBALS["HTTP_POST_VARS"]["ac16_tipopagamento"]) && $GLOBALS["HTTP_POST_VARS"]["ac16_tipopagamento"] == 2) {
+
+            if (empty($this->ac16_numparcela)) {
+                $this->erro_sql = " Campo Número de Parcela não informado.";
+                $this->erro_campo = "ac16_numparcela";
+                $this->erro_banco = "";
+                $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+                $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+                $this->erro_status = "0";
+                return false;
+            }
+
+            $sql  .= $virgula . " ac16_numparcela = $this->ac16_numparcela ";
+            $virgula = ",";
+
+            if (empty($this->ac16_numparcela)) {
+                $this->erro_sql = " Campo Valor da Parcela não informado.";
+                $this->erro_campo = "ac16_vlrparcela";
+                $this->erro_banco = "";
+                $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+                $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+                $this->erro_status = "0";
+                return false;
+            }
+
+            $sql  .= $virgula . " ac16_vlrparcela = $this->ac16_vlrparcela ";
+            $virgula = ",";
+
+        } else if(trim(!empty($this->ac16_tipopagamento)) && $this->ac16_tipopagamento == 1 || isset($GLOBALS["HTTP_POST_VARS"]["ac16_tipopagamento"]) && $GLOBALS["HTTP_POST_VARS"]["ac16_tipopagamento"] == 1) {
+            $sql  .= $virgula . " ac16_numparcela = 1";
+
+            if(!empty($this->ac16_vlrparcela)) {
+                $sql  .= $virgula . " ac16_vlrparcela = $this->ac16_vlrparcela";
+            }
+            $virgula = ",";
+        }
+
+        if (trim(!empty($this->ac16_identificadorcipi)) || isset($GLOBALS["HTTP_POST_VARS"]["ac16_identificadorcipi"])) {
+            $sql  .= $virgula . " ac16_identificadorcipi = '$this->ac16_identificadorcipi'";
+            $virgula = ",";
+        }
+
+        if (trim(!empty($this->ac16_urlcipi)) || isset($GLOBALS["HTTP_POST_VARS"]["ac16_urlcipi"])) {
+
+            if (strlen($this->ac16_urlcipi) < 8 || strlen($this->ac16_urlcipi) > 14) {
+                if(strlen($this->ac16_urlcipi) < 8) {
+                    $this->erro_sql = "Campo Url CIPI não pode ser menor que 8 caracteres.";
+                } elseif (strlen($this->ac16_urlcipi) > 14) {
+                    $this->erro_sql = "Campo Url CIPI não pode ser maior que 14 caracteres.";
+                }
+                
+                $this->erro_campo = "ac16_urlcipi";
+                $this->erro_banco = "";
+                $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+                $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+                $this->erro_status = "0";
+                return false;
+            }
+
+            $sql  .= $virgula . " ac16_urlcipi = '$this->ac16_urlcipi'";
+            $virgula = ",";
+
+        }
+
+        if (trim(!empty($this->ac16_infcomplementares)) || isset($GLOBALS["HTTP_POST_VARS"]["ac16_infcomplementares"])) {
+            $sql  .= $virgula . " ac16_infcomplementares ='$this->ac16_infcomplementares'";
+            $virgula = ",";
+        }
+
         if (trim($this->ac16_acordocategoria) != "" || isset($GLOBALS["HTTP_POST_VARS"]["ac16_acordocategoria"])) {
             if (trim($this->ac16_acordocategoria) == "" && isset($GLOBALS["HTTP_POST_VARS"]["ac16_acordocategoria"])) {
                 $this->ac16_acordocategoria = "0";
@@ -2633,8 +2809,8 @@ class cl_acordo
                         ac16_objeto AS objetoContrato,
                         NULL AS informacaoComplementar,
                         ac16_valor AS valorInicial,
-                        ac16_qtdperiodo AS numeroParcelas,
-                        0 AS valorParcela,
+                        ac16_numparcela AS numeroParcelas,
+                        ac16_vlrparcela AS valorParcela,
                         ac16_valor AS valorGlobal,
                         NULL AS valorAcumulado,
                         ac16_dataassinatura AS dataAssinatura,
@@ -2746,8 +2922,13 @@ class cl_acordo
         ac16_dataassinatura as dataAssinatura,
         ac16_datainicio as dataVigenciaInicio,
         ac16_datafim as datavigenciaFim,
-        null as identificadorCipi,
-        null as urlCipi
+        ac16_tipopagamento as ac16_tipopagamento,
+        ac16_numparcela as ac16_numparcela,
+        ac16_vlrparcela as ac16_vlrparcela,
+        ac16_identificadorcipi as ac16_identificadorcipi,
+        ac16_urlcipi as ac16_urlcipi,
+        ac16_infcomplementares as ac16_infcomplementares,
+        ac16_justificativapncp as ac16_justificativapncp
         from acordo
         join acordocategoria on ac50_sequencial=ac16_acordocategoria
         join liclicita on l20_codigo = ac16_licitacao
@@ -3170,4 +3351,68 @@ class cl_acordo
 
         return $sql;
     }
+
+    function adicionarJustificativasPncp($aSequenciais, $justificativaPncp) {
+        if (empty($aSequenciais)) {
+            return (object) [
+                'erro_banco' => '',
+                'erro_sql' => 'Nenhum sequencial fornecido.',
+                'erro_msg' => 'Usuário: Nenhum sequencial fornecido.',
+                'erro_status' => '0',
+                'numrows' => 0
+            ];
+        }
+    
+        $justificativaPncp = pg_escape_string($justificativaPncp);
+    
+        $sequenciais = implode(', ', array_map(function($obj) {
+            return (int) $obj->codigo;
+        }, $aSequenciais));
+    
+        $sSql = "
+            UPDATE
+                acordo
+            SET
+                ac16_justificativapncp = '$justificativaPncp'
+            WHERE
+                ac16_sequencial IN ($sequenciais);
+        ";
+    
+        $result = db_query($sSql);
+    
+        $oReturn = new stdClass();
+        if ($result === false) {
+            $erroBanco = str_replace("\n", "", @pg_last_error());
+            $erroSql = "Justificativas PNCP não efetuada. Exclusão abortada.\nValores: $sequenciais";
+    
+            $oReturn->erro_banco = $erroBanco;
+            $oReturn->erro_sql = $erroSql;
+            $oReturn->erro_msg = "Usuário: $erroSql\nAdministrador: $erroBanco";
+            $oReturn->erro_status = "0";
+            $oReturn->numrows = 0;
+        } else {
+            $numRows = pg_affected_rows($result);
+    
+            if ($numRows == 0) {
+                $erroSql = "Acordo não encontrado. Justificativas PNCP não efetuada.\nValores: $sequenciais";
+    
+                $oReturn->erro_banco = '';
+                $oReturn->erro_sql = $erroSql;
+                $oReturn->erro_msg = "Usuário: $erroSql\nAdministrador: ";
+                $oReturn->erro_status = "1";
+                $oReturn->numrows = 0;
+            } else {
+                $sucessoSql = "Justificativas PNCP efetuada com sucesso.\nValores: $sequenciais";
+    
+                $oReturn->erro_banco = '';
+                $oReturn->erro_sql = $sucessoSql;
+                $oReturn->erro_msg = "Usuário: $sucessoSql\nAdministrador: ";
+                $oReturn->erro_status = "1";
+                $oReturn->numrows = $numRows;
+            }
+        }
+    
+        return $oReturn;
+    }
+    
 }

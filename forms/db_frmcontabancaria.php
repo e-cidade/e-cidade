@@ -43,7 +43,7 @@ $ano = db_getsession("DB_anousu"); //ano
 
 		if (iIdentificador.length < 11) {
 
-			alert("Campo identificador(CNPJ) invï¿½lido.");
+			alert("Campo identificador(CNPJ) inválido.");
 			return false;
 		}
 
@@ -54,7 +54,7 @@ $ano = db_getsession("DB_anousu"); //ano
 	<center>
 		<fieldset>
 			<legend>
-				<b>Cadastro de Conta Bancï¿½ria</b>
+				<b>Cadastro de Conta Bancária</b>
 			</legend>
 			<table border="0">
 				<tr>
@@ -172,7 +172,7 @@ $ano = db_getsession("DB_anousu"); //ano
     -->
 				<tr>
 					<td nowrap title="Código c206_sequencial">
-						<? db_ancora("Convï¿½nio", "js_pesquisadb83_numconvenio(true);", $db_opcao); ?>
+						<? db_ancora("Convênio", "js_pesquisadb83_numconvenio(true);", $db_opcao); ?>
 					</td>
 					<td>
 						<?
@@ -202,53 +202,56 @@ $ano = db_getsession("DB_anousu"); //ano
 						<?
 						if (db_getsession("DB_anousu") < 2018) {
 							$aTipoAplicacao = array(
-								'00' => 'Nï¿½O INFORMADO',
-								'01' => 'Tï¿½tulos do Tesouro Nacional - SELIC - Art. 7ï¿½, I, "a"',
-								'02' => 'FI 100% tï¿½tulos TN - Art. 7ï¿½, I, "b"',
-								'03' => 'Operaï¿½ï¿½es Compromissadas - Art. 7ï¿½, II',
-								'04' => 'FI Renda Fixa / Referenciado RF - Art. 7ï¿½, III',
-								'05' => 'FI de renda fixa - Art. 7ï¿½, IV',
-								'06' => 'Poupanï¿½a - Art. 7ï¿½, V',
-								'07' => 'FI em direitos creditï¿½rios - aberto - Art. 7ï¿½, VI',
-								'08' => 'FI em direitos creditï¿½rios - fechado - Art. 7ï¿½, VII, "a"',
-								'09' => 'FI renda fixa "Crï¿½dito Privado" - - Art. 7ï¿½, VII, "b"',
-								'10' => 'FI Previdenciï¿½rio em Aï¿½ï¿½es - Art. 8ï¿½, I, "b"',
-								'11' => 'FI de ï¿½ndice referenciado em Aï¿½ï¿½es - - Art. 8ï¿½, II',
-								'12' => 'FI em Aï¿½ï¿½es - - Art. 8ï¿½, III', '13' => 'FI Multimercado aberto - - Art. 8ï¿½, IV', '14' => 'FI em participaï¿½ï¿½es fechado - Art. 8ï¿½ V',
-								'15' => 'FI Imobiliï¿½rio - cotas negociadas em bolsa - - Art. 8ï¿½, VI'
+								'00' => 'NÃO INFORMADO',
+								'01' => 'Títulos do Tesouro Nacional - SELIC - Art. 7º, I, "a"',
+								'02' => 'FI 100% títulos TN - Art. 7º, I, "b"',
+								'03' => 'Operações Compromissadas - Art. 7º, II',
+								'04' => 'FI Renda Fixa / Referenciado RF - Art. 7º, III',
+								'05' => 'FI de renda fixa - Art. 7º, IV',
+								'06' => 'Poupança - Art. 7º, V',
+								'07' => 'FI em direitos creditícios - aberto - Art. 7º, VI',
+								'08' => 'FI em direitos creditícios - fechado - Art. 7º, VII, "a"',
+								'09' => 'FI renda fixa "Crédito Privado" - - Art. 7º, VII, "b"',
+								'10' => 'FI Previdenciário em Ações - Art. 8º, I, "b"',
+								'11' => 'FI de índice referenciado em Ações - - Art. 8º, II',
+								'12' => 'FI em Ações - - Art. 8º, III',
+								'13' => 'FI Multimercado aberto - - Art. 8º, IV',
+								'14' => 'FI em participações fechado - Art. 8º, V',
+								'15' => 'FI Imobiliário - cotas negociadas em bolsa - - Art. 8º, VI'
 							);
 							db_select('db83_tipoaplicacao', $aTipoAplicacao, true, $db_opcao, "");
 						} else {
 							$aTipoAplicacao = array(
-								'00' => 'Nï¿½O INFORMADO',
-								'16' => 'Tï¿½tulos Pï¿½blicos de emissï¿½o do Tesouro Nacional (SELIC) - Art. 7ï¿½, I, a',
-								'17' => 'Fundos referenciados 100% Tï¿½tulos Pï¿½blicos - Art.7ï¿½, I, b',
-								'18' => 'Fundos de ï¿½ndices carteira 100% Tï¿½tulos Pï¿½blicos -Art. 7ï¿½, I, c',
-								'19' => 'Operaï¿½ï¿½es Compromissadas - Art. 7ï¿½, II',
-								'20' => 'Fundos Referenciados em indicadores RF - Art. 7ï¿½,III, a',
-								'21' => 'Fundos de ï¿½ndices (ETF) em indicadores Tï¿½tulos Pï¿½blicos - Art. 7ï¿½, III, b',
-								'22' => 'Fundos de Renda Fixa em geral - Art. 7ï¿½, IV, a',
-								'23' => 'Fundos de ï¿½ndices (ETF) - quaisquer indicadores - Art. 7ï¿½, IV, b',
-								'24' => 'Letra Imobiliï¿½ria Garantida (LIG) - Art. 7ï¿½, V, b',
-								'25' => 'Certificado de Depï¿½sito Bancï¿½rio (CDB) - Art. 7ï¿½, VI, a',
-								'26' => 'Poupanï¿½a - Art. 7ï¿½, VI, b',
-								'27' => 'FIDCs - Cota Sï¿½nior - Art. 7ï¿½, VII, a',
-								'28' => 'Fundos de Renda Fixa - Crï¿½dito Privado - Art. 7ï¿½,VII, b',
-								'29' => 'Fundos de Debï¿½ntures de Infraestrutura - Art. 7ï¿½,VII, c',
-								'30' => 'Fundo de Aï¿½ï¿½es (ï¿½ndices c/ no mï¿½nimo 50 aï¿½ï¿½es)-Art. 8ï¿½, I, a',
-								'31' => 'ETF (ï¿½ndices c/ no mï¿½nimo 50 aï¿½ï¿½es) - Art. 8ï¿½, I, b',
-								'32' => 'Fundo de Aï¿½ï¿½es em geral (com atï¿½ 20% de ativos) - Art. 8ï¿½, II, a',
-								'33' => 'ETF (ï¿½ndices em geral) - Art. 8ï¿½, II, b',
-								'34' => 'Fundos Multimercado (com atï¿½ 20% ativos exterior)- Art. 8ï¿½, III',
-								'35' => 'Fundos de Investimento em Participaï¿½ï¿½es - FIP - Art. 8ï¿½, IV, a',
-								'36' => "Fundo de Investimento Imobiliï¿½rio - FII - Art. 8ï¿½, IV, b",
-								'37' => "Fundos de Investimento classificados como \"Aï¿½ï¿½es - Mercado de Acesso\" - Art. 8ï¿½, IV, \"c\"",
-								'38' => "Fundos de Investimento classificados como \"Renda Fixa - Dï¿½vida Externa\" - Art. 9ï¿½-A, I",
-								'39' => "Fundos de Investimento - Sufixo Investimento no Exterior - Art. 9ï¿½-A, II",
-								'40' => "Fundos de Aï¿½ï¿½es BDR Nï¿½vel 1 - Art. 9ï¿½-A, III",
-								'60' => "Aplicaï¿½ï¿½es financeiras da taxa de administraï¿½ï¿½o do RPPS",
-								'61' => "Tï¿½tulos e valores em enquadramento",
-								'62' => "Tï¿½tulos e valores não sujeitos ao enquadramento"
+								'00' => 'NÃO INFORMADO',
+								'16' => 'Títulos Públicos de emissão do Tesouro Nacional (SELIC) - Art. 7º, I, a',
+								'17' => 'Fundos referenciados 100% Títulos Públicos - Art.7º, I, b',
+								'18' => 'Fundos de índices carteira 100% Títulos Públicos -Art. 7º, I, c',
+								'19' => 'Operações Compromissadas - Art. 7º, II',
+								'20' => 'Fundos Referenciados em indicadores RF - Art. 7º,III, a',
+								'21' => 'Fundos de índices (ETF) em indicadores Títulos Públicos - Art. 7º, III, b',
+								'22' => 'Fundos de Renda Fixa em geral - Art. 7º, IV, a',
+								'23' => 'Fundos de índices (ETF) - quaisquer indicadores - Art. 7º, IV, b',
+								'24' => 'Letra Imobiliária Garantida (LIG) - Art. 7º, V, b',
+								'25' => 'Certificado de Depósito Bancário (CDB) - Art. 7º, VI, a',
+								'26' => 'Poupança - Art. 7º, VI, b',
+								'27' => 'FIDCs - Cota Sênior - Art. 7º, VII, a',
+								'28' => 'Fundos de Renda Fixa - Crédito Privado - Art. 7º,VII, b',
+								'29' => 'Fundos de Debêntures de Infraestrutura - Art. 7º,VII, c',
+								'30' => 'Fundo de Ações (índices c/ no mínimo 50 ações)-Art. 8º, I, a',
+								'31' => 'ETF (índices c/ no mínimo 50 ações) - Art. 8º, I, b',
+								'32' => 'Fundo de Ações em geral (com até 20% de ativos) - Art. 8º, II, a',
+								'33' => 'ETF (índices em geral) - Art. 8º, II, b',
+								'34' => 'Fundos Multimercado (com até 20% ativos exterior)- Art. 8º, III',
+								'35' => 'Fundos de Investimento em Participações - FIP - Art. 8º, IV, a',
+								'36' => 'Fundo de Investimento Imobiliário - FII - Art. 8º, IV, b',
+								'37' => 'Fundos de Investimento classificados como "Ações - Mercado de Acesso" - Art. 8º, IV, "c"',
+								'38' => 'Fundos de Investimento classificados como "Renda Fixa - Dívida Externa" - Art. 9º-A, I',
+								'39' => 'Fundos de Investimento - Sufixo Investimento no Exterior - Art. 9º-A, II',
+								'40' => 'Fundos de Ações BDR Nível 1 - Art. 9º-A, III',
+								'60' => 'Aplicações financeiras da taxa de administração do RPPS',
+								'61' => 'Títulos e valores em enquadramento',
+								'62' => 'Títulos e valores não sujeitos ao enquadramento'
+
 							);
 							db_select('db83_tipoaplicacao', $aTipoAplicacao, true, $db_opcao, "");
 						}

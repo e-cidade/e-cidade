@@ -674,6 +674,7 @@ function js_alterarRetencao() {
    oRetencao.iCpfCnpj        = $F('z01_cgccpf');
    oRetencao.nValorRetencao  = $F('e23_valorretencao');
    oRetencao.nValorbase      = $F('e23_valorbase');
+   oRetencao.iCodMov         = $F('e81_codmov');
    oRetencao.aMovimentos     = new Array();
    if (aBaseDeCalculo[$F('e21_sequencial')] != "undefined") {
       oRetencao.aMovimentos = aBaseDeCalculo[$F('e21_sequencial')];

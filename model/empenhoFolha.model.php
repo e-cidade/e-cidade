@@ -176,6 +176,29 @@ class empenhoFolha {
   protected $tipoEmpenhoResumo = 0;
 
   /**
+   * Lotação do empenho
+   *
+   * @var integer
+   */
+  protected $lotacao = null;
+
+
+  /**
+   * Controla retenção da rubrica
+   *
+   * @var integer
+   */
+  protected $lRubrica = null;
+
+  /**
+   * Define retenções da OP
+   *
+   * @var integer
+   */
+  protected $sRetencoes = null;
+
+
+  /**
    * @param integer $iNumeroEmpenhoFinanceiro
    */
   function setNumeroEmpenhoFinanceiro($iNumeroEmpenhoFinanceiro) {
@@ -190,7 +213,7 @@ class empenhoFolha {
   }
 
 
-  function __construct($iEmpenhoFolha) {
+  function __construct($iEmpenhoFolha, $iLotacao = null, $lRubrica = false, $sRetencoes = null) {
 
     if (empty($iEmpenhoFolha)) {
       throw new ParameterException("Empenho da Folha não informado");
@@ -219,6 +242,9 @@ class empenhoFolha {
     $sSqlDadosEmpenho  .= "       inner join rhpessoalmov          on rh73_seqpes     = rh02_seqpes  ";
     $sSqlDadosEmpenho  .= "                                        and rh73_instit     = rh02_instit ";
     $sSqlDadosEmpenho  .= "   where rh72_sequencial  = {$iEmpenhoFolha}  ";
+    if ($iLotacao != null) {
+      $sSqlDadosEmpenho  .= "   and rh02_lota  = {$iLotacao}  ";
+    }
     //$sSqlDadosEmpenho  .= "     and rh72_tipoempenho = {$iTipo}";
     $sSqlDadosEmpenho  .= "     and rh73_tiporubrica = 1";
     $sSqlDadosEmpenho  .= "   group by rh72_sequencial,  ";
@@ -259,6 +285,10 @@ class empenhoFolha {
     $this->tabelaprevidencia = $oDadosEmpenho->rh72_tabprev;
     $this->tipoempenho       = $oDadosEmpenho->rh72_tipoempenho;
     $this->caracteristica    = $oDadosEmpenho->rh72_concarpeculiar;
+    $this->lotacao           = $iLotacao;
+    $this->lRubrica          = $lRubrica;
+    $this->sRetencoes        = $sRetencoes;
+
 
     switch ($oDadosEmpenho->rh72_siglaarq) {
 
@@ -301,11 +331,16 @@ class empenhoFolha {
     /**
      * Verificamos se existe Reserva de Saldo para esse empenho
      */
+    if ($iLotacao != null) {
+      $sWhere = "o120_rhempenhofolha={$this->empenhofolha} and o120_lota = {$this->lotacao} ";
+    } else {
+      $sWhere = "o120_rhempenhofolha={$this->empenhofolha}";
+    }
     $oDaoReservaSaldo = db_utils::getDao("orcreservarhempenhofolha");
     $sSqlReservaSaldo = $oDaoReservaSaldo->sql_query_file(null,
                                                      "o120_orcreserva",
                                                      null,
-                                                     "o120_rhempenhofolha={$this->empenhofolha}"
+                                                     $sWhere,
                                                      );
 
     $rsReservaSaldo  = $oDaoReservaSaldo->sql_record($sSqlReservaSaldo);
@@ -319,11 +354,16 @@ class empenhoFolha {
     /**
      * Verificamos se o empenho da folha já foi empenhado
      */
+    if ($iLotacao != null) {
+      $sWhere = "rh76_rhempenhofolha = {$this->empenhofolha} and rh76_lota = {$this->lotacao} ";
+    } else {
+      $sWhere = "rh76_rhempenhofolha = {$this->empenhofolha} ";
+    }
     $oDaoEmpenhoFolhaEmpenho = db_utils::getDao("rhempenhofolhaempenho");
     $sSqlEmpenho             = $oDaoEmpenhoFolhaEmpenho->sql_query_file(null,
                                                                         "*",
                                                                         null,
-                                                                        "rh76_rhempenhofolha = {$this->empenhofolha} "
+                                                                        $sWhere
                                                                         );
     $rsEmpenho                = $oDaoEmpenhoFolhaEmpenho->sql_record($sSqlEmpenho);
     if ($oDaoEmpenhoFolhaEmpenho->numrows > 0) {
@@ -465,6 +505,7 @@ class empenhoFolha {
   	    $oDaoReservaEmpenhoFolha = new cl_orcreservarhempenhofolha;
   	    $oDaoReservaEmpenhoFolha->o120_orcreserva     = $oDaoReservaSaldo->o80_codres;
   	    $oDaoReservaEmpenhoFolha->o120_rhempenhofolha = $this->empenhofolha;
+        $oDaoReservaEmpenhoFolha->o120_lota = $this->lotacao;
   	    $oDaoReservaEmpenhoFolha->incluir(null);
   	    if ($oDaoReservaEmpenhoFolha->erro_status == 0) {
 
@@ -495,11 +536,17 @@ class empenhoFolha {
     $oDaoOrcReservaRhEmpenhoFolha = db_utils::getDao("orcreservarhempenhofolha");
     $oDaoOrcReserva               = db_utils::getDao("orcreserva");
 
-    $sSqlReservasGeradas = $oDaoOrcReservaRhEmpenhoFolha->sql_query_file(null, "*", null, " o120_rhempenhofolha = {$this->empenhofolha}");
+    if ($this->lotacao != null) {
+      $sWhere = "o120_rhempenhofolha = {$this->empenhofolha} and o120_lota = {$this->lotacao}";
+    } else {
+      $sWhere = "o120_rhempenhofolha = {$this->empenhofolha}";
+    }
+    
+    $sSqlReservasGeradas = $oDaoOrcReservaRhEmpenhoFolha->sql_query_file(null, "*", null, $sWhere);
     $rsReservasGeradas   = $oDaoOrcReservaRhEmpenhoFolha->sql_record($sSqlReservasGeradas);
     $oReservasGeradas    = db_utils::getCollectionByRecord($rsReservasGeradas);
 
-    $oDaoOrcReservaRhEmpenhoFolha->excluir(null, "o120_rhempenhofolha = {$this->empenhofolha}");
+    $oDaoOrcReservaRhEmpenhoFolha->excluir(null, $sWhere);
     if ($oDaoOrcReservaRhEmpenhoFolha->erro_status == "0") {
       throw new DBException("2. Erro ao excluir reservas de saldo  do Empenho {$this->empenhofolha}\nMensagem:\n{$oDaoOrcReservaRhEmpenhoFolha->erro_msg}");
     }
@@ -550,6 +597,7 @@ class empenhoFolha {
     $sSqlDadosRetencao  .= "       inner join  rhempenhofolharubricaretencao on rh78_rhempenhofolharubrica = rh73_sequencial ";
     $sSqlDadosRetencao  .= "   where rh72_sequencial  = {$this->empenhofolha}  ";
     $sSqlDadosRetencao  .= "     and rh72_tipoempenho = {$iTipoEmpenho}";
+    $sSqlDadosRetencao  .= "     and rh72_siglaarq    = '{$this->siglafolha}'";
     $sSqlDadosRetencao  .= "     and rh73_tiporubrica = 2";
     $sSqlDadosRetencao  .= "     and rh73_pd          = {$iPd}";
     $sSqlDadosRetencao  .= "   group by rh72_sequencial,  ";
@@ -569,6 +617,46 @@ class empenhoFolha {
     $rsDadosEmpenho     = db_query($sSqlDadosRetencao);
 
     $aRetencoes         = db_utils::getCollectionByRecord($rsDadosEmpenho);
+    return $aRetencoes;
+
+  }
+
+    /**
+   * Retorna as retencoes lancadas para o empenho da folha na rubrica principal
+   *
+   */
+  function getRetencoesRubricaPrincipal($sRetencoes,$iTipoEmpenho = 1, $iPd = 2) {
+    if ($sRetencoes == null) {
+      $sFiltroRetencao = "";
+    } else {
+      $sFiltroRetencao = " and rh78_retencaotiporec in ({$sRetencoes}) ";
+    }
+    $sSqlDadosRetencao   = "SELECT  ";
+    $sSqlDadosRetencao  .= "       rh72_anousu, ";
+    $sSqlDadosRetencao  .= "       rh72_mesusu, ";
+    $sSqlDadosRetencao  .= "       rh78_retencaotiporec,";
+    $sSqlDadosRetencao  .= "       round(sum(rh73_valor), 2) as valorretencao ";
+    $sSqlDadosRetencao  .= "  from rhempenhofolha ";
+    $sSqlDadosRetencao  .= "       inner join rhempenhofolharhemprubrica        on rh81_rhempenhofolha = rh72_sequencial ";
+    $sSqlDadosRetencao  .= "       inner join rhempenhofolharubrica on rh73_sequencial     = rh81_rhempenhofolharubrica";
+    $sSqlDadosRetencao  .= "       inner join rhpessoalmov          on rh73_seqpes                         = rh02_seqpes  ";
+    $sSqlDadosRetencao  .= "                                                and rh73_instit                = rh02_instit ";
+    $sSqlDadosRetencao  .= "       inner join  rhempenhofolharubricaretencao on rh78_rhempenhofolharubrica = rh73_sequencial ";
+    $sSqlDadosRetencao  .= "   where rh02_lota = {$this->lotacao}  ";
+    $sSqlDadosRetencao  .= "     {$sFiltroRetencao}";
+    $sSqlDadosRetencao  .= "     and rh72_tipoempenho = {$iTipoEmpenho}";
+    $sSqlDadosRetencao  .= "     and rh73_tiporubrica = 2";
+    $sSqlDadosRetencao  .= "     and rh73_pd          = {$iPd}";
+    $sSqlDadosRetencao  .= "     and rh72_siglaarq    = '{$this->siglafolha}'";
+    $sSqlDadosRetencao  .= "     and rh72_anousu = {$this->ano} ";
+    $sSqlDadosRetencao  .= "     and rh72_mesusu = {$this->mes} ";
+    $sSqlDadosRetencao  .= "   group by   ";
+    $sSqlDadosRetencao  .= "            rh72_mesusu, ";
+    $sSqlDadosRetencao  .= "            rh72_anousu, ";
+    $sSqlDadosRetencao  .= "            rh78_retencaotiporec";
+    $rsDadosEmpenho     = db_query($sSqlDadosRetencao);
+    $aRetencoes         = db_utils::getCollectionByRecord($rsDadosEmpenho);
+
     return $aRetencoes;
 
   }
@@ -603,7 +691,11 @@ class empenhoFolha {
     	 */
     	$oDaoReserva             = db_utils::getDao("orcreserva");
     	$oDaoReservaSaldoEmpenho = db_utils::getDao("orcreservarhempenhofolha");
-    	$sWhere                  = "o120_rhempenhofolha = {$this->empenhofolha}";
+      if ($this->lotacao != null) {
+        $sWhere = "o120_rhempenhofolha = {$this->empenhofolha} and o120_lota = {$this->lotacao}";
+      } else {
+        $sWhere = "o120_rhempenhofolha = {$this->empenhofolha}";
+      }
     	$sSqlDadosReserva        = $oDaoReservaSaldoEmpenho->sql_query_file(null, "o120_orcreserva", null, $sWhere);
     	$rsDadosEmpenho          = $oDaoReservaSaldoEmpenho->sql_record($sSqlDadosReserva);
     	if ($oDaoReservaSaldoEmpenho->numrows > 0) {
@@ -655,6 +747,7 @@ class empenhoFolha {
       $oDaoEmpAutoriza->e54_numcgm         = $iNumCgm;
       $oDaoEmpAutoriza->e54_login          = db_getsession("DB_id_usuario");
       $oDaoEmpAutoriza->e54_anulad         = null;
+      $oDaoEmpAutoriza->e54_datainclusao = date('Y-m-d H:i:s.v', db_getsession("DB_datausu"));
       $oDaoEmpAutoriza->incluir(null);
       if ($oDaoEmpAutoriza->erro_status == 0) {
         throw new DBException("Não foi possivel gerar Autorização de empenho para empenho da folha ({$this->empenhofolha})\n{$oDaoEmpAutoriza->erro_msg}");
@@ -920,6 +1013,7 @@ class empenhoFolha {
       $oDaoRHempenhoFolha                      = db_utils::getDao("rhempenhofolhaempenho");
       $oDaoRHempenhoFolha->rh76_numemp         = $oDaoEmpenho->e60_numemp;
       $oDaoRHempenhoFolha->rh76_rhempenhofolha = $this->empenhofolha;
+      $oDaoRHempenhoFolha->rh76_lota = $this->lotacao;
       $oDaoRHempenhoFolha->incluir(null);
       if ($oDaoRHempenhoFolha->erro_status == 0) {
 
@@ -1048,7 +1142,11 @@ class empenhoFolha {
         if ($lPrevidencia) {
             $aRetencoes =  $this->getRetencoes(2, 1);
         } else {
+          if ($this->lRubrica == null) {
             $aRetencoes =  $this->getRetencoes();
+          } elseif ($this->lRubrica == 'true' || ($this->lRubrica == 'false' && $this->sRetencoes != null)){
+            $aRetencoes =  $this->getRetencoesRubricaPrincipal($this->sRetencoes);
+          }
         }   
 
         require_once("model/retencaoNota.model.php");
@@ -1075,11 +1173,29 @@ class empenhoFolha {
             throw new ParameterException($sErroMsg);
 
           }
-
+          $sRetencoesTipoRec .= $virgula.$oRetencaoEmpenho->rh78_retencaotiporec;
+          $virgula = ", ";
         }
         $oRetencaoNota->salvar($oRetornoLiquidacao->e50_codord);
 
+      if ($sRetencoesTipoRec != "" && $this->lotacao != null) {
+        $aRubricas = $this->consultaRubricas($sRetencoesTipoRec);
+        $oDaoEmpenhoRubrica = db_utils::getDao("rhempenhofolharhemprubrica");        
+        if ($aRubricas) {
+          foreach ($aRubricas as $oRubrica) {
+            $oDaoEmpenhoRubrica->rh81_lancamento = $this->empenhofolha;   
+            $oDaoEmpenhoRubrica->rh81_lota = $this->lotacao;          
+            $oDaoEmpenhoRubrica->alterar($oRubrica->rh81_sequencial);
+      
+            if ($oDaoEmpenhoRubrica->erro_status == 0) {
+              $sErroMsg = "Empenho folha {$this->empenhofolha}:\n";
+              $sErroMsg .= "Erro: {$oDaoEmpenhoRubrica->erro_msg}";
+              throw new DBException($sErroMsg);
+            }
+          }
+        }
       }
+}
 
       if (!empty($this->ordemauxiliar)) {
 
@@ -1110,6 +1226,33 @@ class empenhoFolha {
     }
     return true;
   }
+
+  /**
+   * Define o rubricas do empenho gerado
+   *
+   * @param array $sRetencoesTipoRec
+   */
+  function consultaRubricas($sRetencoesTipoRec)
+  {
+    $sql = "select rh81_sequencial
+            from rhempenhofolha 
+            inner join rhempenhofolharhemprubrica on rh81_rhempenhofolha = rh72_sequencial 
+            inner join rhempenhofolharubrica on rh73_sequencial = rh81_rhempenhofolharubrica
+            inner join rhpessoalmov on rh73_seqpes  = rh02_seqpes and rh73_instit = rh02_instit 
+            inner join  rhempenhofolharubricaretencao on rh78_rhempenhofolharubrica = rh73_sequencial 
+            where 
+              rh02_lota = {$this->lotacao}
+              and rh78_retencaotiporec in ({$sRetencoesTipoRec}) 
+              and rh72_tipoempenho = 1
+              and rh73_tiporubrica = 2
+              and rh73_pd          = 2
+              and rh72_siglaarq    = '{$this->siglafolha}'
+              and rh72_anousu = {$this->ano} 
+              and rh72_mesusu = {$this->mes} ";
+    $aTeste = db_utils::getColectionByRecord(db_query($sql));
+    return $aTeste;
+  }
+
   /**
    * Define o codigo da OP auxiliar
    *
@@ -1161,6 +1304,7 @@ class empenhoFolha {
       /**
        * Verificamos se o empenho teve algum valor de liquidacao estornado
        */
+
       if ($oEmpenho->dadosEmpenho->e60_vlrliq !=  $this->valorempenho) {
 
         $sMsg = "Empenho da Folha ({$this->empenhofolha}), empenho ({$this->numeroempenho}) teve sua liquidacao estornada";
@@ -1210,7 +1354,7 @@ class empenhoFolha {
       }
 
       $oEmpenho->anularEmpenho($aItensEmpenhoAnular,
-                               $this->valorempenho,
+                                $oEmpenho->dadosEmpenho->e60_vlrliq,
                                "Estorno de pagamento empenho da folha nº {$this->empenhofolha}.",
                                 null,
                                 2,
@@ -1266,6 +1410,12 @@ class empenhoFolha {
 
     $sWhere                = "rh72_sequencial   = {$this->empenhofolha}";
     $sWhere               .= " and rh72_tipoempenho = {$this->tipoempenho}";
+    if ($this->lRubrica == 'false') {
+      $sWhere  .= " and rh73_pd = 1 ";
+    }
+    if ($this->lotacao != null) {
+      $sWhere             .= " and rh02_lota = {$this->lotacao}";
+    }
 
     $sSqlDadosEmpenho      = $oDaoRhempenhoRubricas->sql_query_pessoal(null,
                                                                        $sCampos,
@@ -1289,7 +1439,11 @@ class empenhoFolha {
       $sSqlRubricas  .= "                            and rh73_instit = rh27_instit ";
       $sSqlRubricas  .= " where rh81_rhempenhofolha = {$this->empenhofolha} ";
       $sSqlRubricas  .= "   and rh73_seqpes         = {$aDadosEmpenhos[$iEmpenho]->rh73_seqpes}";
+      if ($this->lRubrica == 'false') {
+        $sSqlRubricas  .= " and rh73_pd = 1 ";
+      }
       $sSqlRubricas  .= " order by rh73_pd,rh27_rubric";
+
       $rsRubricas     = db_query($sSqlRubricas);
       $aRubricas      = db_utils::getCollectionByRecord($rsRubricas, false, false, true);
 
@@ -1602,12 +1756,18 @@ class empenhoFolha {
   function getValorRetencao() {
 
     $nValorDesconto = 0;
+    $sWhereLota = "";
     $sSqlValorDesconto  = "select coalesce(sum(rh73_valor),0) as retencao ";
     $sSqlValorDesconto .= "  from rhempenhofolha ";
     $sSqlValorDesconto .= "       inner join rhempenhofolharhemprubrica on rh72_sequencial = rh81_rhempenhofolha ";
     $sSqlValorDesconto .= "       inner join rhempenhofolharubrica on rh81_rhempenhofolharubrica = rh73_sequencial ";
+    if ( $this->lotacao != null) {
+      $sSqlValorDesconto  .= "   inner join rhpessoalmov on rh73_seqpes  = rh02_seqpes  ";
+      $sSqlValorDesconto  .= "                           and rh73_instit = rh02_instit ";
+      $sWhereLota = " and rh02_lota = {$this->lotacao} ";
+    }
     $sSqlValorDesconto .= " where rh73_tiporubrica = 2";
-    $sSqlValorDesconto .= " and rh72_sequencial    = {$this->empenhofolha}";
+    $sSqlValorDesconto .= " and rh72_sequencial    = {$this->empenhofolha} {$sWhereLota}";
     $rsValorDesconto    = db_query($sSqlValorDesconto);
     if ($rsValorDesconto) {
        $nValorDesconto    = db_utils::fieldsMemory($rsValorDesconto, 0)->retencao;
@@ -1628,7 +1788,7 @@ class empenhoFolha {
         return "FGTS referente ao mês {$this->mes}/{$this->anoFolha}";
     }
 
-    return "Pagamento de {$this->tipofolha} {$this->mes}/{$this->anoFolha}";
+    return "Referente ao pagamento de {$this->tipofolha} do mês {$this->mes}/{$this->anoFolha}".($this->lotacao != null ? " da lotação {$this->lotacao}." : ".");
 
   }
   

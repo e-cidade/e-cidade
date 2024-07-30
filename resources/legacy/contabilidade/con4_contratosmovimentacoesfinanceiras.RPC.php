@@ -324,7 +324,7 @@ switch ($oParam->exec) {
                 $oRetorno->pc50_codcom          = $oStdDados->pc50_codcom;
                 $oRetorno->l03_tipo             = $oStdDados->l03_tipo;
             }
-            
+
         } else if ($oRetorno->iOrigemContrato == 3) {
             $aLicitacoesVinculadas = $oContrato->getLicitacoes();
 
@@ -571,18 +571,17 @@ switch ($oParam->exec) {
 
                 $oRetorno->message = "Codigo da autorização não informado.";
                 $oRetorno->status = 2;
-                return;
             }
 
-            $sql = "select distinct       
-        ac20_acordoposicao  from acordoposicao        
-        inner join acordoitem          on ac20_acordoposicao = ac26_sequencial        
-        inner join acordoitemexecutado on ac20_sequencial    = ac29_acordoitem        
-        inner join acordoitemexecutadoempautitem on ac29_sequencial = ac19_acordoitemexecutado        
-        inner join empautitem on e55_sequen = ac19_sequen and ac19_autori = e55_autori        
-        inner join empautoriza on e54_autori = e55_autori        
-        inner join empautidot on e56_autori = e54_autori  
-        where ac26_acordo = {$oContrato->getCodigoAcordo()}     
+            $sql = "select distinct
+        ac20_acordoposicao  from acordoposicao
+        inner join acordoitem          on ac20_acordoposicao = ac26_sequencial
+        inner join acordoitemexecutado on ac20_sequencial    = ac29_acordoitem
+        inner join acordoitemexecutadoempautitem on ac29_sequencial = ac19_acordoitemexecutado
+        inner join empautitem on e55_sequen = ac19_sequen and ac19_autori = e55_autori
+        inner join empautoriza on e54_autori = e55_autori
+        inner join empautidot on e56_autori = e54_autori
+        where ac26_acordo = {$oContrato->getCodigoAcordo()}
         and e54_autori = {$iAutorizacao}";
 
 
@@ -591,8 +590,8 @@ switch ($oParam->exec) {
 
 
             $sql2 = "select max(ac20_acordoposicao) as codigoposicao
-        from acordoposicao 
-        inner join acordoitem on ac20_acordoposicao = ac26_sequencial 
+        from acordoposicao
+        inner join acordoitem on ac20_acordoposicao = ac26_sequencial
         where ac26_acordo = {$oContrato->getCodigoAcordo()}";
 
 
@@ -657,7 +656,6 @@ switch ($oParam->exec) {
                                 $smessage = "Usuário: Não será possível a anulação da autorização " . $iAutorizacao . " .\n\nMotivo: A forma de controle do item " . $oItem->ac20_pcmater . " na autorização é diferente da posição atual do contrato!";
                                 $oRetorno->message = urlencode($smessage);
                                 $oRetorno->status = 2;
-                                return;
                             }
                             if ($oDadosItemUltimaPosicao->ac20_servicoquantidade == 'f' && $oDadosItemUltimaPosicao->pc01_servico == 't') {
                             } else if ($oDadosItemUltimaPosicao->ac20_valorunitario != $oDadosItemAtualPosicao->ac20_valorunitario) {

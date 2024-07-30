@@ -54,9 +54,6 @@ if (isset($_GET['chavepesquisa']) && $_GET['chavepesquisa'] != '') {
   $chavepesquisa = $_GET['chavepesquisa'];
 }
 
-echo "<script>parent.document.formaba.db_cred.disabled=true;</script>";
-// Same as error_reporting(E_ALL);
-//ini_set('error_reporting', E_ALL);
 
 $clpcorcamforne               = new cl_pcorcamforne;
 $clpcorcamfornelic            = new cl_pcorcamfornelic;
@@ -655,16 +652,19 @@ if ($result != false && $clliclicita->numrows > 0) {
   db_fieldsmemory($result, 0);
 }
 
+$rsTipoCompra = $clliclicita->sql_record($clliclicita->getTipocomTribunal($l20_codigo));
+db_fieldsmemory($rsTipoCompra, 0)->l03_pctipocompratribunal;
 if ($l03_pctipocompratribunal == "102" || $l03_pctipocompratribunal == "103") {
-  echo "<script>
-     parent.document.formaba.db_cred.disabled=false;
-    </script>";
+  echo "<script> parent.document.getElementById('db_cred').style.display = '' </script>";
+
   $clcredenciamento = new cl_credenciamento();
   $result_credenciamento = $clcredenciamento->sql_record($clcredenciamento->sql_query(null, "*", null, "l205_licitacao = $l20_codigo"));
 
   if (pg_num_rows($result_credenciamento) == 0) {
     $db_botao = false;
   }
+}else {
+  echo "<script> parent.document.getElementById('db_cred').style.display = 'none' </script>";
 }
 
 ?>
@@ -723,6 +723,7 @@ if (isset($alterar) || isset($excluir) || isset($incluir) || isset($verificado))
         echo "<script> document.form1." . $clpcorcamforne->erro_campo . ".focus();</script>";
       }
     } else {
+      echo "<script> resetarCampos(); </script>";
       if (isset($tipopart1) && isset($tipopart2)) {
         if ($sqlerro == true) {
           db_msgbox($erro_msg);
@@ -771,14 +772,4 @@ $iNumCgmForn  = db_utils::fieldsMemory($result_fornaba, 0)->pc21_numcgm;
 
   }
 
-  if (parent.document.formaba.db_habi.onclick != '') {
-
-    var param1 = $('pc20_codorc').value;
-    var param2 = $('l20_codigo').value;
-
-    CurrentWindow.corpo.iframe_db_habi.location.href = 'lic1_habilitacaoforn001.php?l20_codigo=' + param2 + '&pc20_codorc=' + param1;
-    //parent.document.formaba.db_cred.disabled=false;
-    //parent.document.formaba.db_hab.disabled=false;
-
-  }
 </script>

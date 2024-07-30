@@ -1,28 +1,28 @@
 <?
 /*
- *     E-cidade Software Publico para Gestao Municipal                
- *  Copyright (C) 2013  DBselller Servicos de Informatica             
- *                            www.dbseller.com.br                     
- *                         e-cidade@dbseller.com.br                   
- *                                                                    
- *  Este programa e software livre; voce pode redistribui-lo e/ou     
- *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme  
- *  publicada pela Free Software Foundation; tanto a versao 2 da      
- *  Licenca como (a seu criterio) qualquer versao mais nova.          
- *                                                                    
- *  Este programa e distribuido na expectativa de ser util, mas SEM   
- *  QUALQUER GARANTIA; sem mesmo a garantia implicita de              
- *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM           
- *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais  
- *  detalhes.                                                         
- *                                                                    
- *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU     
- *  junto com este programa; se nao, escreva para a Free Software     
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA          
- *  02111-1307, USA.                                                  
- *  
- *  Copia da licenca no diretorio licenca/licenca_en.txt 
- *                                licenca/licenca_pt.txt 
+ *     E-cidade Software Publico para Gestao Municipal
+ *  Copyright (C) 2013  DBselller Servicos de Informatica
+ *                            www.dbseller.com.br
+ *                         e-cidade@dbseller.com.br
+ *
+ *  Este programa e software livre; voce pode redistribui-lo e/ou
+ *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme
+ *  publicada pela Free Software Foundation; tanto a versao 2 da
+ *  Licenca como (a seu criterio) qualquer versao mais nova.
+ *
+ *  Este programa e distribuido na expectativa de ser util, mas SEM
+ *  QUALQUER GARANTIA; sem mesmo a garantia implicita de
+ *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM
+ *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais
+ *  detalhes.
+ *
+ *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU
+ *  junto com este programa; se nao, escreva para a Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ *  02111-1307, USA.
+ *
+ *  Copia da licenca no diretorio licenca/licenca_en.txt
+ *                                licenca/licenca_pt.txt
  */
 
 include("fpdf151/pdf.php");
@@ -54,11 +54,11 @@ $clveicutilizacao = new cl_veicutilizacao;
 $clveicmanutitem  = new cl_veicmanutitem;
 $clempempenho     = new cl_empempenho;
 /*
- * Variaveis de parâmetros passadas por get 
+ * Variaveis de parâmetros passadas por get
 lAbastecimento
 lManutencao
 lRetirada
-lItens 
+lItens
  */
 
 db_postmemory($_GET);
@@ -180,7 +180,7 @@ for($x = 0; $x < $clveiculos->numrows;$x++){
   $pdf->cell(60,$alt,$ve01_placa,0,1,"L",0);
 
   $pdf->setfont('arial','b',8);
-  $pdf->cell(30,$alt,'Responsável :',0,0,"R",0); 
+  $pdf->cell(30,$alt,'Responsável :',0,0,"R",0);
   $pdf->setfont('arial','',7);
   if (!isset($ve02_numcgm) || $ve02_numcgm == 0){
     $z01_nome = "NENHUM";
@@ -205,7 +205,7 @@ for($x = 0; $x < $clveiculos->numrows;$x++){
   $pdf->setfont('arial','',7);
   $pdf->cell(60,$alt,$ve01_veiccadcor."-".$ve23_descr,0,0,"L",0);
   $pdf->setfont('arial','b',8);
-  $pdf->cell(30,$alt,'Procedência :',0,0,"R",0); 
+  $pdf->cell(30,$alt,'Procedência :',0,0,"R",0);
   $pdf->setfont('arial','',7);
   $pdf->cell(60,$alt,$ve01_veiccadproced."-".$ve25_descr,0,1,"L",0);
 
@@ -214,7 +214,7 @@ for($x = 0; $x < $clveiculos->numrows;$x++){
   $pdf->setfont('arial','',7);
   $pdf->cell(60,$alt,$ve01_veiccadcateg."-".$ve32_descr,0,0,"L",0);
   $pdf->setfont('arial','b',8);
-  $pdf->cell(30,$alt,'Nº do Chassi :',0,0,"R",0); 
+  $pdf->cell(30,$alt,'Nº do Chassi :',0,0,"R",0);
   $pdf->setfont('arial','',7);
   $pdf->cell(60,$alt,$ve01_chassi,0,1,"L",0);
 
@@ -223,12 +223,12 @@ for($x = 0; $x < $clveiculos->numrows;$x++){
   $pdf->setfont('arial','',7);
   $pdf->cell(60,$alt,$ve01_ranavam,0,0,"L",0);
   $pdf->setfont('arial','b',8);
-  $pdf->cell(30,$alt,'Placa em Número :',0,0,"R",0); 
+  $pdf->cell(30,$alt,'Placa em Número :',0,0,"R",0);
   $pdf->setfont('arial','',7);
   $pdf->cell(60,$alt,$ve01_placanum,0,1,"L",0);
 
   $pdf->setfont('arial','b',8);
-  $pdf->cell(30,$alt,'Nº do Certificado :',0,0,"R",0); 
+  $pdf->cell(30,$alt,'Nº do Certificado :',0,0,"R",0);
   $pdf->setfont('arial','',7);
   $pdf->cell(60,$alt,$ve01_certif,0,0,"L",0);
   $pdf->setfont('arial','b',8);
@@ -237,11 +237,11 @@ for($x = 0; $x < $clveiculos->numrows;$x++){
   $pdf->cell(60,$alt,$ve01_medidaini." ".$ve07_sigla,0,1,"L",0);
 
   $pdf->setfont('arial','b',8);
-  $pdf->cell(30,$alt,'Quant. Potência :',0,0,"R",0); 
+  $pdf->cell(30,$alt,'Quant. Potência :',0,0,"R",0);
   $pdf->setfont('arial','',7);
   $pdf->cell(60,$alt,$ve01_quantpotencia,0,0,"L",0);
   $pdf->setfont('arial','b',8);
-  $pdf->cell(30,$alt,'Potência :',0,0,"R",0); 
+  $pdf->cell(30,$alt,'Potência :',0,0,"R",0);
   $pdf->setfont('arial','',7);
   $pdf->cell(60,$alt,$ve01_veiccadpotencia."-".$ve31_descr,0,1,"L",0);
 
@@ -255,16 +255,16 @@ for($x = 0; $x < $clveiculos->numrows;$x++){
   $pdf->cell(60,$alt,$ve01_veiccadtipocapacidade."-".$ve24_descr,0,1,"L",0);
 
   $pdf->setfont('arial','b',8);
-  $pdf->cell(30,$alt,'Data de Aquisição :',0,0,"R",0); 
+  $pdf->cell(30,$alt,'Data de Aquisição :',0,0,"R",0);
   $pdf->setfont('arial','',7);
   $pdf->cell(60,$alt,db_formatar($ve01_dtaquis,'d'),0,0,"L",0);
   $pdf->setfont('arial','b',8);
-  $pdf->cell(30,$alt,'Combustível :',0,0,"R",0); 
+  $pdf->cell(30,$alt,'Combustível :',0,0,"R",0);
   $pdf->setfont('arial','',7);
   $pdf->cell(60,$alt,$valor,0,1,"L",0);
 
   $pdf->setfont('arial','b',8);
-  $pdf->cell(30,$alt,'Ano de Fabricação :',0,0,"R",0); 
+  $pdf->cell(30,$alt,'Ano de Fabricação :',0,0,"R",0);
   $pdf->setfont('arial','',7);
   $pdf->cell(60,$alt,$ve01_anofab,0,0,"L",0);
   $pdf->setfont('arial','b',8);
@@ -329,27 +329,27 @@ for($x = 0; $x < $clveiculos->numrows;$x++){
   $pdf->cell(0,$alt,'','T',1,"R",0);
   $pdf->setfont('arial','b',8);
 
-  
-  /* 
-   *                                                     RETIRADAS 
+
+  /*
+   * RETIRADAS
    */
   if (isset($lRetirada) ) {
-    
+
     $pdf->cell(90,$alt,'RETIRADAS :',0,1,"L",0);
     $result_ret  = $clveicretirada->sql_record($clveicretirada->sql_query_info(null,"distinct ve60_codigo,ve60_datasaida,ve60_horasaida,z01_nome,ve60_medidasaida,ve60_destino,ve61_codigo,ve61_datadevol,ve61_horadevol,ve61_medidadevol,ve60_coddepto, descrdepto","ve60_datasaida,ve60_horasaida"," ve60_veiculo = $veiculo "));
     $numrows_ret = $clveicretirada->numrows;
-    
+
     if ($numrows_ret>0) {
-      
+
       $troca=1;
       $p=0;
       $total_ret=0;
-      
+
       for ($w = 0; $w < $numrows_ret;$w++) {
-        
+
         db_fieldsmemory($result_ret,$w);
         if ($pdf->gety() > $pdf->h - 30 || $troca != 0 ) {
-          
+
           if($troca == 0 ) {
             $pdf->addpage("L");
           }
@@ -386,20 +386,20 @@ for($x = 0; $x < $clveiculos->numrows;$x++){
         }
         $total_ret++;
       }
-  
+
       $pdf->setfont('arial','b',8);
       $pdf->cell(275,$alt,"Total de Retiradas  :".$total_ret,"T",1,"L",0);
-       
+
     }else{
       $pdf->cell(0,$alt,"Não Existem Retiradas:","T",1,"L",0);
     }
-    
+
   }
 
-  /* 
-   *                                                      ABASTECIMENTOS 
+  /*
+   *                                                      ABASTECIMENTOS
    */
-  if (isset($lAbastecimento) ) {  
+  if (isset($lAbastecimento) ) {
     $pdf->ln();
     $pdf->setfont('arial','b',8);
     $pdf->cell(90,$alt,'ABASTECIMENTOS :',0,1,"L",0);
@@ -412,7 +412,7 @@ for($x = 0; $x < $clveiculos->numrows;$x++){
       $total_abast=0;
       $vlr_totalabast = 0;
       $quant_litros   = 0;
-  
+
       for($w = 0; $w < $numrows_abast;$w++){
         db_fieldsmemory($result_abast,$w);
         if ($pdf->gety() > $pdf->h - 30 || $troca != 0 ){
@@ -447,8 +447,8 @@ for($x = 0; $x < $clveiculos->numrows;$x++){
 
         $quant_litros   += $ve70_litros;
         $vlr_totalabast += $ve70_valor;
-         
-         
+
+
         if ($p==0){
           $p=1;
         }else{
@@ -464,24 +464,24 @@ for($x = 0; $x < $clveiculos->numrows;$x++){
       $pdf->cell(20,$alt,'','T',0,"C",$p);
       $pdf->cell(20,$alt,'','T',0,"C",$p);
       $pdf->cell(20,$alt,'','T',1,"C",$p);
-       
+
       $pdf->setfont('arial','b',8);
       $pdf->cell(230,$alt,"Total de Abastecimentos :".$total_abast,"T",1,"L",0);
-       
+
     }else{
       $pdf->cell(0,$alt,"Não Existem Abastecimentos","T",1,"L",0);
     }
   }
-  
-  /*  
-   *                                                         MANUTENÇÕES 
+
+  /*
+   *                                                         MANUTENÇÕES
    */
-  if (isset($lManutencao)) {  
-    
+  if (isset($lManutencao)) {
+
     $pdf->ln();
     $pdf->setfont('arial','b',8);
     $pdf->cell(90,$alt,'MANUTENÇÕES :',0,1,"L",0);
-  
+
     $sCamposVeicmanut  = " distinct ve62_codigo,ve28_descr,ve62_dtmanut,ve62_hora,ve62_numemp";
     $sCamposVeicmanut .= ",case when (ve62_vlrpecas is null or ve62_vlrpecas = 0) and ve62_tipogasto in (6,7,8) then ve62_valor else ve62_vlrpecas end as ve62_vlrpecas ";
     $sCamposVeicmanut .= ",case when (ve62_vlrmobra is null or ve62_vlrmobra = 0) and ve62_tipogasto in (9) then ve62_valor else ve62_vlrmobra end as ve62_vlrmobra ";
@@ -491,38 +491,38 @@ for($x = 0; $x < $clveiculos->numrows;$x++){
 
     $result_manut     = $clveicmanut->sql_record($sSqlVeicmanut);
     $numrows_manut    = $clveicmanut->numrows;
-    
+
     $aManutencao      = array();
     $aNumEmp          = array();
 
     if ($numrows_manut > 0) {
       for($w = 0; $w < $numrows_manut;$w++) {
-    
+
         $oManutencao = db_utils::fieldsMemory($result_manut,$w);
 
-        /* 
-         *                              Se for solicitado imprimir itens da Manutenção  
+        /*
+         *                              Se for solicitado imprimir itens da Manutenção
          */
         if (isset($lItens)) {
-           
+
           $sCamposManutitem = " ve63_veicmanut, ve63_descr, ve63_quant, ve63_vlruni, ve64_pcmater ";
-          $sWhereManutitem  = " ve62_veiculos = {$veiculo}  and ve63_veicmanut = {$oManutencao->ve62_codigo} "; 
-      
+          $sWhereManutitem  = " ve62_veiculos = {$veiculo}  and ve63_veicmanut = {$oManutencao->ve62_codigo} ";
+
           $sSqlManutitem    = $clveicmanutitem->sql_query_ItensManutencao(null,$sCamposManutitem, "", $sWhereManutitem);
           $rsManutitem      = $clveicmanutitem->sql_record($sSqlManutitem);
-      
+
           $iNumRownsManutitem    = $clveicmanutitem->numrows;
-        
+
           $aItensMant       = array();
           if ($iNumRownsManutitem > 0){
-            
+
              for($i = 0; $i < $iNumRownsManutitem; $i++) {
               $oItensMant   = db_utils::fieldsMemory($rsManutitem, $i);
               $aItensMant[] = $oItensMant;
              }
              $oManutencao->lItens = true;
-             $oManutencao->aItens = $aItensMant; 
-              
+             $oManutencao->aItens = $aItensMant;
+
           } else {
              $oManutencao->lItens = false;
           }
@@ -534,13 +534,13 @@ for($x = 0; $x < $clveiculos->numrows;$x++){
         $aNumEmp[] = $resultManu->e60_codemp."/".$resultManu->e60_anousu;
       }
     }
-    
-    /* 
-     *                                                 COMEÇA IMPRESÃO  
+
+    /*
+     *                                                 COMEÇA IMPRESÃO
      */
-    // -> Imprime Manutenções 
+    // -> Imprime Manutenções
     if (count($aManutencao) > 0) {
-      
+
       $troca           = 1;
       $p               = 0;
       $total_manut     = 0;
@@ -555,7 +555,7 @@ for($x = 0; $x < $clveiculos->numrows;$x++){
                 $pdf->addpage("L");
             }
         }
-      
+
       for($ind = 0; $ind < count($aManutencao); $ind++) {
 
           if ($pdf->gety() > $pdf->h - 30) {
@@ -587,11 +587,11 @@ for($x = 0; $x < $clveiculos->numrows;$x++){
             }
 
           if($aManutencao[$ind]->lItens == true) {
-            
+
             $iTotalItens = 0;
             $iValormanut = 0;
             for ($iItens = 0; $iItens < count($aManutencao[$ind]->aItens); $iItens++) {
-              
+
               if ($aManutencao[$ind]->lItens == true ) {
                   $iValormanut = $iValormanut + $aManutencao[$ind]->aItens[$iItens]->ve63_vlruni * $aManutencao[$ind]->aItens[$iItens]->ve63_quant;
                 if ($pdf->gety() > $pdf->h - 30 ) {
@@ -637,12 +637,12 @@ for($x = 0; $x < $clveiculos->numrows;$x++){
 
         $total_manut++;
       }$pdf->ln(); $pdf->ln();
-  
+
     } else {
       $pdf->cell(0,$alt,"Não Existem Itens ","T",1,"L",0);
     }
   }
-  
+
 }
 $pdf->Output();
 ?>

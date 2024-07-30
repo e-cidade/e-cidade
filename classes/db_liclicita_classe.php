@@ -151,6 +151,7 @@ class cl_liclicita
     var $l20_receita = null;
     var $l20_horaaberturaprop = null;
     var $l20_horaencerramentoprop = null;
+    var $l20_dispensaporvalor = null;
 
     // cria propriedade com as variaveis do arquivo
     var $campos = "
@@ -230,6 +231,7 @@ class cl_liclicita
                  l20_receita = bool = receita
                  l20_horaaberturaprop = string = hora de abertura das propostas
                  l20_horaencerramentoprop = string = hora de encerramento das propostas
+                 l20_dispensaporvalor = bool = dispensa por valor
                  ";
 
     //funcao construtor da classe
@@ -428,6 +430,7 @@ class cl_liclicita
         $this->l20_receita = ($this->l20_receita == "" ? @$GLOBALS["HTTP_POST_VARS"]["l20_receita"] : $this->l20_receita);
         $this->l20_horaaberturaprop = ($this->l20_horaaberturaprop == "" ? @$GLOBALS["HTTP_POST_VARS"]["l20_horaaberturaprop"] : $this->l20_horaaberturaprop);
         $this->l20_horaencerramentoprop = ($this->l20_horaencerramentoprop == "" ? @$GLOBALS["HTTP_POST_VARS"]["l20_horaencerramentoprop"] : $this->l20_horaencerramentoprop);
+        $this->l20_dispensaporvalor = ($this->l20_dispensaporvalor == "" ? @$GLOBALS["HTTP_POST_VARS"]["l20_dispensaporvalor"] : $this->l20_dispensaporvalor);
     }
 
     // funcao para inclusao aqui
@@ -625,6 +628,10 @@ class cl_liclicita
             $this->erro_status = "0";
             return false;
         }
+        
+        if($this->l20_dispensaporvalor == null || $this->l20_dispensaporvalor == ""){
+            $this->l20_dispensaporvalor = 'f';
+          }
         if ($this->l20_nroedital == null) {
             if (in_array($tribunal, array(48, 49, 50, 52, 53, 54)) && db_getsession('DB_anousu') >= 2020) {
                 $this->erro_sql = " Campo Numero Edital não Informado.";
@@ -807,8 +814,6 @@ class cl_liclicita
             $this->erro_msg .= str_replace('"', "", str_replace("'", "", "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
             $this->erro_status = "0";
             return false;
-        }else{
-
         }
 
         if ($this->l20_horaencerramentoprop == null) {
@@ -819,12 +824,16 @@ class cl_liclicita
             $this->erro_msg .= str_replace('"', "", str_replace("'", "", "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
             $this->erro_status = "0";
             return false;
-        }else{
-
         }
 
-        if ($this->l20_criterioadjudicacao == null) {
-            $this->l20_criterioadjudicacao = "3";
+        if ($this->l20_criterioadjudicacao == '0') {
+            $this->erro_sql = " Campo Criterio de Adjudicação invalido.";
+            $this->erro_campo = "l20_criterioadjudicacao";
+            $this->erro_banco = "";
+            $this->erro_msg = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+            $this->erro_msg .= str_replace('"', "", str_replace("'", "", "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+            $this->erro_status = "0";
+            return false;
         }
 
         if ($l20_codigo == "" || $l20_codigo == null) {
@@ -973,6 +982,7 @@ class cl_liclicita
                 ,l20_receita
                 ,l20_horaaberturaprop
                 ,l20_horaencerramentoprop
+                ,l20_dispensaporvalor
                        )
                 values (
                  $this->l20_codigo
@@ -1034,8 +1044,12 @@ class cl_liclicita
                 ,'$this->l20_receita'
                 ,'$this->l20_horaaberturaprop'
                 ,'$this->l20_horaencerramentoprop'
+                ,'$this->l20_dispensaporvalor'
                       )";
         $result = db_query($sql);
+        // echo $sql;
+        // exit;
+
         if ($result == false) {
             $this->erro_banco = str_replace("\n", "", @pg_last_error());
             if (strpos(strtolower($this->erro_banco), "duplicate key") != 0) {
@@ -1174,6 +1188,10 @@ class cl_liclicita
             $virgula = ",";
         } else {
             $sql .= $virgula . " l20_validadeproposta = ''";
+            $virgula = ",";
+        }
+        if (trim($this->l20_dispensaporvalor != "" || isset($GLOBALS["HTTP_POST_VARS"]["l20_dispensaporvalor"]))) {
+            $sql .= $virgula . " l20_dispensaporvalor = '$this->l20_dispensaporvalor' ";
             $virgula = ",";
         }
 
@@ -1608,7 +1626,11 @@ class cl_liclicita
                 return false;
             }
         }
-        //if($tribunal==52){
+
+        if($this->l20_equipepregao == null && in_array($tribunal, array(100,101,102,103))){
+            $this->l20_equipepregao = '0';
+          }
+
         if (trim($this->l20_equipepregao) != "" || isset($GLOBALS["HTTP_POST_VARS"]["l20_equipepregao"])) {
             $sql .= $virgula . " l20_equipepregao = $this->l20_equipepregao";
             $virgula = ",";

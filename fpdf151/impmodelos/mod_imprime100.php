@@ -3,6 +3,9 @@
 if (($this->qtdcarne % 3 ) == 0 ){
 
   $iAlt = 4;
+    /**
+     * @var FPDF $this->obj
+     */
   $this->objpdf->AddPage();
   $top = $this->objpdf->GetY()-3;
   $this->objpdf->SetFont('Arial','B',8);
@@ -178,7 +181,7 @@ $this->objpdf->SetFont('Arial','B',6);
 
 $this->objpdf->Cell(03,4,'1ª Via Contribuinte',0,0,"R",0);
 $this->objpdf->SetFont('Arial','B',8);
-$this->objpdf->SetX(105);
+$this->objpdf->SetX(95);
 $this->objpdf->Cell(90,4,$this->tipodebito,0,0,"C",0);
 $this->objpdf->SetFont('Arial','B',6);
 $this->objpdf->Cell(05,4,'2ª Via Prefeitura',0,1,"R",0);
@@ -220,7 +223,7 @@ $this->objpdf->RoundedRect(50,$y+36,33,7,2,'DF','1234'); // valor
 $this->objpdf->SetFont('Arial','',5);
 $this->objpdf->Text(13,$y+3,$this->titulo1); // matricula/ inscrição
 $this->objpdf->SetFont('Arial','B',7);
-$this->objpdf->Text(13,$y+6,$this->descr1); // numero da matricula ou inscricao
+$this->objpdf->Text(13,$y+6,substr($this->descr1, 0, 27)); // numero da matricula ou inscricao
 
 $this->objpdf->SetFont('Arial','',5);
 $this->objpdf->Text(52,$y+3,$this->titulo2); // cod. de arrecadação
@@ -295,7 +298,7 @@ $this->objpdf->RoundedRect(95,$y+8,82,13,2,'DF','1234'); // nome / endereco
 $this->objpdf->SetFont('Arial','',5);
 $this->objpdf->Text(97,$y+3,$this->titulo8); // matricula / inscricao
 $this->objpdf->SetFont('Arial','B',7);
-$this->objpdf->Text(97,$y+6,$this->descr8); // numero da matricula ou inscricao
+$this->objpdf->Text(97,$y+6,substr($this->descr8, 0, 28)); // numero da matricula ou inscricao
 
 $this->objpdf->SetFont('Arial','',5);
 $this->objpdf->Text(138,$y+3,$this->titulo9); // cod. de arrecadação
@@ -308,7 +311,7 @@ $this->objpdf->SetFont('Arial','B',7);
 $this->objpdf->Text(162,$y+6,$this->descr10); // parcela e total das parcelas
 
 $this->objpdf->SetFont('Arial','B',7);
-$this->objpdf->Text(183,$y+6,$this->descr13); // livre
+$this->objpdf->Text(163,$y,$this->descr13); // livre ou numero do parcelamento
 
 $this->objpdf->SetFont('Arial','',5);
 $this->objpdf->Text(97,$y+10,$this->titulo11); // contribuinte / endereço

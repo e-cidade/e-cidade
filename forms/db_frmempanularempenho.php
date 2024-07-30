@@ -39,6 +39,7 @@ $clrotulo->label("o56_elemento");
 $clrotulo->label("o15_codigo");
 $clrotulo->label("o15_descr");
 $clrotulo->label("e60_coddot");
+$oAssintaraDigital =  new AssinaturaDigital();
 $clorcdotacao->rotulo->label();
 if (empty ($e60_numemp)) {
     $db_opcao_inf = 3;
@@ -143,7 +144,7 @@ if (empty ($e60_numemp)) {
                     </tr>
                     <tr>
                         <td colspan='4' style='text-align:center'>
-                            <input name="confirmar" type="button" id="confirmar" value="Confirmar" onclick="return js_verificacordo()" disabled>
+                            <input name='confirmar' type='button' id='confirmar' value='Confirmar' onclick='return js_verificacordo()' disabled>
                             <input name="pesquisar" type="button" id="pesquisar" value="Pesquisar" onclick="js_pesquisa('');" >
                         </td>
                     </tr>
@@ -207,7 +208,7 @@ if (empty ($e60_numemp)) {
                                                     <th class='table_header' width='18px'>&nbsp;</th>
                                                 </tr>
                                                 </thead>
-                                                <tbody id='itenssolicitados' style='height:80;width:95%;overflow:scroll;overflow-x:hidden;background-color:white'>
+                                                <tbody id='itenssolicitados' style='height:80px;width:95%;overflow:scroll;overflow-x:hidden;background-color:white'>
                                                 <td colspan='10'>&nbsp;</td>
                                                 </tbody>
                                             </table>
@@ -415,8 +416,8 @@ if (empty ($e60_numemp)) {
 
                         saida += "<td class='linhagrid' style='text-align:center;width:10%'>";
                         saida += "<input type='text' "+lDisabled+" style='text-align:right' name='vlrtot"+obj.data[i].e62_sequen+"' "+sDisableValor+" id='vlrtot"+obj.data[i].e62_sequen+"'";
-                        saida += " value='" + obj.data[i].e62_vlrtot + "' size='5' class='valores' oninput=\"js_ValidaCampos(this, 4, 'Valor Total', '', '', event);\" onblur='js_calculaValor("+obj.data[i].e62_sequen+",2,1)'></td></tr>";  
-                    }    
+                        saida += " value='" + obj.data[i].e62_vlrtot + "' size='5' class='valores' oninput=\"js_ValidaCampos(this, 4, 'Valor Total', '', '', event);\" onblur='js_calculaValor("+obj.data[i].e62_sequen+",2,1)'></td></tr>";
+                    }
                     if(obj.data[i].servicoquantidade == 't'){
                         lDisabledQuantidade = ' ';
                         sDisableValor       = ' disabled';
@@ -429,10 +430,10 @@ if (empty ($e60_numemp)) {
                         saida += "<td class='linhagrid' style='text-align:center;width:10%'>";
                         saida += "<input type='text' "+lDisabled+" style='text-align:right; background-color:#DEB887' name='vlrtot"+obj.data[i].e62_sequen+"' "+sDisableValor+" id='vlrtot"+obj.data[i].e62_sequen+"'";
                         saida += " value='" + obj.data[i].e62_vlrtot + "' size='5' class='valores' oninput=\"js_ValidaCampos(this, 4, 'Valor Total', '', '', event);\" onblur='js_calculaValor("+obj.data[i].e62_sequen+",2,2)'></td></tr>";
-                    }     
+                    }
                 }
-                if(obj.data[i].pc01_servico == 'f'){ 
-                   
+                if(obj.data[i].pc01_servico == 'f'){
+
                         lDisabledQuantidade = ' ';
                         sDisableValor       = ' disabled';
 
@@ -444,7 +445,7 @@ if (empty ($e60_numemp)) {
                         saida += "<td class='linhagrid' style='text-align:center;width:10%'>";
                         saida += "<input type='text' "+lDisabled+" style='text-align:right;background-color:#DEB887;' name='vlrtot"+obj.data[i].e62_sequen+"' "+sDisableValor+" id='vlrtot"+obj.data[i].e62_sequen+"'";
                         saida += " value='" + obj.data[i].e62_vlrtot + "' size='5' class='valores' oninput=\"js_ValidaCampos(this, 4, 'Valor Total', '', '', event);\" onblur='js_calculaValor("+obj.data[i].e62_sequen+",2,2)'></td></tr>";
-                       
+
                 }
 
             }
@@ -566,7 +567,7 @@ if (empty ($e60_numemp)) {
         }
         if (nQtde < 0){
             alert('Valor negativo não é permitido');
-            $F('qtdesol'+id) = 0;
+            $('qtdesol'+id).value = 0;
         }
 
         //consideramos como saldo valido os saldos do empenho menos o saldo solicitado.
@@ -716,7 +717,7 @@ if (empty ($e60_numemp)) {
                     }
                 }
             }
-            
+
 
             if (iErro != 0){
 
@@ -732,7 +733,7 @@ if (empty ($e60_numemp)) {
             //$('confirmar').disabled = true;
             valorTotal = 0;
             for (i = 0;i < itens.length;i++){
-                
+
                 if (itens[i].checked == true){
 
                     if ($F('vlrtot'+itens[i].value) != 0 && $F('vlrtot'+itens[i].value) !=''){
@@ -793,7 +794,7 @@ if (empty ($e60_numemp)) {
             }
         }
     }
-    
+
     function js_saidaverificacordo(oAjax){
 
 
@@ -834,7 +835,7 @@ if (empty ($e60_numemp)) {
         var iErro         = 0;
         var sSolicAtend   = '';
         var sV            = '';
-       
+
             if (itensAnulados.length > 0){
 
                 var sSolicAnt = 0;
@@ -852,7 +853,7 @@ if (empty ($e60_numemp)) {
                     }
                 }
             }
-            
+
 
             if (iErro != 0){
 
@@ -927,7 +928,7 @@ if (empty ($e60_numemp)) {
                 $('confirmar').disabled = false;
 
             }
-        
+
     }
     function js_saidaAnulacao(oAjax){
 
@@ -938,11 +939,11 @@ if (empty ($e60_numemp)) {
         if (obj.status == 1){
 
             alert('A Anulação foi realizada com sucesso!');
-            if ($('imprimir').checked){
 
-                jan = window.open('emp2_anulemp002.php?e60_numemp='+$F('e60_numemp'),'','width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0 ');
-                jan.moveTo(0,0);
-            }
+
+            jan = window.open('emp2_anulemp002.php?assinar=true&e60_numemp='+$F('e60_numemp')+'&e94_codanu='+obj.iCodAnu,'','width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0 ');
+            jan.moveTo(0,0);
+
             js_reset();
             js_pesquisa();
         }else if(obj.status == 2){

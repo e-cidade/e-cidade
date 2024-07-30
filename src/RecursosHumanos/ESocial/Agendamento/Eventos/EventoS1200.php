@@ -4,8 +4,9 @@ namespace ECidade\RecursosHumanos\ESocial\Agendamento\Eventos;
 
 use cl_rubricasesocial;
 use db_utils;
-use DBPessoal;
 use ECidade\RecursosHumanos\ESocial\Agendamento\Eventos\EventoBase;
+use ECidade\RecursosHumanos\ESocial\Agendamento\Eventos\Traits\ValoresPontoEvento;
+use ECidade\RecursosHumanos\ESocial\Agendamento\Eventos\Traits\TipoPontoConstants;
 
 /**
  * Classe responsável por montar as informações do evento S1200 Esocial
@@ -15,6 +16,7 @@ use ECidade\RecursosHumanos\ESocial\Agendamento\Eventos\EventoBase;
  */
 class EventoS1200 extends EventoBase
 {
+    use ValoresPontoEvento;
 
     /**
      *
@@ -102,9 +104,6 @@ class EventoS1200 extends EventoBase
 
                 $oDadosAPI->evtRemun->indapuracao         = $this->indapuracao;
                 $oDadosAPI->evtRemun->perapur             = $ano . '-' . $mes;
-                // if ($this->indapuracao == 2) {
-                //     $oDadosAPI->evtRemun->perapur         = $ano;
-                // }
                 $oDadosAPI->evtRemun->cpftrab             = $aDadosContabilidade[0]->cpftrab;
 
                 if (strlen($aDadosContabilidade[0]->indmv) > 0) {
@@ -141,219 +140,72 @@ class EventoS1200 extends EventoBase
     /**
      * Retorna os valores por rubrica no formato necessario para envio
      * pela API sped-esocial
+     * @param int $matricula
+     * @param int $ponto
      * @return array stdClass
      */
-    private function buscarValorRubrica($matricula, $rh30_regime, $ponto)
+    private function buscarValorRubrica($matricula, $ponto)
     {
         require_once 'libs/db_libpessoal.php';
         $clrubricasesocial = new cl_rubricasesocial;
-        $iAnoUsu = date("Y", db_getsession("DB_datausu"));
-        $iMesusu = date("m", db_getsession("DB_datausu"));
-        $xtipo = "'x'";
 
-        if ($ponto == 1)
-            $opcao = 'salario';
-        if ($ponto == 2)
-            $opcao = 'rescisao';
-        if ($ponto == 3)
-            $opcao = 'complementar';
-        if ($ponto == 4)
-            $opcao = '13salario';
-
-        switch ($opcao) {
-            case 'salario':
-                $sigla          = 'r14_';
-                $arquivo        = 'gerfsal';
-                $sTituloCalculo = 'Sal?rio';
-                break;
-
-            case 'complementar':
-                $sigla          = 'r48_';
-                $arquivo        = 'gerfcom';
-                $sTituloCalculo = 'Complementar';
-                break;
-
-            case '13salario':
-                $sigla          = 'r35_';
-                $arquivo        = 'gerfs13';
-                $sTituloCalculo = '13? Sal?rio';
-                break;
-            case 'rescisao':
-                $sigla          = 'r20_';
-                $arquivo        = 'gerfres';
-                $xtipo          = ' r20_tpp ';
-                $sTituloCalculo = 'Rescis?o';
-                break;
-
-            default:
-                continue;
-                break;
-        }
-        if ($opcao) {
-
-            $sql = "  select '1' as ordem ,
-                               {$sigla}rubric as rubrica,
-                               case
-                                 when rh27_pd = 3 then 0
-                                 else case
-                                        when {$sigla}pd = 1 then {$sigla}valor
-                                        else 0
-                                      end
-                               end as Provento,
-                               case
-                                 when rh27_pd = 3 then 0
-                                 else case
-                                        when {$sigla}pd = 2 then {$sigla}valor
-                                        else 0
-                                      end
-                               end as Desconto,
-                               {$sigla}quant as quant,
-                               rh27_descr,
-                               {$xtipo} as tipo ,
-                               case
-                                 when rh27_pd = 3 then 'Base'
-                                 else case
-                                        when {$sigla}pd = 1 then 'Provento'
-                                        else 'Desconto'
-                                      end
-                               end as provdesc,
-                               case
-                                when '{$arquivo}' = 'gerfsal' then 1
-                                when '{$arquivo}' = 'gerfcom' then 3
-                                when '{$arquivo}' = 'gerfs13' then 4
-                                when '{$arquivo}' = 'gerfres' then 2
-                                end as ideDmDev
-                          from {$arquivo}
-                               inner join rhrubricas on rh27_rubric = {$sigla}rubric
-                                                    and rh27_instit = " . db_getsession("DB_instit") . "
-                          " . bb_condicaosubpesproc($sigla, $iAnoUsu . "/" . $iMesusu) . "
-                           and {$sigla}regist = $matricula
-                           and {$sigla}pd != 3
-                           and {$sigla}rubric not in ('R985','R993','R981')
-                           order by {$sigla}pd,{$sigla}rubric";
-        }
-        $rsValores = db_query($sql);
-        // echo $sql;
-        // db_criatabela($rsValores);
-        if ($opcao != 'rescisao') {
-            for ($iCont = 0; $iCont < pg_num_rows($rsValores); $iCont++) {
-                $oResult = \db_utils::fieldsMemory($rsValores, $iCont);
-                $oFormatado = new \stdClass();
-                $oFormatado->codrubr    = $oResult->rubrica;
-                $oFormatado->idetabrubr = 'tabrub1';
-                $oFormatado->vrrubr     = ($oResult->provdesc == 'Provento') ? $oResult->provento : $oResult->desconto;
-                $oFormatado->indapurir  = 0;
-                $oFormatado->idedmdev   = $oResult->idedmdev;
-
-                $aItens[] = $oFormatado;
-            }
-        } else {
-            for ($iCont2 = 0; $iCont2 < pg_num_rows($rsValores); $iCont2++) {
-                $oResult = \db_utils::fieldsMemory($rsValores, $iCont2);
-                $rsRubEspeciais = db_query($clrubricasesocial->sql_query(null, "e990_sequencial,e990_descricao", null, "baserubricasesocial.e991_rubricas = '{$oResult->rubrica}' AND e990_sequencial IN ('1000','5001','1020')"));
-                $rubrica = $oResult->rubrica;
-                if (pg_num_rows($rsRubEspeciais) > 0) {
-                    $oRubEspeciais = db_utils::fieldsMemory($rsRubEspeciais);
-                    switch ($oRubEspeciais->e990_sequencial) {
-                        case '1000':
-                            $rubrica = '9000';
-                            $rh27_descr = 'Saldo de Sal?rio na Rescis?o';
-                            break;
-                        case '5001':
-                            $rubrica = '9001';
-                            $rh27_descr = '13? Sal?rio na Rescis?o';
-                            break;
-                        case '1020':
-                            $rubrica = '9002';
-                            $rh27_descr = 'F?rias Proporcional na Rescis?o';
-                            break;
-                        case '1020':
-                            $rubrica = '9003';
-                            $rh27_descr = 'F?rias Vencidas na Rescis?o';
-                            break;
-
-                        default:
-                            break;
-                    }
+        $rsValores = $this->getValoresPorPonto($ponto, $matricula);
+        for ($iCont = 0; $iCont < pg_num_rows($rsValores); $iCont++) {
+            $oResult = \db_utils::fieldsMemory($rsValores, $iCont);
+            $rubrica = $oResult->rubrica;
+            if ($ponto == TipoPontoConstants::PONTO_RESCISAO) {
+                $aRubEspeciais = $clrubricasesocial->buscarDadosRubricaEspecial($oResult->rubrica, $oResult->tipo);
+                if (count($aRubEspeciais) > 0) {
+                    $rubrica = $aRubEspeciais['rubrica'];
                 }
-                $oFormatado = new \stdClass();
-                $oFormatado->codrubr    = $rubrica;
-                $oFormatado->idetabrubr = 'tabrub1';
-                $oFormatado->vrrubr     = ($oResult->provdesc == 'Provento') ? $oResult->provento : $oResult->desconto;
-                $oFormatado->indapurir  = 0;
-                $oFormatado->idedmdev   = $oResult->idedmdev;
-
-                $aItens[] = $oFormatado;
             }
+            $oFormatado = new \stdClass();
+            $oFormatado->codrubr    = $rubrica;
+            $oFormatado->idetabrubr = 'tabrub1';
+            $oFormatado->vrrubr     = ($oResult->provdesc == 'Provento') ? $oResult->provento : $oResult->desconto;
+            $oFormatado->indapurir  = 0;
+            $oFormatado->idedmdev   = $oResult->idedmdev;
+
+            $aItens[] = $oFormatado;
         }
         return $aItens;
     }
 
     /**
-     * Retorna dados dos dependentes no formato necessario para envio
-     * pela API sped-esocial
+     * Busca o identificador de acordo com os pontos existentes para o periodo
+     * no formado requerido pela API sped-esocial
+     * @param int $matricula
+     * @param int $rh30_regime
      * @return array stdClass
      */
     private function buscarIdentificador($matricula, $rh30_regime)
     {
         $iAnoUsu = date("Y", db_getsession("DB_datausu"));
         $iMesusu = date("m", db_getsession("DB_datausu"));
-
-        if ($rh30_regime == 1 || $rh30_regime == 3) {
-            $aPontos = array('13salario');
-            if ($this->indapuracao != 2)
-                $aPontos = array('salario', 'complementar', 'rescisao');
-        } else {
-            $aPontos = array('13salario');
-            if ($this->indapuracao != 2)
-                $aPontos = array('salario', 'complementar');
+        $aPontos = array(TipoPontoConstants::PONTO_13SALARIO);
+        if ($this->indapuracao != 2) {
+            $aPontos = array(TipoPontoConstants::PONTO_SALARIO, TipoPontoConstants::PONTO_COMPLEMENTAR);
+            if ($rh30_regime == 1 || $rh30_regime == 3) {
+                $aPontos = array(TipoPontoConstants::PONTO_SALARIO, TipoPontoConstants::PONTO_COMPLEMENTAR, TipoPontoConstants::PONTO_RESCISAO);
+            }
         }
 
         foreach ($aPontos as $opcao) {
-            switch ($opcao) {
-                case 'salario':
-                    $sigla          = 'r14_';
-                    $arquivo        = 'gerfsal';
-                    break;
-
-                case 'complementar':
-                    $sigla          = 'r48_';
-                    $arquivo        = 'gerfcom';
-                    break;
-
-                case '13salario':
-                    $sigla          = 'r35_';
-                    $arquivo        = 'gerfs13';
-                    break;
-
-                case 'rescisao':
-                    $sigla          = 'r20_';
-                    $arquivo        = 'gerfres';
-                    break;
-
-                default:
-                    continue;
-                    break;
-            }
-            if ($opcao) {
-                $sql = "  select distinct
+            $tipoPonto = $this->getTipoPonto($opcao);
+            $sql = "  select distinct
                         case
-                        when '{$arquivo}' = 'gerfsal' then 1
-                        when '{$arquivo}' = 'gerfcom' then 3
-                        when '{$arquivo}' = 'gerfs13' then 4
-                        when '{$arquivo}' = 'gerfres' then 2
+                        when '{$tipoPonto->arquivo}' = 'gerfsal' then 1
+                        when '{$tipoPonto->arquivo}' = 'gerfcom' then 3
+                        when '{$tipoPonto->arquivo}' = 'gerfs13' then 4
+                        when '{$tipoPonto->arquivo}' = 'gerfres' then 2
                         end as ideDmDev
-                        from {$arquivo}
-                        where " . $sigla . "anousu = '" . $iAnoUsu . "'
-                        and  " . $sigla . "mesusu = '" . $iMesusu . "'
-                        and  " . $sigla . "instit = " . db_getsession("DB_instit") . "
-                        and {$sigla}regist = $matricula";
-            }
+                        from {$tipoPonto->arquivo}
+                        where " . $tipoPonto->sigla . "anousu = '" . $iAnoUsu . "'
+                        and  " . $tipoPonto->sigla . "mesusu = '" . $iMesusu . "'
+                        and  " . $tipoPonto->sigla . "instit = " . db_getsession("DB_instit") . "
+                        and {$tipoPonto->sigla}regist = $matricula";
 
             $rsIdentificadores = db_query($sql);
-            // echo $sql;
-            // db_criatabela($rsIdentificadores);
-            // exit;
             if (pg_num_rows($rsIdentificadores) > 0) {
                 for ($iCont = 0; $iCont < pg_num_rows($rsIdentificadores); $iCont++) {
                     $oIdentificadores = \db_utils::fieldsMemory($rsIdentificadores, $iCont);
@@ -373,47 +225,42 @@ class EventoS1200 extends EventoBase
             $aIdentificador = $this->buscarIdentificador($aDadosPorMatriculas[$iCont]->matricula, $aDadosPorMatriculas[$iCont]->rh30_regime);
 
             for ($iCont2 = 0; $iCont2 < count($aIdentificador); $iCont2++) {
-                $std->dmdev[$seqdmdev] = new \stdClass(); //Obrigat?rio
-                //Identifica??o de cada um dos demonstrativos de valores devidos ao trabalhador.
+                $std->dmdev[$seqdmdev] = new \stdClass();
                 if ($aIdentificador[$iCont2]->idedmdev == 1) {
-                    $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfsal'; //uniqid(); //$aIdentificador[$iCont2]->idedmdev; //Obrigat?rio
+                    $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfsal';
                 }
                 if ($aIdentificador[$iCont2]->idedmdev == 2) {
-                    $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfres'; //uniqid(); //$aIdentificador[$iCont2]->idedmdev; //Obrigat?rio
+                    $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfres';
                 }
                 if ($aIdentificador[$iCont2]->idedmdev == 3) {
-                    $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfcom'; //uniqid(); //$aIdentificador[$iCont2]->idedmdev; //Obrigat?rio
+                    $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfcom';
                 }
                 if ($aIdentificador[$iCont2]->idedmdev == 4) {
-                    $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfs13'; //uniqid(); //$aIdentificador[$iCont2]->idedmdev; //Obrigat?rio
+                    $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfs13';
                 }
-                $std->dmdev[$seqdmdev]->codcateg = $aDadosPorMatriculas[$iCont]->codcateg; //Obrigat?rio
+                $std->dmdev[$seqdmdev]->codcateg = $aDadosPorMatriculas[$iCont]->codcateg;
 
-                //Identifica??o do estabelecimento e da lota??o nos quais o
-                //trabalhador possui remunera??o no per?odo de apura??o
-                $std->dmdev[$seqdmdev]->ideestablot[0] = new \stdClass(); //Opcional
-                $std->dmdev[$seqdmdev]->ideestablot[0]->tpinsc = "1"; //Obrigat?rio
-                $std->dmdev[$seqdmdev]->ideestablot[0]->nrinsc = $aDadosPorMatriculas[$iCont]->nrinsc; //Obrigat?rio
-                $std->dmdev[$seqdmdev]->ideestablot[0]->codlotacao = 'LOTA1'; //Obrigat?rio
+                $std->dmdev[$seqdmdev]->ideestablot[0] = new \stdClass();
+                $std->dmdev[$seqdmdev]->ideestablot[0]->tpinsc = "1";
+                $std->dmdev[$seqdmdev]->ideestablot[0]->nrinsc = $aDadosPorMatriculas[$iCont]->nrinsc;
+                $std->dmdev[$seqdmdev]->ideestablot[0]->codlotacao = 'LOTA1';
 
-                //Informa??es relativas ? remunera??o do trabalhador no per?odo de apura??o.
-                $std->dmdev[$seqdmdev]->ideestablot[0]->remunperapur[0] = new \stdClass(); //Obrigat?rio
-                $std->dmdev[$seqdmdev]->ideestablot[0]->remunperapur[0]->matricula = $aDadosPorMatriculas[$iCont]->matricula_esocial; //Opcional
+                $std->dmdev[$seqdmdev]->ideestablot[0]->remunperapur[0] = new \stdClass();
+                $std->dmdev[$seqdmdev]->ideestablot[0]->remunperapur[0]->matricula = $aDadosPorMatriculas[$iCont]->matricula_esocial;
 
-                $aDadosValoreRubrica = $this->buscarValorRubrica($aDadosPorMatriculas[$iCont]->matricula, $aDadosPorMatriculas[$iCont]->rh30_regime, $aIdentificador[$iCont2]->idedmdev);
+                $aDadosValoreRubrica = $this->buscarValorRubrica($aDadosPorMatriculas[$iCont]->matricula, $aIdentificador[$iCont2]->idedmdev);
 
                 if (count($aDadosValoreRubrica) == 0) {
                     continue;
                 }
 
                 for ($iCont4 = 0; $iCont4 < count($aDadosValoreRubrica); $iCont4++) {
-                    //Rubricas que comp?em a remunera??o do trabalhador.
-                    $std->dmdev[$seqdmdev]->ideestablot[0]->remunperapur[0]->itensremun[$iCont4] = new \stdClass(); //Obrigat?rio
-                    $std->dmdev[$seqdmdev]->ideestablot[0]->remunperapur[0]->itensremun[$iCont4]->codrubr = $aDadosValoreRubrica[$iCont4]->codrubr; //Obrigat?rio
-                    $std->dmdev[$seqdmdev]->ideestablot[0]->remunperapur[0]->itensremun[$iCont4]->idetabrubr = $aDadosValoreRubrica[$iCont4]->idetabrubr; //Obrigat?rio
-                    $std->dmdev[$seqdmdev]->ideestablot[0]->remunperapur[0]->itensremun[$iCont4]->vrunit = $aDadosValoreRubrica[$iCont4]->vrrubr; //Obrigat?rio
-                    $std->dmdev[$seqdmdev]->ideestablot[0]->remunperapur[0]->itensremun[$iCont4]->vrrubr = $aDadosValoreRubrica[$iCont4]->vrrubr; //Obrigat?rio
-                    $std->dmdev[$seqdmdev]->ideestablot[0]->remunperapur[0]->itensremun[$iCont4]->indapurir = $aDadosValoreRubrica[$iCont4]->indapurir; //Opcional
+                    $std->dmdev[$seqdmdev]->ideestablot[0]->remunperapur[0]->itensremun[$iCont4] = new \stdClass();
+                    $std->dmdev[$seqdmdev]->ideestablot[0]->remunperapur[0]->itensremun[$iCont4]->codrubr = $aDadosValoreRubrica[$iCont4]->codrubr;
+                    $std->dmdev[$seqdmdev]->ideestablot[0]->remunperapur[0]->itensremun[$iCont4]->idetabrubr = $aDadosValoreRubrica[$iCont4]->idetabrubr;
+                    $std->dmdev[$seqdmdev]->ideestablot[0]->remunperapur[0]->itensremun[$iCont4]->vrunit = $aDadosValoreRubrica[$iCont4]->vrrubr;
+                    $std->dmdev[$seqdmdev]->ideestablot[0]->remunperapur[0]->itensremun[$iCont4]->vrrubr = $aDadosValoreRubrica[$iCont4]->vrrubr;
+                    $std->dmdev[$seqdmdev]->ideestablot[0]->remunperapur[0]->itensremun[$iCont4]->indapurir = $aDadosValoreRubrica[$iCont4]->indapurir;
                 }
 
                 if (!in_array($aDadosPorMatriculas[$iCont]->codcateg, array(701, 711, 712, 901, 771))) {
@@ -431,119 +278,109 @@ class EventoS1200 extends EventoBase
 
         for ($iCont = 0; $iCont < count($aDadosPorCpf); $iCont++) {
             $seqitens = 0;
-            $std->infocomplem = new \stdClass(); //Opcional
-            $std->infocomplem->nmtrab = $aDadosPorCpf[$iCont]->nmtrab; ///Obrigat?rio
-            $std->infocomplem->dtnascto = $aDadosPorCpf[$iCont]->dtnascto; //Obrigat?rio
+            $std->infocomplem = new \stdClass();
+            $std->infocomplem->nmtrab = $aDadosPorCpf[$iCont]->nmtrab;
+            $std->infocomplem->dtnascto = $aDadosPorCpf[$iCont]->dtnascto;
 
-            $std->dmdev[$iCont] = new \stdClass(); //Obrigat?rio
-            $std->dmdev[$iCont]->idedmdev = $aDadosPorCpf[$iCont]->idedmdev; //Obrigat?rio
-            $std->dmdev[$iCont]->codcateg = $aDadosPorCpf[$iCont]->codcateg; //Obrigat?rio
+            $std->dmdev[$iCont] = new \stdClass();
+            $std->dmdev[$iCont]->idedmdev = $aDadosPorCpf[$iCont]->idedmdev;
+            $std->dmdev[$iCont]->codcateg = $aDadosPorCpf[$iCont]->codcateg;
 
-            //Identifica??o do estabelecimento e da lota??o nos quais o
-            //trabalhador possui remunera??o no per?odo de apura??o
-            //if (!empty($aDadosPorCpf[$iCont]->e50_empresadesconto)) {
-            $std->dmdev[$iCont]->ideestablot[0] = new \stdClass(); //Opcional
-            $std->dmdev[$iCont]->ideestablot[0]->tpinsc = '1'; //Obrigat?rio
-            $std->dmdev[$iCont]->ideestablot[0]->nrinsc = $aDadosPorCpf[$iCont]->nrinsc; //Obrigat?rio
-            $std->dmdev[$iCont]->ideestablot[0]->codlotacao = 'LOTA1'; //Obrigat?rio
-            //}
-            //Informa??es relativas ? remunera??o do trabalhador no per?odo de apura??o.
-            // $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0] = new \stdClass(); //Obrigat?rio
-            // $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->matricula = $aDadosPorCpf[$iCont]->e60_numcgm; //Opcional
+            $std->dmdev[$iCont]->ideestablot[0] = new \stdClass();
+            $std->dmdev[$iCont]->ideestablot[0]->tpinsc = '1';
+            $std->dmdev[$iCont]->ideestablot[0]->nrinsc = $aDadosPorCpf[$iCont]->nrinsc;
+            $std->dmdev[$iCont]->ideestablot[0]->codlotacao = 'LOTA1';
 
-
-            //Rubricas que comp?em a remunera??o do trabalhador.
             if ($aDadosPorCpf[$iCont]->codcateg == 711) {
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass(); //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R002'; //$aDadosPorCpf[$iCont]->codrubr; //Obrigat?rio
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass();
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R002';
                 $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->idetabrubr = 'TABRUB1';
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->e70_vlrliq * 0.7; //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0; //Opcional
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->e70_vlrliq * 0.7;
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0;
                 $seqitens++;
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass(); //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R003'; //$aDadosPorCpf[$iCont]->codrubr; //Obrigat?rio
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass();
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R003';
                 $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->idetabrubr = 'TABRUB1';
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->e70_vlrliq * 0.2; //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0; //Opcional
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->e70_vlrliq * 0.2;
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0;
                 $seqitens++;
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass(); //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R004'; //$aDadosPorCpf[$iCont]->codrubr; //Obrigat?rio
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass();
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R004';
                 $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->idetabrubr = 'TABRUB1';
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->e70_vlrliq * 0.1; //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0; //Opcional
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->e70_vlrliq * 0.1;
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0;
                 $seqitens++;
             } elseif ($aDadosPorCpf[$iCont]->codcateg == 712) {
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass(); //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R002'; //$aDadosPorCpf[$iCont]->codrubr; //Obrigat?rio
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass();
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R002';
                 $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->idetabrubr = 'TABRUB1';
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->e70_vlrliq * 0.2; //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0; //Opcional
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->e70_vlrliq * 0.2;
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0;
                 $seqitens++;
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass(); //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R003'; //$aDadosPorCpf[$iCont]->codrubr; //Obrigat?rio
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass();
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R003';
                 $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->idetabrubr = 'TABRUB1';
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->e70_vlrliq * 0.2; //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0; //Opcional
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->e70_vlrliq * 0.2;
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0;
                 $seqitens++;
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass(); //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R004'; //$aDadosPorCpf[$iCont]->codrubr; //Obrigat?rio
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass();
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R004';
                 $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->idetabrubr = 'TABRUB1';
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->e70_vlrliq * 0.6; //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0; //Opcional
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->e70_vlrliq * 0.6;
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0;
                 $seqitens++;
             } else {
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass(); //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R001'; //$aDadosPorCpf[$iCont]->codrubr; //Obrigat?rio
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass();
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R001';
                 $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->idetabrubr = 'TABRUB1';
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->e70_vlrliq; //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0; //Opcional
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->e70_vlrliq;
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0;
                 $seqitens++;
             }
             if ($aDadosPorCpf[$iCont]->valor_inss > 0) {
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass(); //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R005'; //$aDadosPorCpf[$iCont]->codrubr; //Obrigat?rio
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass();
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R005';
                 $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->idetabrubr = 'TABRUB1';
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->valor_inss; //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0; //Opcional
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->valor_inss;
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0;
                 $seqitens++;
             }
 
             if ($aDadosPorCpf[$iCont]->valor_irrf > 0) {
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass(); //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R006'; //$aDadosPorCpf[$iCont]->codrubr; //Obrigat?rio
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass();
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R006';
                 $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->idetabrubr = 'TABRUB1';
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->valor_irrf; //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0; //Opcional
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->valor_irrf;
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0;
                 $seqitens++;
             }
             if ($aDadosPorCpf[$iCont]->outrasretencoes > 0) {
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass(); //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R009'; //$aDadosPorCpf[$iCont]->codrubr; //Obrigat?rio
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass();
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R009';
                 $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->idetabrubr = 'TABRUB1';
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->outrasretencoes; //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0; //Opcional
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->outrasretencoes;
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0;
                 $seqitens++;
             }
             if ($aDadosPorCpf[$iCont]->sest > 0) {
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass(); //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R007'; //$aDadosPorCpf[$iCont]->codrubr; //Obrigat?rio
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass();
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R007';
                 $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->idetabrubr = 'TABRUB1';
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->sest; //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0; //Opcional
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->sest;
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0;
                 $seqitens++;
             }
             if ($aDadosPorCpf[$iCont]->senat > 0) {
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass(); //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R008'; //$aDadosPorCpf[$iCont]->codrubr; //Obrigat?rio
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens] = new \stdClass();
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->codrubr = 'R008';
                 $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->idetabrubr = 'TABRUB1';
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->senat; //Obrigat?rio
-                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0; //Opcional
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->vrrubr = $aDadosPorCpf[$iCont]->senat;
+                $std->dmdev[$iCont]->ideestablot[0]->remunperapur[0]->itensremun[$seqitens]->indapurir = 0;
                 $seqitens++;
             }
 
-            $std->dmdev[$iCont]->infocomplcont = new \stdClass(); //Opcional
-            $std->dmdev[$iCont]->infocomplcont->codcbo = $aDadosPorCpf[$iCont]->codcbo; //Obrigat?rio
-            //$std->dmdev[$iCont]->infocomplcont->natatividade = 1; //Obrigat?rio
+            $std->dmdev[$iCont]->infocomplcont = new \stdClass();
+            $std->dmdev[$iCont]->infocomplcont->codcbo = $aDadosPorCpf[$iCont]->codcbo;
         }
         return $std;
     }
@@ -555,8 +392,8 @@ class EventoS1200 extends EventoBase
      */
     private function buscarDadosPorMatricula($cpf)
     {
-        $anofolha = db_anofolha();
-        $mesfolha = db_mesfolha();
+        $ano = db_getsession("DB_anousu");
+        $mes = date("m", db_getsession("DB_datausu"));
         $sql = "SELECT
         distinct
         1 as tpInsc,
@@ -582,10 +419,10 @@ class EventoS1200 extends EventoBase
         from
             rhpessoal
             left join rhpessoalmov on
-                rh02_anousu = fc_getsession('DB_anousu')::int
-                and rh02_mesusu = date_part('month', fc_getsession('DB_datausu')::date)
+                rh02_anousu = {$ano}
+                and rh02_mesusu = {$mes}
                 and rh02_regist = rh01_regist
-                and rh02_instit = fc_getsession('DB_instit')::int
+                and rh02_instit = " . db_getsession("DB_instit") . "
             left join rhinssoutros on
                 rh51_seqpes = rh02_seqpes
             left join rhlota on
@@ -618,9 +455,9 @@ class EventoS1200 extends EventoBase
                     r33_tiporegime
                 from
                     inssirf
-                where     r33_anousu = $anofolha
-                                            and r33_mesusu = $mesfolha
-                            and r33_instit = fc_getsession('DB_instit')::int ) as x on
+                where     r33_anousu = $ano
+                                            and r33_mesusu = $mes
+                            and r33_instit = " . db_getsession("DB_instit") . " ) as x on
                 r33_codtab = rhpessoalmov.rh02_tbprev + 2
                 where 1=1
                 and (
@@ -632,21 +469,21 @@ class EventoS1200 extends EventoBase
                         )
                 and cgm.z01_cgccpf = '$cpf'
                 and ((rh05_recis is not null
-                    and date_part('month', rh05_recis) = date_part('month', fc_getsession('DB_datausu')::date)
-                    and date_part('year', rh05_recis) = date_part('year', fc_getsession('DB_datausu')::date)
+                    and date_part('month', rh05_recis) = {$mes} 
+                    and date_part('year', rh05_recis) = {$ano}
                     )
                     or
                     rh05_recis is null
                 )";
 
 
-        $rsValores = db_query($sql);
+        $rsDados = db_query($sql);
         // echo $sql;
-        // db_criatabela($rsValores);
+        // db_criatabela($rsDados);
         // exit;
-        if (pg_num_rows($rsValores) > 0) {
-            for ($iCont = 0; $iCont < pg_num_rows($rsValores); $iCont++) {
-                $oResult = \db_utils::fieldsMemory($rsValores, $iCont);
+        if (pg_num_rows($rsDados) > 0) {
+            for ($iCont = 0; $iCont < pg_num_rows($rsDados); $iCont++) {
+                $oResult = \db_utils::fieldsMemory($rsDados, $iCont);
                 $aItens[] = $oResult;
             }
         }
@@ -804,7 +641,7 @@ class EventoS1200 extends EventoBase
             throw new \Exception("Erro ao buscar os preenchimentos do S1200");
         }
         /**
-         * @todo busca os empregadores da institui??o e adicona para cada rubriuca
+         * @todo busca os empregadores da instituicao adicona para cada rubriuca
          */
         return \db_utils::getCollectionByRecord($rs);
     }

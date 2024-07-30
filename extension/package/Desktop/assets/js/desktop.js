@@ -40,8 +40,12 @@
 
   Desktop.Window.create = function(title, data) {
 
+    /**
+     * O replace substitui o %3F por ? por causa de uma regra do apache 2.4
+     * o restante da url precisa estar codificado para não quebrar o parâmetro action
+     */
     var url = 'extension/desktop/window/index/?' + $.param(data);
-    var win = Desktop.Window.createDefaultWindow(url, title);
+    var win = Desktop.Window.createDefaultWindow(url.replace("%3F", "?"), title);
 
     var buttonList = [
       {
