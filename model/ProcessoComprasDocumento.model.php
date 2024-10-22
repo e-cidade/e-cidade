@@ -71,6 +71,9 @@ class ProcessoComprasDocumento
      */
     private $sCaminhoArquivo;
 
+    private $sNomeArquivo;
+
+
     /**
      * Contrutor da classe, executa lazy load
      *
@@ -189,6 +192,11 @@ class ProcessoComprasDocumento
     public function setCaminhoArquivo($sCaminhoArquivo)
     {
         $this->sCaminhoArquivo = $sCaminhoArquivo;
+    }
+
+    public function setNomeArquivo($sNomeArquivo)
+    {
+        $this->sNomeArquivo = $sNomeArquivo;
     }
 
     /**
@@ -328,7 +336,7 @@ class ProcessoComprasDocumento
         $oDaocomanexopncpdocumento->l217_sequencial    = null;
         $oDaocomanexopncpdocumento->l217_licanexospncp  = $this->getProcessoProtocolo()->getSequencialAnexo();
         $oDaocomanexopncpdocumento->l217_documento     = $this->sNomeDocumento;
-        $oDaocomanexopncpdocumento->l217_nomedocumento = $this->sNomeDocumento;
+        $oDaocomanexopncpdocumento->l217_nomedocumento = $this->sNomeArquivo;
         $oDaocomanexopncpdocumento->l217_tipoanexo = $this->iTipoanexo;
         $oDaocomanexopncpdocumento->incluir(null);
 

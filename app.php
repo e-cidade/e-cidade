@@ -13,7 +13,9 @@ use \ECidade\V3\Error\EntityFactory;
 use \ECidade\V3\Error\Renderer as ErrorRenderer;
 
 try {
-    require_once(__DIR__ . DIRECTORY_SEPARATOR . 'bootstrap.php');
+
+  require_once(__DIR__ . DIRECTORY_SEPARATOR . 'bootstrap.php');
+  require_once(__DIR__ . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'Support' . DIRECTORY_SEPARATOR . 'RegisterEvents.php');
 
     $front = new Front();
     $request = new Request($front->getPath());
@@ -88,11 +90,11 @@ try {
     $filePath = str_replace(ECIDADE_PATH, '', $realpath);
     $fileExtension = pathinfo($filePath, PATHINFO_EXTENSION);
 
-    $isLaravel = preg_match('/w\/[0-9]+\/web/', $_SERVER['REQUEST_URI']);
+    $isLaravel = preg_match('/\/web\/[^ ]*/', $_SERVER['REQUEST_URI']);
 
     // Arquivo nao existe, 404
     if (($realpath === false || !file_exists($filePath)) && !$isLaravel) {
-        throw new ResponseException('P?gina n?o encontrada: ' . $filePath, 404);
+        throw new ResponseException('Pgina nao encontrada: ' . $filePath, 404);
     }
 
     // security issue
@@ -142,7 +144,7 @@ try {
 
     // @TODO - achar melhor forma de emular register_globals
     // @see \DBSeller\Legacy\PHP53\Emulate::registerGlobals()
-    // atualmente package DBSeller/Legacy é executado antes de criar sessao
+    // atualmente package DBSeller/Legacy  executado antes de criar sessao
     if (!ini_get('register_globals')) {
         $front->emulateRegisterGlobals(array('SESSION'));
     }

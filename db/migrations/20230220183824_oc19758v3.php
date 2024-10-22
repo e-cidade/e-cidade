@@ -1,13 +1,13 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc19758v3 extends AbstractMigration
+class Oc19758v3 extends PostgresMigration
 {
     public function up()
     {
         $sql = <<<SQL
-            begin;    
+            begin;
 
             ALTER TABLE public.consvalorestransf ADD c201_codacompanhamento text NULL;
 
@@ -22,7 +22,7 @@ class Oc19758v3 extends AbstractMigration
             ALTER TABLE public.consor202023 ADD si17_codacompanhamento text NULL;
 
             ALTER TABLE public.consor302023 ADD si18_codacompanhamento text NULL;
-   
+
 
             commit;
 SQL;

@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc18791 extends AbstractMigration
+class Oc18791 extends PostgresMigration
 {
     public function up()
     {
@@ -18,9 +18,9 @@ class Oc18791 extends AbstractMigration
     {
         $sql = utf8_encode('
                 BEGIN;
-  
+
                 INSERT INTO db_documentopadrao VALUES ((SELECT max(db60_coddoc) FROM db_documentopadrao)+1, \'ASSINATURA DO BOLETIM DIARIO\', 1508, ' . $instituicao . ');
-  
+
                 INSERT INTO db_paragrafopadrao VALUES
                 ((SELECT MAX(db61_codparag) FROM db_paragrafopadrao)+1, \'ASSINATURA DO BOLETIM DIARIO\', \'
                 $pdf->SetFont(\'\'Arial\'\', \'\'B\'\', 7);

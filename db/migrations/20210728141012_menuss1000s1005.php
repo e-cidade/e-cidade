@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Menuss1000s1005 extends AbstractMigration
+class Menuss1000s1005 extends PostgresMigration
 {
     /**
      * Change Method.
@@ -10,7 +10,7 @@ class Menuss1000s1005 extends AbstractMigration
      * Write your reversible migrations using this method.
      *
      * More information on writing migrations is available here:
-     * http://docs.phinx.org/en/latest/migrations.html#the-abstractmigration-class
+     * http://docs.phinx.org/en/latest/migrations.html#the-PostgresMigration-class
      *
      * The following commands can be used in this method and Phinx will
      * automatically reverse them when rolling back:
@@ -38,9 +38,9 @@ class Menuss1000s1005 extends AbstractMigration
                              FROM db_menu
                              INNER JOIN db_itensmenu ON db_itensmenu.id_item = db_menu.id_item_filho
                              WHERE descricao = 'Informações do Empregador - S1000 e S1005');
-                    
+
                     --INSERINDO NOVO MENU PARA FORMULARIO S1005
-                    
+
                     INSERT INTO db_itensmenu
                     VALUES (
                                 (SELECT max(id_item)+1
@@ -51,7 +51,7 @@ class Menuss1000s1005 extends AbstractMigration
                                                      1,
                                                      'S-1005 - Tabela de Estabelecimentos, Obras ou Unidades de Órgãos Públicos',
                                                      't');
-                    
+
                     INSERT INTO db_menu
                     VALUES(
                                (SELECT id_item
@@ -63,7 +63,7 @@ class Menuss1000s1005 extends AbstractMigration
                                (SELECT max(id_item)
                                 FROM db_itensmenu),2,
                                                    10216);
-                    
+
                     UPDATE db_itensmenu
                     SET descricao = 'Eventos iniciais e de Tabelas'
                     WHERE id_item IN

@@ -630,6 +630,8 @@ if (isset($alterar)) {
             $clliclicita->l20_dataaberproposta      = $oPost->l20_dataaberproposta;
             $clliclicita->l20_cadinicial            = $l20_cadinicial;
             $clliclicita->l20_dispensaporvalor      = $oPost->l20_dispensaporvalor;
+            $clliclicita->l20_lances      = $oPost->l20_lances;
+
 
             $clliclicita->alterar($l20_codigo, $descricao);
 

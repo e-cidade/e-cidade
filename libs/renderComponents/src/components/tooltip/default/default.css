@@ -1,0 +1,73 @@
+.tooltip-default {
+    position: relative;
+    display: none;
+    padding: 5px;
+}
+
+.tooltip-default-text {
+    visibility: hidden;
+    opacity: 0;
+    background-color: #dbdbdb;
+    color: #333;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px;
+    position: absolute;
+    z-index: 10;
+    top: 120%; /* Ajusta a posição do tooltip abaixo do ícone */
+    left: 50%;
+    transform: translateX(-50%); /* Centraliza o tooltip horizontalmente */
+    transition: opacity 0.3s ease-in-out;
+    font-size: 12px;
+}
+
+.tooltip-default:hover .tooltip-default-text,
+.tooltip-default:focus .tooltip-default-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+.tooltip-default-text::after {
+    content: '';
+    position: absolute;
+    bottom: 100%; /* Posição da seta acima do tooltip */
+    left: 50%; /* Centraliza a seta horizontalmente */
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #dbdbdb transparent;
+    /* A seta agora aponta para cima */
+}
+
+/* Auto (auto) - auto */
+.tooltip-default-auto {
+    width: auto;
+}
+
+/* Extra Large (XL) - 900px */
+.tooltip-default-xl {
+    width: 900px;
+}
+
+/* Large (LG) - 700px */
+.tooltip-default-lg {
+    width: 700px;
+}
+
+/* Medium (MD) - 500px */
+.tooltip-default-md {
+    width: 500px;
+}
+
+/* Small (SM) - 300px */
+.tooltip-default-sm {
+    width: 300px;
+}
+
+.tooltip-line {
+    border: none;
+    height: 1px;
+    background-color: #b5b5b594;
+    width: 95%;
+    border-radius: 5px;
+}

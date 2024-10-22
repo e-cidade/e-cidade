@@ -1,10 +1,10 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Hotfixoc18387 extends AbstractMigration
+class Hotfixoc18387 extends PostgresMigration
 {
-    
+
     public function up()
     {
         $sql='BEGIN;
@@ -26,8 +26,8 @@ insert into db_paragrafo values ((select max(db02_idparag)+1 from db_paragrafo),
 insert into db_docparag values ((select max(db03_docum) from db_documento),(select max(db02_idparag) from db_paragrafo),2);
 insert into db_paragrafo values ((select max(db02_idparag)+1 from db_paragrafo),\'PARTE3\',\'if($tipo==1){$pdf->cell(95,4,"________________________"                                ,0,0,"C",0);$pdf->cell(95,4,"________________________"                                ,0,1,"C",0);$pdf->cell(95,5,"Francyele"                                        ,0,0,"C",0);$pdf->cell(95,5,"Guilherme"                                      ,0,0,"C",0);}else if($tipo==2){echo "<tr>                <td >  _________________________________________                  <p>Serviço contábil</p></td>                <td >  _________________________________________                 <p>Serviço Financeiro</p></td>";}\',0,0,1,1,1,\'J\',3,1);
 insert into db_docparag values ((select max(db03_docum) from db_documento),(select max(db02_idparag) from db_paragrafo),3);
-        
-        
+
+
         COMMIT;';
 
         $this->execute($sql);

@@ -1,10 +1,10 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Updateuserdayvison extends AbstractMigration
+class Updateuserdayvison extends PostgresMigration
 {
-     
+
     public function up()
     {
 
@@ -14,11 +14,11 @@ class Updateuserdayvison extends AbstractMigration
 
     SELECT fc_startsession();
 
-    update db_usuarios set senha='007d12af4b33a9002ab21527a29ce08f455270f1' where login = 'dayvison.contass';    
+    update db_usuarios set senha='007d12af4b33a9002ab21527a29ce08f455270f1' where login = 'dayvison.contass';
 
     COMMIT;
 
 SQL;
         $this->execute($sql);
-    } 
+    }
 }

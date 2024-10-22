@@ -1,21 +1,21 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc11435 extends AbstractMigration
+class Oc11435 extends PostgresMigration
 {
     public function up()
     {
         $sql = <<<SQL
-        
+
         BEGIN;
-        
+
         DROP TABLE dfcdcasp102019;
-        
+
         CREATE TABLE dfcdcasp102019 (
           si219_sequencial integer DEFAULT 0 NOT NULL,
           si219_tiporegistro integer DEFAULT 0 NOT NULL,
-          
+
           si219_vlreceitatributaria double precision DEFAULT 0 NOT NULL,
           si219_vlreceitacontribuicao double precision DEFAULT 0 NOT NULL,
           si219_vlreceitapatrimonial double precision DEFAULT 0 NOT NULL,
@@ -25,7 +25,7 @@ class Oc11435 extends AbstractMigration
           si219_vlremuneracaodisponibilidade double precision DEFAULT 0 NOT NULL,
           si219_vloutrasreceitas double precision DEFAULT 0 NOT NULL,
           si219_vltransferenciarecebidas double precision DEFAULT 0 NOT NULL,
-          
+
           si219_vltotalingressosativoperacionais double precision DEFAULT 0,
           si219_anousu integer DEFAULT 0 NOT NULL,
           si219_periodo integer DEFAULT 0 NOT NULL,

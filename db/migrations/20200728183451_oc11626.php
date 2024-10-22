@@ -1,15 +1,15 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc11626 extends AbstractMigration
+class Oc11626 extends PostgresMigration
 {
-   
+
     public function change()
     {
         $sql = "
 
-        
+
 insert
     into
     orcparamseq( o69_codparamrel , o69_codseq , o69_descr , o69_grupo , o69_grupoexclusao , o69_nivel , o69_libnivel , o69_librec , o69_libsubfunc , o69_libfunc , o69_verificaano , o69_labelrel , o69_manual , o69_totalizador , o69_ordem , o69_nivellinha , o69_observacao , o69_desdobrarlinha , o69_origem )

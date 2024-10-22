@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc18523 extends AbstractMigration
+class Oc18523 extends PostgresMigration
 {
     public function up()
     {
@@ -230,7 +230,7 @@ class Oc18523 extends AbstractMigration
 
             $sSql3 = "DELETE FROM conplanoorcamentoanalitica
                       USING conplanoorcamento
-                      WHERE (c61_codcon, c61_anousu) = (c60_codcon, c60_anousu) 
+                      WHERE (c61_codcon, c61_anousu) = (c60_codcon, c60_anousu)
                         AND c61_anousu >= 2022
                         AND c60_estrut = '{$contas->Estrutural}'";
 

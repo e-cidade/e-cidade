@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Esocial1010Update extends AbstractMigration
+class Esocial1010Update extends PostgresMigration
 {
     public function up()
     {

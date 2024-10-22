@@ -484,8 +484,7 @@ class Imovel
         $clpromitente->j41_numcgm = $this->getNumcgm();
         $clpromitente->j41_tipopro = 't';
         $clpromitente->j41_promitipo = 'C';
-        if (!$clpromitente->incluir($this->getMatricula(),$this->getNumcgm())) {
-            throw new Exception('Erro ao incluir o promitente. '.$this->erro_msg);
-        }
+        $clpromitente->excluir($this->getMatricula());
+        $clpromitente->incluir($this->getMatricula(),$this->getNumcgm());
     }
 }

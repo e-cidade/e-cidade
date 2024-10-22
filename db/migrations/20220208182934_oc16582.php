@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc16582 extends AbstractMigration
+class Oc16582 extends PostgresMigration
 {
 
     public function up()
@@ -130,7 +130,7 @@ SQL;
             si195_inst int8 NULL,
             CONSTRAINT flpgo102022_sequ_pk PRIMARY KEY (si195_sequencial)
         );
-        
+
         CREATE TABLE flpgo112022 (
             si196_sequencial int8 NOT NULL DEFAULT 0,
             si196_tiporegistro int8 NULL,
@@ -145,7 +145,7 @@ SQL;
             CONSTRAINT flpgo112022_sequ_pk PRIMARY KEY (si196_sequencial),
             CONSTRAINT flpgo112022_reg10_fk FOREIGN KEY (si196_reg10) REFERENCES flpgo102022(si195_sequencial)
         );
-        
+
         CREATE TABLE flpgo122022 (
             si197_sequencial int8 NOT NULL DEFAULT 0,
             si197_tiporegistro int8 NULL,

@@ -127,7 +127,7 @@ class ContaCorrenteFonteRecurso extends ContaCorrenteBase implements IContaCorre
    */
   private function validarInformacoes() {
 
-    if ( !$this->oContaCorrenteDetalhe->getRecurso() instanceof Recurso) {
+    if ( !$this->oContaCorrenteDetalhe->getRecurso()) {
       throw new ParameterException("Recurso não informado para execução do conta corrente {$this->oContaCorrente->getDescricao()}.");
     }
 

@@ -1,11 +1,22 @@
+.cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
 .cabecalho .logo {
-  width: 110px;
+  width: 100px;
 }
 
 .cabecalho .cliente {
-  width: 620px;
+  width: 500px;
+  display: flex;
+  justify-content: flex-start;
 }
+
 
 .cabecalho .info {
   width: 280px;
+  padding: 1.3px;
 }

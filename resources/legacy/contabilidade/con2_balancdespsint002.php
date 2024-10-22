@@ -304,11 +304,11 @@ $totrecurso_atual_a_pagar_liquidado = 0;
 $codele = "";
 
 $ultimo = count($arr_niveis)-1;
-$nivelb = substr($arr_niveis[$ultimo],0,1);
+$nivelb = substr($arr_niveis[$ultimo],0,2);
 
 $flag_grupo = false;
 for ($i = 0; $i < count($arr_niveis); $i++) {
-  if (substr($arr_niveis[$i],0,1) == "9") {
+  if (substr($arr_niveis[$i],0,2) == "9") {
     $flag_grupo = true;
     break;
   }
@@ -320,14 +320,18 @@ if ($flag_grupo == false) {
   $nivela = 9;
 }
 
-
 $sql_dotacaosaldo = db_dotacaosaldo($nivelb,2,2,true,$sele_work,$anousu,$dataini,$datafin,8,0,true);
 
 $selecao = "";
 $agrupar = "";
 $ordem   = "";
 for ($i = 0; $i < count($arr_niveis); $i++) {
-  $nivel = substr($arr_niveis[$i],0,1);
+
+  if(strlen($arr_niveis[$i]) > 2) {
+    $nivel = substr($arr_niveis[$i],0,2);
+  } else {
+    $nivel = substr($arr_niveis[$i],0,1);
+  }
   
   if ($nivel == 1) {
     // Orgao
@@ -481,7 +485,7 @@ for ($i = 0; $i < count($arr_niveis); $i++) {
     } else {
       $ordem  = "order by o58_codigo,o15_descr";
     }
-  }else if ($nivel == 9) {
+  } else if ($nivel == 9) {
     // cateconomica
     if (trim($selecao)!="") {
       $selecao .= ",substr(o58_elemento,1,2) as elemento";
@@ -500,6 +504,225 @@ for ($i = 0; $i < count($arr_niveis); $i++) {
     } else {
       $ordem  = " order by elemento ";
     }
+  } else if ($nivel == 10) {
+
+      if (trim($selecao)!="") {
+        $selecao .= ",o58_elemento,
+                      CASE
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '1' THEN '1 - Pessoal e Encargos Sociais'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '2' THEN '2 - Juros e Encargos da Dívida'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '3' THEN '3 - Outras Despesas Correntes'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '4' THEN '4 - Investimentos'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '5' THEN '5 - Inversões Financeiras'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '6' THEN '6 - Amortização da Dívida'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '9' THEN '9 - Reserva de Contingência / Reserva do RPPS'
+                        ELSE 'Outros'
+                      END AS o56_descr";
+      } else {
+        $selecao  = "SELECT o58_elemento,
+                      CASE
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '1' THEN '1 - Pessoal e Encargos Sociais'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '2' THEN '2 - Juros e Encargos da Dívida'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '3' THEN '3 - Outras Despesas Correntes'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '4' THEN '4 - Investimentos'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '5' THEN '5 - Inversões Financeiras'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '6' THEN '6 - Amortização da Dívida'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '9' THEN '9 - Reserva de Contingência / Reserva do RPPS'
+                        ELSE 'Outros'
+                      END AS o56_descr";
+      }
+
+      
+      if (trim($agrupar)!="") {
+        $agrupar .= ",  o58_elemento, 
+                      CASE
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '1' THEN '1 - Pessoal e Encargos Sociais'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '2' THEN '2 - Juros e Encargos da Dívida'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '3' THEN '3 - Outras Despesas Correntes'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '4' THEN '4 - Investimentos'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '5' THEN '5 - Inversões Financeiras'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '6' THEN '6 - Amortização da Dívida'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '9' THEN '9 - Reserva de Contingência / Reserva do RPPS'
+                        ELSE 'Outros'
+                      END "; //AS o56_descr
+
+      } else {
+        $agrupar = "GROUP BY
+                    o58_elemento, 
+                    CASE
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '1' THEN '1 - Pessoal e Encargos Sociais'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '2' THEN '2 - Juros e Encargos da Dívida'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '3' THEN '3 - Outras Despesas Correntes'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '4' THEN '4 - Investimentos'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '5' THEN '5 - Inversões Financeiras'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '6' THEN '6 - Amortização da Dívida'
+                        WHEN SUBSTRING(o58_elemento, 3, 1) = '9' THEN '9 - Reserva de Contingência / Reserva do RPPS'
+                        ELSE 'Outros'
+                    END ";
+      }
+
+      if (trim($ordem)!="") {
+        $ordem .= ",o56_descr";
+      } else {
+        $ordem  = "order by o56_descr";
+      }
+
+  } else if ($nivel == 11) {
+
+    if (trim($selecao)!="") {
+      $selecao .= ", o58_elemento, 
+                    CASE
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '20' THEN '20 - Transferências à União'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '22' THEN '22 - Execução Orçamentária Delegada à União'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '30' THEN '30 - Transferências a Estados e ao Distrito Federal'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '31' THEN '31 - Transferências a Estados e ao Distrito Federal'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '32' THEN '32 - Execução Orçamentária Delegada a Estados e ao Distrito Federal'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '35' THEN '35 - Transferências Fundo a Fundo aos Estados e ao Distrito Federal à conta de recursos de que tratam os §§ 1º e 2º do art. 24 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '36' THEN '36 - Transferências Fundo a Fundo aos Estados e ao Distrito Federal à conta de recursos de que trata o art. 25 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '40' THEN '40 - Transferências a Municípios'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '41' THEN '41 - Transferências a Municípios - Fundo a Fundo'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '42' THEN '42 - Execução Orçamentária Delegada a Municípios'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '45' THEN '45 - Transferências Fundo a Fundo aos Municípios à conta de recursos de que tratam os §§ 1º e 2º do art. 24 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '46' THEN '46 - Transferências Fundo a Fundo aos Municípios à conta de recursos de que trata o art. 25 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '50' THEN '50 - Transferências a Instituições Privadas sem Fins Lucrativos'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '60' THEN '60 - Transferências a Instituições Privadas com Fins Lucrativos'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '67' THEN '67 - Execução de Contrato de Parceria Público-Privada ? PPP'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '70' THEN '70 - Transferências a Instituições Multigovernamentais'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '71' THEN '71 - Transferências a Consórcios Públicos mediante contrato de rateio'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '72' THEN '72 - Execução Orçamentária Delegada a Consórcios Públicos'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '73' THEN '73 - Transferências a Consórcios Públicos mediante contrato de rateio à conta de recursos de que tratam os §§ 1º e 2º do art. 24 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '74' THEN '74 - Transferências a Consórcios Públicos mediante contrato de rateio à conta de recursos de que trata o art. 25 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '75' THEN '75 - Transferências a Instituições Multigovernamentais à conta de recursos de que tratam os §§ 1º e 2º do art. 24 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '76' THEN '76 - Transferências a Instituições Multigovernamentais à conta de recursos de que trata o art. 25 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '80' THEN '80 - Transferências ao Exterior'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '90' THEN '90 - Aplicações Diretas'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '91' THEN '91 - Aplicação Direta Decorrente de Operação entre Órgãos, Fundos e Entidades Integrantes dos Orçamentos Fiscal e da Seguridade Social'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '92' THEN '92 - Aplicação Direta de Recursos Recebidos de Outros Entes da Federação Decorrentes de Delegação ou Descentralização'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '93' THEN '93 - Aplicação Direta Decorrente de Operação de Órgãos, Fundos e Entidades Integrantes dos Orçamentos Fiscal e da Seguridade Social com Consórcio Público do qual o Ente Participe'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '94' THEN '94 - Aplicação Direta Decorrente de Operação de Órgãos, Fundos e Entidades Integrantes dos Orçamentos Fiscal e da Seguridade Social com Consórcio Público do qual o Ente Não Participe'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '95' THEN '95 - Aplicação Direta à conta de recursos de que tratam os §§ 1º e 2º do art. 24 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '96' THEN '96 - Aplicação Direta à conta de recursos de que trata o art. 25 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '99' THEN '99 - A definir'
+                      ELSE 'Outros'
+                  END AS o56_descr";
+    } else {
+      $selecao .= "SELECT o58_elemento, 
+                    CASE
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '20' THEN '20 - Transferências à União'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '22' THEN '22 - Execução Orçamentária Delegada à União'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '30' THEN '30 - Transferências a Estados e ao Distrito Federal'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '31' THEN '31 - Transferências a Estados e ao Distrito Federal'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '32' THEN '32 - Execução Orçamentária Delegada a Estados e ao Distrito Federal'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '35' THEN '35 - Transferências Fundo a Fundo aos Estados e ao Distrito Federal à conta de recursos de que tratam os §§ 1º e 2º do art. 24 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '36' THEN '36 - Transferências Fundo a Fundo aos Estados e ao Distrito Federal à conta de recursos de que trata o art. 25 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '40' THEN '40 - Transferências a Municípios'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '41' THEN '41 - Transferências a Municípios - Fundo a Fundo'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '42' THEN '42 - Execução Orçamentária Delegada a Municípios'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '45' THEN '45 - Transferências Fundo a Fundo aos Municípios à conta de recursos de que tratam os §§ 1º e 2º do art. 24 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '46' THEN '46 - Transferências Fundo a Fundo aos Municípios à conta de recursos de que trata o art. 25 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '50' THEN '50 - Transferências a Instituições Privadas sem Fins Lucrativos'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '60' THEN '60 - Transferências a Instituições Privadas com Fins Lucrativos'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '67' THEN '67 - Execução de Contrato de Parceria Público-Privada ? PPP'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '70' THEN '70 - Transferências a Instituições Multigovernamentais'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '71' THEN '71 - Transferências a Consórcios Públicos mediante contrato de rateio'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '72' THEN '72 - Execução Orçamentária Delegada a Consórcios Públicos'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '73' THEN '73 - Transferências a Consórcios Públicos mediante contrato de rateio à conta de recursos de que tratam os §§ 1º e 2º do art. 24 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '74' THEN '74 - Transferências a Consórcios Públicos mediante contrato de rateio à conta de recursos de que trata o art. 25 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '75' THEN '75 - Transferências a Instituições Multigovernamentais à conta de recursos de que tratam os §§ 1º e 2º do art. 24 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '76' THEN '76 - Transferências a Instituições Multigovernamentais à conta de recursos de que trata o art. 25 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '80' THEN '80 - Transferências ao Exterior'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '90' THEN '90 - Aplicações Diretas'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '91' THEN '91 - Aplicação Direta Decorrente de Operação entre Órgãos, Fundos e Entidades Integrantes dos Orçamentos Fiscal e da Seguridade Social'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '92' THEN '92 - Aplicação Direta de Recursos Recebidos de Outros Entes da Federação Decorrentes de Delegação ou Descentralização'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '93' THEN '93 - Aplicação Direta Decorrente de Operação de Órgãos, Fundos e Entidades Integrantes dos Orçamentos Fiscal e da Seguridade Social com Consórcio Público do qual o Ente Participe'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '94' THEN '94 - Aplicação Direta Decorrente de Operação de Órgãos, Fundos e Entidades Integrantes dos Orçamentos Fiscal e da Seguridade Social com Consórcio Público do qual o Ente Não Participe'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '95' THEN '95 - Aplicação Direta à conta de recursos de que tratam os §§ 1º e 2º do art. 24 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '96' THEN '96 - Aplicação Direta à conta de recursos de que trata o art. 25 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '99' THEN '99 - A definir'
+                      ELSE 'Outros'
+                  END AS o56_descr";
+    }
+
+    if (trim($agrupar)!="") {
+      $agrupar .= ", o58_elemento,
+                    CASE
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '20' THEN '20 - Transferências à União'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '22' THEN '22 - Execução Orçamentária Delegada à União'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '30' THEN '30 - Transferências a Estados e ao Distrito Federal'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '31' THEN '31 - Transferências a Estados e ao Distrito Federal'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '32' THEN '32 - Execução Orçamentária Delegada a Estados e ao Distrito Federal'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '35' THEN '35 - Transferências Fundo a Fundo aos Estados e ao Distrito Federal à conta de recursos de que tratam os §§ 1º e 2º do art. 24 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '36' THEN '36 - Transferências Fundo a Fundo aos Estados e ao Distrito Federal à conta de recursos de que trata o art. 25 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '40' THEN '40 - Transferências a Municípios'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '41' THEN '41 - Transferências a Municípios - Fundo a Fundo'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '42' THEN '42 - Execução Orçamentária Delegada a Municípios'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '45' THEN '45 - Transferências Fundo a Fundo aos Municípios à conta de recursos de que tratam os §§ 1º e 2º do art. 24 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '46' THEN '46 - Transferências Fundo a Fundo aos Municípios à conta de recursos de que trata o art. 25 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '50' THEN '50 - Transferências a Instituições Privadas sem Fins Lucrativos'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '60' THEN '60 - Transferências a Instituições Privadas com Fins Lucrativos'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '67' THEN '67 - Execução de Contrato de Parceria Público-Privada ? PPP'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '70' THEN '70 - Transferências a Instituições Multigovernamentais'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '71' THEN '71 - Transferências a Consórcios Públicos mediante contrato de rateio'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '72' THEN '72 - Execução Orçamentária Delegada a Consórcios Públicos'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '73' THEN '73 - Transferências a Consórcios Públicos mediante contrato de rateio à conta de recursos de que tratam os §§ 1º e 2º do art. 24 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '74' THEN '74 - Transferências a Consórcios Públicos mediante contrato de rateio à conta de recursos de que trata o art. 25 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '75' THEN '75 - Transferências a Instituições Multigovernamentais à conta de recursos de que tratam os §§ 1º e 2º do art. 24 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '76' THEN '76 - Transferências a Instituições Multigovernamentais à conta de recursos de que trata o art. 25 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '80' THEN '80 - Transferências ao Exterior'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '90' THEN '90 - Aplicações Diretas'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '91' THEN '91 - Aplicação Direta Decorrente de Operação entre Órgãos, Fundos e Entidades Integrantes dos Orçamentos Fiscal e da Seguridade Social'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '92' THEN '92 - Aplicação Direta de Recursos Recebidos de Outros Entes da Federação Decorrentes de Delegação ou Descentralização'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '93' THEN '93 - Aplicação Direta Decorrente de Operação de Órgãos, Fundos e Entidades Integrantes dos Orçamentos Fiscal e da Seguridade Social com Consórcio Público do qual o Ente Participe'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '94' THEN '94 - Aplicação Direta Decorrente de Operação de Órgãos, Fundos e Entidades Integrantes dos Orçamentos Fiscal e da Seguridade Social com Consórcio Público do qual o Ente Não Participe'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '95' THEN '95 - Aplicação Direta à conta de recursos de que tratam os §§ 1º e 2º do art. 24 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '96' THEN '96 - Aplicação Direta à conta de recursos de que trata o art. 25 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '99' THEN '99 - A definir'
+                      ELSE 'Outros'
+                  END ";
+    } else {
+      $agrupar = "GROUP BY  o58_elemento,
+                    CASE
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '20' THEN '20 - Transferências à União'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '22' THEN '22 - Execução Orçamentária Delegada à União'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '30' THEN '30 - Transferências a Estados e ao Distrito Federal'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '31' THEN '31 - Transferências a Estados e ao Distrito Federal'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '32' THEN '32 - Execução Orçamentária Delegada a Estados e ao Distrito Federal'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '35' THEN '35 - Transferências Fundo a Fundo aos Estados e ao Distrito Federal à conta de recursos de que tratam os §§ 1º e 2º do art. 24 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '36' THEN '36 - Transferências Fundo a Fundo aos Estados e ao Distrito Federal à conta de recursos de que trata o art. 25 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '40' THEN '40 - Transferências a Municípios'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '41' THEN '41 - Transferências a Municípios - Fundo a Fundo'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '42' THEN '42 - Execução Orçamentária Delegada a Municípios'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '45' THEN '45 - Transferências Fundo a Fundo aos Municípios à conta de recursos de que tratam os §§ 1º e 2º do art. 24 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '46' THEN '46 - Transferências Fundo a Fundo aos Municípios à conta de recursos de que trata o art. 25 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '50' THEN '50 - Transferências a Instituições Privadas sem Fins Lucrativos'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '60' THEN '60 - Transferências a Instituições Privadas com Fins Lucrativos'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '67' THEN '67 - Execução de Contrato de Parceria Público-Privada ? PPP'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '70' THEN '70 - Transferências a Instituições Multigovernamentais'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '71' THEN '71 - Transferências a Consórcios Públicos mediante contrato de rateio'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '72' THEN '72 - Execução Orçamentária Delegada a Consórcios Públicos'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '73' THEN '73 - Transferências a Consórcios Públicos mediante contrato de rateio à conta de recursos de que tratam os §§ 1º e 2º do art. 24 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '74' THEN '74 - Transferências a Consórcios Públicos mediante contrato de rateio à conta de recursos de que trata o art. 25 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '75' THEN '75 - Transferências a Instituições Multigovernamentais à conta de recursos de que tratam os §§ 1º e 2º do art. 24 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '76' THEN '76 - Transferências a Instituições Multigovernamentais à conta de recursos de que trata o art. 25 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '80' THEN '80 - Transferências ao Exterior'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '90' THEN '90 - Aplicações Diretas'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '91' THEN '91 - Aplicação Direta Decorrente de Operação entre Órgãos, Fundos e Entidades Integrantes dos Orçamentos Fiscal e da Seguridade Social'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '92' THEN '92 - Aplicação Direta de Recursos Recebidos de Outros Entes da Federação Decorrentes de Delegação ou Descentralização'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '93' THEN '93 - Aplicação Direta Decorrente de Operação de Órgãos, Fundos e Entidades Integrantes dos Orçamentos Fiscal e da Seguridade Social com Consórcio Público do qual o Ente Participe'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '94' THEN '94 - Aplicação Direta Decorrente de Operação de Órgãos, Fundos e Entidades Integrantes dos Orçamentos Fiscal e da Seguridade Social com Consórcio Público do qual o Ente Não Participe'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '95' THEN '95 - Aplicação Direta à conta de recursos de que tratam os §§ 1º e 2º do art. 24 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '96' THEN '96 - Aplicação Direta à conta de recursos de que trata o art. 25 da Lei Complementar nº 141, de 2012'
+                      WHEN SUBSTRING(o58_elemento, 4, 2) = '99' THEN '99 - A definir'
+                      ELSE 'Outros'
+                  END ";
+    }
+    
+    if (trim($ordem)!="") {
+      $ordem .= ",o56_descr";
+    } else {
+      $ordem = "order by o56_descr";
+    }
+
   }
 }
 
@@ -528,109 +751,103 @@ if($nivel != 9 && $nivela != 9){
       ";
 
       if($where != ""){
-        $sql_result .= $where; 
-          
+        $sql_result .= $where;
       }
        
       $sql_result .= $agrupar." ";
       $sql_result .= $ordem;
-           
-      if ($selecao != "") {
-        $result = pg_exec($sql_result);
-      }
-    
-    
-}if($nivel == 9 && $ultimo > 0){
-      $sql_result = $selecao.",
-      sum(dot_ini)        as dot_ini,
-      sum(saldo_anterior) as saldo_anterior,
-      sum(empenhado)      as empenhado,
-      sum(anulado)        as anulado,
-      sum(liquidado)      as liquidado,
-      sum(pago)           as pago,
-      sum(suplementado)   as suplementado,
-      sum(reduzido)       as reduzido,
-      sum(atual)          as atual,
-      sum(reservado)      as reservado,
-      sum(atual_menos_reservado)   as atual_menos_reservado,
-      sum(atual_a_pagar)           as atual_a_pagar,
-      sum(atual_a_pagar_liquidado) as atual_a_pagar_liquidado,
-      sum(empenhado_acumulado)     as empenhado_acumulado,
-      sum(anulado_acumulado)       as anulado_acumulado,
-      sum(liquidado_acumulado)     as liquidado_acumulado,
-      sum(pago_acumulado)          as pago_acumulado,
-      sum(suplementado_acumulado)  as suplementado_acumulado,
-      sum(reduzido_acumulado)      as reduzido_acumulado
-      from ($sql_dotacaosaldo) as rr 
-      ";
+}
 
-      if($where != ""){
-        $sql_result .= $where; 
-          
-      }
-       
-      $sql_result .= $agrupar." ";
-      $sql_result .= $ordem;
+if($nivel == 9 && $ultimo > 0){
+    $sql_result = $selecao.",
+    sum(dot_ini)        as dot_ini,
+    sum(saldo_anterior) as saldo_anterior,
+    sum(empenhado)      as empenhado,
+    sum(anulado)        as anulado,
+    sum(liquidado)      as liquidado,
+    sum(pago)           as pago,
+    sum(suplementado)   as suplementado,
+    sum(reduzido)       as reduzido,
+    sum(atual)          as atual,
+    sum(reservado)      as reservado,
+    sum(atual_menos_reservado)   as atual_menos_reservado,
+    sum(atual_a_pagar)           as atual_a_pagar,
+    sum(atual_a_pagar_liquidado) as atual_a_pagar_liquidado,
+    sum(empenhado_acumulado)     as empenhado_acumulado,
+    sum(anulado_acumulado)       as anulado_acumulado,
+    sum(liquidado_acumulado)     as liquidado_acumulado,
+    sum(pago_acumulado)          as pago_acumulado,
+    sum(suplementado_acumulado)  as suplementado_acumulado,
+    sum(reduzido_acumulado)      as reduzido_acumulado
+    from ($sql_dotacaosaldo) as rr 
+    ";
+
+    if($where != ""){
+      $sql_result .= $where; 
     }
-           
-      if ($selecao != "") {
-        $result = pg_exec($sql_result);
-
-
-
-
-} if($nivel == 9 && $ultimo == 0){
-      $sql_result = $selecao.",
-      sum(dot_ini)        as dot_ini,
-      sum(saldo_anterior) as saldo_anterior,
-      sum(empenhado)      as empenhado,
-      sum(anulado)        as anulado,
-      sum(liquidado)      as liquidado,
-      sum(pago)           as pago,
-      sum(suplementado)   as suplementado,
-      sum(reduzido)       as reduzido,
-      sum(atual)          as atual,
-      sum(reservado)      as reservado,
-      sum(atual_menos_reservado)   as atual_menos_reservado,
-      sum(atual_a_pagar)           as atual_a_pagar,
-      sum(atual_a_pagar_liquidado) as atual_a_pagar_liquidado,
-      sum(empenhado_acumulado)     as empenhado_acumulado,
-      sum(anulado_acumulado)       as anulado_acumulado,
-      sum(liquidado_acumulado)     as liquidado_acumulado,
-      sum(pago_acumulado)          as pago_acumulado,
-      sum(suplementado_acumulado)  as suplementado_acumulado,
-      sum(reduzido_acumulado)      as reduzido_acumulado
-      from ($sql_dotacaosaldo) as rr group by elemento order by elemento";
-
-      $sql_result2 = "select elemento,
-      sum(dot_ini)        as dot_ini,
-      sum(saldo_anterior) as saldo_anterior,
-      sum(empenhado)      as empenhado,
-      sum(anulado)        as anulado,
-      sum(liquidado)      as liquidado,
-      sum(pago)           as pago,
-      sum(suplementado)   as suplementado,
-      sum(reduzido)       as reduzido,
-      sum(atual)          as atual,
-      sum(reservado)      as reservado,
-      sum(atual_menos_reservado)   as atual_menos_reservado,
-      sum(atual_a_pagar)           as atual_a_pagar,
-      sum(atual_a_pagar_liquidado) as atual_a_pagar_liquidado,
-      sum(empenhado_acumulado)     as empenhado_acumulado,
-      sum(anulado_acumulado)       as anulado_acumulado,
-      sum(liquidado_acumulado)     as liquidado_acumulado,
-      sum(pago_acumulado)          as pago_acumulado,
-      sum(suplementado_acumulado)  as suplementado_acumulado,
-      sum(reduzido_acumulado)      as reduzido_acumulado
-      from ($sql_result) as y group by elemento";
-         
-      $sql_result .= $agrupar." ";
-      $sql_result .= $ordem;
+      
+    $sql_result .= $agrupar." ";
+    $sql_result .= $ordem;
+}
      
-      if ($selecao != "") {
-        $result = pg_exec($sql_result2);
-      }
-     
+if ($selecao != "") {
+  $result = pg_exec($sql_result);
+}
+
+// db_criatabela($result);
+//echo '<pre>';  print_r($sql_result); echo '</pre>'; die();
+
+if($nivel == 9 && $ultimo == 0){
+    $sql_result = $selecao.",
+    sum(dot_ini)        as dot_ini,
+    sum(saldo_anterior) as saldo_anterior,
+    sum(empenhado)      as empenhado,
+    sum(anulado)        as anulado,
+    sum(liquidado)      as liquidado,
+    sum(pago)           as pago,
+    sum(suplementado)   as suplementado,
+    sum(reduzido)       as reduzido,
+    sum(atual)          as atual,
+    sum(reservado)      as reservado,
+    sum(atual_menos_reservado)   as atual_menos_reservado,
+    sum(atual_a_pagar)           as atual_a_pagar,
+    sum(atual_a_pagar_liquidado) as atual_a_pagar_liquidado,
+    sum(empenhado_acumulado)     as empenhado_acumulado,
+    sum(anulado_acumulado)       as anulado_acumulado,
+    sum(liquidado_acumulado)     as liquidado_acumulado,
+    sum(pago_acumulado)          as pago_acumulado,
+    sum(suplementado_acumulado)  as suplementado_acumulado,
+    sum(reduzido_acumulado)      as reduzido_acumulado
+    from ($sql_dotacaosaldo) as rr group by elemento order by elemento";
+
+    $sql_result2 = "select elemento,
+    sum(dot_ini)        as dot_ini,
+    sum(saldo_anterior) as saldo_anterior,
+    sum(empenhado)      as empenhado,
+    sum(anulado)        as anulado,
+    sum(liquidado)      as liquidado,
+    sum(pago)           as pago,
+    sum(suplementado)   as suplementado,
+    sum(reduzido)       as reduzido,
+    sum(atual)          as atual,
+    sum(reservado)      as reservado,
+    sum(atual_menos_reservado)   as atual_menos_reservado,
+    sum(atual_a_pagar)           as atual_a_pagar,
+    sum(atual_a_pagar_liquidado) as atual_a_pagar_liquidado,
+    sum(empenhado_acumulado)     as empenhado_acumulado,
+    sum(anulado_acumulado)       as anulado_acumulado,
+    sum(liquidado_acumulado)     as liquidado_acumulado,
+    sum(pago_acumulado)          as pago_acumulado,
+    sum(suplementado_acumulado)  as suplementado_acumulado,
+    sum(reduzido_acumulado)      as reduzido_acumulado
+    from ($sql_result) as y group by elemento";
+        
+    $sql_result .= $agrupar." ";
+    $sql_result .= $ordem;
+    
+    if ($selecao != "") {
+      $result = pg_exec($sql_result2);
+    }
 }
 
 $orgao     = "";
@@ -643,12 +860,24 @@ $cateconomica = "";
 $elemento  = "";
 $codigo    = "";
 
-for ($i=0; $i < pg_numrows($result); $i++) {
+$aGroupElements = [];
+
+$iTotalRegisters = pg_numrows($result);
+
+for ($i=0; $i < $iTotalRegisters; $i++) {
   if ($selecao == "") {
     break;
   }
   
   db_fieldsmemory($result,$i);
+
+  $oNext = db_utils::fieldsmemory($result,$i+1);
+
+  if($oNext->o56_descr != $o56_descr) {
+    $sIsLast = true;
+  } else {
+    $sIsLast = false;
+  }
   
   $flag_imp   = false;
   $flag_nivel = false;
@@ -686,7 +915,14 @@ for ($i=0; $i < pg_numrows($result); $i++) {
     $pdf->cell(0,$alt,'',"T",1,"C",0);
   }
   
-  $pdf->ln(3);
+  if($nivelb == 10 || $nivelb == 11) {
+    if($sIsLast == true) {
+      $pdf->ln(3);
+    }  
+  } else {
+    $pdf->ln(3);
+  }
+
   $pdf->setfont('arial','B',8);
   
   //
@@ -700,16 +936,15 @@ for ($i=0; $i < pg_numrows($result); $i++) {
   //             Valores
   //
   //
-  
-  
+    
   if (trim(@$o58_orgao) != "") {
+
     if ($nivelb == 1) {
       // Ultimo nivel que deve ser impresso
       $flag_imp = true;
     }
    
-    if ($codigo != "" && $codigo != $o58_codigo &&
-    $nivelb != 8  && $i > 0) {
+    if ($codigo != "" && $codigo != $o58_codigo && $nivelb != 8  && $i > 0) {
       // Imprime total do recurso
       
       $pdf->ln(3);
@@ -756,8 +991,7 @@ for ($i=0; $i < pg_numrows($result); $i++) {
       imprime_cabecalho($alt,$pdf);
     }
     
-    if ($elemento != "" && $elemento != $o58_elemento &&
-    $nivelb   != 7  && $nivela   == 0             && $i > 0) {
+    if ($elemento != "" && $elemento != $o58_elemento && $nivelb != 7 && $nivela   == 0  && $i > 0) {
       // Imprime total do elemento
       
       $descr = "ELEMENTO";
@@ -822,8 +1056,7 @@ for ($i=0; $i < pg_numrows($result); $i++) {
 
     // Inicio Alteração da Ocorrência 15679 
     
-    if ($cateconomica != "" && $cateconomica != $elemento &&
-    $nivelb   != 9  && $i > 0) {
+    if ($cateconomica != "" && $cateconomica != $elemento && $nivelb != 9  && $i > 0) {
       // Imprime total do cateconomica
       
       
@@ -873,8 +1106,7 @@ for ($i=0; $i < pg_numrows($result); $i++) {
     }
     // Fim Alteração da Ocorrência 15679 
    
-    if ($projativ != "" && $projativ != $o58_projativ &&
-    $nivelb   != 6  && $i > 0) {
+    if ($projativ != "" && $projativ != $o58_projativ && $nivelb != 6  && $i > 0) {
       // Imprime total do projativ
       
       $pdf->ln(3);
@@ -921,8 +1153,7 @@ for ($i=0; $i < pg_numrows($result); $i++) {
       imprime_cabecalho($alt,$pdf);
     }
     
-    if ($programa != "" && $programa != $o58_programa &&
-    $nivelb   != 5  && $i > 0) {
+    if ($programa != "" && $programa != $o58_programa && $nivelb != 5  && $i > 0) {
       // Imprime total do programa
       
       $pdf->ln(3);
@@ -969,8 +1200,7 @@ for ($i=0; $i < pg_numrows($result); $i++) {
       imprime_cabecalho($alt,$pdf);
     }
     
-    if ($subfuncao != "" && $subfuncao != $o58_subfuncao &&
-    $nivelb    != 4  && $i > 0) {
+    if ($subfuncao != "" && $subfuncao != $o58_subfuncao && $nivelb != 4  && $i > 0) {
       // Imprime total da subfuncao
       
       $pdf->ln(3);
@@ -1017,8 +1247,7 @@ for ($i=0; $i < pg_numrows($result); $i++) {
       imprime_cabecalho($alt,$pdf);
     }
     
-    if ($funcao != "" && $funcao != $o58_funcao &&
-    $nivelb != 3  && $i > 0) {
+    if ($funcao != "" && $funcao != $o58_funcao && $nivelb != 3  && $i > 0) {
       // Imprime total da funcao
       
       $pdf->ln(3);
@@ -1064,8 +1293,7 @@ for ($i=0; $i < pg_numrows($result); $i++) {
       imprime_cabecalho($alt,$pdf);
     }
     
-    if ($unidade != "" && $orgao != $o58_orgao &&
-    $nivelb  != 2  && $i > 0) {
+    if ($unidade != "" && $orgao != $o58_orgao &&  $nivelb  != 2  && $i > 0) {
       // Imprime total da unidade
       
       $pdf->ln(3);
@@ -1114,8 +1342,7 @@ for ($i=0; $i < pg_numrows($result); $i++) {
       imprime_cabecalho($alt,$pdf);
     }
     
-    if ($orgao  != $o58_orgao &&
-    $nivelb != 1          && $i > 0) {
+    if ($orgao != $o58_orgao && $nivelb != 1  && $i > 0) {
       // Trocou de orgao e nao eh nivel de orgao somente - imprime totais
       
       $pdf->ln(3);
@@ -1892,28 +2119,12 @@ for ($i=0; $i < pg_numrows($result); $i++) {
   
   // Fim Alteração da Ocorrência 15679 
   
-  if (trim(@$o58_elemento) != "") {
+  if (trim(@$o58_elemento) != "" && ($nivelb != 10 && $nivelb != 11)) {
     if ($nivelb == 7 && $nivela == 0) {
       $flag_imp = true;
     }
-    
-    /*
-    if ($nivela == 0 && $nivelb == 7) {
-      $descricao = "ELEMENTO";
-    }
-    
-    if ($nivela == 9) {
-      $descricao = "GRUPO NAT. DESP.";
-    }
-    
-    if ($descricao != "ELEMENTO" &&
-    $descricao != "GRUPO NAT. DESP.") {
-      $descricao = "ELEMENTO";
-    }
-    */
-    
-    if ($elemento != "" && $elemento != $o58_elemento &&
-    $nivelb   != 7  && $nivela   == 0             && $i > 0 &&
+        
+    if ($elemento != "" && $elemento != $o58_elemento &&  $nivelb != 7  && $nivela  == 0  && $i > 0 &&
     ($totelemento_dot_ini                != 0 ||
     $totelemento_suplementado_acumulado != 0 ||
     $totelemento_reduzido_acumulado     != 0 ||
@@ -1930,7 +2141,9 @@ for ($i=0; $i < pg_numrows($result); $i++) {
       $pdf->ln(3);
       
       $pdf->cell(10,$alt,'',0,0,"L",0);
+
       $pdf->cell(30,$alt,'TOTAL DO ELEMENTO',0,0,"L",0,'.');
+
       $pdf->cell(30,$alt,db_formatar($totelemento_dot_ini,'f'),0,0,"R",0);
       $pdf->cell(30,$alt,db_formatar($totelemento_suplementado_acumulado,'f'),0,0,"R",0);
       $pdf->cell(30,$alt,db_formatar($totelemento_reduzido_acumulado,'f'),0,0,"R",0);
@@ -1976,14 +2189,18 @@ for ($i=0; $i < pg_numrows($result); $i++) {
       if ($flag_nivel == true) {
         $pdf->cell(($col*$mult_nivel),$alt,'',0,0,"L",0,'.');
       }
+
       $pdf->cell(10,$alt,$descricao.db_formatar($o58_elemento,"elemento").'  -  '.$o56_descr,0,1,"L",0);
       $pdf->ln(3);
+      
       $elemento = $o58_elemento;
+
     } else {
       if ($flag_imp == true) {
         if ($flag_nivel == true) {
           $pdf->cell(($col*$mult_nivel),$alt,'',0,0,"L",0,'.');
         }
+
         $pdf->cell(10,$alt,$descricao.db_formatar($o58_elemento,"elemento").'  -  '.$o56_descr,0,1,"L",0);
         $pdf->ln(3);
       }
@@ -2008,6 +2225,55 @@ for ($i=0; $i < pg_numrows($result); $i++) {
     $mult_nivel++;
   }
 
+  if (trim(@$o58_elemento) != "" && ($nivelb == 10 || $nivelb == 11)) {
+    
+    if( ($nivelb == 10 || $nivelb == 11) && $nivela == 0) {
+      $flag_imp = true;
+    }
+    
+    if ($elemento != "" && $elemento != $o58_elemento &&  $nivelb != 7  && $nivela  == 0  && $i > 0 ) {
+      imprime_cabecalho($alt,$pdf);
+    }
+
+    if(!array_key_exists($o56_descr, $aGroupElements)) {
+      $aGroupElements[$o56_descr]['dot_ini']                = $dot_ini;
+      $aGroupElements[$o56_descr]['suplementado_acumulado'] = $suplementado_acumulado;
+      $aGroupElements[$o56_descr]['reduzido_acumulado']     = $reduzido_acumulado;
+      $aGroupElements[$o56_descr]['atual']                  = $atual;
+      $aGroupElements[$o56_descr]['empenhado']              = $empenhado; 
+      $aGroupElements[$o56_descr]['anulado']                = $anulado;
+      $aGroupElements[$o56_descr]['liquidado']              = $liquidado; 
+      $aGroupElements[$o56_descr]['pago']                   = $pago; 
+      $aGroupElements[$o56_descr]['atual_a_pagar']          = $atual_a_pagar; 
+      $aGroupElements[$o56_descr]['empenhado_acumulado']    = $empenhado_acumulado; 
+      $aGroupElements[$o56_descr]['anulado_acumulado']      = $anulado_acumulado;
+      $aGroupElements[$o56_descr]['liquidado_acumulado']    = $liquidado_acumulado;
+      $aGroupElements[$o56_descr]['pago_acumulado']         = $pago_acumulado;
+
+    } else {
+      $aGroupElements[$o56_descr]['dot_ini']                += $dot_ini;
+      $aGroupElements[$o56_descr]['suplementado_acumulado'] += $suplementado_acumulado;
+      $aGroupElements[$o56_descr]['reduzido_acumulado']     += $reduzido_acumulado;
+      $aGroupElements[$o56_descr]['atual']                  += $atual;
+      $aGroupElements[$o56_descr]['empenhado']              += $empenhado; 
+      $aGroupElements[$o56_descr]['anulado']                += $anulado;
+      $aGroupElements[$o56_descr]['liquidado']              += $liquidado; 
+      $aGroupElements[$o56_descr]['pago']                   += $pago; 
+      $aGroupElements[$o56_descr]['atual_a_pagar']          += $atual_a_pagar; 
+      $aGroupElements[$o56_descr]['empenhado_acumulado']    += $empenhado_acumulado; 
+      $aGroupElements[$o56_descr]['anulado_acumulado']      += $anulado_acumulado;
+      $aGroupElements[$o56_descr]['liquidado_acumulado']    += $liquidado_acumulado;
+      $aGroupElements[$o56_descr]['pago_acumulado']         += $pago_acumulado;
+    }
+
+    if($sIsLast == true) {
+      $pdf->MultiCell(0, $alt, mb_strtoupper($o56_descr, 'ISO-8859-1'), 0, "L", 0);
+      $pdf->ln(1);
+    }
+    
+    $flag_nivel = true;
+    $mult_nivel++;
+  }
   
   if (trim(@$o58_codigo) != "") {
        
@@ -2015,8 +2281,7 @@ for ($i=0; $i < pg_numrows($result); $i++) {
       $flag_imp = true;
     }
     
-    if ($codigo != "" && $codigo != $o58_codigo &&
-    $nivelb != 8  && $nivela   == 0  && $i > 0                 &&
+    if ($codigo != "" && $codigo != $o58_codigo && $nivelb != 8  && $nivela   == 0  && $i > 0  &&
     ($totrecurso_dot_ini                != 0 ||
     $totrecurso_suplementado_acumulado != 0 ||
     $totrecurso_reduzido_acumulado     != 0 ||
@@ -2115,31 +2380,79 @@ for ($i=0; $i < pg_numrows($result); $i++) {
   }
   
   if ($flag_imp == true) {
+
     $pdf->setfont('arial','',7);
-         
-    $pdf->cell(40,$alt,'',0,0,"L",0,0);
-    $pdf->cell(30,$alt,db_formatar($dot_ini,'f'),0,0,"R",0);
-    $pdf->cell(30,$alt,db_formatar($suplementado_acumulado,'f'),0,0,"R",0);
-    $pdf->cell(30,$alt,db_formatar($reduzido_acumulado,'f'),0,0,"R",0);
-    $pdf->cell(30,$alt,db_formatar((($dot_ini + $suplementado_acumulado) - $reduzido_acumulado),'f'),0,0,"R",0);
-    $pdf->cell(30,$alt,db_formatar($atual,'f'),0,1,"R",0);
-    
-    $pdf->cell(40,$alt,"",0,0,"L",0);
-    $pdf->cell(30,$alt,db_formatar($empenhado,'f'),0,0,"R",0);
-    $pdf->cell(30,$alt,db_formatar($anulado,'f'),0,0,"R",0);
-    $pdf->cell(30,$alt,db_formatar($liquidado,'f'),0,0,"R",0);
-    $pdf->cell(30,$alt,db_formatar($pago,'f'),0,0,"R",0);
-    $pdf->cell(30,$alt,db_formatar(($empenhado_acumulado-$anulado_acumulado)-$liquidado_acumulado ,'f'),0,1,"R",0);
-    
-    $pdf->cell(40,$alt,"",0,0,"L",0);
-    $pdf->cell(30,$alt,db_formatar($empenhado_acumulado,'f'),0,0,"R",0);
-    $pdf->cell(30,$alt,db_formatar($anulado_acumulado,'f'),0,0,"R",0);
-    $pdf->cell(30,$alt,db_formatar($liquidado_acumulado,'f'),0,0,"R",0);
-    $pdf->cell(30,$alt,db_formatar($pago_acumulado,'f'),0,0,"R",0);
-    $pdf->cell(30,$alt,db_formatar($liquidado_acumulado-$pago_acumulado,'f'),0,1,"R",0);
-    $pdf->ln(3);
+
+    if(($nivelb == 10 || $nivelb == 11))  {
+
+      if($sIsLast == true) {
+
+        $xdot_ini                = $aGroupElements[$o56_descr]['dot_ini'];
+        $xsuplementado_acumulado = $aGroupElements[$o56_descr]['suplementado_acumulado'];
+        $xreduzido_acumulado     = $aGroupElements[$o56_descr]['reduzido_acumulado'];
+        $xatual                  = $aGroupElements[$o56_descr]['atual'];
+
+        $xempenhado              = $aGroupElements[$o56_descr]['empenhado'];
+        $xanulado                = $aGroupElements[$o56_descr]['anulado'];
+        $xliquidado              = $aGroupElements[$o56_descr]['liquidado'];
+        $xpago                   = $aGroupElements[$o56_descr]['pago'];
+  
+        $xempenhado_acumulado    = $aGroupElements[$o56_descr]['empenhado_acumulado'];
+        $xanulado_acumulado      = $aGroupElements[$o56_descr]['anulado_acumulado'];
+        $xliquidado_acumulado    = $aGroupElements[$o56_descr]['liquidado_acumulado'];
+        $xpago_acumulado         = $aGroupElements[$o56_descr]['pago_acumulado'];
+
+        $pdf->cell(40,$alt,'',0,0,"L",0,0);
+
+        $pdf->cell(30,$alt,db_formatar($xdot_ini,'f'),0,0,"R",0);
+        $pdf->cell(30,$alt,db_formatar($xsuplementado_acumulado,'f'),0,0,"R",0);
+        $pdf->cell(30,$alt,db_formatar($xreduzido_acumulado,'f'),0,0,"R",0);
+        $pdf->cell(30,$alt,db_formatar((($xdot_ini + $xsuplementado_acumulado) - $xreduzido_acumulado),'f'),0,0,"R",0);
+        $pdf->cell(30,$alt,db_formatar($xatual,'f'),0,1,"R",0);
+        
+        $pdf->cell(40,$alt,"",0,0,"L",0);
+        $pdf->cell(30,$alt,db_formatar($xempenhado,'f'),0,0,"R",0);
+        $pdf->cell(30,$alt,db_formatar($xanulado,'f'),0,0,"R",0);
+        $pdf->cell(30,$alt,db_formatar($xliquidado,'f'),0,0,"R",0);
+        $pdf->cell(30,$alt,db_formatar($xpago,'f'),0,0,"R",0);
+        $pdf->cell(30,$alt,db_formatar(($xempenhado_acumulado-$xanulado_acumulado)-$xliquidado_acumulado ,'f'),0,1,"R",0);
+        
+        $pdf->cell(40,$alt,"",0,0,"L",0);
+        $pdf->cell(30,$alt,db_formatar($xempenhado_acumulado,'f'),0,0,"R",0);
+        $pdf->cell(30,$alt,db_formatar($xanulado_acumulado,'f'),0,0,"R",0);
+        $pdf->cell(30,$alt,db_formatar($xliquidado_acumulado,'f'),0,0,"R",0);
+        $pdf->cell(30,$alt,db_formatar($xpago_acumulado,'f'),0,0,"R",0);
+        $pdf->cell(30,$alt,db_formatar($xliquidado_acumulado-$xpago_acumulado,'f'),0,1,"R",0);
+        $pdf->ln(3);
+      }
+
+    } else {
+
+      $pdf->cell(40,$alt,'',0,0,"L",0,0);
+      $pdf->cell(30,$alt,db_formatar($dot_ini,'f'),0,0,"R",0);
+      $pdf->cell(30,$alt,db_formatar($suplementado_acumulado,'f'),0,0,"R",0);
+      $pdf->cell(30,$alt,db_formatar($reduzido_acumulado,'f'),0,0,"R",0);
+      $pdf->cell(30,$alt,db_formatar((($dot_ini + $suplementado_acumulado) - $reduzido_acumulado),'f'),0,0,"R",0);
+      $pdf->cell(30,$alt,db_formatar($atual,'f'),0,1,"R",0);
+      
+      $pdf->cell(40,$alt,"",0,0,"L",0);
+      $pdf->cell(30,$alt,db_formatar($empenhado,'f'),0,0,"R",0);
+      $pdf->cell(30,$alt,db_formatar($anulado,'f'),0,0,"R",0);
+      $pdf->cell(30,$alt,db_formatar($liquidado,'f'),0,0,"R",0);
+      $pdf->cell(30,$alt,db_formatar($pago,'f'),0,0,"R",0);
+      $pdf->cell(30,$alt,db_formatar(($empenhado_acumulado-$anulado_acumulado)-$liquidado_acumulado ,'f'),0,1,"R",0);
+      
+      $pdf->cell(40,$alt,"",0,0,"L",0);
+      $pdf->cell(30,$alt,db_formatar($empenhado_acumulado,'f'),0,0,"R",0);
+      $pdf->cell(30,$alt,db_formatar($anulado_acumulado,'f'),0,0,"R",0);
+      $pdf->cell(30,$alt,db_formatar($liquidado_acumulado,'f'),0,0,"R",0);
+      $pdf->cell(30,$alt,db_formatar($pago_acumulado,'f'),0,0,"R",0);
+      $pdf->cell(30,$alt,db_formatar($liquidado_acumulado-$pago_acumulado,'f'),0,1,"R",0);
+      $pdf->ln(3);
+    }
   }
     
+  // TOTAIS FINAIS
   $totgeraldot_ini                 += $dot_ini;
   $totgeralsuplementado_acumulado  += $suplementado_acumulado;
   $totgeralreduzido_acumulado      += $reduzido_acumulado;
@@ -2333,11 +2646,8 @@ $pdf->cell(30,$alt,db_formatar($totgeralatual_a_pagar_liquidado,'f'),0,1,"R",0);
 $pdf->setfont('arial','',7);
 
 
-
 if ($nivela > 0 && $nivel != 9) {
   $sql_dotacao = db_dotacaosaldo(7,2,2,true,$sele_work,$anousu,$dataini,$datafin,null,null,true);
-
-//  echo $sql_dotacao; exit;
   
   $sql = "select o58_elemento,
   sum(dot_ini)        as dot_ini,
@@ -2367,7 +2677,7 @@ if ($nivela > 0 && $nivel != 9) {
   group by o58_elemento
   order by o58_elemento";
   
-//  echo $sql;  exit;
+ //  echo $sql;  exit;
   $result = pg_exec($sql);
   // db_criatabela($result);  exit;
   
@@ -2461,7 +2771,7 @@ if ($nivela > 0 && $nivel != 9) {
 
     if (substr($retorno,0,3) != substr($o58_elemento,0,3)){
       $res_elemento = $clorcelemento->sql_record($clorcelemento->sql_query_file(null,null,"o56_elemento,o56_descr",null,"o56_anousu = ".db_getsession("DB_anousu")." and o56_elemento = '".substr($retorno,0,3)."0000000000' limit 1"));
-//      if ($clorcelemento->numrows > 0){
+       // if ($clorcelemento->numrows > 0){
         db_fieldsmemory($res_elemento,0);
 
         $pdf->cell(40,$alt,db_formatar($o56_elemento,"elemento").'  -  '.$o56_descr,0,1,"L",0);
@@ -2503,7 +2813,7 @@ if ($nivela > 0 && $nivel != 9) {
         $totalliquidado_acumulado     = 0;
         $totalpago_acumulado          = 0;
         $totalatual_a_pagar_liquidado = 0;
-//      }
+     //      }
       
       $retorno = $o58_elemento;
     }

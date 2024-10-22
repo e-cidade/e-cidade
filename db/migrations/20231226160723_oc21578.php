@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc21578 extends AbstractMigration
+class Oc21578 extends PostgresMigration
 {
   public function up()
   {
@@ -22,9 +22,9 @@ class Oc21578 extends AbstractMigration
 
           ALTER TABLE empenho.empparametro ADD COLUMN e30_modeloop int4 default 2;
 
-          INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+          INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
           VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e30_modeloop' ,'int4' ,'Modelo da Ordem de Pagamento' ,'true' ,'Modelo da Ordem de Pagamento' ,5 ,'false' ,'false' ,'false' ,1 ,'text' ,'Modelo da Ordem de Pagamento' );
-          INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+          INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
           VALUES (
           (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'empparametro'),
           (SELECT codcam FROM db_syscampo WHERE nomecam = 'e30_modeloop'),
@@ -41,7 +41,7 @@ class Oc21578 extends AbstractMigration
         BEGIN;
 
         UPDATE db_itensmenu SET descricao = 'Emite Ordem de Pagamento / Nota Liquidação' WHERE funcao = 'emp2_emitenotaliq001.php';
-             
+
         INSERT INTO db_itensmenu
         VALUES (
                 (SELECT max(id_item)+1 FROM db_itensmenu),
@@ -80,7 +80,7 @@ class Oc21578 extends AbstractMigration
               \$sql = \'select e41_descr as tipo_emp from pagordem inner join empempenho on e50_numemp = e60_numemp inner join emptipo on e60_codtipo = e41_codtipo where e50_codord = \'.\$this->ordpag;
 
               global \$tipo_emp;
-              
+
               \$res_sql = pg_query(\$sql);
               if(pg_numrows(\$res_sql) > 0){
                 db_fieldsmemory(\$res_sql,0);
@@ -90,24 +90,24 @@ class Oc21578 extends AbstractMigration
               //BOX ASSINATURAS TITULO
               \$this->objpdf->text(\$xcol+44,\$xlin+207,\'TESOUREIRO\');
               \$this->objpdf->text(\$xcol+135,\$xlin+207,\'ORDENADOR DE PAGAMENTO\');
-              
+
               \$this->objpdf->rect(\$xcol,\$xlin+190,194,10,2,\'DF\',\'12\');
               \$this->objpdf->setfont(Arial,\'b\',7);
               \$this->objpdf->text(\$xcol+5,\$xlin+196,\'EMPENHO     \'. db_formatar(\$this->numemp,\'s\',\'0\',5).\'     \'. \$this->emptipo);
-              
-              
+
+
               //linha assinatura
               \$this->objpdf->line(\$xcol+120,\$xlin+224,\$xcol+185,\$xlin+224);
               \$this->objpdf->line(\$xcol+20,\$xlin+224,\$xcol+85,\$xlin+224);
-              
-              
+
+
               \$this->objpdf->SetFont(\'Arial\',\'\',6);
-              
+
               //Assinaturas
               \$this->objpdf->text(\$xcol+40,\$xlin+227,\$this->tesoureiro);
-              
+
               \$this->objpdf->text(\$xcol+140,\$xlin+227,\$this->ordenapagamento);
-              
+
               // Moldura do canhoto
               \$this->objpdf->rect(\$xcol, \$xlin +246, 194, 26, 2, \'DF\', \'1234\');
               \$this->objpdf->SetFont(\'Arial\', \'\', 7);

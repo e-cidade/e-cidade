@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc20029 extends AbstractMigration
+class Oc20029 extends PostgresMigration
 {
     public function up()
     {
@@ -41,7 +41,7 @@ class Oc20029 extends AbstractMigration
                         AND e60_anousu = 2023
                         AND substring(o15_codtri, 1, 4) = '1710'
                 ) as x");
-                
+
          foreach ($arrEmpenhos as $empenho) {
             $this->execute("update empenho.empempenho set e60_emendaparlamentar = 1 where e60_numemp = " . $empenho['e60_numemp']);
         }

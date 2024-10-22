@@ -284,7 +284,7 @@ $sCamposFuncionarios .= " rh02_hrsmen, ";
 $sCamposFuncionarios .= " rh01_admiss, ";
 $sCamposFuncionarios .= " rh37_descr,  ";
 $sCamposFuncionarios .= " {$sCampoAgrupadorCodigo}    as agrupador_codigo,   "; 
-$sCamposFuncionarios .= " {$sCampoAgrupadorDescricao} as agrupador_descricao "; 
+$sCamposFuncionarios .= " {$sCampoAgrupadorDescricao} as agrupador_descricao ";
 
 /**
  * Monta sql dos funcionarios 
@@ -383,6 +383,7 @@ for ($i = 0; $i < $iTotalFuncionarios; $i++) {
   $oFuncionario                       = new stdClass();
   $oFuncionario->matricula            = $oDados->rh01_regist;
   $oFuncionario->nome                 = $oDados->z01_nome;
+  $oFuncionario->funcao               = $oDados->rh37_descr;
   $oFuncionario->dataadmissao         = db_formatar($oDados->rh01_admiss, "d");
   $oFuncionario->periodogozadoinicial = '';
   $oFuncionario->periodogozadofinal   = '';
@@ -629,6 +630,7 @@ foreach ($aAgrupador as $iAgrupador => $oAgrupador) {
 
     $iAltura = $pdf->getY(); 
     $pdf->cell(50, $iAlt, substr(($oFuncionario->matricula." - ".$oFuncionario->nome),0, 33), "TR", 1, "L");
+    $pdf->cell(50, $iAlt, substr($oFuncionario->funcao,0, 33), "R", 1, "L");
     $sPeriodoGozado =  "Último Gozo: {$oFuncionario->periodogozadoinicial} a {$oFuncionario->periodogozadofinal}";
     $pdf->cell(50, $iAlt, $sPeriodoGozado, "R", 1, "C");
     $iAlturaGozo   = $pdf->getY();

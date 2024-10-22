@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc17042 extends AbstractMigration
+class Oc17042 extends PostgresMigration
 {
     public function up()
     {
@@ -25,7 +25,7 @@ class Oc17042 extends AbstractMigration
 
             insert into db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select max(codarq) from db_sysarquivo), (select codcam from db_syscampo where nomecam = 'si06_nummodadm'), 1, (select max(codsequencia) from db_syssequencia));
 
-            commit;            
+            commit;
             ";
 
         $this->execute($sSql);

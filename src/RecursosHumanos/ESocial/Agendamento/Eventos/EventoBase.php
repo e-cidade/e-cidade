@@ -80,6 +80,13 @@ abstract class EventoBase
     protected $aDadosExclusao;
 
     /**
+     * dtpgto
+     *
+     * @var string
+     */
+    protected $dtpgto;
+
+    /**
      *
      * @param \stdClass $dados
      */
@@ -135,6 +142,36 @@ abstract class EventoBase
     public function setDadosExclusao($aDadosExclusao)
     {
         $this->aDadosExclusao = $aDadosExclusao;
+    }
+
+    public function setDtpgto($dtpgto)
+    {
+        $this->dtpgto = $dtpgto;
+    }
+
+    public function anoPgto()
+    {
+        return explode('/', $this->dtpgto)[2];
+    }
+
+    public function mesPgto()
+    {
+        return explode('/', $this->dtpgto)[1];
+    }
+
+    public function diaPgto()
+    {
+        return explode('/', $this->dtpgto)[0];
+    }
+
+    public function ano()
+    {
+        return explode('-', $this->iniValid)[0];
+    }
+
+    public function mes()
+    {
+        return explode('-', $this->iniValid)[1];
     }
 
     /**

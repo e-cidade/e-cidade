@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class SicomBalancete2020 extends AbstractMigration
+class SicomBalancete2020 extends PostgresMigration
 {
 
     public function up()
@@ -849,7 +849,7 @@ class SicomBalancete2020 extends AbstractMigration
 
 
         ALTER TABLE ONLY balancete282020
-        ADD CONSTRAINT fk_balancete282020_reg10_fk FOREIGN KEY (si198_reg10) REFERENCES balancete102020(si177_sequencial);";   
+        ADD CONSTRAINT fk_balancete282020_reg10_fk FOREIGN KEY (si198_reg10) REFERENCES balancete102020(si177_sequencial);";
 
         $this->execute($sql);
     }

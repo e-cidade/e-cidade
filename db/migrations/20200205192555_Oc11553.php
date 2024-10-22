@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc11553 extends AbstractMigration
+class Oc11553 extends PostgresMigration
 {
     /**
      * Change Method.
@@ -10,7 +10,7 @@ class Oc11553 extends AbstractMigration
      * Write your reversible migrations using this method.
      *
      * More information on writing migrations is available here:
-     * http://docs.phinx.org/en/latest/migrations.html#the-abstractmigration-class
+     * http://docs.phinx.org/en/latest/migrations.html#the-PostgresMigration-class
      *
      * The following commands can be used in this method and Phinx will
      * automatically reverse them when rolling back:
@@ -30,13 +30,13 @@ class Oc11553 extends AbstractMigration
       $sql = "
         BEGIN;
         SELECT fc_startsession();
-        
+
         CREATE OR REPLACE FUNCTION public.fc_saldocontacorrente(integer, integer, integer, integer, integer)
          RETURNS character varying
          LANGUAGE plpgsql
         AS ".'$function$'."
         DECLARE
-        
+
             iAnousu              alias for $1;
             iSequencia           alias for $2;
             iCC                  alias for $3;
@@ -52,10 +52,10 @@ class Oc11553 extends AbstractMigration
             nFonte               FLOAT8;
             sinal_ant            CHAR(1);
             sinal_final          CHAR(1);
-        
-        BEGIN 
+
+        BEGIN
         -- FONTE;
-        
+
         SELECT DISTINCT c19_orctiporec FROM contacorrente
         INNER JOIN contacorrentedetalhe ON contacorrente.c17_sequencial = contacorrentedetalhe.c19_contacorrente
         INNER JOIN contacorrentedetalheconlancamval ON c28_contacorrentedetalhe = c19_sequencial
@@ -67,11 +67,11 @@ class Oc11553 extends AbstractMigration
           AND contacorrentedetalhe.c19_conplanoreduzanousu = iAnousu
           AND contacorrente.c17_sequencial = iCC
           AND c53_tipo != 1000
-          
+
         INTO nFonte;
-        
+
         -- SALDO DA CONTA POR FONTE;
-        
+
         SELECT coalesce((SELECT CASE WHEN c29_debito > 0 THEN c29_debito
                                    WHEN c29_credito > 0 THEN -1 * c29_credito
                                 ELSE 0 END AS saldoanterior
@@ -81,11 +81,11 @@ class Oc11553 extends AbstractMigration
                          WHERE contacorrentedetalhe.c19_sequencial = iSequencia
                            AND contacorrentedetalhe.c19_instit = iInstit
                            AND contacorrente.c17_sequencial = iCC) ,0)
-        
+
         INTO nSaldoInicialAno;
-        
+
         -- SOMA TOTAL DE CREDITO POR REDUZIDO E FONTE PARA SALDO INICIAL
-        
+
         SELECT coalesce((SELECT sum(c69_valor) AS credito FROM conlancamval
                          INNER JOIN conlancam ON conlancam.c70_codlan = conlancamval.c69_codlan AND conlancam.c70_anousu = conlancamval.c69_anousu
                          INNER JOIN conlancamdoc ON conlancamdoc.c71_codlan = conlancamval.c69_codlan
@@ -100,11 +100,11 @@ class Oc11553 extends AbstractMigration
                            AND c19_instit = iInstit
                            AND c53_tipo != 1000
                          GROUP BY c28_tipo),0)
-        
+
         INTO tCreditoAno;
-        
+
         -- SOMA TOTAL DE DEBITO POR REDUZIDO E FONTE PARA SALDO INICIAL
-        
+
         SELECT coalesce((SELECT sum(c69_valor) AS debito FROM conlancamval
                          INNER JOIN conlancam ON conlancam.c70_codlan = conlancamval.c69_codlan AND conlancam.c70_anousu = conlancamval.c69_anousu
                          INNER JOIN conlancamdoc ON conlancamdoc.c71_codlan = conlancamval.c69_codlan
@@ -118,14 +118,14 @@ class Oc11553 extends AbstractMigration
                            AND contacorrentedetalhe.c19_sequencial = iSequencia
                            AND c19_instit = iInstit
                            AND c53_tipo != 1000
-                         GROUP BY c28_tipo),0) 
-        
+                         GROUP BY c28_tipo),0)
+
         INTO tDebitoAno;
-        
+
         nSaldoInicialMes := round(nSaldoInicialAno,2) + round(tDebitoAno,2) - round(tCreditoAno,2);
-        
+
         -- SOMA TOTAL DE CREDITO POR REDUZIDO E FONTE PARA SALDO MES
-        
+
         SELECT coalesce((SELECT sum(c69_valor) FROM conlancamval
                          INNER JOIN conlancam ON conlancam.c70_codlan = conlancamval.c69_codlan AND conlancam.c70_anousu = conlancamval.c69_anousu
                          INNER JOIN conlancamdoc ON conlancamdoc.c71_codlan = conlancamval.c69_codlan
@@ -140,11 +140,11 @@ class Oc11553 extends AbstractMigration
                            AND c19_instit = iInstit
                            AND c53_tipo != 1000
                          GROUP BY c28_tipo),0)
-        
+
         INTO tCreditoMes;
-        
+
         -- SOMA TOTAL DE DEBITO POR REDUZIDO E FONTE PARA SALDO MES
-        
+
         SELECT coalesce((SELECT sum(c69_valor) FROM conlancamval
                          INNER JOIN conlancam ON conlancam.c70_codlan = conlancamval.c69_codlan AND conlancam.c70_anousu = conlancamval.c69_anousu
                          INNER JOIN conlancamdoc ON conlancamdoc.c71_codlan = conlancamval.c69_codlan
@@ -158,26 +158,26 @@ class Oc11553 extends AbstractMigration
                            AND c19_sequencial = iSequencia
                            AND c19_instit = iInstit
                            AND c53_tipo != 1000
-                         GROUP BY c28_tipo),0) 
-        
+                         GROUP BY c28_tipo),0)
+
         INTO tDebitoMes;
-        
+
         nSaldoFinalMes := nSaldoInicialMes + tDebitoMes - tCreditoMes;
-        
-        IF nSaldoInicialMes < 0 
+
+        IF nSaldoInicialMes < 0
           THEN sinal_ant := 'C';
           ELSE sinal_ant := 'D';
         END IF;
-        
-        IF nSaldoFinalMes < 0 
+
+        IF nSaldoFinalMes < 0
           THEN sinal_final := 'C';
           ELSE sinal_final := 'D';
         END IF;
-        
-        IF nFonte IS NULL 
+
+        IF nFonte IS NULL
           THEN nFonte := 0;
         END IF;
-        
+
             return TO_CHAR(ABS(iSequencia),'999999999999')
                ||';'||TO_CHAR(iCC::integer,'999999999999')
                ||';'||TO_CHAR(nFonte::integer,'999999999999')

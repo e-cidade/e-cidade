@@ -92,6 +92,20 @@ implements IReceitaPeriodoTesourariaRepository
                 continue;
             }
 
+            if ($this->sTipo == ReceitaTipoRepositoryLegacy::ESTRUTURAL) {
+                $data->estrut = $data->estrutural ?? "";
+                $chave = $data->estrutural != 0 ? "ESTRUTURAL DA RECEITA: {$data->estrut} " : "Sem estrutural de receita informado";
+                $aDados[$data->tipo]["ESTRUTREC"][$chave][] = $data;
+                continue;
+            }
+
+            if ($this->sTipo == ReceitaTipoRepositoryLegacy::CONTA) {
+                $data->codconta = $data->conta ?? 0;
+                $chave = $data->codigo != 0 ? "CÓDIGO DA CONTA: {$data->codconta} - {$data->conta_descricao} " : "Sem conta informado";
+                $aDados[$data->tipo]["CODCONTA"][$chave][] = $data;
+                continue;
+            }
+
             if ($this->sOrdem == ReceitaOrdemRepositoryLegacy::OPERACAO_CREDITO) {
                 $data->codreceita = $data->operacao ? $data->operacao : 0;
                 $dataAssinatura = date('d/m/Y', strtotime($data->dtassinatura));

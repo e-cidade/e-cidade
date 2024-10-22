@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AddHistoricoMaterial2024 extends AbstractMigration
+class AddHistoricoMaterial2024 extends PostgresMigration
 {
     public function getItensSicom(){
         return $this->fetchAll("SELECT DISTINCT *

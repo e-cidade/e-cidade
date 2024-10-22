@@ -73,7 +73,7 @@ class FormularioOrdemPagamento
         $result = $this->clpagordem->sql_record($sSqlPagordem);
 
         if ($this->clpagordem->numrows < 1) {
-            db_redireciona('db_erros.php?fechar=true&db_erro=Dados não encontrados. Verifique!');
+            throw new Exception("Dados de pagamento não encontrados! OP {$this->iCodOrdem} Movimento: {$this->iMovimento}");
         }
 
         $result2 = db_query("select * from empparametro where e39_anousu = " . db_getsession("DB_anousu"));
@@ -277,7 +277,7 @@ class FormularioOrdemPagamento
             $this->oAssintaraDigital->gerarArquivoBase64($nomeDocumento);
             $this->oAssintaraDigital->assinarOrdemPagamento($this->oOrdemPagamento->e82_codmov, $this->oOrdemPagamento->e60_coddot, $this->oOrdemPagamento->e60_anousu, $this->dataPagamento, $nomeDocumento, $nomeDocumento);
         } catch (Exception $eErro) {
-            throw new Exception("Erro ao solicitar assinatura :".$eErro->getMessage());
+            throw new Exception($eErro->getMessage());
         }
     }
 

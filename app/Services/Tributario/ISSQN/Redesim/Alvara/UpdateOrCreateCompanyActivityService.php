@@ -42,7 +42,6 @@ class UpdateOrCreateCompanyActivityService
     public function execute(CompanyDTO $data): void
     {
         foreach ($data->atividades as $key => $atividade) {
-            $sequence = $key + 1;
             $estrutural = $atividade->atividade->getCnaeEstruturalEcidade();
             $cnae = $this->cnae->newQuery()
                 ->where('q71_estrutural', 'like', "%{$estrutural}")
@@ -64,14 +63,19 @@ class UpdateOrCreateCompanyActivityService
                 throw new BusinessException('Não existe atividade para o CNAE ' . $estrutural);
             }
 
-            /**
-             * verificar se existe $ativid->q03_ativ para $inscricaoRedesim->issbase->q02_inscr
-             * se nao existe INCLUSAO_DE_ATIVIDADES
-             */
+            $sequence = $this->tabativ->newQuery()
+                ->where('q07_inscr', $inscricaoRedesim->issbase->q02_inscr)
+                ->max('q07_seq');
+
+            if($sequence === null) {
+                $sequence = 0;
+            }
+
+            $sequence = $sequence + 1;
 
             $hasActivity = $this->tabativ->inscricaoAtividade($inscricaoRedesim->issbase->q02_inscr, $ativid->q03_ativ)->get();
 
-            if(!$hasActivity) {
+            if($hasActivity->isEmpty()) {
                 $this->createIssbaseLogService->execute(
                     $inscricaoRedesim->issbase->q02_inscr,
                     IssbaseLog::ORIGEM_REDESIM,
@@ -80,12 +84,17 @@ class UpdateOrCreateCompanyActivityService
                 );
             }
 
+            if(!$hasActivity->isEmpty()) {
+                $sequence = $hasActivity->first()->q07_seq;
+            }
+
             $this->tabativ->newQuery()->updateOrCreate(
                 ['q07_inscr' => $inscricaoRedesim->issbase->q02_inscr, 'q07_seq' => $sequence],
                 [
                     'q07_ativ' => $ativid->q03_ativ,
                     'q07_datain' => $atividade->atividade->inclusao->format('Y-m-d'),
                     'q07_datafi' => $data->getDateEncerramentoEcidade(),
+                    'q07_perman' => true,
                 ],
             );
 

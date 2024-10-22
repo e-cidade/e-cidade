@@ -153,7 +153,7 @@ class ContaBancarias
      */
     public function setDb83Descricao(string $db83_descricao): self
     {
-        $this->db83_descricao =  mb_convert_encoding($db83_descricao,  "UTF-8", "ISO-8859-1");
+        $this->db83_descricao =  $db83_descricao;
         return $this;
     }
     

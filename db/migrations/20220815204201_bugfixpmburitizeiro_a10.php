@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class BugfixpmburitizeiroA10 extends AbstractMigration
+class BugfixpmburitizeiroA10 extends PostgresMigration
 {
 
     public function up()

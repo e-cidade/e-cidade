@@ -469,6 +469,7 @@ class cl_empagemov {
      $sql .= "      inner join pctipocompra  on  pctipocompra.pc50_codcom = empempenho.e60_codcom";
      $sql .= "      inner join emptipo  on  emptipo.e41_codtipo = empempenho.e60_codtipo";
      $sql .= "      inner join emppresta on e81_codmov = e45_codmov";
+     $sql .= "      LEFT JOIN empord ON e81_codmov = e82_codmov";
 
      $sql2 = "";
 

@@ -315,7 +315,12 @@ db_app::load("time.js");
         $("table" + oGridEvento.sName + "header").style.width = width;
         $(oGridEvento.sName + "body").style.width = width;
         $("table" + oGridEvento.sName + "footer").style.width = width;
-
+        js_ajusteLayout();
+    }
+    function js_ajusteLayout()
+    {
+        $('col1').style.width = "30px";
+        $('oGridEventoSelectAll').style.width = "30px";
     }
     
     var anoCompetenciaInput = document.getElementById("anocompetencia");

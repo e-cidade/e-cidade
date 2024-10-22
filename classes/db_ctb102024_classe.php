@@ -814,7 +814,6 @@ class cl_ctb102024
     $sSqlAplicacaoPrevidencia = "";
     if ($oRegVerifica->si09_tipoinstit == 5) {
       $sSqlAplicacaoPrevidencia = $oRegVerifica->nroseqaplicacao == "" ? "" : " AND si95_nroseqaplicacao = {$oRegVerifica->nroseqaplicacao} ";
-      $sSqlAplicacaoPrevidencia .= $oRegVerifica->tipoaplicacao == "" ? "" : " AND si95_tipoaplicacao::int = {$oRegVerifica->tipoaplicacao} ";
     }
 
     for ($iContAnoReg10 = 2014; $iContAnoReg10 <= $ano; $iContAnoReg10++) {

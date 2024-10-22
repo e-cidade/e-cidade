@@ -37,13 +37,6 @@ if (isset($alterar)) {
             break;
         }
 
-        $result1 = db_query("update empautitem set e55_codele = $pc07_codele where e55_autori in (select ac19_autori from acordoitemexecutadoempautitem where ac19_acordoitemexecutado in (select ac29_sequencial from acordoitemexecutado where ac29_acordoitem = $ac20_sequencial)) and e55_item = (select ac20_pcmater from acordoitem where ac20_sequencial = $ac20_sequencial)");
-
-        if ($result1 == false) {
-            $sqlerro = true;
-            db_msgbox("Alteração não realizada. Verifique");
-            break;
-        }
     }
     if ($sqlerro == false) {
         db_msgbox("Alteração realizada com sucesso");

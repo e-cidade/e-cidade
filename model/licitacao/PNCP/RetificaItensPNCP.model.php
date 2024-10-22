@@ -60,7 +60,8 @@ class RetificaitensPNCP extends ModeloBasePNCP
         }else{
             $oDadosAPI->itemCategoriaId             = 3;
         }
-
+        $oDadosAPI->aplicabilidadeMargemPreferenciaNormal       = 0;
+        $oDadosAPI->aplicabilidadeMargemPreferenciaAdicional    = 0;
         $oDadosAPI->justificativa           = utf8_encode($oDado[0]->justificativa);
 
         return json_encode($oDadosAPI);
@@ -68,7 +69,51 @@ class RetificaitensPNCP extends ModeloBasePNCP
 
     public function montarRetificacao()
     {
+        $oDado = $this->dados;
 
+        $vlrtotal                               = $oDado[0]->pc11_quant * $oDado[0]->valorunitarioestimado;
+        $oDadosAPI                              = new \stdClass;
+        $oDadosAPI->numeroItem                  = $oDado[0]->numeroitem;
+        $oDadosAPI->materialOuServico           = $oDado[0]->materialouservico;
+
+        if ($oDado[0]->modalidadeid == "1" || $oDado[0]->modalidadeid == "13") {
+            $oDadosAPI->tipoBeneficioId         = 5;
+        } else {
+            $oDadosAPI->tipoBeneficioId         = $oDado[0]->tipobeneficioid;
+        }
+
+        $oDadosAPI->incentivoProdutivoBasico    = $oDado[0]->incentivoprodutivobasico == 'f' ? 'false' : 'true';
+        $oDadosAPI->descricao                   = utf8_encode($oDado[0]->descricao);
+        $oDadosAPI->quantidade                  = $oDado[0]->pc11_quant;
+        $oDadosAPI->unidadeMedida               = utf8_encode($oDado[0]->unidademedida);
+        $oDadosAPI->orcamentoSigiloso           = $oDado[0]->l21_sigilo == 'f' ? 'false' : 'true';
+        $oDadosAPI->valorUnitarioEstimado       = $oDado[0]->valorunitarioestimado;
+        $oDadosAPI->valorTotal                  = $vlrtotal;
+        $oDadosAPI->situacaoCompraItemId        = $oDado[0]->situacaocompraitemid;
+        $oDadosAPI->criterioJulgamentoId        = $oDado[0]->criteriojulgamentoid;
+
+        //DISPENSA E INEXIGIBILIDADE
+        if ($oDado[0]->modalidadeid == "8" || $oDado[0]->modalidadeid == "9") {
+            $oDadosAPI->situacaoCompraItemId    = $oDado[0]->pc23_orcamforne ? 2 : 4;
+            $oDadosAPI->criterioJulgamentoId    = 7;
+        }
+
+        //CONCURSO
+        if ($oDado[0]->modalidadeid == "3") {
+            $oDadosAPI->criterioJulgamentoId    = 8;
+        }
+
+        if ($oDado[0]->modalidadeid == "1" || $oDado[0]->modalidadeid == "13") {
+            $oDadosAPI->itemCategoriaId         = 2;
+        } else {
+            $oDadosAPI->itemCategoriaId         = 3;
+        }
+
+        $oDadosAPI->aplicabilidadeMargemPreferenciaNormal       = 0;
+        $oDadosAPI->aplicabilidadeMargemPreferenciaAdicional    = 0;
+        $oDadosAPI->justificativa                               = utf8_encode($oDado[0]->justificativa);
+
+        return json_encode($oDadosAPI);
     }
 
     public function retificarItem($oDados, $sCodigoControlePNCP, $iAnoCompra, $seqitem)

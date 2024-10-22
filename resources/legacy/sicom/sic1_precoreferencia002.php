@@ -9,6 +9,7 @@ include("classes/db_liccomissaocgm_classe.php");
 include("dbforms/db_funcoes.php");
 $oPost = db_utils::postMemory($_POST);
 parse_str($HTTP_SERVER_VARS["QUERY_STRING"]);
+
 db_postmemory($HTTP_POST_VARS);
 $clprecoreferencia = new cl_precoreferencia;
 $clitemprecoreferencia = new cl_itemprecoreferencia;
@@ -16,53 +17,7 @@ $clliccomissaocgm      = new cl_liccomissaocgm();
 $clprecoreferenciaacount = new cl_precoreferenciaacount;
 $db_opcao = 22;
 $db_botao = false;
-
-
-
-if (isset($imprimir)) {
-
-    if (!isset($si01_processocompra) || $si01_processocompra == '') {
-        echo "<script>alert(\"Nenhum processo foi selecionado\")</script>";
-    } else {
-
-        echo "<script>
-        jan = window.open('sic1_precoreferencia007.php?impjust=$si01_impjustificativa&codigo_preco='+{$si01_processocompra}+'&quant_casas='+{$si01_casasdecimais}+
-    '&tipoprecoreferencia='+$oPost->si01_tipoprecoreferencia,
-                     'width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0 ');
-	   jan.moveTo(0,0);
-    </script>";
-    }
-}
-
-if (isset($imprimircsv)) {
-
-    if (!isset($si01_processocompra) || $si01_processocompra == '') {
-        echo "<script>alert(\"Nenhum processo foi selecionado\")</script>";
-    } else {
-
-        echo "<script>
-    jan = window.open('sic1_precoreferencia005.php?impjust=$si01_impjustificativa&codigo_preco='+{$si01_processocompra}+'&quant_casas='+{$si01_casasdecimais}+
-    '&tipoprecoreferencia='+$oPost->si01_tipoprecoreferencia,
-                     'width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0 ');
-	   jan.moveTo(0,0);
-    </script>";
-    }
-}
-
-if (isset($imprimirword)) {
-
-    if (!isset($si01_processocompra) || $si01_processocompra == '') {
-        echo "<script>alert(\"Nenhum processo foi selecionado\")</script>";
-    } else {
-
-        echo "<script>
-    jan = window.open('sic1_precoreferencia006.php?impjust=$si01_impjustificativa&codigo_preco='+{$si01_processocompra}+'&quant_casas='+{$si01_casasdecimais}+
-    '&tipoprecoreferencia='+$oPost->si01_tipoprecoreferencia,
-                     'width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0 ');
-	   jan.moveTo(0,0);
-    </script>";
-    }
-}
+$itemmeepp = "2";
 
 if (isset($alterar)) {
 
@@ -78,6 +33,7 @@ if (isset($alterar)) {
     $clprecoreferencia->si01_justificativa = $si01_justificativa;
     $clprecoreferencia->si01_impjustificativa = $si01_impjustificativa;
     $clprecoreferencia->si01_casasdecimais = $si01_casasdecimais;
+    $clprecoreferencia->si01_datacotacao = $si01_datacotacao;
 
 
     $clitemprecoreferencia->excluir(null, "si02_precoreferencia = $si01_sequencial");
@@ -136,7 +92,6 @@ if (isset($alterar)) {
 
     for ($iCont = 0; $iCont < $cont; $iCont++) {
         $valor = $arrayValores[$iCont];
-
         $sSql = "select
                     pc23_orcamitem,
                     round($sFuncao(pc23_vlrun), $si01_casasdecimais) as valor,
@@ -195,7 +150,6 @@ if (isset($alterar)) {
 
         $rsResultee = db_query($sSql);
 
-
         $oItemOrc = db_utils::fieldsMemory($rsResultee, 0);
 
         $clitemprecoreferencia->si02_vlprecoreferencia = $oItemOrc->valor;
@@ -231,13 +185,12 @@ if (isset($alterar)) {
     }
     if($cont == 0){
         $sqlerro = true;
-        $clprecoreferencia->erro_msg    = 'Quantidade de oramentos cadastrados  menor que a quantidade de cotao selecionada.';
+        $clprecoreferencia->erro_msg    = 'Quantidade de orçamentos cadastrados é menor que a quantidade de cotações selecionadas.';
         $clprecoreferencia->erro_status = "0";
         $clprecoreferencia->erro_campo = "si01_cotacaoitem";
     }
 
-
-    if ($clitemprecoreferencia->numrows > 0) {
+    if ($clitemprecoreferencia->numrows > 0 && $sqlerro = false || $sqlerro == null) {
         $clprecoreferencia->alterar($si01_sequencial);
     }
 
@@ -252,9 +205,17 @@ if (isset($alterar)) {
     db_fim_transacao();
 } else if (isset($chavepesquisa)) {
     $db_opcao = 2;
-    $result = $clprecoreferencia->sql_record($clprecoreferencia->sql_query($chavepesquisa));
+    $result = $clprecoreferencia->sql_record($clprecoreferencia->sql_query($chavepesquisa,"*,
+       cgmcotacao.z01_numcgm AS respCotacaocodigo,
+       cgmcotacao.z01_nome AS respCotacaonome,
+       cgmorcamento.z01_numcgm AS respOrcacodigo,
+       cgmorcamento.z01_nome as respOrcanome"));
     db_fieldsmemory($result, 0);
     $db_botao = true;
+    $verificaExistenciadeitenscota = $clprecoreferencia->sql_record($clprecoreferencia->verificaItemCota($si01_processocompra));
+    if (pg_num_rows($verificaExistenciadeitenscota)) {
+        $itemmeepp = "1";
+    }
 }
 ?>
 <html>
@@ -264,32 +225,31 @@ if (isset($alterar)) {
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <meta http-equiv="Expires" CONTENT="0">
     <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
-    <link href="estilos.css" rel="stylesheet" type="text/css">
+    <?php
+    db_app::load("estilos.bootstrap.css");
+    db_app::load("just-validate.js");
+    ?>
 </head>
+<style>
+    .container {
+        margin-top: 140px; /* Espaço acima do container */
+        background-color: #f5fffb;
+        padding: 20px;
+        max-width: 1250px; /* Largura máxima do conteudo */
+        width: 100%; /* Para garantir responsividade */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra leve */
+        font-family: Arial;
+        font-size: 12px;
+    }
 
-<body bgcolor=#CCCCCC leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="a=1">
-    <table width="790" border="0" cellpadding="0" cellspacing="0" bgcolor="#5786B2">
-        <tr>
-            <td width="360" height="18">&nbsp;</td>
-            <td width="263">&nbsp;</td>
-            <td width="25">&nbsp;</td>
-            <td width="140">&nbsp;</td>
-        </tr>
-    </table>
-    <table width="790" border="0" cellspacing="0" cellpadding="0">
-        <tr>
-            <td height="430" align="left" valign="top" bgcolor="#CCCCCC">
-                <center>
-                    <?
-                    include("forms/db_frmprecoreferencia.php");
-                    ?>
-                </center>
-            </td>
-        </tr>
-    </table>
-    <?
+</style>
+<body bgcolor=#f5fffb leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="a=1">
+<div class="container">
+    <?php
+    include("forms/db_frmprecoreferencia.php");
     db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsession("DB_anousu"), db_getsession("DB_instit"));
     ?>
+</div>
 </body>
 
 </html>

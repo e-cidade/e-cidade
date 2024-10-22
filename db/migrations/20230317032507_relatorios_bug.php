@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class RelatoriosBug extends AbstractMigration
+class RelatoriosBug extends PostgresMigration
 {
     public function change()
     {

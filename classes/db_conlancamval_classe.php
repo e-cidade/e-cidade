@@ -80,30 +80,32 @@ class cl_conlancamval {
      }
    }
    // funcao para atualizar campos
-   function atualizacampos($exclusao=false) {
+   function atualizacampos($exclusao = false) {
      if($exclusao==false){
-       $this->c69_sequen = ($this->c69_sequen == ""?@$GLOBALS["HTTP_POST_VARS"]["c69_sequen"]:$this->c69_sequen);
-       $this->c69_anousu = ($this->c69_anousu == ""?@$GLOBALS["HTTP_POST_VARS"]["c69_anousu"]:$this->c69_anousu);
-       $this->c69_codlan = ($this->c69_codlan == ""?@$GLOBALS["HTTP_POST_VARS"]["c69_codlan"]:$this->c69_codlan);
-       $this->c69_codhist = ($this->c69_codhist == ""?@$GLOBALS["HTTP_POST_VARS"]["c69_codhist"]:$this->c69_codhist);
-       $this->c69_credito = ($this->c69_credito == ""?@$GLOBALS["HTTP_POST_VARS"]["c69_credito"]:$this->c69_credito);
-       $this->c69_debito = ($this->c69_debito == ""?@$GLOBALS["HTTP_POST_VARS"]["c69_debito"]:$this->c69_debito);
-       $this->c69_valor = ($this->c69_valor == ""?@$GLOBALS["HTTP_POST_VARS"]["c69_valor"]:$this->c69_valor);
-       if($this->c69_data == ""){
-         $this->c69_data_dia = ($this->c69_data_dia == ""?@$GLOBALS["HTTP_POST_VARS"]["c69_data_dia"]:$this->c69_data_dia);
-         $this->c69_data_mes = ($this->c69_data_mes == ""?@$GLOBALS["HTTP_POST_VARS"]["c69_data_mes"]:$this->c69_data_mes);
-         $this->c69_data_ano = ($this->c69_data_ano == ""?@$GLOBALS["HTTP_POST_VARS"]["c69_data_ano"]:$this->c69_data_ano);
-         if($this->c69_data_dia != ""){
-            $this->c69_data = $this->c69_data_ano."-".$this->c69_data_mes."-".$this->c69_data_dia;
-         }
-       }
+      $this->c69_sequen  = ($this->c69_sequen  ==  "" ? @$GLOBALS["HTTP_POST_VARS"]["c69_sequen"]  : $this->c69_sequen);
+      $this->c69_anousu  = ($this->c69_anousu  ==  "" ? @$GLOBALS["HTTP_POST_VARS"]["c69_anousu"]  : $this->c69_anousu);
+      $this->c69_codlan  = ($this->c69_codlan  ==  "" ? @$GLOBALS["HTTP_POST_VARS"]["c69_codlan"]  : $this->c69_codlan);
+      $this->c69_codhist = ($this->c69_codhist ==  "" ? @$GLOBALS["HTTP_POST_VARS"]["c69_codhist"] : $this->c69_codhist);
+      $this->c69_credito = ($this->c69_credito ==  "" ? @$GLOBALS["HTTP_POST_VARS"]["c69_credito"] : $this->c69_credito);
+      $this->c69_debito  = ($this->c69_debito  ==  "" ? @$GLOBALS["HTTP_POST_VARS"]["c69_debito"]  : $this->c69_debito);
+      $this->c69_valor   = ($this->c69_valor   === "" ? @$GLOBALS["HTTP_POST_VARS"]["c69_valor"]   : $this->c69_valor);
+
+      if($this->c69_data == ""){
+        $this->c69_data_dia = ($this->c69_data_dia == ""?@$GLOBALS["HTTP_POST_VARS"]["c69_data_dia"]:$this->c69_data_dia);
+        $this->c69_data_mes = ($this->c69_data_mes == ""?@$GLOBALS["HTTP_POST_VARS"]["c69_data_mes"]:$this->c69_data_mes);
+        $this->c69_data_ano = ($this->c69_data_ano == ""?@$GLOBALS["HTTP_POST_VARS"]["c69_data_ano"]:$this->c69_data_ano);
+        if($this->c69_data_dia != ""){
+          $this->c69_data = $this->c69_data_ano."-".$this->c69_data_mes."-".$this->c69_data_dia;
+        }
+      }
+
      }else{
        $this->c69_sequen = ($this->c69_sequen == ""?@$GLOBALS["HTTP_POST_VARS"]["c69_sequen"]:$this->c69_sequen);
      }
    }
    // funcao para inclusao
    function incluir ($c69_sequen){
-      $this->atualizacampos();
+      $this->atualizacampos(null);
      if($this->c69_anousu == null ){
        $this->erro_sql = " Campo Exercício nao Informado.";
        $this->erro_campo = "c69_anousu";
@@ -149,15 +151,15 @@ class cl_conlancamval {
        $this->erro_status = "0";
        return false;
      }
-     if($this->c69_valor == null ){
-       $this->erro_sql = " Campo Valor nao Informado.";
-       $this->erro_campo = "c69_valor";
-       $this->erro_banco = "";
-       $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-       $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
-       $this->erro_status = "0";
-       return false;
-     }
+     if($this->c69_valor === null){
+      $this->erro_sql = " Campo Valor nao Informado.";
+      $this->erro_campo = "c69_valor";
+      $this->erro_banco = "";
+      $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+      $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+      $this->erro_status = "0";
+      return false;
+    }
      if($this->c69_data == null ){
        $this->erro_sql = " Campo Data Lanc nao Informado.";
        $this->erro_campo = "c69_data_dia";
@@ -350,15 +352,15 @@ class cl_conlancamval {
      if(trim($this->c69_valor)!="" || isset($GLOBALS["HTTP_POST_VARS"]["c69_valor"])){
        $sql  .= $virgula." c69_valor = $this->c69_valor ";
        $virgula = ",";
-       if(trim($this->c69_valor) == null ){
-         $this->erro_sql = " Campo Valor nao Informado.";
-         $this->erro_campo = "c69_valor";
-         $this->erro_banco = "";
-         $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-         $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
-         $this->erro_status = "0";
-         return false;
-       }
+       if(trim($this->c69_valor) === null ){
+        $this->erro_sql = " Campo Valor nao Informado.";
+        $this->erro_campo = "c69_valor";
+        $this->erro_banco = "";
+        $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+        $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+        $this->erro_status = "0";
+        return false;
+      }
      }
      if(trim($this->c69_data)!="" || isset($GLOBALS["HTTP_POST_VARS"]["c69_data_dia"]) &&  ($GLOBALS["HTTP_POST_VARS"]["c69_data_dia"] !="") ){
        $sql  .= $virgula." c69_data = '$this->c69_data' ";

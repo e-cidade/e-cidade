@@ -9,8 +9,6 @@ class MaterCatMat extends LegacyModel
 {
     use LegacyAccount;
 
-    public $timestamps = false;
-
     protected $table = 'farmacia.far_matercatmat';
 
     protected $primaryKey = 'faxx_i_codigo';

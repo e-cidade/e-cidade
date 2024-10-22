@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class UpdateRub9000 extends AbstractMigration
+class UpdateRub9000 extends PostgresMigration
 {
 
     public function up()
@@ -21,7 +21,7 @@ class UpdateRub9000 extends AbstractMigration
             rh27_codincidfgts = 3003851,
             rh27_codincidregime = 4000561,
             rh27_tetoremun = 't'
-        WHERE rh27_rubric = '9000';        
+        WHERE rh27_rubric = '9000';
 
         UPDATE rhrubricas
         SET rh27_codincidprev = 3003782,

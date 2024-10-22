@@ -90,6 +90,8 @@ $aBimestres = array(
                         <label for="despesa">Despesa</label><br>
                         <input type="checkbox" value="receita" id="receita" />
                         <label for="receita">Receita</label><br>
+                        <input type="checkbox" value="infocomplementares" id="infocomplementares" />
+                        <label for="infocomplementares">Informações Complementares</label><br>
                     </td>
                     <td style="border: 2px groove white;" valign="top">
                     </td>

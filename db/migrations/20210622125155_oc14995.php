@@ -1,11 +1,11 @@
-<?php 
+<?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc14995 extends AbstractMigration 
-{ 
-    PUBLIC FUNCTION up() 
-    { 
+class Oc14995 extends PostgresMigration
+{
+    PUBLIC FUNCTION up()
+    {
         $sql = <<<SQL
 
     BEGIN;

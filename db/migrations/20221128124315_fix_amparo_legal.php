@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class FixAmparoLegal extends AbstractMigration
+class FixAmparoLegal extends PostgresMigration
 {
 
     public function up()

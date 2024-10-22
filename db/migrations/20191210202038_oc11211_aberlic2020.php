@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc11211Aberlic2020 extends AbstractMigration
+class Oc11211Aberlic2020 extends PostgresMigration
 {
     public function up()
     {
@@ -15,7 +15,7 @@ class Oc11211Aberlic2020 extends AbstractMigration
             DROP TABLE aberlic122020;
             DROP TABLE aberlic112020;
             DROP TABLE aberlic102020;
-            
+
             CREATE TABLE aberlic102020 (
                 si46_sequencial bigint DEFAULT 0 NOT NULL,
                 si46_tiporegistro bigint DEFAULT 0 NOT NULL,
@@ -69,7 +69,7 @@ class Oc11211Aberlic2020 extends AbstractMigration
 
             ALTER TABLE aberlic102020_si46_sequencial_seq OWNER TO dbportal;
             ALTER TABLE ONLY aberlic102020 ADD CONSTRAINT aberlic102020_sequ_pk PRIMARY KEY (si46_sequencial);
-            
+
             CREATE TABLE aberlic112020 (
                 si47_sequencial bigint DEFAULT 0 NOT NULL,
                 si47_tiporegistro bigint DEFAULT 0 NOT NULL,
@@ -236,7 +236,7 @@ class Oc11211Aberlic2020 extends AbstractMigration
                 NO MINVALUE
                 NO MAXVALUE
                 CACHE 1;
-            
+
             ALTER TABLE aberlic162020_si52_sequencial_seq OWNER TO dbportal;
 
             ALTER TABLE ONLY aberlic112020

@@ -100,6 +100,7 @@ class cl_db_config {
    var $db21_tipopoder = 0;
    var $db21_codtj = 0;
    var $db21_habitantes = 0;
+   var $db21_apirfb = 0;
    var $orderdepart = 0;
    // cria propriedade com as variaveis do arquivo
    var $campos = "
@@ -239,6 +240,7 @@ class cl_db_config {
        $this->db21_imgmarcadagua = ($this->db21_imgmarcadagua == ""?@$GLOBALS["HTTP_POST_VARS"]["db21_imgmarcadagua"]:$this->db21_imgmarcadagua);
        $this->db21_esfera = ($this->db21_esfera == ""?@$GLOBALS["HTTP_POST_VARS"]["db21_esfera"]:$this->db21_esfera);
        $this->db21_tipopoder = ($this->db21_tipopoder == ""?@$GLOBALS["HTTP_POST_VARS"]["db21_tipopoder"]:$this->db21_tipopoder);
+       $this->db21_apirfb = ($this->db21_apirfb == ""?@$GLOBALS["HTTP_POST_VARS"]["db21_apirfb"]:$this->db21_apirfb);
        $this->db21_codtj = ($this->db21_codtj == ""?@$GLOBALS["HTTP_POST_VARS"]["db21_codtj"]:$this->db21_codtj);
        $this->db21_habitantes = ($this->db21_habitantes == ""?@$GLOBALS["HTTP_POST_VARS"]["db21_habitantes"]:$this->db21_habitantes);
      }else{
@@ -563,6 +565,9 @@ class cl_db_config {
      if($this->db21_tipopoder == null ){
        $this->db21_tipopoder = "0";
      }
+     if($this->db21_apirfb == null ){
+       $this->db21_apirfb = "0";
+     }
      if($this->db21_codtj == null ){
        $this->erro_sql = " Campo Código do município na TJ nao Informado.";
        $this->erro_campo = "db21_codtj";
@@ -661,6 +666,7 @@ class cl_db_config {
                                       ,db21_imgmarcadagua
                                       ,db21_esfera
                                       ,db21_tipopoder
+                                      ,db21_apirfb
                                       ,db21_codtj
                                       ,db21_habitantes
                        )
@@ -712,6 +718,7 @@ class cl_db_config {
                                ,$this->db21_imgmarcadagua
                                ,$this->db21_esfera
                                ,$this->db21_tipopoder
+                               ,$this->db21_apirfb
                                ,$this->db21_codtj
                                ,$this->db21_habitantes
                       )";
@@ -1330,6 +1337,13 @@ class cl_db_config {
            $this->db21_tipopoder = "0" ;
         }
        $sql  .= $virgula." db21_tipopoder = $this->db21_tipopoder ";
+       $virgula = ",";
+     }
+     if(trim($this->db21_apirfb)!="" || isset($GLOBALS["HTTP_POST_VARS"]["db21_apirfb"])){
+        if(trim($this->db21_apirfb)=="" && isset($GLOBALS["HTTP_POST_VARS"]["db21_apirfb"])){
+           $this->db21_apirfb = "0" ;
+        }
+       $sql  .= $virgula." db21_apirfb = $this->db21_apirfb ";
        $virgula = ",";
      }
      if(trim($this->db21_codtj)!="" || isset($GLOBALS["HTTP_POST_VARS"]["db21_codtj"])){

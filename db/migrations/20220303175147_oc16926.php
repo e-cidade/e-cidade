@@ -1,13 +1,13 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc16926 extends AbstractMigration
+class Oc16926 extends PostgresMigration
 {
 
     public function up()
     {
-        $sql = " 
+        $sql = "
         {$this->getDropViews()}
 
         ALTER TABLE rhfuncao ALTER COLUMN rh37_descr TYPE varchar(100);
@@ -18,9 +18,9 @@ class Oc16926 extends AbstractMigration
         $this->execute($sql);
     }
 
-    public function down() 
+    public function down()
     {
-        $sql = " 
+        $sql = "
         {$this->getDropViews()}
 
         ALTER TABLE rhfuncao ALTER COLUMN rh37_descr TYPE varchar(30);
@@ -42,26 +42,26 @@ class Oc16926 extends AbstractMigration
 
     private function getCreateViews()
     {
-        return "CREATE OR REPLACE VIEW averbacoes AS 
-         SELECT protprocesso.p58_codproc, protprocesso.p58_dtproc, averbacao.j75_codigo, 
-    averbacao.j75_matric, averbacao.j75_data, averbacao.j75_obs, 
-    averbacao.j75_tipo, averbacao.j75_dttipo, averbacao.j75_situacao, 
-    averbacao.j75_regra, proprietario.j40_refant, setorloc.j05_codigoproprio, 
-    loteloc.j06_setorloc, loteloc.j06_quadraloc, loteloc.j06_lote, 
-    loteam.j34_descr, proprietario.codpri, proprietario.nomepri, 
-    proprietario.z01_cgccpf, proprietario.tipopri, proprietario.j39_numero, 
-    proprietario.j39_compl, proprietario.j34_area, proprietario.j34_setor, 
-    proprietario.j34_quadra, proprietario.j34_lote, proprietario.j01_baixa, 
-    iptuconstr.j39_area, 
+        return "CREATE OR REPLACE VIEW averbacoes AS
+         SELECT protprocesso.p58_codproc, protprocesso.p58_dtproc, averbacao.j75_codigo,
+    averbacao.j75_matric, averbacao.j75_data, averbacao.j75_obs,
+    averbacao.j75_tipo, averbacao.j75_dttipo, averbacao.j75_situacao,
+    averbacao.j75_regra, proprietario.j40_refant, setorloc.j05_codigoproprio,
+    loteloc.j06_setorloc, loteloc.j06_quadraloc, loteloc.j06_lote,
+    loteam.j34_descr, proprietario.codpri, proprietario.nomepri,
+    proprietario.z01_cgccpf, proprietario.tipopri, proprietario.j39_numero,
+    proprietario.j39_compl, proprietario.j34_area, proprietario.j34_setor,
+    proprietario.j34_quadra, proprietario.j34_lote, proprietario.j01_baixa,
+    iptuconstr.j39_area,
     ( SELECT array_to_string(array_accum((cgm.z01_numcgm || ' - '::text) || cgm.z01_nome::text), ','::text) AS array_to_string
            FROM cgm
       JOIN averbacgm ON cgm.z01_numcgm = averbacgm.j76_numcgm
-     WHERE averbacao.j75_codigo = averbacgm.j76_averbacao) AS z01_nomeadq, 
+     WHERE averbacao.j75_codigo = averbacgm.j76_averbacao) AS z01_nomeadq,
     ( SELECT array_to_string(array_accum((cgm.z01_numcgm || ' - '::text) || cgm.z01_nome::text), ','::text) AS array_to_string
            FROM cgm
       JOIN averbacgmold ON cgm.z01_numcgm = averbacgmold.j79_numcgm
-     WHERE averbacao.j75_codigo = averbacgmold.j79_averbacao) AS z01_nometrans, 
-    db_usuarios.login, db_usuarios.nome, rhpessoal.rh01_regist, 
+     WHERE averbacao.j75_codigo = averbacgmold.j79_averbacao) AS z01_nometrans,
+    db_usuarios.login, db_usuarios.nome, rhpessoal.rh01_regist,
     rhfuncao.rh37_descr
    FROM averbacao
    LEFT JOIN averbaprocesso ON averbacao.j75_codigo = averbaprocesso.j77_averbacao
@@ -82,40 +82,40 @@ class Oc16926 extends AbstractMigration
   WHERE db_usuarios.usuarioativo::text = 1::text AND db_usuarios.usuext = 0 AND rhpessoalmov.rh02_instit::text = fc_getsession('db_instit'::text) AND rhpesrescisao.rh05_recis IS NULL;
 
 
-        CREATE VIEW cadastro_pessoal_2008 AS 
-        SELECT rhpessoalmov.rh02_instit, rhpessoalmov.rh02_anousu, 
-    rhpessoalmov.rh02_mesusu, rhpessoalmov.rh02_regist, 
-    rhpessoalmov.rh02_portadormolestia, rhpessoalmov.rh02_deficientefisico, 
-    rhpessoal.rh01_regist, rhpessoalmov.rh02_hrssem, rhpessoalmov.rh02_hrsmen, 
-    padroes.r02_anousu, padroes.r02_mesusu, padroes.r02_regime, 
-    padroes.r02_codigo, padroes.r02_descr, padroes.r02_valor, 
-    padroes.r02_hrssem, padroes.r02_hrsmen, padroes.r02_tipo, padroes.r02_form, 
-    padroes.r02_minimo, padroes.r02_instit, cgm.z01_nome, rhpessoal.rh01_admiss, 
-    rhpesrescisao.rh05_recis, rhpessoal.rh01_sexo, rhpessoal.rh01_nasc, 
-    rhpessoalmov.rh02_tbprev, rhlota.r70_estrut, rhlota.r70_descr, 
-    rhpessoal.rh01_funcao, btrim(rhfuncao.rh37_descr::text) AS rh37_descr, 
-    rhinstrucao.rh21_descr, rhestcivil.rh08_descr, rhipe.rh14_matipe, 
-    rhpesdoc.rh16_titele, rhpesdoc.rh16_zonael, rhpesdoc.rh16_secaoe, 
-    rhpesdoc.rh16_reserv, rhpesdoc.rh16_catres, rhpesdoc.rh16_ctps_n, 
-    rhpesdoc.rh16_ctps_s, rhpesdoc.rh16_ctps_d, rhpesdoc.rh16_ctps_uf, 
-    rhpesdoc.rh16_pis, cgm.z01_cgccpf, cgm.z01_ident, cgm.z01_telef, 
-    cgm.z01_ender, cgm.z01_compl, cgm.z01_numero, cgm.z01_munic, cgm.z01_bairro, 
-    cgm.z01_cep, cgm.z01_numcgm, rhpesdoc.rh16_carth_n, rhpesdoc.r16_carth_cat, 
-    rhpesdoc.rh16_carth_val, rhpespadrao.rh03_padrao, rhregime.rh30_descr, 
-    rhregime.rh30_regime, rhregime.rh30_vinculo, rhpesbanco.rh44_codban, 
-    rhpesbanco.rh44_agencia, rhpesbanco.rh44_dvagencia, rhpesbanco.rh44_conta, 
-    rhpesbanco.rh44_dvconta, rhlocaltrab.rh55_estrut, rhlocaltrab.rh55_descr, 
-    rhpessoal.rh01_trienio, rhpessoal.rh01_progres, rhraca.rh18_descr, 
-    f.rh37_descr AS h07_cant, admissao.h07_regist, admissao.h07_tipadm, 
-    admissao.h07_dato, admissao.h07_dhist, admissao.h07_ddem, admissao.h07_icon, 
-    admissao.h07_ires, admissao.h07_class, admissao.h07_refe, admissao.h07_area, 
-    admissao.h07_nrato, admissao.h07_nrfich, admissao.h07_impofi, 
-    admissao.h07_dpubl, admissao.h07_fundam, admissao.h07_defet, 
-    admissao.h07_tempor, admissao.h07_termin, admissao.h07_justif, 
-    flegal.h04_descr, areas.h05_descr, concur.h06_refer, concur.h06_eaber, 
-    concur.h06_daber, concur.h06_ehomo, concur.h06_dhomo, concur.h06_concur, 
-    concur.h06_dvalid, concur.h06_dprorr, concur.h06_dpubl, concur.h06_nrproc, 
-    ( SELECT 
+        CREATE VIEW cadastro_pessoal_2008 AS
+        SELECT rhpessoalmov.rh02_instit, rhpessoalmov.rh02_anousu,
+    rhpessoalmov.rh02_mesusu, rhpessoalmov.rh02_regist,
+    rhpessoalmov.rh02_portadormolestia, rhpessoalmov.rh02_deficientefisico,
+    rhpessoal.rh01_regist, rhpessoalmov.rh02_hrssem, rhpessoalmov.rh02_hrsmen,
+    padroes.r02_anousu, padroes.r02_mesusu, padroes.r02_regime,
+    padroes.r02_codigo, padroes.r02_descr, padroes.r02_valor,
+    padroes.r02_hrssem, padroes.r02_hrsmen, padroes.r02_tipo, padroes.r02_form,
+    padroes.r02_minimo, padroes.r02_instit, cgm.z01_nome, rhpessoal.rh01_admiss,
+    rhpesrescisao.rh05_recis, rhpessoal.rh01_sexo, rhpessoal.rh01_nasc,
+    rhpessoalmov.rh02_tbprev, rhlota.r70_estrut, rhlota.r70_descr,
+    rhpessoal.rh01_funcao, btrim(rhfuncao.rh37_descr::text) AS rh37_descr,
+    rhinstrucao.rh21_descr, rhestcivil.rh08_descr, rhipe.rh14_matipe,
+    rhpesdoc.rh16_titele, rhpesdoc.rh16_zonael, rhpesdoc.rh16_secaoe,
+    rhpesdoc.rh16_reserv, rhpesdoc.rh16_catres, rhpesdoc.rh16_ctps_n,
+    rhpesdoc.rh16_ctps_s, rhpesdoc.rh16_ctps_d, rhpesdoc.rh16_ctps_uf,
+    rhpesdoc.rh16_pis, cgm.z01_cgccpf, cgm.z01_ident, cgm.z01_telef,
+    cgm.z01_ender, cgm.z01_compl, cgm.z01_numero, cgm.z01_munic, cgm.z01_bairro,
+    cgm.z01_cep, cgm.z01_numcgm, rhpesdoc.rh16_carth_n, rhpesdoc.r16_carth_cat,
+    rhpesdoc.rh16_carth_val, rhpespadrao.rh03_padrao, rhregime.rh30_descr,
+    rhregime.rh30_regime, rhregime.rh30_vinculo, rhpesbanco.rh44_codban,
+    rhpesbanco.rh44_agencia, rhpesbanco.rh44_dvagencia, rhpesbanco.rh44_conta,
+    rhpesbanco.rh44_dvconta, rhlocaltrab.rh55_estrut, rhlocaltrab.rh55_descr,
+    rhpessoal.rh01_trienio, rhpessoal.rh01_progres, rhraca.rh18_descr,
+    f.rh37_descr AS h07_cant, admissao.h07_regist, admissao.h07_tipadm,
+    admissao.h07_dato, admissao.h07_dhist, admissao.h07_ddem, admissao.h07_icon,
+    admissao.h07_ires, admissao.h07_class, admissao.h07_refe, admissao.h07_area,
+    admissao.h07_nrato, admissao.h07_nrfich, admissao.h07_impofi,
+    admissao.h07_dpubl, admissao.h07_fundam, admissao.h07_defet,
+    admissao.h07_tempor, admissao.h07_termin, admissao.h07_justif,
+    flegal.h04_descr, areas.h05_descr, concur.h06_refer, concur.h06_eaber,
+    concur.h06_daber, concur.h06_ehomo, concur.h06_dhomo, concur.h06_concur,
+    concur.h06_dvalid, concur.h06_dprorr, concur.h06_dpubl, concur.h06_nrproc,
+    ( SELECT
                 CASE
                     WHEN rhpessoalmov.rh02_tbprev = 0 THEN 'SEM PREVIDENCIA'::bpchar
                     ELSE inssirf.r33_nome
@@ -149,40 +149,40 @@ class Oc16926 extends AbstractMigration
   ORDER BY cgm.z01_nome;
 
         CREATE VIEW cadastro_portaria AS
-   SELECT rhpessoal.rh01_regist, cgm.z01_nome, portaria.h31_dtportaria, 
-    portaria.h31_numero, portaria.h31_anousu, portaria.h31_dtlanc, 
-    rhpessoal.rh01_numcgm, cgm.z01_ident, cgm.z01_ender, cgm.z01_numero, 
-    cgm.z01_compl, cgm.z01_bairro, cgm.z01_cep, cgm.z01_munic, 
-    rhpessoal.rh01_admiss, 
+   SELECT rhpessoal.rh01_regist, cgm.z01_nome, portaria.h31_dtportaria,
+    portaria.h31_numero, portaria.h31_anousu, portaria.h31_dtlanc,
+    rhpessoal.rh01_numcgm, cgm.z01_ident, cgm.z01_ender, cgm.z01_numero,
+    cgm.z01_compl, cgm.z01_bairro, cgm.z01_cep, cgm.z01_munic,
+    rhpessoal.rh01_admiss,
         CASE rhregime.rh30_regime
             WHEN 1 THEN 'ESTATUTARIO'::text
             WHEN 2 THEN 'CLT'::text
             WHEN 3 THEN 'EXTRA QUADRO'::text
             ELSE NULL::text
-        END AS rh30_regime, 
-    rhfuncao.rh37_descr, rhlocaltrab.rh55_descr, padroes.r02_descr, 
+        END AS rh30_regime,
+    rhfuncao.rh37_descr, rhlocaltrab.rh55_descr, padroes.r02_descr,
         CASE
             WHEN substr(padroes.r02_descr::text, 1, 1) = 'P'::text THEN ''::text
             ELSE btrim(substr(padroes.r02_descr::text, 3, 2))
-        END AS r02_nivel, 
+        END AS r02_nivel,
         CASE
             WHEN substr(padroes.r02_descr::text, 1, 1) <> 'P'::text THEN ''::text
             ELSE btrim(split_part(padroes.r02_descr::text, '-'::text, 1))
-        END AS r02_padrao, 
+        END AS r02_padrao,
         CASE
             WHEN substr(padroes.r02_descr::text, 1, 1) <> 'P'::text THEN ''::text
             ELSE btrim(split_part(padroes.r02_descr::text, '-'::text, 2))
-        END AS r02_grau, 
+        END AS r02_grau,
         CASE
             WHEN substr(padroes.r02_descr::text, 1, 1) = 'P'::text THEN ''::text
             ELSE btrim(substr(padroes.r02_descr::text, 6, 1))
-        END AS r02_classe, 
-    tipoasse.h12_descr, btrim(portaria.h31_amparolegal) AS h31_amparolegal, 
-    assenta.h16_histor, assenta.h16_hist2, portariaproced.h40_descr, 
-    portariaenvolv.h42_descr, assenta.h16_dtconc, assenta.h16_quant, 
-    assenta.h16_dtterm, portaria.h31_portariatipo, f.rh37_descr AS h07_cant, 
-    rhpessoal.rh01_nasc, orcorgao.o40_descr, portaria.h31_dtinicio, 
-    portariaassinatura.rh136_nome, portariaassinatura.rh136_cargo, 
+        END AS r02_classe,
+    tipoasse.h12_descr, btrim(portaria.h31_amparolegal) AS h31_amparolegal,
+    assenta.h16_histor, assenta.h16_hist2, portariaproced.h40_descr,
+    portariaenvolv.h42_descr, assenta.h16_dtconc, assenta.h16_quant,
+    assenta.h16_dtterm, portaria.h31_portariatipo, f.rh37_descr AS h07_cant,
+    rhpessoal.rh01_nasc, orcorgao.o40_descr, portaria.h31_dtinicio,
+    portariaassinatura.rh136_nome, portariaassinatura.rh136_cargo,
     portariaassinatura.rh136_amparo
    FROM portaria
    JOIN portariaassenta ON portaria.h31_sequencial = portariaassenta.h33_portaria
@@ -210,25 +210,25 @@ class Oc16926 extends AbstractMigration
    LEFT JOIN areas ON areas.h05_codigo = admissao.h07_area
    LEFT JOIN portariaassinatura ON portaria.h31_portariaassinatura = portariaassinatura.rh136_sequencial;
 
-        CREATE VIEW venal AS 
+        CREATE VIEW venal AS
          SELECT COALESCE(( SELECT sum(iptucale.j22_valor) AS sum
            FROM iptucale
-          WHERE iptucale.j22_anousu = iptucalc.j23_anousu AND iptucale.j22_matric = iptucalc.j23_matric), 0::double precision) AS j22_valor, 
+          WHERE iptucale.j22_anousu = iptucalc.j23_anousu AND iptucale.j22_matric = iptucalc.j23_matric), 0::double precision) AS j22_valor,
     'R$ '::text || translate(to_char(iptucalc.j23_vlrter + COALESCE(( SELECT sum(iptucale.j22_valor) AS sum
            FROM iptucale
-          WHERE iptucale.j22_anousu = iptucalc.j23_anousu AND iptucale.j22_matric = iptucalc.j23_matric), 0::double precision), '999,999,999,990.99'::text), ',.'::text, '.,'::text) AS j23_venaltotal, 
-    proprietario.j40_refant, loteloc.j06_setorloc, loteloc.j06_quadraloc, 
-    loteloc.j06_lote, loteam.j34_descr, proprietario.j01_matric, 
-    proprietario.codpri, proprietario.nomepri, proprietario.z01_cgccpf, 
-    proprietario.tipopri, proprietario.j39_numero, proprietario.j39_compl, 
-    proprietario.j34_area, iptucalc.j23_anousu, iptucalc.j23_matric, 
-    iptucalc.j23_testad, iptucalc.j23_arealo, iptucalc.j23_areafr, 
-    iptucalc.j23_areaed, iptucalc.j23_m2terr, iptucalc.j23_vlrter, 
-    iptucalc.j23_aliq, iptucalc.j23_vlrisen, iptucalc.j23_tipoim, 
-    iptucalc.j23_manual, iptucalc.j23_tipocalculo, 
-    to_date(fc_getsession('db_datausu'::text), 'YYYY-MM-DD'::text) AS data_sessao, 
-    fc_dataextenso(to_date(fc_getsession('db_datausu'::text), 'YYYY-MM-DD'::text)) AS data_sessao_extenso, 
-    db_usuarios.login, db_usuarios.nome, rhpessoal.rh01_regist, 
+          WHERE iptucale.j22_anousu = iptucalc.j23_anousu AND iptucale.j22_matric = iptucalc.j23_matric), 0::double precision), '999,999,999,990.99'::text), ',.'::text, '.,'::text) AS j23_venaltotal,
+    proprietario.j40_refant, loteloc.j06_setorloc, loteloc.j06_quadraloc,
+    loteloc.j06_lote, loteam.j34_descr, proprietario.j01_matric,
+    proprietario.codpri, proprietario.nomepri, proprietario.z01_cgccpf,
+    proprietario.tipopri, proprietario.j39_numero, proprietario.j39_compl,
+    proprietario.j34_area, iptucalc.j23_anousu, iptucalc.j23_matric,
+    iptucalc.j23_testad, iptucalc.j23_arealo, iptucalc.j23_areafr,
+    iptucalc.j23_areaed, iptucalc.j23_m2terr, iptucalc.j23_vlrter,
+    iptucalc.j23_aliq, iptucalc.j23_vlrisen, iptucalc.j23_tipoim,
+    iptucalc.j23_manual, iptucalc.j23_tipocalculo,
+    to_date(fc_getsession('db_datausu'::text), 'YYYY-MM-DD'::text) AS data_sessao,
+    fc_dataextenso(to_date(fc_getsession('db_datausu'::text), 'YYYY-MM-DD'::text)) AS data_sessao_extenso,
+    db_usuarios.login, db_usuarios.nome, rhpessoal.rh01_regist,
     rhfuncao.rh37_descr
    FROM iptucalc
    JOIN proprietario ON iptucalc.j23_matric = proprietario.j01_matric

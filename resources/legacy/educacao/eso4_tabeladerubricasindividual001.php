@@ -96,7 +96,7 @@ $mesfolha = DBPessoal::getMesFolha();
                     </td>
                 </tr>
                 <tr>
-                    <td align="left"><label>Início de Validade:</label></td>
+                    <td align="left"><label>Competência:</label></td>
                     <td>
                       <?php
                       db_input('anofolha', 4, 1, true, 'text', 2, "class='field-size1'");

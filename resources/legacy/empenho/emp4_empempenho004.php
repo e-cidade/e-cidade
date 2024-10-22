@@ -25,6 +25,8 @@
  *                                licenca/licenca_pt.txt
  */
 
+use Illuminate\Database\Capsule\Manager as DB;
+
 require_once (modification("libs/db_stdlib.php"));
 require_once (modification("libs/db_utils.php"));
 require_once (modification("std/db_stdClass.php"));
@@ -66,6 +68,7 @@ $clpagordemele  = new cl_pagordemele;
 $clpagordemnota = new cl_pagordemnota;
 $clempnota = new cl_empnota;
 $clempnotaele = new cl_empnotaele;
+$clcgm = new cl_cgm;
 
 $lAutorizacaoAcordo    = false;
 
@@ -145,6 +148,7 @@ $clemptipo	      = new cl_emptipo;
 $clempautitem	  	= new cl_empautitem;
 $clempautidot	  	= new cl_empautidot;
 $clempparametro	  = new cl_empparametro;
+$clorcunidade  = new cl_orcunidade;
 $clcflicita	      = new cl_cflicita;
 $clempparamnum	  = new cl_empparamnum;
 $clconcarpeculiar = new cl_concarpeculiar;
@@ -275,7 +279,67 @@ if (!empty($iElemento)) {
 
 $dtDataUsu = $dDataMovimento == null ? date("Y-m-d", db_getsession('DB_datausu')) : $dDataMovimento;
 if(isset($incluir)) {
-    // Data do sistema
+
+    $buscarOrdenadores = db_utils::fieldsMemory($clempparametro->sql_record($clempparametro->sql_query(db_getsession("DB_anousu"), "e30_buscarordenadores", null, "")), 0)->e30_buscarordenadores;
+    $ordenador = 0;
+    if ($buscarOrdenadores == 2 ) {
+    
+        $aAssinante =  getAssinantesCgm($chavepesquisa, $o41_cgmordenador);
+
+        foreach ($aAssinante as $assinante) {
+            $db243_data_inicio = $assinante->db243_data_inicio;
+            $db243_data_final  = $assinante->db243_data_final;  
+        }
+
+        $dataemiss           = explode('/', $e60_emiss);
+        $dataemissformatada  = date('Y-m-d\TH:i:s\Z', strtotime($dataemiss[2] . '-' . $dataemiss[1] . '-' . $dataemiss[0]));
+        $datainicioformatada = date('Y-m-d\TH:i:s\Z', strtotime($db243_data_inicio));
+        $datafimformatada    = date('Y-m-d\TH:i:s\Z', strtotime($db243_data_final));
+
+        $datafinal = explode('-', $db243_data_final);
+        $datafinal = $datafinal[2] . '/' . $datafinal[1] . '/' . $datafinal[0];
+
+        $datainicial = explode('-', $db243_data_inicio);
+        $datainicial = $datainicial[2] . '/' . $datainicial[1] . '/' . $datainicial[0];
+        
+        if (substr($dataemissformatada, 0, 10) < substr($datainicioformatada, 0, 10) || substr($dataemissformatada, 0, 10) > substr($datafimformatada, 0, 10)) {
+            if (substr($dataemissformatada, 0, 10) < substr($datainicioformatada, 0, 10)) {
+                $erro_msg = ("O ordenador selecionado está fora da data do empenho, data início: ".$datainicial);
+            }
+            if (substr($dataemissformatada, 0, 10) > substr($datafimformatada, 0, 10)) {
+                $erro_msg = ("O ordenador selecionado está fora da data do empenho, data fim: ".$datafinal);
+            }
+            $sqlerro = true;
+            $ordenador = 1;
+            
+            $aAssinantes = getAssinantes($chavepesquisa);
+            $rowCount = count($aAssinantes);  
+            $ordenadoresArray = array(); 
+            $uniqueKeys = array(); 
+            foreach ($aAssinantes as $assinante) {
+                $uniqueKey = $assinante->nome . '|' . $assinante->z01_numcgm;
+    
+                if ($rowCount > 1) {
+                    if (!in_array($uniqueKey, $uniqueKeys)) {
+                        $ordenadoresArray[] = [
+                            'nome' => $assinante->nome,
+                            'z01_numcgm' => $assinante->z01_numcgm,
+                            'db243_data_inicio' => $assinante->db243_data_inicio,
+                            'db243_data_final'  => $assinante->db243_data_final,
+                        ];
+                        $uniqueKeys[] = $uniqueKey;
+                    }
+                } else {
+                    
+                    $o41_cgmordenador = $assinante->z01_numcgm;
+                    $o41_nomeordenador = $assinante->nome;
+                    $db243_data_inicio = $assinante->db243_data_inicio;
+                    $db243_data_final  = $assinante->db243_data_final;
+                }
+            }
+        }
+    } 
+    if($ordenador == 0) {
 
     $anoUsu = db_getsession("DB_anousu");
     $sWhere = "e56_autori = " . $e54_autori . " and e56_anousu = " . $anoUsu;
@@ -625,6 +689,7 @@ if(isset($incluir)) {
             $clempempenho->e60_anousu = $e56_anousu;
             $clempempenho->e60_coddot = $e56_coddot;
             $clempempenho->e60_numcgm = $e54_numcgm;
+            $clempempenho->e60_numcgmordenador = $o41_cgmordenador;
             $clempempenho->e60_emiss  = $dDataMovimento;
             $clempempenho->e60_vencim = $dDataMovimento;
             /*OC4401*/
@@ -656,6 +721,7 @@ if(isset($incluir)) {
             $clempempenho->e60_datasentenca   = $e60_datasentenca;
             $clempempenho->e60_concarpeculiar = $e54_concarpeculiar;
             $clempempenho->e60_codco          = $e60_codco;
+            $clempempenho->e60_dividaconsolidada = $op01_numerocontratoopc;
 
             /**
              * Validação solicitada pela OC 6457
@@ -1334,11 +1400,64 @@ if(isset($incluir)) {
 //            }
 //        }
 //    }
+}
     $db_opcao = 1;
     $db_botao = true;
 }else if(isset($chavepesquisa)){
     $db_opcao = 1;
 
+    $buscarOrdenadores = db_utils::fieldsMemory($clempparametro->sql_record($clempparametro->sql_query(db_getsession("DB_anousu"), "e30_buscarordenadores", null, "")), 0)->e30_buscarordenadores;
+    
+    if ($buscarOrdenadores == 1 ) {
+        
+        $anoUsu = db_getsession("DB_anousu");
+        $sWhere = "e56_autori = " . $chavepesquisa . " and e56_anousu = " . $anoUsu;
+        $result = $clempautidot->sql_record($clempautidot->sql_query_dotacao(null, "*", null, $sWhere));
+        $numrows = $clempautidot->numrows;
+        if ($numrows > 0) {
+            db_fieldsmemory($result, 0);
+        }
+        
+        $whereUnidades = " o41_anousu = {$o58_anousu} and o41_instit = {$o58_instit} and o41_orgao = {$o58_orgao} and o41_unidade = {$o58_unidade} ";
+        $o41_cgmordenador =  db_utils::fieldsMemory($clorcunidade->sql_record($clorcunidade->sql_query(db_getsession("DB_anousu"),null,null, " o41_orddespesa ",null,$whereUnidades)), 0)->o41_orddespesa;
+        $result_cgmordespesa = db_query("SELECT z01_nome FROM cgm WHERE z01_numcgm = {$o41_cgmordenador}");
+        db_fieldsmemory($result_cgmordespesa, 0)->z01_nome;
+        $o41_nomeordenador = $z01_nome;
+
+        $aAssinantes = getAssinantes($chavepesquisa);        
+        foreach ($aAssinantes as $assinante) {
+            $db243_data_inicio = $assinante->db243_data_inicio;
+            $db243_data_final  = $assinante->db243_data_final;
+        }
+        
+    } else {
+
+        $aAssinantes = getAssinantes($chavepesquisa);
+        $rowCount = count($aAssinantes);  
+        $ordenadoresArray = array(); 
+        $uniqueKeys = array(); 
+        foreach ($aAssinantes as $assinante) {
+            $uniqueKey = $assinante->nome . '|' . $assinante->z01_numcgm;
+  
+            if ($rowCount > 1) {
+                if (!in_array($uniqueKey, $uniqueKeys)) {
+                    $ordenadoresArray[] = [
+                        'nome' => $assinante->nome,
+                        'z01_numcgm' => $assinante->z01_numcgm,
+                        'db243_data_inicio' => $assinante->db243_data_inicio,
+                        'db243_data_final'  => $assinante->db243_data_final,
+                    ];
+                    $uniqueKeys[] = $uniqueKey;
+                }
+            } else {
+                
+                $o41_cgmordenador = $assinante->z01_numcgm;
+                $o41_nomeordenador = $assinante->nome;
+                $db243_data_inicio = $assinante->db243_data_inicio;
+                $db243_data_final  = $assinante->db243_data_final;
+            }
+        }
+    }
     $result = $clempautoriza->sql_record($clempautoriza->sql_query($chavepesquisa));
     db_fieldsmemory($result,0);
 
@@ -1494,3 +1613,101 @@ echo "
 if($db_opcao==33){
     echo "<script>document.form1.pesquisar.click();</script>";
 }
+
+function getAssinantes($chavepesquisa) 
+{
+    $anoUsu = db_getsession("DB_anousu");
+    $results = DB::table('empenho.empautidot')
+                ->join('orcdotacao', function($join) {
+                    $join->on('orcdotacao.o58_anousu', '=', 'empautidot.e56_anousu')
+                         ->on('orcdotacao.o58_coddot', '=', 'empautidot.e56_coddot');
+                })
+                ->join('empautoriza', 'empautoriza.e54_autori', '=', 'empautidot.e56_autori')
+                ->join('orcelemento', function($join) {
+                    $join->on('orcelemento.o56_codele', '=', 'orcdotacao.o58_codele')
+                         ->on('orcelemento.o56_anousu', '=', 'orcdotacao.o58_anousu');
+                })
+                ->leftJoin('orctiporec', 'orctiporec.o15_codigo', '=', 'empautidot.e56_orctiporec')
+                ->select('*')
+                ->where('empenho.empautidot.e56_autori', '=', $chavepesquisa)
+                ->where('empenho.empautidot.e56_anousu', '=', $anoUsu)
+                ->get()
+                ->toArray();
+
+    if (!empty($results)) {
+        $autorizacao = $results[0];
+        $o58_instit  =  $autorizacao->o58_instit;
+        $o58_orgao   =  $autorizacao->o58_orgao;
+        $o58_unidade =  $autorizacao->o58_unidade;
+        $o58_anousu  =  $autorizacao->o58_anousu;
+    } else {
+        return []; 
+    }
+
+    $aAssinante = DB::table('configuracoes.assinatura_digital_assinante')
+                ->join('configuracoes.db_usuarios', 'configuracoes.assinatura_digital_assinante.db243_usuario', '=', 'configuracoes.db_usuarios.id_usuario')
+                ->join('configuracoes.db_usuacgm', 'configuracoes.db_usuacgm.id_usuario', '=', 'configuracoes.db_usuarios.id_usuario')
+                ->join('protocolo.cgm', 'protocolo.cgm.z01_numcgm', '=', 'configuracoes.db_usuacgm.cgmlogin')
+                ->where('configuracoes.assinatura_digital_assinante.db243_instit', '=', $o58_instit)
+                ->where('configuracoes.assinatura_digital_assinante.db243_orgao', '=', $o58_orgao)
+                ->where('configuracoes.assinatura_digital_assinante.db243_unidade', '=', $o58_unidade)
+                ->where('configuracoes.assinatura_digital_assinante.db243_anousu', '=', $o58_anousu)
+                ->where('configuracoes.assinatura_digital_assinante.db243_cargo', '=', 1)
+                ->where('configuracoes.assinatura_digital_assinante.db243_documento', '=', 0)
+                ->select('configuracoes.db_usuarios.login', 'configuracoes.db_usuarios.nome', 'configuracoes.db_usuarios.email', 'protocolo.cgm.z01_cgccpf' , 'configuracoes.assinatura_digital_assinante.db243_cargo', 'protocolo.cgm.z01_numcgm', 'configuracoes.assinatura_digital_assinante.db243_data_inicio', 'configuracoes.assinatura_digital_assinante.db243_data_final')
+                ->distinct('login', 'nome', 'z01_cgccpf', 'db243_cargo')
+                ->get()
+                ->toArray(); 
+
+    return $aAssinante;
+}
+
+function getAssinantesCgm($chavepesquisa, $o41_cgmordenador) 
+{
+    $anoUsu = db_getsession("DB_anousu");
+    $results = DB::table('empenho.empautidot')
+                ->join('orcdotacao', function($join) {
+                    $join->on('orcdotacao.o58_anousu', '=', 'empautidot.e56_anousu')
+                         ->on('orcdotacao.o58_coddot', '=', 'empautidot.e56_coddot');
+                })
+                ->join('empautoriza', 'empautoriza.e54_autori', '=', 'empautidot.e56_autori')
+                ->join('orcelemento', function($join) {
+                    $join->on('orcelemento.o56_codele', '=', 'orcdotacao.o58_codele')
+                         ->on('orcelemento.o56_anousu', '=', 'orcdotacao.o58_anousu');
+                })
+                ->leftJoin('orctiporec', 'orctiporec.o15_codigo', '=', 'empautidot.e56_orctiporec')
+                ->select('*')
+                ->where('empenho.empautidot.e56_autori', '=', $chavepesquisa)
+                ->where('empenho.empautidot.e56_anousu', '=', $anoUsu)
+                ->get()
+                ->toArray();
+
+    if (!empty($results)) {
+        $autorizacao = $results[0];
+        $o58_instit  =  $autorizacao->o58_instit;
+        $o58_orgao   =  $autorizacao->o58_orgao;
+        $o58_unidade =  $autorizacao->o58_unidade;
+        $o58_anousu  =  $autorizacao->o58_anousu;
+    } else {
+        return []; 
+    }
+
+    $aAssinante = DB::table('configuracoes.assinatura_digital_assinante')
+                ->join('configuracoes.db_usuarios', 'configuracoes.assinatura_digital_assinante.db243_usuario', '=', 'configuracoes.db_usuarios.id_usuario')
+                ->join('configuracoes.db_usuacgm', 'configuracoes.db_usuacgm.id_usuario', '=', 'configuracoes.db_usuarios.id_usuario')
+                ->join('protocolo.cgm', 'protocolo.cgm.z01_numcgm', '=', 'configuracoes.db_usuacgm.cgmlogin')
+                ->where('configuracoes.assinatura_digital_assinante.db243_instit', '=', $o58_instit)
+                ->where('configuracoes.assinatura_digital_assinante.db243_orgao', '=', $o58_orgao)
+                ->where('configuracoes.assinatura_digital_assinante.db243_unidade', '=', $o58_unidade)
+                ->where('configuracoes.assinatura_digital_assinante.db243_anousu', '=', $o58_anousu)
+                ->where('protocolo.cgm.z01_numcgm', '=', $o41_cgmordenador)
+                ->where('configuracoes.assinatura_digital_assinante.db243_cargo', '=', 1)
+                ->where('configuracoes.assinatura_digital_assinante.db243_documento', '=', 0)
+                ->select('configuracoes.db_usuarios.login', 'configuracoes.db_usuarios.nome', 'configuracoes.db_usuarios.email', 'protocolo.cgm.z01_cgccpf' , 'configuracoes.assinatura_digital_assinante.db243_cargo', 'protocolo.cgm.z01_numcgm', 'configuracoes.assinatura_digital_assinante.db243_data_inicio', 'configuracoes.assinatura_digital_assinante.db243_data_final')
+                ->distinct('login', 'nome', 'z01_cgccpf', 'db243_cargo')
+                ->get()
+                ->toArray(); 
+
+    return $aAssinante;
+}
+

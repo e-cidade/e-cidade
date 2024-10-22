@@ -111,7 +111,13 @@ if (isset($m97_sequencial)&&$m97_sequencial!=""){
     </td>
     <td> 
 	<?
-		$result_depusu = $cldb_depusu->sql_record($cldb_depusu->sql_query_almoxusu(null,null,"distinct m91_codigo as almoxarifado, db_depart.descrdepto", null, " db_depusu.id_usuario = " . db_getsession("DB_id_usuario")));
+
+    $queryWhere = " db_depusu.id_usuario = " . db_getsession("DB_id_usuario");
+    if (!empty($_SESSION['DB_instit'])) {
+      $queryWhere .= " and db_depart.instit = " . $_SESSION['DB_instit'];
+    }
+
+		$result_depusu = $cldb_depusu->sql_record($cldb_depusu->sql_query_almoxusu(null,null,"distinct m91_codigo as almoxarifado, db_depart.descrdepto", null, $queryWhere));
 		if ($cldb_depusu->numrows>0){
 			db_selectrecord('m97_db_almox',$result_depusu,true,($db_opcao == 1?1:3));
 		} else {

@@ -197,7 +197,7 @@ try {
     $oCompilacao = new compilacaoRegistroPreco($_POST['pc54_solicita']);
     $oCompilacao->setDataInicio($oDataInicio->getDate());
     $oCompilacao->setDataTermino($oDataFim->getDate());
-    $oCompilacao->save();
+    $oCompilacao->alterarvigenciaregistropreco();
 
     db_fim_transacao(false);
     db_redireciona();

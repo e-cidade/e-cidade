@@ -405,7 +405,12 @@ db_app::load("time.js");
                     showDadosPopup(dados);
                 }
         });
-
+        js_ajusteLayout();
+    }
+    function js_ajusteLayout()
+    {
+        $('col1').style.width = "30px";
+        $('oGridEventoSelectAll').style.width = "30px";
     }
     function showDadosPopup(dados) 
     {

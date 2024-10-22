@@ -1,9 +1,9 @@
 <?php
 
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Ardigital003 extends AbstractMigration
+class Ardigital003 extends PostgresMigration
 {
     public function up()
     {

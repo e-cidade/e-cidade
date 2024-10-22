@@ -1,14 +1,14 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc18387 extends AbstractMigration
+class Oc18387 extends PostgresMigration
 {
-    
+
     public function up()
     {
         /*$sql='BEGIN;
-        
+
         insert into db_documento values ((select max(db03_docum)+1 from db_documento),\'SOLICITACAO DE DISPO. FINANCEIRA1\',1,8);
 insert into db_paragrafo values ((select max(db02_idparag)+1 from db_paragrafo),\'PARTE1\',\'if($tipo==1){$pdf->x = 30;$pdf->cell(190,5,"De: Pregoeira/ Comissão permanente de Licitação",0,1,"L",0);$pdf->x = 30;$pdf->cell(190,5,"Para: Setor contábil",0,1,"L",0);}else if($tipo==2){echo "<div style=\'text-align: center;\'><strong>SOLICITAÇÃO DE PARECER DE DISPONIBILIDADE FINANCEIRA</strong></div><div><p>De: Pregoeira/ Comissão permanente de Licitação<br>Para: Setor contábil</p></div>";}\',0,0,1,1,1,\'J\',3,8);
 insert into db_docparag values ((select max(db03_docum) from db_documento),(select max(db02_idparag) from db_paragrafo),1);
@@ -25,8 +25,8 @@ insert into db_paragrafo values ((select max(db02_idparag)+1 from db_paragrafo),
 insert into db_docparag values ((select max(db03_docum) from db_documento),(select max(db02_idparag) from db_paragrafo),2);
 insert into db_paragrafo values ((select max(db02_idparag)+1 from db_paragrafo),\'PARTE3\',\'if($tipo==1){$pdf->cell(95,4,"________________________"                                ,0,0,"C",0);$pdf->cell(95,4,"________________________"                                ,0,1,"C",0);$pdf->cell(95,5,"Francyele"                                        ,0,0,"C",0);$pdf->cell(95,5,"Guilherme"                                      ,0,0,"C",0);}else if($tipo==2){echo "<tr>                <td style=\'text-align: center;\'>  _________________________________________                  <p>Serviço contábil</p></td>                <td style=\'text-align: center;\'>  _________________________________________                 <p>Serviço Financeiro</p></td>";}\',0,0,1,1,1,\'J\',3,8);
 insert into db_docparag values ((select max(db03_docum) from db_documento),(select max(db02_idparag) from db_paragrafo),3);
-        
-        
+
+
         COMMIT:';
 
         $this->execute($sql);*/

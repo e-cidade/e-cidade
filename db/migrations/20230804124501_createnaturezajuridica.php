@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Createnaturezajuridica extends AbstractMigration
+class Createnaturezajuridica extends PostgresMigration
 {
     public function up()
     {

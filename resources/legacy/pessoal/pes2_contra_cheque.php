@@ -267,7 +267,11 @@ if ($num == 0){
   $pdf->Open();
   $pdf1 = new db_impcarne($pdf, $iTipoRelatorio);
   $pdf1->logo             = $logo;
+  if(strlen($nomeinst) > 50){
+    $pdf1->prefeitura       = $nomeinstabrev;
+  } else{ 
   $pdf1->prefeitura       = $nomeinst;
+  }
   $pdf1->enderpref        = $ender.(isset($numero)?(', '.$numero):"");
   $pdf1->cgcpref          = $cgc;
   $pdf1->municpref        = $munic;

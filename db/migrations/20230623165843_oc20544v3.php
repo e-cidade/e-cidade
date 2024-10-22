@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc20544v3 extends AbstractMigration
+class Oc20544v3 extends PostgresMigration
 {
     public function up()
     {
@@ -12,10 +12,10 @@ class Oc20544v3 extends AbstractMigration
         $consulta = "SELECT 1 FROM db_syscampo WHERE nomecam = '{$nomeCampo}' AND descricao = '{$descricaoCampo}'";
         $result = $this->query($consulta);
         if(empty($result)){
-            $sql = "    
+            $sql = "
             BEGIN;
                 SELECT fc_startsession();
-                
+
                     -- Insere novo campo
                     INSERT INTO db_syscampo
                     VALUES (
@@ -26,9 +26,9 @@ class Oc20544v3 extends AbstractMigration
                     VALUES ((SELECT codarq FROM db_sysarquivo WHERE nomearq = '{$nomeArquivo}'),
                         (SELECT codcam FROM db_syscampo WHERE nomecam = '{$nomeCampo}'),
                         (SELECT max(seqarq) + 1 FROM db_sysarqcamp WHERE codarq = (SELECT codarq FROM db_sysarquivo WHERE nomearq = '{$nomeArquivo}')), 0);
-               
+
                     ALTER TABLE {$nomeArquivo} ADD COLUMN {$nomeCampo} bool DEFAULT NULL;
-            COMMIT";  
+            COMMIT";
         $this->execute($sql);
         }
     }

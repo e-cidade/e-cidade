@@ -1,4 +1,5 @@
 <?php
+
 require_once(modification("libs/db_stdlib.php"));
 require_once("libs/JSON.php");
 require_once("std/db_stdClass.php");
@@ -28,7 +29,7 @@ try {
             $oRetorno->aDocumentos = [];
             if($assintaraDigital->verificaAssituraAtiva()){
                 $oRetorno->link_base  = $assintaraDigital->getUrlBaseUrlFile();
-                $oRetorno->aDocumentos = $assintaraDigital->getDocumentosPorUsuario();
+                $oRetorno->aDocumentos = $assintaraDigital->getDocumentosPorUsuario($oParam->iPagina ?? 1);
             }
 
             break;
@@ -66,7 +67,7 @@ try {
             echo $response;
             return;
 
-        case 'immprimirDocumentoAssinadoLiquidacao':
+        case 'imprimirDocumentoAssinadoLiquidacao':
 
             $response = $assintaraDigital->getLiquidacoesAssinadas($oParam);
 
@@ -90,8 +91,7 @@ try {
             echo $response;
             return;
 
-        case 'immprimirDocumentoAssinadoOrdemPagamento':
-
+        case 'imprimirDocumentoAssinadoOrdemPagamento':
 
             $response = $assintaraDigital->getOrdemPagamentoAssinadas($oParam);
 
@@ -126,11 +126,21 @@ try {
         case 'enviarOrdemaPagamentoAssinatura':
 
             if($assintaraDigital->verificaAssituraAtiva()) {
-                $formularioOrdemPagamento = new FormularioOrdemPagamento();
                 $aMovimentos = explode( ',', $oParam->sMovimentos);
                 foreach ($aMovimentos as $iMovimento){
+                    $formularioOrdemPagamento = new FormularioOrdemPagamento();
                     $formularioOrdemPagamento->gerarFormularioOrdemPagamento($iMovimento);
                     $formularioOrdemPagamento->solitarAssinatura();
+                }
+            }
+            break;
+
+        case 'enviarOrdemaPagamentoAssinaturaLote':
+
+            if($assintaraDigital->verificaAssituraAtiva()) {
+                $response = $assintaraDigital->enviarOrdemaPagamentoAssinaturaLote($oParam);
+                if(count($response->errors) > 0){
+                    throw new Exception($response->errors[0]);
                 }
             }
             break;

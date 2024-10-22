@@ -34,6 +34,7 @@ include("classes/db_liclicitemlote_classe.php");
 include("classes/db_liclicita_classe.php");
 require_once("classes/db_liclicitaportalcompras_classe.php");
 require_once("model/licitacao/PortalCompras/Provedor/LigadorClasses.model.php");
+require_once("libs/renderComponents/index.php");
 
 parse_str($HTTP_SERVER_VARS["QUERY_STRING"]);
 db_postmemory($HTTP_POST_VARS);
@@ -95,6 +96,14 @@ $codigoModalidade = (db_utils::fieldsMemory($resource, 0))->codigomodalidade;
     <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
     <script language="JavaScript" type="text/javascript" src="scripts/prototype.js"></script>
     <link href="estilos.css" rel="stylesheet" type="text/css">
+
+    <script type="text/javascript">
+        loadComponents([
+            'buttonsSolid',
+            'tooltipDefault',
+            'todosIcones'
+        ]);
+    </script>
 </head>
 
 <body>
@@ -255,7 +264,16 @@ $codigoModalidade = (db_utils::fieldsMemory($resource, 0))->codigomodalidade;
 
                     </table>
                 </fieldset>
-                <input name="<?= ($db_opcao == 1 ? 'incluir' : ($db_opcao == 2 || $db_opcao == 22 ? 'alterar' : 'excluir')) ?>" type="button" id="db_opcao" value="<?= ($db_opcao == 1 ? 'Incluir' : ($db_opcao == 2 || $db_opcao == 22 ? 'Alterar' : 'Excluir')) ?>" onClick="return js_confirmadatas()">
+
+                <?php $component->render('buttons/solid', [
+                    'type' => 'button',
+                    'id' => 'db_opcao',
+                    'name' => ($db_opcao == 1 ? 'incluir' : ($db_opcao == 2 || $db_opcao == 22 ? 'alterar' : 'excluir')),
+                    'designButton' => 'success',
+                    'size' => 'sm',
+                    'onclick' => "js_confirmadatas()",
+                    'message' => ($db_opcao == 1 ? 'Incluir' : ($db_opcao == 2 || $db_opcao == 22 ? 'Alterar' : 'Excluir'))
+                ]); ?>
 
             </form>
             <form name="form1">
@@ -293,7 +311,16 @@ $codigoModalidade = (db_utils::fieldsMemory($resource, 0))->codigomodalidade;
 
                     </table>
                 </fieldset>
-                <input name="emite2" type="button" id="emite2" value="Imprimir" onclick="js_emite();">
+
+                <?php $component->render('buttons/solid', [
+                    'type' => 'button',
+                    'id' => 'emite2',
+                    'name' => 'emite2',
+                    'designButton' => 'success',
+                    'size' => 'sm',
+                    'onclick' => "js_emite()",
+                    'message' => 'Imprimir'
+                ]); ?>
 
             </form>
             <?php
@@ -310,7 +337,29 @@ $codigoModalidade = (db_utils::fieldsMemory($resource, 0))->codigomodalidade;
                                     Portal de Compras:
                                 </td>
                                 <td>
-                                    <input name="enviarPortalCompras" type="button" id="enviarPortalCompras" value="Enviar" onclick="js_EnviarPortalDeCompras();">
+
+                                    <?php $component->render('buttons/solid', [
+                                        'type' => 'button',
+                                        'id' => 'enviarPortalDeCompras',
+                                        'designButton' => 'success',
+                                        'size' => 'sm',
+                                        'onclick' => "js_validarPortalDeCompras('enviarPortalDeCompras')",
+                                        'message' => 'Enviar'
+                                    ]); ?>
+
+                                    <?php $component->render('tooltip/default', [
+                                        'id' => 'tooltip-default-triangle-pcp',
+                                        'body' => '<i class="icon exclamation-triangle warning"></i>',
+                                        'color' => '',
+                                        'size' => 'lg'
+                                    ]) ?>
+
+                                    <?php $component->render('tooltip/default', [
+                                        'id' => 'tooltip-default-circle-pcp',
+                                        'body' => '<i class="icon exclamation-circle info"></i>',
+                                        'color' => '',
+                                        'size' => 'lg'
+                                    ]) ?>
                                 </td>
                             </tr>
                         </table>
@@ -532,7 +581,91 @@ $codigoModalidade = (db_utils::fieldsMemory($resource, 0))->codigomodalidade;
         js_removeObj('msgbox');
         var oRetorno = eval("(" + oAjax.responseText + ")");
 
+        
+        if(oRetorno.status === 1) {
+            const tooltipRdcTriangle = document.getElementById('tooltip-default-triangle-pcp');
+            const tooltipRdcCircle = document.getElementById('tooltip-default-circle-pcp');
+            tooltipRdcTriangle.style.display = 'none';
+            tooltipRdcCircle.style.display = 'none';
+        }
+
         alert(oRetorno.message);
+    }
+
+    function js_validarPortalDeCompras(buttonId) {
+        var sUrl = 'lic1_enviointegracaocompraspublicas.RPC.php';
+        var oParam = new Object();
+        oParam.codigo = "<?= $licitacao?>";
+        oParam.exec = "ValidaPregao";
+
+        var buttonId = buttonId
+        addSpinnerToButton(buttonId, "Validando...");
+
+        var oAjax = new Ajax.Request(sUrl, {
+            method: 'post',
+            parameters: 'json=' + Object.toJSON(oParam),
+            onComplete: function(response) {
+                js_retornoValidarPortalDeCompras(response, buttonId);
+            }
+        });
+    }
+
+    function js_retornoValidarPortalDeCompras(oAjax, buttonId) {
+        const response = JSON.parse(oAjax.responseText); // Supondo que a resposta seja JSON.
+        const tooltipRdcTriangle = document.getElementById('tooltip-default-triangle-pcp');
+        const tooltipTextDivTriangle = tooltipRdcTriangle.querySelector('.tooltip-default-text');
+
+        const tooltipRdcCircle = document.getElementById('tooltip-default-circle-pcp');
+        const tooltipTextDivCircle = tooltipRdcCircle.querySelector('.tooltip-default-text');
+        let tooltipBody = "";
+
+        if (response.status === 4) {
+
+            const mensagensSiglasInvalidas = response.siglasInvalidas.map(siglaInvalida => {
+                return `${siglaInvalida}<hr class="tooltip-line">`;
+            }).join('');
+
+            const mensagensSiglasIncorretasECorretas = response.siglasIncorretasECorretas.map(item => {
+                const { descricao, incorreta, correta } = item;
+                return `A unidade de medida "${descricao}" está com a sigla incorreta "${incorreta}". A sigla correta é "${correta}".<br>`;
+            }).join('');
+
+            tooltipBody += '<strong>' + response.message + '</strong> <hr class="tooltip-line">';
+            tooltipBody += mensagensSiglasInvalidas;
+            tooltipBody += mensagensSiglasIncorretasECorretas;
+
+            tooltipTextDivTriangle.innerHTML = tooltipBody;
+            tooltipRdcTriangle.style.display = 'inline-block';
+
+        } else if (response.status === 3) {
+
+            let mensagensSiglasFaltantesNoPcp = '';
+
+            if (response.siglasFaltantesNoPcp && Object.values(response.siglasFaltantesNoPcp).length > 0) {
+                Object.values(response.siglasFaltantesNoPcp).forEach(siglaFaltante => {
+                    mensagensSiglasFaltantesNoPcp += `${siglaFaltante} `;
+                });
+            }
+
+            if(mensagensSiglasFaltantesNoPcp !== '') {
+                tooltipBody += '<strong>' + response.message + '</strong> <hr class="tooltip-line">';
+                tooltipBody += mensagensSiglasFaltantesNoPcp;
+    
+                tooltipTextDivCircle.innerHTML = tooltipBody;
+                tooltipRdcCircle.style.display = 'inline-block';
+            }
+
+            js_EnviarPortalDeCompras();
+
+        } else if (response.status === 2) {
+
+            alert(response.message);
+
+        } else if (response.status === 1) {
+            js_EnviarPortalDeCompras();
+        }
+
+        removeSpinnerAndShowMessage(buttonId);
     }
 
     document.getElementById('l20_linkedital').value = "<?php echo $oLicitacao->l20_linkedital ?>";

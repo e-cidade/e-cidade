@@ -2089,6 +2089,7 @@ class cl_rhpessoalmov
         $sSql .= "       rh27_descr,                                                                     \n";
         $sSql .= "       {$sSigla}regist as regist,                                                      \n";
         $sSql .= "       z01_nome,                                                                       \n";
+        $sSql .= "       z01_cgccpf,                                                                     \n";
         $sSql .= "       rh25_recurso,                                                                   \n";
         $sSql .= "       o15_descr,                                                                      \n";
         $sSql .= "       {$sSigla}quant as quant,                                                        \n";

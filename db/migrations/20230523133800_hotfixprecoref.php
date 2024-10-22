@@ -1,10 +1,10 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Hotfixprecoref extends AbstractMigration
+class Hotfixprecoref extends PostgresMigration
 {
-    
+
     public function up()
     {
        /* $sql = "Begin;
@@ -28,7 +28,7 @@ class Hotfixprecoref extends AbstractMigration
         ALTER TABLE itemprecoreferencia ADD si02_vltotalprecoreferencia float;
 
         UPDATE itemprecoreferencia SET si02_vltotalprecoreferencia = (si02_vlprecoreferencia * si02_qtditem) WHERE si02_tabela = 'f' AND si02_taxa = 'f';
-        
+
         UPDATE itemprecoreferencia SET si02_vltotalprecoreferencia = si02_vlprecoreferencia WHERE si02_tabela = 't' OR si02_taxa = 't';
 
         CREATE TABLE precoreferenciaacount(
@@ -44,7 +44,7 @@ class Hotfixprecoref extends AbstractMigration
         MAXVALUE 9223372036854775807
         START 1
         CACHE 1;
-        
+
         commit;";
 
         $this->execute($sql);*/

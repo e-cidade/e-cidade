@@ -146,6 +146,12 @@ try {
 			 * Lancamento contabil
 			 */
 			$oEmpenhoFinanceiro = new EmpenhoFinanceiro($oParam->iNumeroEmpenho);
+
+      $clEmpempenho = new cl_empempenho;
+      $rsEmpenho = $clEmpempenho->sql_record($clEmpempenho->sql_query($oParam->iNumeroEmpenho,"o15_codigo"));
+      $sRecurso = db_utils::fieldsMemory($rsEmpenho, 0)->o15_codigo;
+      $oEmpenhoFinanceiro->setRecurso($sRecurso);
+
 			$oPrestacaoConta    = new PrestacaoConta($oEmpenhoFinanceiro, $oParam->iSequencialEmpenho, $oParam->dataLancamento);
 			$sComplemento       = db_stdClass::normalizeStringJson($oParam->sComplemento);
 

@@ -384,7 +384,7 @@ $iOpcao = 3;
                   >
                     <strong>Valor da Parcela:</strong>
                   </td>
-                  <td><?php db_input('ac16_vlrparcela', 10, true, true, 'float', $db_opcao); ?></td>
+                  <td><?php db_input('ac16_vlrparcela', 10, 4, true, 'float', $db_opcao); ?></td>
                 </tr>
 
                 <tr>

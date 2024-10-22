@@ -1,11 +1,11 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc19862 extends AbstractMigration
+class Oc19862 extends PostgresMigration
 {
     protected $sSql = "SELECT o41_anousu, o41_unidade, o41_instit, o41_orddespesa, o41_ordliquidacao, o41_ordpagamento FROM orcunidade ";
-                       
+
     public function up()
     {
         if (!empty($this->getFieldsNulls())) {
@@ -32,7 +32,7 @@ class Oc19862 extends AbstractMigration
         $sSql = $this->sSql;
         $sSql .= "WHERE o41_anousu = 2023
                     AND (o41_orddespesa IS NULL OR o41_ordliquidacao IS NULL OR o41_ordpagamento IS NULL)";
-        
+
         $sSql = $this->query($sSql);
         return $sSql->fetchAll(\PDO::FETCH_ASSOC);
     }
@@ -43,7 +43,7 @@ class Oc19862 extends AbstractMigration
         $sSql .= "WHERE o41_anousu = 2022
                    AND o41_unidade = $iCodUnidade
                    AND o41_instit = $iInstit";
-        
+
         $sSql = $this->query($sSql);
         return $sSql->fetchAll(\PDO::FETCH_ASSOC);
     }
@@ -55,7 +55,7 @@ class Oc19862 extends AbstractMigration
                         o41_ordliquidacao = $ordLiquidacao,
                         o41_ordpagamento = $ordPagamento
                     WHERE (o41_anousu, o41_unidade, o41_instit) = ($iAno, $iUnidade, $iInstit)";
-        
+
         $this->execute($builder);
     }
 }

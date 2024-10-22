@@ -27,22 +27,32 @@ class Siops {
     public $aDespesas = array();
     //@var array
     public $aReceitas = array();
+     //@var array
+     public $aInfoComplementares = array();
     //@var array
     public $aReceitasAnoSeg = array();
     //@var array
     public $aDespesasAnoSeg = array();
     //@var array
+    public $aInfoComplementaresAnoSeg = array();
+    //@var array
     public $aDespesasAgrupadas = array();
     //@var array
     public $aReceitasAgrupadas = array();
     //@var array
+    public $aInfoComplementaresAgrupadas = array();
+    //@var array
     public $aReceitasAnoSegAgrupadas = array();
+    //@var array
+    public $aInfoComplementaresAnoSegAgrupadas = array();
     //@var array
     public $aDespesasAnoSegAgrupadas = array();
     //@var array
     public $aDespesasAgrupadasFinal = array();
     //@var boolean
     public $aReceitasAgrupadasFinal = array();
+    //@var boolean
+    public $aInfoComplementaresAgrupadasFinal = array();
     //@var boolean
     public $lOrcada;
     //@var string
@@ -92,6 +102,22 @@ class Siops {
             $impt = new SiopeIMPT;
             $impt->setNomeArquivo($this->getNomeArquivo());
             $impt->gerarArquivoIMPT($aDados, 2);
+
+        }
+
+    }
+
+    public function gerarsiopsInfoComplementares() {
+
+        $aDados = $aDados = $this->aInfoComplementaresAgrupadasFinal;
+   
+        if (file_exists("model/contabilidade/arquivos/siops/".db_getsession("DB_anousu")."/SiopsIMPT.model.php")) {
+
+            require_once("model/contabilidade/arquivos/siops/" . db_getsession("DB_anousu") . "/SiopsIMPT.model.php");
+
+            $impt = new SiopeIMPT;
+            $impt->setNomeArquivo($this->getNomeArquivo());
+            $impt->gerarArquivoIMPT($aDados, 3);
 
         }
 
@@ -588,6 +614,85 @@ class Siops {
             $this->aReceitasAgrupadasFinal = $aReceitaAgrup;
 
         }
+    }
+
+    public function agrupaInfoComplementares() {
+
+        $aInfoComplementaresAgrup = array();
+        
+        usort($this->aInfoComplementares, function($a, $b) {
+            $numA = (int) filter_var($a['linha'], FILTER_SANITIZE_NUMBER_INT);
+            $numB = (int) filter_var($b['linha'], FILTER_SANITIZE_NUMBER_INT);
+            return $numA - $numB;
+        });
+        
+        foreach ($this->aInfoComplementares as $row) {
+
+            list($rec_realizada, $natureza, $campo, $prev_inicial, $prev_atualizada, $coluna, $linha) = array_values($row);
+
+            $iSubRecRealizada       = isset($aInfoComplementaresAgrup[$natureza.$campo]['rec_realizada']) ? $aInfoComplementaresAgrup[$natureza.$campo]['rec_realizada'] : 0;
+            $iSubPrevInicial        = isset($aInfoComplementaresAgrup[$natureza.$campo]['prev_inicial']) ? $aInfoComplementaresAgrup[$natureza.$campo]['prev_inicial'] : 0;
+            $iSubPrevAtualizada     = isset($aInfoComplementaresAgrup[$natureza.$campo]['prev_atualizada']) ? $aInfoComplementaresAgrup[$natureza.$campo]['prev_atualizada'] : 0;
+  
+            $aInfoComplementaresAgrup[$natureza.$campo]['rec_realizada']      = ($iSubRecRealizada + $rec_realizada);
+            $aInfoComplementaresAgrup[$natureza.$campo]['prev_inicial']       = ($iSubPrevInicial + $prev_inicial);
+            $aInfoComplementaresAgrup[$natureza.$campo]['prev_atualizada']    = ($iSubPrevAtualizada + $prev_atualizada);
+            $aInfoComplementaresAgrup[$natureza.$campo]['natureza']           = $natureza;
+            $aInfoComplementaresAgrup[$natureza.$campo]['campo']              = $campo;
+            $aInfoComplementaresAgrup[$natureza.$campo]['coluna']             = $coluna;
+            $aInfoComplementaresAgrup[$natureza.$campo]['linha']              = $linha;
+            
+        }
+      
+        if ($this->lOrcada) {
+
+            $aInfoComplementaresAgrupAnoSeg = array();
+
+           foreach ($this->aInfoComplementaresAnoSeg as $row) {
+
+              list($natureza, $campo, $linha, $rec_orcada) = array_values($row);
+
+              $aInfoComplementaresAgrupAnoSeg[$natureza.$campo]['natureza']     = $natureza;
+              $aInfoComplementaresAgrupAnoSeg[$natureza.$campo]['campo']        = $campo;
+              $aInfoComplementaresAgrupAnoSeg[$natureza.$campo]['coluna']       = $coluna;
+              $aInfoComplementaresAgrupAnoSeg[$natureza.$campo]['linha']        = $linha;
+
+          }
+
+          /**
+           * Une os dois arrays do ano corrente com o ano seguinte.
+           * ***Pode haver registros no ano seguinte que não estão no ano corrente.***
+           */
+
+          foreach ($aInfoComplementaresAgrup as $cod => $receita) {
+
+              if (isset($aInfoComplementaresAgrupAnoSeg[$cod])) {
+                  $receita['rec_orcada']                  = $aInfoComplementaresAgrupAnoSeg[$cod]['rec_orcada'];
+                  $aInfoComplementaresAgrupAnoSeg[$cod]['flag']          = 1;
+                  $this->aInfoComplementaresAgrupadasFinal[$cod]    = $receita;
+              } else {
+                  $aInfoComplementaresAgrupAnoSeg[$cod]['flag']          = 1;
+                  $receita['rec_orcada']                  = 0;
+                  $this->aInfoComplementaresAgrupadasFinal[$cod]    = $receita;
+              }
+
+          }
+
+          foreach ($aInfoComplementaresAgrupAnoSeg as $cod => $receita) {
+
+              if (!isset($receita['flag']) || $receita['flag'] != 1) {
+                  $receita['rec_realizada']               = $aInfoComplementaresAgrup[$cod]['rec_realizada'];
+                  $receita['prev_inicial']                = $aInfoComplementaresAgrup[$cod]['prev_inicial'];
+                  $receita['prev_atualizada']             = $aInfoComplementaresAgrup[$cod]['prev_atualizada'];
+                  $this->aInfoComplementaresAgrupadasFinal[$cod]    = $receita;
+              }
+
+          }
+
+      } else { 
+          $this->aInfoComplementaresAgrupadasFinal = $aInfoComplementaresAgrup;
+
+      }
 
     }
 
@@ -636,9 +741,13 @@ class Siops {
                 $aReceita['natureza']           = $oNaturrecsiops->c231_elerecsiops;
                 $aReceita['campo']              = $oNaturrecsiops->c231_campo;
                 $aReceita['linha']              = $oNaturrecsiops->c231_linha;
-                $aReceita['prev_inicial']       = $oReceita->saldo_inicial;
-                $aReceita['prev_atualizada']    = ($oReceita->saldo_inicial + $oReceita->saldo_prevadic_acum);
-                $aReceita['total_receitas']     = ($aReceita['rec_realizada'] - ($aReceita['ded_receita'] + $aReceita['ded_fundeb']));
+                
+                if (!in_array(substr($oReceita->o57_fonte, 1, 2), array('91', '92', '93', '95', '96', '98', '99'))) {
+
+                    $aReceita['prev_inicial']       = $oReceita->saldo_inicial;
+                    $aReceita['prev_atualizada']    = ($oReceita->saldo_inicial + $oReceita->saldo_prevadic_acum);
+                    $aReceita['total_receitas']     = ($aReceita['rec_realizada'] - ($aReceita['ded_receita'] + $aReceita['ded_fundeb']));
+                }
 
                 array_push($this->aReceitas, $aReceita);
 
@@ -671,6 +780,81 @@ class Siops {
                     $aReceitaAnoSeg['rec_orcada']   = $oReceitaAnoSeg->saldo_inicial;
 
                     array_push($this->aReceitasAnoSeg, $aReceitaAnoSeg);
+
+                }
+
+            }
+
+        }
+
+    }
+
+     /**
+     * Busca as receitas conforme
+     */
+    public function setInfoComplementares() {
+
+        $result = db_receitasaldo(11,1,3,true,$this->sFiltros,$this->iAnoUsu,$this->dtIni,$this->dtFim,false,' * ',true,0);
+
+        for ($i = 0; $i < pg_num_rows($result); $i++) {
+
+            $oReceita = db_utils::fieldsMemory($result, $i);
+            
+            if ($oReceita->o70_codrec > 0) {
+                
+                $oNaturrecsiops = $this->getNaturInfoComplementaresSiops($oReceita->o57_fonte,$this->iAnoUsu,$oReceita->o70_codigo);
+  
+                $resultado = verificarReceita(substr($oReceita->o57_fonte,1,6), substr($oReceita->o70_codigo,0,4));
+      
+                $aInfoComplementar = array();
+                if ($resultado) {
+                    $aInfoComplementar['rec_realizada']      = 0;
+
+                    $aInfoComplementar['natureza']           = $oNaturrecsiops->c231_elerecsiops;
+                    $aInfoComplementar['campo']              = $resultado['codCampo'];
+                    $aInfoComplementar['prev_inicial']       = $oReceita->saldo_inicial;
+                    $aInfoComplementar['prev_atualizada']    = ($oReceita->saldo_inicial + $oReceita->saldo_prevadic_acum);
+                    $aInfoComplementar['rec_realizada']      = abs($oReceita->saldo_arrecadado);
+                    $aInfoComplementar['coluna']             = $resultado['coluna'];
+                    $aInfoComplementar['linha']              = $resultado['linha'];
+                  
+    
+                    array_push($this->aInfoComplementares, $aInfoComplementar);
+                }
+               
+            }
+            
+        }
+        
+        /**
+         * Caso seja 6º Bimestre, campo ORÇADO será alimentado através do relatório Balancete da Receita no exercício subsequente ao de referência.
+         */
+        if ($this->lOrcada) {
+
+            db_query('drop table work_receita');
+            $iAnoSeg = $this->iAnoUsu+1;
+            $resultAnoSeg = db_receitasaldo(11, 1, 3, true, $this->sFiltros, $iAnoSeg, "{$iAnoSeg}-01-01", "{$iAnoSeg}-01-01", false, ' * ', true, 0);
+
+            for ($i = 0; $i < pg_num_rows($resultAnoSeg); $i++) {
+
+                $oReceitaAnoSeg = db_utils::fieldsMemory($resultAnoSeg, $i);
+
+                if ($oReceitaAnoSeg->o70_codrec > 0) {
+
+                    $oNaturrecsiops = $this->getNaturInfoComplementaresSiops($oReceita->o57_fonte,$this->iAnoUsu,$oReceita->o70_codigo);
+
+                    $resultado = verificarReceita(substr($oReceita->o57_fonte,1,6), substr($oReceita->o70_codigo,0,4));
+
+                    $aInfoComplementarAnoSeg = array();
+
+                    $aInfoComplementarAnoSeg['natureza']     = $oNaturrecsiops->c231_elerecsiops;
+                    $aInfoComplementarAnoSeg['campo']        = $oNaturrecsiops->c231_campo;
+                    $aInfoComplementarAnoSeg['linha']        = $oNaturrecsiops->c231_linha;
+                    $aInfoComplementarAnoSeg['rec_orcada']   = $oReceitaAnoSeg->saldo_inicial;
+                    $aInfoComplementarAnoSeg['coluna']       = $resultado['coluna'];
+                    $aInfoComplementarAnoSeg['linha']        = $resultado['linha'];
+
+                    array_push($this->aInfoComplementaresAnoSeg, $aInfoComplementarAnoSeg);
 
                 }
 
@@ -828,6 +1012,55 @@ class Siops {
 
     }
 
+      /**
+     * Realiza De/Para da Natureza da despesa com tabela elerecsiops composta pela Natureza Receita e Descrição
+     */
+    public function getNaturInfoComplementaresSiops($natureza,$anouso,$fonte)
+    {
+  
+        $sSqlNatRec = "SELECT c231_elerecsiops, c231_campo, c231_linha FROM elerecsiops
+        INNER JOIN naturrecsiops on c230_natrecsiops = c231_elerecsiops and c230_anousu = c231_anousu 
+        WHERE c231_anousu = {$this->iAnoUsu}
+          AND c230_natrececidade = substr('{$natureza}',2,length(rtrim(c231_elerecsiops,'')))
+        ORDER BY 1 DESC LIMIT 1";
+
+        $rsNewNaturrecsiops = db_query($sSqlNatRec);
+       
+        if (pg_num_rows($rsNewNaturrecsiops) > 0) {
+            $oNaturrecsiops = db_utils::fieldsMemory($rsNewNaturrecsiops, 0);        
+            return $oNaturrecsiops;
+            
+        } 
+        
+        if (pg_num_rows($rsNewNaturrecsiops) > 0) {
+            
+            $oNaturrecsiops = db_utils::fieldsMemory($rsNewNaturrecsiops, 0);        
+            return $oNaturrecsiops;
+            
+        } else {
+            
+            $clnaturrecsiops    = new cl_naturrecsiops();
+             if (substr($natureza,1,1) == '9')
+                $natureza = substr($natureza,3,14);
+            $rsNaturrecsiops    = db_query($clnaturrecsiops->sql_query_siops(substr($natureza, 0, 8),"", $this->iAnoUsu));
+    
+            if (pg_num_rows($rsNaturrecsiops) > 0) {
+                $oNaturrecsiops = db_utils::fieldsMemory($rsNaturrecsiops, 0);
+                if (substr($oNaturrecsiops->c230_natrecsiops,0,1) == '9') {
+                    $oNaturrecsiops->c231_elerecsiops = substr($oNaturrecsiops->c230_natrecsiops,2,8);
+                } else {
+                    $oNaturrecsiops->c231_elerecsiops = substr($oNaturrecsiops->c230_natrecsiops,0,8);
+                }                
+                return $oNaturrecsiops;
+            } else {
+                $this->status = 2;
+                if (strpos($this->sMensagem, $natureza) === false){
+                    $this->sMensagem .= "{$natureza} ";
+                }
+            }
+        }
+    }
+
     /**
      * Se 6º bimestre, set true para buscar os valores dos anos seguintes.
      */
@@ -849,5 +1082,65 @@ class Siops {
         return substr($natureza, 0, 1).".".substr($natureza, 1, 1).".".substr($natureza, 2, 2).".".substr($natureza, 4, 2).".".substr($natureza, 6, 2);
     }
 
+    public function getNaturInfoComplementaresFormat($natureza) {
+        return substr($natureza, 0, 1).".".substr($natureza, 1, 1).".".substr($natureza, 2, 1).".".substr($natureza, 3, 1).".".substr($natureza, 4, 2).".".substr($natureza, 6, 1).".".substr($natureza, 7, 1);
+    }
 
+}
+function verificarReceita($codReceita, $codFonte) {
+
+    $criterios = [
+        ['codReceita' => '192201', 'codFonte' => ['1631'], 'linha' => '#L3', 'coluna' => '#C3', 'codCampo' => 2539],
+        ['codReceita' => '132101', 'codFonte' => ['1600', '1601', '1602', '1603', '1604', '1605', '1631'], 'linha' => '#L5', 'coluna' => '#C3', 'codCampo' => 2541],
+        ['codReceita' => '132102', 'codFonte' => ['1600', '1601', '1602', '1603', '1604', '1605', '1631'], 'linha' => '#L6', 'coluna' => '#C3', 'codCampo' => 2542],
+        ['codReceita' => '132103', 'codFonte' => ['1600', '1601', '1602', '1603', '1604', '1605', '1631'], 'linha' => '#L7', 'coluna' => '#C3', 'codCampo' => 2543],
+        ['codReceita' => '132105', 'codFonte' => ['1600', '1601', '1602', '1603', '1604', '1605', '1631'], 'linha' => '#L8', 'coluna' => '#C3', 'codCampo' => 2544],
+        ['codReceita' => '1329', 'codFonte' => ['1600', '1601', '1602', '1603', '1604', '1605', '1631'], 'linha' => '#L9', 'coluna' => '#C3', 'codCampo' => 2545],
+        ['codReceita' => '171399', 'codFonte' => ['1600', '1601', '1602', '1603', '1604', '1605', '1631'], 'linha' => '#L10', 'coluna' => '#C3', 'codCampo' => 2546],
+        ['codReceita' => '192250', 'codFonte' => ['1600', '1601', '1602', '1603', '1604', '1605', '1631'], 'linha' => '#L11', 'coluna' => '#C3', 'codCampo' => 2547],
+        ['codReceita' => '241199', 'codFonte' => ['1600', '1601', '1602', '1603', '1604', '1605', '1631'], 'linha' => '#L12', 'coluna' => '#C3', 'codCampo' => 2548],
+        ['codReceita' => '192201', 'codFonte' => ['1632'], 'linha' => '#L15', 'coluna' => '#C3', 'codCampo' => 2551],
+        ['codReceita' => '132101', 'codFonte' => ['1621', '1632'], 'linha' => '#L17', 'coluna' => '#C3', 'codCampo' => 2553],
+        ['codReceita' => '132102', 'codFonte' => ['1621', '1632'], 'linha' => '#L18', 'coluna' => '#C3', 'codCampo' => 2554],
+        ['codReceita' => '132103', 'codFonte' => ['1621', '1632'], 'linha' => '#L19', 'coluna' => '#C3', 'codCampo' => 2555],
+        ['codReceita' => '132105', 'codFonte' => ['1621', '1632'], 'linha' => '#L20', 'coluna' => '#C3', 'codCampo' => 2556],
+        ['codReceita' => '1329', 'codFonte' => ['1621', '1632'], 'linha' => '#L21', 'coluna' => '#C3', 'codCampo' => 2557],
+        ['codReceita' => '192250', 'codFonte' => ['1621', '1632'], 'linha' => '#L22', 'coluna' => '#C3', 'codCampo' => 2558],
+        ['codReceita' => '192201', 'codFonte' => ['1633'], 'linha' => '#L25', 'coluna' => '#C3', 'codCampo' => 2561],
+        ['codReceita' => '132101', 'codFonte' => ['1622', '1633'], 'linha' => '#L27', 'coluna' => '#C3', 'codCampo' => 2563],
+        ['codReceita' => '132102', 'codFonte' => ['1622', '1633'], 'linha' => '#L28', 'coluna' => '#C3', 'codCampo' => 2564],
+        ['codReceita' => '132103', 'codFonte' => ['1622', '1633'], 'linha' => '#L29', 'coluna' => '#C3', 'codCampo' => 2565],
+        ['codReceita' => '132105', 'codFonte' => ['1622', '1633'], 'linha' => '#L30', 'coluna' => '#C3', 'codCampo' => 2566],
+        ['codReceita' => '1329', 'codFonte' => ['1622', '1633'], 'linha' => '#L31', 'coluna' => '#C3', 'codCampo' => 2567],
+        ['codReceita' => '192250', 'codFonte' => ['1622', '1633'], 'linha' => '#L32', 'coluna' => '#C3', 'codCampo' => 2568],
+        ['codReceita' => '192299', 'codFonte' => ['1634'], 'linha' => '#L35', 'coluna' => '#C3', 'codCampo' => 2571],
+        ['codReceita' => '1712521', 'codFonte' => ['1635'], 'linha' => '#L38', 'coluna' => '#C3', 'codCampo' => 2574],
+        ['codReceita' => '1712522', 'codFonte' => ['1635'], 'linha' => '#L39', 'coluna' => '#C3', 'codCampo' => 2575],
+        ['codReceita' => '1712523', 'codFonte' => ['1635'], 'linha' => '#L40', 'coluna' => '#C3', 'codCampo' => 2576],
+        ['codReceita' => '1712524', 'codFonte' => ['1635'], 'linha' => '#L41', 'coluna' => '#C3', 'codCampo' => 2577],
+        ['codReceita' => '172252', 'codFonte' => ['1635'], 'linha' => '#L42', 'coluna' => '#C3', 'codCampo' => 2578],
+        ['codReceita' => '171999', 'codFonte' => ['1636', '1659'], 'linha' => '#L44', 'coluna' => '#C3', 'codCampo' => 2580],
+        ['codReceita' => '241999', 'codFonte' => ['1636', '1659'], 'linha' => '#L45', 'coluna' => '#C3', 'codCampo' => 2581],
+        ['codReceita' => '172999', 'codFonte' => ['1636', '1659'], 'linha' => '#L46', 'coluna' => '#C3', 'codCampo' => 2582],
+        ['codReceita' => '242999', 'codFonte' => ['1636', '1659'], 'linha' => '#L47', 'coluna' => '#C3', 'codCampo' => 2583],
+        ['codReceita' => '173999', 'codFonte' => ['1636', '1659'], 'linha' => '#L48', 'coluna' => '#C3', 'codCampo' => 2584],
+        ['codReceita' => '243999', 'codFonte' => ['1636', '1659'], 'linha' => '#L49', 'coluna' => '#C3', 'codCampo' => 2585],
+        ['codReceita' => '192299', 'codFonte' => ['1636', '1659'], 'linha' => '#L50', 'coluna' => '#C3', 'codCampo' => 2586],
+        ['codReceita' => '192201', 'codFonte' => ['1636'], 'linha' => '#L52', 'coluna' => '#C3', 'codCampo' => 2588],
+        ['codReceita' => '131', 'codFonte' => ['1600', '1601', '1602', '1603', '1604', '1605', '1621', '1622', '1631', '1632', '1633'], 'linha' => '#L54', 'coluna' => '#C3', 'codCampo' => 2591],
+    ];
+
+    foreach ($criterios as $criterio) {
+        if (strpos($codReceita, $criterio['codReceita']) === 0) {
+            if (in_array($codFonte, $criterio['codFonte'])) {
+                return [
+                    'linha' => $criterio['linha'],
+                    'coluna' => $criterio['coluna'],
+                    'codCampo' => $criterio['codCampo']
+                ];
+            }
+        }
+    }
+
+    return null;
 }

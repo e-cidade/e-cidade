@@ -76,6 +76,8 @@ require_once 'dbforms/db_funcoes.php';
             return alert("Usuário: selecione o tipo para ajustar.")
         }
 
+        js_divCarregando('Aguarde, ajuste em processamento!', 'msgBox');
+
         const idCampo = {
             1: 'conplano',
             2: 'conplanocontacorrente',
@@ -101,8 +103,26 @@ require_once 'dbforms/db_funcoes.php';
         let oAjax = new Ajax.Request('m4_ajustacontas_inclusaoexe_pcasp.RPC.php', {
             method: 'post',
             parameters: 'json=' + Object.toJSON(oParametros),
-            onComplete: js_retornoAlteraObservacao
+            onComplete: function(x) {
 
+                if(x.statusText !== 'OK') {
+                    alert('Erro: ' + x.statusText);
+                    js_removeObj("msgBox");
+                } else {
+                    alert("Ajustes efetuados com sucesso!");
+                    js_removeObj("msgBox");
+                }
+            }, 
+            onFailure: function(e) {
+
+                alert('Erro: ' + e.statusText);
+                js_removeObj("msgBox");
+            },
+            onException: function(request, exception) {
+
+                alert('Exceção: ' + exception);
+                js_removeObj("msgBox");
+            }
         });
     }
 

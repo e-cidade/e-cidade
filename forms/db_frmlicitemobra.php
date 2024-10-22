@@ -104,7 +104,7 @@ $cllicitemobra->rotulo->label();
     </fieldset>
 
     <?php
-   
+
     $ano = 0;
     if (!empty($l20_codigo)) {
         
@@ -115,7 +115,7 @@ $cllicitemobra->rotulo->label();
             $ano = (int) $lic->l20_anousu;
         }
         
-        $sCampos  = " distinct pc01_codmater,pc01_descrmater,obr06_tabela,obr06_descricaotabela,obr06_dtregistro,obr06_dtcadastro,obr06_codigotabela,obr06_versaotabela,l21_ordem";
+        $sCampos  = " distinct on (l21_ordem) pc01_codmater,pc01_descrmater,obr06_sequencial,obr06_tabela,obr06_descricaotabela,obr06_dtregistro,obr06_dtcadastro,obr06_codigotabela,obr06_versaotabela,l21_ordem";
         $sOrdem   = "l21_ordem";
         $sWhere   = "l21_codliclicita = {$l20_codigo} and pc01_obras = 't' and pc10_instit = " . db_getsession('DB_instit');
         
@@ -140,7 +140,7 @@ $cllicitemobra->rotulo->label();
             $ano = (int)substr($proc->pc80_data, 0, 4);
         }
 
-        $sCampos  = " distinct pc01_codmater,pc01_descrmater,obr06_tabela,obr06_descricaotabela,obr06_dtregistro,obr06_dtcadastro,obr06_codigotabela,obr06_versaotabela,pc11_seq";
+        $sCampos  = "distinct on (pc11_seq) pc01_codmater,pc01_descrmater,obr06_sequencial,obr06_tabela,obr06_descricaotabela,obr06_dtregistro,obr06_dtcadastro,obr06_codigotabela,obr06_versaotabela,pc11_seq";
         $sOrdem   = "pc11_seq";
         $sWhere   = "pc80_codproc = {$pc80_codproc} and pc01_obras = 't' and pc10_instit = " . db_getsession('DB_instit');
         
@@ -151,7 +151,7 @@ $cllicitemobra->rotulo->label();
         } else {
             $sSqlItemProcessodeCompras = $cllicitemobra->sql_query_itens_obras_processodecompras(null, $sCampos, $sOrdem, $sWhere);
         }
-        
+
         $sResultitens = $cllicitemobra->sql_record($sSqlItemProcessodeCompras);
         $aItensObras = db_utils::getCollectionByRecord($sResultitens);
         $numrows = $cllicitemobra->numrows;
@@ -195,7 +195,7 @@ $cllicitemobra->rotulo->label();
                         <input type="hidden" id=<?= 'obr06_dtcadastro_' . $iItem ?> value="<?= $aItem->obr06_dtcadastro ?>">
 
                         <th class="table_header" style="width: 35px">
-                            <input type="checkbox" class="marca_itens[<?= $iItem ?>]" name="aItonsMarcados" value="<?= $iItem ?>" id="<?= $iItem ?>">
+                            <input data-sequencial="<?=$aItem->obr06_sequencial?>" type="checkbox" class="marca_itens[<?= $iItem ?>]" name="aItonsMarcados" value="<?= $iItem ?>" id="<?= $iItem ?>">
                         </th>
 
                         <th class="linhagrid" style="width: 35px">
@@ -230,7 +230,7 @@ $cllicitemobra->rotulo->label();
                             <input type="text" name="" value="<?= mb_convert_encoding($aItem->obr06_descricaotabela, "ISO-8859-1", "UTF-8") ?>" id="<?= 'obr06_descricaotabela_' . $iItem ?>" <?= $aItem->obr06_tabela !== "3" ? "disabled style='background-color: #E6E4F1'" : "" ?>>
                         </td>
                         <td class="linhagrid" style="width: 87px">
-                            <input type="button" name="" value="Excluir" id="<?= $iItem ?>" onclick="excluirLinha('<?= $iItem ?>')">
+                            <input type="button" name="" value="Excluir" id="<?= $iItem ?>" onclick="excluirLinha('<?= $iItem ?>','<?= $aItem->obr06_sequencial ?>')">
                         </td>
                     </tr>
                 <?php
@@ -608,10 +608,11 @@ $cllicitemobra->rotulo->label();
             itens.forEach(function(item) {
 
                 const coditem = item.id;
+                const sequencialItem = item.getAttribute('data-sequencial');
                 const linha = document.getElementById("linha_" + coditem);
                 linha.style.backgroundColor = "#FFFFFF";
 
-                const novoItem = NovoItem(coditem);
+                const novoItem = NovoItem(coditem,sequencialItem);
 
                 if (!itemEValido(novoItem)) {
                     temErro = true;
@@ -650,7 +651,9 @@ $cllicitemobra->rotulo->label();
                 salvarItemAjax({
                     exec: 'SalvarItemObra',
                     itens: itensEnviar,
-                    ano: "<?=$ano?>"
+                    ano: "<?=$ano?>",
+                    licitacao: document.getElementById('l20_codigo').value,
+                    processocompra: document.getElementById('pc80_codproc').value,
                 }, retornoAjax);
             }
         } catch (e) {
@@ -660,11 +663,12 @@ $cllicitemobra->rotulo->label();
         return false;
     }
 
-    function NovoItem(coditem) {
+    function NovoItem(coditem,sequencialItem) {
         const obr06_pcmater = coditem.split("-")[0];
         const obr06_tabela = document.getElementById('obr06_tabela_' + coditem).value;
         const obr06_dtcadastro = document.getElementById('obr06_dtcadastro_' + coditem).value;
         const obr06_ordem = document.getElementById('obr06_ordem_' + coditem).value;
+        const obr06_sequencial = sequencialItem;
 
         let obr06_descricaotabela = null;
         let obr06_codigotabela = null;
@@ -690,7 +694,8 @@ $cllicitemobra->rotulo->label();
             obr06_codigotabela,
             obr06_versaotabela,
             obr06_dtcadastro,
-            obr06_ordem
+            obr06_ordem,
+            obr06_sequencial
         }
     }
 
@@ -712,6 +717,7 @@ $cllicitemobra->rotulo->label();
             alert(response.message.urlDecode());
         } else {
             alert("Item salvo com sucesso!");
+            document.form1.submit();
         }
     }
 
@@ -858,6 +864,7 @@ $cllicitemobra->rotulo->label();
                 var novoItem = {
                     obr06_pcmater: coditem.split("-")[0],
                     obr06_ordem: document.getElementById('obr06_ordem_' + coditem).value,
+                    obr06_sequencial: item.getAttribute('data-sequencial')
                 };
                 
                 itensEnviar.push(novoItem);
@@ -897,16 +904,18 @@ $cllicitemobra->rotulo->label();
                 document.getElementById('obr06_dtcadastro_' + item).value = "";
                 document.getElementById('obr06_codigotabela_' + item).value = "";
             })
-            alert("Item Excluido com sucesso!")
+            alert("Item Excluido com sucesso!");
+            document.form1.submit();
         }
     }
 
-    function excluirLinha(codigo) {
+    function excluirLinha(codigo,sequencial) {
         var itensEnviar = [];
         try {
             var novoItem = {
                 obr06_pcmater: codigo.split("-")[0],
                 obr06_ordem: document.getElementById('obr06_ordem_' + codigo).value,
+                obr06_sequencial: sequencial
             };
             itensEnviar.push(novoItem);
             excluirlinhaAjax({
@@ -944,7 +953,8 @@ $cllicitemobra->rotulo->label();
                 document.getElementById('obr06_dtcadastro_' + item).value = "";
                 document.getElementById('obr06_codigotabela_' + item).value = "";
             })
-            alert("Item Excluido com sucesso!")
+            alert("Item Excluido com sucesso!");
+            document.form1.submit();
         }
     }
 </script>

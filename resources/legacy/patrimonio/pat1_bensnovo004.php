@@ -81,7 +81,7 @@ if ($oDaoEmpNotaItem->numrows > 0) {
   $oStdDadosItem     = db_utils::fieldsMemory($rsBuscaItemNota, 0);
   $cod_notafiscal    = $oStdDadosItem->notafiscal;     
   $cod_ordemdecompra = $oStdDadosItem->ordemdecompra;
-  $emp_sistema       = 's' ;
+  $emp_sistema_select_descr = 's' ;
   $t53_empen         = $oStdDadosItem->seqempenho;
   $z01_nome_empenho  = $oStdDadosItem->nome;
      
@@ -298,7 +298,7 @@ if ($oDaoEmpNotaItem->numrows > 0) {
       $("vlAquisicao").value = oRetorno.e62_vlrun;
       $("t52_descr").value = oRetorno.pc01_descrmater;
       $("iCodigoItemNota").value = <?php echo $iCodigoNota; ?>;
-
+     
       $("t52_dtaqu").style.backgroundColor = '#FFFFFF';
       $("t52_numcgm").style.backgroundColor = '#DEB887';
       $("z01_nome").style.backgroundColor = '#DEB887';
@@ -313,8 +313,31 @@ if ($oDaoEmpNotaItem->numrows > 0) {
       $("contabilizado").style.display = 'none';
       document.getElementById("contabilizador").style.display = 'none';
       $("contabilizado").value = 'nao';
+
+      js_validarBusDadosMat($("iCodigoItemNota").value);
     }
   }
+
+  function js_validarBusDadosMat(valor)
+  {
+    console.log(valor);
+    if (valor) {
+      sCor = '#DEB887';
+      $("t53_empen").disabled = true;
+      $("t53_empen").style.backgroundColor = sCor;
+      $("t53_empen").style.color = "#000";
+      $("cod_notafiscal").disabled = true;
+      $("cod_notafiscal").style.backgroundColor = sCor;
+      $("cod_notafiscal").style.color = "#000";
+      $("cod_ordemdecompra").disabled = true;
+      $("cod_ordemdecompra").style.backgroundColor = sCor;
+      $("cod_ordemdecompra").style.color = "#000";
+      $("emp_sistema_select_descr").disabled = true;
+      $("emp_sistema_select_descr").style.backgroundColor = sCor;
+      $("emp_sistema_select_descr").style.color = "#000";
+    } 
+  }
+
 </script>
 
 <?

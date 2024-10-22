@@ -43,7 +43,7 @@ class ContratoPNCP extends ModeloBasePNCP
             'codigoUnidade'                            => $this->getUndCompradora(),
             'objetoContrato'                           => $oDado->objetocontrato,
             'valorInicial'                             => $oDado->valorinicial,
-            'numeroParcelas'                           => $oDado->numeroparcelas,
+            'numeroParcelas'                           => $oDado->numeroparcelas == '' ? 1 : $oDado->numeroparcelas,
             'valorParcela'                             => $oDado->valorparcela == '' ? $oDado->valorglobal : $oDado->valorparcela,
             'valorGlobal'                              => $oDado->valorglobal,
             'dataAssinatura'                           => $oDado->dataassinatura,
@@ -70,7 +70,7 @@ class ContratoPNCP extends ModeloBasePNCP
             'processo'                                 => $oDado->processo,
             'categoriaProcessoId'                      => $oDado->categoriaprocessoid,
             'niFornecedor'                             => $oDado->nifornecedor,
-            'tipoPessoaFornecedor'                     => 'PJ', //$oDado->tipopessoafornecedor,
+            'tipoPessoaFornecedor'                     => $oDado->tipopessoafornecedor,
             'nomeRazaoSocialFornecedor'                => $oDado->nomerazaosocialfornecedor,
             'receita'                                  => $oDado->receita == 'f' ? 'true' : 'false',
             'codigoUnidade'                            => $this->getUndCompradora(),
@@ -201,7 +201,7 @@ class ContratoPNCP extends ModeloBasePNCP
         return array($retorno[22], substr($retorno[0], 7, 3));
     }
 
-    public function excluirContrato($sequencial, $ano, $cnpj)
+    public function excluirContrato($sequencial, $ano, $cnpj, $justificativapncp = '')
     {
         $token = $this->login();
 
@@ -217,7 +217,7 @@ class ContratoPNCP extends ModeloBasePNCP
             'Authorization: ' . $token,
         );
 
-        $optionspncp = $this->getParancurl('DELETE', null,$headers,false,false);
+        $optionspncp = $this->getParancurl('DELETE', $justificativapncp, $headers, true, false);
 
         curl_setopt_array($chpncp, $optionspncp);
         $contentpncp = curl_exec($chpncp);
@@ -229,7 +229,7 @@ class ContratoPNCP extends ModeloBasePNCP
         return $retorno;
     }
 
-    public function enviarArquivoContrato($dados, $file, $Documentos,$tipoAnexo)
+    public function enviarArquivoContrato($dados, $file, $nomeArquivo,$tipoAnexo)
     {
 
         $token = $this->login();
@@ -250,7 +250,7 @@ class ContratoPNCP extends ModeloBasePNCP
         $headers = array(
             'Content-Type: multipart/form-data',
             'Authorization: ' . $token,
-            'Titulo-Documento: Contrato ' . $dados->ac213_sequencialpncp . "/" . $dados->ac213_ano . " Anexo " . $Documentos,
+            'Titulo-Documento: '. $nomeArquivo,
             'Tipo-Documento-Id:' . $tipoAnexo
         );
 
@@ -327,7 +327,7 @@ class ContratoPNCP extends ModeloBasePNCP
 
         $url = $this->envs['URL'] . "orgaos/" . $cnpj . "/contratos" . "/" . $dados->ac214_ano . "/" . $dados->ac214_sequencialpncp . "/arquivos" . "/" . $dados->ac214_sequencialarquivo;
 
-        $justificativa = '{"justificativa":"Excluindo arquivo do PNCP"}';
+        $justificativa['justificativa'] = $dados->justificativa; 
 
         $chpncp      = curl_init($url);
 
@@ -336,7 +336,7 @@ class ContratoPNCP extends ModeloBasePNCP
             'Authorization: ' . $token,
         );
 
-        $optionspncp = $this->getParancurl('DELETE',$justificativa,$headers,false,false);
+        $optionspncp = $this->getParancurl('DELETE', $justificativa, $headers, true, false);
 
         curl_setopt_array($chpncp, $optionspncp);
         $contentpncp = curl_exec($chpncp);
@@ -376,5 +376,20 @@ class ContratoPNCP extends ModeloBasePNCP
         $retorno = json_decode($contentpncp);
 
         return $retorno;
+    }
+
+    public function verificarCpfCnpj($numero)
+    {
+        // Remove caracteres não numéricos
+        $numero = preg_replace('/[^0-9]/', '', $numero);
+    
+        // Verifica a quantidade de caracteres
+        if (strlen($numero) == 11) {
+            return "PF";
+        } elseif (strlen($numero) == 14) {
+            return "PJ";
+        } else {
+            return "";
+        }
     }
 }

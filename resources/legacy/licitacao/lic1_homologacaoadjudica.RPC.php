@@ -383,17 +383,17 @@ switch ($oParam->exec) {
         if ($oParam->dbopcao == "1") {
             $sWhere = " liclicitem.l21_codliclicita = {$oParam->iLicitacao} and pc24_pontuacao = 1 AND pc81_codprocitem not in (select l203_item from homologacaoadjudica
                         inner join itenshomologacao on l203_homologaadjudicacao = l202_sequencial where l202_licitacao = {$oParam->iLicitacao})";
-            $result = $clhomologacaoadjudica->sql_record($clhomologacaoadjudica->sql_query_itens_semhomologacao(null, $campos, "l04_descricao,pc11_seq,z01_nome", $sWhere));
+            $result = $clhomologacaoadjudica->sql_record($clhomologacaoadjudica->sql_query_itens_semhomologacao(null, $campos, "pc11_seq,l04_descricao,z01_nome", $sWhere));
         }
         //Itens para alteração
         if ($oParam->dbopcao == "2") {
             $sWhere = " liclicitem.l21_codliclicita = {$oParam->iLicitacao} and pc24_pontuacao = 1 AND itenshomologacao.l203_homologaadjudicacao = {$oParam->iHomologacao}";
-            $result = $clhomologacaoadjudica->sql_record($clhomologacaoadjudica->sql_query_itens_comhomologacao(null, $campos, "l04_descricao,pc11_seq,z01_nome", $sWhere));
+            $result = $clhomologacaoadjudica->sql_record($clhomologacaoadjudica->sql_query_itens_comhomologacao(null, $campos, "pc11_seq,l04_descricao,z01_nome", $sWhere));
         }
         //Itens para ExclusÃo
         if ($oParam->dbopcao == "3") {
             $sWhere = " liclicitem.l21_codliclicita = {$oParam->iLicitacao} and pc24_pontuacao = 1 AND itenshomologacao.l203_homologaadjudicacao = {$oParam->iHomologacao}";
-            $result = $clhomologacaoadjudica->sql_record($clhomologacaoadjudica->sql_query_itens_comhomologacao(null, $campos, "l04_descricao,pc11_seq,z01_nome", $sWhere));
+            $result = $clhomologacaoadjudica->sql_record($clhomologacaoadjudica->sql_query_itens_comhomologacao(null, $campos, "pc11_seq,l04_descricao,z01_nome", $sWhere));
         }
 
         /**
@@ -564,7 +564,7 @@ switch ($oParam->exec) {
             if($oParam->possuiDataReferencia && $oParam->dataReferencia == ""){
                 throw new Exception("Usuário: Campo Data de Referência nao Informado.");
             }
-            
+
             if($oParam->possuiDataReferencia){
                 $mesDataReferencia = intval($l202_datareferencia->format('m'));
                 $rsDataEncerramento = $clcondataconf->sql_record($clcondataconf->sql_query_file(db_getsession('DB_anousu'), db_getsession('DB_instit'), "c99_datapat", null, null));
@@ -574,7 +574,7 @@ switch ($oParam->exec) {
                 $mesEncerramentoPatrimonial = intval($dataEncerramento->format('m'));
                 $anoDataReferencia = intval($l202_datareferencia->format('Y'));
                 $anoEncerramentoPatrimonial = intval($dataEncerramento->format('Y'));
-    
+
                 if($mesDataReferencia <= $mesEncerramentoPatrimonial || $anoDataReferencia < $anoEncerramentoPatrimonial){
                     throw new Exception("Usuário: a data de referência deve ser no mês subsequente a data de encerramento do patrimonial.");
                 }

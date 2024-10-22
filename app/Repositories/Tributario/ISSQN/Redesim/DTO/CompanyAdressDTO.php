@@ -2,6 +2,9 @@
 
 namespace App\Repositories\Tributario\ISSQN\Redesim\DTO;
 
+use DBNumber;
+use DBString;
+
 class CompanyAdressDTO extends BaseDTO
 {
     /**
@@ -55,6 +58,21 @@ class CompanyAdressDTO extends BaseDTO
     public function getLogradouroEcidadeFormat()
     {
         return substr($this->logradouro, 0, 40);
+    }
+
+    public function getBairroEcidadeFormat()
+    {
+        return substr($this->bairro, 0, 40);
+    }
+
+    public function getMunicipioEcidadeFormat(): string
+    {
+        return DBString::removerCaracteresEspeciais(DBString::removerAcentuacao($this->cidade));
+    }
+
+    public function getNumeroFormmated(): int
+    {
+        return DBNumber::brToInteger($this->numero);
     }
 
 }

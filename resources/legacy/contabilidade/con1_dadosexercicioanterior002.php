@@ -42,7 +42,9 @@ if (isset($alterar)) {
     db_fim_transacao();
 } else if (isset($chavepesquisa)) {
     $db_opcao = 2;
-    $result = $cldadosexercicioanterior->sql_record($cldadosexercicioanterior->sql_query($chavepesquisa));
+    $anousu = db_getsession("DB_anousu");
+    $where  = " c235_anousu = $anousu ";
+    $result = $cldadosexercicioanterior->sql_record($cldadosexercicioanterior->sql_query($chavepesquisa,"*",null,$where));
     db_fieldsmemory($result, 0);
     $db_botao = true;
 }

@@ -87,6 +87,7 @@ $clconlancamlr     = new cl_conlancamlr;
 $clconlancamcompl  = new cl_conlancamcompl;
 $clconlancamord    = new cl_conlancamord;
 $clpagordemtiporec = new cl_pagordemtiporec;
+$clcgm             = new cl_cgm;
 $clempenho         = new empenho; // rotinas para liquidação de empenho
 
 parse_str($HTTP_SERVER_VARS["QUERY_STRING"]);
@@ -100,7 +101,6 @@ if(isset($numemp)){
   
   $db_opcao = 1;
   $db_botao = true;
-//  echo "<br>{$numemp}";
 }  
 ?>
 <html>

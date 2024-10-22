@@ -1,12 +1,12 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc15808 extends AbstractMigration
+class Oc15808 extends PostgresMigration
 {
     public function up()
     {
-        $this->execute("DELETE FROM conplanoorcamentoanalitica 
+        $this->execute("DELETE FROM conplanoorcamentoanalitica
                         WHERE c61_anousu >2021
                           AND c61_codcon IN
                           (SELECT c60_codcon FROM conplanoorcamento
@@ -85,15 +85,15 @@ class Oc15808 extends AbstractMigration
     private function insertCtaSintetica($estrutural, $descr)
     {
 
-        $sqlTempTable = "SELECT * FROM pg_catalog.pg_tables 
+        $sqlTempTable = "SELECT * FROM pg_catalog.pg_tables
                          WHERE tablename = 'anousu'";
 
         $tempTable = $this->fetchAll($sqlTempTable);
 
         if (empty($tempTable)) {
-            
-            $sqlAno = "CREATE TEMP TABLE anousu ON COMMIT DROP AS 
-                       SELECT DISTINCT c91_anousudestino FROM conaberturaexe 
+
+            $sqlAno = "CREATE TEMP TABLE anousu ON COMMIT DROP AS
+                       SELECT DISTINCT c91_anousudestino FROM conaberturaexe
                        WHERE c91_anousuorigem = 2021
                          AND c91_instit IN (SELECT codigo FROM db_config ORDER BY 1)";
             $this->execute($sqlAno);
@@ -131,11 +131,11 @@ class Oc15808 extends AbstractMigration
                                   0 AS c60_consistemaconta,
                                   'N'::varchar AS c60_identificadorfinanceiro,
                                   2 AS c60_naturezasaldo;
-                            
+
                            INSERT INTO conplanoorcamento
                            SELECT * FROM newconta
                            WHERE c60_estrut NOT IN (SELECT c60_estrut FROM conplanoorcamento WHERE c60_anousu = 2022);
-                           
+
                            DROP TABLE newconta";
 
             $this->execute($sqlInsert);
@@ -156,13 +156,13 @@ class Oc15808 extends AbstractMigration
                                     WHERE c60_anousu = 2022
                                       AND c60_estrut = '{$estrutural}'
                                       AND c60_estrut NOT IN (SELECT c60_estrut FROM conplanoorcamento WHERE c60_anousu = c91_anousudestino);
-                                      
+
                                     DROP TABLE anousu;";
 
             $this->execute($sqlInsertExercicios);
         }
-        
-        $sqlVerifyCta = "SELECT 1 FROM conplanoorcamento 
+
+        $sqlVerifyCta = "SELECT 1 FROM conplanoorcamento
                          JOIN conplanoorcamentoanalitica ON (c60_codcon, c60_anousu) = (c61_codcon, c61_anousu)
                          WHERE c60_estrut = '{$estrutural}'
                            AND c61_instit IN (SELECT codigo FROM db_config ORDER BY 1)
@@ -175,7 +175,7 @@ class Oc15808 extends AbstractMigration
             $sqlInsertAnalitica = " INSERT INTO conplanoorcamentoanalitica
                                     SELECT c60_codcon,
                                             c60_anousu,
-                                            nextval('conplanoorcamentoanalitica_c61_reduz_seq'), 
+                                            nextval('conplanoorcamentoanalitica_c61_reduz_seq'),
                                             db_config.codigo,
                                             100,
                                             0
@@ -254,7 +254,7 @@ class Oc15808 extends AbstractMigration
                                       'F'::varchar AS c60_identificadorfinanceiro,
                                       1 AS c60_naturezasaldo,
                                       1 AS c60_infcompmsc;
-                                      
+
                                INSERT INTO conplano
                                SELECT * FROM newpcasp
                                WHERE c60_estrut NOT IN (SELECT c60_estrut FROM conplano WHERE c60_anousu = 2022)";
@@ -292,7 +292,7 @@ class Oc15808 extends AbstractMigration
                 $sqlInsert = "INSERT INTO conplanoreduz
                               SELECT c60_codcon,
                                      c60_anousu,
-                                     nextval('conplanoreduz_c61_reduz_seq')::integer, 
+                                     nextval('conplanoreduz_c61_reduz_seq')::integer,
                                      db_config.codigo::integer,
                                      100::integer,
                                      0::integer

@@ -29,7 +29,6 @@ require_once "libs/db_stdlib.php";
 require_once "libs/db_conecta.php";
 include_once "libs/db_sessoes.php";
 include_once "libs/db_usuariosonline.php";
-include("vendor/mpdf/mpdf/mpdf.php");
 include("libs/db_liborcamento.php");
 include("libs/db_libcontabilidade.php");
 include("libs/db_sql.php");
@@ -51,6 +50,89 @@ if(count($aInstits) > 1){
     }
 }
 
+function getDados($sDtIni, $sDtFim, $aInstit, $iAnousu, $aContas, $sFonte)
+{
+    $oDadosAgrupados = Array();
+    foreach(getContasPorFonte($aInstit, $iAnousu, $aContas, $sFonte) as $oContaFonte){
+
+        $oDado = new stdClass();
+        $oDado->iReduz = $oContaFonte->c61_reduz;
+        $oDado->iFonte = $oContaFonte->o15_codtri;
+        $oDado->sDescr = $oContaFonte->c60_descr;
+        $oDado->aValores = getTransValorTferencias($sDtIni, $sDtFim, $oDado->iReduz);
+
+        $oDadosAgrupados[] = $oDado;
+
+
+    }
+    $aDadosRetorno = array();
+    foreach ($oDadosAgrupados as $oDadosRelatorio) {
+
+        foreach ($oDadosRelatorio->aValores as $oValores) {
+
+            $oDadoRetorno = new stdClass();
+            $oDadoRetorno->sData = $oValores->c69_data;
+            $oDadoRetorno->iReduz = $oDadosRelatorio->iReduz;
+            $oDadoRetorno->sDescr = $oDadosRelatorio->sDescr;
+            $oDadoRetorno->iFonte = $oDadosRelatorio->iFonte;
+            $oDadoRetorno->fValorRetirada = $oValores->saida;
+            $oDadoRetorno->fValorDeposito = $oValores->entrada;
+            $aDadosRetorno[$oValores->c69_data][] = $oDadoRetorno;
+        }
+    }
+
+    return $aDadosRetorno;
+}
+
+function getContasPorFonte($aInstit, $iAnousu, $aContas, $sFonte){
+
+    if(!empty($sFonte)){
+        $sWhereFonte = " and o15_codtri = '{$sFonte}' ";
+    }
+
+    if(!empty($aContas)){
+        $sWhereContas = " and c61_reduz in (".implode(',',$aContas).") ";
+    }
+
+    $sSqlContas  = " select distinct c61_reduz,c60_descr,o15_codtri ";
+    $sSqlContas .= " from conplanoreduz ";
+    $sSqlContas .= " inner join conplano on c61_codcon = c60_codcon and c61_anousu = c60_anousu ";
+    $sSqlContas .= " inner join orctiporec on c61_codigo = o15_codigo ";
+    $sSqlContas .= " where c61_anousu = {$iAnousu} and c61_instit in (".implode(',',$aInstit).") $sWhereFonte $sWhereContas ";
+
+    return db_utils::getCollectionByRecord(db_query($sSqlContas));
+
+}
+
+function getTransValorTferencias($sDtIni, $sDtFim,$iConta){
+
+    $sSqlTransf = "SELECT  c69_codlan,
+                           c69_data,
+                           sum(saida)AS saida,
+                           sum(entrada) AS entrada
+                    FROM
+                      (SELECT CASE
+                                  WHEN c69_credito = {$iConta} THEN c69_valor
+                                  ELSE 0
+                              END AS saida,
+                              CASE
+                                  WHEN c69_debito = {$iConta} THEN c69_valor
+                                  ELSE 0
+                              END AS entrada,
+                              c69_debito,
+                              c69_credito,
+                              c69_data,
+                              c69_codlan
+                       FROM conlancamval
+                       INNER JOIN conlancamdoc ON c71_codlan = c69_codlan
+                       WHERE (c69_credito in ({$iConta})
+                              OR c69_debito in ({$iConta}))
+                         AND c69_data BETWEEN '{$sDtIni}' AND '{$sDtFim}' and c71_coddoc in (140,141)) AS xx group by 1,2";
+
+    return db_utils::getCollectionByRecord(db_query($sSqlTransf));
+}
+
+
 /**
  * mPDF
  * @param string $mode              | padrão: BLANK
@@ -67,18 +149,18 @@ if(count($aInstits) > 1){
  * Nenhum dos parâmetros é obrigatório
  */
 
+try {
 $mPDF = new Mpdf([
     'mode' => '',
-    'format' => 'A4-L',
+    'format' => 'A4',
     'orientation' => 'L',
     'margin_left' => 15,
     'margin_right' => 15,
     'margin_top' => 20,
-    'margin_bottom' => 10,
+    'margin_bottom' => 15,
     'margin_header' => 5,
     'margin_footer' => 11,
 ]);
-
 $header = <<<HEADER
 <header>
   <table style="width:100%;text-align:center;font-family:sans-serif;border-bottom:1px solid #000;padding-bottom:6px;">
@@ -210,93 +292,13 @@ ob_start();
 
 <?php
 
-function getDados($sDtIni, $sDtFim, $aInstit, $iAnousu, $aContas, $sFonte)
-{
-    $oDadosAgrupados = Array();
-    foreach(getContasPorFonte($aInstit, $iAnousu, $aContas, $sFonte) as $oContaFonte){
-
-        $oDado = new stdClass();
-        $oDado->iReduz = $oContaFonte->c61_reduz;
-        $oDado->iFonte = $oContaFonte->o15_codtri;
-        $oDado->sDescr = $oContaFonte->c60_descr;
-        $oDado->aValores = getTransValorTferencias($sDtIni, $sDtFim, $oDado->iReduz);
-
-        $oDadosAgrupados[] = $oDado;
-
-
-    }
-    $aDadosRetorno = array();
-    foreach ($oDadosAgrupados as $oDadosRelatorio) {
-
-        foreach ($oDadosRelatorio->aValores as $oValores) {
-
-            $oDadoRetorno = new stdClass();
-            $oDadoRetorno->sData = $oValores->c69_data;
-            $oDadoRetorno->iReduz = $oDadosRelatorio->iReduz;
-            $oDadoRetorno->sDescr = $oDadosRelatorio->sDescr;
-            $oDadoRetorno->iFonte = $oDadosRelatorio->iFonte;
-            $oDadoRetorno->fValorRetirada = $oValores->saida;
-            $oDadoRetorno->fValorDeposito = $oValores->entrada;
-            $aDadosRetorno[$oValores->c69_data][] = $oDadoRetorno;
-        }
-    }
-
-    return $aDadosRetorno;
-}
-
-function getContasPorFonte($aInstit, $iAnousu, $aContas, $sFonte){
-
-    if(!empty($sFonte)){
-        $sWhereFonte = " and o15_codtri = '{$sFonte}' ";
-    }
-
-    if(!empty($aContas)){
-        $sWhereContas = " and c61_reduz in (".implode(',',$aContas).") ";
-    }
-
-    $sSqlContas  = " select distinct c61_reduz,c60_descr,o15_codtri ";
-    $sSqlContas .= " from conplanoreduz ";
-    $sSqlContas .= " inner join conplano on c61_codcon = c60_codcon and c61_anousu = c60_anousu ";
-    $sSqlContas .= " inner join orctiporec on c61_codigo = o15_codigo ";
-    $sSqlContas .= " where c61_anousu = {$iAnousu} and c61_instit in (".implode(',',$aInstit).") $sWhereFonte $sWhereContas ";
-
-    return db_utils::getCollectionByRecord(db_query($sSqlContas));
-
-}
-
-function getTransValorTferencias($sDtIni, $sDtFim,$iConta){
-
-    $sSqlTransf = "SELECT  c69_codlan,
-                           c69_data,
-                           sum(saida)AS saida,
-                           sum(entrada) AS entrada
-                    FROM
-                      (SELECT CASE
-                                  WHEN c69_credito = {$iConta} THEN c69_valor
-                                  ELSE 0
-                              END AS saida,
-                              CASE
-                                  WHEN c69_debito = {$iConta} THEN c69_valor
-                                  ELSE 0
-                              END AS entrada,
-                              c69_debito,
-                              c69_credito,
-                              c69_data,
-                              c69_codlan
-                       FROM conlancamval
-                       INNER JOIN conlancamdoc ON c71_codlan = c69_codlan
-                       WHERE (c69_credito in ({$iConta})
-                              OR c69_debito in ({$iConta}))
-                         AND c69_data BETWEEN '{$sDtIni}' AND '{$sDtFim}' and c71_coddoc in (140,141)) AS xx group by 1,2";
-
-    return db_utils::getCollectionByRecord(db_query($sSqlTransf));
-}
-
 $html = ob_get_contents();
 ob_end_clean();
 $mPDF->WriteHTML(utf8_encode($html));
-$mPDF->Output();
+$mPDF->Output('Transf. Banc. - '.$dtini.' - '.$dtfim.'.pdf', 'I');
 //echo $html;
-
+} catch (MpdfException $e) {
+    db_redireciona('db_erros.php?fechar=true&db_erro='.$e->getMessage());
+}
 
 ?>

@@ -475,6 +475,7 @@ class cl_anexocomprapncp
     {
         $sql = "
         SELECT  l217_nomedocumento AS l216_nomedocumento,
+        l217_documento,
                 l213_sequencial,
                 l213_descricao,
                 l217_sequencial
@@ -506,7 +507,8 @@ class cl_anexocomprapncp
         $sql = "
       SELECT    l217_nomedocumento AS l216_nomedocumento,
                 l217_tipoanexo as l216_tipoanexo,
-                l213_descricao
+                l213_descricao,
+                l217_documento
         FROM anexocomprapncp
         INNER JOIN comanexopncpdocumento ON l217_licanexospncp = l216_sequencial
         INNER JOIN tipoanexo ON l213_sequencial = l217_tipoanexo

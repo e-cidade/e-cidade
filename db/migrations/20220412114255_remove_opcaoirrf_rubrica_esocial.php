@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class RemoveOpcaoirrfRubricaEsocial extends AbstractMigration
+class RemoveOpcaoirrfRubricaEsocial extends PostgresMigration
 {
     public function up()
     {

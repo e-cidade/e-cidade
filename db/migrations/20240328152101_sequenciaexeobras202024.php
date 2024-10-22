@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Sequenciaexeobras202024 extends AbstractMigration
+class Sequenciaexeobras202024 extends PostgresMigration
 {
 
     public function up()

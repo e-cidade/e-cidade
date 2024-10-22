@@ -83,6 +83,7 @@ $clempempitem			= new cl_empempitem;
 $clempnotaele           = new cl_empnotaele;
 $clempnota           = new cl_empnota;
 $clempefdreinf       = new cl_empefdreinf;
+$clcgm            = new cl_cgm;
 
 parse_str($HTTP_SERVER_VARS["QUERY_STRING"]);
 db_postmemory($HTTP_POST_VARS);
@@ -551,6 +552,12 @@ if(isset($alterar)){
     }
     $db_opcao = 1;
     $result = $clempempenho->sql_record($clempempenho->sql_query($chavepesquisa));
+    $aVariables = pg_fetch_object($result);
+
+    if(!empty($aVariables->e60_dividaconsolidada)) {
+        $op01_numerocontratoopc = $aVariables->e60_dividaconsolidada;
+    }
+
     db_fieldsmemory($result,0);
 
     $result=$clempemphist->sql_record($clempemphist->sql_query_file($e60_numemp));
@@ -567,6 +574,35 @@ if(isset($alterar)){
     if($clemppresta->numrows > 0){
         db_fieldsmemory($result,0);
     }
+
+    $result=$clemppresta->sql_record($clemppresta->sql_query_file(null,"e45_tipo as e44_tipo", null, "e45_numemp = $e60_numemp"));
+    if($clemppresta->numrows > 0){
+        db_fieldsmemory($result,0);
+    }
+     //Verifica se o periodo contabil esta encerrado na data do empenho
+     $sSqlConsultaFimPeriodoContabil   = "SELECT * FROM condataconf WHERE c99_anousu = ".db_getsession("DB_anousu")." and c99_instit = ".db_getsession('DB_instit');
+     $rsConsultaFimPeriodoContabil     = db_query($sSqlConsultaFimPeriodoContabil);
+     $fimperiodocontabil = 1;
+     if($sqlerro == false){
+         if (pg_num_rows($rsConsultaFimPeriodoContabil) > 0) {
+             $oFimPeriodoContabil = db_utils::fieldsMemory($rsConsultaFimPeriodoContabil, 0);
+
+             if ($oFimPeriodoContabil->c99_data != '' &&
+             ($e60_emiss && (db_strtotime($e60_emiss) <= db_strtotime($oFimPeriodoContabil->c99_data)) || ($data_empenho &&
+             db_strtotime($data_empenho) <= db_strtotime($oFimPeriodoContabil->c99_data)))) {
+                 $fimperiodocontabil = 3;
+             }
+ 
+         }
+ 
+     }
+     if ($e60_numcgmordenador)
+        $result = $clcgm->sql_record($clcgm->sql_query_file($e60_numcgmordenador,"z01_nome as e60_nomeordenador"));
+   
+    if($clcgm->numrows > 0){
+        db_fieldsmemory($result, 0)->e60_nomeordenador;
+    } 
+
     $db_botao = true;
 }
 ?>

@@ -106,42 +106,6 @@ $clrotulo->label("l20_descrinterporrecurso");
 		<br>
 
 	<table>
-<?//
-//$x = array("2"=>"Nao","1"=>"Sim",);
-//db_select("l20_interporrecurso",$x,true,$db_opcao,"onchange='js_interporrecurso()'");
-//?>
-<!--    </td>-->
-<!--  </tr>-->
-  </table>
-
-<!--  <fieldset style="width: 60%">-->
-<!--  <legend align="left">-->
-<!--  <b>Descrição do Recurso</b>-->
-<!--  </legend>-->
-<!--  <table>-->
-<!--  <tr>-->
-<!--   <td nowrap title="--><?//=@$Tl20_descrinterporrecurso?><!--">-->
-<!--       --><?//=@$Ll20_descrinterporrecurso?>
-<!--    </td>-->
-<!--    <td>-->
-<!--  --><?//
-//  db_textarea('l20_descrinterporrecurso',2,80,$Il20_descrinterporrecurso,true,'text',$db_opcao,"","","#E6E4F1")
-//  ?>
-<!--  </td>-->
-<!--  </tr>-->
-<!--  -->
-<!--  <tr align="center">-->
-<!--  <td colspan="2">-->
-<!--  <input name="salvar" type="submit" value="Salvar"-->
-<!--		             --><?//=($db_opcao==3?"disabled":"")?>
-<!--  -->
-<!--  <input name="liberar" type="button" value="Liberar" onclick="js_liberar()"-->
-<!--		             --><?//=($db_opcao==3?"disabled":"")?>
-<!--  </td>-->
-<!--  </tr>-->
-<!--  -->
-<!--  </table>-->
-<!--  </fieldset>-->
 
 		<br>
 		<table border="0">

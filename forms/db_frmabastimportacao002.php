@@ -46,7 +46,7 @@ if (!empty($_FILES)) {
     $dadosImportados = $viewModel->getDadosImportados($nomeArquivo);
 
     if($dataFinal < $dataInicial){
-        echo "<script>alert('A data do período final deve ser maior ou igual a do período Inicial.');</script>";
+        echo "<script>Swal.fire({icon: 'warning', title: 'Atenção!', html: 'A data do período final deve ser maior ou igual a do período Inicial.'});</script>";
     }else{
         $quantidadeItens = count($dadosImportados);
 
@@ -65,7 +65,7 @@ if (!empty($_FILES)) {
         }
 
         if ($quantidadeItens === 0) {
-            echo "<script>alert('Não há abastecimentos para ser importados');</script>";
+            echo "<script>Swal.fire({ icon: 'warning', title: 'Atenção!', html: 'Não há abastecimentos para ser importados'});</script>";
         }
     }
 }
@@ -73,10 +73,12 @@ if (!empty($_FILES)) {
 ?>
 <style>
     .form_movimentacoes {
-        width: 68%;
+        /* width: 68%;
         height: 150px;
         padding: 15px;
-        margin-bottom: 10px;
+        margin-bottom: 10px; */
+        /* max-width: 600px; */
+        margin: 0 auto;
     }
 
     .column {
@@ -100,12 +102,12 @@ if (!empty($_FILES)) {
         background-color: #3CA980;
     }
 
-    .scroll {
+    /* .scroll {
         width: 70%;
         max-height: 350px;
         overflow-y: auto;
         padding: 0 15px;
-    }
+    } */
 
     .row {
         display: flex;
@@ -168,17 +170,16 @@ if (!empty($_FILES)) {
         background-color: #A7D6C4;
     }
 
-    .form_empenho_abastecimento {
+    /* .form_empenho_abastecimento {
         width: 68%;
         padding: 15px;
-    }
+    } */
 
-    .form_empenho_abastecimento .row input {
+    /* .form_empenho_abastecimento .row input {
         margin-left: 5px;
-    }
-
+    } */
     #table-result {
-        width: 70%;
+        width: 100%;
         border: 0px solid black;
     }
 
@@ -191,62 +192,108 @@ if (!empty($_FILES)) {
         background: #eeeff2;
         border: 0px solid red;
     }
-</style>
-<form method="post" enctype="multipart/form-data" onsubmit="return verificaCamposImportacao()">
-    <fieldset class="form_movimentacoes">
-        <legend>Importar Abastecimento</legend>
-        <div class="box">
-            <div class="row">
-                <div class="column w-35">
-                    <div class="row row_align_right">
-                        <label for="arquivo">Importar XLSX:</label>
-                    </div>
-                    <div class="row row_align_right">
-                        <label for="nomeArquivo">Nome do Arquivo: </label>
-                    </div>
-                    <div class="row row_align_right">
-                        <label>Período: </label>
-                    </div>
-                </div>
 
-                <div class="column w-60">
+    #table-errors td,
+    #table-errors th,
+    #minhaTabela td,
+    #minhaTabela th{
+        padding: 1em;
+    }
+
+    .contain-inputs-data{
+        display: flex;
+        gap: 5px;
+    }
+    .contain-inputs-data div{
+        max-width: 100%;
+        width: 200px;
+    }
+
+    legend{
+        width: auto;
+        padding: 5px;
+    }
+
+    .contain-info-fieldset{
+        max-width: 100%;
+        width: 800px;
+        margin: 0 auto;
+    }
+
+</style>
+<form method="post" enctype="multipart/form-data" onsubmit="return verificaCamposImportacao()" id="frmImportarAbastecimento">
+    <fieldset class="form_movimentacoes mt-4 p-4">
+        <legend>Importar Abastecimento</legend>
+        <div class="contain-info-fieldset">
+            <div class="row">
+                <div class="col-12 col-sm-12 form-group">
+                    <label for="arquivo">Importar XLSX:</label>
+                    <input
+                        type="file"
+                        name="arquivo"
+                        id="arquivo"
+                        class="form-control"
+                        data-validate-required="true"
+                        data-validate-required-message="O campo importar xlsx é obrigatório"
+                    >
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-sm-12 form-group">
+                    <label for="nomeArquivo">Nome do Arquivo:</label>
+                    <?php db_input('nomeArquivo', 35, $nomeArquivo, true, 'text', 3, "", "", "", "", null, 'form-control'); ?>
+                    <input type="hidden" id="nomeArquivoHidden" name="nomeArquivoHidden" value="<?= $nomeArquivo ?>">
+                    <input type="hidden" id="dataReferenciaEmpHidden" name="dataReferenciaEmpHidden" value="<?= $dataReferenciaEmpHidden ?>">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-sm-12 form-group">
+                    <label for="">Período:</label>
                     <div class="row">
-                        <input type="file" name="arquivo" id="arquivo" style="width: 256px;">
-                    </div>
-                    <div class="row">
-                        <?php db_input('nomeArquivo', 35, $nomeArquivo, true, 'text', 3, "", "", "", "width: 255px"); ?>
-                        <input type="hidden" id="nomeArquivoHidden" name="nomeArquivoHidden" value="<?= $nomeArquivo ?>">
-                        <input type="hidden" id="dataReferenciaEmpHidden" name="dataReferenciaEmpHidden" value="<?= $dataReferenciaEmpHidden ?>">
-                    </div>
-                    <div class="row">
-                        <?php
-                        if (!empty($dataInicial) && !empty($dataFinal)) {
-                            db_inputdata("dataInicial", $dataInicial->format('d'), $dataInicial->format('m'), $dataInicial->format('Y'), '', 'text', 1, '', 'dataInicial');
-                            echo " <strong style='margin: 0 15px;'>até</strong> ";
-                            db_inputdata("dataFinal", $dataFinal->format('d'), $dataFinal->format('m'), $dataFinal->format('Y'), '', 'text', 1, '', 'dataFinal');
-                        } else {
-                            db_inputdata("dataInicial", '', '', '', '', 'text', 1, '', 'dataInicial');
-                            echo " <strong style='margin: 0 15px;'>até</strong> ";
-                            db_inputdata("dataFinal", '', '', '', '', 'text', 1, '', 'dataFinal');
-                        }
-                        ?>
+                        <div class="col-12 col-sm-12 form-group pl-0 contain-inputs-data">
+                            <div>
+                                <input
+                                    type="date"
+                                    name="dataInicial"
+                                    id="dataInicial"
+                                    class="form-control"
+                                    value="<?= (!empty($dataInicial)? $dataInicial->format('Y-m-d') : '') ?>"
+                                    data-validate-required="true"
+                                    data-validate-date="true"
+                                    data-validate-date-message="Informe uma data válida"
+                                    style=""
+                                >
+                            </div>
+                            <b style="margin-top: 1.5em;">até</b>
+                            <div>
+                                <input
+                                    type="date"
+                                    name="dataFinal"
+                                    id="dataFinal"
+                                    class="form-control"
+                                    value="<?= (!empty($dataFinal)? $dataFinal->format('Y-m-d') : '') ?>"
+                                    data-validate-required="true"
+                                    data-validate-date="true"
+                                    data-validate-date-message="Informe uma data válida"
+                                >
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="row row-controls">
-                <div class="control">
-                    <input name='processar' type='submit' id="Processar" value="Processar" />
-                </div>
-                <div class="control">
-                    <input name='exportar' type='button' id="exportar" value="Gerar Planilha" onclick="gerar()" />
-                </div>
-            </div>
+        </div>
     </fieldset>
+    <div class="row">
+        <div class="col-12 mt-1 mb-4">
+            <button type='submit' name='processar' class="btn btn-success" id="Processar">Processar</button>
+            <button type='button' name='exportar' class="btn btn-primary" id="exportar" onclick="gerar()">Gerar Planilha</button>
+        </div>
+    </div>
 </form>
 <?php if (!empty($resultValidation) && $resultValidation->hasErrors()) : ?>
-    <section>
+    <section class="mt-4">
         <h3>A importação contém erros</h3>
-        <table class="table-errors">
+        <table id="table-errors" class="DBGrid table-errors mt-2" style="width: 100%;">
             <thead>
                 <tr>
                     <th>Codigo de Abastecimendo</th>
@@ -270,17 +317,29 @@ if (!empty($_FILES)) {
 <?php if (!empty($resultValidation) && !$resultValidation->hasErrors()) : ?>
     <fieldset class="form_empenho_abastecimento">
         <legend>Empenho para abastecimentos</legend>
-        <div class="row">
-            <?php db_ancora("Empenho:", "js_pesquisae60_codemp(true,0);", 1); ?>
-            <?php db_input('e60_codemp', 10, $Ie60_codemp, true, 'text', 1, "placeholder='num/ano' onchange='js_pesquisae60_codemp(false,0);'") ?>
-            <?php
-            db_input('z01_nome', 35, $Iz01_nome, true, 'text', 3, "", "", "", "");
-            ?>
-            <input type='button' id='btnAplicar' value='Aplicar' onclick="aplicarEmpenho();">
+        <div class="contain-info-fieldset">
+            <div class="row">
+                <div class="col-12 col-sm-11 form-group">
+                    <label>
+                        <?php db_ancora("Empenho:", "js_pesquisae60_codemp(true,0);", 1); ?>
+                    </label>
+                    <div class="row">
+                        <div class="col-12 col-sm-2 form-group pl-0">
+                            <?php db_input('e60_codemp', 10, $Ie60_codemp, true, 'text', 1, "placeholder='num/ano' onchange='js_pesquisae60_codemp(false,0);'", '', '', '', null, 'form-control') ?>
+                        </div>
+                        <div class="col-12 col-sm-10 form-group">
+                            <?php db_input('z01_nome', 35, $Iz01_nome, true, 'text', 3, "", "", "", "", null, 'form-control'); ?>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-1">
+                    <button type='button' id='btnAplicar' class="btn btn-success mt-3" onclick="aplicarEmpenho();">Aplicar</button>
+                </div>
+            </div>
         </div>
     </fieldset>
 
-    <table class="DBGrid" id="table-result" style="width: 70%; margin-top:15px">
+    <table class="DBGrid table table-striped" id="table-result" style="margin-top:15px">
         <thead>
             <tr>
                 <th class="table_header" style="width: 30px; cursor: pointer;" onclick="marcarTodos();">M</th>
@@ -313,8 +372,6 @@ if (!empty($_FILES)) {
     <div class="scroll">
         <table class="DBGrid" id="table-result" style="width: 100%;">
             <tbody>
-
-
                 <?php foreach ($dadosImportados as $key => $value) : ?>
                     <tr id="tr_<?= $value['codigo_abastecimento'] ?>">
                         <td class="table_header" style="width: 30px; cursor: pointer;" data-info="<?= $key ?>">
@@ -358,8 +415,8 @@ if (!empty($_FILES)) {
                         </td>
                         <td id="td_unidade_<?= $value['codigo_abastecimento'] ?>" style="width:200px;">
                             <?= utf8_decode($value['unidade']) ?>
-                        <td id="td_empenho_<?= $value['codigo_abastecimento'] ?>" style="display:flex; align-items: center; justify-content: center;">
-                            <input type="text" onchange="empvalido(this.value,this.id);js_pesquisaempenholinha(this.value,this.id);" name="input_empenho" id="input_empenho_<?= $key ?>" style="margin-right: 3px;" placeholder="num/ano">
+                        <td id="td_empenho_<?= $value['codigo_abastecimento'] ?>" class="form-group" style="display:flex; align-items: center; justify-content: center;">
+                            <input type="text" onchange="empvalido(this.value,this.id);js_pesquisaempenholinha(this.value,this.id);" name="input_empenho" id="input_empenho_<?= $key ?>" class="form-control" style="margin-right: 3px;" placeholder="num/ano">
                         </td>
 
                     </tr>
@@ -367,36 +424,38 @@ if (!empty($_FILES)) {
             </tbody>
         </table>
     </div>
-    <table style="width: 68%;" >
-        <tbody>
-            <tr style="padding: 3px">
-                <td align="right">
-                 <p><strong>Total de itens:</strong>
-                    <span class="nowrap" id="totalitens"> <?= $quantidadeItens ?> </span></p>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="7" align="center">
-                    <input style="margin-top:10px;" type="button" id="salvarImportacao" value="Salvar" onclick="js_salvar();">
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="row">
+        <div class="col-12 text-right">
+            <p><strong>Total de itens:</strong>
+                <span class="nowrap" id="totalitens"> <?= $quantidadeItens ?> </span></p>
+            </td>
+        </div>
+        <div class="col-12 mt-4">
+            <button style="margin-top:10px;" type="button" id="salvarImportacao" class="btn btn-success" onclick="js_salvar();">Salvar</button>
+        </div>
+    </div>
 <?php endif; ?>
 
-<table id="minhaTabela" class="table-errors" style="display: none; margin-top: 10px">
-    <thead>
-        <tr>
-            <th>Código de Abastecimento</th>
-            <th>Mensagem</th>
-            <th>Placa</th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- Dados serão inseridos aqui via JavaScript -->
-    </tbody>
-</table>
+<div class="row">
+    <div class="col-12">
+        <table id="minhaTabela" class="DBGrid table-errors" style="display: none; margin-top: 10px; width: 100%;">
+            <thead>
+                <tr>
+                    <th width="15%">Código de Abastecimento</th>
+                    <th width="70%">Mensagem</th>
+                    <th width="15%">Placa</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dados serão inseridos aqui via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+</div>
 <script>
+    const validator = initializeValidation('#frmImportarAbastecimento');
+    const btnProcessar = document.getElementById('Processar');
+
     function verificaCamposImportacao() {
         const inputDataInicial = document.getElementById('dataInicial');
         const inputDataFinal = document.getElementById('dataFinal');
@@ -405,19 +464,31 @@ if (!empty($_FILES)) {
         const inputNomeArquivo = document.getElementById('nomeArquivo');
 
         if (inputFile.files.length === 0 && inputNomeArquivo.value == "") {
-            alert('É preciso anexar um arquivo');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atenção!',
+                text: 'É preciso anexar um arquivo',
+            });
             return false;
         }
 
 
         if (inputDataInicial.value == "") {
-            alert("Campo data inicial vazio");
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atenção!',
+                text: 'Campo data inicial vazio',
+            });
             dataInicial.select();
             return false;
         }
 
         if (inputDataFinal.value == "") {
-            alert("Campo data final vazio");
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atenção!',
+                text: 'Campo data final vazio',
+            });
             dataFinal.select();
             return false;
         }
@@ -455,7 +526,11 @@ if (!empty($_FILES)) {
         const codigosEmpenhoNulo = getCodigoEmpenhoNulo(abastecimentos);
 
         if (codigosEmpenhoNulo.length > 0) {
-            alert("Existe(em) abastecimento(os) com campo empenho não informado. Codigos de Abastecimento: <br/> " + codigosEmpenhoNulo.toString());
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atenção!',
+                html: "Existe(em) abastecimento(os) com campo empenho não informado. Codigos de Abastecimento: <br/> " + codigosEmpenhoNulo.toString(),
+            });
             return;
         }
 
@@ -507,12 +582,21 @@ if (!empty($_FILES)) {
 
         js_removeObj("msgbox");
         if (oRetorno.status === 1) {
-            alert("Abastecimento(s) cadastrado(s) com sucesso!");
+            Swal.fire({
+                icon: 'success',
+                title: 'Sucesso!',
+                text: 'Abastecimento(s) cadastrado(s) com sucesso!',
+            });
             window.location.href = 'vei1_abastimportacao002.php';
             return;
         }
 
-        alert(oRetorno.message);
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro!',
+            html: oRetorno.message,
+        });
+
         if (oRetorno.errors.length === 0) {
             return;
         }
@@ -594,12 +678,22 @@ if (!empty($_FILES)) {
 
         if (anoempenho == "" || anoempenho == undefined) {
             document.getElementById(event.target.id).value = '';
-            return alert('Usuário: informar o número do empenho com exercício');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atenção!',
+                html: 'Usuário: informar o número do empenho com exercício',
+            });
+            return;
         }
 
         if(anoempenho.length !== 4){
             document.getElementById(id).value = '';
-            return alert('Usuario: Número do empenho invalido');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atenção!',
+                html: 'Usuario: Número do empenho invalido',
+            });
+            return;
         }
     }
 
@@ -620,7 +714,12 @@ if (!empty($_FILES)) {
 
     function js_mostrarempenholinha(chave1,chave2){
         if(chave2 === true){
-            return alert('Usuario: Número do Empenho não Encontrado.')
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atenção!',
+                html: 'Usuario: Número do Empenho não Encontrado.',
+            });
+            return;
         }
     }
 
@@ -636,13 +735,21 @@ if (!empty($_FILES)) {
         const dataFinal = document.getElementById('dataFinal');
 
         if (dataInicial.value == "") {
-            alert("Campo data inicial vazio");
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atenção!',
+                html: 'Campo data inicial vazio',
+            });
             dataInicial.select();
             return false;
         }
 
         if (dataFinal.value == "") {
-            alert("Campo data final vazio");
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atenção!',
+                html: 'Campo data final vazio',
+            });
             dataFinal.select();
             return false;
         }
@@ -714,4 +821,17 @@ if (!empty($_FILES)) {
 
         return true;
     }
+
+    if(btnProcessar != null){
+        btnProcessar.addEventListener('click', function(e){
+            e.preventDefault();
+            const isValid = validator.validate();
+            if(!isValid){
+                return false;
+            }
+
+            document.getElementById('frmImportarAbastecimento').dispatchEvent((new Event('submit')));
+        })
+    }
+
 </script>

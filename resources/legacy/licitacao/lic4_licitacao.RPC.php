@@ -1,4 +1,7 @@
 <?php
+
+use App\Helpers\FileHelper;
+
 require_once("libs/db_stdlib.php");
 require_once("std/db_stdClass.php");
 require_once("libs/db_utils.php");
@@ -12,6 +15,7 @@ require_once("model/licitacao.model.php");
 require_once("model/licitacao/SituacaoLicitacao.model.php");
 require_once("model/EditalDocumento.model.php");
 require_once("classes/db_solicitem_classe.php");
+require_once("app/Helpers/FileHelper.php");
 
 $clliclicita       = new cl_liclicita;
 $oJson             = new services_json();
@@ -609,6 +613,7 @@ switch ($oParam->exec) {
 
             $nometmp = explode('/', $oParam->arquivo);
             $novoNome = strlen($nometmp[1]) > 100 ? substr($nometmp[1], 0, 100) : $nometmp[1];
+            $novoNome = FileHelper::sanitizeFileName(FileHelper::replaceSpecialChars($novoNome));
 
             if (!$erro) {
                 $oEdital = new EditalDocumento;
@@ -620,7 +625,7 @@ switch ($oParam->exec) {
                 $oEdital->salvar();
                 $oRetorno->message = 'Anexo cadastrado com sucesso!';
             }
-        } catch (Exception $erro) {
+        } catch (Exception $oErro) {
             $oRetorno->message = $oErro->getMessage();
             $oRetorno->status  = 2;
         }

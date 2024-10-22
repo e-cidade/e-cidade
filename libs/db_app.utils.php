@@ -36,16 +36,22 @@ class db_app
   {
   }
 
-  static function load($files)
+  static function load($files, $version = DB_VERSION)
   {
 
     $aFiles = array();
+    $aFiles["estilos.bootstrap.css"]    = "<link href='estilos.bootstrap.css' rel='stylesheet' type='text/css'>";
     $aFiles["estilos.css"]    = "<link href='estilos.css' rel='stylesheet' type='text/css'>";
     $aFiles["grid.style.css"] = "<link href='estilos/grid.style.css' rel='stylesheet' type='text/css'>";
-    $aFiles["scripts.js"]     = "<script language='JavaScript' type='text/javascript' src='scripts/scripts.js?version=" . DB_VERSION . "'></script>";
-    $aFiles["strings.js"]     = "<script language='JavaScript' type='text/javascript' src='scripts/strings.js?version=" . DB_VERSION . "'></script>";
-    $aFiles["datagrid.widget.js"] = "<script language='JavaScript' type='text/javascript' src='scripts/datagrid.widget.js?version=" . DB_VERSION . "'></script>";
-    $aFiles["prototype.js"]       = "<script language='JavaScript' type='text/javascript' src='scripts/prototype.js?version=" . DB_VERSION . "'></script>";
+    $aFiles["scripts.js"]     = "<script language='JavaScript' type='text/javascript' src='scripts/scripts.js?version=" . $version . "'></script>";
+    $aFiles["strings.js"]     = "<script language='JavaScript' type='text/javascript' src='scripts/strings.js?version=" . $version . "'></script>";
+    $aFiles["datagrid.widget.js"] = "<script language='JavaScript' type='text/javascript' src='scripts/datagrid.widget.js?version=" . $version . "'></script>";
+    $aFiles["prototype.js"]       = "<script language='JavaScript' type='text/javascript' src='scripts/prototype.js?version=" . $version . "'></script>";
+    $aFiles["sweetalert.js"]     = "<script language='JavaScript' type='text/javascript' src='scripts/sweetalert2.all.min.js'></script>";
+    $aFiles["just-validate.js"]     = "
+        <script language='JavaScript' type='text/javascript' src='scripts/just-validate.production.min.js'></script>
+        <script language='JavaScript' type='text/javascript' src='scripts/validator-form.js'></script>
+    ";
     $aFileToLoad = explode(",", $files);
 
     foreach ($aFileToLoad as $index => $filename) {

@@ -69,16 +69,14 @@ switch ($oParam->exec) {
         $rsAvisoPNCP = $clacocontrolepncp->sql_record($clacocontrolepncp->sql_query(null, "ac213_numerocontrolepncp,ac213_contrato,ac213_sequencialpncp,ac213_ano", null, "ac213_contrato = $oParam->iContrato limit 1"));
         $oDadosAvisoPNCP = db_utils::fieldsMemory($rsAvisoPNCP, 0);
 
-
-
         try {
             foreach ($oParam->aTermo as $termo) {
 
                 //Verifica se ja existe lancamento de termo de recisao no PNCP
-                $rsTermoPNCP = $cl_acocontroletermospncp->sql_record($cl_acocontroletermospncp->sql_query(null,"*",null,"l214_acordo = $oParam->iContrato and l214_tipotermocontratoid = 1"));
+                $rsTermoPNCP = $cl_acocontroletermospncp->sql_record($cl_acocontroletermospncp->sql_query(null,"*",null,"l214_acordo = $oParam->iContrato"));
 
                 if(pg_num_rows($rsTermoPNCP)){
-                    throw new Exception(utf8_decode("Contrato já possui termo de rescisão publicado no pncp."));
+                    throw new Exception("Contrato já possui termo de rescisão publicado no pncp.");
                 }
 
                 $aDadosTermos = $oAcordo->getDadosTermosPncp($termo->codigo,$termo->numeroaditamento);
@@ -122,6 +120,52 @@ switch ($oParam->exec) {
         }
         break;
 
+    case 'retificarTermo':
+
+        $clacocontrolepncp = new cl_acocontratopncp;
+        $oAcordo = new Acordo($oParam->iContrato);
+        $cl_acocontroletermospncp = new cl_acocontroletermospncp();
+
+        //Buscos Chave do Contrato do PNCP
+        $rsAvisoPNCP = $clacocontrolepncp->sql_record($clacocontrolepncp->sql_query(null, "ac213_numerocontrolepncp,ac213_contrato,ac213_sequencialpncp,ac213_ano", null, "ac213_contrato = $oParam->iContrato limit 1"));
+        $oDadosAvisoPNCP = db_utils::fieldsMemory($rsAvisoPNCP, 0);
+
+        try {
+
+            if(empty($oParam->justificativa)) {
+                throw new Exception("A inclusão de uma justificativa é obrigatória ao realizar a operação de retificação do termo.");
+            }
+
+            foreach ($oParam->aTermo as $termo) {
+
+                //Verifica se ja existe lancamento de termo de recisao no PNCP
+                $rsTermoPNCP = $cl_acocontroletermospncp->sql_record($cl_acocontroletermospncp->sql_query(null,"*",null,"l214_acordo = $oParam->iContrato"));
+
+                if(!pg_num_rows($rsTermoPNCP)){
+                    throw new Exception("Contrato já possui termo de rescisão publicado no pncp.");
+                }
+
+                $aDadosTermos = $oAcordo->getDadosTermosPncp($termo->codigo, $termo->numeroaditamento);
+
+                //envia para pncp
+                $clTermodeContrato = new TermodeContrato($aDadosTermos);
+                $oDadosTermo = $clTermodeContrato->montarRetificacao($oParam->justificativa);
+
+                $rsApiPNCP = $clTermodeContrato->enviarRetificao($oDadosTermo, $oDadosAvisoPNCP->ac213_sequencialpncp, $oDadosAvisoPNCP->ac213_ano, $termo->codigotermo);
+
+                if ($rsApiPNCP == null) {
+                    $oRetorno->status  = 1;
+                    $oRetorno->message = "Retificado com Sucesso !";
+                } else {
+                    throw new Exception(utf8_decode($rsApiPNCP->message));
+                }
+            }
+        }catch (Exception $eErro) {
+            $oRetorno->status  = 2;
+            $oRetorno->message = urlencode($eErro->getMessage());
+        }
+        break;
+
     case 'excluirTermo':
         $oAcordo = new Acordo($oParam->iContrato);
 
@@ -134,7 +178,7 @@ switch ($oParam->exec) {
 
                 //envia para pncp
                 $clTermodeContrato = new TermodeContrato();
-                $rsApiPNCP = $clTermodeContrato->excluirTermo($oAcordo->getAno(),$oAcordo->getCodigoContratoPNCP($oParam->iContrato),$termo->codigotermo);
+                $rsApiPNCP = $clTermodeContrato->excluirTermo($oAcordo->getAno(), $oAcordo->getCodigoContratoPNCP($oParam->iContrato), $termo->codigotermo, $oParam->justificativa);
 
                 if ($rsApiPNCP == null) {
                     $cl_acocontroletermospncp = new cl_acocontroletermospncp();

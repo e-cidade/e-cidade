@@ -26,7 +26,15 @@ $oRetorno->status  = 1;
 switch ($oParam->exec) {
     case 'getContratos':
         $clcontratos = new cl_acordo;
-        $rsContrato = $clcontratos->sql_record($clcontratos->sql_Contrato_PCNP());
+
+        if ($oParam->tipo == "1") {
+            $whereCustomParam = " AND ac213_numerocontrolepncp is null ";
+        } else {
+            $whereCustomParam = " AND ac213_numerocontrolepncp != '' ";
+        }
+        $whereCustomParam .= "AND ac16_anousu = $oParam->ano";
+
+        $rsContrato = $clcontratos->sql_record($clcontratos->sql_Contrato_PCNP($whereCustomParam));
 
         for ($iCont = 0; $iCont < pg_num_rows($rsContrato); $iCont++) {
 
@@ -61,45 +69,54 @@ switch ($oParam->exec) {
                 }
 
                 $clContratoPNCP = new ContratoPNCP($oDadosContrato);
-                //monta o json com os dados da Contrato
-                $oDados = $clContratoPNCP->montarDados();
-                $arraybensjson = json_encode(DBString::utf8_encode_all($oDados));
+                $tipopessoafornecedor = $clContratoPNCP->verificarCpfCnpj($oDadosContrato->nifornecedor);
 
-                $rsApiPNCP = $clContratoPNCP->enviarContrato($arraybensjson);
-
-                //$rsApiPNCP = array(201,'//treina.pncp.gov.br/pncp-api/v1/orgaos/23539463000121/contratos/2024/6 x-content-type-options');
-
-                if ($rsApiPNCP[0] == 201) {
-                    //producao
-                    $anocontrato = substr($rsApiPNCP[1], 58, 4);
-                    $ac213_sequencialpncp = trim(substr(str_replace('x-content-type-options', '', $rsApiPNCP[1]), 63));
-                    $ac213_numerocontrolepncp = db_utils::getCnpj() . '-2-' . str_pad($ac213_sequencialpncp, 6, '0', STR_PAD_LEFT) . '/' . $anocontrato;
-                    //treinamento
-                    if($envs['APP_ENV'] == "T"){
-                        $anocontrato = substr($rsApiPNCP[1], 65, 4);
-                        $ac213_sequencialpncp = trim(substr(str_replace('x-content-type-options', '', $rsApiPNCP[1]), 70));
-                        $ac213_numerocontrolepncp = db_utils::getCnpj() . '-2-' . str_pad($ac213_sequencialpncp, 6, '0', STR_PAD_LEFT) . '/' . $anocontrato;
-                    }
-
-                    //monto o codigo do contrato no pncp
-                    $clacocontrolepncp->ac213_contrato = $aContrato->codigo;
-                    $clacocontrolepncp->ac213_usuario = db_getsession('DB_id_usuario');
-                    $clacocontrolepncp->ac213_dtlancamento = date('Y-m-d', db_getsession('DB_datausu'));
-                    $clacocontrolepncp->ac213_numerocontrolepncp = $ac213_numerocontrolepncp;
-                    $clacocontrolepncp->ac213_situacao = 1;
-                    $clacocontrolepncp->ac213_instit = db_getsession('DB_instit');
-                    $clacocontrolepncp->ac213_ano = $anocontrato;
-                    $clacocontrolepncp->ac213_sequencialpncp = $ac213_sequencialpncp;
-                    $clacocontrolepncp->incluir();
-
-                    if($clacocontrolepncp->erro_status == 0){
-                        $erro = $clacocontrolepncp->erro_msg;
-                        $sqlerro = true;
-                    }
-
-                    $oRetorno->status  = 1;
+                if(empty($tipopessoafornecedor)) {
+                    $oRetorno->status  = 2;
+                    $oRetorno->message = urlencode("O número identificador $oDadosContrato->nifornecedor é inválido! Ele não corresponde a um CNPJ ou CPF válido.");
                 } else {
-                    throw new Exception(utf8_decode($rsApiPNCP[1]));
+                    $oDadosContrato->tipopessoafornecedor;
+
+                    //monta o json com os dados da Contrato
+                    $oDados = $clContratoPNCP->montarDados();
+                    $arraybensjson = json_encode(DBString::utf8_encode_all($oDados));
+    
+                    $rsApiPNCP = $clContratoPNCP->enviarContrato($arraybensjson);
+    
+                    //$rsApiPNCP = array(201,'//treina.pncp.gov.br/pncp-api/v1/orgaos/23539463000121/contratos/2024/6 x-content-type-options');
+    
+                    if ($rsApiPNCP[0] == 201) {
+                        //producao
+                        $anocontrato = substr($rsApiPNCP[1], 58, 4);
+                        $ac213_sequencialpncp = trim(substr(str_replace('x-content-type-options', '', $rsApiPNCP[1]), 63));
+                        $ac213_numerocontrolepncp = db_utils::getCnpj() . '-2-' . str_pad($ac213_sequencialpncp, 6, '0', STR_PAD_LEFT) . '/' . $anocontrato;
+                        //treinamento
+                        if($envs['APP_ENV'] == "T"){
+                            $anocontrato = substr($rsApiPNCP[1], 65, 4);
+                            $ac213_sequencialpncp = trim(substr(str_replace('x-content-type-options', '', $rsApiPNCP[1]), 70));
+                            $ac213_numerocontrolepncp = db_utils::getCnpj() . '-2-' . str_pad($ac213_sequencialpncp, 6, '0', STR_PAD_LEFT) . '/' . $anocontrato;
+                        }
+    
+                        //monto o codigo do contrato no pncp
+                        $clacocontrolepncp->ac213_contrato = $aContrato->codigo;
+                        $clacocontrolepncp->ac213_usuario = db_getsession('DB_id_usuario');
+                        $clacocontrolepncp->ac213_dtlancamento = date('Y-m-d', db_getsession('DB_datausu'));
+                        $clacocontrolepncp->ac213_numerocontrolepncp = $ac213_numerocontrolepncp;
+                        $clacocontrolepncp->ac213_situacao = 1;
+                        $clacocontrolepncp->ac213_instit = db_getsession('DB_instit');
+                        $clacocontrolepncp->ac213_ano = $anocontrato;
+                        $clacocontrolepncp->ac213_sequencialpncp = $ac213_sequencialpncp;
+                        $clacocontrolepncp->incluir();
+    
+                        if($clacocontrolepncp->erro_status == 0){
+                            $erro = $clacocontrolepncp->erro_msg;
+                            $sqlerro = true;
+                        }
+    
+                        $oRetorno->status  = 1;
+                    } else {
+                        throw new Exception(utf8_decode($rsApiPNCP[1]));
+                    }
                 }
             }
         } catch (Exception $eErro) {
@@ -159,7 +176,8 @@ switch ($oParam->exec) {
                     $sequencialpncp = db_utils::fieldsMemory($rsContrato, $iCont);
                 }
 
-                $statusExclusao = $clContratoPNCP->excluirContrato($sequencialpncp->ac213_sequencialpncp, $sequencialpncp->ac213_ano, $sequencialpncp->ac213_numerocontrolepncp);
+                $justificativapncp['justificativa'] = $sequencialpncp->ac16_justificativapncp;
+                $statusExclusao = $clContratoPNCP->excluirContrato($sequencialpncp->ac213_sequencialpncp, $sequencialpncp->ac213_ano, $sequencialpncp->ac213_numerocontrolepncp, $justificativapncp);
 
                 if ($statusExclusao->status == null)
                     $clacocontrolepncp->excluir($ac123_sequencial = null, "ac213_contrato = $aContrato->codigo");

@@ -1050,7 +1050,6 @@
       me.oDivDestino.appendChild(me.oButtonNovo);
 
       if(me.lAlteracao){
-        console.log(me.bAssinaturaAtiva);
         if(me.bAssinaturaAtiva){
           me.oDivDestino.appendChild(me.oButtonAssinar);
         }
@@ -1173,169 +1172,205 @@
      */
     me.oButtonSalvar.observe('click', function() {
 
-      if (!me.validarInstituicao()) {
-        return false;
-      }
+      var obsHistorico = document.getElementById('observacao_oDBViewSlipPagamento').value;
 
-      if (!me.validarTipo()) {
-        return false;
-      }
+      document.getElementById('oTxtHistoricoInputCodigo').dispatchEvent(new Event('change'));
 
-      if (!me.validarContaCreditoDebito()) {
-        return false;
-      }
-
-      if (me.iTipoTransferencia != 5 && me.iTipoTransferencia != 6) {
-
-        if (me.oTxtFavorecidoInputCodigo.getValue() == "") {
-
-          alert("Favorecido não informado.");
+      setTimeout(function() {
+        
+        if (!me.validarInstituicao()) {
           return false;
         }
-      }
 
-      if (me.iAno >= 2022) {
+        if (!me.validarTipo()) {
+          return false;
+        }
+
+        if (!me.validarContaCreditoDebito()) {
+          return false;
+        }
+
+        if (me.iTipoTransferencia != 5 && me.iTipoTransferencia != 6) {
+
+          if (me.oTxtFavorecidoInputCodigo.getValue() == "") {
+
+            alert("Favorecido não informado.");
+            return false;
+          }
+        }
+
+        if (me.iAno >= 2022) {
+        
           if (me.oTxtFonteInputCodigo.getValue() == "") {
               alert("Fonte não informada.");
               return false;
           }
 
-        if (me.iAno >= 2024) {
-          if (me.oTxtFonteInputCodigo.getValue().length < 4) {
-            alert("Fonte inválida");
+          if (me.iAno >= 2024) {
+            if (me.oTxtFonteInputCodigo.getValue().length < 4) {
+              alert("Fonte inválida");
+              return false;
+            }
+          }
+
+          if (me.temExercicioDevolucao()) {
+              if (me.oTxtExercicioCompetenciaDevolucaoInput.getValue() == "") {
+                  alert("Exercício da Competência da Devolução não informada.");
+                  return false;
+              }
+
+              if (me.oTxtExercicioCompetenciaDevolucaoInput.getValue().length != 4) {
+                  alert("Exercício da Competência da Devolução incorreta.");
+                  return false;
+              }
+          }
+        }
+
+        if (me.iTipoTransferencia == 1) {
+
+          if (me.oTxtInstituicaoDestinoCodigo.getValue() == "") {
+            alert("Informe a instituição de destino.");
             return false;
           }
         }
 
-            if (me.temExercicioDevolucao()) {
-                if (me.oTxtExercicioCompetenciaDevolucaoInput.getValue() == "") {
-                    alert("Exercício da Competência da Devolução não informada.");
-                    return false;
-                }
+        if (me.lFinalidadeDePagamentoFundeb && me.oTxtCodigoFinalidadeFundeb.getValue() == "") {
 
-                if (me.oTxtExercicioCompetenciaDevolucaoInput.getValue().length != 4) {
-                    alert("Exercício da Competência da Devolução incorreta.");
-                    return false;
-                }
-            }
-      }
-
-      if (me.iTipoTransferencia == 1) {
-
-        if (me.oTxtInstituicaoDestinoCodigo.getValue() == "") {
-          alert("Informe a instituição de destino.");
+          alert("Informe a finalidade de pagamento do FUNDEB.");
           return false;
         }
-      }
 
-      if (me.lFinalidadeDePagamentoFundeb && me.oTxtCodigoFinalidadeFundeb.getValue() == "") {
+        if (me.oTxtHistoricoInputCodigo.getValue() == "") {
 
-        alert("Informe a finalidade de pagamento do FUNDEB.");
-        return false;
-      }
+          alert("Informe o histórico para a transferência.");
+          return false;
+        }
 
-      if (me.oTxtHistoricoInputCodigo.getValue() == "") {
+        if (me.oTxtDataInput.getValue() == "") {
 
-        alert("Informe o histórico para a transferência.");
-        return false;
-      }
+          alert("Informe a Data.");
+          return false;
+        }
 
-      if (me.oTxtDataInput.getValue() == "") {
+        if (me.oTxtValorInput.getValue() == "" || me.oTxtValorInput.getValue() <= 0) {
 
-        alert("Informe a Data.");
-        return false;
-      }
+          alert("O campo valor não pode ser vazio nem ser negativo.");
+          return false;
+        }
 
-      if (me.oTxtValorInput.getValue() == "" || me.oTxtValorInput.getValue() <= 0) {
+        var aDadosValor = me.oTxtValorInput.getValue().split(',');
 
-        alert("O campo valor não pode ser vazio nem ser negativo.");
-        return false;
-      }
+        if (aDadosValor.length > 2) {
 
-      var aDadosValor = me.oTxtValorInput.getValue().split(',');
+          alert("Valor digitado inválido. Verifique.");
+          return false;
+        }
 
-      if (aDadosValor.length > 2) {
+        if (obsHistorico == "") {
 
-        alert("Valor digitado inválido. Verifique.");
-        return false;
-      }
+          alert("Campo descrição do histórico é obrigatório.");
+          return false;
+        }
 
-      if (me.getObservacao() == "") {
+        if (me.iInscricaoPassivo != null && me.oTxtProcessoAdministrativoInput.getValue() == "") {
 
-        alert("Campo descrição do histórico é obrigatório.");
-        return false;
-      }
-
-      if (me.iInscricaoPassivo != null && me.oTxtProcessoAdministrativoInput.getValue() == "") {
-
-        alert("Campo processo adminstrativo é obrigatório.");
-        return false;
-      }
+          alert("Campo processo adminstrativo é obrigatório.");
+          return false;
+        }
 
 
-      js_divCarregando("Aguarde, salvando dados da transferência...", "msgBox");
-      var oParam                            = new Object();
-      oParam.exec                           = "salvarSlip";
-      oParam.k17_codigo                     = me.oTxtCodigoSlip.getValue();
-      oParam.iCodigoTipoOperacao            = me.iTipoTransferencia;
-      oParam.k17_debito                     = me.oTxtContaDebitoCodigo.getValue();
-      oParam.k17_credito                    = me.oTxtContaCreditoCodigo.getValue();
-      oParam.k17_valor                      = me.oTxtValorInput.getValue();
-      oParam.k17_hist                       = me.oTxtHistoricoInputCodigo.getValue();
-      oParam.iCGM                           = me.oTxtFavorecidoInputCodigo.getValue();
-      if (me.iAno >= 2022 || me.lAlteracao == true)
-          oParam.iCodigoFonte = me.oTxtFonteInputCodigo.getValue();
-      oParam.sCaracteristicaPeculiarDebito  = me.oTxtCaracteristicaDebitoInputCodigo.getValue();
-      oParam.sCaracteristicaPeculiarCredito = me.oTxtCaracteristicaCreditoInputCodigo.getValue();
-        if (me.iAno >= 2022 && me.temExercicioDevolucao())
-            oParam.iExercicioCompetenciaDevolucao = me.oTxtExercicioCompetenciaDevolucaoInput.getValue();
-      oParam.k17_texto                      = encodeURIComponent(tagString(me.getObservacao()));
-      oParam.sCodigoFinalidadeFundeb        = me.oTxtCodigoFinalidadeFundeb.getValue();
-      oParam.k17_numdocumento               = encodeURIComponent(tagString(me.oTxtNumDocumentoInput.getValue())) ;
-      oParam.k17_data                       = me.oTxtDataInput.getValue();
-      oParam.k17_tiposelect                 = iTipoTransferencia == 5 ? $("txt_tipo_" + me.sNomeInstancia).value : '' ;
-      oParam.k145_numeroprocesso            = encodeURIComponent(tagString(me.oTxtProcessoInput.getValue())) ;
+        js_divCarregando("Aguarde, salvando dados da transferência...", "msgBox");
+        var oParam                            = new Object();
+        oParam.exec                           = "salvarSlip";
+        oParam.k17_codigo                     = me.oTxtCodigoSlip.getValue();
+        oParam.iCodigoTipoOperacao            = me.iTipoTransferencia;
+        oParam.k17_debito                     = me.oTxtContaDebitoCodigo.getValue();
+        oParam.k17_credito                    = me.oTxtContaCreditoCodigo.getValue();
+        oParam.k17_valor                      = me.oTxtValorInput.getValue();
+        oParam.k17_hist                       = me.oTxtHistoricoInputCodigo.getValue();
+        oParam.iCGM                           = me.oTxtFavorecidoInputCodigo.getValue();
+        if (me.iAno >= 2022 || me.lAlteracao == true)
+            oParam.iCodigoFonte = me.oTxtFonteInputCodigo.getValue();
+        oParam.sCaracteristicaPeculiarDebito  = me.oTxtCaracteristicaDebitoInputCodigo.getValue();
+        oParam.sCaracteristicaPeculiarCredito = me.oTxtCaracteristicaCreditoInputCodigo.getValue();
+          if (me.iAno >= 2022 && me.temExercicioDevolucao())
+              oParam.iExercicioCompetenciaDevolucao = me.oTxtExercicioCompetenciaDevolucaoInput.getValue();
+        oParam.k17_texto                      = encodeURIComponent(tagString(obsHistorico));
+        oParam.sCodigoFinalidadeFundeb        = me.oTxtCodigoFinalidadeFundeb.getValue();
+        oParam.k17_numdocumento               = encodeURIComponent(tagString(me.oTxtNumDocumentoInput.getValue())) ;
+        oParam.k17_data                       = me.oTxtDataInput.getValue();
+        oParam.k17_tiposelect                 = iTipoTransferencia == 5 ? $("txt_tipo_" + me.sNomeInstancia).value : '' ;
+        oParam.k145_numeroprocesso            = encodeURIComponent(tagString(me.oTxtProcessoInput.getValue())) ;
 
-      if(me.iInscricaoPassivo != null) {
+        if(me.iInscricaoPassivo != null) {
 
-        oParam.k17_texto += " Processo Adminstrativo: ";
-        oParam.k17_texto += encodeURIComponent(tagString(me.oTxtProcessoAdministrativoInput.getValue()));
-        oParam.iInscricao = me.iInscricaoPassivo;
-        sMsg  = "Este expediente deverá ser utilizado para registrar o fato contábil ocorrido,";
-        sMsg += " mas fica-se claro que é absolutamente ilegal realizar pagamentos sem o prévio empenho da despesa.\n";
-        sMsg += "Logo, recomenda-se a abertura de Processo Administrativo e que este seja anexado a documentação,";
-        sMsg += "visando proteger a integridade profissional do responsável técnico da área contábil.";
-        alert(sMsg);
-      }
+          oParam.k17_texto += " Processo Adminstrativo: ";
+          oParam.k17_texto += encodeURIComponent(tagString(me.oTxtProcessoAdministrativoInput.getValue()));
+          oParam.iInscricao = me.iInscricaoPassivo;
+          sMsg  = "Este expediente deverá ser utilizado para registrar o fato contábil ocorrido,";
+          sMsg += " mas fica-se claro que é absolutamente ilegal realizar pagamentos sem o prévio empenho da despesa.\n";
+          sMsg += "Logo, recomenda-se a abertura de Processo Administrativo e que este seja anexado a documentação,";
+          sMsg += "visando proteger a integridade profissional do responsável técnico da área contábil.";
+          alert(sMsg);
+        }
 
-      if (me.iTipoTransferencia == 1) {
-        oParam.iCodigoInstituicaoDestino = me.oTxtInstituicaoDestinoCodigo.getValue();
-      }
+        if (me.iTipoTransferencia == 1) {
+          oParam.iCodigoInstituicaoDestino = me.oTxtInstituicaoDestinoCodigo.getValue();
+        }
 
-      new Ajax.Request(me.sUrlRpc,
-                      {method: 'post',
-                       async: false,
-                       parameters: 'json='+Object.toJSON(oParam),
-                       onComplete: me.completaSalvar
-                      });
+        new Ajax.Request(me.sUrlRpc,
+                        {method: 'post',
+                        async: false,
+                        parameters: 'json='+Object.toJSON(oParam),
+                        onComplete: me.completaSalvar
+                        });
+
+      }, 1700);
     });
 
-    /**
-     * Funcao responsavel por tratar os dados do objeto depois de salvar
-     */
-    me.completaSalvar = function (oAjax) {
+	me.geraSlip = function(iCodigoSlip) {
+		var sRpc = 'con1_assinaturadigital.RPC.php';
+		
+		var oParam = new Object();
+		oParam.sExecuta	= "checkParametroAtivoPorInstituicao";
+		oParam.instituicao = document.getElementById('oTxtInstituicaoOrigemCodigo').value;
 
-      js_removeObj("msgBox");
-      var oRetorno = eval("("+oAjax.responseText+")");
-      if (oRetorno.status == 1) {
-        if (!me.lAlteracao) {
-          window.open('cai1_slip003.php?&numslip=' + oRetorno.iCodigoSlip, '', 'location=0');
-        }
-        me.clearAllFields();
-      } else {
-        alert(oRetorno.message.urlDecode());
-      }
-    };
+		new Ajax.Request(sRpc,
+			{
+				method: 'post',
+				parameters: 'json='+Object.toJSON(oParam),
+				async: false,
+				onComplete: function (oAjax) {
+					js_removeObj("msgBox");
+					var oRetorno = eval("("+oAjax.responseText+")");
+					if (oRetorno.oAssinadorAtivo) {
+						window.open('cai1_slip003.php?&numslip=' + iCodigoSlip, '', 'location=0');
+						return;
+					}
+					var resultado = confirm("Deseja imprimir a Slip " + iCodigoSlip + "?");
+					if (resultado == true) {
+						window.open('cai1_slip003.php?&numslip=' + iCodigoSlip, '', 'location=0');
+					}
+				}
+			}
+		);
+	}
+
+	 /**
+	  * Funcao responsavel por tratar os dados do objeto depois de salvar
+	  */
+	 me.completaSalvar = function (oAjax) {
+		js_removeObj("msgBox");
+		var oRetorno = eval("(" + oAjax.responseText + ")");
+		if (oRetorno.status == 1) {
+		 	if (!me.lAlteracao) {
+				me.geraSlip(oRetorno.iCodigoSlip);
+			}
+			me.clearAllFields();
+		} else {
+			alert(oRetorno.message.urlDecode());
+		}
+	};
 
     /**
      * Executa o estorno do pagamento
@@ -1800,15 +1835,18 @@
     me.preencheHistorico = function (sDescricao,sHistorico, lErro) {
 
       me.oTxtHistoricoInputDescricao.setValue(sDescricao);
-      if (sHistorico) {
+
+      if (sHistorico != "" && sHistorico != true) {
         me.oTxtObservacaoInput.setValue(sHistorico);
       }
+
       if (lErro) {
         me.oTxtHistoricoInputCodigo.setValue();
       }
 
       if(sDescricao.match(/Chave/)){
         me.oTxtHistoricoInputDescricao.setValue("");
+        me.oTxtHistoricoInputCodigo.setValue("");
       }
     };
 

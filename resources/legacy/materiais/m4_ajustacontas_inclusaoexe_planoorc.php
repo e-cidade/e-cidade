@@ -79,6 +79,8 @@ require_once 'dbforms/db_funcoes.php';
             return alert("Usuário: selecione o tipo para ajustar.")
         }
 
+        js_divCarregando('Aguarde, ajuste em processamento!', 'msgBox');
+
         const idCampo = {
             1: 'conplanoorcamento',
             2: 'conplanoconplanoorcamento',
@@ -103,21 +105,41 @@ require_once 'dbforms/db_funcoes.php';
         oParametros.tipo = selectedValues;
         oParametros.anoOrigem = anoOrigem;
         oParametros.anoDestino = anoDestino;
+
         let oAjax = new Ajax.Request('m4_ajustacontas_inclusaoexe_planoorc.RPC.php', {
             method: 'post',
             parameters: 'json=' + Object.toJSON(oParametros),
-            onComplete: js_retornoAlteraObservacao
+            onComplete: function(x) {
+
+                if(x.statusText !== 'OK') {
+                    alert('Erro: ' + x.statusText);
+                    js_removeObj("msgBox");
+                } else {
+                    alert("Ajustes efetuados com sucesso!");
+                    js_removeObj("msgBox");
+                }
+            }, 
+            onFailure: function(e) {
+
+                alert('Erro: ' + e.statusText);
+                js_removeObj("msgBox");
+            },
+            onException: function(request, exception) {
+
+                alert('Exceção: ' + exception);
+                js_removeObj("msgBox");
+            }
         });
     }
 
     function js_retornoAlteraObservacao(oAjax) {
 
         let oRetorno = eval("(" + oAjax.responseText + ")");
+
         if (oRetorno.status == 1) {
             return alert("Ajustes Efetuados");
         }
         alert(erro);
-
     }
 
 </script>

@@ -72,43 +72,43 @@ if (count($aParametrosEmpenho) > 0) {
 
 <body bgcolor='#CCCCCC' leftmargin="0" id='body' topmargin="0" marginwidth="0" marginheight="0" onLoad="js_init()">
 
-    <fieldset>
-        <legend><b><?= $sCaption ?></b></legend>
-        <div style='position:fixed;
+<fieldset>
+    <legend><b><?= $sCaption ?></b></legend>
+    <div style='position:fixed;
               border:2px outset white;
               background-color: #CCCCCC;
               z-index:0;
               visibility:hidden;' id='digitarHistorico'>
 
-            <div style='padding:0px;text-align:right;border-bottom: 2px outset white;background-color: #2C7AFE;color:white'>
-                <span style='float:left'><b>Histórico</b></span>
-                <img src='imagens/jan_fechar_on.gif' border='0' onclick="$('digitarHistorico').style.visibility='hidden';">
-            </div>
+        <div style='padding:0px;text-align:right;border-bottom: 2px outset white;background-color: #2C7AFE;color:white'>
+            <span style='float:left'><b>Histórico</b></span>
+            <img src='imagens/jan_fechar_on.gif' border='0' onclick="$('digitarHistorico').style.visibility='hidden';">
+        </div>
 
-            <div style='padding:3px ;border: 1px inset white'>
+        <div style='padding:3px ;border: 1px inset white'>
                 <textarea id='historicoAnulacao' rows="10" cols="30">
          </textarea>
-                <center>
-                    <input value='Confirma' type='button' id='atualizarHistorico' onclick='js_atualizaHistorico'>
-                </center>
-            </div>
+            <center>
+                <input value='Confirma' type='button' id='atualizarHistorico' onclick='js_atualizaHistorico'>
+            </center>
         </div>
+    </div>
 
-        <div id='gridNotas' style='z-index:0'>
-        </div>
-    </fieldset>
-    <div style='position:absolute;top: 200px; left:15px;
+    <div id='gridNotas' style='z-index:0'>
+    </div>
+</fieldset>
+<div style='position:absolute;top: 200px; left:15px;
             border:1px solid black;
             width:300px;
             padding:3px;
             background-color: #FFFFCC;
             display:none;' id='ajudaItem'>
 
-    </div>
-    <input type='button' value='Pagar Selecionados' onclick='js_pagarEmpenhos()'>
-    <input type="checkbox" id='autenticar' unchecked><label for="autenticar">Autenticar no documento</label>
-    <input type="checkbox" id='emiterelatorio'><label for="emiterelatorio">Emite Relatório de Pagamento</label>
-    <input type="checkbox" id='emiterecibo'><label for="emiterecibo">Emite Recibo de retenções</label>
+</div>
+<input type='button' value='Pagar Selecionados' onclick='js_pagarEmpenhos()'>
+<input type="checkbox" id='autenticar' unchecked><label for="autenticar">Autenticar no documento</label>
+<input type="checkbox" id='emiterelatorio'><label for="emiterelatorio">Emite Relatório de Pagamento</label>
+<input type="checkbox" id='emiterecibo'><label for="emiterecibo">Emite Recibo de retenções</label>
 </body>
 
 </html>
@@ -374,8 +374,7 @@ if (count($aParametrosEmpenho) > 0) {
     }
 
     function js_objectToJson(oObject) {
-
-        var sJson = oObject.toSource();
+        var sJson = JSON.stringify(oObject);
         sJson = sJson.replace("(", "");
         sJson = sJson.replace(")", "");
         return sJson;

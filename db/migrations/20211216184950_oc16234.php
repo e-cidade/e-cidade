@@ -1,17 +1,17 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc16234 extends AbstractMigration
+class Oc16234 extends PostgresMigration
 {
 
     public function up()
     {
         $sql = "
         BEGIN;
-        
+
         ALTER TABLE acordo ALTER COLUMN ac16_tipomodalidade TYPE varchar(40);
-        
+
         COMMIT;
         ";
 
@@ -24,7 +24,7 @@ class Oc16234 extends AbstractMigration
         BEGIN;
 
         ALTER TABLE acordo ALTER COLUMN ac16_tipomodalidade TYPE varchar(30);
-        
+
         COMMIT;
         ";
 

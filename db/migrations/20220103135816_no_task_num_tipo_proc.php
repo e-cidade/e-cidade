@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class NoTaskNumTipoProc extends AbstractMigration
+class NoTaskNumTipoProc extends PostgresMigration
 {
     public function up()
     {

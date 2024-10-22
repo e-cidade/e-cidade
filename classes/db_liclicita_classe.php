@@ -152,6 +152,7 @@ class cl_liclicita
     var $l20_horaaberturaprop = null;
     var $l20_horaencerramentoprop = null;
     var $l20_dispensaporvalor = null;
+    var $l20_lances = null;
 
     // cria propriedade com as variaveis do arquivo
     var $campos = "
@@ -232,6 +233,7 @@ class cl_liclicita
                  l20_horaaberturaprop = string = hora de abertura das propostas
                  l20_horaencerramentoprop = string = hora de encerramento das propostas
                  l20_dispensaporvalor = bool = dispensa por valor
+                 l20_lances = bool = apuracao de lances pelo sistema
                  ";
 
     //funcao construtor da classe
@@ -431,6 +433,7 @@ class cl_liclicita
         $this->l20_horaaberturaprop = ($this->l20_horaaberturaprop == "" ? @$GLOBALS["HTTP_POST_VARS"]["l20_horaaberturaprop"] : $this->l20_horaaberturaprop);
         $this->l20_horaencerramentoprop = ($this->l20_horaencerramentoprop == "" ? @$GLOBALS["HTTP_POST_VARS"]["l20_horaencerramentoprop"] : $this->l20_horaencerramentoprop);
         $this->l20_dispensaporvalor = ($this->l20_dispensaporvalor == "" ? @$GLOBALS["HTTP_POST_VARS"]["l20_dispensaporvalor"] : $this->l20_dispensaporvalor);
+        $this->l20_lances = ($this->l20_lances == "" ? @$GLOBALS["HTTP_POST_VARS"]["l20_lances"] : $this->l20_lances);
     }
 
     // funcao para inclusao aqui
@@ -628,7 +631,6 @@ class cl_liclicita
             $this->erro_status = "0";
             return false;
         }
-        
         if($this->l20_dispensaporvalor == null || $this->l20_dispensaporvalor == ""){
             $this->l20_dispensaporvalor = 'f';
           }
@@ -913,15 +915,15 @@ class cl_liclicita
             $this->erro_status = "0";
             return false;
         }
-
-        if (db_getsession('DB_anousu') >= 2020) {
+        
+        if (db_getsession('DB_anousu') >= 2020 && !$this->l20_dispensaporvalor) {
             $this->l20_cadinicial = 1;
             $this->l20_exercicioedital = db_getsession('DB_anousu');
         } else {
-            $this->l20_cadinicial = 'null';
+            $this->l20_cadinicial = $this->l20_cadinicial;
             $this->l20_exercicioedital = 'null';
         }
-
+        
         $sql = "insert into liclicita(
                                  l20_codigo
                 ,l20_edital
@@ -983,6 +985,7 @@ class cl_liclicita
                 ,l20_horaaberturaprop
                 ,l20_horaencerramentoprop
                 ,l20_dispensaporvalor
+                ,l20_lances
                        )
                 values (
                  $this->l20_codigo
@@ -1045,11 +1048,12 @@ class cl_liclicita
                 ,'$this->l20_horaaberturaprop'
                 ,'$this->l20_horaencerramentoprop'
                 ,'$this->l20_dispensaporvalor'
+                ,'$this->l20_lances'
                       )";
         $result = db_query($sql);
         // echo $sql;
         // exit;
-
+        
         if ($result == false) {
             $this->erro_banco = str_replace("\n", "", @pg_last_error());
             if (strpos(strtolower($this->erro_banco), "duplicate key") != 0) {
@@ -1066,6 +1070,7 @@ class cl_liclicita
             $this->numrows_incluir = 0;
             return false;
         }
+        
         $this->erro_banco = "";
         $this->erro_sql = "Inclusao efetuada com Sucesso\\n";
         $this->erro_sql .= "Valores : " . $this->l20_codigo;
@@ -1128,7 +1133,7 @@ class cl_liclicita
         }
         return true;
     }
-
+    
     // funcao para alteracao
     function alterar($l20_codigo = null, $convite, $ibuscartribunal = null)
     {
@@ -1192,6 +1197,10 @@ class cl_liclicita
         }
         if (trim($this->l20_dispensaporvalor != "" || isset($GLOBALS["HTTP_POST_VARS"]["l20_dispensaporvalor"]))) {
             $sql .= $virgula . " l20_dispensaporvalor = '$this->l20_dispensaporvalor' ";
+            $virgula = ",";
+        }
+        if (trim($this->l20_lances != "" || isset($GLOBALS["HTTP_POST_VARS"]["l20_lances"]))) {
+            $sql .= $virgula . " l20_lances = '$this->l20_lances' ";
             $virgula = ",";
         }
 
@@ -3732,6 +3741,7 @@ class cl_liclicita
                                     END AS materialOuServico,
                                     COALESCE ((case when liclicita.l20_destexclusiva = 1 then 1 else null end),
                                             (case when liclicita.l20_subcontratacao = 1 then 2 else null end),
+                                            (case when solicitem.pc11_exclusivo = 't' then 1 ELSE null end),
                                             (case when liclicitem.l21_reservado = 't' then 3 ELSE null end),
                                             4) AS tipoBeneficioId,
                                     FALSE AS incentivoProdutivoBasico,
@@ -3803,6 +3813,7 @@ class cl_liclicita
                 END AS materialOuServico,
                 COALESCE ((case when liclicita.l20_destexclusiva = 1 then 1 else null end),
                         (case when liclicita.l20_subcontratacao = 1 then 2 else null end),
+                        (case when solicitem.pc11_exclusivo = 't' then 1 ELSE null end),
                         (case when liclicitem.l21_reservado = 't' then 3 ELSE null end),
                         4) AS tipoBeneficioId,
                 FALSE AS incentivoProdutivoBasico,
@@ -4838,7 +4849,7 @@ class cl_liclicita
             LEFT JOIN liccontrolepncp ON l213_licitacao = l20_codigo
             LEFT JOIN licontroleatarppncp ON l215_licitacao = l20_codigo and l221_numata::int =  l215_numataecidade
             WHERE l20_usaregistropreco ='t'
-                AND l03_pctipocompratribunal IN (110,51,53,52,102,101,100,101)
+                AND l03_pctipocompratribunal IN (110,51,53,52,102,101,100,101,50,103)
                 AND l213_numerocontrolepncp IS NOT NULL
                 AND liclicita.l20_leidalicitacao = 1
                 AND l20_instit = ".db_getsession('DB_instit')."

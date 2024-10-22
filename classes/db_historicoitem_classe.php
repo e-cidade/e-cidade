@@ -136,7 +136,7 @@ class cl_historicoitem {
       $this->erro_status = "0";
       return false;
     }
-     if($pc96_sequencial == "" || $pc96_sequencial == null ){
+     if($this->pc96_sequencial == "" || $this->pc96_sequencial == null ){
        $result = db_query("select nextval('historicoitem_pc96_sequencial_seq')");
        if($result==false){
          $this->erro_banco = str_replace("\n","",@pg_last_error());

@@ -1,10 +1,10 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AddCampoAmbienteEnvio extends AbstractMigration
+class AddCampoAmbienteEnvio extends PostgresMigration
 {
-    
+
     public function up()
     {
         $sql = "

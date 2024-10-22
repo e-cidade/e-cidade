@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc15672 extends AbstractMigration
+class Oc15672 extends PostgresMigration
 {
     public function up()
     {
@@ -16,8 +16,8 @@ class Oc15672 extends AbstractMigration
         ALTER TABLE precoreferencia add column si01_numcgmcotacao int;
         ALTER TABLE precoreferencia add column si01_tipoorcamento int;
         ALTER TABLE precoreferencia add column si01_numcgmorcamento int;
-        
-        COMMIT;        
+
+        COMMIT;
 
 SQL;
         $this->execute($sql);

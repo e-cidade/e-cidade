@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Addmenunperiodicos extends AbstractMigration
+class Addmenunperiodicos extends PostgresMigration
 {
     public function up()
     {

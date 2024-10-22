@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc11442 extends AbstractMigration
+class Oc11442 extends PostgresMigration
 {
     public function up()
     {
@@ -10,11 +10,11 @@ class Oc11442 extends AbstractMigration
 
 				ALTER TABLE adesaoregprecos add column si06_edital integer;
 				ALTER TABLE adesaoregprecos add column si06_cadinicial integer DEFAULT null;
-				ALTER TABLE adesaoregprecos add column si06_exercicioedital integer;  
-				ALTER TABLE adesaoregprecos add column si06_anocadastro integer;  
-			
+				ALTER TABLE adesaoregprecos add column si06_exercicioedital integer;
+				ALTER TABLE adesaoregprecos add column si06_anocadastro integer;
+
 				DROP TABLE regadesao152020, regadesao142020, regadesao132020, regadesao122020, regadesao112020, regadesao102020;
-		
+
 				CREATE TABLE regadesao102020 (
 				si67_sequencial bigint DEFAULT 0 NOT NULL,
 				si67_tiporegistro bigint DEFAULT 0 NOT NULL,
@@ -40,24 +40,24 @@ class Oc11442 extends AbstractMigration
 				si67_processoporlote bigint DEFAULT 0 NOT NULL,
 				si67_mes bigint DEFAULT 0 NOT NULL,
 				si67_instit bigint DEFAULT 0);
-				
+
 				ALTER TABLE regadesao102020 OWNER TO dbportal;
-			
-				
+
+
 				ALTER TABLE regadesao102020_si67_sequencial_seq OWNER TO dbportal;
-				
+
 				 --
 				 -- Name: regadesao102020_sequ_pk; Type: CONSTRAINT; Schema: public; Owner: dbportal; Tablespace:
 				 --
-			
+
 				ALTER TABLE ONLY regadesao102020
 					ADD CONSTRAINT regadesao102020_sequ_pk PRIMARY KEY (si67_sequencial);
-			
-				
+
+
 				--
 				-- Name: regadesao112020; Type: TABLE; Schema: public; Owner: dbportal; Tablespace:
 				--
-			
+
 				CREATE TABLE regadesao112020 (
 					si68_sequencial bigint DEFAULT 0 NOT NULL,
 					si68_tiporegistro bigint DEFAULT 0 NOT NULL,
@@ -71,24 +71,24 @@ class Oc11442 extends AbstractMigration
 					si68_reg10 bigint DEFAULT 0 NOT NULL,
 					si68_instit bigint DEFAULT 0
 				);
-			
+
 				ALTER TABLE regadesao112020 OWNER TO dbportal;
-			
-				
+
+
 				ALTER TABLE regadesao112020_si68_sequencial_seq OWNER TO dbportal;
-			
+
 				--
 				-- Name: regadesao112020_sequ_pk; Type: CONSTRAINT; Schema: public; Owner: dbportal; Tablespace:
 				--
-			
+
 				ALTER TABLE ONLY regadesao112020
 					ADD CONSTRAINT regadesao112020_sequ_pk PRIMARY KEY (si68_sequencial);
-			
-			
+
+
 				--
 				-- Name: regadesao122020; Type: TABLE; Schema: public; Owner: dbportal; Tablespace:
 				--
-			
+
 				CREATE TABLE regadesao122020 (
 					si69_sequencial bigint DEFAULT 0 NOT NULL,
 					si69_tiporegistro bigint DEFAULT 0 NOT NULL,
@@ -102,23 +102,23 @@ class Oc11442 extends AbstractMigration
 					si69_reg10 bigint DEFAULT 0 NOT NULL,
 					si69_instit bigint DEFAULT 0
 				);
-			
-			
+
+
 					ALTER TABLE regadesao122020 OWNER TO dbportal;
-			
+
 					ALTER TABLE regadesao122020_si69_sequencial_seq OWNER TO dbportal;
-					
+
 				--
 				-- Name: regadesao122020_sequ_pk; Type: CONSTRAINT; Schema: public; Owner: dbportal; Tablespace:
 				--
-			
+
 				ALTER TABLE ONLY regadesao122020
 					ADD CONSTRAINT regadesao122020_sequ_pk PRIMARY KEY (si69_sequencial);
-					
+
 				--
 				-- Name: regadesao132020; Type: TABLE; Schema: public; Owner: dbportal; Tablespace:
 				--
-			
+
 				CREATE TABLE regadesao132020 (
 					si70_sequencial bigint DEFAULT 0 NOT NULL,
 					si70_tiporegistro bigint DEFAULT 0 NOT NULL,
@@ -132,20 +132,20 @@ class Oc11442 extends AbstractMigration
 					si70_reg10 bigint DEFAULT 0 NOT NULL,
 					si70_instit bigint DEFAULT 0
 				);
-			
-			
+
+
 				ALTER TABLE regadesao132020 OWNER TO dbportal;
-			
+
 				--
 				-- Name: regadesao132020_sequ_pk; Type: CONSTRAINT; Schema: public; Owner: dbportal; Tablespace:
 				--
-			
+
 				ALTER TABLE ONLY regadesao132020
 					ADD CONSTRAINT regadesao132020_sequ_pk PRIMARY KEY (si70_sequencial);
 				--
 				-- Name: regadesao142020; Type: TABLE; Schema: public; Owner: dbportal; Tablespace:
 				--
-			
+
 				CREATE TABLE regadesao142020 (
 					si71_sequencial bigint DEFAULT 0 NOT NULL,
 					si71_tiporegistro bigint DEFAULT 0 NOT NULL,
@@ -162,20 +162,20 @@ class Oc11442 extends AbstractMigration
 					si71_reg10 bigint DEFAULT 0 NOT NULL,
 					si71_instit bigint DEFAULT 0
 					);
-			
+
 				ALTER TABLE regadesao142020 OWNER TO dbportal;
-			
+
 				--
 				-- Name: regadesao142020_sequ_pk; Type: CONSTRAINT; Schema: public; Owner: dbportal; Tablespace:
 				--
-			
+
 				ALTER TABLE ONLY regadesao142020
 					ADD CONSTRAINT regadesao142020_sequ_pk PRIMARY KEY (si71_sequencial);
-					
+
 				--
 				-- Name: regadesao152020; Type: TABLE; Schema: public; Owner: dbportal; Tablespace:
 				--
-			
+
 				CREATE TABLE regadesao152020 (
 					si72_sequencial bigint DEFAULT 0 NOT NULL,
 					si72_tiporegistro bigint DEFAULT 0 NOT NULL,
@@ -194,85 +194,85 @@ class Oc11442 extends AbstractMigration
 					si72_reg10 bigint DEFAULT 0 NOT NULL,
 					si72_instit bigint DEFAULT 0
 					);
-			
+
 				ALTER TABLE regadesao152020 OWNER TO dbportal;
-			
-				
+
+
 				--
 				-- Name: regadesao152020_sequ_pk; Type: CONSTRAINT; Schema: public; Owner: dbportal; Tablespace:
 				--
-			
+
 				ALTER TABLE ONLY regadesao152020
 					ADD CONSTRAINT regadesao152020_sequ_pk PRIMARY KEY (si72_sequencial);
-			
-								
+
+
 				-- Criação dos índices
-				
+
 				--
 				-- Name: regadesao112020_si68_reg10_index; Type: INDEX; Schema: public; Owner: dbportal; Tablespace:
 				--
-				
+
 				CREATE INDEX regadesao112020_si68_reg10_index ON regadesao112020 USING btree (si68_reg10);
-				
+
 				--
 				-- Name: regadesao122020_si69_reg10_index; Type: INDEX; Schema: public; Owner: dbportal; Tablespace:
 				--
-				
+
 				CREATE INDEX regadesao122020_si69_reg10_index ON regadesao122020 USING btree (si69_reg10);
-				
+
 				--
 				-- Name: regadesao132020_si70_reg10_index; Type: INDEX; Schema: public; Owner: dbportal; Tablespace:
 				--
-				
+
 				CREATE INDEX regadesao132020_si70_reg10_index ON regadesao132020 USING btree (si70_reg10);
-				
+
 				--
 				-- Name: regadesao142020_si71_reg10_index; Type: INDEX; Schema: public; Owner: dbportal; Tablespace:
 				--
-				
+
 				CREATE INDEX regadesao142020_si71_reg10_index ON regadesao142020 USING btree (si71_reg10);
-				
+
 				--
 				-- Name: regadesao152020_si72_reg10_index; Type: INDEX; Schema: public; Owner: dbportal; Tablespace:
 				--
-				
+
 				CREATE INDEX regadesao152020_si72_reg10_index ON regadesao152020 USING btree (si72_reg10);
-			
+
 				-- Chaves estrangeiras
-				
+
 				--
 				-- Name: regadesao112020_reg10_fk; Type: FK CONSTRAINT; Schema: public; Owner: dbportal
 				--
-				
+
 				ALTER TABLE ONLY regadesao112020
 					ADD CONSTRAINT regadesao112020_reg10_fk FOREIGN KEY (si68_reg10) REFERENCES regadesao102020(si67_sequencial);
-				
-				
+
+
 				--
 				-- Name: regadesao122020_reg10_fk; Type: FK CONSTRAINT; Schema: public; Owner: dbportal
 				--
-				
+
 				ALTER TABLE ONLY regadesao122020
 					ADD CONSTRAINT regadesao122020_reg10_fk FOREIGN KEY (si69_reg10) REFERENCES regadesao102020(si67_sequencial);
-							
+
 				--
 				-- Name: regadesao132020_reg10_fk; Type: FK CONSTRAINT; Schema: public; Owner: dbportal
 				--
-				
+
 				ALTER TABLE ONLY regadesao132020
 					ADD CONSTRAINT regadesao132020_reg10_fk FOREIGN KEY (si70_reg10) REFERENCES regadesao102020(si67_sequencial);
-								
+
 				--
 				-- Name: regadesao142020_reg10_fk; Type: FK CONSTRAINT; Schema: public; Owner: dbportal
 				--
-				
+
 				ALTER TABLE ONLY regadesao142020
 					ADD CONSTRAINT regadesao142020_reg10_fk FOREIGN KEY (si71_reg10) REFERENCES regadesao102020(si67_sequencial);
-				
+
 				--
 				-- Name: regadesao152020_reg10_fk; Type: FK CONSTRAINT; Schema: public; Owner: dbportal
 				--
-				
+
 				ALTER TABLE ONLY regadesao152020
 					ADD CONSTRAINT regadesao152020_reg10_fk FOREIGN KEY (si72_reg10) REFERENCES regadesao102020(si67_sequencial);
 

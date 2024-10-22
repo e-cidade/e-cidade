@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc20692 extends AbstractMigration
+class Oc20692 extends PostgresMigration
 {
 
     public function up()

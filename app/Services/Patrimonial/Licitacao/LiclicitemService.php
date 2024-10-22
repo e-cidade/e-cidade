@@ -31,7 +31,7 @@ class LiclicitemService
         $aliclicitem['l21_codpcprocitem'] = $dados->pc81_codprocitem;
         $aliclicitem['l21_situacao'] = 0;
         $aliclicitem['l21_ordem'] = $this->getMaxOrdem($dados->l20_codigo);
-        $aliclicitem['l21_reservado'] = 'f';
+        $aliclicitem['l21_reservado'] = $dados->l21_reservado == "1" ? 't' : 'f';
         $aliclicitem['l21_sigilo'] = $dados->l21_sigilo;
         return $this->licilicitemRepository->insert($aliclicitem);
     }

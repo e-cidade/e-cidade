@@ -509,8 +509,12 @@ if (isset($incluir)) {
             $clliclicita->l20_horaaberturaprop = $l20_horaaberturaprop;
             $clliclicita->l20_horaencerramentoprop = $l20_horaencerramentoprop;
             $clliclicita->l20_dispensaporvalor = $l20_dispensaporvalor;
+			$clliclicita->l20_lances = $l20_lances;
+
 			if($l20_dispensaporvalor == 't'){
-				$clliclicita->l20_cadinicial = 0;
+				$clliclicita->l20_cadinicial = '0';
+			}else{
+				$clliclicita->l20_cadinicial = '1';
 			}
 			
 			$clliclicita->incluir(null, null);

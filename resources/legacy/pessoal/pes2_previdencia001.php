@@ -116,7 +116,8 @@ db_postmemory($HTTP_POST_VARS);
                                      "r48"=>"Complementar",
                                      "r35"=>"13o Salário",
                                      "r20"=>"Rescisão",
-                                     "todas"=>"Todas"
+                                     "todas"=>"Todas",
+                                     "todasexc13" => "Todas - Exceto 13o"
                                     );
       $geraform->complementar = "r48";
                       // VALUE DA COMPLEMENTAR PARA BUSCAR SEMEST

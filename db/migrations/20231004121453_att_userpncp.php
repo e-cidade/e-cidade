@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AttUserpncp extends AbstractMigration
+class AttUserpncp extends PostgresMigration
 {
     public function up()
     {

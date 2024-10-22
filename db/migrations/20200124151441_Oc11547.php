@@ -1,10 +1,10 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc11547 extends AbstractMigration
+class Oc11547 extends PostgresMigration
 {
-    
+
     public function up()
     {
         $sql = <<<SQL
@@ -21,9 +21,9 @@ class Oc11547 extends AbstractMigration
           AND (t1.c61_reduz, t1.c61_anousu) = (t2.c61_reduz, t2.c61_anousu);
 
         COMMIT;
-        
+
 SQL;
-    
+
         $this->execute($sql);
 
     }

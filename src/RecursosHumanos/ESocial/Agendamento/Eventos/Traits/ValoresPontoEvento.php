@@ -12,13 +12,13 @@ trait ValoresPontoEvento
    * @param integer $matricula
    * @return resource
    */
-  public function getValoresPorPonto(int $ponto, int $matricula)
+  public function getValoresPorPonto(int $ponto, int $matricula, int $ano, int $mes)
   {
     if (empty($ponto)) {
       return db_query('');
     }
-    $anousu = date("Y", db_getsession("DB_datausu"));
-    $mesusu = date("m", db_getsession("DB_datausu"));
+    $anousu = $ano;
+    $mesusu = $mes;
 
     $tipoPonto = $this->getTipoPonto($ponto);
     $sql = "  select '1' as ordem ,

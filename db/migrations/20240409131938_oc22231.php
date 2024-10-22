@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc22231 extends AbstractMigration
+class Oc22231 extends PostgresMigration
 {
     public function up()
     {
@@ -36,7 +36,7 @@ class Oc22231 extends AbstractMigration
                                         efd05_status    	      int8 NULL,
                                         efd05_descResposta        character varying(500) NULL,
                                         efd05_dscResp  	      character varying(500) NULL
-                                        
+
                     );
 
                     CREATE SEQUENCE IF NOT EXISTS efdreinfr2010_efd05_sequencial_seq
@@ -45,7 +45,7 @@ class Oc22231 extends AbstractMigration
                                 NO MINVALUE
                                 NO MAXVALUE
                                 CACHE 1;
-        COMMIT;   
+        COMMIT;
 
         SQL;
 
@@ -66,11 +66,11 @@ class Oc22231 extends AbstractMigration
             $sql = <<<SQL
 
             BEGIN;
-            
+
             SELECT fc_startsession();
 
                 ALTER TABLE efdreinfr2010 ALTER COLUMN efd05_estabelecimento TYPE varchar(500) USING efd05_estabelecimento::varchar(500);
-        
+
             COMMIT;
 
             SQL;

@@ -1,35 +1,35 @@
 <?
 /*
- *     E-cidade Software Publico para Gestao Municipal                
- *  Copyright (C) 2012  DBselller Servicos de Informatica             
- *                            www.dbseller.com.br                     
- *                         e-cidade@dbseller.com.br                   
- *                                                                    
- *  Este programa e software livre; voce pode redistribui-lo e/ou     
- *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme  
- *  publicada pela Free Software Foundation; tanto a versao 2 da      
- *  Licenca como (a seu criterio) qualquer versao mais nova.          
- *                                                                    
- *  Este programa e distribuido na expectativa de ser util, mas SEM   
- *  QUALQUER GARANTIA; sem mesmo a garantia implicita de              
- *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM           
- *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais  
- *  detalhes.                                                         
- *                                                                    
- *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU     
- *  junto com este programa; se nao, escreva para a Free Software     
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA          
- *  02111-1307, USA.                                                  
- *  
- *  Copia da licenca no diretorio licenca/licenca_en.txt 
- *                                licenca/licenca_pt.txt 
+ *     E-cidade Software Publico para Gestao Municipal
+ *  Copyright (C) 2012  DBselller Servicos de Informatica
+ *                            www.dbseller.com.br
+ *                         e-cidade@dbseller.com.br
+ *
+ *  Este programa e software livre; voce pode redistribui-lo e/ou
+ *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme
+ *  publicada pela Free Software Foundation; tanto a versao 2 da
+ *  Licenca como (a seu criterio) qualquer versao mais nova.
+ *
+ *  Este programa e distribuido na expectativa de ser util, mas SEM
+ *  QUALQUER GARANTIA; sem mesmo a garantia implicita de
+ *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM
+ *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais
+ *  detalhes.
+ *
+ *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU
+ *  junto com este programa; se nao, escreva para a Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ *  02111-1307, USA.
+ *
+ *  Copia da licenca no diretorio licenca/licenca_en.txt
+ *                                licenca/licenca_pt.txt
  */
 
 //MODULO: material
 //CLASSE DA ENTIDADE matordem
 class cl_matordem
 {
-  // cria variaveis de erro 
+  // cria variaveis de erro
   var $rotulo     = null;
   var $query_sql  = null;
   var $numrows    = 0;
@@ -42,7 +42,7 @@ class cl_matordem
   var $erro_msg   = null;
   var $erro_campo = null;
   var $pagina_retorno = null;
-  // cria variaveis do arquivo 
+  // cria variaveis do arquivo
   var $m51_codordem = 0;
   var $m51_data_dia = null;
   var $m51_data_mes = null;
@@ -55,26 +55,30 @@ class cl_matordem
   var $m51_prazoent = 0;
   var $m51_tipo = 0;
   var $m51_deptoorigem = 0;
-  // cria propriedade com as variaveis do arquivo 
+  var $m51_prazoentnovo = null;
+  var $m51_sequencial = 0;
+  // cria propriedade com as variaveis do arquivo
   var $campos = "
-                 m51_codordem = int8 = Código 
-                 m51_data = date = Data emissão 
-                 m51_depto = int8 = Departamento 
-                 m51_numcgm = int4 = Fornecedor 
-                 m51_obs = text = Observações 
-                 m51_valortotal = float8 = Valor Total 
-                 m51_prazoent = int8 = Dias de prazo para entrega 
-                 m51_tipo = int4 = Tipo da Ordem 
-                 m51_deptoorigem = int4 = Departamento de Origem 
+                 m51_codordem = int8 = Código
+                 m51_data = date = Data emissão
+                 m51_depto = int8 = Departamento
+                 m51_numcgm = int4 = Fornecedor
+                 m51_obs = text = Observações
+                 m51_valortotal = float8 = Valor Total
+                 m51_prazoent = int8 = Dias de prazo para entrega
+                 m51_tipo = int4 = Tipo da Ordem
+                 m51_deptoorigem = int4 = Departamento de Origem
+                 m51_prazoentnovo = text = Prazo de entrega
+                 m51_sequencial = int8 = Sequencial do prazo de entrega
                  ";
-  //funcao construtor da classe 
+  //funcao construtor da classe
   function cl_matordem()
   {
     //classes dos rotulos dos campos
     $this->rotulo = new rotulo("matordem");
     $this->pagina_retorno =  basename($GLOBALS["HTTP_SERVER_VARS"]["PHP_SELF"]);
   }
-  //funcao erro 
+  //funcao erro
   function erro($mostra, $retorna)
   {
     if (($this->erro_status == "0") || ($mostra == true && $this->erro_status != null)) {
@@ -104,6 +108,7 @@ class cl_matordem
       $this->m51_prazoent = ($this->m51_prazoent == "" ? @$GLOBALS["HTTP_POST_VARS"]["m51_prazoent"] : $this->m51_prazoent);
       $this->m51_tipo = ($this->m51_tipo == "" ? @$GLOBALS["HTTP_POST_VARS"]["m51_tipo"] : $this->m51_tipo);
       $this->m51_deptoorigem = ($this->m51_deptoorigem == "" ? @$GLOBALS["HTTP_POST_VARS"]["m51_deptoorigem"] : $this->m51_deptoorigem);
+      $this->m51_prazoentnovo = ($this->m51_prazoentnovo == "" ? @$GLOBALS["HTTP_POST_VARS"]["m51_prazoentnovo"] : $this->m51_prazoentnovo);
     } else {
       $this->m51_codordem = ($this->m51_codordem == "" ? @$GLOBALS["HTTP_POST_VARS"]["m51_codordem"] : $this->m51_codordem);
     }
@@ -157,6 +162,15 @@ class cl_matordem
       $this->erro_status = "0";
       return false;
     }
+
+    if ($this->m51_prazoentnovo == null) {
+        $this->m51_prazoentnovo = 'null';
+    }
+
+    if ($this->m51_sequencial == null) {
+        $this->m51_sequencial = 'null';
+    }
+
     if ($this->m51_tipo == null) {
       $this->erro_sql = " Campo Tipo da Ordem nao Informado.";
       $this->erro_campo = "m51_tipo";
@@ -203,28 +217,33 @@ class cl_matordem
     }
     $this->m51_deptoorigem = db_getsession("DB_coddepto");
     $sql = "insert into matordem(
-                                       m51_codordem 
-                                      ,m51_data 
-                                      ,m51_depto 
-                                      ,m51_numcgm 
-                                      ,m51_obs 
-                                      ,m51_valortotal 
-                                      ,m51_prazoent 
-                                      ,m51_tipo 
-                                      ,m51_deptoorigem 
+                                       m51_codordem
+                                      ,m51_data
+                                      ,m51_depto
+                                      ,m51_numcgm
+                                      ,m51_obs
+                                      ,m51_valortotal
+                                      ,m51_prazoent
+                                      ,m51_tipo
+                                      ,m51_deptoorigem
+                                      ,m51_prazoentnovo
+                                      ,m51_sequencial
                        )
                 values (
-                                $this->m51_codordem 
-                               ," . ($this->m51_data == "null" || $this->m51_data == "" ? "null" : "'" . $this->m51_data . "'") . " 
-                               ,$this->m51_depto 
-                               ,$this->m51_numcgm 
-                               ,'$this->m51_obs' 
-                               ,$this->m51_valortotal 
-                               ,$this->m51_prazoent 
-                               ,$this->m51_tipo 
-                               ,$this->m51_deptoorigem 
+                                $this->m51_codordem
+                               ," . ($this->m51_data == "null" || $this->m51_data == "" ? "null" : "'" . $this->m51_data . "'") . "
+                               ,$this->m51_depto
+                               ,$this->m51_numcgm
+                               ,'$this->m51_obs'
+                               ,$this->m51_valortotal
+                               ,$this->m51_prazoent
+                               ,$this->m51_tipo
+                               ,$this->m51_deptoorigem
+                               ,'$this->m51_prazoentnovo'
+                               ,$this->m51_sequencial
                       )";
     $result = db_query($sql);
+
     if ($result == false) {
       $this->erro_banco = str_replace("\n", "", @pg_last_error());
       if (strpos(strtolower($this->erro_banco), "duplicate key") != 0) {
@@ -241,6 +260,7 @@ class cl_matordem
       $this->numrows_incluir = 0;
       return false;
     }
+
     $this->erro_banco = "";
     $this->erro_sql = "Inclusao efetuada com Sucesso\\n";
     $this->erro_sql .= "Valores : " . $this->m51_codordem;
@@ -263,6 +283,8 @@ class cl_matordem
       $resac = db_query("insert into db_acount values($acount,1007,6601,'','" . AddSlashes(pg_result($resaco, 0, 'm51_prazoent')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
       $resac = db_query("insert into db_acount values($acount,1007,10840,'','" . AddSlashes(pg_result($resaco, 0, 'm51_tipo')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
       $resac = db_query("insert into db_acount values($acount,1007,19240,'','" . AddSlashes(pg_result($resaco, 0, 'm51_deptoorigem')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
+      $resac = db_query("insert into db_acount values($acount,1007,19241,'','" . AddSlashes(pg_result($resaco, 0, 'm51_prazoentnovo')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
+
     }
     return true;
   }
@@ -374,6 +396,11 @@ class cl_matordem
         return false;
       }
     }
+    if (trim($this->m51_prazoentnovo) != "" || isset($GLOBALS["HTTP_POST_VARS"]["m51_prazoent"])) {
+      $sql  .= $virgula . " m51_prazoentnovo = '$this->m51_prazoentnovo' ";
+      $virgula = ",";
+    }
+
     if (trim($this->m51_tipo) != "" || isset($GLOBALS["HTTP_POST_VARS"]["m51_tipo"])) {
       $sql  .= $virgula . " m51_tipo = $this->m51_tipo ";
       $virgula = ",";
@@ -423,6 +450,8 @@ class cl_matordem
           $resac = db_query("insert into db_acount values($acount,1007,10840,'" . AddSlashes(pg_result($resaco, $conresaco, 'm51_tipo')) . "','$this->m51_tipo'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
         if (isset($GLOBALS["HTTP_POST_VARS"]["m51_deptoorigem"]) || $this->m51_deptoorigem != "")
           $resac = db_query("insert into db_acount values($acount,1007,19240,'" . AddSlashes(pg_result($resaco, $conresaco, 'm51_deptoorigem')) . "','$this->m51_deptoorigem'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
+          if (isset($GLOBALS["HTTP_POST_VARS"]["m51_prazoentnovo"]) || $this->m51_prazoentnovo != "")
+          $resac = db_query("insert into db_acount values($acount,1007,6601,'" . AddSlashes(pg_result($resaco, $conresaco, 'm51_prazoentnovo')) . "','$this->m51_prazoentnovo'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
       }
     }
     $result = db_query($sql);
@@ -457,7 +486,7 @@ class cl_matordem
       }
     }
   }
-  // funcao para exclusao 
+  // funcao para exclusao
   function excluir($m51_codordem = null, $dbwhere = null)
   {
     if ($dbwhere == null || $dbwhere == "") {
@@ -480,6 +509,8 @@ class cl_matordem
         $resac = db_query("insert into db_acount values($acount,1007,6601,'','" . AddSlashes(pg_result($resaco, $iresaco, 'm51_prazoent')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
         $resac = db_query("insert into db_acount values($acount,1007,10840,'','" . AddSlashes(pg_result($resaco, $iresaco, 'm51_tipo')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
         $resac = db_query("insert into db_acount values($acount,1007,19240,'','" . AddSlashes(pg_result($resaco, $iresaco, 'm51_deptoorigem')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
+        $resac = db_query("insert into db_acount values($acount,1007,6601,'','" . AddSlashes(pg_result($resaco, $iresaco, 'm51_prazoentnovo')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
+
       }
     }
     $sql = " delete from matordem
@@ -527,7 +558,7 @@ class cl_matordem
       }
     }
   }
-  // funcao do recordset 
+  // funcao do recordset
   function sql_record($sql)
   {
     $result = db_query($sql);
@@ -551,7 +582,7 @@ class cl_matordem
     }
     return $result;
   }
-  // funcao do sql 
+  // funcao do sql
   function sql_query($m51_codordem = null, $campos = "*", $ordem = null, $dbwhere = "")
   {
     $sql = "select ";
@@ -589,7 +620,7 @@ class cl_matordem
     }
     return $sql;
   }
-  // funcao do sql 
+  // funcao do sql
   function sql_query_file($m51_codordem = null, $campos = "*", $ordem = null, $dbwhere = "")
   {
     $sql = "select ";
@@ -680,6 +711,18 @@ class cl_matordem
     $sql .= "      inner join matordemitem on matordemitem.m52_codordem = matordem.m51_codordem";
     $sql .= "      inner join empempenho on empempenho.e60_numemp = matordemitem.m52_numemp";
     $sql .= "      left join matordemanu  on  matordemanu.m53_codordem = matordem.m51_codordem";
+    $sql .= "      left join (
+                             select
+                                matordemitem.m52_codordem,
+                                sum(matestoqueitem.m71_valor) as sum_valor
+                             from
+                                matestoqueitemoc
+                              inner join matordemitem on matordemitem.m52_codlanc = matestoqueitemoc.m73_codmatordemitem
+                              inner join matestoqueitem on matestoqueitem.m71_codlanc = matestoqueitemoc.m73_codmatestoqueitem
+                              inner join matestoque as a on a.m70_codigo = matestoqueitem.m71_codmatestoque
+                              where m73_cancelado is false
+                              group by matordemitem.m52_codordem
+                              ) as dl_A_Lançar on dl_A_Lançar.m52_codordem = matordem.m51_codordem ";
     $sql2 = "";
     if ($dbwhere == "") {
       if ($m51_codordem != null) {

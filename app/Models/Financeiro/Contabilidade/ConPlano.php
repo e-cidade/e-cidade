@@ -12,9 +12,9 @@ class ConPlano extends LegacyModel
 
     public $timestamps = false;
 
-    protected $table = 'conplano';
+    protected $table = 'contabilidade.conplano';
 
-    protected $primaryKey = 'c60_codcon, c60_anousu';
+    protected $primaryKey = 'c60_codcon';
 
     public $incrementing = false;
 

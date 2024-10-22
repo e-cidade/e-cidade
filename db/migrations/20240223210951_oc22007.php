@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc22007 extends AbstractMigration
+class Oc22007 extends PostgresMigration
 {
     public function up()
     {
@@ -110,7 +110,7 @@ class Oc22007 extends AbstractMigration
         INSERT INTO public.nomearqdessiops
         (c228_codplanilha, c228_nomearquivo, c228_anousu)
         VALUES('95_18', 'Desp_Rec_Enferm_Inf_Compl', 2024);
-        
+
         COMMIT;
 
 SQL;

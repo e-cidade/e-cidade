@@ -38,6 +38,8 @@ require_once("model/configuracao/endereco/Estado.model.php");
 require_once("model/configuracao/endereco/Municipio.model.php");
 require_once("classes/db_condataconf_classe.php");
 require_once("classes/db_historicocgm_classe.php");
+require_once("classes/db_cgmcnae_classe.php");
+use App\Services\Patrimonial\Fornecedores\PcForneService;
 
 $oJson    = new services_json();
 $oParam   = $oJson->decode(str_replace("\\","",$_POST["json"]));
@@ -48,7 +50,6 @@ $oRetorno->status  = 1;
 $oRetorno->message = "";
 
 switch ($oParam->exec) {
-
     case 'findCidadao':
 
         $oDaoCidado = db_utils::getDao('cidadao');
@@ -69,8 +70,8 @@ switch ($oParam->exec) {
             $oCidadao = db_utils::fieldsMemory($rsQueryCidadao,0);
             $oRetorno->cidadao = $oCidadao;
 
-            $sMsgPermissao  = "usuário:\n\n Você não tem permissão para incluir CPF/CNPJ zerado,";
-            $sMsgPermissao .= "\n contate o administrador para obter esta permissão!\n\n";
+            $sMsgPermissao  = "usurio:\n\n Voc no tem permisso para incluir CPF/CNPJ zerado,";
+            $sMsgPermissao .= "\n contate o administrador para obter esta permisso!\n\n";
             // Aqui Valida se o usuario tem permissao para manipular CPF zerado {00000000000}
             $lPermissaoCpfZerado = db_permissaomenu(db_getsession("DB_anousu"),604,4459);
 
@@ -163,7 +164,7 @@ switch ($oParam->exec) {
 
         } else {
             $oRetorno->status = 2;
-            $oRetorno->message = urlencode("usuário:\n\n Falha ao importar os dados do cadastro do cidadão!\n\n");
+            $oRetorno->message = urlencode("usurio:\n\n Falha ao importar os dados do cadastro do cidado!\n\n");
         }
 
         echo $oJson->encode($oRetorno);
@@ -176,7 +177,7 @@ switch ($oParam->exec) {
             $oRetorno->z01_numcgm = false;
         } else {
             $oRetorno->z01_numcgm = $oCgm->getCodigo();
-            $oRetorno->message = urlencode("usuário:\n\n CPF/CNPJ já cadastrado para o CGM {".$oCgm->getCodigo()."}\n\n");
+            $oRetorno->message = urlencode("usurio:\n\n CPF/CNPJ j cadastrado para o CGM {".$oCgm->getCodigo()."}\n\n");
         }
 
         echo $oJson->encode($oRetorno);
@@ -187,8 +188,8 @@ switch ($oParam->exec) {
         $oCgm       = new stdClass();
         $oCgm = CgmFactory::getInstanceByCgm($oParam->numcgm);
 
-        $sMsgPermissao  = "usuário:\n\n Você não tem permissão para incluir CPF/CNPJ zerado,";
-        $sMsgPermissao .= "\n contate o administrador para obter esta permissão!\n\n";
+        $sMsgPermissao  = "usurio:\n\n Voc no tem permisso para incluir CPF/CNPJ zerado,";
+        $sMsgPermissao .= "\n contate o administrador para obter esta permisso!\n\n";
         // Aqui Valida se o usuario tem permissao para manipular CPF zerado {00000000000}
         $lPermissaoCpfZerado = db_permissaomenu(db_getsession("DB_anousu"),604,4459);
 
@@ -209,7 +210,7 @@ switch ($oParam->exec) {
             break;
         }
 
-        /* Verifico se o CGM é Físico */
+        /* Verifico se o CGM  Fsico */
         if ($oCgm->isFisico()) {
 
             $oCgmFisico = new stdClass();
@@ -256,6 +257,7 @@ switch ($oParam->exec) {
 
             $oCgmFisico->z04_rhcbo         = $oCgm->getCBO();
             $oCgmFisico->z01_notificaemail = $oCgm->getNotificalEmail();
+            $oCgmFisico->z01_produtorrural = $oCgm->getProdutorRural();
             $oCgmFisico->z01_ibge          = $oCgm->getIbge();
 
             $oRetorno->cgm = $oCgmFisico;
@@ -286,6 +288,7 @@ switch ($oParam->exec) {
             $oCgmJuridico->z01_nomecomple  = urlencode($oCgm->getNomeCompleto());
             $oCgmJuridico->z01_foto        = $oCgm->getFotoPrincipal();
             $oCgmJuridico->nire            = $oCgm->getNire();
+            $oCgmJuridico->z08_capitalsocial            = $oCgm->getCapitalSocial();
             // dados para novo cadastro CGM
             $oCgmJuridico->z01_fax         = $oCgm->getFax();
             $oCgmJuridico->z01_cxpostal    = $oCgm->getCaixaPostal();
@@ -331,22 +334,20 @@ switch ($oParam->exec) {
     case 'incluirAlterar' :
 
         $sqlErro = false;
-        $clcondataconf        = new cl_condataconf;
-        $clhistoricocgm      = new cl_historicocgm;
-        $oRetorno->action     = $oParam->action;
+        $clcondataconf    = new cl_condataconf;
+        $clhistoricocgm   = new cl_historicocgm;
+        $oRetorno->action = $oParam->action;
 
-        try {
+
+        try {          
             db_inicio_transacao();
             db_query("select fc_putsession('DB_habilita_trigger_endereco','false')");
 
             if ($oParam->lPessoaFisica == true) {
-
+        
                 if ($oParam->action == "incluir") {
-
                     $oCgm = CgmFactory::getInstanceByType(1);
-
                 } else if ($oParam->action == "alterar") {
-
                     $oCgm = CgmFactory::getInstanceByCgm($oParam->pessoa->z01_numcgm);
                 }
 
@@ -379,7 +380,7 @@ switch ($oParam->exec) {
                 $oCgm->setDataFalecimento($oParam->pessoa->z01_dtfalecimento);
                 $oCgm->setIdentDataExp($oParam->pessoa->z01_identdtexp);
                 $oCgm->setCadastro($oParam->pessoa->z01_cadast);
-
+                $oCgm->setAnoObito($oParam->pessoa->z01_anoobito);
                 // Campos novos criados
                 $oCgm->setFax($oParam->pessoa->z01_fax);
                 $oCgm->setCaixaPostal($oParam->pessoa->z01_cxpostal);
@@ -387,48 +388,81 @@ switch ($oParam->exec) {
                 $oCgm->setInscricaoEstadual($oParam->pessoa->z01_incest);
                 $oCgm->setInscricaoMunicipal($oParam->pessoa->z01_incmunici);
                 $oCgm->setNotificalEmail($oParam->pessoa->z01_notificaemail);
+                $oCgm->setProdutorRural($oParam->pessoa->z01_produtorrural);
+                $oCgm->setSituacaoCadastral($oParam->pessoa->z01_situacaocadastral);
                 $oCgm->setObs(utf8_decode(db_stdClass::db_stripTagsJson($oParam->pessoa->z01_obs)));
-
+                
                 if ($oParam->pessoa->z01_trabalha == 't') {
                     $oCgm->setTrabalha(true);
                 } else {
                     $oCgm->setTrabalha(false);
                 }
                 $oCgm->setRenda($oParam->pessoa->z01_renda);
+                // Criando endereço primário
+                $oEndereco = new endereco(null);
+                $oEndereco->setCodigoEstado($oParam->pessoa->iestado); // Trazer ou buscar pelo estado informado
+                $oEndereco->setCodigoMunicipio($oParam->pessoa->imunicipio == 'Selecione' ? null : $oParam->pessoa->imunicipio); // Trazer ou buscar pelo municipio informado
+                //$oEndereco->setDescricaoMunicipio(utf8_decode($oParam->endereco->descricaoMunicipio));
+                $oEndereco->setCodigoBairro($oParam->pessoa->ibairro);
+                $oEndereco->setDescricaoBairro(utf8_decode(($oParam->pessoa->z01_bairro)));
+                $oEndereco->setCodigoRua($oParam->pessoa->irua);
+                $oEndereco->setDescricaoRua(utf8_decode($oParam->pessoa->z01_ender));
+                // $oEndereco->setCodigoLocal($oParam->endereco->codigoLocal);
+                // $oEndereco->setCodigoEndereco($oParam->endereco->codigoEndereco);
+                $oEndereco->setNumeroLocal($oParam->pessoa->z01_numero);
+                $oEndereco->setComplementoEndereco(utf8_decode($oParam->pessoa->z01_compl));
+                $oEndereco->setLoteamentoEndereco(utf8_decode($oParam->pessoa->z01_loteamento));
+                $oEndereco->setCondominioEndereco(utf8_decode($oParam->pessoa->z01_condominio));
+                $oEndereco->setPontoReferenciaEndereco(utf8_decode($oParam->pessoa->z01_pontoreferencia));
+                $oEndereco->setCepEndereco($oParam->pessoa->z01_cep);
+                $oEndereco->setCep($oParam->pessoa->z01_cep);
+                $oEndereco->setCadEnderRuaTipo(3);
+                // $oEndereco->setCodigoRuasTipo($oParam->endereco->codigoRuasTipo);
+                $oEndereco->setCodigoCep($oParam->pessoa->z01_cep);
+                $oEndereco->salvaEndereco();
 
-                /*seta os endereços*/
-                $oEnderecoPrimario   = endereco::findEnderecoByCodigo($oParam->endereco->idEndPrimario,   false);
+                $oEnderecoPrimario   = endereco::findEnderecoByCodigo($oEndereco->getCodigoEndereco(), false);
 
                 if ($oParam->endereco->idEndSecundario == '') {
                     $oEnderecoSecundario = false;
                 } else {
                     $oEnderecoSecundario = endereco::findEnderecoByCodigo($oParam->endereco->idEndSecundario, false);
                 }
-                $oCgm->setEnderecoPrimario($oParam->endereco->idEndPrimario);
+                // Vincular endereco com CGM
+                // $sql .= " inner join cgmendereco     on cgmendereco.z07_endereco = endereco.db76_sequencial ";
+                // throw new Exception($oParam->endereco);
+                $oCgm->setEnderecoPrimario($oEndereco->getCodigoEndereco());
                 $oCgm->setEnderecoSecundario($oParam->endereco->idEndSecundario);
-                if ($oEnderecoPrimario !== false) {
 
+                if ($oEnderecoPrimario !== false) {
                     $oCgm->setUf($oEnderecoPrimario[0]->ssigla);
                     if ($oEnderecoPrimario[0]->scep != "") {
                         $oCgm->setCep($oEnderecoPrimario[0]->scep);
                     }
-                    $oCgm->setBairro($oEnderecoPrimario[0]->sbairro);
+                    if ($oParam->pessoa->z01_bairro) {
+                        $oCgm->setBairro(substr(utf8_decode($oParam->pessoa->z01_bairro), 0, 40));
+                    } else {
+                        $oCgm->setBairro(substr($oEnderecoPrimario[0]->sbairro, 0, 40));
+                    } 
+
                     $oCgm->setNumero($oEnderecoPrimario[0]->snumero);
                     $oCgm->setMunicipio($oEnderecoPrimario[0]->smunicipio);
-                    $oCgm->setLogradouro($oEnderecoPrimario[0]->srua);
+                    if ($oParam->pessoa->z01_ender) {
+                        $oCgm->setLogradouro(utf8_decode($oParam->pessoa->z01_ender));
+                    } else {
+                        $oCgm->setLogradouro($oEnderecoPrimario[0]->srua);
+                    }
                     $oCgm->setComplemento($oEnderecoPrimario[0]->scomplemento);
-
                 } else {
-
-                    $sqlErro = true;
+                    db_fim_transacao(true);
                     $oRetorno->status = 2;
-                    $oRetorno->message = urlencode("endereco não informado");
+                    $oRetorno->message = urlencode("endereco no informado");
+                    echo $oJson->encode($oRetorno);
+                    exit();
                 }
 
                 if (!$sqlErro) {
-
                     if ($oEnderecoSecundario !== false) {
-
                         $oCgm->setUfComercial($oEnderecoSecundario[0]->ssigla);
                         if ($oEnderecoSecundario[0]->scep != "") {
                             $oCgm->setCepComercial($oEnderecoSecundario[0]->scep);
@@ -438,9 +472,7 @@ switch ($oParam->exec) {
                         $oCgm->setMunicipioComercial($oEnderecoSecundario[0]->smunicipio);
                         $oCgm->setLogradouroComercial($oEnderecoSecundario[0]->srua);
                         $oCgm->setComplementoComercial($oEnderecoSecundario[0]->scomplemento);
-
                     } else {
-
                         $oCgm->setUfComercial('');
                         $oCgm->setCepComercial('');
                         $oCgm->setBairroComercial('');
@@ -486,18 +518,13 @@ switch ($oParam->exec) {
 
                 if (!$sqlErro) {
                     try {
-
                         $oCgm->save();
-
                         if ($oParam->action == "incluir") {
                         	$oRetorno->message = urlencode("usuario:\\n\\n Cgm incluído com sucesso (".$oCgm->getCodigo().")\\n\\n");
                         } else if ($oParam->action == "alterar") {
-
                             $oRetorno->message = urlencode("usuario:\\n\\n Cgm alterado com sucesso (".$oCgm->getCodigo().")\\n\\n");
                         }
-
                     } catch (Exception $erro) {
-
                         $sqlErro = true;
                         $oRetorno->status = 2;
                         $oRetorno->message = urlencode($erro->getMessage());
@@ -506,7 +533,6 @@ switch ($oParam->exec) {
                 //Aqui vai manipular o cidadaocgm
                 if (!$sqlErro) {
                     if (trim($oParam->cidadao->ov02_sequencial) != "" && trim($oParam->cidadao->ov02_seq) != "") {
-
                         $oDaoCidadoCgm    = db_utils::getDao("cidadaocgm");
                         $sCampos = " * ";
                         $sWhere  = " ov03_cidadao = ".$oParam->cidadao->ov02_sequencial." and ov03_seq = ".$oParam->cidadao->ov02_seq ;
@@ -516,7 +542,6 @@ switch ($oParam->exec) {
                         $rsQueryCidadaoCgm = $oDaoCidadoCgm->sql_record($sQueryCidadaoCgm);
 
                         if ($oDaoCidadoCgm->numrows == 0) {
-
                             $oDaoCidadoCgm->ov03_cidadao = $oParam->cidadao->ov02_sequencial;
                             $oDaoCidadoCgm->ov03_seq     = $oParam->cidadao->ov02_seq;
                             $oDaoCidadoCgm->ov03_numcgm  = $oCgm->getCodigo();
@@ -529,17 +554,18 @@ switch ($oParam->exec) {
                         }
 
                         if (!$sqlErro) {
-
                             $oDaoCidado = db_utils::getDao("cidadao");
                             $oDaoCidado->ov02_situacaocidadao = 1;
                             $oDaoCidado->alterar_where($oParam->cidadao->ov02_sequencial,
                                 $oParam->cidadao->ov02_seq,
                                 "ov02_sequencial = ".$oParam->cidadao->ov02_sequencial." and
-                                            ov02_seq = ".$oParam->cidadao->ov02_seq
+                                ov02_seq = ".$oParam->cidadao->ov02_seq
                             );
 
                             if ($oDaoCidado->erro_status == 0) {
-
+                                if (db_utils::inTransaction()) {
+                                    db_fim_transacao(true);
+                                }
                                 $oRetorno->status = 2;
                                 $oRetorno->message = urlencode($oDaoCidado->erro_msg);
                                 $sqlErro = true;
@@ -548,20 +574,24 @@ switch ($oParam->exec) {
                     }
                 }
 
-    		    //Aqui manipula cgm Pessoa Jurídica
+    		//Aqui manipula cgm Pessoa Jurdica
             } else if ($oParam->lPessoaFisica == false) {
-
                 $sqlErro = false;
 
                 if ($oParam->action == "incluir") {
-
                     $oCgm = CgmFactory::getInstanceByType(2);
-
                 } else if ($oParam->action == "alterar") {
-
                     $oCgm = CgmFactory::getInstanceByCgm($oParam->pessoa->z01_numcgm);
                 }
 
+                $oCgm->setSituacaoCadastral($oParam->pessoa->z01_situacaocadastral);
+                $oCgm->setSituacaoEspecial($oParam->pessoa->z01_situacaoespecial);
+                $oCgm->setOptanteMei($oParam->pessoa->z01_optantemei);
+                $oCgm->setOptanteSimples($oParam->pessoa->z01_optantesimples);
+                $oCgm->setPorte($oParam->pessoa->z01_porte);
+                $oCgm->setDataAbertura($oParam->pessoa->z01_dtabertura);
+                $oCgm->setDataSituacaoEspecial($oParam->pessoa->z01_datasituacaoespecial);
+                $oCgm->setTipoEstabelecimento($oParam->pessoa->z01_tipoestabelecimento);
                 $oCgm->setCodigo($oParam->pessoa->z01_numcgm);
                 $oCgm->setCnpj($oParam->pessoa->z01_cgccpf);
                 $oCgm->setNaturezaJuridica($oParam->pessoa->z01_naturezajuridica);
@@ -578,7 +608,9 @@ switch ($oParam->exec) {
                 $oCgm->setCelularComercial($oParam->pessoa->z01_celcon);
                 $oCgm->setEmailComercial(utf8_decode(db_stdClass::db_stripTagsJson($oParam->pessoa->z01_emailc)));
                 $oCgm->setNotificalEmail($oParam->pessoa->z01_notificaemail);
-                $oCgm->setNire($oParam->nire->z08_nire);
+                $oCgm->setNire($oParam->juridico->z08_nire);
+                // throw new Exception($oParam->juridico->z08_capitalsocial);
+                $oCgm->setCapitalSocial($oParam->juridico->z08_capitalsocial);
                 //Campos novos criados
                 $oCgm->setCadastro($oParam->pessoa->z01_cadast);
                 $oCgm->setFax($oParam->pessoa->z01_fax);
@@ -586,60 +618,69 @@ switch ($oParam->exec) {
                 $oCgm->setCaixaPostalComercial($oParam->pessoa->z01_cxposcon);
                 $oCgm->setObs(utf8_decode(db_stdClass::db_stripTagsJson($oParam->pessoa->z01_obs)));
 
-                /*seta os endereços*/
-                $oEnderecoPrimario   = endereco::findEnderecoByCodigo($oParam->endereco->idEndPrimario,   false);
+                // Criando endereço primário
+                $oEndereco = new endereco(null);
+                $oEndereco->setCodigoEstado($oParam->pessoa->iestado); // Trazer ou buscar pelo estado informado
+                $oEndereco->setCodigoMunicipio($oParam->pessoa->imunicipio); // Trazer ou buscar pelo municipio informado
+                //$oEndereco->setDescricaoMunicipio(utf8_decode($oParam->endereco->descricaoMunicipio));
+                $oEndereco->setCodigoBairro($oParam->pessoa->ibairro);
+                $oEndereco->setDescricaoBairro(utf8_decode(($oParam->pessoa->z01_bairro)));
+                $oEndereco->setCodigoRua($oParam->pessoa->irua);
+                $oEndereco->setDescricaoRua(utf8_decode($oParam->pessoa->z01_ender));
+                // $oEndereco->setCodigoLocal($oParam->endereco->codigoLocal);
+                // $oEndereco->setCodigoEndereco($oParam->endereco->codigoEndereco);
+                $oEndereco->setNumeroLocal($oParam->pessoa->z01_numero);
+                $oEndereco->setComplementoEndereco(utf8_decode($oParam->pessoa->z01_compl));
+                $oEndereco->setLoteamentoEndereco(utf8_decode($oParam->pessoa->z01_loteamento));
+                $oEndereco->setCondominioEndereco(utf8_decode($oParam->pessoa->z01_condominio));
+                $oEndereco->setPontoReferenciaEndereco(utf8_decode($oParam->pessoa->z01_pontoreferencia));
+                $oEndereco->setCepEndereco($oParam->pessoa->z01_cep);
+                $oEndereco->setCep($oParam->pessoa->z01_cep);
+                $oEndereco->setCadEnderRuaTipo(3);
+                // $oEndereco->setCodigoRuasTipo($oParam->endereco->codigoRuasTipo);
+                $oEndereco->setCodigoCep($oParam->pessoa->z01_cep);
+                $oEndereco->salvaEndereco();
+
+                /*seta os endereos*/
+                $oEnderecoPrimario   = endereco::findEnderecoByCodigo($oEndereco->getCodigoEndereco(), false);
+
                 if ($oParam->endereco->idEndSecundario == '') {
                     $oEnderecoSecundario = false;
                 } else {
                     $oEnderecoSecundario = endereco::findEnderecoByCodigo($oParam->endereco->idEndSecundario, false);
                 }
 
-                $oCgm->setEnderecoPrimario($oParam->endereco->idEndPrimario);
-
+                $oCgm->setEnderecoPrimario($oEndereco->getCodigoEndereco());
                 $oCgm->setEnderecoSecundario($oParam->endereco->idEndSecundario);
 
                 if ($oEnderecoPrimario !== false) {
-
                     $oCgm->setUf($oEnderecoPrimario[0]->ssigla);
                     if ($oEnderecoPrimario[0]->scep != "") {
                         $oCgm->setCep($oEnderecoPrimario[0]->scep);
                     }
-                    $oCgm->setBairro($oEnderecoPrimario[0]->sbairro);
+
+                    if ($oParam->pessoa->z01_bairro) {
+                        $oCgm->setBairro(substr(utf8_decode($oParam->pessoa->z01_bairro), 0, 40));
+                    } else {
+                        $oCgm->setBairro(substr($oEnderecoPrimario[0]->sbairro, 0, 40));
+                    } 
                     $oCgm->setNumero($oEnderecoPrimario[0]->snumero);
                     $oCgm->setMunicipio($oEnderecoPrimario[0]->smunicipio);
-                    $oCgm->setLogradouro($oEnderecoPrimario[0]->srua);
+                    if ($oParam->pessoa->z01_ender) {
+                        $oCgm->setLogradouro(utf8_decode($oParam->pessoa->z01_ender));
+                    } else {
+                        $oCgm->setLogradouro($oEnderecoPrimario[0]->srua);
+                    }
                     $oCgm->setComplemento($oEnderecoPrimario[0]->scomplemento);
-
+   
                 } else {
                     db_fim_transacao(true);
                     $oRetorno->status = 2;
-                    $oRetorno->message = urlencode("endereco não informado");
+                    $oRetorno->message = urlencode("endereco no informado");
                     echo $oJson->encode($oRetorno);
                     exit();
                 }
 
-                if ($oEnderecoSecundario !== false) {
-
-                    $oCgm->setUfComercial($oEnderecoSecundario[0]->ssigla);
-                    if ($oEnderecoSecundario[0]->scep != "") {
-                        $oCgm->setCepComercial($oEnderecoSecundario[0]->scep);
-                    }
-                    $oCgm->setBairroComercial($oEnderecoSecundario[0]->sbairro);
-                    $oCgm->setNumeroComercial($oEnderecoSecundario[0]->snumero);
-                    $oCgm->setMunicipio($oEnderecoSecundario[0]->smunicipio);
-                    $oCgm->setLogradouroComercial($oEnderecoSecundario[0]->srua);
-                    $oCgm->setComplementoComercial($oEnderecoSecundario[0]->scomplemento);
-
-                } else {
-
-                    $oCgm->setUfComercial('');
-                    $oCgm->setCepComercial('');
-                    $oCgm->setBairroComercial('');
-                    $oCgm->setNumeroComercial('');
-                    //$oCgm->setMunicipio('');
-                    $oCgm->setLogradouroComercial('');
-                    $oCgm->setComplementoComercial('');
-                }
                 if(!empty($oParam->pessoa->z01_cadast)){
                     $anousu = db_getsession('DB_anousu');
                     $instituicao = db_getsession('DB_instit');
@@ -654,13 +695,13 @@ switch ($oParam->exec) {
 
                 if($oParam->pessoa->z01_naturezajuridica == "1"){
                     $oRetorno->status = 2;
-                    $oRetorno->message = urlencode("Campo Natureza Juridica não informado !");
+                    $oRetorno->message = urlencode("Campo Natureza Juridica no informado !");
                     $sqlErro  = true;
                 }
 
                 if(strlen($oParam->pessoa->z01_cgccpf) == 14 && $oParam->pessoa->z01_naturezajuridica == "8885"){
                     $oRetorno->status = 2;
-                    $oRetorno->message = urlencode("Natureza não informada, selecione a Natureza Jurídica correta!");
+                    $oRetorno->message = urlencode("Natureza no informada, selecione a Natureza Jurdica correta!");
                     $sqlErro  = true;
                 }
 
@@ -707,6 +748,29 @@ switch ($oParam->exec) {
                 //Aqui vai manipular o cidadaocgm
 
                 if (!$sqlErro) {
+                    if ($oParam->pessoa->z01_cnae) {
+                        $oCgmCnae = db_utils::getDao("cgmcnae");
+                        $oCgmCnae->excluir('', 'z16_numcgm = ' . $oCgm->getCodigo() . ' AND z16_tipo = \'p\' ');
+                        
+                        $oCnae = db_utils::getDao("cgmcnae");
+                        $oCnae->z16_numcgm = $oCgm->getCodigo();
+                        $oCnae->z16_cnae = $oParam->pessoa->z01_cnae;
+                        $oCnae->z16_tipo = 'p';
+                        $oCnae->incluir(); 
+                    }
+
+                    $oCgmCnae = db_utils::getDao("cgmcnae");
+                    $oCgmCnae->excluir('', 'z16_numcgm = ' . $oCgm->getCodigo() . ' AND z16_tipo = \'s\' ');
+                    
+                    if ($oParam->pessoa->z01_cnaes) {                        
+                        foreach ($oParam->pessoa->z01_cnaes as $cnae) {      
+                            $oCnae = db_utils::getDao("cgmcnae");
+                            $oCnae->z16_numcgm = $oCgm->getCodigo();
+                            $oCnae->z16_cnae = $cnae;
+                            $oCnae->z16_tipo = 's';
+                            $oCnae->incluir();
+                        }
+                    }
 
                     if (trim($oParam->cidadao->ov02_sequencial) != "" && trim($oParam->cidadao->ov02_seq) != "") {
 
@@ -845,8 +909,8 @@ switch ($oParam->exec) {
 
         $oCgm = CgmFactory::getInstanceByCgm($oParam->pessoa->z01_numcgm);
 
-        $sMsgPermissao  = "usuário:\n\n Você não tem permissão para incluir CPF/CNPJ zerado,";
-        $sMsgPermissao .= "\n contate o administrador para obter esta permissão!\n\n";
+        $sMsgPermissao  = "usurio:\n\n Voc no tem permisso para incluir CPF/CNPJ zerado,";
+        $sMsgPermissao .= "\n contate o administrador para obter esta permisso!\n\n";
         // Aqui Valida se o usuario tem permissao para manipular CPF zerado {00000000000}
         $lPermissaoCpfZerado = db_permissaomenu(db_getsession("DB_anousu"),604,4459);
 
@@ -889,7 +953,7 @@ switch ($oParam->exec) {
             if ($oCgm->isFisico()) {
 
                 $oCgm->setCpf($oParam->pessoa->z01_cpf);
-                //Nova Validação devido a criação dos nóvos campos
+                //Nova Validao devido a criao dos nvos campos
                 if (isset($oParam->pessoa->z01_incest) || isset($oParam->pessoa->z01_incmunici)) {
                     $oCgm->setInscricaoEstadual($oParam->pessoa->z01_incest);
                     $oCgm->setInscricaoMunicipal($oParam->pessoa->z01_incmunici);
@@ -898,15 +962,15 @@ switch ($oParam->exec) {
                 $oCgm->setCnpj($oParam->pessoa->z01_cpf);
             }
         }
-        //Nova Validação devido a criação dos nóvos campos
+        //Nova Validao devido a criao dos nvos campos
         if (isset($oParam->pessoa->z01_fax)) {
             $oCgm->setFax($oParam->pessoa->z01_fax);
         }
-        //Nova Validação devido a criação dos nóvos campos
+        //Nova Validao devido a criao dos nvos campos
         if (isset($oParam->pessoa->z01_cxpostal)) {
             $oCgm->setCaixaPostal($oParam->pessoa->z01_cxpostal);
         }
-        //Nova Validação devido a criação dos nóvos campos
+        //Nova Validao devido a criao dos nvos campos
         if (isset($oParam->pessoa->z01_cxposcon)) {
             $oCgm->setCaixaPostalComercial($oParam->pessoa->z01_cxposcon);
         }
@@ -967,7 +1031,7 @@ switch ($oParam->exec) {
             $oCgm   = CgmFactory::getInstanceByCgm($oParam->z01_numcgm);
 
             /**
-             * Remove as fotos vinculadas ao CGM antes de excluí-lo
+             * Remove as fotos vinculadas ao CGM antes de exclu-lo
              */
             $aFotos = $oCgm->getFotos();
             if( !empty($aFotos) ){
@@ -992,10 +1056,9 @@ switch ($oParam->exec) {
             $sUsuarioAtivo    = '';
 
             if ( $oDaoDB_usuacgm->numrows > 0 ) {
-
                 $sUsuarioAtivo = db_utils::fieldsMemory($rsDB_usuacgm,0)->usuarioativo;
                 if( $sUsuarioAtivo == 1 ){
-                    throw new Exception("Cgm possui usuário ativo no sistema, não é possível excluir!\\n\\n");
+                    throw new Exception("Cgm possui usurio ativo no sistema, no  possvel excluir!\\n\\n");
                 }
 
                 $oDaoDB_usuacgm->excluir(null, $sWhereDB_usuacgm);
@@ -1008,7 +1071,7 @@ switch ($oParam->exec) {
 
             db_fim_transacao(false);
 
-            $oRetorno->message = urlencode("usuario:\\n\\n Cgm excluído com sucesso {".$oCgm->getCodigo()."}\\n\\n");
+            $oRetorno->message = urlencode("usuario:\\n\\n Cgm excludo com sucesso {".$oCgm->getCodigo()."}\\n\\n");
             $oRetorno->status = 1;
 
         } catch (Exception $erro) {
@@ -1104,11 +1167,76 @@ switch ($oParam->exec) {
             $oRetorno->z01_cadast   = $data_cadastro_original;
 			$oRetorno->z09_cadastro = $data_cadastro;
 			$oRetorno->status = 1;
-
-		}catch(Exception $exception){
-
+		} catch(Exception $eErro) {
 			$oRetorno->status = 2;
 			$oRetorno->message = urlencode($eErro->getMessage());
+		}
+        echo $oJson->encode($oRetorno);
+		break;
+
+    case 'getCnaes':
+        $oCgmCnae  = db_utils::getDao('cgmcnae');
+
+        $sSqCnae  = $oCgmCnae->sql_query('', 'q71_sequencial, q71_descr', '', ' z16_numcgm = ' . $oParam->cgm . ' AND z16_tipo = \'s\'');
+        $rsSqCnae = $oCgmCnae->sql_record($sSqCnae);
+        
+        for ($i = 0; $i < pg_num_rows($rsSqCnae); $i++) {
+            $oCnae = db_utils::fieldsMemory($rsSqCnae, $i);
+            $oCnae->q71_descr = urlencode($oCnae->q71_descr);
+            $arrayCnaes[] = $oCnae;
+        }
+        
+        $oRetorno->cnaes = $arrayCnaes;
+        echo $oJson->encode($oRetorno);
+        break;
+
+    case 'getCnae':
+        $oCnae  = db_utils::getDao('cnae');
+        $sSqCnae  = "SELECT q71_sequencial, q71_descr FROM cnae WHERE q71_estrutural LIKE '%" . $oParam->cnae . "%'";
+        $rsSqCnae = $oCnae->sql_record($sSqCnae);
+        
+        db_fieldsmemory($rsSqCnae, 0);
+        $oRetorno->cnae = $q71_sequencial;
+        $oRetorno->descricao = urlencode($q71_descr);
+        
+        echo $oJson->encode($oRetorno);
+        break;
+
+    case 'consultarRFB':
+        $oRetorno->message = "Consulta de RFB em desenvolvimento, o sistema ficara instavel";
+        echo $oJson->encode($oRetorno);
+        break;
+
+    case 'cadastrarFornecedor':
+        try{
+
+			$oRetorno->abrirAbaCadastroFornecedor = false;
+            $rsCgm = db_query("select * from cgm where z01_numcgm = {$oParam->numcgm}");
+            $cpfcnpj = db_utils::fieldsMemory($rsCgm, 0)->z01_cgccpf;
+            if(strlen($cpfcnpj) == 14){
+                $oRetorno->abrirAbaCadastroFornecedor = true;
+                echo $oJson->encode($oRetorno);
+		        break;
+            }
+
+            $aDados = array(
+                'pc60_numcgm' => $oParam->numcgm,
+                'pc60_dtlanc' => date("Y-m-d", db_getsession('DB_datausu')),
+                'pc60_hora' => db_hora(),
+                'pc60_usuario' => db_getsession("DB_id_usuario"),
+                'pc60_orgaoreg' => 0,
+                'pc60_cnpjcpf' => db_utils::fieldsMemory($rsCgm, 0)->z01_cgccpf,
+                'pc60_inscriestadual' => db_utils::fieldsMemory($rsCgm, 0)->z01_incest,
+                'pc60_uf' => db_utils::fieldsMemory($rsCgm, 0)->z01_uf
+            );
+
+            $PcForneService = new PcForneService();
+            $PcForneService->cadastroAutomatico($aDados);
+
+        }catch(Exception $exception){
+
+			$oRetorno->status = 2;
+			$oRetorno->message = urlencode($exception->getMessage());
 		}
 		echo $oJson->encode($oRetorno);
 		break;

@@ -113,7 +113,7 @@ db_input('e91_elemento',20,$Ie91_elemento,true,'text',$db_opcao,"")
     </td>
     <td>
 <?
-db_input('e91_recurso',4,$Ie91_recurso,true,'text',$db_opcao," onchange='js_pesquisae91_recurso(false);'")
+db_input('e91_recurso',8,$Ie91_recurso,true,'text',$db_opcao," onchange='js_pesquisae91_recurso(false);'")
 ?>
        <?
 db_input('o15_descr',60,$Io15_descr,true,'text',3,'')

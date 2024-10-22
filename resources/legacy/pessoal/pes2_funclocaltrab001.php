@@ -110,9 +110,13 @@ function js_gerar(){
   $geraform->onchpad = true;                          // MUDAR AS OPÇÕES AO SELECIONAR OS TIPOS DE FILTRO OU RESUMO
   $geraform->qbrapag = true;
   $geraform->mostord = true;
+  $geraform->mostrescindidos = true;
   $geraform->tipordem = "Imprimir cadastro de funcionário";
+  $geraform->tiporescindidos = "Listar Rescindidos";
+  $geraform->rescindidosnome = "lista_rescindidos";
   $geraform->mornome  = "formaimpr";
   $geraform->arr_mostord = Array("s"=>"Sim", "n"=>"Não");
+  $geraform->arr_rescindidos = Array("s"=>"Sim", "n"=>"Não");
   $geraform->jsgerar = "js_gerar()";
   $geraform->gera_form($anofolha,$mesfolha);
   ?>

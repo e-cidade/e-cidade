@@ -1,14 +1,14 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc13553Contratos extends AbstractMigration
+class Oc13553Contratos extends PostgresMigration
 {
     public function up(){
 		$sql = "
 			ALTER TABLE contratos132021 ADD COLUMN si86_tipodocrepresentante bigint NOT NULL;
 			ALTER TABLE contratos132021 RENAME COLUMN si86_cpfrepresentantelegal TO si86_nrodocrepresentantelegal;
-			ALTER TABLE contratos132021 ALTER COLUMN si86_nrodocrepresentantelegal TYPE character varying(14);			
+			ALTER TABLE contratos132021 ALTER COLUMN si86_nrodocrepresentantelegal TYPE character varying(14);
 		";
 		$this->execute($sql);
     }

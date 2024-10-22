@@ -15,7 +15,7 @@ class Numpref extends LegacyModel
     /**
      * @var string
      */
-    protected $primaryKey = 'k03_anousu, k03_instit';
+    protected $primaryKey = "k03_anousu";
 
     /**
      * Indicates if the IDs are auto-incrementing.

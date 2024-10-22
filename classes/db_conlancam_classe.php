@@ -82,8 +82,11 @@ class cl_conlancam {
   function atualizacampos($exclusao = false) {
 
     if ($exclusao == false) {
-      $this->c70_codlan = ($this->c70_codlan == "" ? @$GLOBALS["HTTP_POST_VARS"]["c70_codlan"] : $this->c70_codlan);
-      $this->c70_anousu = ($this->c70_anousu == "" ? @$GLOBALS["HTTP_POST_VARS"]["c70_anousu"] : $this->c70_anousu);
+
+      $this->c70_codlan = ($this->c70_codlan ==  "" ? @$GLOBALS["HTTP_POST_VARS"]["c70_codlan"] : $this->c70_codlan);
+      $this->c70_anousu = ($this->c70_anousu ==  "" ? @$GLOBALS["HTTP_POST_VARS"]["c70_anousu"] : $this->c70_anousu);
+      $this->c70_valor  = ($this->c70_valor  === "" ? @$GLOBALS["HTTP_POST_VARS"]["c70_valor"]  : $this->c70_valor);
+
       if ($this->c70_data == "") {
         $this->c70_data_dia = ($this->c70_data_dia == "" ? @$GLOBALS["HTTP_POST_VARS"]["c70_data_dia"]
             : $this->c70_data_dia);
@@ -95,7 +98,7 @@ class cl_conlancam {
           $this->c70_data = $this->c70_data_ano . "-" . $this->c70_data_mes . "-" . $this->c70_data_dia;
         }
       }
-      $this->c70_valor = ($this->c70_valor == "" ? @$GLOBALS["HTTP_POST_VARS"]["c70_valor"] : $this->c70_valor);
+     
     } else {
       $this->c70_codlan = ($this->c70_codlan == "" ? @$GLOBALS["HTTP_POST_VARS"]["c70_codlan"] : $this->c70_codlan);
     }
@@ -103,8 +106,7 @@ class cl_conlancam {
   // funcao para inclusao
 
   function incluir($c70_codlan) {
-
-    $this->atualizacampos();
+    $this->atualizacampos(null);
     if ($this->c70_anousu == null) {
       $this->erro_sql = " Campo Exercício nao Informado.";
       $this->erro_campo = "c70_anousu";
@@ -125,7 +127,7 @@ class cl_conlancam {
       $this->erro_status = "0";
       return false;
     }
-    if ($this->c70_valor == null) {
+    if ($this->c70_valor === null) {
       $this->erro_sql = " Campo Valor do Lançamento nao Informado.";
       $this->erro_campo = "c70_valor";
       $this->erro_banco = "";
@@ -303,7 +305,7 @@ class cl_conlancam {
     if (trim($this->c70_valor) != "" || isset($GLOBALS["HTTP_POST_VARS"]["c70_valor"])) {
       $sql .= $virgula . " c70_valor = $this->c70_valor ";
       $virgula = ",";
-      if (trim($this->c70_valor) == null) {
+      if (trim($this->c70_valor) === null) {
         $this->erro_sql = " Campo Valor do Lançamento nao Informado.";
         $this->erro_campo = "c70_valor";
         $this->erro_banco = "";

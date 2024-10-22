@@ -1,0 +1,71 @@
+{
+    "todosIcones": {
+        "css": [
+            "/libs/renderComponents/src/components/icons/asterisk/asterisk.css",
+            "/libs/renderComponents/src/components/icons/exclamation-triangle/exclamation-triangle.css",
+            "/libs/renderComponents/src/components/icons/exclamation-circle/exclamation-circle.css"
+        ]
+    },
+    "buttonsSolid": {
+        "css": [
+            "/libs/renderComponents/src/components/buttons/buttons.css",
+            "/libs/renderComponents/src/components/buttons/solid/solids.css"
+        ],
+        "js": [
+            "/libs/renderComponents/src/components/buttons/buttons.js",
+            "/libs/renderComponents/src/components/buttons/solid/solids.js"
+        ]
+    },
+    "simpleModal": {
+        "css": [
+            "/libs/renderComponents/src/components/modais/simpleModal/simpleModal.css"
+        ],
+        "js": [
+            "/libs/renderComponents/src/components/modais/simpleModal/simpleModal.js",
+            "/libs/renderComponents/src/components/modais/modais.js"
+        ]
+    },
+    "selectsChoicesSimple": {
+        "css": [
+            "/libs/renderComponents/src/components/inputs/selects/choices/base.min.css",
+            "/libs/renderComponents/src/components/inputs/selects/choices/choices-sizes.css",
+            "/libs/renderComponents/src/components/inputs/selects/choices/choices.min.css",
+            "/libs/renderComponents/src/components/inputs/selects/choices/simple/simple.css"
+        ],
+        "js": [
+            "/libs/renderComponents/src/components/inputs/selects/choices/choices.min.js",
+            "/libs/renderComponents/src/components/inputs/selects/choices/choices-pt-BR.js",
+            "/libs/renderComponents/src/components/inputs/selects/choices/simple/simple.js"
+        ]
+    },
+    "cardsSimple": {
+        "css": [
+            "/libs/renderComponents/src/components/cards/simple/simple.css"
+        ],
+        "js": [
+            "/libs/renderComponents/src/components/cards/simple/simple.js"
+        ]
+    },
+    "radiosBordered": {
+        "css": [
+            "/libs/renderComponents/src/components/inputs/radios/bordered/bordered.css"
+        ],
+        "js": [
+            "/libs/renderComponents/src/components/inputs/radios/bordered/bordered.js"
+        ]
+    },
+    "dateSimple": {
+        "css": [
+            "/libs/renderComponents/src/components/inputs/date/simple/simple.css"
+        ],
+        "js": [
+            "/libs/renderComponents/src/components/inputs/date/simple/simple.js"
+        ]
+    },
+    "tooltipDefault": {
+        "css": [
+            "/libs/renderComponents/src/components/tooltip/default/default.css",
+            "/libs/renderComponents/src/components/tooltip/tooltip.css"
+        ]
+    }
+}

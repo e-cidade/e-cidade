@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class RegistroS2200 extends AbstractMigration
+class RegistroS2200 extends PostgresMigration
 {
     public function up()
     {
@@ -21,7 +21,7 @@ class RegistroS2200 extends AbstractMigration
         INSERT INTO esocialformulariotipo
         VALUES(25,'Cadastramento Inicial do Viculo e Admissao/Ingresso de Trabalhador');
 
-        -- INSERIR FORMULARIO 
+        -- INSERIR FORMULARIO
         INSERT INTO avaliacao (db101_sequencial, db101_avaliacaotipo, db101_descricao, db101_identificador, db101_obs, db101_ativo, db101_cargadados, db101_permiteedicao) VALUES (4000093, 5, 'FORMULÁRIO S2200 - CADASTRAMENTO INICIAL DO VÍNCULO E ADMISSÃO/INGRESSO DE TRABALHADOR V2.5', 'formulario-s2200-v25', 'Versão 2.5 do formulario S2200 do eSocial', true, '', false);
 
         INSERT INTO esocialversaoformulario
@@ -524,35 +524,35 @@ SQL;
     private function insertSqlCargaDados()
     {
         $sql = <<<SQL
-        
+
         UPDATE avaliacao SET db101_cargadados = '
-        SELECT 
+        SELECT
         cgm.z01_cgccpf as cpfTrab,
         cgm.z01_pis as nisTrab,
         cgm.z01_nome as nmTrab,
         cgm.z01_sexo as sexo,
         CASE WHEN rhpessoal.rh01_raca = 2 THEN 1
-        WHEN rhpessoal.rh01_raca = 4 THEN 2 
-        WHEN rhpessoal.rh01_raca = 8 THEN 3 
-        WHEN rhpessoal.rh01_raca = 6 THEN 4 
-        WHEN rhpessoal.rh01_raca = 1 THEN 5 
+        WHEN rhpessoal.rh01_raca = 4 THEN 2
+        WHEN rhpessoal.rh01_raca = 8 THEN 3
+        WHEN rhpessoal.rh01_raca = 6 THEN 4
+        WHEN rhpessoal.rh01_raca = 1 THEN 5
         ELSE 6 END AS racaCor,
-        CASE WHEN rhpessoal.rh01_estciv = 1 THEN 1 
-        WHEN rhpessoal.rh01_estciv = 2 THEN 2 
+        CASE WHEN rhpessoal.rh01_estciv = 1 THEN 1
+        WHEN rhpessoal.rh01_estciv = 2 THEN 2
         WHEN rhpessoal.rh01_estciv = 5 THEN 3
         WHEN rhpessoal.rh01_estciv = 4 THEN 4
         WHEN rhpessoal.rh01_estciv = 3 THEN 5 END AS estCiv,
         CASE WHEN rhpessoal.rh01_instru = 10 THEN \'11\'
         WHEN rhpessoal.rh01_instru = 11 THEN \'12\'
         ELSE \'0\'||rhpessoal.rh01_instru::varchar END AS grauInstr,
-        CASE WHEN rhpessoal.rh01_tipadm = 1 THEN \'S\' 
+        CASE WHEN rhpessoal.rh01_tipadm = 1 THEN \'S\'
         ELSE \'N\' END AS indPriEmpr,
         -- nmSoc será preenchido manualmente
         cgm.z01_nasc AS dtNascto,
         cgm.z01_ibge AS codMunicNascto,
         (SELECT cadenderestado.db71_sigla
         FROM cadendermunicipio
-        INNER JOIN cadendermunicipiosistema 
+        INNER JOIN cadendermunicipiosistema
         ON cadendermunicipiosistema.db125_cadendermunicipio = cadendermunicipio.db72_sequencial
         INNER JOIN cadenderestado ON cadendermunicipio.db72_cadenderestado = cadenderestado.db71_sequencial
         WHERE cadendermunicipiosistema.db125_codigosistema = cgm.z01_ibge) AS ufNascto,
@@ -628,7 +628,7 @@ SQL;
         -- ideTrabSubstituido vamos pular
         -- aprend Não será preenchido
         CASE WHEN rhregime.rh30_regime != 2 THEN \'1\' ELSE \'N\' END AS indProvim,
-        CASE WHEN rhregime.rh30_regime != 2 THEN 
+        CASE WHEN rhregime.rh30_regime != 2 THEN
         (CASE WHEN h13_tipocargo = 1 THEN \'1\'
             WHEN h13_tipocargo = 2 OR h13_tipocargo = 3  THEN \'2\'
             ELSE \'99\' END) ELSE \'N\' END AS tpProv,
@@ -670,11 +670,11 @@ SQL;
                    END) AS horaintevalo
                FROM jornadahoras
                WHERE jornadahoras.rh189_jornada = jornada.rh188_sequencial) AS x)::integer AS jornadasemanal
-            FROM gradeshorariosjornada 
-            inner join jornada on jornada.rh188_sequencial = gradeshorariosjornada.rh191_jornada 
+            FROM gradeshorariosjornada
+            inner join jornada on jornada.rh188_sequencial = gradeshorariosjornada.rh191_jornada
             JOIN gradeshorarios ON gradeshorariosjornada.rh191_gradehorarios = gradeshorarios.rh190_sequencial
             JOIN escalaservidor ON gradeshorarios.rh190_sequencial = escalaservidor.rh192_gradeshorarios
-            WHERE escalaservidor.rh192_regist = rhpessoal.rh01_regist 
+            WHERE escalaservidor.rh192_regist = rhpessoal.rh01_regist
             AND escalaservidor.rh192_instit = fc_getsession(\'DB_instit\')::int
             AND jornada.rh188_tipo = \'T\'
             GROUP by jornada.rh188_sequencial) AS horcontratual) AS qtdHrsSem,
@@ -690,7 +690,7 @@ SQL;
         -- mudancaCPF será preenchido manualmente
         -- afastamento Buscar na hora de enviar afastamentos que estejam na data de envio
         -- desligamento será preenchido manualmente (observar necessidade conforme o layout)
-        FROM cgm 
+        FROM cgm
         JOIN rhpessoal ON cgm.z01_numcgm = rhpessoal.rh01_numcgm
         JOIN rhpesdoc ON rhpessoal.rh01_regist = rhpesdoc.rh16_regist
         JOIN rhpessoalmov ON rhpessoal.rh01_regist = rhpessoalmov.rh02_regist
@@ -708,7 +708,7 @@ SQL;
         JOIN cgmendereco ON cgm.z01_numcgm = cgmendereco.z07_numcgm
         JOIN endereco ON cgmendereco.z07_endereco = endereco.db76_sequencial
         JOIN cadenderlocal ON endereco.db76_cadenderlocal = cadenderlocal.db75_sequencial
-        JOIN cadenderbairrocadenderrua 
+        JOIN cadenderbairrocadenderrua
         ON cadenderlocal.db75_cadenderbairrocadenderrua = cadenderbairrocadenderrua.db87_sequencial
         JOIN cadenderbairro ON cadenderbairrocadenderrua.db87_cadenderbairro = cadenderbairro.db73_sequencial
         JOIN cadenderrua ON cadenderbairrocadenderrua.db87_cadenderrua = cadenderrua.db74_sequencial
@@ -721,7 +721,7 @@ SQL;
         AND cadenderpaissistema.db135_db_sistemaexterno = 3
         JOIN cadenderruaruastipo ON cadenderrua.db74_sequencial = cadenderruaruastipo.db85_cadenderrua
         JOIN ruastipo ON cadenderruaruastipo.db85_ruastipo = ruastipo.j88_codigo
-        -- FIM ENDERECO TRABALHADOR 
+        -- FIM ENDERECO TRABALHADOR
         WHERE db_config.codigo = fc_getsession(\'DB_instit\')::int' WHERE db101_sequencial = 4000093;
 
 

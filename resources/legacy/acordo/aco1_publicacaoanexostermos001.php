@@ -6,6 +6,7 @@ require_once("libs/db_utils.php");
 require_once("libs/db_usuariosonline.php");
 require_once("libs/db_app.utils.php");
 require_once("dbforms/db_funcoes.php");
+require_once("libs/renderComponents/index.php");
 
 $iOpcaoLicitacao = 1;
 $lExibirMenus   = true;
@@ -84,19 +85,70 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
       </form>
     </fieldset>
 
-    <input type="button" id="btnSalvar" onClick="js_salvarDocumento();" value="Salvar" />
-    <input type="button" id="btnAlterar" onClick="js_alterar();" value="Alterar" />
+    <div style="width: 100%; display: flex; justify-content: center;">
+      
+      <?php $component->render('buttons/solid', [
+        'designButton' => 'success',
+        'id' => 'btnSalvar',
+        'type' => 'button',
+        'onclick' => "js_salvarDocumento()",
+        'message' => 'Salvar',
+        'size' => 'sm'
+      ]); ?>
+      
+      <?php $component->render('buttons/solid', [
+        'designButton' => 'success',
+        'id' => 'btnAlterar',
+        'type' => 'button',
+        'onclick' => "js_alterar()",
+        'message' => 'Alterar',
+        'size' => 'sm'
+      ]); ?>
 
+    </div>
 
     <fieldset style="margin-top:15px;">
       <legend>Documentos Anexados</legend>
       <div id="ctnDbGridDocumentos"></div>
     </fieldset>
 
-    <input type="button" id="btnEnviarPNCP" value="Envia documento para o PNCP" onClick="js_enviarDocumentoPNCP();" />
-    <input type="button" id="btnExcluirPNCP" value="Excluir documento no PNCP" onClick="js_excluirDocumentoPNCP();" />
-    <input type="button" id="btnExcluir" value="Excluir Selecionados" onClick="js_excluirSelecionados();" />
-    <input type="button" id="btnDownloadAnexos" value="Download" onClick="js_downloadAnexos();" />
+    <div style="width: 100%; display: flex; justify-content: center;">
+      
+      <?php $component->render('buttons/solid', [
+        'designButton' => 'success',
+        'type' => 'button',
+        'onclick' => "js_enviarDocumentoPNCP()",
+        'message' => 'Envia documento para o PNCP',
+        'size' => 'sm'
+      ]); ?>
+
+      <?php $component->render('buttons/solid', [
+        'designButton' => 'danger',
+        'type' => 'button',
+        'onclick' => "openModal('justificativaModal')",
+        'message' => 'Excluir documento no PNCP',
+        'size' => 'sm'
+      ]); ?>
+
+      
+      <?php $component->render('buttons/solid', [
+        'designButton' => 'danger',
+        'type' => 'button',
+        'onclick' => "js_excluirSelecionados()",
+        'message' => 'Excluir Selecionados',
+        'size' => 'sm'
+      ]); ?>
+
+      
+      <?php $component->render('buttons/solid', [
+        'designButton' => 'secondary',
+        'type' => 'button',
+        'onclick' => "js_downloadAnexos()",
+        'message' => 'Download',
+        'size' => 'sm'
+      ]); ?>
+
+    </div>
 
   </div>
 
@@ -104,11 +156,42 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
     <?php db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsession("DB_anousu"), db_getsession("DB_instit")); ?>
   <?php endif; ?>
 
+  <?php $component->render('modais/simpleModal/startModal', [
+    'title' => 'Justificativa para o PNCP',
+    'id' => 'justificativaModal',
+    'size' => 'lg'
+  ], true); ?>
+
+    <?php db_textarea('justificativapncp', 10, 48, false, true, 'text', $db_opcao, "", "", "justificativapncp", "255"); ?>
+    
+    <div style="width: 100%; display: flex; justify-content: center;">
+      <?php $component->render('buttons/solid', [
+        'designButton' => 'success',
+        'onclick' => 'js_excluirDocumentoPNCP();',
+        'message' => 'Salvar justificativa PNCP',
+        'size' => 'md'
+      ]); ?>
+    </div>
+  <?php $component->render('modais/simpleModal/endModal', [], true); ?>
+
   <div id="teste" style="display:none;"></div>
 </body>
 
 </html>
+
+<style>
+  #justificativapncp {
+    width: 100%;
+    margin-bottom: 7px;
+    font-size: 1rem;
+  }
+</style>
+
 <script type="text/javascript">
+  loadComponents([
+    'buttonsSolid',
+    'simpleModal'
+  ]);
 
   const oGridDocumentos = new DBGrid('gridDocumentos');
 
@@ -203,6 +286,7 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
     oParam.sequencial = $F('l214_sequencial');
     oParam.tipoanexo  = $F('ac56_tipoanexo');
     oParam.arquivo    = $F('namefile');
+    oParam.sNomeArquivo = $("uploadfile").files[0].name;
     js_divCarregando('Aguarde... Salvando Documento','msgbox');
     let oAjax         = new Ajax.Request('con1_anexostermos.RPC.php',{
               parameters: 'json='+Object.toJSON(oParam),
@@ -348,10 +432,16 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
       var iSelecionados = documentosSelecionados.length;
       var iCodigoTermo = $('l214_sequencial').value;
       var aDocumentos = [];
+      let justificativa = document.getElementById('justificativapncp').value.trim();
 
       if (iSelecionados== 0) {
           alert('Selecione pelo menos um arquivo para Excluir')
           return false
+      }
+
+      if (justificativa === '') {
+        alert('A justificativa não pode estar vazia');
+        return false;
       }
 
       if (!confirm('Confirma a Exclusão do Documento?')) {
@@ -375,6 +465,7 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
       oParametros.exec = 'ExcluirDocumentoPNCP';
       oParametros.iCodigoTermo = iCodigoTermo;
       oParametros.aDocumentos = aDocumentos;
+      oParametros.justificativa = justificativa;
 
       let oAjax = new Ajax.Request(
           'con1_envioanexostermos.RPC.php', {
@@ -387,19 +478,21 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
                * Retorno do RPC
                */
               onComplete: function(oAjax) {
-
-                  js_removeObj("msgbox");
-                  let oRetorno = eval('(' + oAjax.responseText + ")");
-                  let sMensagem = oRetorno.message.urlDecode();
-                  let status = oRetorno.status;
-                  for (let cont = 0; cont <= oRetorno.length; cont++) {
-                      document.write(oRetorno[cont] + "<br>");
-                  }
-                  if (oRetorno.status == 2) {
-                      alert(sMensagem);
-                      return false;
-                  }
-                  alert("Documento(s) Excluido(s) com Sucesso do PNCP!");
+                
+                closeModal('justificativaModal');
+                clearModaFieldsRenderComponents();
+                js_removeObj("msgbox");
+                let oRetorno = eval('(' + oAjax.responseText + ")");
+                let sMensagem = oRetorno.message.urlDecode();
+                let status = oRetorno.status;
+                for (let cont = 0; cont <= oRetorno.length; cont++) {
+                    document.write(oRetorno[cont] + "<br>");
+                }
+                if (oRetorno.status == 2) {
+                    alert(sMensagem);
+                    return false;
+                }
+                alert("Documento(s) Excluido(s) com Sucesso do PNCP!");
 
               }
           });

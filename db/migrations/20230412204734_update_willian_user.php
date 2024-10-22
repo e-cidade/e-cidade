@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class UpdateWillianUser extends AbstractMigration
+class UpdateWillianUser extends PostgresMigration
 {
     public function up()
     {

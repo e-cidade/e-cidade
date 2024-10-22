@@ -17,4 +17,17 @@ class CgmRepository
     {
         return $this->model->where('z01_cgccpf', $cpf)->first($campos);
     }
+
+    public function getMotoristaByCpf(string $cpf, array $campos = ['*']): ?object{
+        return $this->model
+            ->join(
+                'veicmotoristas',
+                'veicmotoristas.ve05_numcgm',
+                '=',
+                'cgm.z01_numcgm'
+            )
+            ->where('z01_cgccpf', $cpf)
+            ->first($campos);
+    }
+
 }

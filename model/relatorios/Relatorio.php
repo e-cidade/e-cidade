@@ -20,7 +20,8 @@ if(!defined('DB_BIBLIOT')){
 
 }
 
-use \Mpdf\Mpdf;
+use Mpdf\Mpdf;
+use Mpdf\MpdfException;
 
 /**
  * PDF
@@ -60,12 +61,28 @@ class Relatorio extends mPDF
   private $lImprimeRodape = true;
 
 
-  public function __construct(
-    $mode = 'BLANK', $format = 'A4', $default_font_size = 0, $default_font = '',
-    $margin_left = 7, $margin_right = 7, $margin_top = 40, $margin_bottom = 14,
-    $margin_header = 6, $margin_footer = 0
-  ) {
-    parent::__construct();
+    /**
+     * @throws MpdfException
+     */
+    public function __construct(
+        $mode = 'BLANK',
+        $format = 'A4',
+        $margin_left = 10,
+        $margin_right = 20,
+        $margin_top = 35,
+        $margin_bottom = 14
+    )
+    {
+        $orientation = strpos($format, 'P') ? 'P' : 'L';
+        parent::__construct([
+            'mode' => $mode,
+            'format' => $format,
+            'orientation' => $orientation,
+            'margin_top' => $margin_top,
+            'margin_bottom' => $margin_bottom,
+            'margin_left' => $margin_left,
+            'margin_right' => $margin_right
+        ]);
 
     /*----------- Footer -----------*/
     $this->setHTMLFooter(utf8_encode($this->rodape()), 'O');
@@ -154,7 +171,7 @@ class Relatorio extends mPDF
     /*---------- HTML <header> ----------*/
     $header = <<<HEADER
     <header class='cabecalho'>
-      <div class='logo' style='background-image: url(imagens/files/{$sLogo});'>
+      <div class='logo' style='background-image: url(../../imagens/files.proper/{$sLogo});'>
       </div>
 
       <div class='cliente'>

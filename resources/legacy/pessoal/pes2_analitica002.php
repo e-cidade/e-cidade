@@ -174,7 +174,7 @@ if ($tipo == "m") {
     $lotacao = true;
 
     $head5 = "LOTAÇÕES";
-    $orderBY = " r70_estrut,z01_nome,rh01_regist,r14_rubric";
+    $orderBY = " rh02_lota,z01_nome,rh01_regist,r14_rubric";
     $camposFiltrar .= ", r70_estrut as codigofiltro, r70_descr as descrifiltro, r70_estrut as estrutfiltro ";
 
     if (isset($lti) && trim($lti) != "" && isset($ltf) && trim($ltf) != "") {
@@ -330,6 +330,7 @@ $camposSQL = "
               rh02_hrsmen,
               rh01_admiss,
               rh02_tbprev,
+              rh02_lota,
               rh04_descr,
               case when #s#_rubric < 'R950' then 'PD' else 'N' end as provdesc,
               case rh30_vinculo when 'A' then 'Ativo'
@@ -365,6 +366,7 @@ $sql_dados1 = "select distinct
                       rh02_hrsmen,
                       rh01_admiss,
                       rh02_tbprev,
+                      rh02_lota,
                       rh04_descr,
                       provdesc,
                       rh30_vinculo,
@@ -435,6 +437,7 @@ $arr_nomesfuncion = array(); // Nome do funcionário
 $arr_horasfuncion = array(); // Horas mês do funcionário
 $arr_lotacfuncion = array(); // Lotação do funcionário
 $arr_descrfuncion = array(); // Função do funcionário
+$arr_nlotafuncion = array(); // Numero da Lotação
 $arr_nascifuncion = array(); // Data de nascimento do funcionário
 $arr_situafuncion = array(); // Situação do funcionário (Ativo ou Inativo)
 $arr_admisfuncion = array(); // Data de admissão do funcionário
@@ -509,6 +512,7 @@ for ($x = 0; $x < pg_numrows($result_dados); $x++) {
         $arr_admisfuncion["$index"]       = db_formatar($rh01_admiss, "d");
         $arr_afastfuncion["$index"]       = $situacao_funcionario;
         $arr_dpadrfuncion["$index"]       = $r02_descr;
+        $arr_nlotafuncion["$index"]       = $rh02_lota;
 
         if ($tipo != "g" && $tipo != "m") {
             $arr_quebras_codigo["$rh01_regist"] = $codigofiltro;
@@ -902,6 +906,8 @@ for ($ireg = 0; $ireg < $index; $ireg++) {
         $codigoquebra = $arr_quebras_codigo["$registro"]; // Código da lotação, do local de trabalho ou do órgão
         $descriquebra = $arr_quebras_descri["$registro"]; // Descrição da lotação, do local de trabalho ou do órgão
         $estrutquebra = $arr_quebras_estrut["$registro"]; // Estrutural da lotação, do local de trabalho ou do órgão
+        $lotacaonova = $arr_nlotafuncion["$ireg"];
+
         $pdf->addpage();
         $troca = 0;
         $pdf->setfont('arial', 'b', 7);
@@ -910,7 +916,8 @@ for ($ireg = 0; $ireg < $index; $ireg++) {
         if ($ansin == "a") {
             $widthQUEBRA = 172;
         }
-        $pdf->cell($widthQUEBRA, $alt, $descriquebra . " (" . $estrutquebra . ")", "RTB", 1, "L", 1);
+        //$pdf->cell($widthQUEBRA, $alt, $descriquebra . " (" . $estrutquebra . ")", "RTB", 1, "L", 1);
+        $pdf->cell($widthQUEBRA, $alt, $lotacaonova . " - " . $descriquebra . " (" . $estrutquebra . ")", "RTB", 1, "L", 1);
         $imprime_cabecalho_analitico = true;
         $quebrarpagina = $codigoquebra;
     }

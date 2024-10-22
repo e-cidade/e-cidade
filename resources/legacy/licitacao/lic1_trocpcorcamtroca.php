@@ -652,41 +652,6 @@ ORDER BY $ordem";
                         db_msgbox($erro_msg);
                     }
 
-                    function fornecedoreHabilitado($cgm_fornecedor){
-                        $sSqlFornHabilic = "SELECT cgm.z01_numcgm,
-                             cgm.z01_nome,
-                             l206_datahab,
-                             l206_numcertidaoinss,
-                             l206_numcertidaofgts,
-                             l206_numcertidaocndt
-                      FROM habilitacaoforn
-                      INNER JOIN pcforne ON pcforne.pc60_numcgm = habilitacaoforn.l206_fornecedor
-                      INNER JOIN liclicita ON liclicita.l20_codigo = habilitacaoforn.l206_licitacao
-                      INNER JOIN cgm ON cgm.z01_numcgm = pcforne.pc60_numcgm
-                      INNER JOIN db_usuarios ON db_usuarios.id_usuario = pcforne.pc60_usuario
-                      INNER JOIN db_config ON db_config.codigo = liclicita.l20_instit
-                      INNER JOIN db_usuarios AS a ON a.id_usuario = liclicita.l20_id_usucria
-                      INNER JOIN cflicita ON cflicita.l03_codigo = liclicita.l20_codtipocom
-                      INNER JOIN liclocal ON liclocal.l26_codigo = liclicita.l20_liclocal
-                      INNER JOIN liccomissao ON liccomissao.l30_codigo = liclicita.l20_liccomissao
-                      INNER JOIN licsituacao ON licsituacao.l08_sequencial = liclicita.l20_licsituacao
-                      WHERE cgm.z01_numcgm = {$cgm_fornecedor}";
-                        $resSqlFornHabilic = pg_query($sSqlFornHabilic);
-
-                        if(pg_num_rows($resSqlFornHabilic) == 0){
-                            return false;
-                        }else{
-                            return true;
-                        }
-                    }
-
-                    foreach ($vitens as $aForn) {
-                        if(!fornecedoreHabilitado($aForn['cgm'])){
-                            echo "<script type='text/javascript'> parent.document.form1.confirmar.disabled = true; </script>";
-                            break;
-                        }
-                    }
-
                     ?>
                 </td>
             </tr>

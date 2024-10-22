@@ -131,6 +131,7 @@ switch ($oParam->exec) {
                     $oDadosEmpenhoExtras = db_utils::fieldsMemory($rsDadosEnvio, $aco);
                 }
 
+                $oDadosEmpenhoExtras->justificativaPncp = $oParam->justificativa; 
                 $clliclicitaPNCP = new ContratoPNCP($oDadosEmpenhoExtras);
                 $oDadosRatificacao = $clliclicitaPNCP->montarRetificacao();
                 $arraybensjson = json_encode(DBString::utf8_encode_all($oDadosRatificacao));
@@ -158,19 +159,19 @@ switch ($oParam->exec) {
                     $sequencialpncp = db_utils::fieldsMemory($rsContrato, $iCont);
                 }
 
-                $statusExclusão = $clliclicitaPNCP->excluirContrato($sequencialpncp->e213_sequencialpncp, $sequencialpncp->e213_ano, $sequencialpncp->e213_numerocontrolepncp);
+                $statusExclusï¿½o = $clliclicitaPNCP->excluirContrato($sequencialpncp->e213_sequencialpncp, $sequencialpncp->e213_ano, $sequencialpncp->e213_numerocontrolepncp, $oParam->justificativa);
 
-                if ($statusExclusão->status == null)
+                if ($statusExclusï¿½o->status == null)
                     $clempcontrolepncp->excluir($e123_sequencial = null, "e213_contrato = $aEmpenho->codigo");
 
-                if ($statusExclusão->status == 404) {
-                    throw new Exception(utf8_decode($statusExclusão->message));
+                if ($statusExclusï¿½o->status == 404) {
+                    throw new Exception(utf8_decode($statusExclusï¿½o->message));
                 }
-                if ($statusExclusão->status == 422) {
-                    throw new Exception(utf8_decode($statusExclusão->message));
+                if ($statusExclusï¿½o->status == 422) {
+                    throw new Exception(utf8_decode($statusExclusï¿½o->message));
                 }
-                if ($statusExclusão->status == 500) {
-                    throw new Exception(utf8_decode($statusExclusão->message));
+                if ($statusExclusï¿½o->status == 500) {
+                    throw new Exception(utf8_decode($statusExclusï¿½o->message));
                 }
             }
         } catch (Exception $eErro) {

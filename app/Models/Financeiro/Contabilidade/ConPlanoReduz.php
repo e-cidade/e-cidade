@@ -10,9 +10,9 @@ class ConPlanoReduz extends LegacyModel
 {
     use LegacyAccount;
 
-    protected $table = 'conplanoreduz';
+    protected $table = 'contabilidade.conplanoreduz';
 
-    protected $primaryKey = 'c61_reduz, c61_anousu';
+    protected $primaryKey = 'c61_reduz';
 
     public $incrementing = false;
 

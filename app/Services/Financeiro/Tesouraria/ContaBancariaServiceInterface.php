@@ -20,4 +20,6 @@ interface ContaBancariaServiceInterface
     public function checkAccount(int $sequencial);
 
     public function checkGeneral(int $sequencial);
+
+    public function checkRepeatedAccount(int $agencia, string $conta, int $tipoconta, string $fonte, int $nroseqaplicacao);
 }

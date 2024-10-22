@@ -268,12 +268,11 @@ if (pg_num_rows($this->rsLotes) > 0) {
             if ($oResult->si02_tabela == "t" || $oResult->si02_taxa == "t") {
                 $oDadosDaLinha->valorUnitario = number_format($oResult->si02_vlprecoreferencia, $this->quant_casas, ",", ".");
                 $oDadosDaLinha->quantidade = $oResult->pc11_quant;
-
-                    $oDadosDaLinha->si02_vlpercreferencia = number_format($oResult->si02_vlpercreferencia, 2) . "%";
-
+                $oDadosDaLinha->si02_vlpercreferencia = number_format($oResult->si02_vlpercreferencia, $this->quant_casas) . "%";
+                $oDadosDaLinha->percentual = number_format($oResult->si02_vlpercreferencia, $this->quant_casas) . "%";
                 $oDadosDaLinha->unidadeDeMedida = $oResult->m61_abrev;
                 $oResult->si02_vltotalprecoreferencia = $oResult->pc11_quant * $oResult->si02_vlprecoreferencia;
-                $oDadosDaLinha->total = number_format($oResult->si02_vltotalprecoreferencia,2);
+                $oDadosDaLinha->total = number_format($oResult->si02_vltotalprecoreferencia,$this->quant_casas);
                 $nTotalItens += $oResult->si02_vltotalprecoreferencia;
             } else {
                 $oDadosDaLinha->valorUnitario = number_format($oResult->si02_vlprecoreferencia, $this->quant_casas, ",", ".");
@@ -281,11 +280,11 @@ if (pg_num_rows($this->rsLotes) > 0) {
                 if ($oResult->si02_vlpercreferencia == 0) {
                     $oDadosDaLinha->si02_vlpercreferencia = "-";
                 } else {
-                    $oDadosDaLinha->si02_vlpercreferencia = number_format($oResult->si02_vlpercreferencia, 2) . "%";
+                    $oDadosDaLinha->si02_vlpercreferencia = number_format($oResult->si02_vlpercreferencia, $this->quant_casas) . "%";
                 }
                 $oDadosDaLinha->unidadeDeMedida = $oResult->m61_abrev;
                 $oResult->si02_vltotalprecoreferencia = $oResult->pc11_quant * $oResult->si02_vlprecoreferencia;
-                $oDadosDaLinha->total = number_format($oResult->si02_vltotalprecoreferencia,2,",", ".");
+                $oDadosDaLinha->total = number_format($oResult->si02_vltotalprecoreferencia,$this->quant_casas,",", ".");
                 $nTotalItens += $oResult->si02_vltotalprecoreferencia;
             }
             if (($this->objpdf->gety() > $this->objpdf->h - 20) || $this->objpdf->gety() + $addalt > $this->objpdf->h) {
@@ -431,49 +430,30 @@ if (pg_num_rows($this->rsLotes) > 0) {
         $this->objpdf->cell(20, $alt, "TOTAL", 1, 1, "C", 1);
         $this->objpdf->setfillcolor(255);
     }
-    $quantLinhas = $this->quantLinhas;
-
     $sqencia = 0;
     for ($iCont = 0; $iCont < pg_num_rows($this->sqlitens); $iCont++) {
 
         $oResult = db_utils::fieldsMemory($this->sqlitens, $iCont);
-        $sSql1 = "select m61_abrev from matunid where m61_codmatunid = $oResult->si02_codunidadeitem";
-        $rsResult1 = db_query($sSql1) or die(pg_last_error());
-        $oResult1 = db_utils::fieldsMemory($rsResult1, 0);
+        $sqlUnidadeMedida = "select m61_abrev from matunid where m61_codmatunid = $oResult->si02_codunidadeitem";
+        $rsUnidadeMedida = db_query($sqlUnidadeMedida) or die(pg_last_error());
+        $oUnidade = db_utils::fieldsMemory($rsUnidadeMedida, 0);
 
-        $sSql2 = "select case when pc01_descrmater=pc01_complmater or pc01_complmater is null then pc01_descrmater
+        $sqlDescricaoMaterial = "select case when pc01_descrmater=pc01_complmater or pc01_complmater is null then pc01_descrmater
         else pc01_descrmater||'. '||pc01_complmater end as pc01_descrmater from pcmater where
         pc01_codmater = $oResult->si02_coditem";
-        $rsResult2 = db_query($sSql2) or die(pg_last_error());
-        $oResult2 = db_utils::fieldsMemory($rsResult2, 0);
+        $rsDescricaoMaterial = db_query($sqlDescricaoMaterial) or die(pg_last_error());
+        $oDescricaoMaterial = db_utils::fieldsMemory($rsDescricaoMaterial, 0);
 
 
         $oDadosDaLinha = new stdClass();
 
-        $op = 1;
-
-        for ($i = 0; $i < $quantLinhas; $i++) {
-
-            if ($this->arrayValores[$i][0] == $oResult->si02_coditem) {
-                $valorqtd = $this->arrayValores[$i][1];
-                $op = 2;
-            }
-        }
-        if ($op == 1) {
-            $fazerloop = 1;
-        } else {
-            $fazerloop = 2;
-        }
-        $controle = 0;
-
-        while ($controle != $fazerloop) {
             $quebraPagina = false;
             $oDadosDaLinha->seq = $sqencia + 1;
             $oDadosDaLinha->item = $oResult->si02_coditem;
-            if ($controle == 1) {
-                $oDadosDaLinha->descricao = '[ME/EPP] - ' . $oResult2->pc01_descrmater;
+            if ($oResult->pc11_reservado == 't') {
+                $oDadosDaLinha->descricao = '[ME/EPP] - ' . $oDescricaoMaterial->pc01_descrmater;
             } else {
-                $oDadosDaLinha->descricao = $oResult2->pc01_descrmater;
+                $oDadosDaLinha->descricao = $oDescricaoMaterial->pc01_descrmater;
             }
             if ($oResult->si02_tabela == "t" || $oResult->si02_taxa == "t") {
                 $oDadosDaLinha->valorUnitario = number_format($oResult->si02_vlprecoreferencia, $this->quant_casas, ",", ".");
@@ -484,10 +464,10 @@ if (pg_num_rows($this->rsLotes) > 0) {
                 }else{
                     $oDadosDaLinha->quantidade = $oResult->si02_qtditem;
                 }
-                $oDadosDaLinha->percentual = number_format($oResult->si02_vlpercreferencia, 2) . "%";
-                $oDadosDaLinha->unidadeDeMedida = $oResult1->m61_abrev;
+                $oDadosDaLinha->percentual = number_format($oResult->si02_vlpercreferencia, $this->quant_casas) . "%";
+                $oDadosDaLinha->unidadeDeMedida = $oUnidade->m61_abrev;
                 $oResult->si02_vltotalprecoreferencia = $oDadosDaLinha->quantidade * $oResult->si02_vlprecoreferencia;
-                $oDadosDaLinha->total = number_format($oResult->si02_vltotalprecoreferencia,2,",", ".");
+                $oDadosDaLinha->total = number_format($oResult->si02_vltotalprecoreferencia,$this->quant_casas,",", ".");
                 $nTotalItens += $oResult->si02_vltotalprecoreferencia;
             } else {
                 $oDadosDaLinha->valorUnitario = number_format($oResult->si02_vlprecoreferencia, $this->quant_casas, ",", ".");
@@ -502,11 +482,11 @@ if (pg_num_rows($this->rsLotes) > 0) {
                 if ($oResult->si02_vlpercreferencia == 0) {
                     $oDadosDaLinha->percentual = "-";
                 } else {
-                    $oDadosDaLinha->percentual = number_format($oResult->si02_vlpercreferencia, 2) . "%";
+                    $oDadosDaLinha->percentual = number_format($oResult->si02_vlpercreferencia, $this->quant_casas) . "%";
                 }
-                $oDadosDaLinha->unidadeDeMedida = $oResult1->m61_abrev;
+                $oDadosDaLinha->unidadeDeMedida = $oUnidade->m61_abrev;
                 $oResult->si02_vltotalprecoreferencia = $oDadosDaLinha->quantidade * $oResult->si02_vlprecoreferencia;
-                $oDadosDaLinha->total = number_format($oResult->si02_vltotalprecoreferencia,2,",", ".");
+                $oDadosDaLinha->total = number_format($oResult->si02_vltotalprecoreferencia,$this->quant_casas,",", ".");
                 $nTotalItens += $oResult->si02_vltotalprecoreferencia;
             }
 
@@ -793,7 +773,6 @@ if (pg_num_rows($this->rsLotes) > 0) {
                     preencherCelulas($this->objpdf, $oDadosDaLinha, $iContadorLinhasCriterios, $alt);
                 }
             }
-        }
     }
 
     if (($this->objpdf->gety() > $this->objpdf->h - 20)) {
@@ -937,7 +916,8 @@ if (($this->objpdf->gety() > $this->objpdf->h - 20) || $this->objpdf->gety() + $
 }
 $this->objpdf->setfont('arial', '', 7);
 $this->objpdf->cell(265, $alt, "VALOR TOTAL ESTIMADO", 1, 0, "L", 1);
-$this->objpdf->cell(20, $alt, "R$" . number_format($nTotalItens, 2, ",", "."), 1, 1, "C", 1);
+$rsTotalPrecoReferencia = db_query("select sum(si02_vltotalprecoreferencia) as totalprecoreferencia  from itemprecoreferencia where si02_precoreferencia = $this->precoreferencia");
+$this->objpdf->cell(20, $alt, "R$" . number_format(db_utils::fieldsMemory($rsTotalPrecoReferencia, 0)->totalprecoreferencia, $this->quant_casas, ",", "."), 1, 1, "C", 1);
 if ($this->impjust == 't') {
     $this->objpdf->setfillcolor(235);
     $this->objpdf->Setfont('Arial', 'B', 7);

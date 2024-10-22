@@ -55,6 +55,8 @@ class cl_solicitem
   var $pc11_liberado = 'f';
   var $pc11_servicoquantidade = 'f';
   var $pc11_reservado = null;
+  var $pc11_exclusivo = null;
+  var $pc11_usuario = null;
   // cria propriedade com as variaveis do arquivo
   var $campos = "
                  pc11_codigo = int8 = Código do registro
@@ -69,6 +71,8 @@ class cl_solicitem
                  pc11_liberado = bool = Liberar para contabilidade
                  pc11_servicoquantidade = bool = Serviço Controlado por Quantidade
                  pc11_reservado = boolean = Reservado
+                 pc11_exclusivo = boolean = Exclusivo
+                 pc11_usuario = int = usuario
                  ";
   //funcao construtor da classe
   function cl_solicitem()
@@ -103,6 +107,8 @@ class cl_solicitem
       $this->pc11_liberado = ($this->pc11_liberado == "" ? @$GLOBALS["HTTP_POST_VARS"]["pc11_liberado"] : $this->pc11_liberado);
       $this->pc11_servicoquantidade = ($this->pc11_servicoquantidade == "f" ? @$GLOBALS["HTTP_POST_VARS"]["pc11_servicoquantidade"] : $this->pc11_servicoquantidade);
       $this->pc11_reservado = ($this->pc11_reservado == "" ? @$GLOBALS["HTTP_POST_VARS"]["pc11_reservado"] : $this->pc11_reservado);
+      $this->pc11_exclusivo = ($this->pc11_exclusivo == "" ? @$GLOBALS["HTTP_POST_VARS"]["pc11_exclusivo"] : $this->pc11_exclusivo);
+      $this->pc11_usuario = ($this->pc11_usuario == "" ? @$GLOBALS["HTTP_POST_VARS"]["pc11_usuario"] : $this->pc11_usuario);
     } else {
       $this->pc11_codigo = ($this->pc11_codigo == "" ? @$GLOBALS["HTTP_POST_VARS"]["pc11_codigo"] : $this->pc11_codigo);
     }
@@ -190,6 +196,16 @@ class cl_solicitem
       $this->pc11_reservado = 'false';
     }
 
+    if (!$this->pc11_exclusivo || $this->pc11_exclusivo == null) {
+      $this->pc11_exclusivo = 'false';
+    }
+
+      if (!$this->pc11_usuario || $this->pc11_usuario == null) {
+          $this->pc11_usuario = db_getsession('DB_id_usuario');
+      }
+
+
+
     $sql = "insert into solicitem(
                                        pc11_codigo
                                       ,pc11_numero
@@ -203,6 +219,8 @@ class cl_solicitem
                                       ,pc11_liberado
                                       ,pc11_servicoquantidade
                                       ,pc11_reservado
+                                      ,pc11_exclusivo
+                                      ,pc11_usuario
                        )
                 values (
                                 $this->pc11_codigo
@@ -217,7 +235,9 @@ class cl_solicitem
                                ,'$this->pc11_liberado'
                                ,'$this->pc11_servicoquantidade'
                                ,'$this->pc11_reservado'
-                      )";                
+                               ,'$this->pc11_exclusivo'
+                               ,$this->pc11_usuario
+                      )";
     $result = db_query($sql);
     if ($result == false) {
       $this->erro_banco = str_replace("\n", "", @pg_last_error());
@@ -2074,5 +2094,30 @@ class cl_solicitem
       }
     }
     return $sql;
+  }
+
+  public function getProximaSequenciaItem($pc11_numero)
+  {
+    return "
+        select max(pc11_seq) + 1 as pc11_seq from solicitem where pc11_numero = $pc11_numero;
+    ";
+  }
+
+  public function getItensCotaSolicitem($pc01_codmater,$pc80_codproc)
+  {
+      return "
+        SELECT DISTINCT pc11_codigo,pc11_seq,pc11_numero,pc11_quant,pc11_reservado,pc81_codprocitem,pc22_orcamitem,pc23_orcamitem,pc31_orcamitem,si02_sequencial,pc81_codproc,pc01_codmater
+        FROM pcprocitem
+        INNER JOIN pcorcamitemproc ON pc31_pcprocitem = pc81_codprocitem
+        INNER JOIN pcorcamitem ON pc22_orcamitem = pc31_orcamitem
+        INNER JOIN itemprecoreferencia ON si02_itemproccompra = pc22_orcamitem
+        INNER JOIN pcorcamval ON pc23_orcamitem = pc22_orcamitem
+        INNER JOIN solicitem ON pc11_codigo = pc81_solicitem
+        INNER JOIN solicitempcmater ON pc16_solicitem = pc11_codigo
+        INNER JOIN solicitemunid ON pc17_codigo = pc11_codigo
+        INNER JOIN matunid ON m61_codmatunid = pc17_unid
+        INNER JOIN pcmater ON pc01_codmater = pc16_codmater
+        WHERE pc81_codproc = $pc80_codproc and pc01_codmater = $pc01_codmater
+      ";
   }
 }

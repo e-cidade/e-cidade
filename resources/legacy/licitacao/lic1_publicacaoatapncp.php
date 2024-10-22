@@ -4,6 +4,7 @@ require("libs/db_conecta.php");
 include("libs/db_sessoes.php");
 include("libs/db_usuariosonline.php");
 include("dbforms/db_funcoes.php");
+require_once("libs/renderComponents/index.php");
 
 db_app::load("scripts.js, strings.js, datagrid.widget.js, windowAux.widget.js,dbautocomplete.widget.js");
 db_app::load("dbmessageBoard.widget.js, prototype.js, dbtextField.widget.js, dbcomboBox.widget.js, widgets/DBHint.widget.js");
@@ -18,6 +19,13 @@ db_app::load("time.js");
     <meta http-equiv="Expires" CONTENT="0">
     <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
     <link href="estilos.css" rel="stylesheet" type="text/css">
+
+    <script type="text/javascript">
+        loadComponents([
+            'buttonsSolid',
+            'simpleModal'
+        ]);
+    </script>
 </head>
 <style>
 </style>
@@ -56,14 +64,51 @@ db_app::load("time.js");
         </br>
         <div id='cntgridlicitacoesrp'></div>
 
-        <input style="margin-left: 50%" type="button" value="Enviar para PNCP" onclick="js_enviar();">
+        <div style="width: 100%; display: flex; justify-content: center;">
+            <?php $component->render('buttons/solid', [
+                'designButton' => 'success',
+                'type' => 'button',
+                'onclick' => 'js_clickSendPNCP()',
+                'size' => 'md',
+                'message' => 'Enviar para PNCP'
+            ]); ?>
+        </div>
     </form>
+
+    
+    <?php $component->render('modais/simpleModal/startModal', [
+        'title' => 'Justificativa para o PNCP',
+        'id' => 'justificativaModal',
+        'size' => 'lg'
+    ], true); ?>
+
+        <?php db_textarea('justificativapncp', 10, 48, false, true, 'text', $db_opcao, "", "", "justificativapncp", "255"); ?>
+        
+        <div style="width: 100%; display: flex; justify-content: center;">
+            <?php $component->render('buttons/solid', [
+                'designButton' => 'success',
+                'onclick' => 'js_enviar();',
+                'message' => 'Salvar justificativa PNCP',
+                'size' => 'md'
+            ]); ?>
+        </div>
+  <?php $component->render('modais/simpleModal/endModal', [], true); ?>
+
     <?php
     db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsession("DB_anousu"), db_getsession("DB_instit"));
     ?>
 </body>
 
 </html>
+
+<style>
+    #justificativapncp {
+        width: 100%;
+        margin-bottom: 7px;
+        font-size: 1rem;
+    }
+</style>
+
 <script>
     function js_showGrid() {
         oGridLicitacao = new DBGrid('gridLicitacao');
@@ -86,7 +131,7 @@ db_app::load("time.js");
         oGridLicitacao.clearAll(true);
         var oParam = new Object();
         oParam.exec = "getLicitacoesRP";
-        js_divCarregando('Aguarde, pesquisando Licitaes', 'msgBox');
+        js_divCarregando('Aguarde, pesquisando licitações', 'msgBox');
         var oAjax = new Ajax.Request(
             'lic1_enviopncp.RPC.php', {
                 method: 'post',
@@ -167,6 +212,15 @@ db_app::load("time.js");
             oParam.exec = "excluirAtaRP";
         }
         oParam.ambiente = $F('ambiente');
+
+        let justificativa = document.getElementById('justificativapncp').value;
+        oParam.justificativa = justificativa;
+
+        if (tipo != 1 && justificativa == '') {
+            alert('A justificativa não pode estar vazia');
+            return false;
+        }
+
         oParam.aLicitacoes = new Array();
 
         for (var i = 0; i < aLicitacoes.length; i++) {
@@ -202,5 +256,28 @@ db_app::load("time.js");
         var oRetornoLicitacoes = eval('(' + oAjax.responseText + ")");
         alert(oRetornoLicitacoes.message.urlDecode());
         window.location.href = "lic1_publicacaoatapncp.php";
+    }
+
+    function js_clickSendPNCP() {
+
+        let tipo = $F('tipo');
+        var oLicitacao = oGridLicitacao.getSelection("object");
+
+        if (tipo == 0) {
+            alert('Selecione um Tipo');
+            return false;
+        }
+
+        if (oLicitacao.length == 0) {
+            alert('Nenhum Contrato Selecionado');
+            return false;
+        }
+
+        if (tipo != 1) {
+            openModal('justificativaModal');
+        } else {
+            js_enviar();
+        }
+
     }
 </script>

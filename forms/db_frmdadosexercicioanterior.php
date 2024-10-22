@@ -83,6 +83,16 @@ $cldadosexercicioanterior->rotulo->label();
                         ?>
                     </td>
                 </tr>
+                <tr>
+                    <td nowrap title="<?= @$Tc235_valornaoaplicsaude ?>">
+                        <?= @$Lc235_valornaoaplicsaude ?>
+                    </td>
+                    <td>
+                        <?
+                        db_input('c235_valornaoaplicsaude', 20, $Lc235_valornaoaplicsaude, true, 'text', $db_opcao, "");
+                        ?>
+                    </td>
+                </tr>
             </table>
         </fieldset>
     </center>

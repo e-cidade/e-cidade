@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\LegacyController;
 use App\Models\Cadastro\Bairro;
 use App\Models\Cadastro\Rua;
 use App\Models\Cadastro\RuaBairro;
@@ -46,7 +47,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
-class RedesimController extends Controller
+class RedesimController extends LegacyController
 {
     public function index(): Response
     {
@@ -100,7 +101,7 @@ class RedesimController extends Controller
             $readConfirmationCompanyService = new ReadConfirmationCompanyService($settingsModel, $redesimSettingsRepository, (new Client()));
             $readConfirmationCompanyService->execute($confirmacaoLeituraEmpresaFilter);
         } catch (Throwable $e) {
-            return new JsonResponse(['statusCode' => 500, 'message' => $e->getMessage()], 200);
+            return new JsonResponse(['statusCode' => 500, 'message' => utf8_encode($e->getMessage())], 200);
         }
 
         return new JsonResponse(['statusCode' => 200, 'message' => 'Success'], 200);

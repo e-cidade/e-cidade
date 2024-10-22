@@ -39,6 +39,7 @@ db_postmemory($HTTP_POST_VARS);
 
 $clrotulo        = new rotulocampo;
 $clrotulo->label("e60_codemp");
+$clrotulo->label("e30_obrigadivida");
 
 $clempparametro = new cl_empparametro;
 $db_opcao = 22;
@@ -106,6 +107,12 @@ if((isset($HTTP_POST_VARS["db_opcao"]) && $HTTP_POST_VARS["db_opcao"])=="Alterar
         $clempparametro->e30_obrigadiarias="true";
     } else {
         $clempparametro->e30_obrigadiarias="false";
+    }
+
+    if ($e30_obrigadivida!="" && $e30_obrigadivida=='t'){
+        $clempparametro->e30_obrigadivida="true";
+    } else {
+        $clempparametro->e30_obrigadivida="false";
     }
 
     if ($e30_modeloop != "" && $e30_modeloop == '2'){

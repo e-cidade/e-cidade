@@ -49,6 +49,11 @@ if(isset($locali) && trim($locali) != "" && isset($localf) && trim($localf) != "
   $where = $andwhere." rh55_estrut in ('".str_replace(",","','",$selloc)."')";
 }
 
+$whererescindidos = "";
+if($lista_rescindidos != "s"){
+    $whererescindidos = " and rh05_seqpes is null";
+}
+
 $whereregime = "";
 if(isset($atinpen)){
   if($atinpen == "a"){
@@ -68,7 +73,7 @@ if(trim($anofolha) == "" || trim($mesfolha) == ""){
 }
 if(isset($selecao) && $selecao != ""){
       $result_sel = db_query("select r44_where from selecao where r44_selec = {$selecao} and r44_instit = " . db_getsession("DB_instit"));
-            if(pg_numrows($result_sel) > 0){
+            if(pg_num_rows($result_sel) > 0){
                           db_fieldsmemory($result_sel, 0, 1);
                                           $whereregime .= " and ".$r44_where;
                                                             }
@@ -95,17 +100,17 @@ from rhpessoal
      inner join rhregime on rh30_codreg = rh02_codreg
 		                    and rh30_instit = rh02_instit
      left join rhpesrescisao on rh05_seqpes = rh02_seqpes
-where rh05_seqpes is null
+where 1=1
+$whererescindidos
 $whereregime
 ) as x
 $where
 order by rh55_estrut,z01_nome     
 ";
 
-//echo $sql ; exit;
 $result = db_query($sql);
-//db_criatabela($result);
-$xxnum = pg_numrows($result);
+$xxnum = pg_num_rows($result);
+
 if($xxnum == 0){
   db_redireciona('db_erros.php?fechar=true&db_erro=Não existem funcionários cadastrados no intervalo para o período de '.$mesfolha.' / '.$anofolha);
 }
@@ -123,7 +128,7 @@ $pdf->setleftmargin(5);
 $orgao 	= 0;
 $troca_loc = 's';
 
-for($x = 0; $x < pg_numrows($result);$x++){
+for($x = 0; $x < pg_num_rows($result);$x++){
   db_fieldsmemory($result,$x);
   if($orgao != $rh55_estrut){
     if($x != 0){

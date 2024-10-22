@@ -13,12 +13,8 @@ $rsInst = db_query($sSql);
 $sInstCgc  = str_pad(db_utils::fieldsMemory($rsInst, 0)->cgc, 5, "0", STR_PAD_LEFT);
 
 $aFontesNovas = array('15000001' => 1001, '15000002' => 1002, '15400007' => 1070  , '1542000' => 1070);
-//Cimva
-//$aCgcExecaoRelFinanceiro = $arrayName = array('21466841000169');
 
 $aCgcExecaoRelFinanceiro = $arrayName = array('');
-
-//db_criatabela($rsInst);exit;
 
 $aTotal = array(
     'empenhado' => array(
@@ -113,9 +109,9 @@ ob_start();
 
         <tbody>
         <tr style='height:20px;'>
-            <td class="s0 borda3" colspan="5">Classifica&ccedil;&atilde;o</td>
+            <td class="s0 borda3" colspan="5">Classificação</td>
             <td class="s0" colspan="2">Empenhado</td>
-            <td class="s0" colspan="2">Emp. Anualdo</td>
+            <td class="s0" colspan="2">Emp. Anulado</td>
             <td class="s0" colspan="2">Liquidado</td>
             <td class="s0" colspan="2">Liq. Anulado</td>
             <td class="s0" colspan="2">Pago</td>
@@ -123,24 +119,19 @@ ob_start();
         </tr>
 
         <tr style='height:20px;'>
-            <!-- <td class="s1 borda2 borda3">Fun&ccedil;&atilde;o</td>
-            <td class="s2 borda2">SubFun&ccedil;&atilde;o</td>
-            <td class="s2 borda2">Elemento</td>
-            <td class="s3 borda2">SubElemento</td>
-            <td class="s0">Fonte</td> -->
             <td class="s0 borda3" colspan="5"></td>
-            <td class="s0">No M&ecirc;s</td>
-            <td class="s0">At&eacute; o M&ecirc;s</td>
-            <td class="s0">No M&ecirc;s</td>
-            <td class="s0">At&eacute; o M&ecirc;s</td>
-            <td class="s0">No M&ecirc;s</td>
-            <td class="s0">At&eacute; o M&ecirc;s</td>
-            <td class="s0">No M&ecirc;s</td>
-            <td class="s0">At&eacute; o M&ecirc;s</td>
-            <td class="s0">No M&ecirc;s</td>
-            <td class="s0">At&eacute; o M&ecirc;s</td>
-            <td class="s0">No M&ecirc;s</td>
-            <td class="s0">At&eacute; o M&ecirc;s</td>
+            <td class="s0">No Mês</td>
+            <td class="s0">Até o Mês</td>
+            <td class="s0">No Mês</td>
+            <td class="s0">Até o Mês</td>
+            <td class="s0">No Mês</td>
+            <td class="s0">Até o Mês</td>
+            <td class="s0">No Mês</td>
+            <td class="s0">Até o Mês</td>
+            <td class="s0">No Mês</td>
+            <td class="s0">Até o Mês</td>
+            <td class="s0">No Mês</td>
+            <td class="s0">Até o Mês</td>
         </tr>
 
 
@@ -238,11 +229,11 @@ ob_start();
         </tr>
 
         <tr style='height:20px;'>
-            <td class="s1 fstb borda2 borda3">Classifica&ccedil;&atilde;o</td>
-            <td class="s2 fstb borda2">Saldo Incial</td>
-            <td class="s2 fstb borda2">Receitas At&eacute; o M&ecirc;s</td>
-            <td class="s3 fstb borda2">Despesas At&eacute; o M&ecirc;s</td>
-            <td class="s0 fstb">RPs At&eacute; o M&ecirc;s</td>
+            <td class="s0 fstb borda2 borda3">Classificação</td>
+            <td class="s0 fstb borda2">Saldo Incial</td>
+            <td class="s0 fstb borda2">Receitas Até o Mês</td>
+            <td class="s0 fstb borda2">Despesas Até o Mês</td>
+            <td class="s0 fstb">RPs Até o Mês</td>
             <td class="s0 fstb">Saldo</td>
         </tr>
 

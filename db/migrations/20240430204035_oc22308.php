@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc22308 extends AbstractMigration
+class Oc22308 extends PostgresMigration
 {
     public function up()
     {
@@ -12,7 +12,7 @@ class Oc22308 extends AbstractMigration
         SELECT fc_startsession();
 
         ALTER TABLE empenho.empagegera ALTER COLUMN e87_descgera TYPE varchar(100) USING e87_descgera::varchar(100) ;
-        
+
         COMMIT;
 
 SQL;

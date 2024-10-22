@@ -3,7 +3,7 @@
 namespace App\Traits;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 use LogicException;
 
 trait LegacyAccount
@@ -16,9 +16,21 @@ trait LegacyAccount
         $this->persistLegacyAccount($this, $this->exists ? 'A' : 'I');
         return parent::save($options);
     }
+    public function update(array $attributes = [], array $options = [])
+    {
+        $this->persistLegacyAccount($this, 'A');
+        parent::update($attributes, $options);
+    }
+
+    public function delete()
+    {
+        $this->persistLegacyAccount($this, 'D');
+        parent::delete();
+    }
 
     public function persistLegacyAccount(Model $model, string $action = 'I')
     {
+        return;
         $sequence = $this->getAccountNextVal();
 
         if (empty($model->fillable)) {
@@ -64,7 +76,7 @@ trait LegacyAccount
     protected function getAccountNextVal(): int
     {
         ['acount' => $sequence] = (array)DB::connection()
-            ->selectOne("select nextval('db_acount_id_acount_seq') as acount");
+            ->selectOne("select nextval('configuracoes.db_acount_id_acount_seq') as acount");
         return $sequence;
     }
 
@@ -82,7 +94,7 @@ trait LegacyAccount
     protected function insertAcountAcesso($sequence)
     {
         DB::connection()
-            ->unprepared("insert into db_acountacesso values($sequence," . db_getsession("DB_acessado") . ")");
+            ->unprepared("insert into configuracoes.db_acountacesso values($sequence," . session("DB_acessado") . ")");
     }
 
     protected function insertAcountKey(int $sequence, string $action)
@@ -93,16 +105,16 @@ trait LegacyAccount
                 continue;
             }
             DB::connection()
-                ->unprepared("insert into db_acountkey values($sequence,$codCam,'$primaryKey','$action')");
+                ->unprepared("insert into configuracoes.db_acountkey values($sequence,$codCam,'$primaryKey','$action')");
         }
     }
 
     protected function getCodcamByName(string $name): ?int
     {
         $sql = "select db_syscampo.codcam
-                from db_syscampo
-                inner join db_sysarqcamp on db_syscampo.codcam = db_sysarqcamp.codcam
-                inner join db_sysarquivo on db_sysarquivo.codarq = db_sysarqcamp.codarq
+                from configuracoes.db_syscampo
+                inner join configuracoes.db_sysarqcamp on db_syscampo.codcam = db_sysarqcamp.codcam
+                inner join configuracoes.db_sysarquivo on db_sysarquivo.codarq = db_sysarqcamp.codarq
                 where db_sysarquivo.nomearq = '{$this->tableName}'
                 and db_syscampo.nomecam = '{$name}'";
         ['codcam' => $codCam] = (array)DB::connection()->selectOne($sql);
@@ -112,34 +124,24 @@ trait LegacyAccount
     protected function getCodarqByTableName(string $tableName): ?int
     {
         ['codarq' => $codarq] = (array)DB::connection()
-            ->selectOne("select codarq from db_sysarquivo where nomearq = '{$tableName}'");
+            ->selectOne("select codarq from configuracoes.db_sysarquivo where nomearq = '{$tableName}'");
         return $codarq;
     }
 
     protected function insertAcount(int $sequence, int $codarq, int $codcam, string $newValue, string $oldValue = '')
     {
+        $newValue = addslashes($newValue);
+        $oldValue = addslashes($oldValue);
         DB::connection()
-            ->unprepared("insert into db_acount
+            ->unprepared("insert into configuracoes.db_acount
                         values(
                                $sequence,
                                $codarq,
                                $codcam,
                                '{$oldValue}',
                                '{$newValue}',
-                               " . db_getsession('DB_datausu') . ",
-                               " . db_getsession('DB_id_usuario') . ")"
+                               " . session('DB_datausu') . ",
+                               " . session('DB_id_usuario') . ")"
             );
-    }
-
-    public function update(array $attributes = [], array $options = [])
-    {
-        $this->persistLegacyAccount($this, 'A');
-        parent::update($attributes, $options);
-    }
-
-    public function delete()
-    {
-        $this->persistLegacyAccount($this, 'D');
-        parent::delete();
     }
 }

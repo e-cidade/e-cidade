@@ -1,14 +1,14 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc13668 extends AbstractMigration
+class Oc13668 extends PostgresMigration
 {
     public function change(){
-        
+
         $sql = "
 
-            ALTER TABLE pcmater 
+            ALTER TABLE pcmater
                 ADD COLUMN pc01_dataalteracao DATE,
                 ADD COLUMN pc01_justificativa varchar(100);
 
@@ -23,11 +23,11 @@ class Oc13668 extends AbstractMigration
                 pc96_descricaoanterior VARCHAR(120)
             );
 
-            
+
 
         ";
         $this->execute($sql);
 
     }
- 
+
 }

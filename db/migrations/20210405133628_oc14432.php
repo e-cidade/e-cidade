@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc14432 extends AbstractMigration
+class Oc14432 extends PostgresMigration
 {
     public function up(){
         $sql = "
@@ -38,17 +38,17 @@ class Oc14432 extends AbstractMigration
                 db150_lote integer,
                 db150_bdi numeric,
                 db150_cep varchar(8),
-                CONSTRAINT db150_codobra_fk 
+                CONSTRAINT db150_codobra_fk
                     FOREIGN KEY(db150_codobra) REFERENCES obrascodigos(db151_codigoobra)
             );
-            
+
             CREATE SEQUENCE obrasdadoscomplementareslote_db150_sequencial_seq
               START WITH 1
               INCREMENT BY 1
               NO MINVALUE
               NO MAXVALUE
               CACHE 1;
-            
+
             ALTER TABLE ONLY obrasdadoscomplementareslote
                   ADD CONSTRAINT obrasdadoscomplementareslote_sequ_pk PRIMARY KEY (db150_sequencial);
 
@@ -60,8 +60,8 @@ class Oc14432 extends AbstractMigration
                 DROP COLUMN si182_graulongitude,
                 DROP COLUMN si182_minutolongitude,
                 DROP COLUMN si182_segundolongitude;
-                  
-            ALTER TABLE ralic122021 
+
+            ALTER TABLE ralic122021
                 ADD COLUMN si182_latitude numeric,
                 ADD COLUMN si182_longitude numeric,
                 ADD COLUMN si182_nrolote integer,
@@ -69,7 +69,7 @@ class Oc14432 extends AbstractMigration
 
             -- Alteração das tabelas do REDISPI
 
-            ALTER TABLE redispi102021 
+            ALTER TABLE redispi102021
                 ADD COLUMN si183_link varchar(200);
 
             ALTER TABLE redispi122021
@@ -79,9 +79,9 @@ class Oc14432 extends AbstractMigration
                 DROP COLUMN si185_graulongitude,
                 DROP COLUMN si185_minutolongitude,
                 DROP COLUMN si185_segundolongitude;
-                
-            ALTER TABLE redispi122021 
-                ADD COLUMN si185_latitude numeric, 
+
+            ALTER TABLE redispi122021
+                ADD COLUMN si185_latitude numeric,
                 ADD COLUMN si185_longitude numeric,
                 ADD COLUMN si185_codbempublico integer;
 

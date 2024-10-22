@@ -147,7 +147,6 @@ class db_utils
      */
     static function getDao($sClasse, $lInstanciaClasse = true)
     {
-
         if (!class_exists("cl_{$sClasse}")) {
             require_once modification("classes/db_{$sClasse}_classe.php");
         }
@@ -400,5 +399,28 @@ class db_utils
         $rsCnpj = db_query($sqlCnpj);
         $sCNPJ = pg_fetch_row($rsCnpj);
         return $sCNPJ[0];
+    }
+
+    public static function convertToUtf8($data, $encodingfrom = 'ISO-8859-1', $encodingto = 'UTF-8') {
+        if (is_array($data)) {
+            return array_map(function($item) use ($encodingfrom, $encodingto) {
+                return self::convertToUtf8($item, $encodingfrom, $encodingto);
+            }, $data);
+        } elseif (is_object($data)) {
+            foreach ($data as $key => $value) {
+                $data->$key = self::convertToUtf8($value, $encodingfrom, $encodingto);
+            }
+            return $data;
+        } elseif (is_string($data)) {
+            // Verificar se a string já está na codificação desejada
+            $currentEncoding = mb_detect_encoding($data, [$encodingfrom, $encodingto], true);
+
+            // Só converter se a string estiver na codificação de origem esperada
+            if ($currentEncoding === $encodingfrom) {
+                return mb_convert_encoding($data, $encodingto, $encodingfrom);
+            }
+        }
+
+        return $data;
     }
 }

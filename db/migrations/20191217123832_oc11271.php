@@ -1,17 +1,17 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc11271 extends AbstractMigration
+class Oc11271 extends PostgresMigration
 {
     public function up()
     {
     	$sql = "
     			INSERT into db_itensmenu (id_item, descricao, help, funcao, itemativo, manutencao, desctec, libcliente)
 				values ((select max(id_item) from db_itensmenu) + 1, 'Envio do edital', 'Envio do edital', '', 1, 1, 'Envio do edital', 't');
-				
+
 				--INSERE o campo status para ser utilizado na inclusão de editais
-				
+
         INSERT into db_menu(id_item, id_item_filho, menusequencia, modulo) values (1818, (select id_item from db_itensmenu where descricao = 'Envio do edital'), (select max(menusequencia) from db_menu where id_item = 1818 and modulo = 381)+1, 381);
 
 				-- Menu Inclusão
@@ -21,7 +21,7 @@ class Oc11271 extends AbstractMigration
 
 				INSERT into db_menu (id_item, id_item_filho, menusequencia, modulo) values ((select id_item from db_itensmenu where descricao = 'Envio do edital'), (select max(id_item) from db_itensmenu), 1, 381);
 
-        
+
         CREATE TABLE liclancedital(
           l47_sequencial BIGINT NOT NULL PRIMARY KEY,
           l47_linkpub VARCHAR(200),
@@ -39,7 +39,7 @@ class Oc11271 extends AbstractMigration
                   NO MAXVALUE
                   CACHE 1;
 
-                  
+
         CREATE TABLE editaldocumentos(
           l48_sequencial BIGINT NOT NULL DEFAULT 0,
           l48_nomearquivo varchar(100),
@@ -48,14 +48,14 @@ class Oc11271 extends AbstractMigration
           l48_liclicita bigint,
           FOREIGN KEY(l48_liclicita) REFERENCES liclicita(l20_codigo)
         );
-        
+
         CREATE SEQUENCE editaldocumentos_l48_sequencial_seq
                   START WITH 1
                   INCREMENT BY 1
                   NO MINVALUE
                   NO MAXVALUE
                   CACHE 1;
-        
+
         CREATE TABLE obrasdadoscomplementares(
           db150_sequencial BIGINT NOT NULL DEFAULT 0,
           db150_codobra BIGINT NOT NULL,
@@ -85,10 +85,10 @@ class Oc11271 extends AbstractMigration
           db150_cep CHAR(8),
           PRIMARY KEY(db150_sequencial)
         );
-        
+
         ALTER TABLE ONLY obrasdadoscomplementares
             ADD CONSTRAINT obrasdadoscomplementares_fk FOREIGN KEY (db150_liclicita) REFERENCES liclicita(l20_codigo);
-        
+
         CREATE SEQUENCE obrasdadoscomplementares_db150_sequencial_seq
           START WITH 1
           INCREMENT BY 1

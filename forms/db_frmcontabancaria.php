@@ -289,11 +289,14 @@ $ano = db_getsession("DB_anousu"); //ano
 	}
 
 	function js_pesquisaop01_db_operacaodecredito(mostra) {
+
+		var tiposLancamento = [3, 6, 7];
+
 		if (mostra == true) {
-			js_OpenJanelaIframe('top.corpo', 'db_iframe_db_operacaodecredito', 'func_db_operacaodecredito.php?funcao_js=parent.js_mostraoperacaodecredito1|op01_sequencial|op01_numerocontratoopc|op01_dataassinaturacop', 'Pesquisa', true);
+			js_OpenJanelaIframe('top.corpo', 'db_iframe_db_operacaodecredito', 'func_db_operacaodecredito.php?tipos_lancamento=' +tiposLancamento+ '&funcao_js=parent.js_mostraoperacaodecredito1|op01_sequencial|op01_numerocontratoopc|op01_dataassinaturacop', 'Pesquisa', true);
 		} else {
 			if (document.form1.db83_codigoopcredito.value != '') {
-				js_OpenJanelaIframe('top.corpo', 'db_iframe_db_operacaodecredito', 'func_db_operacaodecredito.php?pesquisa_chave=' + document.form1.db83_codigoopcredito.value + '&funcao_js=parent.js_mostraoperacaodecredito', 'Pesquisa', false);
+				js_OpenJanelaIframe('top.corpo', 'db_iframe_db_operacaodecredito', 'func_db_operacaodecredito.php?tipos_lancamento=' +tiposLancamento+ '&pesquisa_chave=' + document.form1.db83_codigoopcredito.value + '&funcao_js=parent.js_mostraoperacaodecredito', 'Pesquisa', false);
 			} else {
 				document.form1.op01_numerocontratoopc.value = '';
 				document.form1.op01_dataassinaturacop.value = '';

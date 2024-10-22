@@ -66,6 +66,7 @@ try {
 
       if (!empty($oParam->sCaminhoArquivo)) {
         $oLicitacaoDocumento->setCaminhoArquivo($oParam->sCaminhoArquivo);
+        $oLicitacaoDocumento->setNomeArquivo($oParam->sTitulo);
       }
 
       $oRetorno->sMensagem = urlencode($oLicitacaoDocumento->salvar());
@@ -91,7 +92,7 @@ try {
     case "download":
 
       $oProcessoDocumento                = new LicitacaoDocumento($oParam->iCodigoDocumento);
-      $oRetorno->sCaminhoDownloadArquivo = PATH_ANEXO_LICITACAO . $oProcessoDocumento->sNomeDocumento;
+      $oRetorno->sCaminhoDownloadArquivo = $oProcessoDocumento->download();
       $oRetorno->sTituloArquivo          = urlencode($oProcessoDocumento->getNomeDocumento());
 
       break;

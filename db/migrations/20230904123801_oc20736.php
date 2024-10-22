@@ -1,12 +1,12 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc20736 extends AbstractMigration
+class Oc20736 extends PostgresMigration
 {
     public function up()
     {
-        $sSql = 
+        $sSql =
             "
                 BEGIN;
                 --Cria o campo k02_descrjm na tabela tabrecjm no módulo caixa.

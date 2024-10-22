@@ -91,6 +91,7 @@ if($cliptubaixa->numrows > 0){
    document.formaba.outros.disabled = true;
    document.formaba.dadosdiver.disabled = true;
    document.formaba.ender.disabled = true;
+   document.formaba.fotos.disabled = true;
  }
 
 
@@ -137,7 +138,7 @@ if($cliptubaixa->numrows > 0){
     document.formaba.outros.disabled = false;
     document.formaba.dadosdiver.disabled = false;
     document.formaba.ender.disabled = false;
-
+    document.formaba.fotos.disabled = false;
 
     iframe_lote.document.form1.idmatricu.value=document.form1.idmatricula.value;
 
@@ -249,6 +250,8 @@ function mo_camada(idtabela,mostra,camada) {
         document.formaba.isencao.style.fontWeight = "normal";
         document.formaba.dadosdiver.style.color = "#666666";
         document.formaba.dadosdiver.style.fontWeight = "normal";
+        document.formaba.fotos.style.color = "#666666";
+        document.formaba.fotos.style.fontWeight = "normal";
       }
       if (aba == tab[x].id) {
         tab[x].style.border = "3px outset #999999";
@@ -471,6 +474,16 @@ function js_pripromi(){
                </tr>
              </table>
            </td>
+
+           <td>
+               <table border="0" class="bordas" id="fotos" cellpadding="3" cellspacing="0" width="12%">
+                   <tr>
+                       <td id="link_fotos" nowrap>
+                           <input <?=($alterando==false?"disabled":"")?> readonly type="text" value="Fotos" size="11" maxlength="11" class="nomes" name="fotos" title="Fotos" onClick="mo_camada('fotos', true, 'Iframe11')" />
+                       </td>
+                   </tr>
+               </table>
+           </td>
          </tr>
        </table>
      </td>
@@ -524,6 +537,10 @@ function js_pripromi(){
  <div class="tabela" id="Iframe10" style="position:absolute; left:0px; top:47px;  z-index:99; visibility: hidden;">
  <iframe name="iframe_isencao" frameborder="0" class="bordasi" leftmargin="0" topmargin="0" src="cad4_iptuisen002.php?alterando=true&j46_matric=<?=$j01_matric?>" scrolling="no" height="100%" width="100%"></iframe>
 </div>
+
+        <div class="tabela" id="Iframe11" style="position:absolute; left:0px; top:47px;  z-index:99; visibility: hidden;">
+            <iframe name="iframe_fotos" frameborder="0" class="bordasi" leftmargin="0" topmargin="0" src="cad4_iptufotos002.php?alterando=true&j01_matric=<?=$j01_matric?>" scrolling="no" height="100%" width="100%"></iframe>
+        </div>
 
 <div class="tabela" id="Iframe1" style="position:absolute; left:0px; top:47px; z-index:99; visibility: visible;">
   <iframe name="iframe_lote" frameborder="0" src="cad1_lotealt.php?alterando=true&j01_matric=<?=$j01_matric?>" height="100%" scrolling="no" width="100%"></iframe>

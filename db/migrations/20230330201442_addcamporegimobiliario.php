@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Addcamporegimobiliario extends AbstractMigration
+class Addcamporegimobiliario extends PostgresMigration
 {
 
     public function up()

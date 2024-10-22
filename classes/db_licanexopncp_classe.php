@@ -475,6 +475,7 @@ class cl_licanexopncp
   {
     $sql = "
             SELECT l216_nomedocumento,
+            l216_documento,
             l213_sequencial,
             l213_descricao,
             l216_sequencial
@@ -504,7 +505,7 @@ class cl_licanexopncp
   public function sql_anexos_licitacao($l20_codigo, $l216_sequencial)
   {
     $sql = "
-       SELECT l216_nomedocumento,l216_tipoanexo,l213_descricao
+       SELECT l216_nomedocumento,l216_documento,l216_tipoanexo,l213_descricao
         FROM licanexopncp
         INNER JOIN licanexopncpdocumento ON l215_sequencial = l216_licanexospncp
         INNER JOIN tipoanexo ON l213_sequencial = l216_tipoanexo

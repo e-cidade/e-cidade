@@ -12,7 +12,7 @@ class ConPlanoContaCorrente extends LegacyModel
 
     public $timestamps = false;
 
-    protected $table = 'conplanocontacorrente';
+    protected $table = 'contabilidade.conplanocontacorrente';
 
     protected $primaryKey = 'c18_sequencial';
 

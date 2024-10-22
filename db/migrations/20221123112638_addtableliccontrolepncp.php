@@ -1,13 +1,13 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Addtableliccontrolepncp extends AbstractMigration
+class Addtableliccontrolepncp extends PostgresMigration
 {
 
     public function up()
     {
-        $sql = " 
+        $sql = "
         BEGIN;
 
             CREATE TABLE licsituacaocontrolepncp(
@@ -15,11 +15,11 @@ class Addtableliccontrolepncp extends AbstractMigration
                 l214_situacao             varchar(55) NOT NULL,
                 PRIMARY KEY (l214_sequencial)
             );
-            
+
             insert into licsituacaocontrolepncp values(1,'Enviada');
             insert into licsituacaocontrolepncp values(2,'Ratificada');
             insert into licsituacaocontrolepncp values(3,'Excluida');
-            
+
             CREATE TABLE liccontrolepncp(
                 l213_sequencial           int8 NOT NULL,
                 l213_licitacao            int8 NOT NULL,
@@ -36,7 +36,7 @@ class Addtableliccontrolepncp extends AbstractMigration
 
             ALTER TABLE liccontrolepncp
             ADD CONSTRAINT fk_id_licsituacaocontrolepncp FOREIGN KEY (l213_situacao) REFERENCES licsituacaocontrolepncp(l214_sequencial);
-            
+
             --criando sequencia
             CREATE SEQUENCE liccontrolepncp_l213_sequencial_seq
             INCREMENT 1
@@ -54,7 +54,7 @@ class Addtableliccontrolepncp extends AbstractMigration
                 l214_ordem                int8 NOT NULL,
                 PRIMARY KEY (l214_sequencial)
             );
-    
+
                 --criando sequencia
                 CREATE SEQUENCE liccontrolepncpitens_l214_sequencial_seq
                 INCREMENT 1

@@ -140,7 +140,7 @@ switch ($oParam->exec) {
                     //classe modelo
                     $clResultadoItensPNCP = new ResultadoItensPNCP($aItensProcessoResultado);
                     //monta o json com os dados da licitacao
-                    $odadosResultado = $clResultadoItensPNCP->montarDados();
+                    $odadosResultado = $clResultadoItensPNCP->montarRetificacao();
 
                     //envia para pncp
                     $rsApiPNCP = $clResultadoItensPNCP->retificarResultado($odadosResultado, $oDadosAvisoPNCP->l213_numerocompra, $oDadosAvisoPNCP->l213_anousu, $item->pc11_seq,1);

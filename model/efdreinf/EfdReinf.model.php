@@ -188,10 +188,10 @@ class EFDReinfEventos extends ModeloBaseEFDREINF
         foreach ($dadosArray as $chave => $valor) {
             $aDadosAPI['detaquis'][$chave] = array(
                 "indaquis" => (integer) substr($valor[8],0,1),
-                "vlrbruto" => (float)number_format(str_replace(['R$', '.', ','], ['', '', '.'], $valor[3]), 2, '.', ''),
-                "vlrcpdescpr" => (float)number_format(str_replace(['R$', '.', ','], ['', '', '.'], $valor[4]), 2, '.', ''),
-                "vlrratdescpr" => (float)number_format(str_replace(['R$', '.', ','], ['', '', '.'], $valor[5]), 2, '.', ''),
-                "vlrsenardesc" => (float)number_format(str_replace(['R$', '.', ','], ['', '', '.'], $valor[6]), 2, '.', ''),
+                "vlrbruto" => number_format((float)str_replace(['R$', '.', ','], ['', '', '.'], $valor[3]), 2, '.', ''),
+                "vlrcpdescpr" => number_format((float)str_replace(['R$', '.', ','], ['', '', '.'], $valor[4]), 2, '.', ''),
+                "vlrratdescpr" => number_format((float)str_replace(['R$', '.', ','], ['', '', '.'], $valor[5]), 2, '.', ''),
+                "vlrsenardesc" => number_format((float)str_replace(['R$', '.', ','], ['', '', '.'], $valor[6]), 2, '.', ''),
                 'infoprocjud' => array(
                     "nrprocjud" => "",
                     "codsusp" => "",
@@ -223,6 +223,9 @@ class EFDReinfEventos extends ModeloBaseEFDREINF
         }
         if (simplexml_load_string($retorno))
             return  simplexml_load_string($retorno);
+        if (!is_array($retorno)) {
+            throw new Exception("Erro no envio das informações. \n {$exportar->getDescResposta()}");
+        }
         return $retorno; 
     }
     public function buscarReinfR2055($dadosEnvio,$oCertificado,$protocolo)
@@ -244,6 +247,9 @@ class EFDReinfEventos extends ModeloBaseEFDREINF
         }
         if (simplexml_load_string($retornobuscar))
             return  simplexml_load_string($retornobuscar);
+        if (!is_array($retornobuscar)) {
+            throw new Exception("Erro no envio das informações. \n {$exportar->getDescResposta()}");
+        }
         return $retornobuscar; 
     }
     public function montarDadosReinfR4099()

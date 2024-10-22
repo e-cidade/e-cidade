@@ -358,6 +358,7 @@ class CadastroCgmWebService {
     $oCgm->setEmail($this->sEmail);
     $oCgm->setTelefone($this->sTelefone);
     $oCgm->setCelular($this->sCelular);
+    $oCgm->setNotificalEmail(true);
 
     /**
      * Salva os dados na tabela cgm

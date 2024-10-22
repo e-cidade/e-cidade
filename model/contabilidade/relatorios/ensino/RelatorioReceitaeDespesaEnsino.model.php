@@ -507,6 +507,72 @@ class RelatorioReceitaeDespesaEnsino
         return array($nRPIncritosSemDesponibilidade101, $nRPIncritosSemDesponibilidade136, $nRPIncritosSemDesponibilidade118_119, $nRPSemDesponibilidade101, $nRPSemDesponibilidade136, $nRPSemDesponibilidade118_119);
     }
 
+    public function getLinha10RestosaPagarInscritoSemDis()
+    {
+        $dtfimExercicio = db_getsession("DB_anousu") . "-12-31";
+        if ($this->dtfim == $dtfimExercicio) {
+            $this->setFontes(array("'15000002','25000002','1102','102','2102','202'"));
+            $nSaldoApagarGeral101 = self::getSaldoApagarGeral();
+           
+            $this->setFontes(array("'15020002', 25020002"));
+            $nSaldoApagarGeral118_119 = self::getSaldoApagarGeral();
+        }
+        $nSaldoFonteAno101 = getSaldoPlanoContaFonte("'15000002','25000002','1102','102','2102','202'", $this->dtini, $this->dtfim, $this->instits);
+
+        $nRPIncritosSemDesponibilidade101 = 0;
+        $this->setFontes(array("'15000002','25000002','1102','102','2102','202'"));
+        $this->setTipo('lqd');
+        $nLiqAPagar101 = self::getEmpenhosAPagar();
+        $this->setTipo('');
+        $nNaoLiqAPagar101 = self::getEmpenhosAPagar();
+        $aTotalPago101 = $nLiqAPagar101 + $nNaoLiqAPagar101;
+
+        if ($this->dtfim == $dtfimExercicio) {
+            $nSaldoFonteAno101 = getSaldoPlanoContaFonte("'15000002','25000002','1102','102','2102','202'", $this->dtini, $this->dtfim, $this->instits);
+            $dtfimExercicio = db_getsession("DB_anousu") . "-12-31";
+            $nRPSemDesponibilidade101 = $nSaldoFonteAno101 - $nSaldoApagarGeral101;
+
+            if ($nRPSemDesponibilidade101 <= 0) {
+                $nRPIncritosSemDesponibilidade101 = $aTotalPago101;
+            }
+            if ($nRPSemDesponibilidade101 > 0) {
+                $nRPIncritosSemDesponibilidade101 = $nRPSemDesponibilidade101 - $aTotalPago101;
+                if ($nRPIncritosSemDesponibilidade101 >= 0) {
+                    $nRPIncritosSemDesponibilidade101 = 0;
+                }
+                $nRPIncritosSemDesponibilidade101 = abs($nRPIncritosSemDesponibilidade101);
+            }
+        }
+
+        $nRPIncritosSemDesponibilidade118_119 = 0;
+        $this->setFontes(array("'15020002', 25020002"));
+        $this->setTipo('lqd');
+        $nLiqAPagar118_119 = self::getEmpenhosAPagar();
+        $this->setTipo('');
+        $nNaoLiqAPagar118_119 = self::getEmpenhosAPagar();
+        $aTotalPago118_119 = $nLiqAPagar118_119 + $nNaoLiqAPagar118_119;
+
+        if ($this->dtfim == $dtfimExercicio) {
+            
+            $nSaldoFonteAno118_119 = getSaldoPlanoContaFonte("'15020002', 25020002", $this->dtini, $this->dtfim, $this->instits);
+            $dtfimExercicio = db_getsession("DB_anousu") . "-12-31";
+            $nRPSemDesponibilidade118_119 = $nSaldoFonteAno118_119 - $nSaldoApagarGeral118_119;
+
+            if ($nRPSemDesponibilidade118_119 <= 0) {
+                $nRPIncritosSemDesponibilidade118_119 = $aTotalPago118_119;
+            }
+            if ($nRPSemDesponibilidade118_119 > 0) {
+                $nRPIncritosSemDesponibilidade118_119 = $nRPSemDesponibilidade118_119 - $aTotalPago118_119;
+                if ($nRPIncritosSemDesponibilidade118_119 >= 0) {
+                    $nRPIncritosSemDesponibilidade118_119 = 0;
+                }
+                $nRPIncritosSemDesponibilidade118_119 = abs($nRPIncritosSemDesponibilidade118_119);
+            }
+        }
+        return array($nRPIncritosSemDesponibilidade101, $nRPIncritosSemDesponibilidade118_119, $nRPSemDesponibilidade101, $nRPSemDesponibilidade118_119);
+
+    }
+
     /*Calcula a linha 10 - RESTOS A PAGAR DE EXERCÍCIOS ANTERIORES SEM DISPONIBILIDADE FINANCEIRA PAGOS NO EXERCÍCIO ATUAL (CONSULTA 932.736), das Despesa de Ensino */
     public function getLinha10RestoaPagarSemDis()
     {

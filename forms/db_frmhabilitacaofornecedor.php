@@ -122,6 +122,7 @@
                         <input id="db_opcao" style="margin-top:10px;" type='button' value="Incluir" onclick="processar();" />
                         <input style="margin-top:10px;" type='button' value="Pesquisar" onclick="pesquisar();" />
                         <input style="display:none;" id="novo" style="margin-top:10px;" type='button' value="Novo" onclick="novoFornecedor();" />
+                        <input style="display:none;" id="cadastrarfornecedor" style="margin-top:10px;" type='button' value="Cadastrar Fornecedor" onclick="redirecionamentoCadastroFornecedor();" />
                     </center>
                 </td>
             </tr>
@@ -131,6 +132,7 @@
                 <td>
                     <fieldset>
                         <legend> Fornecedores Habilitados </legend>
+                        <b> 'Para habilitação do fornecedor Pessoa Jurídica, é necessário que o(s) representante(s) legal(is) esteja(m) cadastrado(s). </b> 
                         <div style="margin-top:10px;" id='gridFornecedoresHabilitados'>
                         </div>
                     </fieldset>
@@ -438,6 +440,7 @@
             oParametros.l206_datavalidadefgts = document.getElementById('l206_datavalidadefgts').value; 
             oParametros.l206_datavalidadecndt = document.getElementById('l206_datavalidadecndt').value;
             oParametros.sequencialHabilitacao = document.getElementById('l206_sequencial').value;
+            oParametros.l206_forncedor = document.getElementById('l206_fornecedor').value;
             oParametros.sExecuta = "alterarForncedorHabilitado";
             js_divCarregando('Alterando Dados do Forncedor...', 'msgBox');
         }
@@ -461,6 +464,10 @@
 
         js_removeObj('msgBox');
         let oRetorno = JSON.parse(oAjax.responseText);
+
+        if(oRetorno.habilitacaoCadastroFornecedor){
+            document.getElementById("cadastrarfornecedor").style.display = "";
+        }
 
         if(oRetorno.status == "2"){
             return alert(oRetorno.erro);
@@ -528,6 +535,7 @@
     function resetarCampos(){
 
         document.getElementById("novo").style.display = "none";
+        document.getElementById("cadastrarfornecedor").style.display = "none";
         document.getElementById("db_opcao").value = "Incluir";
         document.getElementById("l206_numcertidaoinss").readOnly = false;
         document.getElementById("l206_numcertidaofgts").readOnly = false;
@@ -563,6 +571,21 @@
 
     function pesquisar(){
         js_OpenJanelaIframe('CurrentWindow.corpo','db_iframe_liclicita','func_liclicita.php?habilitacaofornecedor=true&funcao_js=parent.preencheDados|l20_codigo','Pesquisa',true);
+    }
+
+    function redirecionamentoCadastroFornecedor(){
+
+        let oParams = {
+            action: `com1_pcforne001.php`,
+            iInstitId: top.jQuery('#instituicoes span.active').data('id'),
+            iAreaId: 4,
+            iModuloId: 381
+        }
+
+        let title = 'DB:PATRIMONIAL > Licitações > Cadastros > Fornecedor > Inclusão';
+
+        Desktop.Window.create(title, oParams);
+
     }
 
 </script>

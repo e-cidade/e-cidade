@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AlterarTabelaSicomContratos extends AbstractMigration
+class AlterarTabelaSicomContratos extends PostgresMigration
 {
     public function up()
     {

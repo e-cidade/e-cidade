@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class SicomObras2024 extends AbstractMigration
+class SicomObras2024 extends PostgresMigration
 {
     public function up()
     {

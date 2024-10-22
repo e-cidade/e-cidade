@@ -4625,3 +4625,62 @@ function fecharDBTooltip(oElemento) {
   oElemento.parentElement.style.display = 'none';
   document.getElementById('listaquestionario').style.display = 'none';
 }
+
+function showCustomConfirm(message) {
+  return new Promise((resolve) => {
+    // Create the confirm dialog elements
+    const confirmOverlay = document.createElement('div');
+    confirmOverlay.style.position = 'fixed';
+    confirmOverlay.style.top = '0';
+    confirmOverlay.style.left = '0';
+    confirmOverlay.style.width = '100%';
+    confirmOverlay.style.height = '100%';
+    confirmOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    confirmOverlay.style.display = 'flex';
+    confirmOverlay.style.justifyContent = 'center';
+    confirmOverlay.style.alignItems = 'center';
+    confirmOverlay.style.zIndex = '1000';
+
+    const confirmBox = document.createElement('div');
+    confirmBox.style.backgroundColor = 'white';
+    confirmBox.style.padding = '20px';
+    confirmBox.style.borderRadius = '5px';
+    confirmBox.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.5)';
+    confirmBox.style.textAlign = 'center';
+
+    const confirmMessage = document.createElement('p');
+    confirmMessage.innerHTML = message;
+
+    const confirmYesButton = document.createElement('button');
+    confirmYesButton.textContent = 'Sim';
+    confirmYesButton.style.margin = '5px';
+    confirmYesButton.onclick = () => {
+      document.body.removeChild(confirmOverlay);
+      resolve(true);
+    };
+
+    const confirmNoButton = document.createElement('button');
+    confirmNoButton.textContent = 'Não';
+    confirmNoButton.style.margin = '5px';
+    confirmNoButton.onclick = () => {
+      document.body.removeChild(confirmOverlay);
+      resolve(false);
+    };
+
+    confirmBox.appendChild(confirmMessage);
+    confirmBox.appendChild(confirmYesButton);
+    confirmBox.appendChild(confirmNoButton);
+    confirmOverlay.appendChild(confirmBox);
+    document.body.appendChild(confirmOverlay);
+  });
+}
+function parseObjectToFormData(object) {
+  const formData = new FormData();
+
+  for (const key in object) {
+    if (object.hasOwnProperty(key)) {
+      formData.append(key, object[key]);
+    }
+  }
+  return formData;
+}

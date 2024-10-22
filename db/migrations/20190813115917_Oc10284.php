@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc10284 extends AbstractMigration
+class Oc10284 extends PostgresMigration
 {
     /**
      * Change Method.
@@ -10,7 +10,7 @@ class Oc10284 extends AbstractMigration
      * Write your reversible migrations using this method.
      *
      * More information on writing migrations is available here:
-     * http://docs.phinx.org/en/latest/migrations.html#the-abstractmigration-class
+     * http://docs.phinx.org/en/latest/migrations.html#the-PostgresMigration-class
      *
      * The following commands can be used in this method and Phinx will
      * automatically reverse them when rolling back:
@@ -32,7 +32,7 @@ class Oc10284 extends AbstractMigration
         BEGIN;
 
         SELECT fc_startsession();
-        
+
         CREATE TEMP TABLE ementario_rec_2020
         (
         estrut varchar,
@@ -40,15 +40,15 @@ class Oc10284 extends AbstractMigration
         descricao varchar,
         finalidade text
         );
-        
-        
-        CREATE TEMP TABLE novas_receitas_2020 ON COMMIT DROP AS 
+
+
+        CREATE TEMP TABLE novas_receitas_2020 ON COMMIT DROP AS
         SELECT * FROM conplanoorcamento
         JOIN orcfontes ON (o57_fonte, o57_anousu) = (c60_estrut, 2020)
         LEFT JOIN taborc ON (k02_estorc, k02_anousu) = (c60_estrut, c60_anousu)
         WHERE (substr(c60_estrut,1,1), c60_anousu) = ('4', 2020);
-        
-        
+
+
         INSERT INTO ementario_rec_2020 VALUES
         ('42418052',
         NULL,
@@ -274,8 +274,8 @@ class Oc10284 extends AbstractMigration
         106,
         'Outras Transferencias dos Estados-Principal- F:106',
         'Outras Transferencias dos Estados - Principal - Fonte 106');
-        
-        
+
+
         INSERT INTO conplanoorcamentoanalitica
         SELECT c61_codcon,
                2020 AS c61_anousu,
@@ -290,15 +290,15 @@ class Oc10284 extends AbstractMigration
           AND c61_codcon NOT IN
             (SELECT c61_codcon FROM conplanoorcamentoanalitica
              WHERE c61_anousu = 2020)
-          AND c61_codcon NOT IN 
+          AND c61_codcon NOT IN
           (SELECT c60_codcon FROM conplanoorcamento
            WHERE (substr(c60_estrut,1,7) IN ('4171808', '4241808')
-               OR 
-               c60_estrut IN ('417681000000000', '417681011010000', '417781000000000', '424481011020000', '424481011030000', '424481011040000', '424180511020000', '417481011020000', 
+               OR
+               c60_estrut IN ('417681000000000', '417681011010000', '417781000000000', '424481011020000', '424481011030000', '424481011040000', '424180511020000', '417481011020000',
                       '417481011030000', '417481011040000', '419280211030000', '419280211040000', '419280211050000', '424180511020000', '424481011020000', '424481011030000'))
            AND c60_anousu>= 2020);
-        
-        
+
+
         INSERT INTO conplanoorcamento
         SELECT nextval('conplanoorcamento_c60_codcon_seq') c60_codcon,
                2020 c60_anousu,
@@ -311,11 +311,11 @@ class Oc10284 extends AbstractMigration
                'N' c60_identificadorfinanceiro,
                0 c60_naturezasaldo
         FROM ementario_rec_2020
-        WHERE substr(rpad(estrut, 15, '0'),1,15) NOT IN 
+        WHERE substr(rpad(estrut, 15, '0'),1,15) NOT IN
          (SELECT c60_estrut FROM conplanoorcamento
            WHERE c60_anousu = 2020);
-        
-        
+
+
         INSERT INTO conplanoorcamentoanalitica
         SELECT c60_codcon,
                c60_anousu,
@@ -326,11 +326,11 @@ class Oc10284 extends AbstractMigration
         FROM ementario_rec_2020
         JOIN conplanoorcamento ON substr(rpad(estrut, 15, '0'),1,15) = c60_estrut
         WHERE fonte IS NOT NULL
-          AND c60_codcon NOT IN 
+          AND c60_codcon NOT IN
           (SELECT c61_codcon FROM conplanoorcamentoanalitica
            WHERE c61_anousu = 2020);
-        
-        
+
+
         UPDATE conplanoorcamento
         SET c60_descr = (CASE
                              WHEN substr(c60_estrut,1,11) = '42418051000' THEN substr('Prog Apo Transp Escolar Educ Basica-CAMINHO ESCOLA',1,50)
@@ -352,8 +352,8 @@ class Oc10284 extends AbstractMigration
                           END)
         WHERE substr(c60_estrut,1,11) IN ('42418051000', '42418051100', '42418051101', '42448100000', '42448101000', '42448101100', '42448101101')
           AND c60_anousu = 2020;
-        
-        
+
+
         UPDATE conplanoorcamentoanalitica
         SET c61_codigo = (CASE
                              WHEN substr(c60_estrut,1,11) = '42418051101' THEN 146
@@ -365,8 +365,8 @@ class Oc10284 extends AbstractMigration
         WHERE substr(c60_estrut,1,11) IN ('42418051000', '42418051100', '42418051101', '42448100000', '42448101000', '42448101100', '42448101101')
           AND c60_anousu = 2020
           AND (c60_codcon, c60_anousu) = (conplanoorcamentoanalitica.c61_codcon, conplanoorcamentoanalitica.c61_anousu);
-        
-        
+
+
         UPDATE conplanoorcamento
         SET c60_estrut = (CASE
                               WHEN substr(c60_estrut,1,11) = '41768101000' THEN '417680190000000'
@@ -382,8 +382,8 @@ class Oc10284 extends AbstractMigration
                           END)
         WHERE substr(c60_estrut,1,11) IN ('41768101000', '41768101100', '41768101102', '41768101103', '41778101000', '41778101100', '41778101101', '42468101000', '42468101100', '42468101101')
           AND c60_anousu = 2020;
-        
-        
+
+
         UPDATE conplanoorcamentoanalitica
         SET c61_codigo = (CASE
                              WHEN c60_estrut = '417680191010000' THEN 124
@@ -397,8 +397,8 @@ class Oc10284 extends AbstractMigration
         WHERE c60_estrut IN ('417680191010000', '417680191020000', '417780191010000', '424680191010000')
           AND c60_anousu = 2020
           AND (c60_codcon, c60_anousu) = (conplanoorcamentoanalitica.c61_codcon, conplanoorcamentoanalitica.c61_anousu);
-        
-        
+
+
         UPDATE conplanoorcamentoanalitica
         SET c61_codigo = (CASE
                              WHEN c60_estrut LIKE '41218%' AND t1.c61_codigo = 100 THEN 105
@@ -430,34 +430,34 @@ class Oc10284 extends AbstractMigration
         WHERE c60_anousu = 2020
           AND (c60_codcon, c60_anousu) = (conplanoorcamentoanalitica.c61_codcon, conplanoorcamentoanalitica.c61_anousu)
           AND (substr(c60_estrut,1,11) IN
-              ('41718022101', '41718031101', '41718032101', '41718033101', '41718034101', '41718035101', '41728022101', '41728991101', '41922031101', 
+              ('41718022101', '41718031101', '41718032101', '41718033101', '41718034101', '41718035101', '41728022101', '41728991101', '41922031101',
                '41928021101', '41928021102', '41990011101', '42418031101', '42418032101', '42418033101', '42418034101', '42418035101', '42448101101')
-               OR 
+               OR
                substr(c60_estrut,1,9) IN ('413210041', '419900311')
                OR
                substr(c60_estrut,1,5) IN ('41218', '47218'));
-        
-        
+
+
         UPDATE conplanoorcamento
         SET c60_descr = (CASE
-                              WHEN t1.c60_estrut LIKE '41218%' 
-                                   AND c61_codigo = 100 
-                                   AND t1.c60_descr ILIKE '%recursos ordinarios%' 
+                              WHEN t1.c60_estrut LIKE '41218%'
+                                   AND c61_codigo = 100
+                                   AND t1.c60_descr ILIKE '%recursos ordinarios%'
                                  THEN replace(t1.c60_descr,'Recursos Ordinarios', 'Taxa de Admin. RPPS')
-                              WHEN t1.c60_estrut LIKE '47218%' 
-                                   AND c61_codigo = 100 
-                                   AND t1.c60_descr ILIKE '%recursos ordinarios%' 
+                              WHEN t1.c60_estrut LIKE '47218%'
+                                   AND c61_codigo = 100
+                                   AND t1.c60_descr ILIKE '%recursos ordinarios%'
                                  THEN replace(t1.c60_descr,'Recursos Ordinarios', 'Taxa de Admin. RPPS')
                               ELSE t1.c60_descr
                           END),
             c60_finali = (CASE
-                              WHEN t1.c60_estrut LIKE '41218%' 
-                                   AND c61_codigo = 100 
-                                   AND t1.c60_finali ILIKE '%recursos ordinarios%' 
+                              WHEN t1.c60_estrut LIKE '41218%'
+                                   AND c61_codigo = 100
+                                   AND t1.c60_finali ILIKE '%recursos ordinarios%'
                                  THEN replace(t1.c60_finali,'Recursos Ordinarios', 'Taxa de Admin. RPPS')
-                              WHEN t1.c60_estrut LIKE '47218%' 
-                                   AND c61_codigo = 100 
-                                   AND t1.c60_finali ILIKE '%recursos ordinarios%' 
+                              WHEN t1.c60_estrut LIKE '47218%'
+                                   AND c61_codigo = 100
+                                   AND t1.c60_finali ILIKE '%recursos ordinarios%'
                                  THEN replace(t1.c60_finali,'Recursos Ordinarios', 'Taxa de Admin. RPPS')
                               ELSE t1.c60_finali
                           END)
@@ -468,8 +468,8 @@ class Oc10284 extends AbstractMigration
           AND (substr(t1.c60_estrut,1,9) IN ('413210041', '419900311')
                OR
                substr(t1.c60_estrut,1,5) IN ('41218', '47218'));
-        
-        
+
+
         UPDATE taborc
         SET k02_estorc = conplanoorcamento.c60_estrut
         FROM taborc t1
@@ -477,17 +477,17 @@ class Oc10284 extends AbstractMigration
         JOIN conplanoorcamento ON (conplanoorcamento.c60_codcon, conplanoorcamento.c60_anousu) = (novas_receitas_2020.c60_codcon, novas_receitas_2020.c60_anousu)
         WHERE conplanoorcamento.c60_estrut != taborc.k02_estorc
           AND taborc.k02_anousu >= 2020;
-        
-        
+
+
         UPDATE orcfontes
         SET o57_fonte = conplanoorcamento.c60_estrut
-        FROM orcfontes t1 
+        FROM orcfontes t1
         JOIN novas_receitas_2020 ON (novas_receitas_2020.o57_codfon, 2021, novas_receitas_2020.o57_fonte) = (t1.o57_codfon, t1.o57_anousu, t1.o57_fonte)
         JOIN conplanoorcamento ON (conplanoorcamento.c60_codcon, conplanoorcamento.c60_anousu) = (novas_receitas_2020.c60_codcon, novas_receitas_2020.c60_anousu)
         WHERE conplanoorcamento.c60_estrut != orcfontes.o57_fonte
           AND orcfontes.o57_anousu = 2020;
-        
-        
+
+
         UPDATE conplanoorcamento
         SET c60_estrut = (CASE
                               WHEN t2.c60_estrut != t1.c60_estrut
@@ -500,8 +500,8 @@ class Oc10284 extends AbstractMigration
           AND conplanoorcamento.c60_codcon = t2.c60_codcon
           AND conplanoorcamento.c60_anousu = 2021
           AND conplanoorcamento.c60_estrut != t1.c60_estrut;
-        
-        
+
+
         UPDATE conplanoorcamentoanalitica
         SET c61_codigo = (CASE
                               WHEN t2.c61_codcon = t1.c61_codcon AND t2.c61_reduz = t1.c61_reduz
@@ -514,8 +514,8 @@ class Oc10284 extends AbstractMigration
           AND (conplanoorcamentoanalitica.c61_codcon, conplanoorcamentoanalitica.c61_reduz) = (t2.c61_codcon, t2.c61_reduz)
           AND conplanoorcamentoanalitica.c61_anousu = 2021
           AND conplanoorcamentoanalitica.c61_codigo != t1.c61_codigo;
-        
-        
+
+
         INSERT INTO conplanoorcamentoanalitica
         SELECT c60_codcon,
                c60_anousu,
@@ -532,13 +532,13 @@ class Oc10284 extends AbstractMigration
         FROM conplanoorcamento
         WHERE substr(c60_estrut, 1, 11) IN ('41768019101', '41768019102', '41778019101', '42468019101')
           AND c60_anousu = 2020
-          AND (c60_codcon, c60_anousu) NOT IN 
+          AND (c60_codcon, c60_anousu) NOT IN
           (SELECT c61_codcon, c61_anousu FROM conplanoorcamentoanalitica
            JOIN conplanoorcamento ON (c60_codcon, c60_anousu) = (c61_codcon, c61_anousu)
            WHERE substr(c60_estrut, 1, 11) IN ('41768019101', '41768019102', '41778019101', '42468019101')
              AND c60_anousu = 2020);
-        
-        
+
+
         INSERT INTO conplanoorcamento
         SELECT c60_codcon,
                2021 c60_anousu,
@@ -556,8 +556,8 @@ class Oc10284 extends AbstractMigration
           (SELECT c60_estrut, c60_codcon FROM conplanoorcamento
            WHERE c60_anousu = 2021)
           AND c60_anousu = 2020;
-        
-        
+
+
         INSERT INTO conplanoorcamentoanalitica
         SELECT c61_codcon,
                2021 c61_anousu,
@@ -567,50 +567,50 @@ class Oc10284 extends AbstractMigration
                c61_contrapartida
         FROM conplanoorcamentoanalitica
         JOIN conplanoorcamento ON (c60_codcon, c60_anousu) = (c61_codcon, c61_anousu)
-        WHERE (c61_codcon, c61_reduz) NOT IN 
+        WHERE (c61_codcon, c61_reduz) NOT IN
         (SELECT c61_codcon, c61_reduz FROM conplanoorcamentoanalitica
          WHERE c61_anousu = 2021)
           AND c60_estrut IN (SELECT c60_estrut FROM conplanoorcamento WHERE c60_anousu = 2021)
           AND c61_anousu = 2020;
-        
-        
+
+
         DELETE FROM conplanoorcamentoanalitica
         USING conplanoorcamento
         WHERE substr(c60_estrut,1,7) IN ('4171808', '4241808')
         AND (c61_codcon, c61_anousu) = (c60_codcon, c60_anousu)
         AND c61_anousu >= 2020;
-        
-        
+
+
         DELETE FROM conplanoorcamentoanalitica
         USING conplanoorcamento
-        WHERE c60_estrut IN ('417681000000000', '417681011010000', '417781000000000', '424481011020000', '424481011030000', '424481011040000', '424180511020000', '417481011020000', 
+        WHERE c60_estrut IN ('417681000000000', '417681011010000', '417781000000000', '424481011020000', '424481011030000', '424481011040000', '424180511020000', '417481011020000',
                              '417481011030000', '417481011040000', '419280211030000', '419280211040000', '419280211050000', '424180511020000', '424481011020000', '424481011030000')
         AND (c61_codcon, c61_anousu) = (c60_codcon, c60_anousu)
         AND c61_anousu >= 2020;
-        
-        
+
+
         UPDATE conplanoorcamento
         SET c60_descr = 'DESATIVADA 2020',
             c60_finali = 'DESATIVADA 2020',
             c60_codsis = 0,
             c60_codcla = 4
         WHERE (substr(c60_estrut,1,7) IN ('4171808', '4241808')
-               OR 
-               c60_estrut IN ('417681000000000', '417681011010000', '417781000000000', '424481011020000', '424481011030000', '424481011040000', '424180511020000', '417481011020000', 
+               OR
+               c60_estrut IN ('417681000000000', '417681011010000', '417781000000000', '424481011020000', '424481011030000', '424481011040000', '424180511020000', '417481011020000',
                               '417481011030000', '417481011040000', '419280211030000', '419280211040000', '419280211050000', '424180511020000', '424481011020000', '424481011030000'))
         AND c60_anousu>= 2020;
-        
-        
+
+
         DELETE FROM conplanoconplanoorcamento
         USING conplanoorcamento
         WHERE (substr(c60_estrut,1,7) IN ('4171808', '4241808')
-               OR 
-               c60_estrut IN ('417681000000000', '417681011010000', '417781000000000', '424481011020000', '424481011030000', '424481011040000', '424180511020000', '417481011020000', 
+               OR
+               c60_estrut IN ('417681000000000', '417681011010000', '417781000000000', '424481011020000', '424481011030000', '424481011040000', '424180511020000', '417481011020000',
                               '417481011030000', '417481011040000', '419280211030000', '419280211040000', '419280211050000', '424180511020000', '424481011020000', '424481011030000'))
         AND (c72_conplanoorcamento, c72_anousu) = (c60_codcon, c60_anousu)
         AND c72_anousu >= 2020;
-        
-        
+
+
         INSERT INTO orcfontes
         SELECT c60_codcon o57_codfon,
                c60_anousu o57_anousu,
@@ -620,11 +620,11 @@ class Oc10284 extends AbstractMigration
         FROM conplanoorcamento
         JOIN ementario_rec_2020 ON substr(rpad(estrut, 15, '0'),1,15) = c60_estrut
         WHERE c60_anousu = 2020
-        AND (c60_codcon, c60_estrut) NOT IN 
+        AND (c60_codcon, c60_estrut) NOT IN
         (SELECT o57_codfon, o57_fonte FROM orcfontes
          WHERE o57_anousu = 2020);
-        
-        
+
+
         INSERT INTO orcfontes
         SELECT c60_codcon o57_codfon,
                2021 o57_anousu,
@@ -634,15 +634,15 @@ class Oc10284 extends AbstractMigration
         FROM conplanoorcamento
         JOIN ementario_rec_2020 ON substr(rpad(estrut, 15, '0'),1,15) = c60_estrut
         WHERE c60_anousu = 2020
-        AND (c60_codcon, c60_estrut) NOT IN 
+        AND (c60_codcon, c60_estrut) NOT IN
         (SELECT o57_codfon, o57_fonte FROM orcfontes
          WHERE o57_anousu = 2021);
-        
-        
+
+
         DROP TABLE ementario_rec_2020;
-        
-        
-        COMMIT;  
+
+
+        COMMIT;
 
 SQL;
 

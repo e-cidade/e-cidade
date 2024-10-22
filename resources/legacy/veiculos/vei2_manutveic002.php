@@ -164,6 +164,7 @@ HTML;
 
 
                       $sSql2 = "SELECT distinct ve01_codigo AS veic,
+                          ve63_codigo,
                            ve01_placa,
                            ve01_veiccadmarca||'-'||ve21_descr AS marca,
                            ve01_veiccadmodelo||'-'||veiccadmodelo AS modelo,
@@ -229,6 +230,7 @@ HTML;
                     if ($ve01_codigo) {
                           $sSql2 .= " and veicmanut.ve62_veiculos in ($ve01_codigo)
                                    GROUP BY veiculos.ve01_codigo,
+                                   ve63_codigo,
                                    veiccadmarca.ve21_descr,
                                    veicmanut.ve62_codigo,
                                    cgm.z01_numcgm,
@@ -244,6 +246,7 @@ HTML;
                     }else{
                           $sSql2 .="
                                    GROUP BY veiculos.ve01_codigo,
+                                   ve63_codigo,
                                    veiccadmarca.ve21_descr,
                                    veicmanut.ve62_codigo,
                                    cgm.z01_numcgm,

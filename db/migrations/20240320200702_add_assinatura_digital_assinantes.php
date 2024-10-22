@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AddAssinaturaDigitalAssinantes extends AbstractMigration
+class AddAssinaturaDigitalAssinantes extends PostgresMigration
 {
     public function change()
     {

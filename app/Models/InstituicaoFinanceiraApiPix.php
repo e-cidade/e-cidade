@@ -18,13 +18,6 @@ class InstituicaoFinanceiraApiPix extends LegacyModel
      */
     protected $primaryKey = 'k175_sequencial';
 
-    /**
-     * Indicates if the IDs are auto-incrementing.
-     *
-     * @var bool
-     */
-    public $incrementing = false;
-
     public $timestamps = false;
 
     /**

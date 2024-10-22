@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class ViradaAnual extends AbstractMigration
+class ViradaAnual extends PostgresMigration
 {
     /**
      * Change Method.
@@ -10,7 +10,7 @@ class ViradaAnual extends AbstractMigration
      * Write your reversible migrations using this method.
      *
      * More information on writing migrations is available here:
-     * http://docs.phinx.org/en/latest/migrations.html#the-abstractmigration-class
+     * http://docs.phinx.org/en/latest/migrations.html#the-PostgresMigration-class
      *
      * The following commands can be used in this method and Phinx will
      * automatically reverse them when rolling back:
@@ -30,7 +30,7 @@ class ViradaAnual extends AbstractMigration
         $sql = <<<SQL
 
         BEGIN;
-        
+
         /* Atualizando/inserindo dados para 2020 */
 
         CREATE TEMP TABLE plano_contas ON COMMIT DROP AS
@@ -85,9 +85,9 @@ class ViradaAnual extends AbstractMigration
                c21_instit
         FROM conplanoorcamentogrupo
         WHERE c21_anousu = 2019
-          AND c21_codcon NOT IN 
+          AND c21_codcon NOT IN
             (SELECT c21_codcon FROM conplanoorcamentogrupo WHERE c21_anousu = 2020)
-          AND c21_codcon IN 
+          AND c21_codcon IN
             (SELECT c60_codcon FROM conplanoorcamento WHERE c60_anousu = 2020);
 
 
@@ -121,7 +121,7 @@ class ViradaAnual extends AbstractMigration
              WHERE o70_anousu = 2020);
 
         ALTER TABLE taborc ENABLE TRIGGER ALL;
-        
+
         INSERT INTO acordogruponumeracao
         SELECT nextval('acordogruponumeracao_ac03_sequencial_seq') AS ac03_sequencial,
               ac03_acordogrupo,
@@ -130,7 +130,7 @@ class ViradaAnual extends AbstractMigration
               ac03_instit
         FROM acordogruponumeracao
         WHERE ac03_anousu = 2019;
-        
+
 
         INSERT INTO numeracaotipoproc
         SELECT nextval('numeracaotipoproc_p200_codigo_seq') AS p200_codigo,
@@ -138,10 +138,10 @@ class ViradaAnual extends AbstractMigration
                0 AS p200_numeracao,
                p200_tipoproc
         FROM numeracaotipoproc
-        WHERE p200_ano = 2019;        
-        
+        WHERE p200_ano = 2019;
+
         /* Atualizando/inserindo dados para 2021*/
-        
+
         CREATE TEMP TABLE plano_contas1 ON COMMIT DROP AS
         SELECT * FROM conplano
         WHERE c60_anousu = 2020;
@@ -194,9 +194,9 @@ class ViradaAnual extends AbstractMigration
                c21_instit
         FROM conplanoorcamentogrupo
         WHERE c21_anousu = 2020
-          AND c21_codcon NOT IN 
+          AND c21_codcon NOT IN
             (SELECT c21_codcon FROM conplanoorcamentogrupo WHERE c21_anousu = 2021)
-          AND c21_codcon IN 
+          AND c21_codcon IN
             (SELECT c60_codcon FROM conplanoorcamento WHERE c60_anousu = 2021);
 
 

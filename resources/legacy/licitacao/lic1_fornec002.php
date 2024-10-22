@@ -123,13 +123,12 @@ if (isset($alterar) || isset($excluir) || isset($incluir) || isset($verificado))
       }
     }
 
-    $rsCgmforn = db_query("select z01_cgccpf from cgm where z01_numcgm = $pc21_numcgm");
-    $sCnpjFornecedor  = db_utils::fieldsMemory($rsCgmforn, 0)->z01_cgccpf;
-    $rsPcfornereprlegal = db_query("select * from pcfornereprlegal inner join cgm on z01_numcgm = pc81_cgmresp where pc81_cgmforn = $pc21_numcgm and z01_cgccpf = '$sCnpjFornecedor'");
-    if (strlen($sCnpjFornecedor) == 14 && pg_num_rows($rsPcfornereprlegal) > 0) {
+    $rsPcForne = db_query("select * from pcforne where pc60_numcgm = $pc21_numcgm");
+    if (pg_num_rows($rsPcForne) == 0) {
       $sqlerro = true;
-      $erro_msg = "Usuário: No cadastro do fornecedor selecionado, o CGM do Representante está o mesmo CNPJ do CGM do Fornecedor. Corrija o cadastro e selecione novamente o fornecedor.";
+      $erro_msg = "Usuário: O CGM $pc21_numcgm não se encontra cadastrado como fornecedor. Verifique!" ;
     }
+
   }
   //FIM OC 7037
 
@@ -178,6 +177,12 @@ for ($iCont = 0; $iCont < pg_num_rows($result); $iCont++) {
     $tipopart2 = $dados->pc81_tipopart;
   } elseif ($dados->pc81_tipopart == 3) {
     $tipopart3 = $dados->pc81_tipopart;
+  }elseif ($dados->pc81_tipopart == 4) {
+    $tipopart4 = $dados->pc81_tipopart;
+  }elseif ($dados->pc81_tipopart == 5) {
+    $tipopart5 = $dados->pc81_tipopart;
+  }elseif ($dados->pc81_tipopart == 6) {
+    $tipopart6 = $dados->pc81_tipopart;
   }
 }
 
@@ -255,8 +260,6 @@ if (isset($incluir)) {
   }
 
   if (strlen($tipocgm) == 14) {
-
-    if ((isset($tipopart1) && isset($tipopart2)) || isset($tipopart3)) {
 
       db_inicio_transacao();
 
@@ -374,10 +377,6 @@ if (isset($incluir)) {
       }
       db_fim_transacao();
       $op = 1;
-    } else {
-      echo "<script>alert('É necessário cadastrar pelo menos um representante legal e demais membros para o fornecedor.')</script>";
-      $op = 1;
-    }
   } else {
     db_inicio_transacao();
 
@@ -483,10 +482,27 @@ if (isset($incluir)) {
 } else if (isset($excluir)) {
   $resultValores = $clpcorcamval->sql_record($clpcorcamval->sql_query_file($pc21_orcamforne, null, "sum(pc23_vlrun) as valor", null, ""));
   db_fieldsmemory($resultValores, 0)->valor;
+  
+  $sql = "SELECT * FROM licpropostavinc where l223_fornecedor = ". $pc21_numcgm;
+  $rsResult = db_query($sql);
+
+  if(pg_num_rows($rsResult) > 0 ){
+    $sqlerro = true;
+    $erro_msg = "Fornecedor possuí proposta lançada, para remove-lo é necessário remover primeiro sua proposta";
+  }
+
+  
   if ($valor > 0) {
     $sqlerro = true;
     $erro_msg = "Fornecedor com valores lançados";
   } else {
+
+    $rsFornecedorHabilitado = db_query("select * from habilitacaoforn where l206_fornecedor = $pc21_numcgm and l206_licitacao = $l20_codigo");
+    if(pg_numrows($rsFornecedorHabilitado) > 0){
+      $sqlerro = true;
+      $erro_msg = "Não é possível excluir fornecedor já habilitado.";
+    }
+
     if (!$sqlerro) {
       $clpcorcamjulg->excluir(null, $pc21_orcamforne, null);
       if ($clpcorcamjulg->erro_status == 0) {
@@ -511,6 +527,8 @@ if (isset($incluir)) {
         $erro_msg = $clpcorcamfornelic->erro_msg;
       }
     }
+
+
 
     /**
      * Exclui da pcorcamjulgamentologitem

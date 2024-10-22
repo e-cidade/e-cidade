@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc12052 extends AbstractMigration
+class Oc12052 extends PostgresMigration
 {
     public function up()
     {
@@ -47,7 +47,7 @@ class Oc12052 extends AbstractMigration
         FROM new_ctas_orc
         JOIN conplanoorcamento t1 ON c60_estrut = '331901103000000'
         WHERE t1.c60_anousu = 2020
-          AND estrut NOT IN 
+          AND estrut NOT IN
           (SELECT c60_estrut FROM conplanoorcamento WHERE c60_anousu = 2020);
 
         INSERT INTO conplanoorcamento

@@ -546,6 +546,15 @@ if (isset($pc30_instit) && $pc30_instit != "") {
 																			?>
 																		</td>
 																	</tr>
+																	<tr>
+																	<td ><b>Prazo de Entrega - Ordem de Compra</b></td>
+																		<td>
+																			<?
+																			$aPrazoEntrega = array(1 => "Em Dias", 2 => 'Texto Pré-Cadastrado');
+																			db_select('pc30_prazoent', $aPrazoEntrega, true, $db_opcao);
+																			?>
+																		</td>
+																	</tr>
 																</table>
 															</fieldset>
 								</fieldset>

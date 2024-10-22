@@ -40,7 +40,7 @@ switch ($oParam->exec) {
                 $rsAnexosPNCP = $clcontroleanexostermospncp->sql_record($clcontroleanexostermospncp->sql_query_file(null, " * ", null, "ac57_sequencialarquivo = " . $iDocumentos));
 
                 if (pg_num_rows($rsAnexosPNCP) > 0) {
-                    throw new Exception("O documento do codigo " . $iDocumentos . " ja foi enviado !");
+                    throw new Exception("O Anexo do código " . $iDocumentos . " já foi enviado !");
                 }
 
                 //validacao para enviar somente idocumentos de termos que ja foram enviados para PNCP
@@ -63,7 +63,7 @@ switch ($oParam->exec) {
 
                 //envio
                 $cltermocontrato = new TermodeContrato();
-                $rsApiPNCP = $cltermocontrato->enviarAnexos($oDadosTermo->l214_anousu,$oDadosTermo->l214_numcontratopncp,$oDadosTermo->l214_numerotermo,$oDadosAnexo->ac56_anexo,$oDadosAnexo->descricao,$oDadosAnexo->ac56_tipoanexo);
+                $rsApiPNCP = $cltermocontrato->enviarAnexos($oDadosTermo->l214_anousu,$oDadosTermo->l214_numcontratopncp,$oDadosTermo->l214_numerotermo,$oDadosAnexo->ac56_anexo,$oDadosAnexo->ac56_nomearquivo,$oDadosAnexo->ac56_tipoanexo);
 
                 if ($rsApiPNCP[0] == 201) {
 
@@ -108,12 +108,11 @@ switch ($oParam->exec) {
                 $oDadosAnexo = db_utils::fieldsMemory($rsAnexos, 0);
 
                 if (pg_num_rows($rsAnexos) == null) {
-                    throw new Exception("O documento do codigo " . $iDocumentos . " não foi enviado no PNCP!");
+                    throw new Exception("O Anexo do código " . $iDocumentos . " não foi enviado no PNCP!");
                 }
 
-                //envio exclusao
                 $cltermocontrato = new TermodeContrato();
-                $rsApiPNCP = $cltermocontrato->excluirAnexos($oDadosAnexo->ac57_ano, $oDadosAnexo->l214_numcontratopncp, $oDadosAnexo->l214_numerotermo,$oDadosAnexo->ac57_sequencialpncp);
+                $rsApiPNCP = $cltermocontrato->excluirAnexos($oDadosAnexo->ac57_ano, $oDadosAnexo->l214_numcontratopncp, $oDadosAnexo->l214_numerotermo, $oDadosAnexo->ac57_sequencialpncp, $oParam->justificativa);
 
                 if ($rsApiPNCP[0] == 201) {
 

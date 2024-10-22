@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc17341 extends AbstractMigration
+class Oc17341 extends PostgresMigration
 {
     public function up()
     {
@@ -53,7 +53,7 @@ class Oc17341 extends AbstractMigration
                     54 AS o48_suplcreditoespecial,
                     0 AS o48_redcreditoespecial;
 
-        UPDATE orcsuplemtipo SET o48_arrecadmaior = 58 WHERE o48_tiposup = 1002;  
+        UPDATE orcsuplemtipo SET o48_arrecadmaior = 58 WHERE o48_tiposup = 1002;
 
 
         COMMIT;

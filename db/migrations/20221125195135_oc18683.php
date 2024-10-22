@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc18683 extends AbstractMigration
+class Oc18683 extends PostgresMigration
 {
     public function up()
     {
@@ -30,7 +30,7 @@ class Oc18683 extends AbstractMigration
                               0,
                               'boolean',
                               'Orçamento Aprovado');
-                             
+
           INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia)
           VALUES (
           (SELECT codarq
@@ -47,10 +47,10 @@ class Oc18683 extends AbstractMigration
            WHERE codcam =
                (SELECT codcam
                 FROM db_syscampo
-                WHERE nomecam IN ('o134_percentuallimiteloa'))), 0);      
+                WHERE nomecam IN ('o134_percentuallimiteloa'))), 0);
         COMMIT;
 
 SQL;
         $this->execute($sql);
-    } 
+    }
 }

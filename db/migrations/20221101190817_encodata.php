@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Encodata extends AbstractMigration
+class Encodata extends PostgresMigration
 {
 
     public function up()
@@ -25,7 +25,7 @@ class Encodata extends AbstractMigration
 
         DELETE FROM db_menu WHERE id_item_filho in (select max(id_item) FROM db_itensmenu WHERE descricao like '%Desist%' AND funcao = 'lic1_licatareg002.php');
         DELETE FROM db_itensmenu WHERE descricao like '%Desist%' AND funcao = 'lic1_licatareg002.php';
-        
+
         UPDATE db_syscampo SET descricao = 'Licitação', rotulo = 'Licitação', rotulorel = 'Licitação' WHERE nomecam = 'l221_licitacao';
 
         UPDATE db_syscampo SET descricao = 'Número da Ata', rotulo = 'Número da Ata', rotulorel = 'Número da Ata' WHERE nomecam = 'l221_numata';
@@ -40,13 +40,13 @@ class Encodata extends AbstractMigration
 
         COMMIT;
 
-        
-        
+
+
         ";
 
-        
-       
-       
+
+
+
         $this->execute($sql);
 
     }

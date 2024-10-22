@@ -45,11 +45,13 @@ class cl_cgmjuridico {
    var $z08_sequencial = 0; 
    var $z08_numcgm = 0; 
    var $z08_nire = null; 
+   var $z08_capitalsocial = null; 
    // cria propriedade com as variaveis do arquivo 
    var $campos = "
                  z08_sequencial = int4 = Código 
                  z08_numcgm = int4 = Código CGM 
                  z08_nire = varchar(11) = Nire 
+                 z08_capitalsocial = varchar(11) = Capital Social 
                  ";
    //funcao construtor da classe 
    function cl_cgmjuridico() { 
@@ -72,6 +74,7 @@ class cl_cgmjuridico {
        $this->z08_sequencial = ($this->z08_sequencial == ""?@$GLOBALS["HTTP_POST_VARS"]["z08_sequencial"]:$this->z08_sequencial);
        $this->z08_numcgm = ($this->z08_numcgm == ""?@$GLOBALS["HTTP_POST_VARS"]["z08_numcgm"]:$this->z08_numcgm);
        $this->z08_nire = ($this->z08_nire == ""?@$GLOBALS["HTTP_POST_VARS"]["z08_nire"]:$this->z08_nire);
+       $this->z08_capitalsocial = ($this->z08_capitalsocial == ""?@$GLOBALS["HTTP_POST_VARS"]["z08_capitalsocial"]:$this->z08_capitalsocial);
      }else{
        $this->z08_sequencial = ($this->z08_sequencial == ""?@$GLOBALS["HTTP_POST_VARS"]["z08_sequencial"]:$this->z08_sequencial);
      }
@@ -124,11 +127,13 @@ class cl_cgmjuridico {
                                        z08_sequencial 
                                       ,z08_numcgm 
                                       ,z08_nire 
+                                      ,z08_capitalsocial
                        )
                 values (
                                 $this->z08_sequencial 
                                ,$this->z08_numcgm 
                                ,'$this->z08_nire' 
+                               ,'$this->z08_capitalsocial'
                       )";
      $result = db_query($sql); 
      if($result==false){ 
@@ -201,6 +206,10 @@ class cl_cgmjuridico {
        $sql  .= $virgula." z08_nire = '$this->z08_nire' ";
        $virgula = ",";
      }
+     if(trim($this->z08_capitalsocial)!="" || isset($GLOBALS["HTTP_POST_VARS"]["z08_capitalsocial"])){ 
+       $sql  .= $virgula." z08_capitalsocial = '$this->z08_capitalsocial' ";
+       $virgula = ",";
+     }
      $sql .= " where ";
      if($z08_sequencial!=null){
        $sql .= " z08_sequencial = $this->z08_sequencial";
@@ -220,6 +229,7 @@ class cl_cgmjuridico {
            $resac = db_query("insert into db_acount values($acount,2940,16720,'".AddSlashes(pg_result($resaco,$conresaco,'z08_nire'))."','$this->z08_nire',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
        }
      }
+     // throw new Exception($sql);
      $result = db_query($sql);
      if($result==false){ 
        $this->erro_banco = str_replace("\n","",@pg_last_error());

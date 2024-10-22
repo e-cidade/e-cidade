@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc13722 extends AbstractMigration
+class Oc13722 extends PostgresMigration
 {
     public function up()
     {
@@ -25,12 +25,12 @@ class Oc13722 extends AbstractMigration
                 nSaldoIniDeb         double precision[];
                 nSaldoFimCred        double precision[];
                 nSaldoFimDeb         double precision[];
-                
+
                 nSumSaldoIniCred     double precision;
                 nSumSaldoIniDeb      double precision;
                 nSumSaldoFimCred     double precision;
                 nSumSaldoFimDeb      double precision;
-                
+
                 nReduz               integer[];
                 nMes                 integer[];
                 nConlancam           integer[];
@@ -84,7 +84,7 @@ class Oc13722 extends AbstractMigration
                     AND corautent.k12_autent IN (SELECT UNNEST(nAutent));
 
                     DELETE FROM corlanc
-                    WHERE corlanc.k12_id IN (SELECT UNNEST(nIdCorrente)) 
+                    WHERE corlanc.k12_id IN (SELECT UNNEST(nIdCorrente))
                     AND corlanc.k12_data IN (SELECT UNNEST(nDateCorrente))
                     AND corlanc.k12_autent IN (SELECT UNNEST(nAutent));
 
@@ -95,22 +95,22 @@ class Oc13722 extends AbstractMigration
 
                     DELETE FROM conlancamcorrente
                     WHERE c86_conlancam IN (SELECT UNNEST(nConlancam));
-                    
-                    DELETE FROM cornump 
+
+                    DELETE FROM cornump
                     WHERE cornump.k12_id IN (SELECT UNNEST(nIdCorrente))
                     AND cornump.k12_data IN (SELECT UNNEST(nDateCorrente))
                     AND cornump.k12_autent IN (SELECT UNNEST(nAutent));
-                    
+
                     DELETE FROM corplacaixa
                     WHERE corplacaixa.k82_id IN (SELECT UNNEST(nIdCorrente))
                     AND corplacaixa.k82_data IN (SELECT UNNEST(nDateCorrente))
                     AND corplacaixa.k82_autent IN (SELECT UNNEST(nAutent));
-                    
+
                     DELETE FROM corhist
                     WHERE corhist.k12_id IN (SELECT UNNEST(nIdCorrente))
                     AND corhist.k12_data IN (SELECT UNNEST(nDateCorrente))
                     AND corhist.k12_autent IN (SELECT UNNEST(nAutent));
-                    
+
                     DELETE FROM corrente
                     WHERE corrente.k12_id IN (SELECT UNNEST(nIdCorrente))
                     AND corrente.k12_data IN (SELECT UNNEST(nDateCorrente))

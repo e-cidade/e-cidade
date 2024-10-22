@@ -4,6 +4,7 @@ require("libs/db_conecta.php");
 include("libs/db_sessoes.php");
 include("libs/db_usuariosonline.php");
 include("dbforms/db_funcoes.php");
+require_once("libs/renderComponents/index.php");
 
 db_app::load("scripts.js, strings.js, datagrid.widget.js, windowAux.widget.js,dbautocomplete.widget.js");
 db_app::load("dbmessageBoard.widget.js, prototype.js, dbtextField.widget.js, dbcomboBox.widget.js, widgets/DBHint.widget.js");
@@ -13,11 +14,26 @@ db_app::load("time.js");
 <html>
 
 <head>
-    <title>Contass Contabilidade Ltda - Página Inicial</title>
+    <title>Contass Contabilidade Ltda - Pï¿½gina Inicial</title>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <meta http-equiv="Expires" CONTENT="0">
     <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
     <link href="estilos.css" rel="stylesheet" type="text/css">
+
+    <style>
+        #justificativapncp {
+            width: 100%;
+            margin-bottom: 7px;
+            font-size: 1rem;
+        }
+    </style>
+
+    <script>
+        loadComponents([
+            'buttonsSolid',
+            'simpleModal'
+        ]);
+    </script>
 </head>
 <style>
 </style>
@@ -25,7 +41,7 @@ db_app::load("time.js");
 <body bgcolor=#CCCCCC>
     <form action="">
         <fieldset style="margin-top:50px;">
-            <legend>Publição Empenhos PNCP</legend>
+            <legend>Publiï¿½ï¿½o Empenhos PNCP</legend>
             <table style="width:100%">
                 <tr>
                     <td colspan="2">
@@ -37,9 +53,9 @@ db_app::load("time.js");
                         <strong>Tipo: </strong>
                         <select name="tipo" id="tipo">
                             <option value="0">Selecione</option>
-                            <option value="1">Inclusão</option>
-                            <option value="2">Retificação</option>
-                            <option value="3">Exclusão</option>
+                            <option value="1">Inclusï¿½o</option>
+                            <option value="2">Retificaï¿½ï¿½o</option>
+                            <option value="3">Exclusï¿½o</option>
                         </select>
                     </td>
                 </tr>
@@ -57,8 +73,35 @@ db_app::load("time.js");
         </br>
         <div id='cntgridempenhos'></div>
 
-        <input style="margin-left: 50%" type="button" value="Enviar para PNCP" onclick="js_enviar();">
+        <div style="width: 100%; display: flex; justify-content: center;">
+            <?php $component->render('buttons/solid', [
+                'designButton' => 'success',
+                'onclick' => 'js_clickSendPNCP()',
+                'type' => 'button',
+                'message' => 'Enviar para PNCP',
+                'size' => 'md'
+            ]); ?>
+        </div>
     </form>
+
+    <?php $component->render('modais/simpleModal/startModal', [
+        'title' => 'Justificativa para o PNCP',
+        'id' => 'justificativaModal',
+        'size' => 'lg'
+    ], true); ?>
+        <?php db_textarea('justificativapncp', 10, 48, false, true, 'text', $db_opcao, "", "", "justificativapncp", "255"); ?>
+                
+        <div style="width: 100%; display: flex; justify-content: center;">
+            <?php $component->render('buttons/solid', [
+                'designButton' => 'success',
+                'type' => 'button',
+                'message' => 'Salvar justificativa PNCP',
+                'onclick' => "js_enviar()",
+                'size' => 'md'
+            ]); ?>
+        </div>
+    <?php $component->render('modais/simpleModal/endModal', [], true); ?>
+
     <?php
     db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsession("DB_anousu"), db_getsession("DB_instit"));
     ?>
@@ -72,7 +115,7 @@ db_app::load("time.js");
         oGridEmpenho.setCheckbox(0);
         oGridEmpenho.setCellAlign(new Array("center", "center", "Center", "Left", "Center", "Center"));
         oGridEmpenho.setCellWidth(new Array("5%", "40%", "10%", "40%", "10%", "20%"));
-        oGridEmpenho.setHeader(new Array("Código", "Objeto", "Empenho", "Fornecedor", "Licitação", "Número de Controle"));
+        oGridEmpenho.setHeader(new Array("Cï¿½digo", "Objeto", "Empenho", "Fornecedor", "Licitaï¿½ï¿½o", "Nï¿½mero de Controle"));
         oGridEmpenho.hasTotalValue = false;
         oGridEmpenho.show($('cntgridempenhos'));
 
@@ -151,6 +194,7 @@ db_app::load("time.js");
 
     function js_enviar() {
         var aEmpenhos = oGridEmpenho.getSelection("object");
+        let justificativa = document.getElementById('justificativapncp').value.trim();
 
         let tipo = $F('tipo');
 
@@ -172,6 +216,16 @@ db_app::load("time.js");
         } else {
             oParam.exec = "ExcluirEmpenho";
         }
+
+        if (tipo != 1) {
+            oParam.justificativa = justificativa;
+
+            if (justificativa === '') {
+                alert('A justificativa nï¿½o pode estar vazia');
+                return false;
+            }
+        }
+        
         oParam.ambiente = $F('ambiente');
         oParam.aEmpenhos = new Array();
 
@@ -208,10 +262,26 @@ db_app::load("time.js");
             if (tipo == 1)
                 alert('Enviado com sucesso !');
             if (tipo == 2)
-                alert('Retificação enviada com sucesso!');
+                alert('Retificaï¿½ï¿½o enviada com sucesso!');
             if (tipo == 3)
-                alert('Exclusão efetuada com sucesso!');
+                alert('Exclusï¿½o efetuada com sucesso!');
             window.location.href = "lic1_publicacaoempenhopncp.php";
         }
+    }
+
+    function js_clickSendPNCP() {
+
+        let tipo = $F('tipo');
+        if (tipo == 0) {
+            alert('Selecione um Tipo');
+            return false;
+        }
+
+        if (tipo != 1) {
+            openModal('justificativaModal');
+        } else {
+            js_enviar();
+        }
+
     }
 </script>

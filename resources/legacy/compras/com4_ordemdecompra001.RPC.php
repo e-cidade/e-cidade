@@ -25,6 +25,8 @@
  *                                licenca/licenca_pt.txt
  */
 
+use App\Repositories\Patrimonial\Compras\PrazoEntregaRepository;
+
 require_once ("libs/db_stdlib.php");
 require_once ("libs/db_utils.php");
 require_once ("libs/db_app.utils.php");
@@ -307,9 +309,51 @@ try {
 
     break;
 
+    case "buscarPrazo" :
+      $sql = "SELECT * 
+      FROM pcparam 
+      WHERE pc30_prazoent = (SELECT MAX(pc30_prazoent) FROM pcparam);";
+      $rsResult = db_query($sql);
+      db_fieldsmemory($rsResult, 0);
+      $prazo = $pc30_prazoent;
+
+      $oRetorno->prazo = $prazo;
+
+      break;
+
     default:
       throw new ParameterException("Nenhuma Opção Definida");
     break;
+
+      case "getPrazoAltera":
+        $prazoentregaRepository = new PrazoEntregaRepository();
+        $oRetorno->prazo = $prazoentregaRepository->getprazoscadastradosAltera($oParam->ordem);
+    
+        $itensPrazo = [];
+        foreach ($oRetorno->prazo as $prazo) {
+            $itemPrazo = new stdClass();
+            $itemPrazo->pc97_descricao = $prazo->pc97_descricao;
+            $itemPrazo->pc97_sequencial = $prazo->pc97_sequencial; 
+            $itensPrazo[] = $itemPrazo;
+        }
+        $oRetorno->prazoCadastrado = $itensPrazo;
+    
+        break;
+
+    case "getPrazo":
+      $prazoentregaRepository = new PrazoEntregaRepository();
+      $oRetorno->prazo = $prazoentregaRepository->getprazoscadastrados();
+  
+      $itensPrazo = [];
+      foreach ($oRetorno->prazo as $prazo) {
+          $itemPrazo = new stdClass();
+          $itemPrazo->pc97_descricao = $prazo->pc97_descricao;
+          $itemPrazo->pc97_sequencial = $prazo->pc97_sequencial; 
+          $itensPrazo[] = $itemPrazo;
+      }
+      $oRetorno->prazoCadastrado = $itensPrazo;
+  
+      break;
 
   }
 

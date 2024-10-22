@@ -78,7 +78,7 @@ if(isset($numemp)){
         </style>
     </head>
     <body style="margin-top: 20px;" >
-    <div class="container div-centralizada">
+    <div class="container" style="width:600px;">
         <?php
         require_once(Modification::getFile("forms/db_frmempanularempenho.php"));
         ?>

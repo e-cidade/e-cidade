@@ -73,6 +73,29 @@ class SiopeIMPT extends Siops {
 
             $this->fechaArquivo();
 
+        } elseif($tipo == 3) {
+            
+            $this->sArquivo = $this->getNomeArquivo();
+            $this->abreArquivo();
+
+            foreach ($aDados as $value) {
+
+                $sLinha  = "96" . $this->sDelim;
+                $sLinha .= $this->getNaturInfoComplementaresFormat($value['natureza']) . $this->sDelim;
+                $sLinha .= $value['campo'] . $this->sDelim;
+                $sLinha .= "V0:[>R$" . number_format($value['prev_inicial'], 2, ',', '') . "<]:-[17](Previsão Inicial das Receitas Brutas (a))" . $this->sDelim;
+                $sLinha .= "V1:[>R$" . number_format($value['prev_atualizada'], 2, ',', '') . "<]:-[15](Previsão Atualizada das Receitas Brutas (b))" . $this->sDelim;
+                $sLinha .= "V2:[>R$" . number_format($value['rec_realizada'], 2, ',', '') . "<]:-[18](Receitas Realizadas Brutas (c))".$this->sDelim;
+                $sLinha .= $value['linha'] . $this->sDelim;
+                $sLinha .= $value['coluna'] . $this->sDelim;
+
+                fputs($this->_arquivo, utf8_encode($sLinha));
+                fputs($this->_arquivo, "\r\n");
+
+            }
+
+            $this->fechaArquivo();
+
         }
 
     }

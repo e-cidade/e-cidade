@@ -17,7 +17,7 @@
  *  detalhes.
  *
  *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU
- *  junto com este programa; se não, escreva para a Free Software
+ *  junto com este programa; se no, escreva para a Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
  *  02111-1307, USA.
  *
@@ -56,6 +56,14 @@ class cl_cgm {
     var $z01_cadast_mes = null;
     var $z01_cadast_ano = null;
     var $z01_cadast = null;
+    var $z01_dtabertura_dia = null;
+    var $z01_dtabertura_mes = null;
+    var $z01_dtabertura_ano = null;
+    var $z01_dtabertura = null;
+    var $z01_datasituacaoespecial_dia = null;
+    var $z01_datasituacaoespecial_mes = null;
+    var $z01_datasituacaoespecial_ano = null;
+    var $z01_datasituacaoespecial = null;
     var $z01_telef = null;
     var $z01_ident = null;
     var $z01_login = 0;
@@ -128,20 +136,30 @@ class cl_cgm {
     var $z01_notificaemail = 't';
     var $z01_ibge = null;
     var $z01_naturezajuridica = null;
+    var $z01_anoobito = null;
+    var $z01_produtorrural = null;
+    var $z01_situacaocadastral = null;
+    var $z01_situacaoespecial = null;
+    var $z01_tipoestabelecimento = null;
+    var $z01_porte = null;
+    var $z01_optantesimples = null;
+    var $z01_optantemei = null;
 
     // cria propriedade com as variaveis do arquivo
     var $campos = "
                  z01_numcgm = int4 = Numcgm
-                 z01_nome = varchar(40) = Nome/Razão Social
-                 z01_ender = varchar(100) = Endereço
+                 z01_nome = varchar(40) = Nome/Razo Social
+                 z01_ender = varchar(100) = Endereo
                  z01_numero = int4 = Numero
                  z01_compl = varchar(100) = Complemento
                  z01_bairro = varchar(40) = Bairro
-                 z01_munic = varchar(40) = Município
+                 z01_munic = varchar(40) = Municpio
                  z01_uf = varchar(2) = UF
                  z01_cep = varchar(8) = CEP
                  z01_cxpostal = varchar(20) = Caixa Postal
                  z01_cadast = date = Data do cadastramento
+                 z01_dtabertura = date = Data do cadastramento
+                 z01_datasituacaoespecial = date = Data do cadastramento
                  z01_telef = varchar(12) = Telefone
                  z01_ident = varchar(20) = Identidade
                  z01_login = int4 = Login
@@ -167,32 +185,37 @@ class cl_cgm {
                  z01_fax = varchar(12) = Fax
                  z01_nasc = date = Nascimento
                  z01_pai = varchar(40) = Pai
-                 z01_mae = varchar(40) = Mãe
+                 z01_mae = varchar(40) = Me
                  z01_sexo = varchar(1) = Sexo
-                 z01_ultalt = date = Ultima Alteração
+                 z01_ultalt = date = Ultima Alterao
                  z01_contato = varchar(40) = Contato
                  z01_hora = varchar(5) = Hora do Cadastramento
                  z01_nomefanta = varchar(100) = Nome Fantasia
                  z01_cnh = varchar(20) = CNH
                  z01_categoria = varchar(2) = Categoria CNH
-                 z01_dtemissao = date = Emissão CNH
+                 z01_dtemissao = date = Emisso CNH
                  z01_dthabilitacao = date = Primeira CNH
                  z01_nomecomple = varchar(100) = Nome Completo
                  z01_dtvencimento = date = Vencimento CNH
                  z01_dtfalecimento = date = Falecimento
                  z01_escolaridade = varchar(50) = Escolaridade
                  z01_naturalidade = varchar(100) = Naturalidade
-                 z01_identdtexp = date = Data Expedição
-                 z01_identorgao = varchar(50) = Orgão Emissor
+                 z01_identdtexp = date = Data Expedio
+                 z01_identorgao = varchar(50) = Orgo Emissor
                  z01_localtrabalho = varchar(100) = Local de Trabalho
                  z01_renda = float4 = Renda
                  z01_trabalha = bool = Trabalha
                  z01_pis = varchar(11) = Pis/Pasep/CI
-                 z01_obs = text = Observações
-                 z01_incmunici = int8 = Inscrição Municipal
+                 z01_obs = text = Observaes
+                 z01_incmunici = int8 = Inscrio Municipal
                  z01_notificaemail = bool = Notifica
-                 z01_ibge = char(7) = Código do IBGE
+                 z01_ibge = char(7) = Cdigo do IBGE
                  z01_naturezajuridica = char(4) = natureza juridica
+                 z01_anoobito = int4 = Ano do bito
+                 z01_produtorrural = char(1) = Produtor Rural
+                 z01_situacaocadastral = char(1) = Situao Cadastral
+                 z01_situacaoespecial = char(1) = Situao Cadastral
+                 z01_tipoestabelecimento = char(50) = Tipo Estabelecimento
                  ";
     //funcao construtor da classe
     function cl_cgm() {
@@ -218,6 +241,7 @@ class cl_cgm {
             $this->z01_numero = ($this->z01_numero == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_numero"]:$this->z01_numero);
             $this->z01_compl = ($this->z01_compl == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_compl"]:$this->z01_compl);
             $this->z01_bairro = ($this->z01_bairro == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_bairro"]:$this->z01_bairro);
+            $this->z01_bairro = substr($this->z01_bairro, 0, 39);
             $this->z01_munic = ($this->z01_munic == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_munic"]:$this->z01_munic);
             $this->z01_uf = ($this->z01_uf == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_uf"]:$this->z01_uf);
             $this->z01_cep = ($this->z01_cep == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_cep"]:$this->z01_cep);
@@ -231,6 +255,24 @@ class cl_cgm {
                     $this->z01_cadast = $this->z01_cadast_ano."-".$this->z01_cadast_mes."-".$this->z01_cadast_dia;
                 }
             }
+            if($this->z01_dtabertura == ""){
+                $this->z01_dtabertura_dia = ($this->z01_dtabertura_dia == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_dtabertura_dia"]:$this->z01_dtabertura_dia);
+                $this->z01_dtabertura_mes = ($this->z01_dtabertura_mes == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_dtabertura_mes"]:$this->z01_dtabertura_mes);
+                $this->z01_dtabertura_ano = ($this->z01_dtabertura_ano == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_dtabertura_ano"]:$this->z01_dtabertura_ano);
+                if($this->z01_dtabertura_dia != ""){
+                    $this->z01_dtabertura = $this->z01_dtabertura_ano."-".$this->z01_dtabertura_mes."-".$this->z01_dtabertura_dia;
+                }
+            }
+
+            if($this->z01_datasituacaoespecial == ""){
+                $this->z01_datasituacaoespecial_dia = ($this->z01_datasituacaoespecial_dia == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_datasituacaoespecial_dia"]:$this->z01_datasituacaoespecial_dia);
+                $this->z01_datasituacaoespecial_mes = ($this->z01_datasituacaoespecial_mes == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_datasituacaoespecial_mes"]:$this->z01_datasituacaoespecial_mes);
+                $this->z01_datasituacaoespecial_ano = ($this->z01_datasituacaoespecial_ano == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_datasituacaoespecial_ano"]:$this->z01_datasituacaoespecial_ano);
+                if($this->z01_datasituacaoespecial_dia != ""){
+                    $this->z01_datasituacaoespecial = $this->z01_datasituacaoespecial_ano."-".$this->z01_datasituacaoespecial_mes."-".$this->z01_datasituacaoespecial_dia;
+                }
+            }
+            
             $this->z01_telef = ($this->z01_telef == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_telef"]:$this->z01_telef);
             $this->z01_ident = ($this->z01_ident == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_ident"]:$this->z01_ident);
             $this->z01_login = ($this->z01_login == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_login"]:$this->z01_login);
@@ -330,6 +372,10 @@ class cl_cgm {
             $this->z01_incmunici = ($this->z01_incmunici == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_incmunici"]:$this->z01_incmunici);
             $this->z01_ibge = ($this->z01_ibge == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_ibge"]:$this->z01_ibge);
             $this->z01_naturezajuridica = ($this->z01_naturezajuridica == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_naturezajuridica"]:$this->z01_naturezajuridica);
+            $this->z01_anoobito = ($this->z01_anoobito == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_anoobito"]:$this->z01_anoobito);
+            $this->z01_produtorrural = ($this->z01_produtorrural == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_produtorrural"]:$this->z01_produtorrural);
+            $this->z01_situacaocadastral = ($this->z01_situacaocadastral == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_situacaocadastral"]:$this->z01_situacaocadastral);
+            $this->z01_situacaoespecial = ($this->z01_situacaoespecial == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_situacaoespecial"]:$this->z01_situacaoespecial);
         }else{
             $this->z01_numcgm = ($this->z01_numcgm == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_numcgm"]:$this->z01_numcgm);
         }
@@ -338,19 +384,19 @@ class cl_cgm {
     function incluir ($z01_numcgm){
         $this->atualizacampos();
         if($this->z01_nome == null ){
-            $this->erro_sql = " Campo Nome/Razão Social não Informado.";
+            $this->erro_sql = " Campo Nome/Razo Social no Informado.";
             $this->erro_campo = "z01_nome";
             $this->erro_banco = "";
-            $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+            $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
             $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
             $this->erro_status = "0";
             return false;
         }
         if($this->z01_ender == null ){
-            $this->erro_sql = " Campo Endereço não Informado.";
+            $this->erro_sql = " Campo Endereo no Informado.";
             $this->erro_campo = "z01_ender";
             $this->erro_banco = "";
-            $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+            $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
             $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
             $this->erro_status = "0";
             return false;
@@ -360,6 +406,12 @@ class cl_cgm {
         }
         if($this->z01_cadast == null ){
             $this->z01_cadast = "null";
+        }
+        if($this->z01_dtabertura == null ){
+            $this->z01_dtabertura = "null";
+        }
+        if($this->z01_datasituacaoespecial == null ){
+            $this->z01_datasituacaoespecial = "null";
         }
         if($this->z01_login == null ){
             $this->z01_login = "0";
@@ -409,9 +461,23 @@ class cl_cgm {
         if($this->z01_ibge == null ){
             $this->z01_ibge = "null";
         }
-
-        if($this->z01_notificaemail == null ){
-            $this->z01_notificaemail = "t";
+        
+        if ($this->z01_anoobito == null) {
+            $this->z01_anoobito = "null";
+        }
+        
+        if ($this->z01_optantemei == null) {
+            $this->z01_optantemei = "null";
+        }
+        
+        if ($this->z01_optantesimples == null) {
+            $this->z01_optantesimples = "null";
+        }
+        if ($this->z01_porte == null) {
+            $this->z01_porte = "null";
+        }
+        if ($this->z01_tipoestabelecimento == null) {
+            $this->z01_tipoestabelecimento = "null";
         }
 
         if($z01_numcgm == "" || $z01_numcgm == null ){
@@ -419,7 +485,7 @@ class cl_cgm {
             if($result==false){
                 $this->erro_banco = str_replace("\n","",@pg_last_error());
                 $this->erro_sql   = "Verifique o cadastro da sequencia: cgm_z01_numcgm_seq do campo: z01_numcgm";
-                $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
                 $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
                 $this->erro_status = "0";
                 return false;
@@ -428,9 +494,9 @@ class cl_cgm {
         }else{
             $result = db_query("select last_value from cgm_z01_numcgm_seq");
             if(($result != false) && (pg_result($result,0,0) < $z01_numcgm)){
-                $this->erro_sql = " Campo z01_numcgm maior que último número da sequencia.";
-                $this->erro_banco = "Sequencia menor que este número.";
-                $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_sql = " Campo z01_numcgm maior que ltimo nmero da sequencia.";
+                $this->erro_banco = "Sequencia menor que este nmero.";
+                $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
                 $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
                 $this->erro_status = "0";
                 return false;
@@ -439,9 +505,9 @@ class cl_cgm {
             }
         }
         if(($this->z01_numcgm == null) || ($this->z01_numcgm == "") ){
-            $this->erro_sql = " Campo z01_numcgm não declarado.";
+            $this->erro_sql = " Campo z01_numcgm no declarado.";
             $this->erro_banco = "Chave Primaria zerada.";
-            $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+            $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
             $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
             $this->erro_status = "0";
             return false;
@@ -458,6 +524,8 @@ class cl_cgm {
                                       ,z01_cep
                                       ,z01_cxpostal
                                       ,z01_cadast
+                                      ,z01_dtabertura
+                                      ,z01_datasituacaoespecial
                                       ,z01_telef
                                       ,z01_ident
                                       ,z01_login
@@ -509,6 +577,14 @@ class cl_cgm {
                                       ,z01_notificaemail
                                       ,z01_ibge
                                       ,z01_naturezajuridica
+                                      ,z01_anoobito
+                                      ,z01_produtorrural
+                                      ,z01_situacaocadastral
+                                      ,z01_situacaoespecial
+                                      ,z01_tipoestabelecimento
+                                      ,z01_porte
+                                      ,z01_optantesimples
+                                      ,z01_optantemei
                        )
                 values (
                                 $this->z01_numcgm
@@ -522,6 +598,8 @@ class cl_cgm {
                                ,'$this->z01_cep'
                                ,'$this->z01_cxpostal'
                                ,".($this->z01_cadast == "null" || $this->z01_cadast == ""?"null":"'".$this->z01_cadast."'")."
+                               ,".($this->z01_dtabertura == "null" || $this->z01_dtabertura == ""?"null":"'".$this->z01_dtabertura."'")."
+                               ,".($this->z01_datasituacaoespecial == "null" || $this->z01_datasituacaoespecial == ""?"null":"'".$this->z01_datasituacaoespecial."'")."
                                ,'$this->z01_telef'
                                ,'$this->z01_ident'
                                ,$this->z01_login
@@ -573,19 +651,31 @@ class cl_cgm {
                                ,'$this->z01_notificaemail'
                                ,'$this->z01_ibge'
                                ,'$this->z01_naturezajuridica'
+                               ,$this->z01_anoobito
+                               ,'$this->z01_produtorrural'
+                               ,'$this->z01_situacaocadastral'
+                               ,'$this->z01_situacaoespecial'
+                               ,$this->z01_tipoestabelecimento
+                               ,$this->z01_porte
+                               ,$this->z01_optantesimples
+                               ,$this->z01_optantemei
                       )";
+
         $result = db_query($sql);
+        
         if($result==false){
             $this->erro_banco = str_replace("\n","",@pg_last_error());
             if( strpos(strtolower($this->erro_banco),"duplicate key") != 0 ){
-                $this->erro_sql   = "Cadastro Geral de Contribuinte ($this->z01_numcgm) não Incluído. Inclusao Abortada.";
-                $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-                $this->erro_banco = "Cadastro Geral de Contribuinte já Cadastrado";
-                $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+                $this->erro_sql   = "Cadastro Geral de Contribuinte ($this->z01_numcgm) no Includo. Inclusao Abortada.";
+                $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_banco = "Cadastro Geral de Contribuinte j Cadastrado";
+                // $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+                $this->erro_msg   .=  $sql;
             }else{
-                $this->erro_sql   = "Cadastro Geral de Contribuinte ($this->z01_numcgm) não Incluído. Inclusao Abortada.";
-                $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-                $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+                $this->erro_sql   = "Cadastro Geral de Contribuinte ($this->z01_numcgm) no Includo. Inclusao Abortada.";
+                $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
+                // $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+                $this->erro_msg   .=  $sql;
             }
             $this->erro_status = "0";
             $this->numrows_incluir= 0;
@@ -594,7 +684,7 @@ class cl_cgm {
         $this->erro_banco = "";
         $this->erro_sql = "Inclusao efetuada com Sucesso\\n";
         $this->erro_sql .= "Valores : ".$this->z01_numcgm;
-        $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+        $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
         $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
         $this->erro_status = "1";
         $this->numrows_incluir= pg_affected_rows($result);
@@ -681,10 +771,10 @@ class cl_cgm {
             $sql  .= $virgula." z01_numcgm = $this->z01_numcgm ";
             $virgula = ",";
             if(trim($this->z01_numcgm) == null ){
-                $this->erro_sql = " Campo Numcgm não Informado.";
+                $this->erro_sql = " Campo Numcgm no Informado.";
                 $this->erro_campo = "z01_numcgm";
                 $this->erro_banco = "";
-                $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
                 $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
                 $this->erro_status = "0";
                 return false;
@@ -694,10 +784,10 @@ class cl_cgm {
             $sql  .= $virgula." z01_nome = '$this->z01_nome' ";
             $virgula = ",";
             if(trim($this->z01_nome) == null ){
-                $this->erro_sql = " Campo Nome/Razão Social não Informado.";
+                $this->erro_sql = " Campo Nome/Razo Social no Informado.";
                 $this->erro_campo = "z01_nome";
                 $this->erro_banco = "";
-                $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
                 $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
                 $this->erro_status = "0";
                 return false;
@@ -707,10 +797,10 @@ class cl_cgm {
             $sql  .= $virgula." z01_ender = '$this->z01_ender' ";
             $virgula = ",";
             if(trim($this->z01_ender) == null ){
-                $this->erro_sql = " Campo Endereço não Informado.";
+                $this->erro_sql = " Campo Endereo no Informado.";
                 $this->erro_campo = "z01_ender";
                 $this->erro_banco = "";
-                $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
                 $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
                 $this->erro_status = "0";
                 return false;
@@ -753,6 +843,25 @@ class cl_cgm {
         }     else{
             if(isset($GLOBALS["HTTP_POST_VARS"]["z01_cadast_dia"])){
                 $sql  .= $virgula." z01_cadast = null ";
+                $virgula = ",";
+            }
+        }
+        if(trim($this->z01_dtabertura)!="" || isset($GLOBALS["HTTP_POST_VARS"]["z01_dtabertura_dia"]) &&  ($GLOBALS["HTTP_POST_VARS"]["z01_dtabertura_dia"] !="") ){
+            $sql  .= $virgula." z01_dtabertura = '$this->z01_dtabertura' ";
+            $virgula = ",";
+        }     else{
+            if(isset($GLOBALS["HTTP_POST_VARS"]["z01_dtabertura_dia"])){
+                $sql  .= $virgula." z01_dtabertura = null ";
+                $virgula = ",";
+            }
+        }
+
+        if(trim($this->z01_datasituacaoespecial)!="" || isset($GLOBALS["HTTP_POST_VARS"]["z01_datasituacaoespecial_dia"]) &&  ($GLOBALS["HTTP_POST_VARS"]["z01_datasituacaoespecial_dia"] !="") ){
+            $sql  .= $virgula." z01_datasituacaoespecial = '$this->z01_datasituacaoespecial' ";
+            $virgula = ",";
+        }     else{
+            if(isset($GLOBALS["HTTP_POST_VARS"]["z01_datasituacaoespecial_dia"])){
+                $sql  .= $virgula." z01_datasituacaoespecial = null ";
                 $virgula = ",";
             }
         }
@@ -1005,6 +1114,38 @@ class cl_cgm {
             $sql  .= $virgula." z01_naturezajuridica = '$this->z01_naturezajuridica' ";
             $virgula = ",";
         }
+        if(trim($this->z01_anoobito)!="" || isset($GLOBALS["HTTP_POST_VARS"]["z01_anoobito"])){
+            $sql  .= $virgula." z01_anoobito = $this->z01_anoobito ";
+            $virgula = ",";
+        }
+        if(trim($this->z01_produtorrural)!="" || isset($GLOBALS["HTTP_POST_VARS"]["z01_produtorrural"])){
+            $sql  .= $virgula." z01_produtorrural = '$this->z01_produtorrural' ";
+            $virgula = ",";
+        }
+        if(trim($this->z01_situacaocadastral)!="" || isset($GLOBALS["HTTP_POST_VARS"]["z01_situacaocadastral"])){
+            $sql  .= $virgula." z01_situacaocadastral = '$this->z01_situacaocadastral' ";
+            $virgula = ",";
+        }
+        if(trim($this->z01_situacaoespecial)!="" || isset($GLOBALS["HTTP_POST_VARS"]["z01_situacaoespecial"])){
+            $sql  .= $virgula." z01_situacaoespecial = '$this->z01_situacaoespecial' ";
+            $virgula = ",";
+        }
+        if(trim($this->z01_tipoestabelecimento)!="" || isset($GLOBALS["HTTP_POST_VARS"]["z01_tipoestabelecimento"])){
+            $sql  .= $virgula." z01_tipoestabelecimento = '$this->z01_tipoestabelecimento' ";
+            $virgula = ",";
+        }
+        if(trim($this->z01_porte)!="" || isset($GLOBALS["HTTP_POST_VARS"]["z01_porte"])){
+            $sql  .= $virgula." z01_porte = '$this->z01_porte' ";
+            $virgula = ",";
+        }
+        if(trim($this->z01_optantesimples)!="" || isset($GLOBALS["HTTP_POST_VARS"]["z01_optantesimples"])){
+            $sql  .= $virgula." z01_optantesimples = '$this->z01_optantesimples' ";
+            $virgula = ",";
+        }
+        if(trim($this->z01_optantemei)!="" || isset($GLOBALS["HTTP_POST_VARS"]["z01_optantemei"])){
+            $sql  .= $virgula." z01_optantemei = '$this->z01_optantemei' ";
+            $virgula = ",";
+        }
         if(trim($this->z01_incmunici)!="" || isset($GLOBALS["HTTP_POST_VARS"]["z01_incmunici"])){
             if(trim($this->z01_incmunici)=="" && isset($GLOBALS["HTTP_POST_VARS"]["z01_incmunici"])){
                 $this->z01_incmunici = "0" ;
@@ -1023,7 +1164,7 @@ class cl_cgm {
         $lSessaoDesativarAccount = db_getsession("DB_desativar_account", false);
         if (!isset($lSessaoDesativarAccount) || (isset($lSessaoDesativarAccount)
                 && ($lSessaoDesativarAccount === false))) {
-
+            
             $resaco = $this->sql_record($this->sql_query_file($this->z01_numcgm));
             if($this->numrows>0){
 
@@ -1158,9 +1299,9 @@ class cl_cgm {
         $result = db_query($sql);
         if($result==false){
             $this->erro_banco = str_replace("\n","",@pg_last_error());
-            $this->erro_sql   = "Cadastro Geral de Contribuinte não Alterado. Alteracao Abortada.\\n";
+            $this->erro_sql   = "Cadastro Geral de Contribuinte no Alterado. Alteracao Abortada.\\n";
             $this->erro_sql .= "Valores : ".$this->z01_numcgm;
-            $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+            $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
             $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
             $this->erro_status = "0";
             $this->numrows_alterar = 0;
@@ -1168,18 +1309,18 @@ class cl_cgm {
         }else{
             if(pg_affected_rows($result)==0){
                 $this->erro_banco = "";
-                $this->erro_sql = "Cadastro Geral de Contribuinte não foi Alterado. Alteracao Executada.\\n";
+                $this->erro_sql = "Cadastro Geral de Contribuinte no foi Alterado. Alteracao Executada.\\n";
                 $this->erro_sql .= "Valores : ".$this->z01_numcgm;
-                $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
                 $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
                 $this->erro_status = "1";
                 $this->numrows_alterar = 0;
                 return true;
             }else{
                 $this->erro_banco = "";
-                $this->erro_sql = "Alteração efetuada com Sucesso\\n";
+                $this->erro_sql = "Alterao efetuada com Sucesso\\n";
                 $this->erro_sql .= "Valores : ".$this->z01_numcgm;
-                $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
                 $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
                 $this->erro_status = "1";
                 $this->numrows_alterar = pg_affected_rows($result);
@@ -1286,9 +1427,9 @@ class cl_cgm {
         $result = db_query($sql.$sql2);
         if($result==false){
             $this->erro_banco = str_replace("\n","",@pg_last_error());
-            $this->erro_sql   = "Cadastro Geral de Contribuinte não Excluído. Exclusão Abortada.\\n";
+            $this->erro_sql   = "Cadastro Geral de Contribuinte no Excludo. Excluso Abortada.\\n";
             $this->erro_sql .= "Valores : ".$z01_numcgm;
-            $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+            $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
             $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
             $this->erro_status = "0";
             $this->numrows_excluir = 0;
@@ -1296,18 +1437,18 @@ class cl_cgm {
         }else{
             if(pg_affected_rows($result)==0){
                 $this->erro_banco = "";
-                $this->erro_sql = "Cadastro Geral de Contribuinte não Encontrado. Exclusão não Efetuada.\\n";
+                $this->erro_sql = "Cadastro Geral de Contribuinte no Encontrado. Excluso no Efetuada.\\n";
                 $this->erro_sql .= "Valores : ".$z01_numcgm;
-                $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
                 $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
                 $this->erro_status = "1";
                 $this->numrows_excluir = 0;
                 return true;
             }else{
                 $this->erro_banco = "";
-                $this->erro_sql = "Exclusão efetuada com Sucesso\\n";
+                $this->erro_sql = "Excluso efetuada com Sucesso\\n";
                 $this->erro_sql .= "Valores : ".$z01_numcgm;
-                $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
                 $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
                 $this->erro_status = "1";
                 $this->numrows_excluir = pg_affected_rows($result);
@@ -1315,6 +1456,7 @@ class cl_cgm {
             }
         }
     }
+    
     // funcao do recordset
     function sql_record($sql) {
         $result = db_query($sql);
@@ -1322,7 +1464,7 @@ class cl_cgm {
             $this->numrows    = 0;
             $this->erro_banco = str_replace("\n","",@pg_last_error());
             $this->erro_sql   = "Erro ao selecionar os registros.";
-            $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+            $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
             $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
             $this->erro_status = "0";
             return false;
@@ -1331,7 +1473,7 @@ class cl_cgm {
         if($this->numrows==0){
             $this->erro_banco = "";
             $this->erro_sql   = "Record Vazio na Tabela:cgm";
-            $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+            $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
             $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
             $this->erro_status = "0";
             return false;
@@ -1352,6 +1494,8 @@ class cl_cgm {
             $sql .= $campos;
         }
         $sql .= " from cgm left join issbase on z01_numcgm = q02_numcgm ";
+        $sql .= " LEFT JOIN cgmendereco ON z07_numcgm = z01_numcgm AND z07_tipo = 'P' ";
+        $sql .= " LEFT JOIN endereco ON z07_endereco = db76_sequencial ";
         $sql2 = "";
         if($dbwhere==""){
             if($z01_numcgm!=null ){
@@ -1437,6 +1581,67 @@ class cl_cgm {
                 $virgula = ",";
             }
         }
+        return $sql;
+    }
+    function sql_query_ordenador( $z01_numcgm=null,$ordem=null,$dbwhere=""){
+        $sql = "select * ";
+        $sql .= " from (
+                        select
+                            0 as o41_cgmordenador,
+                            'SELECIONE' as o41_nomeordenador,
+                            0 as sort_order
+                        union all
+                        select
+                            z01_numcgm as o41_cgmordenador,
+                            z01_nome as o41_nomeordenador,
+                            1 as sort_order
+                        from
+                            cgm ";
+        $sql2 = "";
+        if($dbwhere == ""){
+            if($z01_numcgm!=null ){
+                $sql2 .= " where cgm.z01_numcgm = $z01_numcgm ";
+            }
+        }else if($dbwhere != ""){
+            $sql2 = " where $dbwhere ";
+        }
+        $sql2 .= " ) as combined_results";
+        $sql .= $sql2;
+        if($ordem != null ){
+            $sql .= " order by ";
+            $campos_sql = explode("#",$ordem);
+            $virgula = "";
+            for($i=0;$i<sizeof($campos_sql);$i++){
+                $sql .= $virgula.$campos_sql[$i];
+                $virgula = ",";
+            }
+        }
+
+        return $sql;
+    }
+    function sql_buscar_ordenador( $z01_numcgm=null,$ordem=null,$dbwhere=""){
+        $sql = "select z01_numcgm as o41_cgmordenador,  z01_nome as o41_nomeordenador";
+        $sql .= " from cgm ";
+        $sql2 = "";
+        if($dbwhere == ""){
+            if($z01_numcgm!=null ){
+                $sql2 .= " where cgm.z01_numcgm = $z01_numcgm ";
+            }
+        }else if($dbwhere != ""){
+            $sql2 = " where $dbwhere ";
+        }
+
+        $sql .= $sql2;
+        if($ordem != null ){
+            $sql .= " order by ";
+            $campos_sql = explode("#",$ordem);
+            $virgula = "";
+            for($i=0;$i<sizeof($campos_sql);$i++){
+                $sql .= $virgula.$campos_sql[$i];
+                $virgula = ",";
+            }
+        }
+
         return $sql;
     }
     function sql_query_cpf ( $z01_numcgm=null,$campos="*",$ordem=null,$dbwhere=""){
@@ -1749,10 +1954,10 @@ class cl_cgm {
             $sql  .= $virgula." z01_numcgm = $this->z01_numcgm ";
             $virgula = ",";
             if(trim($this->z01_numcgm) == null ){
-                $this->erro_sql = " Campo Numcgm não Informado.";
+                $this->erro_sql = " Campo Numcgm no Informado.";
                 $this->erro_campo = "z01_numcgm";
                 $this->erro_banco = "";
-                $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
                 $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
                 $this->erro_status = "0";
                 return false;
@@ -1763,10 +1968,10 @@ class cl_cgm {
             $sql  .= $virgula." z01_nome = '$this->z01_nome' ";
             $virgula = ",";
             if(trim($this->z01_nome) == null ){
-                $this->erro_sql = " Campo Nome/Razão Social não Informado.";
+                $this->erro_sql = " Campo Nome/Razo Social no Informado.";
                 $this->erro_campo = "z01_nome";
                 $this->erro_banco = "";
-                $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
                 $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
                 $this->erro_status = "0";
                 return false;
@@ -1776,10 +1981,10 @@ class cl_cgm {
             $sql  .= $virgula." z01_ender = '$this->z01_ender' ";
             $virgula = ",";
             if(trim($this->z01_ender) == null ){
-                $this->erro_sql = " Campo Endereço não Informado.";
+                $this->erro_sql = " Campo Endereo no Informado.";
                 $this->erro_campo = "z01_ender";
                 $this->erro_banco = "";
-                $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
                 $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
                 $this->erro_status = "0";
                 return false;
@@ -1822,6 +2027,26 @@ class cl_cgm {
         }     else{
             if(isset($GLOBALS["HTTP_POST_VARS"]["z01_cadast_dia"])){
                 $sql  .= $virgula." z01_cadast = null ";
+                $virgula = ",";
+            }
+        }
+  
+        if(trim($this->z01_dtabertura)!="" ){
+            $sql  .= $virgula." z01_dtabertura = '$this->z01_dtabertura' ";
+            $virgula = ",";
+        }     else{
+            if(isset($GLOBALS["HTTP_POST_VARS"]["z01_dtabetura_dia"])){
+                $sql  .= $virgula." z01_dtabetura = null ";
+                $virgula = ",";
+            }
+        }
+        
+        if(trim($this->z01_datasituacaoespecial)!="" ){
+            $sql  .= $virgula." z01_datasituacaoespecial = '$this->z01_datasituacaoespecial' ";
+            $virgula = ",";
+        }     else{
+            if(isset($GLOBALS["HTTP_POST_VARS"]["z01_datasituacaoespecial_dia"])){
+                $sql  .= $virgula." z01_datasituacaoespecial = null ";
                 $virgula = ",";
             }
         }
@@ -1888,6 +2113,11 @@ class cl_cgm {
 
         $sql  .= $virgula." z01_emailc = '$this->z01_emailc' ";
         $virgula = ",";
+
+        if (trim($this->z01_anoobito) != "") {
+            $sql .= $virgula . " z01_anoobito = $this->z01_anoobito ";
+            $virgula = ",";
+        }
 
         if(trim($this->z01_nacion)!="" ){
             if(trim($this->z01_nacion)=="" ){
@@ -2020,15 +2250,54 @@ class cl_cgm {
             $sql  .= $virgula." z01_incmunici = '$this->z01_incmunici' ";
             $virgula = ",";
         }
-        if(trim($this->z01_notificaemail) != ""){
+
+        if(trim($this->z01_notificaemail) != "" || isset($GLOBALS["HTTP_POST_VARS"]["z01_notificaemail"])){
             $sql  .= $virgula." z01_notificaemail = '$this->z01_notificaemail' ";
             $virgula = ",";
         }
+        
+        if (trim($this->z01_produtorrural) != "" || isset($GLOBALS["HTTP_POST_VARS"]["z01_produtorrural"])) {
+            $sql  .= $virgula." z01_produtorrural = '$this->z01_produtorrural' ";
+            $virgula = ",";
+        }
+        
+        if (trim($this->z01_situacaocadastral) != "" || isset($GLOBALS["HTTP_POST_VARS"]["z01_situacaocadastral"])) {
+            $sql  .= $virgula." z01_situacaocadastral = '$this->z01_situacaocadastral' ";
+            $virgula = ",";
+        }
+        
+        if (trim($this->z01_situacaoespecial) != "" || isset($GLOBALS["HTTP_POST_VARS"]["z01_situacaoespecial"])) {
+            $sql  .= $virgula." z01_situacaoespecial = '$this->z01_situacaoespecial' ";
+            $virgula = ",";
+        }
+        
+        if (trim($this->z01_tipoestabelecimento) != "" || isset($GLOBALS["HTTP_POST_VARS"]["z01_tipoestabelecimento"])) {
+            $sql  .= $virgula." z01_tipoestabelecimento = '$this->z01_tipoestabelecimento' ";
+            $virgula = ",";
+        }
+        
+        if (trim($this->z01_porte) != "" || isset($GLOBALS["HTTP_POST_VARS"]["z01_porte"])) {
+            $sql  .= $virgula." z01_porte = '$this->z01_porte' ";
+            $virgula = ",";
+        }
+        
+        if (trim($this->z01_optantesimples) != "" || isset($GLOBALS["HTTP_POST_VARS"]["z01_optantesimples"])) {
+            $sql  .= $virgula." z01_optantesimples = '$this->z01_optantesimples' ";
+            $virgula = ",";
+        }        
+
+        if (trim($this->z01_optantemei) != "" || isset($GLOBALS["HTTP_POST_VARS"]["z01_optantemei"])) {
+            $sql  .= $virgula." z01_optantemei = '$this->z01_optantemei' ";
+            $virgula = ",";
+        }
+
         $sql .= " where ";
         if($z01_numcgm!=null){
             $sql .= " z01_numcgm = $this->z01_numcgm";
         }
+
         $resaco = $this->sql_record($this->sql_query_file($this->z01_numcgm));
+
         if($this->numrows>0){
             for($conresaco=0;$conresaco<$this->numrows;$conresaco++){
                 $resac = db_query("select nextval('db_acount_id_acount_seq') as acount");
@@ -2137,12 +2406,13 @@ class cl_cgm {
                     $resac = db_query("insert into db_acount values($acount,42,18201,'".AddSlashes(pg_result($resaco,$conresaco,'z01_obs'))."','$this->z01_obs',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
             }
         }
+
         $result = db_query($sql);
         if($result==false){
             $this->erro_banco = str_replace("\n","",@pg_last_error());
-            $this->erro_sql   = "Cadastro Geral de Contribuinte não Alterado. Alteracao Abortada.\\n";
+            $this->erro_sql   = "Cadastro Geral de Contribuinte no Alterado. Alteracao Abortada.\\n";
             $this->erro_sql .= "Valores : ".$this->z01_numcgm;
-            $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+            $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
             $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
             $this->erro_status = "0";
             $this->numrows_alterar = 0;
@@ -2150,18 +2420,18 @@ class cl_cgm {
         }else{
             if(pg_affected_rows($result)==0){
                 $this->erro_banco = "";
-                $this->erro_sql = "Cadastro Geral de Contribuinte não foi Alterado. Alteracao Executada.\\n";
+                $this->erro_sql = "Cadastro Geral de Contribuinte no foi Alterado. Alteracao Executada.\\n";
                 $this->erro_sql .= "Valores : ".$this->z01_numcgm;
-                $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
                 $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
                 $this->erro_status = "1";
                 $this->numrows_alterar = 0;
                 return true;
             }else{
                 $this->erro_banco = "";
-                $this->erro_sql = "Alteração efetuada com Sucesso\\n";
+                $this->erro_sql = "Alterao efetuada com Sucesso\\n";
                 $this->erro_sql .= "Valores : ".$this->z01_numcgm;
-                $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
                 $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
                 $this->erro_status = "1";
                 $this->numrows_alterar = pg_affected_rows($result);
@@ -2169,5 +2439,54 @@ class cl_cgm {
             }
         }
     }
+
+      // funcao para exclusao
+      function excluirCnaes($z01_numcgm=null,$dbwhere=null) {
+        $sql = " delete from cgmcnae
+                    where ";
+        $sql2 = "";
+        if($dbwhere==null || $dbwhere ==""){
+            if($z01_numcgm != ""){
+                if($sql2!=""){
+                    $sql2 .= " and ";
+                }
+                $sql2 .= " z16_numcgm = $z01_numcgm ";
+            }
+        }else{
+            $sql2 = $dbwhere;
+        }
+        $result = db_query($sql.$sql2);
+        if($result==false){
+            $this->erro_banco = str_replace("\n","",@pg_last_error());
+            $this->erro_sql   = "Cadastro do CNAES Geral de Contribuinte no Excludo. Excluso Abortada.\\n";
+            $this->erro_sql .= "Valores : ".$z01_numcgm;
+            $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
+            $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+            $this->erro_status = "0";
+            $this->numrows_excluir = 0;
+            return false;
+        }else{
+            if(pg_affected_rows($result)==0){
+                $this->erro_banco = "";
+                $this->erro_sql = "Cadastro dos CNAES Geral de Contribuinte no Encontrado. Excluso no Efetuada.\\n";
+                $this->erro_sql .= "Valores : ".$z01_numcgm;
+                $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+                $this->erro_status = "1";
+                $this->numrows_excluir = 0;
+                return true;
+            }else{
+                $this->erro_banco = "";
+                $this->erro_sql = "Excluso efetuada com Sucesso\\n";
+                $this->erro_sql .= "Valores : ".$z01_numcgm;
+                $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+                $this->erro_status = "1";
+                $this->numrows_excluir = pg_affected_rows($result);
+                return true;
+            }
+        }
+    }
+
 }
 ?>

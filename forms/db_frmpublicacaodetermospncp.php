@@ -13,7 +13,8 @@ db_app::load("estilos.css, grid.style.css");
                 <select name="tipo" id="tipo" style="width: 91px;" onchange="js_verificatipo();">
                     <option value="0">Selecione</option>
                     <option value="1">Inclusão</option>
-                    <option value="2">Exclusão</option>
+                    <option value="2">Retificação</option>
+                    <option value="3">Exclusão</option>
                 </select>
             </td>
         </tr>
@@ -33,9 +34,16 @@ db_app::load("estilos.css, grid.style.css");
             </td>
         </tr>
     </table>
-    </br>
-    <input type="button" value="Processar" onclick="js_getTermos();">
-    </br>
+
+    <div style="width: 100%; display: flex; justify-content: center;">
+        <?php $component->render('buttons/solid', [
+            'designButton' => 'success',
+            'type' => 'button',
+            'onclick' => "js_getTermos()",
+            'message' => 'Processar',
+            'size' => 'md'
+        ]); ?>
+    </div>
 
     <table style="width: 100%">
         <tr>
@@ -52,9 +60,52 @@ db_app::load("estilos.css, grid.style.css");
         <div id='cntgriditens'></div>
     </fieldset>
     </br>
-    <input type="button" value="Enviar para PNCP" onclick="js_enviarTermo();">
+
+    <div style="width: 100%; display: flex; justify-content: center;">
+        <?php $component->render('buttons/solid', [
+            'designButton' => 'success',
+            'type' => 'button',
+            'onclick' => "js_clickSendPNCP()",
+            'message' => 'Enviar para PNCP',
+            'size' => 'md'
+        ]); ?>
+    </div>
 </form>
-<script>
+
+<?php $component->render('modais/simpleModal/startModal', [
+    'title' => 'Justificativa para o PNCP',
+    'id' => 'justificativaModal',
+    'size' => 'lg'
+], true); ?>
+
+    <?php db_textarea('justificativapncp', 10, 48, false, true, 'text', $db_opcao, "", "", "justificativapncp", "255"); ?>
+       
+    <div style="width: 100%; display: flex; justify-content: center;">
+        <?php $component->render('buttons/solid', [
+            'designButton' => 'success',
+            'onclick' => 'js_enviarTermo();',
+            'message' => 'Salvar justificativa PNCP',
+            'size' => 'md'
+        ]); ?>
+    </div>
+<?php $component->render('modais/simpleModal/endModal', [], true); ?>
+
+<style>
+  #justificativapncp {
+    width: 100%;
+    margin-bottom: 7px;
+    font-size: 1rem;
+  }
+</style>
+
+<script type="text/javascript">
+    var form = document.getElementById('justificativaForm');
+
+    loadComponents([
+        'buttonsSolid',
+        'simpleModal'
+    ]);
+
     function js_showGrid() {
         let opcao = "<?= $db_opcao ?>";
         oGridItens = new DBGrid('gridItens');
@@ -169,6 +220,7 @@ db_app::load("estilos.css, grid.style.css");
 
     function js_enviarTermo() {
         var aTermo = oGridItens.getSelection("object");
+        let justificativa = document.getElementById('justificativapncp').value.trim();
 
         if (aTermo.length == 0) {
             alert('Nenhum item Selecionado');
@@ -180,25 +232,60 @@ db_app::load("estilos.css, grid.style.css");
         oParam.ambiente = $F('ambiente');
         oParam.aTermo = new Array();
         oParam.iContrato = $F('ac16_sequencial');
-        if (tipo == 1) {
-            oParam.exec = "enviarTermo";
-            for (var i = 0; i < aTermo.length; i++) {
-                with(aTermo[i]) {
-                    var iTermos = new Object();
-                    iTermos.codigo = Number(aCells[1].getValue());
-                    iTermos.numeroaditamento = Number(aCells[3].getValue());
-                    oParam.aTermo.push(iTermos);
+
+        switch (tipo) {
+            case '1':
+                oParam.exec = "enviarTermo";
+                for (var i = 0; i < aTermo.length; i++) {
+                    with(aTermo[i]) {
+                        var iTermos = new Object();
+                        iTermos.codigo = Number(aCells[1].getValue());
+                        iTermos.numeroaditamento = Number(aCells[3].getValue());
+                        oParam.aTermo.push(iTermos);
+                    }
                 }
-            }
-        } else {
-            oParam.exec = "excluirTermo";
-            for (var i = 0; i < aTermo.length; i++) {
-                with(aTermo[i]) {
-                    var iTermos = new Object();
-                    iTermos.codigotermo = Number(aCells[6].getValue());
-                    oParam.aTermo.push(iTermos);
+                break;
+
+            case '2':
+                oParam.exec = "retificarTermo";
+                oParam.justificativa = justificativa;
+
+                if (justificativa === '') {
+                    alert('A justificativa não pode estar vazia');
+                    return false;
                 }
-            }
+
+                for (var i = 0; i < aTermo.length; i++) {
+                    with(aTermo[i]) {
+                        var iTermos = new Object();
+                        iTermos.codigo = Number(aCells[1].getValue());
+                        iTermos.numeroaditamento = Number(aCells[3].getValue());
+                        iTermos.codigotermo = Number(aCells[6].getValue());
+                        oParam.aTermo.push(iTermos);
+                    }
+                }
+                break;
+
+            case '3':
+                oParam.exec = "excluirTermo";
+                oParam.justificativa = justificativa;
+                
+                if (justificativa === '') {
+                    alert('A justificativa não pode estar vazia');
+                    return false;
+                }
+
+                for (var i = 0; i < aTermo.length; i++) {
+                    with(aTermo[i]) {
+                        var iTermos = new Object();
+                        iTermos.codigotermo = Number(aCells[6].getValue());
+                        oParam.aTermo.push(iTermos);
+                    }
+                }
+                break;
+
+            default:
+                // Código a ser executado se nenhum dos casos acima for verdadeiro
         }
 
         js_divCarregando('Aguarde, Processando', 'msgBox');
@@ -212,6 +299,8 @@ db_app::load("estilos.css, grid.style.css");
     }
 
     function js_returnEnvPncp(oAjax) {
+        closeModal('justificativaModal');
+        clearModaFieldsRenderComponents();
         js_removeObj('msgBox');
         var oRetornoResultado = eval('(' + oAjax.responseText + ")");
         alert(oRetornoResultado.message.urlDecode());
@@ -220,6 +309,23 @@ db_app::load("estilos.css, grid.style.css");
 
     function js_verificatipo(){
         js_getTermos();
+    }
+
+    function js_clickSendPNCP() {
+
+        let tipo = $F('tipo');
+
+        if (tipo == 0) {
+            alert('Selecione um Tipo');
+            return false;
+        }
+
+        if (tipo != 1) {
+            openModal('justificativaModal');
+        } else {
+            js_enviarTermo();
+        }
+
     }
 
 </script>

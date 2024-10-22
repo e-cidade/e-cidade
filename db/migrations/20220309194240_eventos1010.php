@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Eventos1010 extends AbstractMigration
+class Eventos1010 extends PostgresMigration
 {
 
     public function up()
@@ -13,7 +13,7 @@ class Eventos1010 extends AbstractMigration
         UPDATE avaliacaopergunta
         SET db103_camposql = LOWER(db103_identificadorcampo)
         WHERE db103_avaliacaogrupopergunta = 3000217;
-        
+
 
         update avaliacao set db101_cargadados = 'SELECT rh27_rubric AS codigorubrica,
         rh27_instit AS instituicao,

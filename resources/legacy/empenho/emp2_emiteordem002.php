@@ -312,7 +312,7 @@ for ($i = 0; $i < $clpagordem->numrows; $i++) {
     $pdf1->dotacao          = $estrutural;
     $pdf1->outrasordens     = $outrasordens;
     $pdf1->recorddositens   = $resultitem;
-    $pdf1->ano                   = $e60_anousu;
+    $pdf1->ano              = $e60_anousu;
     $pdf1->linhasdositens   = pg_numrows($resultitem);
     $pdf1->elementoitem     = "o56_elemento";
     $pdf1->descr_elementoitem = "o56_descr";
@@ -346,12 +346,12 @@ for ($i = 0; $i < $clpagordem->numrows; $i++) {
     $pdf1->descr_projativ   = $o55_descr;
     $pdf1->recurso          = $o58_codigo;
     $pdf1->descr_recurso    = $o15_descr;
-    $pdf1->elemento            = $o56_elemento;
+    $pdf1->elemento         = $o56_elemento;
     $pdf1->descr_elemento   = $o56_descr;
 
 
     $pdf1->emissao      = db_formatar($e50_data, 'd');
-    $pdf1->texto             = $sLogin . '  -  ' . date("d-m-Y", $sDataUsu) . '    ' . db_hora($sDataUsu);
+    $pdf1->texto            = $sLogin . '  -  ' . date("d-m-Y", $sDataUsu) . '    ' . db_hora($sDataUsu);
 
     $pdf1->telef            = $z01_telef;
     $pdf1->fax              = $z01_fax;

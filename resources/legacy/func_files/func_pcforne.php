@@ -110,12 +110,21 @@ $lValidaRepr = isset($validaRepresentante);
       </td>
     </tr>
 
-    <?php if ($lValidaRepr) : ?>
+    <?php if (isset($infoValidacaoRepresentanteAcordo)) : ?>
+      <tr>
+        <td>
+          <p style="font-weight: bold;"><br>
+          Se o contratado que você procura não está disponível, verifique se este está cadastrado como fornecedor e, caso seja Pessoa Jurídica, se possui o(s) representante(s) legal(is).          </p>
+        </td>
+      </tr>
+    <?php endif; ?>
+
+    <?php if (isset($infoValidacaoRepresentante)) : ?>
       <tr>
         <td>
           <p style="font-weight: bold;"><br>
             Se o contratado que você procura não está disponível, verifique se este está
-            cadastrado como fornecedor e se possui representante legal informado.
+            cadastrado como fornecedor.
           </p>
         </td>
       </tr>

@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc16418Sicom extends AbstractMigration
+class Oc16418Sicom extends PostgresMigration
 {
     public function up()
     {
@@ -102,10 +102,10 @@ class Oc16418Sicom extends AbstractMigration
         "si234_instit" int8 NOT NULL DEFAULT 0,
         PRIMARY KEY ("si234_sequencial")
         );
- 
+
         COMMIT;
 
 SQL;
         $this->execute($sql);
-    } 
+    }
 }

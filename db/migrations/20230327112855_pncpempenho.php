@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Pncpempenho extends AbstractMigration
+class Pncpempenho extends PostgresMigration
 {
 
     public function up()

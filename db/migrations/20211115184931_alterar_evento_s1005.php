@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AlterarEventoS1005 extends AbstractMigration
+class AlterarEventoS1005 extends PostgresMigration
 {
 
     public function up()

@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc20080v3 extends AbstractMigration
+class Oc20080v3 extends PostgresMigration
 {
     public function up()
     {
@@ -22,24 +22,24 @@ class Oc20080v3 extends AbstractMigration
 
         INSERT INTO db_itensmenu VALUES ((select max(id_item) + 1 from db_itensmenu), 'Lançar Frequência', 'Menu Frequência', 'tra1_linhafrequencia001.php', 1, 1, 'Menu Frequência', 't');
 
-        INSERT INTO db_menu VALUES (32, (select max(id_item) from db_itensmenu), (select max(menusequencia)+1 from db_menu where id_item = 32 and modulo = 7147), 7147); 
+        INSERT INTO db_menu VALUES (32, (select max(id_item) from db_itensmenu), (select max(menusequencia)+1 from db_menu where id_item = 32 and modulo = 7147), 7147);
 
         INSERT INTO db_itensmenu VALUES ((select max(id_item) + 1 from db_itensmenu), 'Faturamento das Linhas', 'Menu Faturamento das Linhas', 'tra1_faturamentolinhas011.php', 1, 1, 'Menu Faturamento das Linhas', 't');
 
         INSERT INTO db_menu VALUES (30, (select max(id_item) from db_itensmenu), (select max(menusequencia)+1 from db_menu where id_item = 30 and modulo = 7147), 7147);
 
-        INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel) 
+        INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel)
                 VALUES ((SELECT max(codcam)+1 FROM db_syscampo), 'tre06_datalimite', 'date', 'Data limite', 0, 'Data limite', 1, FALSE, FALSE, FALSE, 1, 'text', 'Data limite,');
 
-        INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel) 
+        INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel)
                 VALUES ((SELECT max(codcam)+1 FROM db_syscampo), 'tre06_kmidaevolta', 'int8', 'KM Ida e Volta (Diário)', 0, 'KM Ida e Volta (Diário)', 1, FALSE, FALSE, FALSE, 1, 'text', 'KM Ida e Volta (Diário)');
 
-        INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel) 
+        INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel)
                 VALUES ((SELECT max(codcam)+1 FROM db_syscampo), 'tre06_valorkm', 'int8', 'Valor do KM', 0, 'Valor do KM', 1, FALSE, FALSE, FALSE, 1, 'text', 'Valor do KM');
-                
-        INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel) 
-                VALUES ((SELECT max(codcam)+1 FROM db_syscampo), 'tre06_numcgm', 'int8', 'CGM', 0, 'CGM', 1, FALSE, FALSE, FALSE, 1, 'text', 'CGM');        
-                
+
+        INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel)
+                VALUES ((SELECT max(codcam)+1 FROM db_syscampo), 'tre06_numcgm', 'int8', 'CGM', 0, 'CGM', 1, FALSE, FALSE, FALSE, 1, 'text', 'CGM');
+
         CREATE TABLE IF NOT EXISTS transporteescolar.linhafrequencia (
             tre13_sequencial int8 NOT NULL,
             tre13_linhatransporte int8 NOT NULL,
@@ -60,5 +60,5 @@ class Oc20080v3 extends AbstractMigration
 
 SQL;
         $this->execute($sql);
-    } 
+    }
 }

@@ -1465,7 +1465,7 @@ class agendaPagamento {
           $oMovimento->aContasVinculadas = $aContasVinculadas;
         }
         if ($lTrazfornecedor) {
-          $oMovimento->aContasFornecedor = $this->getContasFornecedor($oMovimento->z01_numcgm);
+          $oMovimento->aContasFornecedor = $this->getContasFornecedor($oMovimento->z01_numcgm, $oMovimento->e50_codord);
         }
         $aNotas[] = $oMovimento;
       }
@@ -1536,32 +1536,34 @@ class agendaPagamento {
    * @param  integer $iNumCgm cgm do fornecedor
    * @return array com as contas
    */
-  function getContasFornecedor($iNumCgm) {
+  function getContasFornecedor($iNumCgm, $iCodord = null) {
 
     $oDaoPcForne = db_utils::getDao("pcfornecon");
     $iAnoUsu     = db_getsession("DB_anousu");
-    $sSqlConta   = $oDaoPcForne->sql_query_lefpadrao(null,
-      "
-                                                      pc63_agencia,
-                                                      pc63_agencia_dig,
-                                                      pc63_banco,
-                                                      pc63_conta,
-                                                      pc63_conta_dig,
-                                                      pc63_contabanco,
-                                                      (select e98_contabanco
-                                                         from empempenho
-                                                              inner join empagemov on empempenho.e60_numemp = empagemov.e81_numemp
-                                                              inner join empagemovconta on e98_codmov = e81_codmov
-                                                         where  empempenho.e60_numcgm = pc63_numcgm
-                                                            and e60_anousu = {$iAnoUsu}
-                                                         order by e60_numemp desc limit 1) as conta_historico_fornecedor,
-                                                     case when
-                                                       pc64_contabanco is not null
-                                                         then true
-                                                       else false
-                                                       end as padrao,
-                                                     pc63_dataconf
-                                                      ",'',"pc63_numcgm={$iNumCgm}");
+    $sCampos = "
+    pc63_agencia,
+    pc63_agencia_dig,
+    pc63_banco,
+    pc63_conta,
+    pc63_conta_dig,
+    pc63_contabanco,
+    (select e98_contabanco
+      from empempenho
+      inner join empagemov on empempenho.e60_numemp = empagemov.e81_numemp
+      inner join empagemovconta on e98_codmov = e81_codmov
+      where empempenho.e60_numcgm = pc63_numcgm and e60_anousu = {$iAnoUsu}
+      order by e60_numemp desc limit 1) as conta_historico_fornecedor,
+    case 
+      when pc64_contabanco is not null then true
+      else false
+    end as padrao,
+    pc63_dataconf";
+
+    if ($iCodord != null) {
+      $sCampos .= ", (select e50_contafornecedor from pagordem where e50_codord = {$iCodord}) as conta_fornecedor ";
+    }
+
+    $sSqlConta = $oDaoPcForne->sql_query_lefpadrao(null, $sCampos, '', "pc63_numcgm={$iNumCgm}");
 
     $rsContas  = $oDaoPcForne->sql_record($sSqlConta);
     if ($oDaoPcForne->numrows > 0) {

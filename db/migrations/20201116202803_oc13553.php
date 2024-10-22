@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc13553 extends AbstractMigration
+class Oc13553 extends PostgresMigration
 {
     public function up(){
 		$sql = "
@@ -43,16 +43,16 @@ class Oc13553 extends AbstractMigration
 					si83_mes bigint DEFAULT 0 NOT NULL,
 					si83_instit bigint DEFAULT 0
 				);
-			
-			
+
+
 			CREATE SEQUENCE sicom2021.contratos102021_si83_sequencial_seq
 			START WITH 1
 			INCREMENT BY 1
 			NO MINVALUE
 			NO MAXVALUE
 			CACHE 1;
-			
-			
+
+
 			CREATE TABLE sicom2021.contratos112021 (
 				si84_sequencial bigint DEFAULT 0 NOT NULL,
 				si84_tiporegistro bigint DEFAULT 0 NOT NULL,
@@ -69,16 +69,16 @@ class Oc13553 extends AbstractMigration
 				si84_reg10 bigint DEFAULT 0 NOT NULL,
 				si84_instit bigint DEFAULT 0
 			);
-			
-			
+
+
 			CREATE SEQUENCE sicom2021.contratos112021_si84_sequencial_seq
 			START WITH 1
 			INCREMENT BY 1
 			NO MINVALUE
 			NO MAXVALUE
 			CACHE 1;
-			
-			
+
+
 			CREATE TABLE sicom2021.contratos122021 (
 				si85_sequencial bigint DEFAULT 0 NOT NULL,
 				si85_tiporegistro bigint DEFAULT 0 NOT NULL,
@@ -97,14 +97,14 @@ class Oc13553 extends AbstractMigration
 				si85_reg10 bigint DEFAULT 0 NOT NULL,
 				si85_instit bigint DEFAULT 0
 			);
-			
+
 			CREATE SEQUENCE sicom2021.contratos122021_si85_sequencial_seq
 			START WITH 1
 			INCREMENT BY 1
 			NO MINVALUE
 			NO MAXVALUE
 			CACHE 1;
-			
+
 			CREATE TABLE sicom2021.contratos132021 (
 				si86_sequencial bigint DEFAULT 0 NOT NULL,
 				si86_tiporegistro bigint DEFAULT 0 NOT NULL,
@@ -116,16 +116,16 @@ class Oc13553 extends AbstractMigration
 				si86_reg10 bigint DEFAULT 0 NOT NULL,
 				si86_instit bigint DEFAULT 0
 			);
-			
-			
+
+
 			CREATE SEQUENCE sicom2021.contratos132021_si86_sequencial_seq
 			START WITH 1
 			INCREMENT BY 1
 			NO MINVALUE
 			NO MAXVALUE
 			CACHE 1;
-			
-			
+
+
 			CREATE TABLE sicom2021.contratos202021 (
 				si87_sequencial bigint DEFAULT 0 NOT NULL,
 				si87_tiporegistro bigint DEFAULT 0 NOT NULL,
@@ -146,16 +146,16 @@ class Oc13553 extends AbstractMigration
 				si87_mes bigint DEFAULT 0 NOT NULL,
 				si87_instit bigint DEFAULT 0
 			);
-			
-			
+
+
 			CREATE SEQUENCE sicom2021.contratos202021_si87_sequencial_seq
 			START WITH 1
 			INCREMENT BY 1
 			NO MINVALUE
 			NO MAXVALUE
 			CACHE 1;
-			
-			
+
+
 			CREATE TABLE sicom2021.contratos212021 (
 				si88_sequencial bigint DEFAULT 0 NOT NULL,
 				si88_tiporegistro bigint DEFAULT 0 NOT NULL,
@@ -173,16 +173,16 @@ class Oc13553 extends AbstractMigration
 				si88_reg20 bigint DEFAULT 0 NOT NULL,
 				si88_instit bigint DEFAULT 0
 			);
-			
-			
+
+
 			CREATE SEQUENCE sicom2021.contratos212021_si88_sequencial_seq
 			START WITH 1
 			INCREMENT BY 1
 			NO MINVALUE
 			NO MAXVALUE
 			CACHE 1;
-			
-			
+
+
 			CREATE TABLE sicom2021.contratos302021 (
 				si89_sequencial bigint DEFAULT 0 NOT NULL,
 				si89_tiporegistro bigint DEFAULT 0 NOT NULL,
@@ -199,15 +199,15 @@ class Oc13553 extends AbstractMigration
 				si89_mes bigint DEFAULT 0 NOT NULL,
 				si89_instit bigint DEFAULT 0
 			);
-			
+
 			CREATE SEQUENCE sicom2021.contratos302021_si89_sequencial_seq
 			START WITH 1
 			INCREMENT BY 1
 			NO MINVALUE
 			NO MAXVALUE
 			CACHE 1;
-			
-			
+
+
 			CREATE TABLE sicom2021.contratos402021 (
 				si91_sequencial bigint DEFAULT 0 NOT NULL,
 				si91_tiporegistro bigint DEFAULT 0 NOT NULL,
@@ -220,15 +220,15 @@ class Oc13553 extends AbstractMigration
 				si91_mes bigint DEFAULT 0 NOT NULL,
 				si91_instit bigint DEFAULT 0
 			);
-			
+
 			CREATE SEQUENCE sicom2021.contratos402021_si91_sequencial_seq
 			START WITH 1
 			INCREMENT BY 1
 			NO MINVALUE
 			NO MAXVALUE
 			CACHE 1;
-			
-					
+
+
 
 		";
 //		$this->execute($sql);

@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc18547 extends AbstractMigration
+class Oc18547 extends PostgresMigration
 {
 
     public function up()
@@ -11,7 +11,7 @@ class Oc18547 extends AbstractMigration
 
         INSERT INTO db_itensmenu VALUES((select max(id_item)+1 from db_itensmenu),'Ata de Registro de Preço','Ata de Registro de Preço','',1,1,'Ata de Registro de Preço','t');
         INSERT INTO db_menu VALUES(1818,(select max(id_item) from db_itensmenu),7,381);
-        
+
         INSERT INTO db_itensmenu values ((select max(id_item)+1 from db_itensmenu),'Inclusão','Inclusão','lic1_licatareg002.php',1,1,'Inclusão','t');
         INSERT INTO db_menu VALUES((select id_item from db_itensmenu where descricao like'%Ata de Registro%'),(select max(id_item) from db_itensmenu),1,381);
 
@@ -62,7 +62,7 @@ class Oc18547 extends AbstractMigration
             l221_datafinal		 date NOT NULL,
             l221_datapublica		 date,
             l221_veiculopublica		 text);
-        
+
         ALTER TABLE licatareg ADD PRIMARY KEY (l221_sequencial);
 
         ALTER TABLE licatareg ADD CONSTRAINT licatareg_liclicita_fk

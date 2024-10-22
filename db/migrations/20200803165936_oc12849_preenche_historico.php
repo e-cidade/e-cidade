@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc12849PreencheHistorico extends AbstractMigration
+class Oc12849PreencheHistorico extends PostgresMigration
 {
     public function up(){
 		$sql = "
@@ -22,17 +22,17 @@ class Oc12849PreencheHistorico extends AbstractMigration
 			BEGIN
 				FOR r IN SELECT * FROM preencheHistorico
 				LOOP
-			
+
 					INSERT INTO historicocgm(z09_sequencial, z09_numcgm, z09_datacadastro) (select DISTINCT (select nextval('historicocgm_z09_sequencial_seq')) as sequencial, r.numcgm, r.cadast);
-			
+
 					RETURN NEXT r;
-			
+
 				END LOOP;
 				RETURN;
 			END
 			$$
 			LANGUAGE plpgsql;
-			
+
 			select * from preencheCgm();
 			DROP FUNCTION preencheCgm();
 		";

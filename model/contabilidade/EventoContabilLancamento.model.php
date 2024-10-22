@@ -521,6 +521,7 @@ class EventoContabilLancamento {
     $oDaoValorLancamento->c69_valor   = $oLancamentoAuxiliar->getValorTotal();
     $oDaoValorLancamento->c69_data    = $dtDataUsu;
     $oDaoValorLancamento->c69_anousu  = $iAnoUsu;
+
     $oDaoValorLancamento->incluir(null);
 
     //die("Vitor Vitor Vitor $oDaoValorLancamento->c69_data");

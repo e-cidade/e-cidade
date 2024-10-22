@@ -45,5 +45,5 @@ if(isset($reemite_recibo) && $reemite_recibo == 1) {
 
 $_POST["iModeloRecibo"] = $iModeloRecibo;
 
-include("cai3_gerfinanc003.php");
+include(__DIR__. "/../caixa/cai3_gerfinanc003.php");
 ?>

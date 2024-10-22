@@ -1,7 +1,7 @@
 <?php
 
 use App\Support\Database\Sequence;
-use Classes\PostgresMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;;
 
 class Redesim008 extends PostgresMigration
 {

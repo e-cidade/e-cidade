@@ -88,9 +88,23 @@ try {
 				 * selecionamos todos os empenhos do tipo que tenham empenho gerados e anulamos
 				 */
 				if ($oParam->iTipoEmpenho == 2) {
-					$sSqlEmpenhos   = "SELECT COUNT(*) OVER (PARTITION BY rh02_lota) AS qtdlota,* from ( SELECT rh72_sequencial,                     ";
-					$sSqlEmpenhos  .= "                    rh02_lota,                                                                                ";
-					$sSqlEmpenhos  .= "                    rh25_codlotavinc,                                                                         ";
+					$sSqlEmpenhos   = " SELECT 
+										COUNT(*) over (partition by rh02_lota, rh72_siglaarq) as qtdlota,
+										case
+											when COUNT(*) over (partition by rh02_lota, rh72_siglaarq) > 1
+											and COUNT(codlotavinc) over (partition by rh02_lota, rh72_siglaarq) = 0
+											and MIN(o56_elemento::bigint) over (partition by rh02_lota, rh72_siglaarq) = o56_elemento::bigint 
+                      						and MIN(rh72_recurso) over (partition by rh02_lota, rh72_siglaarq) = rh72_recurso then o56_elemento::bigint
+											when COUNT(*) over (partition by rh02_lota, rh72_siglaarq) > 1
+											and (COUNT(codlotavinc) over (partition by rh02_lota, rh72_siglaarq) > 0
+											and (row_number() over (partition by rh02_lota, rh72_siglaarq order by rh73_valor desc) = 1))
+											or (COUNT(codlotavinc) over (partition by rh02_lota, rh72_siglaarq) = 1)
+											or COUNT(*) over (partition by rh02_lota, rh72_siglaarq) = 1 then codlotavinc
+											else null
+										end as rh25_codlotavinc, *		                                                                             ";			
+					$sSqlEmpenhos  .= "	FROM ( SELECT rh72_sequencial,                                                                       ";
+					$sSqlEmpenhos  .= "               rh02_lota,                                                                                ";
+					$sSqlEmpenhos  .= "               rh25_codlotavinc as codlotavinc,                                                          ";
 				} else {
 					$sSqlEmpenhos   = "SELECT * from ( SELECT rh72_sequencial,                                                                       ";
 				}
@@ -127,8 +141,9 @@ try {
 				$sSqlEmpenhos  .= "                        inner join rhpessoalmov                on rh73_seqpes         = rh02_seqpes               ";
 				$sSqlEmpenhos  .= "                                                              and rh73_instit         = rh02_instit               ";
 				$sSqlEmpenhos  .= "                        left join rhempenhofolhaempenho        on rh72_sequencial     = rh76_rhempenhofolha       ";
-				$sSqlEmpenhos  .= "                        left join orcreservarhempenhofolha     on rh72_sequencial     = o120_rhempenhofolha       ";
 				if ($oParam->iTipoEmpenho == 2) {
+					$sSqlEmpenhos  .= "                    and rh76_lota = rh02_lota                                                                 ";
+					$sSqlEmpenhos  .= "                    left join orcreservarhempenhofolha     on rh72_sequencial     = o120_rhempenhofolha       ";
 					$sSqlEmpenhos  .= "                    and rh02_lota = o120_lota                                                                 ";
 					$sSqlEmpenhos  .= "                    left join rhlotavinc on                                                                   ";
 					$sSqlEmpenhos  .= "                    	rh02_lota = rh25_codigo                                                                   ";
@@ -137,8 +152,10 @@ try {
 					$sSqlEmpenhos  .= "                    	and rh72_recurso = rh25_recurso                                                           ";
 					$sSqlEmpenhos  .= "                    	and rh25_codlotavinc = (select rh28_codlotavinc from rhlotavincele                        ";
 					$sSqlEmpenhos  .= "                    where rh25_codlotavinc = rh28_codlotavinc and rh72_codele = rh28_codelenov)               ";
+				} else {
+					$sSqlEmpenhos  .= "                    left join orcreservarhempenhofolha     on rh72_sequencial     = o120_rhempenhofolha       ";
 				}
-				$sSqlEmpenhos  .= "                  where rh76_rhempenhofolha is null				                                                       ";
+				$sSqlEmpenhos  .= "                  where rh76_rhempenhofolha is null			                                                     ";
 				$sSqlEmpenhos  .= "                    and rh72_tipoempenho = {$oParam->iTipo}                                                       ";
 				$sSqlEmpenhos  .= "                    and rh73_instit      = ".db_getsession("DB_instit"). "                                        ";
 				$sSqlEmpenhos  .= "                    and rh73_tiporubrica = 1																																			 ";

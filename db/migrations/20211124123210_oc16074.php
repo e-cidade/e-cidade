@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc16074 extends AbstractMigration
+class Oc16074 extends PostgresMigration
 {
     public function change()
     {
@@ -55,7 +55,7 @@ class Oc16074 extends AbstractMigration
         ('3191920000', '3191990000', 2021),
         ('3390080000', '3390080000', 2021),
         ('3190115200', '3190119900', 2021);
-        
+
 
         COMMIT;
 

@@ -29,8 +29,6 @@ class EventoCargaS2300 implements EventoCargaInterface
 
     public function __construct()
     {
-        $this->ano = db_getsession("DB_anousu");
-        $this->mes = date("m", db_getsession("DB_datausu"));
         $this->instit = db_getsession("DB_instit");
     }
 
@@ -39,7 +37,7 @@ class EventoCargaS2300 implements EventoCargaInterface
      * @param integer|null $matricula
      * @return resource
      */
-    public function execute($matricula = null)
+    public function execute($matricula = null, $ano, $mes)
     {
         $sql = "
     	SELECT distinct
@@ -251,7 +249,7 @@ class EventoCargaS2300 implements EventoCargaInterface
             nomeinst as desccomp_localtrabgeral
             FROM rhpessoal
             join cgm on rhpessoal.rh01_numcgm = cgm.z01_numcgm
-            join rhpessoalmov on rhpessoal.rh01_regist = rh02_regist and (rh02_anousu,rh02_mesusu) = ({$this->ano},{$this->mes})
+            join rhpessoalmov on rhpessoal.rh01_regist = rh02_regist and (rh02_anousu,rh02_mesusu) = ({$ano},{$mes})
             left join tpcontra ON tpcontra.h13_codigo = rhpessoalmov.rh02_tpcont
             left join rhregime ON rhregime.rh30_codreg = rhpessoalmov.rh02_codreg
             left join rhfuncao on rhfuncao.rh37_funcao = rhpessoalmov.rh02_funcao
@@ -262,7 +260,7 @@ class EventoCargaS2300 implements EventoCargaInterface
         left join rhestagiocurricular on rhpessoal.rh01_regist = h83_regist
         left join rhpessoal as rhpessoalsupervisor on h83_supervisor = rhpessoalsupervisor.rh01_regist
         left join cgm as cgmsupervisor ON cgmsupervisor.z01_numcgm = rhpessoalsupervisor.rh01_numcgm
-        left join inssirf on (r33_codtab::integer-2,r33_anousu,r33_mesusu) = (rh02_tbprev,{$this->ano},{$this->mes})
+        left join inssirf on (r33_codtab::integer-2,r33_anousu,r33_mesusu) = (rh02_tbprev,{$ano},{$mes})
         left join rhpesrescisao on rh05_seqpes = rh02_seqpes
         inner join db_config on
         db_config.codigo = rhpessoal.rh01_instit
@@ -272,12 +270,12 @@ class EventoCargaS2300 implements EventoCargaInterface
         AND (
             ( 
             (date_part('year',rhpessoal.rh01_admiss)::varchar || lpad(date_part('month',rhpessoal.rh01_admiss)::varchar,2,'0'))::integer <= 202207
-            and " . $this->ano . str_pad(strval($this->mes), "0", STR_PAD_LEFT) . " <= 202207
+            and " . $ano . str_pad(strval($mes), "0", STR_PAD_LEFT) . " <= 202207
             and (rh05_recis is null or (date_part('year',rh05_recis)::varchar || lpad(date_part('month',rh05_recis)::varchar,2,'0'))::integer > 202207)
             ) or (
-            date_part('month',rhpessoal.rh01_admiss) = {$this->mes}
-            and date_part('year',rhpessoal.rh01_admiss) = {$this->ano} 
-            and " . $this->ano . str_pad(strval($this->mes), "0", STR_PAD_LEFT) . " > 202207
+            date_part('month',rhpessoal.rh01_admiss) = {$mes}
+            and date_part('year',rhpessoal.rh01_admiss) = {$ano} 
+            and " . $ano . str_pad(strval($mes), "0", STR_PAD_LEFT) . " > 202207
             )
             )
     	";

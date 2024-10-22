@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc16737Desativar extends AbstractMigration
+class Oc16737Desativar extends PostgresMigration
 {
     public function up()
     {

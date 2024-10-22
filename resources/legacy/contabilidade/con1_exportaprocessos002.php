@@ -212,6 +212,7 @@ if ($leiaute == 1) {
     l20_exercicioedital as exercicioedital,
     l20_edital as numprocesso,
     l20_numero,
+    l20_tipojulg,
     nomeinst as orgao,
     l20_usaregistropreco,
     12 as mesesvigencia
@@ -224,23 +225,56 @@ if ($leiaute == 1) {
         exit;
     }
 
-    $resultRegistro2 = db_query("select distinct
-    2 as tiporegistro,
-    l20_nroedital as edital,
-    l20_exercicioedital as exercicioedital,
-    l04_descricao as  descricaolote,
-    l20_liclocal as localentrega,
-    l20_localentrega as localdeentrega,
-    l20_prazoentrega as datadeentrega,
-    l20_numero,
-    0 as garantia /*gerar em branco*/
-    from liclicita
-    join liclicitem on l21_codliclicita=l20_codigo
+    $tipoJulgamento = pg_result($resultRegistro1, 0, "l20_tipojulg");
+
+    if($tipoJulgamento == 3){
+
+        $resultRegistro2 = db_query("select distinct on (l04_numerolote)
+        2 as tiporegistro,
+        l20_nroedital as edital,
+        l20_exercicioedital as exercicioedital,
+        l04_descricao as  descricaolote,
+        l20_liclocal as localentrega,
+        l20_localentrega as localdeentrega,
+        l20_prazoentrega as datadeentrega,
+        l20_numero,
+        l04_numerolote,
+        l21_ordem,
+        pc01_descrmater,
+        0 as garantia /*gerar em branco*/
+        from liclicita
+        join liclicitem on l21_codliclicita=l20_codigo
+        INNER JOIN pcprocitem ON liclicitem.l21_codpcprocitem = pcprocitem.pc81_codprocitem
+        INNER JOIN pcproc ON pcproc.pc80_codproc = pcprocitem.pc81_codproc
+        INNER JOIN solicitem ON solicitem.pc11_codigo = pcprocitem.pc81_solicitem
+        INNER JOIN solicitempcmater ON solicitempcmater.pc16_solicitem = solicitem.pc11_codigo
+        INNER JOIN pcmater ON pc01_codmater = pc16_codmater
+        join liclicitemlote on l04_liclicitem=l21_codigo
+        where l20_codigo= $l20_codigo and pc11_quant != 0 order by l04_numerolote,l21_ordem");
+    } else {
+
+        $resultRegistro2 = db_query("  SELECT 
+        2 AS tiporegistro,
+        l20_nroedital AS edital,
+        l20_exercicioedital AS exercicioedital,
+        l20_liclocal AS localentrega,
+        l20_localentrega AS localdeentrega,
+        l20_prazoentrega AS datadeentrega,
+        l20_numero,
+        l21_ordem,
+        pc01_descrmater,
+        0 AS garantia /* gerar em branco */
+    FROM liclicita
+    JOIN liclicitem ON l21_codliclicita = l20_codigo
     INNER JOIN pcprocitem ON liclicitem.l21_codpcprocitem = pcprocitem.pc81_codprocitem
     INNER JOIN pcproc ON pcproc.pc80_codproc = pcprocitem.pc81_codproc
     INNER JOIN solicitem ON solicitem.pc11_codigo = pcprocitem.pc81_solicitem
-    join liclicitemlote on l04_liclicitem=l21_codigo
-    where l20_codigo= $l20_codigo and pc11_quant != 0;");
+    INNER JOIN solicitempcmater ON solicitempcmater.pc16_solicitem = solicitem.pc11_codigo
+    INNER JOIN pcmater ON pc01_codmater = pc16_codmater
+    WHERE l20_codigo = $l20_codigo AND pc11_quant != 0
+    ORDER BY l21_ordem;");
+    }
+
 
     if (pg_numrows($resultRegistro2) == 0) {
         db_redireciona('db_erros.php?fechar=true&db_erro=Dados do Lote Edital Incompletos.');
@@ -259,6 +293,8 @@ if ($leiaute == 1) {
     m61_descr as unidade,
     pc11_quant,
     pc80_codproc,
+    l04_numerolote,
+    l21_ordem,
     CASE
                WHEN pc80_criterioadjudicacao = 3 THEN si02_vlprecoreferencia
                ELSE si02_vlpercreferencia
@@ -280,8 +316,7 @@ if ($leiaute == 1) {
     LEFT JOIN solicitempcmater ON solicitempcmater.pc16_solicitem = solicitem.pc11_codigo
     LEFT JOIN pcmater ON pcmater.pc01_codmater = solicitempcmater.pc16_codmater
     LEFT JOIN solicitemele ON solicitemele.pc18_solicitem = solicitem.pc11_codigo
-    where l20_codigo= $l20_codigo and pc11_quant != 0
-    ORDER BY l21_ordem;");
+    where l20_codigo= $l20_codigo and pc11_quant != 0 ORDER BY l04_numerolote,l21_ordem;");
 
     if (pg_numrows($resultRegistro3) == 0) {
         db_redireciona('db_erros.php?fechar=true&db_erro=Dados do Edital Incompletos.');
@@ -335,8 +370,13 @@ if ($leiaute == 1) {
             fputs($clabre_arquivo->arquivo, pg_result($resultRegistro2, $w, "l20_numero") . "|");
 
             fputs($clabre_arquivo->arquivo, pg_result($resultRegistro2, $w, "exercicioedital") . "|");
-            fputs($clabre_arquivo->arquivo, $sequencialLote[pg_result($resultRegistro2, $w, "numerodolote")] . "|");
-            fputs($clabre_arquivo->arquivo, pg_result($resultRegistro2, $w, "descricaolote") . "|");
+            if($tipoJulgamento != 3){
+                fputs($clabre_arquivo->arquivo, $w+1 . "|");
+                fputs($clabre_arquivo->arquivo, pg_result($resultRegistro2, $w, "pc01_descrmater") . "|");
+            }else {
+                fputs($clabre_arquivo->arquivo, $sequencialLote[pg_result($resultRegistro2, $w, "numerodolote")] . "|");
+                fputs($clabre_arquivo->arquivo, pg_result($resultRegistro2, $w, "descricaolote") . "|");
+            }
             fputs($clabre_arquivo->arquivo, pg_result($resultRegistro2, $w, "localentrega") . "|");
             fputs($clabre_arquivo->arquivo, pg_result($resultRegistro2, $w, "localdeentrega") . "|");
             fputs($clabre_arquivo->arquivo, pg_result($resultRegistro2, $w, "datadeentrega") . "|");

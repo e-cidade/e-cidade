@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc16190hotFix extends AbstractMigration
+class Oc16190hotFix extends PostgresMigration
 {
     public function up()
     {
@@ -20,7 +20,7 @@ class Oc16190hotFix extends AbstractMigration
         DROP COLUMN db83_dataassinaturacop;
 
         ALTER TABLE contabancaria ADD COLUMN db83_numerocontratooc varchar(30);
-        ALTER TABLE contabancaria ADD COLUMN db83_dataassinaturacop  date; 
+        ALTER TABLE contabancaria ADD COLUMN db83_dataassinaturacop  date;
 
         COMMIT;
 

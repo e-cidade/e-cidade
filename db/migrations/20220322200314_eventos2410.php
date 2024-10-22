@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Eventos2410 extends AbstractMigration
+class Eventos2410 extends PostgresMigration
 {
     public function up()
     {
@@ -271,7 +271,7 @@ class Eventos2410 extends AbstractMigration
 
         insert into avaliacaoperguntaopcao values ((select max(db104_sequencial)+1 from avaliacaoperguntaopcao),4001269 ,'1001 - Pensão especial sem vínculo previdenciário'                                                                                                     ,true,'tpbeneficio_1001',0,'1001','');
         insert into avaliacaoperguntaopcao values ((select max(db104_sequencial)+1 from avaliacaoperguntaopcao),4001269 ,'1009 - Outros benefícios sem vínculo previdenciário'                                                                                                   ,true,'tpbeneficio_1009',0,'1009','');
-        
+
         COMMIT;
 SQL;
         $this->execute($sql);

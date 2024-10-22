@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc21264relatorio extends AbstractMigration
+class Oc21264relatorio extends PostgresMigration
 {
     public function up()
     {
@@ -11,20 +11,20 @@ class Oc21264relatorio extends AbstractMigration
                         INSERT INTO db_menu
                         VALUES (
                                     (SELECT id_item FROM db_modulos
-                                    WHERE nome_modulo = 'EFD-Reinf'), 
-                                    
+                                    WHERE nome_modulo = 'EFD-Reinf'),
+
                                     30,
-                                    
+
                                     1,
-                                    
+
                                     (SELECT id_item FROM db_modulos
                                     WHERE nome_modulo = 'EFD-Reinf')
                                 );
-                        
-                        
+
+
                         INSERT INTO db_itensmenu
                         VALUES (
-                                    (SELECT max(id_item)+1 FROM db_itensmenu), 
+                                    (SELECT max(id_item)+1 FROM db_itensmenu),
                                     'Reltatórios de Conferência',
                                     'Reltatório de Conferência do EFD-Reinf',
                                     '',
@@ -33,8 +33,8 @@ class Oc21264relatorio extends AbstractMigration
                                     'Reltatório de Conferência do EFD-Reinf',
                                     't'
                                 );
-                        
-                        
+
+
                         INSERT INTO db_menu
                         VALUES (
                                     30,
@@ -44,8 +44,8 @@ class Oc21264relatorio extends AbstractMigration
                                     (SELECT id_item FROM db_modulos
                                     WHERE nome_modulo = 'EFD-Reinf')
                                 );
-                        
-                        
+
+
                         UPDATE db_menu
                         SET id_item = (SELECT id_item FROM db_itensmenu
                         WHERE help = 'Reltatório de Conferência do EFD-Reinf'),

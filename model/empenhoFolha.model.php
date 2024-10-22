@@ -918,7 +918,54 @@ class empenhoFolha {
     $oCodigoAcompanhamento->setFonte($oSaldoDotacao->o58_codigo);
     $oCodigoAcompanhamento->setDeParaFonteCompleta();
     $e60_codco = $oCodigoAcompanhamento->getCodigoParaEmpenho();
-   
+
+    $buscarOrdenadores = buscarParamentosOrdenadores();
+
+    $buscarOrdenadoresliquidacao = buscarParamentosOrdenadoresLiquidacao();
+
+    if ($buscarOrdenadores == 1 || $buscarOrdenadores == 3 ) {
+
+      $aOrdenadoresdespesas   = getOrdenadoresDespesa($this->orgao,$this->unidade);
+      $oDaoEmpenho->e60_numcgmordenador = $aOrdenadoresdespesas['cgmordenadordespesa'];
+
+      if (!$oDaoEmpenho->e60_numcgmordenador) {
+        $sErroMsg  = "Ordenador da despesa não encontrado para o orgão $this->orgao unidade $this->unidade";
+        throw new DBException($sErroMsg);
+      }
+
+    } elseif ($buscarOrdenadores == 2) {
+
+      $aAssinantesDespesas  = getAssinantes($this->orgao,$this->unidade,1,0);
+      $aOrdenadoresdespesas = getAllOrdenadores($aAssinantesDespesas);
+      $oDaoEmpenho->e60_numcgmordenador = $aOrdenadoresdespesas->z01_numcgm;
+      if (!$aOrdenadoresdespesas->z01_numcgm) {
+        $sErroMsg  = "Ordenador da despesa não encontrado para o orgão $this->orgao unidade $this->unidade";
+        throw new DBException($sErroMsg);
+      }
+    }
+
+    if ($buscarOrdenadoresliquidacao == 1 || $buscarOrdenadoresliquidacao == 3 ) {
+
+      $aOrdenadoresliquidacao = getOrdenadoresLiquidacao($this->orgao,$this->unidade);
+      $cgmordenadorliquidacao = $aOrdenadoresliquidacao['cgmordenadorliquidacao'];
+
+      if (!$cgmordenadorliquidacao) {
+        $sErroMsg  = "Ordenador da liquidação não encontrado para o orgão $this->orgao unidade $this->unidade";
+        throw new DBException($sErroMsg);
+      }
+     
+    } elseif ($buscarOrdenadoresliquidacao == 2) {
+
+      $aAssinantesLiquidacao  = getAssinantes($this->orgao,$this->unidade,2,1);
+      $aOrdenadoresliquidacao = getAllOrdenadores($aAssinantesLiquidacao);
+      $cgmordenadorliquidacao = $aOrdenadoresliquidacao->z01_numcgm;
+
+      if (!$aOrdenadoresliquidacao->z01_numcgm) {
+        $sErroMsg  = "Ordenador da liquidação não encontrado para o orgão $this->orgao unidade $this->unidade";
+        throw new DBException($sErroMsg);
+      }
+    }
+
 	  $oDaoEmpenho->e60_coddot         = $this->dotacao;
 	  $oDaoEmpenho->e60_anousu         = $this->ano;
 	  $oDaoEmpenho->e60_codcom         = 7;
@@ -1109,7 +1156,21 @@ class empenhoFolha {
                                              null,
                                              '',
                                              null,
-                                             false
+                                             null,
+                                             0,
+                                             null,
+                                             null,
+                                             null,
+                                             null,
+                                             null,
+                                             null,
+                                             null,
+                                             null,
+                                             null,
+                                             null,
+                                             null,
+                                             null,
+                                             $cgmordenadorliquidacao
                                            );
       require_once("libs/JSON.php");
       $oJson               = new Services_JSON();
@@ -1800,5 +1861,89 @@ class empenhoFolha {
     $this->tipoEmpenhoResumo = $iTipo;
   }
 
+}
+use Illuminate\Database\Capsule\Manager as DB;
+function getAssinantes($orgao, $unidade,$cargo,$documento) 
+{
+
+  $anousu = db_getsession("DB_anousu");
+  $instit = db_getsession('DB_instit');
+
+  $aAssinante = DB::table('configuracoes.assinatura_digital_assinante')
+              ->join('configuracoes.db_usuarios', 'configuracoes.assinatura_digital_assinante.db243_usuario', '=', 'configuracoes.db_usuarios.id_usuario')
+              ->join('configuracoes.db_usuacgm', 'configuracoes.db_usuacgm.id_usuario', '=', 'configuracoes.db_usuarios.id_usuario')
+              ->join('protocolo.cgm', 'protocolo.cgm.z01_numcgm', '=', 'configuracoes.db_usuacgm.cgmlogin')
+              ->where('configuracoes.assinatura_digital_assinante.db243_instit', '=', $instit)
+              ->where('configuracoes.assinatura_digital_assinante.db243_orgao', '=', $orgao)
+              ->where('configuracoes.assinatura_digital_assinante.db243_unidade', '=', $unidade)
+              ->where('configuracoes.assinatura_digital_assinante.db243_anousu', '=', $anousu)
+              ->where('configuracoes.assinatura_digital_assinante.db243_cargo', '=', $cargo)
+              ->where('configuracoes.assinatura_digital_assinante.db243_documento', '=', $documento)
+              ->select('configuracoes.db_usuarios.login', 'configuracoes.db_usuarios.nome', 'configuracoes.db_usuarios.email', 'protocolo.cgm.z01_cgccpf' , 'configuracoes.assinatura_digital_assinante.db243_cargo', 'protocolo.cgm.z01_numcgm', 'configuracoes.assinatura_digital_assinante.db243_data_inicio', 'configuracoes.assinatura_digital_assinante.db243_data_final')
+              ->distinct('login', 'nome', 'z01_cgccpf', 'db243_cargo')
+              ->get()
+              ->toArray(); 
+
+  return $aAssinante;
+}
+
+function getOrdenadoresDespesa($orgao, $unidade)
+{
+  $clorcunidade = new cl_orcunidade;
+  $anousu = db_getsession("DB_anousu");
+  $instit = db_getsession('DB_instit');
+  $whereUnidades = " o41_anousu = {$anousu} and o41_instit = {$instit} and o41_orgao = {$orgao} and o41_unidade = {$unidade} ";
+  $o41_cgmordenador =  db_utils::fieldsMemory($clorcunidade->sql_record($clorcunidade->sql_query(db_getsession("DB_anousu"),null,null, " o41_orddespesa ",null,$whereUnidades)), 0)->o41_orddespesa;
+  return ['cgmordenadordespesa' => $o41_cgmordenador];
+}
+
+function getOrdenadoresLiquidacao($orgao, $unidade)
+{
+  $clorcunidade = new cl_orcunidade;
+  $anousu = db_getsession("DB_anousu");
+  $instit = db_getsession('DB_instit');
+  $whereUnidades = " o41_anousu = {$anousu} and o41_instit = {$instit} and o41_orgao = {$orgao} and o41_unidade = {$unidade} ";
+  $o41_cgmordenador =  db_utils::fieldsMemory($clorcunidade->sql_record($clorcunidade->sql_query(db_getsession("DB_anousu"),null,null, " o41_ordliquidacao ",null,$whereUnidades)), 0)->o41_ordliquidacao;
+
+  return ['cgmordenadorliquidacao' => $o41_cgmordenador];
+}
+
+function buscarParamentosOrdenadores()
+{
+  $clempparametro    = new cl_empparametro;
+  return db_utils::fieldsMemory($clempparametro->sql_record($clempparametro->sql_query(db_getsession("DB_anousu"), "e30_buscarordenadores", null, "")), 0)->e30_buscarordenadores;
+}
+
+function buscarParamentosOrdenadoresLiquidacao()
+{
+  $clempparametro    = new cl_empparametro;
+  return db_utils::fieldsMemory($clempparametro->sql_record($clempparametro->sql_query(db_getsession("DB_anousu"), "e30_buscarordenadoresliqui", null, "")), 0)->e30_buscarordenadoresliqui;
+}
+
+function getAllOrdenadores($aAssinantes)
+{
+
+  foreach($aAssinantes as $assinante) {
+      
+      $db243_data_inicio = $assinante->db243_data_inicio;
+      $db243_data_final  = $assinante->db243_data_final;  
+      
+      $e60_emiss = date("Y-m-d", db_getsession("DB_datausu"));
+      $dataemissformatada  = $e60_emiss;
+      $datainicioformatada = date('Y-m-d\TH:i:s\Z', strtotime($db243_data_inicio));
+      $datafimformatada    = date('Y-m-d\TH:i:s\Z', strtotime($db243_data_final));
+      
+      $datafinal = explode('-', $db243_data_final);
+      $datafinal = $datafinal[2] . '/' . $datafinal[1] . '/' . $datafinal[0];
+
+      $datainicial = explode('-', $db243_data_inicio);
+      $datainicial = $datainicial[2] . '/' . $datainicial[1] . '/' . $datainicial[0];
+
+      if (substr($dataemissformatada, 0, 10) < substr($datainicioformatada, 0, 10) || substr($dataemissformatada, 0, 10) > substr($datafimformatada, 0, 10)) {
+        continue;
+      }
+      return $assinante;
+  } 
+  
 }
 ?>

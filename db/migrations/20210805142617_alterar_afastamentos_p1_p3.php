@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AlterarAfastamentosP1P3 extends AbstractMigration
+class AlterarAfastamentosP1P3 extends PostgresMigration
 {
 
     public function up()

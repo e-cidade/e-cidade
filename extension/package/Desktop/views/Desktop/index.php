@@ -58,10 +58,10 @@
 
                 <div class="system-info">
 
-                  <p>
-                    <b>Base:</b>
-                    <em class="base-name selectable"><?php echo $this->request->session()->get('DB_NBASE'); ?></em>
-                  </p>
+<!--                  <p>-->
+<!--                    <b>Base:</b>-->
+<!--                    <em class="base-name selectable">--><?php //echo $this->request->session()->get('DB_NBASE'); ?><!--</em>-->
+<!--                  </p>-->
                   <p>
                     <b>Servidor:</b>
                     <em class="selectable">

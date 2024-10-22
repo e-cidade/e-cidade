@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc22127 extends AbstractMigration
+class Oc22127 extends PostgresMigration
 {
 
     public function up()
@@ -17,7 +17,7 @@ class Oc22127 extends AbstractMigration
             MINVALUE 1
             MAXVALUE 9223372036854775807
             START 1;
-        
+
         SQL;
 
         $this->execute($sql);

@@ -31,7 +31,15 @@ $clrotulo = new rotulocampo;
 $clrotulo->label("descrdepto");
 $clrotulo->label("nome");
   if (isset($m40_codigo)&&$m40_codigo!=""){
-    $result_jahatend=$clmatrequiitem->sql_record($clmatrequiitem->sql_query_atend(null,'*',null,"m41_codmatrequi=$m40_codigo and (m43_codigo is not null OR m102_sequencial is not null)"));
+    $result_jahatend=$clmatrequiitem->sql_record(
+        $clmatrequiitem->sql_query_atend(
+            null,
+            '*',
+            null,
+            "m41_codmatrequi=$m40_codigo and (m43_codigo is not null OR m102_sequencial is not null)"
+        )
+    );
+
     if ($clmatrequiitem->numrows!=0){
        $opcao= $db_opcao;
        $db_opcao=3;
@@ -55,126 +63,105 @@ $clrotulo->label("nome");
     $permissao = 1;
   }
 ?>
-  <form name="form1" method="post" action="">
-  <center>
-  <fieldset style="width: 50%" ><legend><b>Dados da requisição</b></legend>
-  <table border="0">
-    <tr>
-    <td nowrap title="<?=@$Tm40_codigo?>">
-      <b>Código: </b>
-      <?//=@$Lm40_codigo?>
-    </td>
-    <td>
-<?
-db_input('m40_codigo',10,$Im40_codigo,true,'text',3,"")
-?>
-    </td>
-  </tr>
-  <tr>
-    <td nowrap title="<?=@$Tm40_data?>">
-       <?=@$Lm40_data?>
-    </td>
-    <td>
-<?
-db_inputdata('m40_data',@$m40_data_dia,@$m40_data_mes,@$m40_data_ano,true,'text',3,"")
-?>
-    </td>
-  </tr>
-  <tr>
-    <td nowrap title="<?=@$Tm40_depto?>">
-       <?
-       db_ancora(@$Lm40_depto,"js_pesquisam40_depto(true);",3);
-       ?>
-    </td>
-    <td>
-<?
-db_input('m40_depto',6,$Im40_depto,true,'text',3," onchange='js_pesquisam40_depto(false);'")
-?>
-       <?
-db_input('descrdepto',40,$Idescrdepto,true,'text',3,'')
-       ?>
-    </td>
-  </tr>
-  <tr>
-    <td nowrap title="<?=@$Tm40_login?>">
-       <?
-       db_ancora(@$Lm40_login,"js_pesquisam40_login(true);",3);
-       ?>
-    </td>
-    <td>
-<?
-db_input('m40_login',10,$Im40_login,true,'text',3," onchange='js_pesquisam40_login(false);'")
-?>
-       <?
-db_input('nome',40,$Inome,true,'text',3,'')
-       ?>
-    </td>
-  </tr>
-  <tr>
-    <td nowrap title="<?=@$Tm40_hora?>">
-       <?=@$Lm40_hora?>
-    </td>
-    <td>
-<?
-db_input('m40_hora',5,$Im40_hora,true,'text',3,"")
-?>
-    </td>
-  </tr>
-
-
-
-
-  <tr>
-    <td nowrap title="<?=@$Tm40_almox?>">
-       <?=@$Lm40_almox?>
-    </td>
-    <td>
-
-<?
-	$result_depusu = $cldb_depusu->sql_record($cldb_depusu->sql_query_almoxusu(null,
-	                                                                           null,
-	                                                                           " distinct
-	                                                                             m91_codigo as almoxarifado,
-	                                                                             db_depart.descrdepto",
-	                                                                           null,
-	                                                                           "     db_depusu.id_usuario = " . db_getsession("DB_id_usuario") .
-	                                                                           " and db_depart.instit = ".db_getsession("DB_instit") . " order by almoxarifado") );
-	if ($cldb_depusu->numrows>0){
-		db_selectrecord('m40_almox',$result_depusu,true,($db_opcao == 1?1:3));
-	} else {
-		echo "Nenhum almoxarifado disponível!";
-	}
-?>
-
-
-    </td>
-  </tr>
-
-
-
-
-
-  <tr>
-    <td nowrap title="<?=@$Tm40_obs?>">
-       <?=@$Lm40_obs?>
-    </td>
-    <td>
-<?
-db_textarea('m40_obs',10,50,$Im40_obs,true,'text',$db_opcao,"")
-?>
-    </td>
-  </tr>
-  </table>
-  </fieldset>
+<form name="form1" method="post" action="">
+    <center>
+        <fieldset style="width: 50%" ><legend><b>Dados da requisição</b></legend>
+            <table border="0">
+                <tr>
+                    <td nowrap title="<?=@$Tm40_codigo?>">
+                        <b>Código: </b>
+                        <?//=@$Lm40_codigo?>
+                    </td>
+                    <td>
+                        <? db_input('m40_codigo',10,$Im40_codigo,true,'text',3,"") ?>
+                    </td>
+                </tr>
+                <tr>
+                    <td nowrap title="<?=@$Tm40_data?>">
+                        <?=@$Lm40_data?>
+                    </td>
+                    <td>
+                        <? db_inputdata('m40_data',@$m40_data_dia,@$m40_data_mes,@$m40_data_ano,true,'text',3,"") ?>
+                    </td>
+                </tr>
+                <tr>
+                    <td nowrap title="<?=@$Tm40_depto?>">
+                        <? db_ancora(@$Lm40_depto,"js_pesquisam40_depto(true);",3); ?>
+                    </td>
+                    <td>
+                        <? db_input('m40_depto',6,$Im40_depto,true,'text',3," onchange='js_pesquisam40_depto(false);'") ?>
+                        <? db_input('descrdepto',40,$Idescrdepto,true,'text',3,'') ?>
+                    </td>
+                </tr>
+                <tr>
+                    <td nowrap title="<?=@$Tm40_login?>">
+                        <? db_ancora(@$Lm40_login,"js_pesquisam40_login(true);",3); ?>
+                    </td>
+                    <td>
+                        <? db_input('m40_login',10,$Im40_login,true,'text',3," onchange='js_pesquisam40_login(false);'") ?>
+                        <? db_input('nome',40,$Inome,true,'text',3,'') ?>
+                    </td>
+                </tr>
+                <tr>
+                    <td nowrap title="<?=@$Tm40_hora?>">
+                        <?=@$Lm40_hora?>
+                    </td>
+                    <td>
+                        <? db_input('m40_hora',5,$Im40_hora,true,'text',3,"") ?>
+                    </td>
+                </tr>
+                <tr>
+                    <td nowrap title="<?=@$Tm40_almox?>">
+                        <?=@$Lm40_almox?>
+                    </td>
+                    <td>
+                        <?
+                            $result_depusu = $cldb_depusu->sql_record(
+                                                $cldb_depusu->sql_query_almoxusu(
+                                                    null,
+                                                    null,
+                                                    " distinct m91_codigo as almoxarifado, db_depart.descrdepto",
+                                                    null,
+                                                    "     db_depusu.id_usuario = " . db_getsession("DB_id_usuario") . " and db_depart.instit = ".db_getsession("DB_instit") . " order by almoxarifado")
+                                                );
+                            if ($cldb_depusu->numrows>0){
+                                db_selectrecord('m40_almox',$result_depusu,true,($db_opcao == 1?1:3));
+                            } else {
+                                echo "Nenhum almoxarifado disponível!";
+                            }
+                        ?>
+                    </td>
+                </tr>
+                <tr>
+                    <td nowrap title="<?=@$Tm40_obs?>">
+                        <?=@$Lm40_obs?>
+                    </td>
+                    <td>
+                        <? db_textarea('m40_obs',10,50,$Im40_obs,true,'text',$db_opcao,"") ?>
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
   </center>
   <?
-  if (isset($opcao)){
-    $db_opcao=@$opcao;
-  }
+    if (isset($opcao)){
+        $db_opcao=@$opcao;
+    }
   ?>
-
-<input name="<?=($db_opcao==1?"incluir":($db_opcao==2||$db_opcao==22?"alterar":"excluir"))?>" type="submit" id="db_opcao" value="<?=($db_opcao==1?"Incluir":($db_opcao==2||$db_opcao==22?"Alterar":"Excluir"))?>" <?=($db_botao==false?"disabled":"")?> >
-<input name="pesquisar" type="button" id="pesquisar" value="Pesquisar" onclick="js_pesquisa();" >
+    <input
+        name="<?=($db_opcao==1?"incluir":($db_opcao==2||$db_opcao==22?"alterar":"excluir"))?>"
+        type="submit"
+        id="db_opcao"
+        value="<?=($db_opcao==1?"Incluir":($db_opcao==2||$db_opcao==22?"Alterar":"Excluir"))?>"
+        <?=($db_botao==false?"disabled":"")?>
+    >
+    <input
+        name="pesquisar"
+        type="button"
+        id="pesquisar"
+        value="Pesquisar"
+        onclick="js_pesquisa();"
+    >
 </form>
 <script>
 function js_pesquisam40_depto(mostra){

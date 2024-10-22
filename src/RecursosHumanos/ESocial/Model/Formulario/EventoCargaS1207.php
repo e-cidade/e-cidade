@@ -12,36 +12,34 @@ use ECidade\RecursosHumanos\ESocial\Model\Formulario\EventoCargaInterface;
 class EventoCargaS1207 implements EventoCargaInterface
 {
 
-    /**
-     * @var Integer
-     */
-    private $instit;
+	/**
+	 * @var Integer
+	 */
+	private $instit;
 
-    /**
-     * @var Integer
-     */
-    private $ano;
+	/**
+	 * @var Integer
+	 */
+	private $ano;
 
-    /**
-     * @var Integer
-     */
-    private $mes;
+	/**
+	 * @var Integer
+	 */
+	private $mes;
 
-    public function __construct()
-    {
-        $this->ano = db_getsession("DB_anousu");
-        $this->mes = date("m", db_getsession("DB_datausu"));
-        $this->instit = db_getsession("DB_instit");
-    }
+	public function __construct()
+	{
+		$this->instit = db_getsession("DB_instit");
+	}
 
-    /**
-     * Executa o sql da carga
-     * @param integer|null $matricula
-     * @return resource
-     */
-    public function execute($matricula = null)
-    {
-        $sql = "SELECT DISTINCT
+	/**
+	 * Executa o sql da carga
+	 * @param integer|null $matricula
+	 * @return resource
+	 */
+	public function execute($matricula = null, $ano, $mes)
+	{
+		$sql = "SELECT DISTINCT
 		--ideVinculo
 		z01_cgccpf as cpftrab,
 		rh01_regist as matricula,
@@ -57,31 +55,31 @@ class EventoCargaS1207 implements EventoCargaInterface
 		JOIN cgm ON rhpessoal.rh01_numcgm = cgm.z01_numcgm
 		JOIN rhpesrescisao ON rhpessoalmov.rh02_seqpes = rhpesrescisao.rh05_seqpes
 		JOIN rhmotivorescisao ON rhpesrescisao.rh05_motivo = rhmotivorescisao.rh173_sequencial
-		WHERE (rh02_anousu,rh02_mesusu) = ({$this->ano},{$this->mes})
-		AND DATE_PART('YEAR',rh05_recis) = {$this->ano}
-		AND DATE_PART('MONTH',rh05_recis) = {$this->mes}
+		WHERE (rh02_anousu,rh02_mesusu) = ({$ano},{$mes})
+		AND DATE_PART('YEAR',rh05_recis) = {$ano}
+		AND DATE_PART('MONTH',rh05_recis) = {$mes}
 		AND rhpessoal.rh01_instit = {$this->instit}";
 
-        if (!empty($matricula)) {
-            $sql .= " AND rhpessoal.rh01_regist = {$matricula} ";
-        }
+		if (!empty($matricula)) {
+			$sql .= " AND rhpessoal.rh01_regist = {$matricula} ";
+		}
 
-        $rsResult = \db_query($sql);
+		$rsResult = \db_query($sql);
 
-        if (!$rsResult) {
-            throw new \Exception("Erro ao buscar preenchimentos do S2299");
-        }
-        return $rsResult;
-    }
+		if (!$rsResult) {
+			throw new \Exception("Erro ao buscar preenchimentos do S1207");
+		}
+		return $rsResult;
+	}
 
-    /**
-     * Executa o sql das verbas rescisorias
-     * @param integer $matricula
-     * @return resource
-     */
-    public function getVerbasResc($matricula)
-    {
-        $sql = "SELECT DISTINCT
+	/**
+	 * Executa o sql das verbas rescisorias
+	 * @param integer $matricula
+	 * @return resource
+	 */
+	public function getVerbasResc($matricula, $ano, $mes)
+	{
+		$sql = "SELECT DISTINCT
 				--dmDev
 				CASE
 					WHEN gerfsal.r14_regist IS NOT NULL THEN 1
@@ -122,13 +120,13 @@ class EventoCargaS1207 implements EventoCargaInterface
 				LEFT JOIN gerfres ON (rh02_anousu,rh02_mesusu,rh02_regist) = (r20_anousu,r20_mesusu,r20_regist)
 				LEFT JOIN gerfcom ON (rh02_anousu,rh02_mesusu,rh02_regist) = (r48_anousu,r48_mesusu,r48_regist)
 				LEFT JOIN gerfs13 ON (rh02_anousu,rh02_mesusu,rh02_regist) = (r35_anousu,r35_mesusu,r35_regist)
-				WHERE (rh02_instit,rh02_anousu,rh02_mesusu,rh02_regist) = ({$this->instit},{$this->ano},{$this->mes},{$this->matricula})";
+				WHERE (rh02_instit,rh02_anousu,rh02_mesusu,rh02_regist) = ({$this->instit},{$ano},{$mes},{$matricula})";
 
-        $rsResult = \db_query($sql);
+		$rsResult = \db_query($sql);
 
-        if (!$rsResult) {
-            throw new \Exception("Erro ao buscar Verbas Rescisórias.");
-        }
-        return $rsResult;
-    }
+		if (!$rsResult) {
+			throw new \Exception("Erro ao buscar Verbas Rescisórias.");
+		}
+		return $rsResult;
+	}
 }

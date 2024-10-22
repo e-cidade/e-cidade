@@ -283,8 +283,18 @@ function js_emite(){
         </td>        
         <td align="left">
           <?
-          $t = array(2 => "Dotação",1 => "Lotação");
-          db_select('tipoEmpenho',$t,true,4,'onchange="js_validaTipo()"');
+            $clcfpess = new cl_cfpess;
+            $sSql     = $clcfpess->sql_query(db_getsession("DB_anousu"),date('m', db_getsession("DB_datausu")),db_getsession("DB_instit"),'r11_tipoempenho');
+            $iTipoEmpenho   = db_utils::fieldsMemory($clcfpess->sql_record($sSql),0)->r11_tipoempenho;
+            if ($iTipoEmpenho == 1) {
+              $aTiposEmpenho = array("1" => "Dotação");
+            }else if ($iTipoEmpenho == 2) {
+              $aTiposEmpenho = array("2" => "Lotação");
+            } else {
+              $aTiposEmpenho = array("1" => "Dotação", "2" => "Lotação");
+            }
+
+          db_select('tipoEmpenho',$aTiposEmpenho,true,4,'onchange="js_validaTipo()"');
           ?>
         </td>
       </tr>
@@ -307,6 +317,11 @@ function js_emite(){
 </body>
 </html>
 <script>
+
+if ($('tipoEmpenho').value == 2) {
+  $('linhaSeparar').style.display = 'none';
+}
+
 function js_pesquisasel(mostra){
   if(mostra==true){
     js_OpenJanelaIframe('CurrentWindow.corpo','db_iframe_selecao','func_selecao.php?funcao_js=parent.js_mostrasel1|r44_selec|r44_descr','Pesquisa',true);
@@ -401,7 +416,7 @@ function js_mostratabdesc1(chave1,chave2){
 }
 
 function js_validaTipo() {
-  if ($('tipoEmpenho').value == 1) {
+  if ($('tipoEmpenho').value == 2) {
     document.form1.separar.value = 0;
     $('linhaSeparar').style.display = 'none';
   } else {

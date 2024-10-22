@@ -17,6 +17,7 @@ $AssinaturaDigital = new AssinaturaDigital();
 
 <form name="form1" method="post">
     <input type="hidden" name="empenho" id="empenho" value="<?= $empenho ?>">
+    <input type="hidden" name="fornecedor" id="fornecedor" value="<?= $fornecedor ?>">
     <table border="0">
         <tr>
             <td>
@@ -83,6 +84,14 @@ $AssinaturaDigital = new AssinaturaDigital();
                                 <?db_input('e53_vlrpag', 10, "", true, 'text', 3);?>
                             </td>
                         </tr>
+                        <tr>
+                            <td><strong>Conta Fornecedor: </strong></td>
+                            <td colspan='6'>
+                            <?                
+                                db_select("e50_contafornecedor",null,true,1,"style='width:100%'");
+                            ?>
+                            </td>
+                        </tr>
                         <!-- OC 12746 -->
                         <tr style="display: none" id="competDespInput">
                             <td>
@@ -90,6 +99,22 @@ $AssinaturaDigital = new AssinaturaDigital();
                             </td>
                             <td>
                                 <? db_inputData('e50_compdesp', '', '', '', true, 'text', 1); ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td nowrap title="<?=$Te50_numcgmordenador?>">
+                                <?db_ancora('Ordenador da Liquidação',"js_pesquisa_liquidacao(true);",$fimperiodocontabil);?>
+                            </td>
+                            <td>
+                                <?
+                                    db_input("e50_numcgmordenador",10,$Ie50_numcgmordenador,true,"text",$fimperiodocontabil,"onChange='js_pesquisa_liquidacao(false);'");
+                                    db_input("e50_numcgmordenadoranterior",10,$Ie50_numcgmordenadoranterior,true,"hidden");
+                                ?>
+                            </td>
+                            <td colspan="6">
+                                <?
+                                    db_input("e50_nomeordenador",56,$Ie50_nomeordenador,true,"text",3);
+                                ?>
                             </td>
                         </tr>
                     </table>
@@ -262,6 +287,10 @@ $AssinaturaDigital = new AssinaturaDigital();
                 return false;
             }
         }
+        if (document.form1.e50_numcgmordenadoranterior.value && !document.form1.e50_numcgmordenador.value) {
+                alert("Campo Ordenador da Liquidação nao Informado.")
+                return false;
+        }
         document.getElementById("db_opcao").type = "submit";
     }
 
@@ -277,7 +306,7 @@ $AssinaturaDigital = new AssinaturaDigital();
         js_OpenJanelaIframe(
             '',
             'db_iframe_alteracaoop',
-            'func_pagordem.php?chave_e60_codemp=' + e60_codemp + '&funcao_js=parent.js_mostraordem|e50_codord|e50_obs|e50_compdesp|elemento|e50_data|e60_numemp|data_anulacao|e53_valor|e50_retencaoir|e50_naturezabemservico|e53_vlranu|e53_vlrpag',
+            'func_pagordem.php?chave_e60_codemp=' + e60_codemp + '&funcao_js=parent.js_mostraordem|e50_codord|e50_obs|e50_compdesp|elemento|e50_data|e60_numemp|data_anulacao|e53_valor|e50_retencaoir|e50_naturezabemservico|e53_vlranu|e53_vlrpag|e50_contafornecedor|e50_numcgmordenador',
             'Pesquisa',
             true,
             '0',
@@ -291,7 +320,7 @@ $AssinaturaDigital = new AssinaturaDigital();
         return ("0" + data.getDate()).substr(-2) + "/" + ("0" + (data.getMonth() + 1)).substr(-2) + "/" + data.getFullYear();
     }
 
-    function js_mostraordem(e50_codord, e50_obs, e50_compdesp, elemento, e50_data, e60_numemp, data_anulacao, e53_valor, e50_retencaoir, e50_naturezabemservico, e53_vlranu, e53_vlrpag) {
+    function js_mostraordem(e50_codord, e50_obs, e50_compdesp, elemento, e50_data, e60_numemp, data_anulacao, e53_valor, e50_retencaoir, e50_naturezabemservico, e53_vlranu, e53_vlrpag, e50_contafornecedor,e50_numcgmordenador) {
 
         $('e60_numemp').value = e60_numemp;
         $('e50_codord').value = e50_codord;
@@ -301,6 +330,11 @@ $AssinaturaDigital = new AssinaturaDigital();
         $('e53_vlrpag').value = e53_vlrpag;
         $('historicoOp').value = e50_obs;
         $('e50_data').value = e50_data;
+        $('e50_numcgmordenador').value = e50_numcgmordenador;
+        $('e50_numcgmordenadoranterior').value = e50_numcgmordenador;
+        if (e50_numcgmordenador) {
+            js_pesquisa_liquidacao(false);
+        }
         $('dataLiquidacao').value = converterData(e50_data);
         $('dataLiquidacaoAtual').value = converterData(e50_data);
         if (data_anulacao !== "") {
@@ -322,6 +356,8 @@ $AssinaturaDigital = new AssinaturaDigital();
         js_verificaEstabelecimentosInclusos(e50_codord);
         js_validarRetencaoIR();
         js_pesquisaDiaria(e50_codord,e60_numemp);
+        $("e50_contafornecedor").innerHTML = ''
+        js_carregaContaFornecedor(e50_contafornecedor);
 
         if (e50_compdesp != '') {
             e50_compdesp = converterData(e50_compdesp);
@@ -379,6 +415,89 @@ $AssinaturaDigital = new AssinaturaDigital();
         }
         jan = window.open('emp2_emitenotaliq002.php?codordem='+$('e50_codord').getValue()+'&assinar=true', '','width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0');
         jan.moveTo(0,0);
+    }
+
+    function js_carregaContaFornecedor(iConta){
+        var oParam = new Object();
+        oParam.method = "getContasFornecedor";
+        oParam.iFornecedor = $('fornecedor').value;
+        let oAjax = new Ajax.Request("emp4_liquidacao004.php", {
+            method: 'post',
+            parameters: 'json=' + Object.toJSON(oParam),
+            onComplete: function (oAjax) {
+                let iContaPadrao = 0;
+                oRetorno = eval("("+oAjax.responseText+")");
+                if ($("e50_contafornecedor").length == 0) {
+                    opcaoPadrao = document.createElement('option');
+                    opcaoPadrao.value = 0;
+                    opcaoPadrao.textContent = "Sem conta definida.";
+                    $("e50_contafornecedor").appendChild(opcaoPadrao);
+                    
+                    if (oRetorno.length > 0) {      
+                        oRetorno.forEach(function(conta) {
+                            const novaConta = document.createElement('option');
+                            novaConta.value = conta.pc63_contabanco;
+                            if (conta.tipo == 1) {
+                                iContaPadrao = conta.pc63_contabanco;
+                                novaConta.textContent = conta.conta+' - '+conta.tipoconta+' (Padrão)';
+                            } else {
+                                novaConta.textContent = conta.conta+' - '+conta.tipoconta;
+                            }
+                            $("e50_contafornecedor").appendChild(novaConta);  
+                        })
+                    }
+                    if (iConta == '') {
+                        $("e50_contafornecedor").value = iContaPadrao;
+                    } else {
+                        $("e50_contafornecedor").value = iConta;
+                    }
+                }
+            }
+        });
+    }
+
+    function js_pesquisa_liquidacao(mostra)
+    {
+        if(mostra==true){
+            js_OpenJanelaIframe('','db_iframe_cgm','func_cgmordenador.php?funcao_js=parent.js_mostraliquidacao1|z01_numcgm|z01_nome|tipo','Pesquisa',true);
+        }else{
+            if(document.form1.e50_numcgmordenador.value != ''){
+                js_OpenJanelaIframe('','db_iframe_cgm','func_cgmordenador.php?pesquisa_chave='+document.form1.e50_numcgmordenador.value+'&funcao_js=parent.js_mostraliquidacao','Pesquisa',false);
+            }else{
+                document.form1.e50_nomeordenador.value = '';
+            }
+        }
+    }
+
+    function js_mostraliquidacao(erro,chave,chave1)
+    {
+        if (chave1 == 'JURIDICA') {
+            alert("É obrigatório que o ordenador seja uma pessoa física.");
+            document.form1.e50_numcgmordenador.value = '';
+            document.form1.e50_nomeordenador.value   = '';
+            document.form1.e50_numcgmordenador.focus();
+        } else {
+            document.form1.e50_nomeordenador.value = chave;
+        }   
+        
+        if(erro==true){
+            document.form1.e50_nomeordenador.value = '';
+            document.form1.e50_numcgmordenador.focus();
+        }
+    }
+    
+    function js_mostraliquidacao1(chave,chave1,chave2)
+    {
+        if (chave2 == 'JURIDICA') {
+            alert("É obrigatório que o ordenador seja uma pessoa física.")
+            document.form1.e50_numcgmordenador.value = '';
+            document.form1.e50_nomeordenador.value = '';
+            return false;
+        } else {
+            document.form1.e50_numcgmordenador.value = chave;
+            document.form1.e50_nomeordenador.value   = chave1;
+            db_iframe_cgm.hide();
+        }
     }
 
 </script>

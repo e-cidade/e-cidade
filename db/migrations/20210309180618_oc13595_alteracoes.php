@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc13595Alteracoes extends AbstractMigration
+class Oc13595Alteracoes extends PostgresMigration
 {
     public function up()
     {
@@ -160,7 +160,7 @@ class Oc13595Alteracoes extends AbstractMigration
                             ELSE c60_estrut_get
                         END)
         FROM verifica_estrut t1
-        JOIN conplano t2 ON (t1.c60_anousu_get, c60_estrut_get) = (t2.c60_anousu, t2.c60_estrut) 
+        JOIN conplano t2 ON (t1.c60_anousu_get, c60_estrut_get) = (t2.c60_anousu, t2.c60_estrut)
         WHERE (conplano.c60_anousu, conplano.c60_estrut) = (2021, c60_estrut_get)
         AND estrut_valido NOT IN (SELECT c60_estrut FROM conplano WHERE c60_anousu = 2021);
 
@@ -1111,7 +1111,7 @@ class Oc13595Alteracoes extends AbstractMigration
 
         UPDATE conplano
         SET c60_nregobrig = (CASE
-                                WHEN substr(conplano.c60_estrut, 1, length(rtrim(estrut_conta, '0'))) = rtrim(estrut_conta, '0') 
+                                WHEN substr(conplano.c60_estrut, 1, length(rtrim(estrut_conta, '0'))) = rtrim(estrut_conta, '0')
                                     THEN nro_reg_obrig::int4
                                 ELSE conplano.c60_nregobrig
                             END)
@@ -1218,7 +1218,7 @@ class Oc13595Alteracoes extends AbstractMigration
 
         UPDATE conplano
         SET c60_descr = (CASE
-                            WHEN conplano.c60_estrut = substr(estrut||'00000000000000',1,15) 
+                            WHEN conplano.c60_estrut = substr(estrut||'00000000000000',1,15)
                                 THEN substr(new_titulo,1,50)
                             ELSE conplano.c60_estrut
                         END)
@@ -1372,7 +1372,7 @@ class Oc13595Alteracoes extends AbstractMigration
 
         UPDATE conplano
         SET c60_descr = (CASE
-                            WHEN conplano.c60_estrut = substr(estrut_conta||'000000000000000',1,15) 
+                            WHEN conplano.c60_estrut = substr(estrut_conta||'000000000000000',1,15)
                                 THEN substr(titulo,1,50)
                             ELSE conplano.c60_estrut
                         END),

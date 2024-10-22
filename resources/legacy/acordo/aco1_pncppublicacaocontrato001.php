@@ -4,6 +4,7 @@
     include("libs/db_sessoes.php");
     include("libs/db_usuariosonline.php");
     include("dbforms/db_funcoes.php");
+    require_once("libs/renderComponents/index.php");
 
     db_app::load("scripts.js, strings.js, datagrid.widget.js, windowAux.widget.js,dbautocomplete.widget.js");
     db_app::load("dbmessageBoard.widget.js, prototype.js, dbtextField.widget.js, dbcomboBox.widget.js, widgets/DBHint.widget.js");
@@ -18,6 +19,13 @@
         <meta http-equiv="Expires" CONTENT="0">
         <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
         <link href="estilos.css" rel="stylesheet" type="text/css">
+
+        <script type="text/javascript">
+            loadComponents([
+                'buttonsSolid',
+                'simpleModal'
+            ]);
+        </script>
     </head>
 
     <body bgcolor=#CCCCCC>
@@ -33,11 +41,15 @@
                             </select>
 
                             <strong>Tipo: </strong>
-                            <select name="tipo" id="tipo">
-                                <option value="0">Selecione</option>
+                            <select name="tipo" id="tipo" onchange="js_getContratos()">
                                 <option value="1">Inclusão</option>
                                 <option value="2">Retificação</option>
                                 <option value="3">Exclusão</option>
+                            </select>
+
+                            </select>
+                                <strong>Ano competência: </strong>
+                                <input type="number" name="anocompetencia" id="anocompetencia" onclick="js_getContratos()" min="1111" max="9999" />
                             </select>
                         </td>
                     </tr>
@@ -58,128 +70,50 @@
         </form>
 
         <div style="width: 100%; display: flex; justify-content: center;">
-            <button id="openModalBtn" class="buttom-sucess">Enviar para PNCP</button>
+            <?php $component->render('buttons/solid', [
+                'designButton' => 'success',
+                'onclick' => 'js_clickSendPNCP()',
+                'message' => 'Enviar para PNCP',
+                'size' => 'md'
+            ]); ?>
         </div>
 
-        <div id="justificativaModal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h2>Justificativa PNCP</h2>
-                <form id="justificativaForm">
-                    <table border="0" cellspacing="0" cellpadding="0" width="100%">
-                        <tr>
-                            <td>
-                                <?php db_textarea('ac16_justificativapncp', 10, 48, false, true, 'text', $db_opcao, "", "", "justificativapncp", "5120"); ?>
-                            </td>
-                        </tr>
-                    </table>
-                    <div style="width: 100%; display: flex; justify-content: center;">
-                        <button class="buttom-sucess" type="submit">Salvar justificativa PNCP</button>
-                    </div>
-                </form>
+        <?php $component->render('modais/simpleModal/startModal', [
+            'title' => 'Justificativa para o PNCP',
+            'id' => 'justificativaModal',
+            'size' => 'lg'
+        ], true); ?>
+            <?php db_textarea('justificativapncp', 10, 48, false, true, 'text', $db_opcao, "", "", "justificativapncp", "255"); ?>
 
+            <div style="width: 100%; display: flex; justify-content: center;">
+                <?php $component->render('buttons/solid', [
+                    'designButton' => 'success',
+                    'type' => 'submit',
+                    'message' => 'Salvar justificativa PNCP',
+                    'onclick' => "js_saveJustificativaPNCP()",
+                    'size' => 'md'
+                ]); ?>
             </div>
-        </div>
+        <?php $component->render('modais/simpleModal/endModal', [], true); ?>
 
         <?php db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsession("DB_anousu"), db_getsession("DB_instit")); ?>
     </body>
 </html>
 
 <style>
-    #ac16_justificativapncp {
+    #justificativapncp {
         width: 100%;
         margin-bottom: 7px;
         font-size: 1rem;
     }
-
-    .buttom-sucess {
-        padding: 10px 30px 10px 30px;
-        background-color: #039b03;
-        color: white;
-        font-weight: bold;
-        border: none;
-        border-radius: 5px;
-        box-shadow: 0px 2px 6px 0px #595959;
-        cursor: pointer;
-    }
-
-    .buttom-sucess:hover {
-        background-color: #026502;
-    }
-
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1;
-        padding-top: 100px;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgb(0, 0, 0);
-        background-color: rgba(0, 0, 0, 0.7);
-        animation: fadeIn 0.5s;
-    }
-
-    .modal-content {
-        background-color: #fefefe;
-        margin: auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-        border-radius: 10px;
-        animation: slideIn 0.5s;
-    }
-
-    .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-    }
-
-    .close:hover,
-    .close:focus {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-    @keyframes fadeIn {
-        from {opacity: 0;}
-        to {opacity: 1;}
-    }
-
-    @keyframes slideIn {
-        from {transform: translateY(-200px); opacity: 0;}
-        to {transform: translateY(0); opacity: 1;}
-    }
-
-    @keyframes fadeOut {
-        from {opacity: 1;}
-        to {opacity: 0;}
-    }
-
-    @keyframes slideOut {
-        from {transform: translateY(0); opacity: 1;}
-        to {transform: translateY(-200px); opacity: 0;}
-    }
-
-    .modal.fadeOut {
-        animation: fadeOut 0.5s;
-    }
-
-    .modal-content.slideOut {
-        animation: slideOut 0.5s;
-    }
 </style>
 
 <script>
-    var modal = document.getElementById('justificativaModal');
     var btn = document.getElementById('openModalBtn');
-    var span = document.getElementsByClassName('close')[0];
-    var form = document.getElementById('justificativaForm');
+
+    var anoCompetenciaInput = document.getElementById("anocompetencia");
+    var anoAtual = new Date().getFullYear();
+    anoCompetenciaInput.value = anoAtual;
 
     function js_showGrid() {
         oGridContrato = new DBGrid('gridContrato');
@@ -187,7 +121,8 @@
         oGridContrato.setCheckbox(0);
         oGridContrato.setCellAlign(new Array("center", "center", "Center", "Left", "Center", "Center"));
         oGridContrato.setCellWidth(new Array("5%", "40%", "10%", "40%", "10%", "20%"));
-        oGridContrato.setHeader(new Array("Código", "Objeto", "Contato", "Fornecedor", "Licitação", "Número de Controle"));
+        oGridContrato.setHeader(new Array("Código", "Objeto", "Contrato", "Fornecedor", "Licitação", "Número de Controle"));
+        oGridContrato.setHeight(400);
         oGridContrato.hasTotalValue = false;
         oGridContrato.show($('cntgridcontratos'));
 
@@ -200,7 +135,12 @@
 
     function js_getContratos() {
         oGridContrato.clearAll(true);
+        let anocompetencia = document.getElementById("anocompetencia").value;
+        let tipo = document.getElementById("tipo").value;
+
         var oParam = new Object();
+        oParam.ano = anocompetencia;
+        oParam.tipo = tipo;
         oParam.exec = "getContratos";
         js_divCarregando('Aguarde, pesquisando Contratos', 'msgBox');
         var oAjax = new Ajax.Request(
@@ -268,6 +208,7 @@
         var aContratos = oGridContrato.getSelection("object");
 
         let tipo = $F('tipo');
+
         var oParam = new Object();
         if (tipo == 1) {
             oParam.exec = "enviarContrato";
@@ -325,8 +266,7 @@
         }
     }
 
-    // Abrir o modal quando o botão for clicado
-    btn.onclick = function() {
+    function js_clickSendPNCP() {
 
         let tipo = $F('tipo');
         var aContratos = oGridContrato.getSelection("object");
@@ -341,49 +281,26 @@
             return false;
         }
 
-        if (tipo == 2) {
-            modal.style.display = 'block';
-            modal.classList.remove("fadeOut");
-            modal.classList.add("fadeIn");
-            modal.querySelector(".modal-content").classList.remove("slideOut");
-            modal.querySelector(".modal-content").classList.add("slideIn");
+        if (tipo != 1) {
+            openModal('justificativaModal');
         } else {
             js_enviar();
         }
 
     }
 
-    // Fechar o modal quando o X for clicado
-    span.onclick = function() {
-        modal.classList.remove("fadeIn");
-        modal.classList.add("fadeOut");
-        modal.querySelector(".modal-content").classList.remove("slideIn");
-        modal.querySelector(".modal-content").classList.add("slideOut");
-        setTimeout(function() {
-            modal.style.display = 'none';
-        }, 300);
-    }
-
-    // Fechar o modal se clicar fora dele
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.classList.remove("fadeIn");
-            modal.classList.add("fadeOut");
-            modal.querySelector(".modal-content").classList.remove("slideIn");
-            modal.querySelector(".modal-content").classList.add("slideOut");
-            setTimeout(function() {
-                modal.style.display = 'none';
-            }, 300);
-        }
-    }
-
     // Manipular o envio do formulário dentro do modal
-    form.onsubmit = function(event) {
-        event.preventDefault();
+    function js_saveJustificativaPNCP() {
 
         var oParam = {};
-        oParam.justificativa = document.getElementById('ac16_justificativapncp').value;
+        justificativa = document.getElementById('justificativapncp').value;
+        oParam.justificativa = justificativa;
         oParam.exec = "AdicionarJustificativaPncp";
+
+        if (justificativa == '') {
+            alert('A justificativa não pode estar vazia');
+            return false;
+        }
 
         var aContratos = oGridContrato.getSelection("object");
 
@@ -408,7 +325,8 @@
                     if (xhr.status === 200) {
                         var response = JSON.parse(xhr.responseText);
                         if (response.status == '1') {
-                            modal.style.display = 'none';
+                            closeModal('justificativaModal');
+                            clearModaFieldsRenderComponents();
                             js_enviar();
                         } else {
                             alert(response.message);
@@ -419,5 +337,5 @@
                 }
             }
         );
-    };
+    }
 </script>

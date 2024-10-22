@@ -1,13 +1,13 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc19653v3 extends AbstractMigration
+class Oc19653v3 extends PostgresMigration
 {
     public function up()
     {
         $sql = <<<SQL
-            begin;    
+            begin;
 
             ALTER TABLE public.orgao112023 ADD si15_numerotelefone int8 NULL;
 

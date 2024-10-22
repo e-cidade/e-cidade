@@ -1,10 +1,10 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class InserirMenuEnvio extends AbstractMigration
+class InserirMenuEnvio extends PostgresMigration
 {
-    
+
     public function up()
     {
         $sSql = "INSERT INTO db_itensmenu
@@ -17,7 +17,7 @@ class InserirMenuEnvio extends AbstractMigration
             'Exportação (Envio)',
             't');
 
-        INSERT INTO db_menu 
+        INSERT INTO db_menu
         VALUES (32,
             (SELECT MAX(id_item) FROM db_itensmenu),
             (SELECT coalesce(MAX(menusequencia),0) FROM db_menu WHERE id_item = 32 and modulo = 10216),

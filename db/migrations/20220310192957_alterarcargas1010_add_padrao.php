@@ -1,15 +1,15 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Alterarcargas1010AddPadrao extends AbstractMigration
+class Alterarcargas1010AddPadrao extends PostgresMigration
 {
     public function up()
     {
         $sql = <<<SQL
         BEGIN;
 
-        
+
         UPDATE avaliacaopergunta
         SET db103_camposql = 'codidentpadrao'
         WHERE db103_sequencial = 3000941;

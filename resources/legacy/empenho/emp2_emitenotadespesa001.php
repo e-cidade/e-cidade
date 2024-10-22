@@ -380,29 +380,56 @@ db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsessio
 
 
     function js_solicitarAssinatura() {
+
         if (!confirm("Esse procedimento invalidará as assinaturas já realizadas. Deseja continuar?")) {
             return;
         }
         obj = document.form1;
-        if (obj.e81_codmov.value == '') {
-            alert("Selecione um movimento!");
+        if (obj.e81_codmov.value == '' && obj.dtini.value == ''  && obj.dtfim.value == '') {
+            alert("Selecione um Movimento ou um Período!");
             return;
         }
+        js_divCarregando('Aguarde, Enviando documentos para assinatura','msgbox');
         var oParametros = new Object();
-        oParametros.sMovimentos = obj.e81_codmov.value;
-        oParametros.sExecuta = 'enviarOrdemaPagamentoAssinatura';
-        oParametros.method = 'post';
-        new AjaxRequest(
+        oParametros.codmov = obj.e81_codmov.value;
+        var sDtini = obj.dtini.value.split("/");
+        var sDtfim = obj.dtfim.value.split("/");
+        var dtini_dia = sDtini[0];
+        var dtini_mes = sDtini[1];
+        var dtini_ano = sDtini[2];
+        var dtfim_dia = sDtfim[0];
+        var dtfim_mes = sDtfim[1];
+        var dtfim_ano = sDtfim[2];
+        if ((dtini_dia != '') && (dtini_mes != '') && (dtini_ano != '')) {
+            oParametros.dtini_ano = dtini_ano;
+            oParametros.dtini_mes = dtini_mes;
+            oParametros.dtini_dia = dtini_dia;
+        }
+        if ((dtfim_dia != '') && (dtfim_mes != '') && (dtfim_ano != '')) {
+            oParametros.dtfim_ano = dtfim_ano;
+            oParametros.dtfim_mes = dtfim_mes;
+            oParametros.dtfim_dia = dtfim_dia;
+        }
+        oParametros.sExecuta = 'enviarOrdemaPagamentoAssinaturaLote';
+        console.log('aqui')
+        var oAjax  = new Ajax.Request(
             'con1_assinaturaDigitalDocumentos.RPC.php',
-            oParametros,
-            function (oRetorno) {
-                if (oRetorno.erro) {
-                    alert("Erro ao enviar documentos para assinatura :" + oRetorno.sMensagem);
-                    return;
-                }
-                alert("Documento enviado com sucesso!");
+            {
+                method: 'post',
+                parameters: 'json='+Object.toJSON(oParametros),
+                onComplete: js_retornoSolicitarAssinatura
             }
-        ).execute();
+        );
+    }
+
+    function js_retornoSolicitarAssinatura(oRequest){
+        js_removeObj('msgbox');
+        var oRetorno = eval("("+oRequest.responseText+")");
+        if (oRetorno.erro) {
+            alert(oRetorno.sMensagem.urlDecode());
+            return;
+        }
+        alert('Documentos enviados para assinatura com sucesso!');
     }
 
     function js_solicitarImpressaoComAssinatura() {
@@ -412,7 +439,7 @@ db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsessio
             return;
         }
         var oParametros = new Object();
-        oParametros.e81_codmov = obj.e81_codmov.value;
+        oParametros.codmov = obj.e81_codmov.value;
         var sDtini = obj.dtini.value.split("/");
         var sDtfim = obj.dtfim.value.split("/");
         var dtini_dia = sDtini[0];
@@ -433,7 +460,7 @@ db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsessio
         }
 
         oParametros.method = 'post';
-        oParametros.sExecuta = 'immprimirDocumentoAssinadoOrdemPagamento';
+        oParametros.sExecuta = 'imprimirDocumentoAssinadoOrdemPagamento';
         window.open('con1_assinaturaDigitalDocumentos.RPC.php?json=' + encodeURIComponent(JSON.stringify(oParametros)), "_blank");
 
 

@@ -298,7 +298,6 @@ $cllicobras->rotulo->label();
             } else {
 
                 if (document.form1.obr01_licitacao.value != '') {
-                    alert('OI');
 
                     js_OpenJanelaIframe('CurrentWindow.corpo',
                         'db_iframe_licobraslicitacao',
@@ -693,6 +692,10 @@ $cllicobras->rotulo->label();
     }
     function getNumObra(){
 
+        if(document.getElementById('db_opcao').value != "Incluir"){
+            return false;
+        }
+
         const oParam = {};
         oParam.exec = 'buscarNumObra';
 
@@ -705,14 +708,10 @@ $cllicobras->rotulo->label();
             }
         );
     }
-        function mostrarNumObra(oAjax){
-            let oRetorno = eval('(' + oAjax.responseText + ")"); 
-            document.getElementById('obr01_numeroobra').value = oRetorno.numobra;
 
-        }
+    function mostrarNumObra(oAjax){
+        let oRetorno = eval('(' + oAjax.responseText + ")"); 
+        document.getElementById('obr01_numeroobra').value = oRetorno.numobra;
+    }
         
-
-
-
-
 </script>

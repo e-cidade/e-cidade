@@ -189,9 +189,17 @@ if ($listacom != "") {
     }
 }
 
+if ($listaacordo != "") {
+    if (isset($vercom) and $vercom == "com") {
+        $sWhereSQL = $sWhereSQL . " and ac16_sequencial in  ($listaacordo)";
+    } else {
+        $sWhereSQL = $sWhereSQL . " and ac16_sequencial not in  ($listaacordo)";
+    }
+}
+
 if ($listalicita != "") {
     if (isset($vercom) and $vercom == "com") {
-        $sWhereSQL = $sWhereSQL . " and empempenho.e60_numerol IN (select l20_numero::varchar ||'/'|| l20_anousu::varchar as ano from liclicita where l20_codigo in  ($listalicita))";
+        $sWhereSQL = $sWhereSQL . " and empempenho.e60_numerol IN (select l20_edital::varchar ||'/'|| l20_anousu::varchar as ano from liclicita where l20_codigo in  ($listalicita))";
 
         $sWhereSQL = $sWhereSQL . " AND empempenho.e60_codcom IN
     (SELECT l03_codcom
@@ -358,7 +366,7 @@ if ($processar == "a") {
             FROM empelemento
             inner JOIN empempenho ON e64_numemp = e60_numemp
             inner JOIN orcelemento ON (e64_codele, e60_anousu) = (o56_codele, o56_anousu)
-            WHERE $sWhereSQL
+            WHERE $sWhereSQL $sele_desdobramentos
             GROUP BY 2, o56_elemento,o56_descr
             HAVING count(e60_numemp) >= 1
             ORDER BY 4";
@@ -842,7 +850,81 @@ if ($processar == "a") {
                          order by  e60_emiss
   			    ";
         }
+    } elseif ($agrupar == "ta") {
+
+        $sqlperiodo =  "
+			      select e60_numemp,
+					e60_resumo,
+					e60_codemp,
+					e60_emiss,
+					e60_numcgm,
+					z01_nome,
+					z01_cgccpf,
+					z01_munic,
+					e60_vlremp,
+					e60_vlranu,
+					e60_vlrliq,
+					e63_codhist,
+					e40_descr,
+					e60_vlrpag,
+					e60_anousu,
+					e60_coddot,
+					o58_coddot,
+					o58_orgao,
+					o40_orgao,
+					o40_descr,
+					o58_unidade,
+					o41_descr,
+					o15_codigo,
+					o15_descr,
+					dl_estrutural,
+					e60_codcom,
+					pc50_descr,
+					empelemento.e64_codele,
+					orcelemento.o56_descr,
+          			e60_concarpeculiar,
+          			e60_numerol
+		      from ($sqlperiodo) as x
+			    /* inner join empelemento on x.e60_numemp = e64_numemp */
+
+	 	      inner join empelemento on x.e60_numemp = e64_numemp  " . $sele_desdobramentos . "
+			  inner join orcelemento on o56_codele = e64_codele and o56_anousu = x.e60_anousu
+
+		      group by  e60_numemp,
+					e60_resumo,
+					e60_codemp,
+					e60_emiss,
+					e60_numcgm,
+					z01_nome,
+					z01_cgccpf,
+					z01_munic,
+					e60_vlremp,
+					e60_vlranu,
+					e60_vlrliq,
+					e63_codhist,
+					e40_descr,
+					e60_vlrpag,
+					e60_anousu,
+					e60_coddot,
+					o58_coddot,
+					o58_orgao,
+					o40_orgao,
+					o40_descr,
+					o58_unidade,
+					o41_descr,
+					o15_codigo,
+					o15_descr,
+					dl_estrutural,
+					e60_codcom,
+					pc50_descr,
+					empelemento.e64_codele,
+					orcelemento.o56_descr,
+          e60_concarpeculiar,
+          e60_numerol";
+
+        $sqlperiodo .= " order by e60_codemp, e60_emiss, empelemento.e64_codele ";
     }
+
 
     $res = $clempempenho->sql_record($sqlperiodo);
     //echo $sqlperiodo;db_criatabela($res);die();

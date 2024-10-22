@@ -36,7 +36,8 @@ $oAssintaraDigital =  new AssinaturaDigital();
 <body class="body-default">
 <div class="container">
     <form name="form1">
-        <input name="pesquisar" type="submit" id="pesquisar"  title="Atualiza a Consulta" value="Atualizar" >
+        <input name="pesquisar" type="submit" id="pesquisar" title="Atualiza a Consulta" value="Atualizar" >
+    
         <fieldset class="form-container">
             <legend>Documentos</legend>
             <fieldset style='width:900px; margin-top: 10px;'>
@@ -44,11 +45,20 @@ $oAssintaraDigital =  new AssinaturaDigital();
                 <div id='ctnGridDocumentos'></div>
 
             </fieldset>
+
+            <input type="hidden" value="0" id="pagina-anterior"/>
+            <input type="hidden" value="0" id="pagina-proxima"/>
+
+            <input name="anterior" type="button" id="anterior" title="Anterior" value="Anterior" onclick="js_getAnterior()">
+            <input name="proximo" type="button" id="proximo" title="Próximo" value="Próximo" onclick="js_getProximo()">
+
             <input name="assinar" type="button" id="assinar"  title="Assinar todos" value="Assinar Selecionados" onclick="js_assinarVarios();">
+            
             <fieldset style='width:900px; margin-top: 10px;'>
                 <legend>Documentos Assinados</legend>
                 <div id='ctnGridDocumentosAssinados'></div>
             </fieldset>
+            <b>O limite de registros por página é de 1000. Ao atingir esse limite, clique no botão Próximo para visualizar mais documentos pendentes e assinados.</b>
         </fieldset>
     </form>
 </div>
@@ -79,22 +89,43 @@ $oAssintaraDigital =  new AssinaturaDigital();
     oGridDocumentosAssinados.show($("ctnGridDocumentosAssinados"));
 
     init = function() {
-        js_getDocumentos();
+        js_getDocumentos(1);
     };
 
-    function js_getDocumentos() {
+    function js_getAnterior() {
+        js_getDocumentos(document.getElementById("pagina-anterior").value);
+    }
+
+    function js_getProximo() {
+        js_getDocumentos(document.getElementById("pagina-proxima").value);
+    }
+
+    function js_getDocumentos(iPagina) {
         js_divCarregando('Aguarde, carregando os dados!', 'msgBox');
         oGridDocumentos.clearAll(true);
         oGridDocumentosAssinados.clearAll(true);
         var oParametros = new Object();
         oParametros.sExecuta = 'getDocumentos';
+        oParametros.iPagina = iPagina;
         var oAjax = new Ajax.Request(sRpc, {
             method: 'post',
             parameters: 'json=' + Object.toJSON(oParametros),
             onComplete: function(oResponse) {
                 var oRetorno = eval("(" + oResponse.responseText + ")");
                 var aDocumentos = [];
-                if(oRetorno.aDocumentos.length > 0) {
+                if (oRetorno.aDocumentos.length > 0) {
+                    sPaginacao = JSON.parse(oRetorno.aDocumentos).ocs.data.pagination;
+              
+                    iPaginaAnterior = sPaginacao.prev ? sPaginacao.prev.split('?')[1].split('&')[0].split('=')[1] : 1;
+                    iPaginaProxima = sPaginacao.next ? sPaginacao.next.split('?')[1].split('&')[0].split('=')[1] : 2;
+                    iPaginaAtual =  sPaginacao.current ? sPaginacao.current.split('?')[1].split('&')[0].split('=')[1] : 2;
+                    iPaginaFinal =  sPaginacao.last ? sPaginacao.last.split('?')[1].split('&')[0].split('=')[1] : iPaginaAtual;
+
+                    document.getElementById("pagina-anterior").value = iPaginaAnterior;
+                    document.getElementById("pagina-proxima").value = iPaginaProxima;
+
+                    js_AtivarPaginacao((iPaginaFinal == iPaginaAtual), "proximo");
+                    js_AtivarPaginacao((iPaginaAnterior == 1 && iPaginaProxima == 2), "anterior");
                     aDocumentos = JSON.parse(oRetorno.aDocumentos).ocs.data.data;
                 }
                 sUrlBase = oRetorno.link_base;
@@ -107,6 +138,16 @@ $oAssintaraDigital =  new AssinaturaDigital();
                 js_removeObj('msgBox');
             }
         });
+    }
+
+    function js_AtivarPaginacao(bCondicao, sBotao)
+    {
+        if (bCondicao) {
+            document.getElementById(sBotao).disabled = true;
+            return;
+        }
+        document.getElementById(sBotao).disabled = false;
+        return;
     }
 
     function js_Assinar(uuid) {
@@ -139,7 +180,6 @@ $oAssintaraDigital =  new AssinaturaDigital();
         var iTotalItensNaoAssinados   = 0;
         oGridDocumentos.clearAll(true);
         oGridDocumentosAssinados.clearAll(true);
-
         aDocumentos.each(function(oDocumento, iSeq) {
             var sign = js_getSignerUUID(oDocumento.signers);
             if(!sign.signed){

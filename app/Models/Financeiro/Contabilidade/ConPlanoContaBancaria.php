@@ -12,7 +12,7 @@ class ConPlanoContaBancaria extends LegacyModel
 
     public $timestamps = false;
 
-    protected $table = 'conplanocontabancaria';
+    protected $table = 'contabilidade.conplanocontabancaria';
 
     protected $primaryKey = 'c56_sequencial';
 

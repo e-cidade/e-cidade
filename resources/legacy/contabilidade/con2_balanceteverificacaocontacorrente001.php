@@ -57,19 +57,61 @@ $aMeses = array(
 <form id='form1' name="form1" method="post" action="" enctype="multipart/form-data">
     <div class="center container">
         <fieldset class="fieldS1"> <legend>Balancete Verificação Conta Corrente</legend>
-            <div class="formatdiv" align="left">
+            <div class="formatdiv" align="center">
                 <table style="margin-top: 10px; width: 100%;">
-                    <br>
                     <tr>
-                        <strong>Mês Referência:&nbsp;</strong>
-                        <select name="mes" class="formatselect">
-                            <option value="">Selecione...</option>
-                            <?php foreach ($aMeses as $key => $value) : ?>
-                                <option value="<?= $key ?>" >
-                                    <?= $value ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select><br><br>
+                        <td>
+                            <label class="bold">Data Inicial: </label>
+                        </td>
+                        <td>
+                            <?
+                                db_inputdata('dataInicial','01','01',db_getsession('DB_anousu'),true,'text',1);
+                            ?>
+                            </td>
+                        <td>
+                            <label class="bold" style="margin-left: -182px">&nbsp;&nbsp;Data Final: </label>
+                            <?
+                                $dataAtual = db_getsession('DB_datausu');
+                                db_inputdata('dataFinal',date('d', $dataAtual),date('m', $dataAtual),date('Y', $dataAtual),true,'text',1);
+                            ?>
+                        </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label class="bold">Indicador de Superávit: </label>
+                      </td>
+                      <td colspan="3">
+                          <?php
+                             $aIndicadores = array(
+                                ''  => 'Todos',
+                                'N' => 'N - Não se aplica',
+                                'F' => 'F - Financeiro',
+                                'P' => 'P - Patrimonial',
+                            );
+                            db_select('indicadorSuperavit', $aIndicadores, true, 1, 'style="width: 518px;"');
+                          ?>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label class="bold">Natureza de Saldo:</label>
+                      </td>
+                      <td colspan="3">
+                          <?php
+                            $aOpcoes = array(0  => 'Todos', 1 => 'Invertidas');
+                            db_select('naturezaSaldo', $aOpcoes, true, 1, 'style="width: 518px;"');
+                          ?>
+                      </td>
+                    </tr>
+                    <tr>
+                        <td>
+                        <b>Tipo:</b>
+                        <td>
+                            <?$aTipos = array(2 => "Analítico - Fonte", 1 => "Sintético");
+                            db_select('tipoRelatorio',$aTipos,false,1, 'style="width: 518px;"');
+                            ?>
+                        </td>
+                        </td>
                     </tr>
                     <tr>
                         <?
@@ -83,19 +125,23 @@ $aMeses = array(
                         <td colspan="3">
                             <?php
                             $Testrut_inicial = 'Informe os estruturais separados por vírgula';
-                            db_input('estrut_inicial', '', '', false, '', '', 'style="width: 100%;"')
+                            db_input('estrut_inicial', '', '', false, '', '', 'style="width: 518px;"')
                             ?>
                         </td>
-                    </tr>
+                    </tr>                    
                     <tr>
-                        <td>
-                        <b>Tipo:</b>
-                        <td>
-                            <?$aTipos = array(2 => "Analítico - Fonte", 1 => "Sintético");
-                            db_select('tipoRelatorio',$aTipos,false,1);
-                            ?>
-                        </td>
-                        </td>
+                      <td>
+                        <label class="bold" id="lbl_recurso" for="recurso">Recurso:</label>
+                      </td>
+                      <td colspan="3">
+                        <?php
+                            $sData         = date('Y-m-d', db_getsession('DB_datausu'));
+                            $sWhere        = " o15_datalimite is null or o15_datalimite > '{$sData}' ";
+                            $oClorctiporec = new cl_orctiporec;
+                            $oResource     = $oClorctiporec->sql_record($oClorctiporec->sql_query(null, "distinct on (o15_codtri) o15_codtri, o15_descr", "o15_codtri", $sWhere));
+                            db_selectrecord("recurso", $oResource, true, 2, "", "", "", "0");
+                        ?>
+                      </td>
                     </tr>
                 </table>
             </div>
@@ -110,13 +156,17 @@ $aMeses = array(
 <script>
 
     function js_emite(){
-        var mes     = document.form1.mes.value;
+        var dataInicial     = document.form1.dataInicial.value;
+        var dataFinal     = document.form1.dataFinal.value;
         var selinstit= document.form1.db_selinstit.value;
         var estrut_inicial = document.form1.estrut_inicial.value;
         var tipoRel = document.form1.tipoRelatorio.value;
+        var recurso = document.form1.recurso.value;
+        var naturezaSaldo = document.form1.naturezaSaldo.value;
+        var indicSuperavit = document.form1.indicadorSuperavit.value;
         var arquivo = "";
 
-        if (!mes) {
+        if (!dataInicial || !dataFinal) {
             alert("Todos os campos são obrigatórios");
             return false;
         }
@@ -124,7 +174,7 @@ $aMeses = array(
         arquivo = 'con2_balanceteverificacaocontacorrente002.php';
 
         var query = "";
-        query += ("mes="+mes+"&selinstit="+selinstit+"&estrut_inicial="+estrut_inicial)+"&tipoRel="+tipoRel;
+        query += ("dataInicial="+dataInicial+"&dataFinal="+dataFinal+"&selinstit="+selinstit+"&estrut_inicial="+estrut_inicial)+"&tipoRel="+tipoRel+"&naturezaSaldo="+naturezaSaldo+"&recurso="+recurso+"&indicSuperavit="+indicSuperavit;
 
         jan = window.open(
             arquivo+"?" + query,

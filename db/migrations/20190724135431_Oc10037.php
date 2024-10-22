@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc10037 extends AbstractMigration
+class Oc10037 extends PostgresMigration
 {
     /**
      * Change Method.
@@ -10,7 +10,7 @@ class Oc10037 extends AbstractMigration
      * Write your reversible migrations using this method.
      *
      * More information on writing migrations is available here:
-     * http://docs.phinx.org/en/latest/migrations.html#the-abstractmigration-class
+     * http://docs.phinx.org/en/latest/migrations.html#the-PostgresMigration-class
      *
      * The following commands can be used in this method and Phinx will
      * automatically reverse them when rolling back:
@@ -28,7 +28,7 @@ class Oc10037 extends AbstractMigration
     public function up()
     {
         $sql = <<<SQL
-        
+
         BEGIN;
         SELECT fc_startsession();
 
@@ -143,13 +143,13 @@ class Oc10037 extends AbstractMigration
                t1.o58_codigo,
                t1.o58_instit
         FROM dotacoes t1
-        JOIN dotacoes t2 ON 
-        (t1.o58_anousu, t1.o58_orgao, t1.o58_unidade, t1.o58_funcao, t1.o58_subfuncao, t1.o58_programa, t1.o58_codele, t1.o58_projativ, t1.o58_codigo, t1.o58_instit) = 
+        JOIN dotacoes t2 ON
+        (t1.o58_anousu, t1.o58_orgao, t1.o58_unidade, t1.o58_funcao, t1.o58_subfuncao, t1.o58_programa, t1.o58_codele, t1.o58_projativ, t1.o58_codigo, t1.o58_instit) =
         (t2.o58_anousu, t2.o58_orgao, t2.o58_unidade, t2.o58_funcao, t2.o58_subfuncao, t2.o58_programa, t2.o58_codele, t2.o58_projativ, t2.o58_codigo, t2.o58_instit)
-        WHERE 
-        (t1.o58_anousu, t1.o58_orgao, t1.o58_unidade, t1.o58_funcao, t1.o58_subfuncao, t1.o58_programa, t1.o58_codele, t1.o58_projativ, t1.o58_codigo, t1.o58_instit) = 
+        WHERE
+        (t1.o58_anousu, t1.o58_orgao, t1.o58_unidade, t1.o58_funcao, t1.o58_subfuncao, t1.o58_programa, t1.o58_codele, t1.o58_projativ, t1.o58_codigo, t1.o58_instit) =
         (t2.o58_anousu, t2.o58_orgao, t2.o58_unidade, t2.o58_funcao, t2.o58_subfuncao, t2.o58_programa, t2.o58_codele, t2.o58_projativ, t2.o58_codigo, t2.o58_instit)
-        GROUP BY 
+        GROUP BY
         t1.o58_anousu, t1.o58_orgao, t1.o58_unidade, t1.o58_funcao, t1.o58_subfuncao, t1.o58_programa, t1.o58_codele, t1.o58_projativ, t1.o58_codigo, t1.o58_instit
         HAVING count(*) > 1;
 
@@ -185,13 +185,13 @@ class Oc10037 extends AbstractMigration
                o58_datacriacao,
                o58_concarpeculiar
         FROM orcdotacao
-        WHERE (o58_anousu,o58_orgao,o58_unidade,o58_funcao,o58_subfuncao,o58_programa,o58_codele,o58_projativ,o58_instit) IN 
+        WHERE (o58_anousu,o58_orgao,o58_unidade,o58_funcao,o58_subfuncao,o58_programa,o58_codele,o58_projativ,o58_instit) IN
         (SELECT o58_anousu,o58_orgao,o58_unidade,o58_funcao,o58_subfuncao,o58_programa,o58_codele,o58_projativ,o58_instit FROM dot_duplicada)
         AND orcdotacao.o58_codigo IN (148, 149, 150, 151, 152)) a
         GROUP BY o58_anousu, o58_orgao, o58_unidade, o58_subfuncao, o58_projativ, o58_codigo, o58_funcao, o58_programa, o58_codele, o58_instit, o58_localizadorgastos, o58_datacriacao, o58_concarpeculiar;
 
         DELETE FROM dotacoes
-        WHERE (o58_anousu,o58_orgao,o58_unidade,o58_funcao,o58_subfuncao,o58_programa,o58_codele,o58_projativ,o58_instit) IN 
+        WHERE (o58_anousu,o58_orgao,o58_unidade,o58_funcao,o58_subfuncao,o58_programa,o58_codele,o58_projativ,o58_instit) IN
         (SELECT o58_anousu,o58_orgao,o58_unidade,o58_funcao,o58_subfuncao,o58_programa,o58_codele,o58_projativ,o58_instit FROM dot_reagrupadas);
 
         INSERT INTO dotacoes
@@ -212,17 +212,17 @@ class Oc10037 extends AbstractMigration
                dot_reagrupadas.o58_datacriacao,
                dot_reagrupadas.o58_concarpeculiar
         FROM dot_reagrupadas
-        JOIN orcdotacao ON 
-        (orcdotacao.o58_anousu, orcdotacao.o58_orgao, orcdotacao.o58_unidade, orcdotacao.o58_funcao, orcdotacao.o58_subfuncao, orcdotacao.o58_programa, orcdotacao.o58_codele, orcdotacao.o58_projativ, orcdotacao.o58_instit) = 
-        (dot_reagrupadas.o58_anousu, dot_reagrupadas.o58_orgao, dot_reagrupadas.o58_unidade, dot_reagrupadas.o58_funcao, dot_reagrupadas.o58_subfuncao, dot_reagrupadas.o58_programa, dot_reagrupadas.o58_codele, dot_reagrupadas.o58_projativ, dot_reagrupadas.o58_instit) 
+        JOIN orcdotacao ON
+        (orcdotacao.o58_anousu, orcdotacao.o58_orgao, orcdotacao.o58_unidade, orcdotacao.o58_funcao, orcdotacao.o58_subfuncao, orcdotacao.o58_programa, orcdotacao.o58_codele, orcdotacao.o58_projativ, orcdotacao.o58_instit) =
+        (dot_reagrupadas.o58_anousu, dot_reagrupadas.o58_orgao, dot_reagrupadas.o58_unidade, dot_reagrupadas.o58_funcao, dot_reagrupadas.o58_subfuncao, dot_reagrupadas.o58_programa, dot_reagrupadas.o58_codele, dot_reagrupadas.o58_projativ, dot_reagrupadas.o58_instit)
         WHERE
-        (orcdotacao.o58_anousu, orcdotacao.o58_orgao, orcdotacao.o58_unidade, orcdotacao.o58_funcao, orcdotacao.o58_subfuncao, orcdotacao.o58_programa, orcdotacao.o58_codele, orcdotacao.o58_projativ, orcdotacao.o58_instit) = 
+        (orcdotacao.o58_anousu, orcdotacao.o58_orgao, orcdotacao.o58_unidade, orcdotacao.o58_funcao, orcdotacao.o58_subfuncao, orcdotacao.o58_programa, orcdotacao.o58_codele, orcdotacao.o58_projativ, orcdotacao.o58_instit) =
         (dot_reagrupadas.o58_anousu, dot_reagrupadas.o58_orgao, dot_reagrupadas.o58_unidade, dot_reagrupadas.o58_funcao, dot_reagrupadas.o58_subfuncao, dot_reagrupadas.o58_programa, dot_reagrupadas.o58_codele, dot_reagrupadas.o58_projativ, dot_reagrupadas.o58_instit)
         AND orcdotacao.o58_codigo IN (148, 149, 150, 151, 152);
 
         DELETE FROM orcdotacao
         WHERE o58_anousu >= 2020
-        AND (o58_orgao, o58_unidade, o58_subfuncao, o58_projativ, o58_funcao, o58_programa, o58_codele) IN 
+        AND (o58_orgao, o58_unidade, o58_subfuncao, o58_projativ, o58_funcao, o58_programa, o58_codele) IN
         (SELECT o58_orgao, o58_unidade, o58_subfuncao, o58_projativ, o58_funcao, o58_programa, o58_codele FROM dotacoes)
         AND orcdotacao.o58_codigo IN (148, 149, 150, 151, 152);
 
@@ -246,7 +246,7 @@ class Oc10037 extends AbstractMigration
 
         COMMIT;
 SQL;
-    
+
         $this->execute($sql);
     }
 }

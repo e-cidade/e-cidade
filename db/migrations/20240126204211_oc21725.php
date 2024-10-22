@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc21725 extends AbstractMigration
+class Oc21725 extends PostgresMigration
 {
 
     public function up()
@@ -28,8 +28,8 @@ class Oc21725 extends AbstractMigration
             si203_mes int8 NOT NULL DEFAULT 0,
             si203_instit int8 NULL DEFAULT 0,
             CONSTRAINT dispensa302024_sequ_pk PRIMARY KEY (si203_sequencial)
-        );  
-        
+        );
+
         CREATE TABLE public.dispensa402024 (
             si204_sequencial int8 NOT NULL,
             si204_tiporegistro int4 NOT NULL,

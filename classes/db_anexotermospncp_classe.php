@@ -20,12 +20,14 @@ class cl_anexotermospncp {
   public $ac56_acocontroletermospncp = 0;
   public $ac56_anexo = 0;
   public $ac56_tipoanexo = 0;
+  public $ac56_nomearquivo = null;
   // cria propriedade com as variaveis do arquivo
   public $campos = "
                  ac56_sequencial = int8 = Cód. Sequencial
                  ac56_acocontroletermospncp = int8 = codigo do termo na tabela de controle
                  ac56_anexo = oid = anexo
                  ac56_tipoanexo = Varchar = tipo de anexo
+                 ac56_nomearquivo Varchar = nome do arquivo
                  ";
 
   //funcao construtor da classe
@@ -52,6 +54,7 @@ class cl_anexotermospncp {
       $this->ac56_acocontroletermospncp = ($this->ac56_acocontroletermospncp == ""?@$GLOBALS["HTTP_POST_VARS"]["ac56_acocontroletermospncp"]:$this->ac56_acocontroletermospncp);
       $this->ac56_anexo = ($this->ac56_anexo == ""?@$GLOBALS["HTTP_POST_VARS"]["ac56_anexo"]:$this->ac56_anexo);
       $this->ac56_tipoanexo = ($this->ac56_tipoanexo == ""?@$GLOBALS["HTTP_POST_VARS"]["ac56_tipoanexo"]:$this->ac56_tipoanexo);
+      $this->ac56_nomearquivo = ($this->ac56_nomearquivo == ""?@$GLOBALS["HTTP_POST_VARS"]["ac56_nomearquivo"]:$this->ac56_nomearquivo);
     }
 
   }
@@ -98,18 +101,29 @@ class cl_anexotermospncp {
       $this->erro_status = "0";
       return false;
     }
+    if ($this->ac56_nomearquivo == null ) {
+      $this->erro_sql = " nome do arquivo não informado.";
+      $this->erro_campo = "ac56_nomearquivo";
+      $this->erro_banco = "";
+      $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+      $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+      $this->erro_status = "0";
+      return false;
+    }
 
     $sql = "insert into anexotermospncp(
                                        ac56_sequencial
                                       ,ac56_acocontroletermospncp
                                       ,ac56_tipoanexo
                                       ,ac56_anexo
+                                      ,ac56_nomearquivo
                        )
                 values (
                                 $this->ac56_sequencial
                                ,$this->ac56_acocontroletermospncp
                                ,'$this->ac56_tipoanexo'
                                ,$this->ac56_anexo
+                               ,'$this->ac56_nomearquivo'
                       )";
     $result = db_query($sql);
     if ($result==false) {

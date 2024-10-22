@@ -16,6 +16,8 @@ require_once("classes/db_liclicitaportalcompras_classe.php");
 require_once("model/licitacao/PortalCompras/Fabricas/LicitacaoFabrica.model.php");
 require_once("model/licitacao/PortalCompras/Comandos/EnviaLicitacaoPcp.model.php");
 require_once("model/licitacao/PortalCompras/Comandos/ValidaAcessoApi.model.php");
+require_once("model/licitacao/PortalCompras/Modalidades/UnidadeMedida.model.php");
+require_once("model/licitacao/PortalCompras/Comandos/EnviaUnidadeMedidaPcp.model.php");
 
 $cl_liclicitaportalcompras = new cl_liclicitaportalcompras;
 $licitacaoFabrica  = new LicitacaoFabrica;
@@ -31,27 +33,125 @@ $oRetorno->itens   = array();
 
 switch ($oParam->exec) {
     case 'EnviarPregao':
-            try {
+        try {
+            // Recupera a chave de acesso e o código da licitação
+            $codigoLicitacao = $oParam->codigo;
+            $chaveAcesso = $validaAcessoApi->getChaveAcesso();
 
-                $codigo    = $oParam->codigo;
+            // Busca informações da licitação
+            $resultadosLicitacao = $cl_liclicitaportalcompras->buscaLicitacoes($codigoLicitacao);
+            $validaAcessoApi->execute($resultadosLicitacao);
 
-                $chaveAcesso = $validaAcessoApi->getChaveAcesso();
+            $unidadeMedida = new UnidadeMedida();
+            $unidadeMedida->validateAcronymAndDescriptionShoppingPortal($resultadosLicitacao, $cl_liclicitaportalcompras->numrows, $chaveAcesso);
+            
+            $siglasFaltantesNoPcp = $unidadeMedida->getSiglasFaltantesNoPcp();
 
-                $results   = $cl_liclicitaportalcompras->buscaLicitacoes($codigo);
-                $validaAcessoApi->execute($results);
+            // Trata siglas faltantes
+            if (!empty($siglasFaltantesNoPcp)) {
 
-                $licitacao = $licitacaoFabrica->criar($results, $cl_liclicitaportalcompras->numrows);
-                $url = $licitacao->getUrlPortalCompras($chaveAcesso);
+                $urlPost = $unidadeMedida->getUrlPostShoppingPortal($chaveAcesso);
+                $aBodyPostShoppingPortal = $unidadeMedida->getBodyPostShoppingPortal();
 
-                $enviador  = new EnviaLicitacaoPcp();
-                $resultado = $enviador->execute($licitacao, $url);
+                $messageErroCreateunitMeasure = "";
+                foreach ($aBodyPostShoppingPortal as $key => $body) {
+                    // Cria novas unidades no portal de compras se estiverem faltando
+                    $enviadorUnidadeMedida = new EnviaUnidadeMedidaPcp();
+                    $resultadoPost = $enviadorUnidadeMedida->create($body, $urlPost);
 
-                $oRetorno->message = $resultado['message'];
-                $oRetorno->status = (int)$resultado['success'];
-            } catch (Exception $oErro) {
-                $oRetorno->message = $oErro->getMessage();
-                $oRetorno->status  = 2;
+                    if (!$resultadoPost->success || empty($resultadoPost->success)) {
+                        $messageErroCreateunitMeasure .= $resultadoEnvio->message . "\n";
+                    }
+                }
+
+                if (!empty($messageErroCreateunitMeasure)) {
+                    $oRetorno->message = "Erro: " . $messageErroCreateunitMeasure;
+                    $oRetorno->status = 2;
+                }
+
             }
+
+            // Prossegue para enviar a licitação se não houver siglas faltantes ou se o post foi bem-sucedido
+            if (empty($siglasFaltantesNoPcp) || $resultadoPost->success) {
+                $fabricaLicitacao = new LicitacaoFabrica();
+                $licitacao = $fabricaLicitacao->criar($resultadosLicitacao, $cl_liclicitaportalcompras->numrows);
+                $urlPortalLicitacao = $licitacao->getUrlPortalCompras($chaveAcesso);
+
+                $enviadorLicitacao = new EnviaLicitacaoPcp();
+                $resultadoEnvio = $enviadorLicitacao->execute($licitacao, $urlPortalLicitacao);
+
+                $oRetorno->status = $resultadoEnvio['sucess'];
+                $oRetorno->message = $resultadoEnvio['message'];
+            }
+
+        } catch (Exception $exception) {
+            // Trata exceções
+            $oRetorno->message = $exception->getMessage();
+            $oRetorno->status = 2;
+        }
         break;
+
+    case 'ValidaPregao':
+
+        try {
+            // Recupera a chave de acesso e o código da licitação
+            $codigoLicitacao = $oParam->codigo;
+            $chaveAcesso = $validaAcessoApi->getChaveAcesso();
+
+            // Busca informações da licitação
+            $resultadosLicitacao = $cl_liclicitaportalcompras->buscaLicitacoes($codigoLicitacao);
+            $validaAcessoApi->execute($resultadosLicitacao);
+
+            $unidadeMedida = new UnidadeMedida();
+            $unidadeMedida->validateAcronymAndDescriptionShoppingPortal($resultadosLicitacao, $cl_liclicitaportalcompras->numrows, $chaveAcesso);
+            
+            $siglasIncorretasECorretas = $unidadeMedida->getSiglasIncorretasECorretas();
+            $siglasInvalidas = $unidadeMedida->getSiglasInvalidas();
+
+            // Trata siglas faltantes ou incorretas
+            if (empty($siglasIncorretasECorretas) && empty($siglasInvalidas)) {
+
+                $responseGetPcpUnidadeMedida = $unidadeMedida->getRespostaSiglaUnidadeGet();
+
+                if (empty($responseGetPcpUnidadeMedida['success']) || $responseGetPcpUnidadeMedida['success'] != 2) {
+
+                    $siglasFaltantesNoPcp = $unidadeMedida->getSiglasFaltantesNoPcp();
+
+                    if (!empty($siglasFaltantesNoPcp)) {
+                        $oRetorno->message = utf8_encode("Será incluido as seguintes unidades de medidas no Portal de Compras Publicas");
+                        $oRetorno->siglasFaltantesNoPcp = $siglasFaltantesNoPcp;
+                        $oRetorno->status = 3;
+                    } else {
+                        $oRetorno->status = 1;
+                    }
+
+                } else {
+                    $oRetorno->message = "Erro: " . $responseGetPcpUnidadeMedida['message'];
+                    $oRetorno->status = 2;
+                }
+
+            } else {
+
+                if (count($siglasIncorretasECorretas) > 1) {
+                    $messageStatus = "Algumas unidades de medidas já estão cadastradas no Portal de Compras Publicas, mas as siglas enviadas estão incorretas. Segue o gabarito para correção.";
+                } else {
+                    $messageStatus = "A unidade de medida já esta cadastradas no Portal de Compras Publicas, mas as sigla enviada esta incorreta. Segue o gabarito para correção.";
+                }
+
+                $oRetorno->message = utf8_encode($messageStatus);
+                $oRetorno->siglasInvalidas = $siglasInvalidas;
+                $oRetorno->siglasIncorretasECorretas = $siglasIncorretasECorretas;
+                $oRetorno->status = 4;
+
+            }
+
+        } catch (Exception $exception) {
+            // Trata exceções
+            $oRetorno->message = $exception->getMessage();
+            $oRetorno->status = 2;
+        }
+
+        break;  
 }
+
 echo json_encode($oRetorno);

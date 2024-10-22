@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc14870 extends AbstractMigration
+class Oc14870 extends PostgresMigration
 {
 
     public function up()
@@ -21,7 +21,7 @@ class Oc14870 extends AbstractMigration
     {
         $sSql = "";
         $aRowsInstit = $this->getInstit();
-        for ($iMes=1; $iMes <= 6; $iMes++) { 
+        for ($iMes=1; $iMes <= 6; $iMes++) {
             foreach ($aRowsInstit as $aInstit) {
                 $sSql .= "INSERT INTO bases (r08_anousu, r08_mesusu, r08_codigo, r08_descr, r08_calqua, r08_mesant, r08_pfixo, r08_instit) VALUES (2021,{$iMes},'B500','Dedução Salário família INSS','f','f','f',{$aInstit['codigo']});";
                 $sSql .= "INSERT INTO bases (r08_anousu, r08_mesusu, r08_codigo, r08_descr, r08_calqua, r08_mesant, r08_pfixo, r08_instit) VALUES (2021,{$iMes},'B501','Dedução Salário Mat. INSS','f','f','f',{$aInstit['codigo']});";
@@ -42,6 +42,6 @@ class Oc14870 extends AbstractMigration
         if (empty($result)) {
             return true;
         }
-        return false; 
+        return false;
     }
 }

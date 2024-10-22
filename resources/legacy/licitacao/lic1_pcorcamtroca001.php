@@ -543,8 +543,6 @@ if (isset($confirmar) && trim($confirmar) != "") {
 }
 
 if (isset($salvar) && trim($salvar) != "") {
-  //$result_licitacao = $clliclicita->sql_record($clliclicita->sql_query($l20_codigo));
-  //die($l20_descrinterporrecurso);
   $clliclicita->l20_licsituacao = 11;
   $clliclicita->l20_codigo      = $l20_codigo;
   $clliclicita->l20_regata = $l20_regata;
@@ -556,7 +554,6 @@ if (isset($salvar) && trim($salvar) != "") {
   $clliclicita->alterar_liclicitajulgamento($l20_codigo);
 
   if ($clliclicita->erro_status != 0) {
-    //$disable_confirmar = true;
     db_msgbox($clliclicita->erro_msg);
     if ($l20_interporrecurso == 1) {
       echo "<script>location.href='lic1_pcorcamtroca001.php?pc20_codorc=$pc20_codorc&pc21_orcamforne=$pc21_orcamforne&l20_codigo=$l20_codigo&disable_confirmar=true'</script>";
@@ -565,7 +562,6 @@ if (isset($salvar) && trim($salvar) != "") {
     $sqlerro = true;
   }
   db_fim_transacao($sqlerro);
-  //$erro_msg = $clliclicita->erro_msg;
 } else {
   $sSqlDadosLicitacao = $clliclicita->sql_query_file($l20_codigo);
   $rsDadosLicitacao   = $clliclicita->sql_record($sSqlDadosLicitacao);
@@ -574,24 +570,6 @@ if (isset($salvar) && trim($salvar) != "") {
     $disable_confirmar = true;
   }
 }
-
-
-/*if (isset($liberar) && trim($liberar) != "") {
-	$result_licitacao = $clliclicita->sql_record($clliclicita->sql_query($l20_codigo));
-	db_fieldsmemory($result_licitacao, 0);
-	$clliclicita->l20_licsituacao = 0;
-	db_inicio_transacao();
-	$clliclicita->alterar($l20_codigo);
-	if ($clliclicita->erro_status != 0) {
-	  //$disable_confirmar = false;
-	  db_msgbox($clliclicita->erro_msg);
-    echo "<script>location.href='lic1_pcorcamtroca001.php?pc20_codorc=$pc20_codorc&pc21_orcamforne=$pc21_orcamforne&l20_codigo=$l20_codigo'</script>";
-	} else {
-		$sqlerro = true;
-	}
-	db_fim_transacao($sqlerro);
-	//$erro_msg = $clliclicita->erro_msg;
-}*/
 
 ?>
 <html>

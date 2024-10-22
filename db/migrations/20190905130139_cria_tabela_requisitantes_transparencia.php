@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class CriaTabelaRequisitantesTransparencia extends AbstractMigration
+class CriaTabelaRequisitantesTransparencia extends PostgresMigration
 {
     /**
      * Change Method.
@@ -10,7 +10,7 @@ class CriaTabelaRequisitantesTransparencia extends AbstractMigration
      * Write your reversible migrations using this method.
      *
      * More information on writing migrations is available here:
-     * http://docs.phinx.org/en/latest/migrations.html#the-abstractmigration-class
+     * http://docs.phinx.org/en/latest/migrations.html#the-PostgresMigration-class
      *
      * The following commands can be used in this method and Phinx will
      * automatically reverse them when rolling back:
@@ -60,9 +60,9 @@ SQL;
     {
         $sql = <<<SQL
         INSERT INTO db_sysarquivo (codarq, nomearq, descricao, sigla, dataincl, rotulo, tipotabela, naolibclass, naolibfunc, naolibprog, naolibform) VALUES ((select max(codarq)+1 from db_sysarquivo), 'requisitantes_transparencia             ', 'Requisitantes Folha Transparência', 'db149', '2019-09-05', 'Requisitantes Folha Transparência', 0, false, false, false, false);
-         
+
         INSERT INTO db_sysarqmod (codmod, codarq) VALUES (7, (select max(codarq) from db_sysarquivo));
-         
+
         INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel) VALUES ((select max(codcam)+1 from db_syscampo), 'db149_sequencial                        ', 'int8                                    ', 'Código Sequencial', '0', 'Código Sequencial', 11, false, false, false, 1, 'text', 'Código Sequencial');
         INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel) VALUES ((select max(codcam)+1 from db_syscampo), 'db149_matricula                         ', 'int4                                    ', 'Matricula Consultada', '0', 'Matricula Consultada', 11, false, false, false, 1, 'text', 'Matricula Consultada');
         INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel) VALUES ((select max(codcam)+1 from db_syscampo), 'db149_cpf                               ', 'varchar(11)                             ', 'Cpf do Requisitante', '', 'Cpf do Requisitante', 11, false, true, false, 0, 'text', 'Cpf do Requisitante');
@@ -74,7 +74,7 @@ SQL;
         INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select max(codarq) from db_sysarquivo), (select codcam from db_syscampo where nomecam = 'db149_cpf'), 3, 0);
         INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select max(codarq) from db_sysarquivo), (select codcam from db_syscampo where nomecam = 'db149_nome'), 4, 0);
         INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select max(codarq) from db_sysarquivo), (select codcam from db_syscampo where nomecam = 'db149_data'), 5, 0);
- 
+
 SQL;
         $this->execute($sql);
 

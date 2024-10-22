@@ -228,7 +228,16 @@ switch ($oParam->exec) {
         $oRetorno->status = 2;
         break;
     };
-        
+    $oParam->db83_nroseqaplicacao = (int) $oParam->db83_nroseqaplicacao; 
+    $service     = new ContaBancariaService();
+    $verificarContas = $service->checkRepeatedAccount($oParam->db83_bancoagencia, $oParam->db83_conta, $oParam->db83_tipoconta, $oParam->iCodigoRecurso,$oParam->db83_nroseqaplicacao);
+
+    if ($verificarContas['status']) {
+        $oRetorno->message = "Conta já existe, reduzido: ". $verificarContas['c61_reduz'];
+        $oRetorno->status = 2;
+        break;
+    }
+
     $iAno          = db_getsession('DB_anousu');
     $ultimoEstrut  = strval(lastStructural($oParam->db83_tipoconta));
     $ultimoEstrut  ++;
@@ -273,7 +282,7 @@ switch ($oParam->exec) {
       $tablesObject->k13_conta  = $ckeysTables->k13_conta;
       $tablesObject->c63_codcon = $ckeysTables->c63_codcon;
       $tablesObject->e83_conta  = $ckeysTables->e83_conta;
-   
+      $oParam->db83_descricao = utf8_decode($oParam->db83_descricao);
       $result      = $service->updateContaBancaria($oParam,$tablesObject);
     
       if (!$result['status']) {
@@ -380,7 +389,7 @@ function accountsAnalytics($oParam,$estrutValido)
   
   $iMaximoAno             = db_getsession('DB_anousu');
   $oDataImplantacao = date('Y-m-d', strtotime(str_replace('/', '-', $oParam->db83_dataimplantaoconta)));
-
+  $oParam->db83_descricao = utf8_decode($oParam->db83_descricao);
   //Tabela ContaBancaria
   $service = new ContaBancariaService();
   $result = $service->insertContaBancaria($oParam);

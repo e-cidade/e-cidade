@@ -832,7 +832,7 @@ $aTiposRetencoesINSS = array(
             somaInss :  parseFloat(<?= $somaInss ?>),
             somaIrrf : parseFloat(<?= $somaIrrf ?>),
             baseIrrf :  parseFloat(<?= $baseIRRF ?>),
-            baseIrrfPassageiro :  parseFloat(<?= $baseIRRFPassageiro ?>),
+            baseIrrfPassageiro :  Math.abs(parseFloat(<?= $baseIRRFPassageiro ?>)),
             InssCargaPassageiro :  parseFloat(<?= $inss_carga_passageiro ?>),
             somaRetido :  parseFloat(<?= $soma_retido ?>),
             valorTotal :  parseFloat(<?= $valorTotal ?>)
@@ -1114,6 +1114,7 @@ $aTiposRetencoesINSS = array(
        //realiza o calculo
        var fixo = baseCalculoFixo(baseIrrfAtual);
        var percentual = baseCalculoPercentual(baseIrrfAtual);
+
        var calculo = parseFloat(percentual - fixo) - info.somaRetido;
        calculo = (Math.round(calculo * 100) / 100).toFixed(2);
 
@@ -1159,12 +1160,13 @@ $aTiposRetencoesINSS = array(
        var fixo = baseCalculoFixo(baseIrrfAtual);
        var percentual = baseCalculoPercentual(baseIrrfAtual);
        var calculo = parseFloat(percentual - fixo);
-       calculo -= info.somaIrrf;
-       calculo = (Math.round(calculo * 100) / 100).toFixed(2);
+
+       var resultado = info.baseIrrf - calculo;
+       calculo = (Math.round(resultado * 100) / 100).toFixed(2);
 
        //seta o valor do calculo no input
        document.getElementById("q62_vlrirrf").value = calculo;
-
+       
        return inssAtual;
     }
 

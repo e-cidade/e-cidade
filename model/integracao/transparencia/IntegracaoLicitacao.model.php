@@ -118,10 +118,9 @@ class IntegracaoLicitacao extends IntegracaoBase implements IItemIntegracao {
     $oDaoLIcilicitem = new cl_liclicitem();
     $sSqlLiclicitem  = $oDaoLIcilicitem->sql_query_portal_transparencia(null,
       $sListaCampos,
-      'l21_codliclicita, l21_ordem',
+      'l21_codliclicita',
       "l20_anousu >= {$this->iAnoInicioIntegracao} and pc24_pontuacao = 1 "
     );
-
     $rsItensLicitacao= db_query($this->rsConexaoOrigem, $sSqlLiclicitem);
     if (!$rsItensLicitacao) {
       throw new Exception("Erro ao pesquisar os itens da licitacao ".pg_last_error());
@@ -198,7 +197,7 @@ class IntegracaoLicitacao extends IntegracaoBase implements IItemIntegracao {
       $aListaArquivos[$oDocumento->documento] = $oDocumento->nome_arquivo_importacao;
       $this->inserirDadosPortalTransparencia($oDocumento, $oTableManagerLicitacoesDocumentos);
     }
-    
+
     $this->persistirDadosPortalTransparencia($oTableManagerLicitacoesDocumentos);
     $database = pg_connect("host=localhost user=dbportal password= port=5432 dbname=portal_transparencia");
     foreach ($aListaArquivos as $iOId => $sArquivo) {

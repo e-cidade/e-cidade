@@ -14,10 +14,10 @@ class PcprocRepository
         $this->model = new Pcproc();
     }
 
-    public function getProcessodeComprasLicitacao():array
+    public function getProcessodeComprasLicitacao(string $where):array
     {
         $clPcproc = new cl_pcproc();
-        $sql = $clPcproc->queryProcessodeComprasLicitacao();
+        $sql = $clPcproc->queryProcessodeComprasLicitacao($where);
         return DB::select($sql);
     }
 
@@ -32,6 +32,27 @@ class PcprocRepository
     {
         $clPcproc = new cl_pcproc();
         $sql = $clPcproc->getDadosProcessoCompras($pc80_codproc);
+        return DB::select($sql);
+    }
+
+    public function getOrigimProcessodeCompras($pc80_codproc):array
+    {
+        $clPcproc = new cl_pcproc();
+        $sql = $clPcproc->sqlOrigemProcessoDecompras($pc80_codproc);
+        return DB::select($sql);
+    }
+
+    public function getEstimativasOnPcproc(int $pc80_codproc)
+    {
+        $clPcproc = new cl_pcproc();
+        $sql = $clPcproc->sqlEstimativas($pc80_codproc);
+        return DB::select($sql);
+    }
+
+    public function getLicitacaoPcproc(int $pc80_codproc)
+    {
+        $clPcproc = new cl_pcproc();
+        $sql = $clPcproc->getlicitacao($pc80_codproc);
         return DB::select($sql);
     }
 }

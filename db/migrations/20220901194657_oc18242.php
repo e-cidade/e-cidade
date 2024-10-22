@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc18242 extends AbstractMigration
+class Oc18242 extends PostgresMigration
 {
     public function up()
     {
@@ -15,7 +15,7 @@ class Oc18242 extends AbstractMigration
 
        -- Inserindo menu Relatorio de Autonomos
        INSERT INTO db_itensmenu VALUES ((SELECT max(id_item)+1 FROM db_itensmenu),'Autônomos', 'Autônomos','emp2_autonomos001.php',1,1,'','t');
-      
+
         INSERT INTO db_menu VALUES
         ((SELECT id_item FROM db_itensmenu
         WHERE descricao LIKE 'Relatorio de Conferencia'),
@@ -33,5 +33,5 @@ class Oc18242 extends AbstractMigration
 
 SQL;
         $this->execute($sql);
-    } 
+    }
 }

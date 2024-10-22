@@ -143,7 +143,7 @@ db_input('si177_subelemento',2,$Isi177_subelemento,true,'text',$db_opcao,"")
     </td>
     <td>
 <?
-db_input('si177_codfontrecursos',3,$Isi177_codfontrecursos,true,'text',$db_opcao,"")
+db_input('si177_codfontrecursos',7,$Isi177_codfontrecursos,true,'text',$db_opcao,"")
 ?>
     </td>
   </tr>

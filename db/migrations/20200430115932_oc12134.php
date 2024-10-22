@@ -1,24 +1,24 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc12134 extends AbstractMigration
+class Oc12134 extends PostgresMigration
 {
     public function up()
     {
         $sql = "INSERT INTO db_itensmenu VALUES ((SELECT max(id_item)+1 FROM db_itensmenu), 'Manutenção de dados', 'Manutenção de dados', '', 1, 1, 'Manutenção de dados', 't');
 
-        INSERT INTO db_menu VALUES (32, 
-            (SELECT max(id_item) FROM db_itensmenu), 
-            (SELECT max(menusequencia)+1 as count FROM db_menu  WHERE id_item = 32), 
+        INSERT INTO db_menu VALUES (32,
+            (SELECT max(id_item) FROM db_itensmenu),
+            (SELECT max(menusequencia)+1 as count FROM db_menu  WHERE id_item = 32),
             (1));
 
         INSERT INTO db_itensmenu VALUES ((SELECT max(id_item)+1 FROM db_itensmenu), 'Excluir Empenhos', 'Excluir Empenhos', 'm4_empenhos.php', 1, 1, 'Empenhos', 't');
 
         INSERT INTO db_menu VALUES (
-            (SELECT id_item from db_itensmenu where descricao = 'Manutenção de dados'), 
-            (SELECT max(id_item) FROM db_itensmenu), 
-            (SELECT max(menusequencia)+1 as count FROM db_menu  WHERE id_item = 32), 
+            (SELECT id_item from db_itensmenu where descricao = 'Manutenção de dados'),
+            (SELECT max(id_item) FROM db_itensmenu),
+            (SELECT max(menusequencia)+1 as count FROM db_menu  WHERE id_item = 32),
             (1));
 
         create sequence configuracoes.db_manut_log_manut_sequencial_seq

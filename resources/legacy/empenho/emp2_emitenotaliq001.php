@@ -111,7 +111,7 @@ db_app::load("scripts.js,
 	   <b><? db_ancora("Ordem:","js_pesquisae50_codord(true);",1); ?></b>
 	</td>
 	<td>
-	   <? db_input('e50_codord',13,$Ie50_codord,true,'text',$db_opcao," onchange='js_pesquisae50_codord(false);'","e50_codord_ini")  ?>
+	   <? db_input('e50_codord',13,$Ie50_codord,true,'text',$db_opcao," ","e50_codord_ini")  ?>
      <strong> / </strong>
      <? db_input('e50_codord',13,$Ie50_codord,true,'text',$db_opcao,"","e50_codord_fim")  ?>
 	</td>
@@ -472,7 +472,7 @@ function js_imprimirAssinado(){
         oParametros.aFornecedores =aFornecedores;
         oParametros.historico =historico;
         oParametros.valor_ordem =valor_ordem;
-        oParametros.sExecuta = 'immprimirDocumentoAssinadoLiquidacao';
+        oParametros.sExecuta = 'imprimirDocumentoAssinadoLiquidacao';
         window.open(sRpcAssinaturaDigital+'?json='+encodeURIComponent(JSON.stringify(oParametros)), "_blank");
     }
 }

@@ -1,0 +1,60 @@
+.btn {
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 5px;
+}
+
+/* Small (SM) */
+.btn.sm {
+    padding: 5px 10px;
+    font-size: 14px;
+}
+
+/* Medium (MD) */
+.btn.md {
+    padding: 10px 20px;
+    font-size: 16px;
+}
+
+/* Large (LG) */
+.btn.lg {
+    padding: 15px 30px;
+    font-size: 18px;
+}
+
+/* Extra Large (XL) */
+.btn.xl {
+    padding: 20px 40px;
+    font-size: 20px;
+}
+
+/* Full width (full) */
+.btn.full {
+    padding: 10px 20px;
+    width: 100%;
+}
+
+#rdc-spinner-div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rdc-spinner-button {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.75rem;
+    fill: #E5E7EB;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}

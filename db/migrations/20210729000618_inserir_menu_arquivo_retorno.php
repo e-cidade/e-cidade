@@ -1,10 +1,10 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class InserirMenuArquivoRetorno extends AbstractMigration
+class InserirMenuArquivoRetorno extends PostgresMigration
 {
-    
+
     public function up()
     {
         $sql = "INSERT INTO db_itensmenu VALUES ((SELECT max(id_item)+1 FROM db_itensmenu),'Arquivo Retorno', 'Arquivo Retorno','pes4_arquivoretorno001.php',1,1,'','t');
@@ -20,7 +20,7 @@ class InserirMenuArquivoRetorno extends AbstractMigration
         $sql = "DELETE FROM db_menu WHERE id_item_filho = (SELECT id_item FROM db_itensmenu WHERE descricao='Arquivo Retorno');
         DELETE FROM db_itensmenu WHERE descricao='Arquivo Retorno';
         ";
-        
+
         $this->execute($sql);
     }
 }

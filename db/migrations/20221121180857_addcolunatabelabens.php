@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Addcolunatabelabens extends AbstractMigration
+class Addcolunatabelabens extends PostgresMigration
 {
     public function up()
     {
@@ -19,5 +19,5 @@ class Addcolunatabelabens extends AbstractMigration
 
 SQL;
         $this->execute($sql);
-    } 
+    }
 }

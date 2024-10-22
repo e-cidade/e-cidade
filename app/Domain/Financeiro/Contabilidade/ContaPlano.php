@@ -138,7 +138,7 @@ class ContaPlano
      */
     public function setC60Descr(string $c60_descr): self
     {
-        $this->c60_descr = mb_convert_encoding($c60_descr,  "UTF-8", "ISO-8859-1");
+        $this->c60_descr = $c60_descr;
         return $this;
     }
 

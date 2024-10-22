@@ -119,5 +119,19 @@ class ContaBancariaService implements ContaBancariaServiceInterface
         }
     }
 
+    public function checkRepeatedAccount(int $agencia, string $conta, int $tipoconta, string $fonte, int $nroseqaplicacao)
+    {
+        try {
+           
+            $contabancaria = new InsertContaBancariaCommand();
+            $contabancarianovo = $contabancaria->checkRepeated($agencia, $conta, $tipoconta, $fonte, $nroseqaplicacao);
+
+            return ['status' => true, 'c61_reduz' => $contabancarianovo->c61_reduz];
+        } catch (\Exception $e) {
+            return ['status' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+
 
 }

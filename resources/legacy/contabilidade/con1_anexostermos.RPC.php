@@ -51,6 +51,7 @@ switch ($oParam->exec) {
             $cl_anexotermospncp->ac56_acocontroletermospncp = $oParam->sequencial;
             $cl_anexotermospncp->ac56_tipoanexo = $oParam->tipoanexo;
             $cl_anexotermospncp->ac56_anexo = $oOidBanco;
+            $cl_anexotermospncp->ac56_nomearquivo = $oParam->sNomeArquivo;
             $cl_anexotermospncp->incluir();
 
             if ($cl_anexotermospncp->erro_status == '0') {

@@ -14,7 +14,7 @@ class Tabativbaixa extends LegacyModel
 
     protected $table = 'issqn.tabativbaixa';
 
-    protected $primaryKey = 'q11_inscr, q11_seq';
+    protected $primaryKey = 'q11_inscr';
 
     protected $fillable = [
         'q11_inscr',

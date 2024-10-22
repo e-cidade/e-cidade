@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc18148 extends AbstractMigration
+class Oc18148 extends PostgresMigration
 {
     public function up()
     {
@@ -14,11 +14,11 @@ class Oc18148 extends AbstractMigration
     public function criacampo()
     {
         $sqlCria = "
-        
+
         select fc_startsession();
 
         begin;
-        
+
         alter table relatorios add column rel_instit int;
 
         select setval('relatorios_rel_sequencial_seq',(select max(rel_sequencial) from relatorios));
@@ -52,7 +52,7 @@ class Oc18148 extends AbstractMigration
 
             $rel1 = array($rel_sequencial_autorizacao, $autorizacao['rel_descricao'], $autorizacao['rel_arquivo'], $autorizacao['rel_corpo'], $instit['codigo']);
             $rel2 = array($rel_sequencial_autuacao, $autuacao['rel_descricao'], $autuacao['rel_arquivo'], $autuacao['rel_corpo'], $instit['codigo']);
-            
+
             $this->table('relatorios', array('schema' => 'public'))->insert($campos, array($rel1))->saveData();
             $this->table('relatorios', array('schema' => 'public'))->insert($campos, array($rel2))->saveData();
         }
@@ -60,7 +60,7 @@ class Oc18148 extends AbstractMigration
 
     public function removeInstitNull(){
         $remove = "begin;
-        
+
         delete from relatorios where rel_instit is null;
 
         commit;";

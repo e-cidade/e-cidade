@@ -159,22 +159,24 @@ class ImportacaoAbastecimentoService
                     $movimentacaoValida['hora_servidor'] = date("H:i", db_getsession('DB_uol_hora'));
 
                     $placa = str_replace("-", '', $movimentacao->placa);
-                    $veiculo = $this->veiculosRepository->getVeiculoByPlaca($placa,db_getsession('DB_instit') ,['ve01_codigo', 've01_placa']);
-                    if (empty($veiculo->ve01_codigo)) {
+                    $veiculos = $this->veiculosRepository->getVeiculosByPlacaAndInstit($placa,db_getsession('DB_instit') ,['ve01_codigo', 've01_placa']);
+
+                    if(empty($veiculos)){
                         throw new Exception('Veículo não encontrado');
                     }
+
+                    $veiculosCodigo = array_column($veiculos, 've01_codigo');
+                    $veiculo = $this->veiculosRepository->getVeiculoNotBaixa($veiculosCodigo, $movimentacao->data);
+
+                    if(empty($veiculo)){
+                        throw new Exception('Veículo baixado');
+                    }
+
                     $verificaRetiradaSemDevolucaoCommand = new VerificaRetidadaSemDevolucao();
                     $retiradaSemDevolucao = $verificaRetiradaSemDevolucaoCommand->execute($veiculo->ve01_codigo);
 
                     if($retiradaSemDevolucao[0]->ve60_codigo){
                         throw new Exception('Veículo possui retida sem devolução codigo : '.$retiradaSemDevolucao[0]->ve60_codigo);
-                    }
-
-                    $verificabaixaCommand = new GetBaixaVeiculo();
-                    $baixaveiculo = $verificabaixaCommand->execute($veiculo->ve01_codigo,$movimentacao->data);
-
-                    if($baixaveiculo[0]->ve04_codigo){
-                        throw new Exception('Veículo baixado');
                     }
 
                     $movimentacaoValida['codigoVeiculo'] = $veiculo->ve01_codigo;
@@ -190,8 +192,7 @@ class ImportacaoAbastecimentoService
 
                     $movimentacaoValida['motorista'] = $movimentacao->motorista;
 
-                    $cgmMotorista = $this->cgmRepository->getCgmByCpf($movimentacaoValida['cpf'], ['z01_numcgm']);
-                    $motoristaCgm = $this->motoristasRepository->getMotoristaByCgm($cgmMotorista->z01_numcgm);
+                    $motoristaCgm = $this->cgmRepository->getMotoristaByCpf($movimentacaoValida['cpf']);
 
                     if (empty($motoristaCgm->ve05_codigo)) {
                         throw new Exception('Motorista não encontrado');
@@ -226,6 +227,7 @@ class ImportacaoAbastecimentoService
                     if (empty($retirada->ve60_codigo)) {
                         throw new Exception('Não foi possivel inserir na tabela veiretirada ');
                     }
+
                     $movimentacaoValida['codigoRetirada'] = $retirada->ve60_codigo;
 
                     $abastecimento = $this->veicAbastService->insert($movimentacaoValida);

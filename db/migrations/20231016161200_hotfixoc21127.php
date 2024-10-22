@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Hotfixoc21127 extends AbstractMigration
+class Hotfixoc21127 extends PostgresMigration
 {
     public function up(){
         $sql = "

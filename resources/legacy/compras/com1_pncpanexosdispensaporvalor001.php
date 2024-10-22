@@ -6,6 +6,7 @@ require_once("libs/db_utils.php");
 require_once("libs/db_usuariosonline.php");
 require_once("libs/db_app.utils.php");
 require_once("dbforms/db_funcoes.php");
+require_once("libs/renderComponents/index.php");
 
 $iOpcaoLicitacao = 1;
 $lExibirMenus   = true;
@@ -116,20 +117,80 @@ $oRotulo->label("pc80_resumo");
             </form>
         </fieldset>
 
-        <input type="button" id="btnSalvar" onClick="js_salvar();" value="Salvar" />
-        <input type="button" id="btnAlterar" onClick="js_alterar();" value="Alterar" />
+        <?php $component->render('buttons/solid', [
+            'designButton' => 'success',
+            'onclick' => 'js_salvar();',
+            'message' => 'Salvar',
+            'id' => 'btnSalvar',
+            'size' => 'sm'
+        ]); ?>
+
+        <?php $component->render('buttons/solid', [
+            'designButton' => 'success',
+            'onclick' => 'js_alterar();',
+            'message' => 'Alterar',
+            'id' => 'btnAlterar',
+            'size' => 'sm'
+        ]); ?>
 
 
         <fieldset style="margin-top:15px;">
             <legend>Documentos Anexados</legend>
             <div id="ctnDbGridDocumentos"></div>
         </fieldset>
-        <input type="button" id="btnEnviarPNCP" value="Envia documento para o PNCP" onClick="js_enviarDocumentoPNCP();" />
-        <input type="button" id="btnExcluirPNCP" value="Excluir documento no PNCP" onClick="js_excluirDocumentoPNCP();" />
-        <input type="button" id="btnExcluir" value="Excluir Selecionados" onClick="js_excluirSelecionados();" />
-        <input type="button" id="btnDownloadAnexos" value="Download" onClick="js_downloadAnexos();" />
+        
+        <div style="width: 100%; display: flex; justify-content: center;">
+            <?php $component->render('buttons/solid', [
+                'designButton' => 'success',
+                'onclick' => 'js_enviarDocumentoPNCP();',
+                'message' => 'Envia documento para o PNCP',
+                'id' => 'btnEnviarPNCP',
+                'size' => 'sm'
+            ]); ?>
+
+            <?php $component->render('buttons/solid', [
+                'designButton' => 'danger',
+                'onclick' => "openModal('justificativaModal');",
+                'message' => 'Excluir documento no PNCP',
+                'id' => 'btnExcluirPNCP',
+                'size' => 'sm'
+            ]); ?>
+
+            <?php $component->render('buttons/solid', [
+                'designButton' => 'danger',
+                'onclick' => 'js_excluirSelecionados();',
+                'message' => 'Excluir Selecionados',
+                'id' => 'btnExcluir',
+                'size' => 'sm'
+            ]); ?>
+
+            <?php $component->render('buttons/solid', [
+                'designButton' => 'secondary',
+                'onclick' => 'js_downloadAnexos();',
+                'message' => 'Download',
+                'id' => 'btnDownloadAnexos',
+                'size' => 'sm'
+            ]); ?>
+        </div>
 
     </div>
+
+    <?php $component->render('modais/simpleModal/startModal', [
+        'title' => 'Justificativa para o PNCP',
+        'id' => 'justificativaModal',
+        'size' => 'lg'
+    ], true); ?>
+        <?php db_textarea('justificativapncp', 10, 48, false, true, 'text', $db_opcao, "", "", "justificativapncp", "255"); ?>
+        
+        <div style="width: 100%; display: flex; justify-content: center;">
+            <?php $component->render('buttons/solid', [
+                'designButton' => 'success',
+                'onclick' => 'js_excluirDocumentoPNCP();',
+                'message' => 'Salvar justificativa PNCP',
+                'size' => 'md'
+            ]); ?>
+        </div>
+    <?php $component->render('modais/simpleModal/endModal', [], true); ?>
 
     <?php if ($lExibirMenus) : ?>
         <?php db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsession("DB_anousu"), db_getsession("DB_instit")); ?>
@@ -139,7 +200,21 @@ $oRotulo->label("pc80_resumo");
 </body>
 
 </html>
+
+<style>
+  #justificativapncp {
+    width: 100%;
+    margin-bottom: 7px;
+    font-size: 1rem;
+  }
+</style>
+
 <script type="text/javascript">
+    loadComponents([
+        'buttonsSolid',
+        'simpleModal'
+    ]);
+
     document.getElementById("btnAlterar").style.display = "none";
 
     /**
@@ -162,7 +237,7 @@ $oRotulo->label("pc80_resumo");
     oGridDocumentos.nameInstance = "oGridDocumentos";
     oGridDocumentos.setCheckbox(0);
     oGridDocumentos.setCellAlign(new Array("center", "center", "center", "center"));
-    oGridDocumentos.setCellWidth(["30%", "30%", "30%", "30%"]);
+    oGridDocumentos.setCellWidth(["0%", "10%", "60%", "30%"]);
     oGridDocumentos.setHeader(new Array("Seq", "Código", "Tipo", "Ação"));
     oGridDocumentos.aHeaders[1].lDisplayed = false;
     oGridDocumentos.allowSelectColumns(true);
@@ -819,6 +894,7 @@ $oRotulo->label("pc80_resumo");
         oParametros.iCodigoDocumento = iCodigoDocumento;
         oParametros.iCodigoProcesso = iCodigoProcesso;
         oParametros.sCaminhoArquivo = sCaminhoArquivo;
+        oParametros.sTitulo = $("uploadfile").files[0].name;
 
         var oAjax = new Ajax.Request(
             sUrlRpc, {
@@ -854,6 +930,7 @@ $oRotulo->label("pc80_resumo");
         var iCodigoProcesso = $('pc80_codproc').value;
         var aDocumentos = [];
         var aTipo = [];
+        let aCodigoAnexo = [];
 
         if (iSelecionados == 0) {
             alert('Selecione pelo menos arquivo para Enviar')
@@ -877,6 +954,8 @@ $oRotulo->label("pc80_resumo");
             var iTipo = documentosSelecionados[iIndice].aCells[3].getValue();
             aTipo.push(iTipo);
 
+            aCodigoAnexo.push(documentosSelecionados[iIndice].aCells[2].getValue());
+
         }
 
         js_divCarregando('Aguarde... Enviando documentos!', 'msgbox');
@@ -887,6 +966,7 @@ $oRotulo->label("pc80_resumo");
         oParametros.iCodigoProcesso = iCodigoProcesso;
         oParametros.aDocumentos = aDocumentos;
         oParametros.aTipoDocumentos = aTipo;
+        oParametros.aCodigoAnexo = aCodigoAnexo;
 
         var oAjax = new Ajax.Request(
             'com1_envioanexos.RPC.php', {
@@ -919,6 +999,8 @@ $oRotulo->label("pc80_resumo");
         var iCodigoProcesso = $('pc80_codproc').value;
         var aDocumentos = [];
         var aTipo = [];
+        let aCodigoAnexo = [];
+        let justificativa = document.getElementById('justificativapncp').value;
 
         if (iSelecionados == 0) {
             alert('Selecione pelo menos arquivo para Excluir')
@@ -942,6 +1024,8 @@ $oRotulo->label("pc80_resumo");
             var iTipo = documentosSelecionados[iIndice].aCells[3].getValue();
             aTipo.push(iTipo);
 
+            aCodigoAnexo.push(documentosSelecionados[iIndice].aCells[2].getValue());
+
         }
 
         js_divCarregando('Aguarde... Excluindo documentos!', 'msgbox');
@@ -952,6 +1036,13 @@ $oRotulo->label("pc80_resumo");
         oParametros.iCodigoProcesso = iCodigoProcesso;
         oParametros.aDocumentos = aDocumentos;
         oParametros.aTipoDocumentos = aTipo;
+        oParametros.aCodigoAnexo = aCodigoAnexo;
+        oParametros.justificativa = justificativa;
+
+        if (justificativa == '') {
+            alert('A justificativa no pode estar vazia');
+            return false;
+        }
 
         var oAjax = new Ajax.Request(
             'com1_envioanexos.RPC.php', {
@@ -967,7 +1058,8 @@ $oRotulo->label("pc80_resumo");
 
                     js_removeObj("msgbox");
                     var oRetorno = eval('(' + oAjax.responseText + ")");
-                    console.log(oRetorno);
+                    closeModal('justificativaModal');
+                    clearModaFieldsRenderComponents();
                     if (oRetorno.status == 1) {
                         alert("Anexo(s) Excluidos(s) com Sucesso!");
                     } else {

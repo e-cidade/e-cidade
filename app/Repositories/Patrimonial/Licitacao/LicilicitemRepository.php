@@ -33,4 +33,17 @@ class LicilicitemRepository
         $sql = $cllicitem->queryOrdemItens($l20_codigo);
         return DB::select($sql);
     }
+    public function getItensLicitacao($l20_codigo,$l224_forne,$lote)
+    {
+        $cllicitem = new cl_liclicitem();
+        $sql = $cllicitem->getItensLicitacao($l20_codigo,$l224_forne,$lote);
+        return DB::select($sql);
+    }
+    public function getPrecoReferencia($l20_codigo)
+    {
+        $cllicitem = new cl_liclicitem();
+        $sql = $cllicitem->getPrecoReferencia($l20_codigo);
+        return DB::select($sql);
+    }
+    
 }

@@ -14,7 +14,7 @@ class cl_itemprecoreferencia {
    var $erro_banco = null;
    var $erro_msg   = null;
    var $erro_campo = null;
-   var $pagina_retorno = null; 
+   var $pagina_retorno = null;
    // cria variaveis do arquivo
    var $si02_sequencial = 0;
    var $si02_precoreferencia = 0;
@@ -38,12 +38,12 @@ class cl_itemprecoreferencia {
                  si02_itemproccompra = int8 = Codigo do Item
                  si02_vlprecoreferencia = float8 = Valor do preco de referencia
                  si02_coditem = int8 = Codigo do Item Material
-                 si02_qtditem =  int8 = quantidade item 
+                 si02_qtditem =  int8 = quantidade item
                  si02_codunidadeitem = int8 = codigo da unidade
-                 si02_reservado = bool = Reservado 
+                 si02_reservado = bool = Reservado
                  si02_tabela = bool = Tabela
                  si02_taxa = bool = Taxa
-                 si02_criterioadjudicacao = int8 = criterio 
+                 si02_criterioadjudicacao = int8 = criterio
                  si02_mediapercentual = float8 = Media percentual
                  si02_vltotalprecoreferencia = float8 = Valor total do preco de referencia
                  ";
@@ -63,7 +63,7 @@ class cl_itemprecoreferencia {
      }
    }
    // funcao para atualizar campos
-   function atualizacampos($exclusao=false) {  
+   function atualizacampos($exclusao=false) {
      if($exclusao==false){
        $this->si02_sequencial = ($this->si02_sequencial == ""?@$GLOBALS["HTTP_POST_VARS"]["si02_sequencial"]:$this->si02_sequencial);
        $this->si02_precoreferencia = ($this->si02_precoreferencia == ""?@$GLOBALS["HTTP_POST_VARS"]["si02_precoreferencia"]:$this->si02_precoreferencia);
@@ -77,13 +77,13 @@ class cl_itemprecoreferencia {
        $this->si02_reservado = ($this->si02_reservado == ""?@$GLOBALS["HTTP_POST_VARS"]["si02_reservado"]:$this->si02_reservado);
        $this->si02_tabela = ($this->si02_tabela == ""?@$GLOBALS["HTTP_POST_VARS"]["si02_tabela"]:$this->si02_tabela);
        $this->si02_taxa = ($this->si02_taxa == ""?@$GLOBALS["HTTP_POST_VARS"]["si02_taxa"]:$this->si02_taxa);
-       $this->si02_criterioadjudicacao = ($this->si02_criterioadjudicacao == ""?@$GLOBALS["HTTP_POST_VARS"]["si02_criterioadjudicacao"]:$this->si02_criterioadjudicacao); 
-       $this->si02_mediapercentual = ($this->si02_mediapercentual == ""?@$GLOBALS["HTTP_POST_VARS"]["si02_mediapercentual"]:$this->si02_mediapercentual); 
+       $this->si02_criterioadjudicacao = ($this->si02_criterioadjudicacao == ""?@$GLOBALS["HTTP_POST_VARS"]["si02_criterioadjudicacao"]:$this->si02_criterioadjudicacao);
+       $this->si02_mediapercentual = ($this->si02_mediapercentual == ""?@$GLOBALS["HTTP_POST_VARS"]["si02_mediapercentual"]:$this->si02_mediapercentual);
       }else{
        $this->si02_sequencial = ($this->si02_sequencial == ""?@$GLOBALS["HTTP_POST_VARS"]["si02_sequencial"]:$this->si02_sequencial);
      }
    }
-   // funcao para inclusao 
+   // funcao para inclusao
    function incluir ($si02_sequencial){
       $this->atualizacampos();
      if($this->si02_precoreferencia == null ){
@@ -96,7 +96,7 @@ class cl_itemprecoreferencia {
        return false;
      }
      if($this->si02_itemproccompra == null ){
-       $this->erro_sql = " Campo Codigo do Item nao Informado.";
+       $this->erro_sql = " Campo Codigoaaaaaaaaaaaaaaaa do Item nao Informado.";
        $this->erro_campo = "si02_itemproccompra";
        $this->erro_banco = "";
        $this->erro_msg   = "Usurio: \\n\\n ".$this->erro_sql." \\n\\n";
@@ -148,7 +148,7 @@ class cl_itemprecoreferencia {
       $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
       $this->erro_status = "0";
       return false;
-    } 
+    }
     if($this->si02_codunidadeitem == null ){
       $this->erro_sql = " Campo codigo unidade do item no informado.";
       $this->erro_campo = "si02_codunidadeitem";
@@ -179,8 +179,8 @@ class cl_itemprecoreferencia {
     if($this->si02_mediapercentual == null ){
       $this->si02_mediapercentual = 0;
     }
-    
-    
+
+
 
    if($si02_sequencial == "" || $si02_sequencial == null ){
        $result = db_query("select nextval('sic_itemprecoreferencia_si02_sequencial_seq')");
@@ -246,9 +246,9 @@ class cl_itemprecoreferencia {
                                ,$this->si02_mediapercentual
                                ,$this->si02_vltotalprecoreferencia
                       )";
-                 
+
      $result = db_query($sql);
-     
+
      if($result==false){
        $this->erro_banco = str_replace("\n","",@pg_last_error());
        if( strpos(strtolower($this->erro_banco),"duplicate key") != 0 ){
@@ -288,9 +288,9 @@ class cl_itemprecoreferencia {
    }
    // funcao para alteracao
    function alterar ($si02_sequencial=null) {
-    
+
       $this->atualizacampos();
-      
+
      $sql = " update itemprecoreferencia set ";
      $virgula = "";
      if(trim($this->si02_sequencial)!="" || isset($GLOBALS["HTTP_POST_VARS"]["si02_sequencial"])){
@@ -384,7 +384,7 @@ class cl_itemprecoreferencia {
         return false;
       }
       }
-     $sql .= " where ";  
+     $sql .= " where ";
      if($si02_sequencial==null){
         $sql .= " si02_sequencial = $this->si02_sequencial";
      }else{
@@ -406,10 +406,10 @@ class cl_itemprecoreferencia {
          if(isset($GLOBALS["HTTP_POST_VARS"]["si02_vlprecoreferencia"]) || $this->si02_vlprecoreferencia != "")
            $resac = db_query("insert into db_acount values($acount,2010196,2009257,'".AddSlashes(pg_result($resaco,$conresaco,'si02_vlprecoreferencia'))."','$this->si02_vlprecoreferencia',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
          if(isset($GLOBALS["HTTP_POST_VARS"]["si02_vltotalprecoreferencia"]) || $this->si02_vltotalprecoreferencia != "")
-           $resac = db_query("insert into db_acount values($acount,2010196,2009257,'".AddSlashes(pg_result($resaco,$conresaco,'si02_vltotalprecoreferencia'))."','$this->si02_vltotalprecoreferencia',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");  
+           $resac = db_query("insert into db_acount values($acount,2010196,2009257,'".AddSlashes(pg_result($resaco,$conresaco,'si02_vltotalprecoreferencia'))."','$this->si02_vltotalprecoreferencia',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
        }
      }
-     
+
      $result = db_query($sql);
      if($result==false){
        $this->erro_banco = str_replace("\n","",@pg_last_error());
@@ -602,8 +602,8 @@ class cl_itemprecoreferencia {
   }
 
   public function sql_query_precoreferencia($pc80_codproc){
-    $sSql  = "select si01_sequencial "; 
-    $sSql .= " from sicom.precoreferencia "; 
+    $sSql  = "select si01_sequencial ";
+    $sSql .= " from sicom.precoreferencia ";
     $sSql .= " where si01_processocompra=$pc80_codproc";
 
     return $sSql;
@@ -613,17 +613,17 @@ class cl_itemprecoreferencia {
 
 
   public function sql_query_precoreferensequncial($si01_sequencial,$pc23_orcamitem){
-    $sSql  = "select si02_sequencial ";  
-    $sSql  .= "from sicom.itemprecoreferencia "; 
-    $sSql  .= "where si02_precoreferencia = $si01_sequencial and si02_itemproccompra = $pc23_orcamitem "; 
+    $sSql  = "select si02_sequencial ";
+    $sSql  .= "from sicom.itemprecoreferencia ";
+    $sSql  .= "where si02_precoreferencia = $si01_sequencial and si02_itemproccompra = $pc23_orcamitem ";
 
     return $sSql;
   }
 
   public function sql_query_codprocesso($pc11_numero){
-    $sSql  = "select pc81_codproc ";  
-    $sSql  .= "from pcprocitem "; 
-    $sSql  .= "where pc81_solicitem = $pc11_numero "; 
+    $sSql  = "select pc81_codproc ";
+    $sSql  .= "from pcprocitem ";
+    $sSql  .= "where pc81_solicitem = $pc11_numero ";
 
     return $sSql;
   }
@@ -642,5 +642,48 @@ class cl_itemprecoreferencia {
     return $sSql;
 
   }
+
+  public function getPrecomedio($si01_processocompra,$pc01_codmater,$reservado)
+  {
+      if($reservado){
+        $where = "and pc11_reservado = 't'";
+      }else{
+          $where = " and pc11_reservado = 'f'";
+      }
+      return "SELECT itemprecoreferencia.*
+                    FROM itemprecoreferencia
+                    INNER JOIN pcorcamitem ON si02_itemproccompra = pc22_orcamitem
+                    INNER JOIN precoreferencia ON si01_sequencial = si02_precoreferencia
+                    INNER JOIN pcorcamitemproc ON pc31_orcamitem = pc22_orcamitem
+                    INNER JOIN pcprocitem ON pc31_pcprocitem = pc81_codprocitem
+                    INNER JOIN solicitem ON pc81_solicitem = pc11_codigo
+                    INNER JOIN solicitempcmater ON pc16_solicitem = pc11_codigo
+                    WHERE si02_precoreferencia =
+                            (SELECT si01_sequencial
+                             FROM precoreferencia
+                             WHERE si01_processocompra = $si01_processocompra)
+                          AND pc16_codmater = $pc01_codmater".$where;
+  }
+
+    public function getItensCota($si02_precoreferencia)
+    {
+        return "
+            SELECT pc11_seq,
+               pc01_codmater,
+               pc11_quant as qtdCota,
+               case when pc11_exclusivo = 't' then 1 else 0 end as exclusivo,
+               pc81_codprocitem
+            FROM itemprecoreferencia
+            INNER JOIN pcorcamitem ON si02_itemproccompra = pc22_orcamitem
+            INNER JOIN precoreferencia ON si01_sequencial = si02_precoreferencia
+            INNER JOIN pcorcamitemproc ON pc31_orcamitem = pc22_orcamitem
+            INNER JOIN pcprocitem ON pc31_pcprocitem = pc81_codprocitem
+            INNER JOIN solicitem ON pc81_solicitem = pc11_codigo
+            INNER JOIN solicitempcmater ON pc16_solicitem = pc11_codigo
+            INNER JOIN pcmater ON pc01_codmater = pc16_codmater
+            WHERE si02_precoreferencia = $si02_precoreferencia
+            and (pc11_exclusivo = 't' or pc11_reservado = 't')
+        ";
+    }
 }
 ?>

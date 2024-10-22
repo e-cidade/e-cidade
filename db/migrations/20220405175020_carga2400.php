@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Carga2400 extends AbstractMigration
+class Carga2400 extends PostgresMigration
 {
 
     public function up()
@@ -13,7 +13,7 @@ class Carga2400 extends AbstractMigration
 
         INSERT INTO avaliacaoperguntaopcao VALUES (
             (SELECT max(db104_sequencial)+1 FROM avaliacaoperguntaopcao),
-            (SELECT db103_sequencial FROM avaliacaopergunta WHERE db103_identificador = 'tipo-de-logradouro-4001203'), 
+            (SELECT db103_sequencial FROM avaliacaopergunta WHERE db103_identificador = 'tipo-de-logradouro-4001203'),
             NULL,
             't',
             (SELECT db103_identificadorcampo FROM avaliacaopergunta WHERE db103_identificador = 'tipo-de-logradouro-4001203')||'-'||(SELECT max(db104_sequencial)+1 FROM avaliacaoperguntaopcao)::varchar,
@@ -26,7 +26,7 @@ class Carga2400 extends AbstractMigration
         WHERE db103_identificador = 'informar-se-o-dependente-e-pessoa-com-do-4001224';
 
         INSERT INTO habitacao.avaliacaopergunta (db103_sequencial, db103_avaliacaotiporesposta, db103_avaliacaogrupopergunta, db103_descricao, db103_obrigatoria, db103_ativo, db103_ordem, db103_identificador, db103_tipo, db103_mascara, db103_dblayoutcampo, db103_perguntaidentificadora, db103_camposql, db103_identificadorcampo)
-        VALUES( (SELECT max(db103_sequencial)+1 FROM avaliacaopergunta), 
+        VALUES( (SELECT max(db103_sequencial)+1 FROM avaliacaopergunta),
                                              2,
                                              4000354,
                                              'Instituição no e-Cidade:',
@@ -44,8 +44,8 @@ class Carga2400 extends AbstractMigration
         INSERT INTO avaliacaoperguntaopcao
         VALUES (
             (SELECT max(db104_sequencial)+1 FROM avaliacaoperguntaopcao),
-            (SELECT db103_sequencial FROM avaliacaopergunta WHERE db103_identificador = 'instituicao-no-ecidade-4000354'), 
-            NULL, 
+            (SELECT db103_sequencial FROM avaliacaopergunta WHERE db103_identificador = 'instituicao-no-ecidade-4000354'),
+            NULL,
             't',
             (SELECT db103_identificadorcampo FROM avaliacaopergunta WHERE db103_identificador = 'instituicao-no-ecidade-4000354')||'-'|| (SELECT max(db104_sequencial)+1
              FROM avaliacaoperguntaopcao)::varchar, 0, NULL, (SELECT db103_identificadorcampo FROM avaliacaopergunta WHERE db103_identificador = 'instituicao-no-ecidade-4000354'));
@@ -132,19 +132,19 @@ class Carga2400 extends AbstractMigration
             AND rescisao.r59_regime = rhregime.rh30_regime
             AND rescisao.r59_causa = rhpesrescisao.rh05_causa
             AND rescisao.r59_caub = rhpesrescisao.rh05_caub::char(2)
-            where rh30_vinculo in (\'I\',\'P\')  
+            where rh30_vinculo in (\'I\',\'P\')
             AND (
-            ( 
+            (
             (date_part(\'year\',rhpessoal.rh01_admiss)::varchar || lpad(date_part(\'month\',rhpessoal.rh01_admiss)::varchar,2,\'0\'))::integer <= 202207
             and (date_part(\'year\',fc_getsession(\'DB_datausu\')::date)::varchar || lpad(date_part(\'month\',fc_getsession(\'DB_datausu\')::date)::varchar,2,\'0\'))::integer <= 202207
             and (rh05_recis is null or (date_part(\'year\',rh05_recis)::varchar || lpad(date_part(\'month\',rh05_recis)::varchar,2,\'0\'))::integer > 202207)
             ) or (
             date_part(\'month\',rhpessoal.rh01_admiss) = date_part(\'month\',fc_getsession(\'DB_datausu\')::date)
-            and date_part(\'year\',rhpessoal.rh01_admiss) = date_part(\'year\',fc_getsession(\'DB_datausu\')::date) 
+            and date_part(\'year\',rhpessoal.rh01_admiss) = date_part(\'year\',fc_getsession(\'DB_datausu\')::date)
             and (date_part(\'year\',fc_getsession(\'DB_datausu\')::date)::varchar || lpad(date_part(\'month\',fc_getsession(\'DB_datausu\')::date)::varchar,2,\'0\'))::integer > 202207
             )
             )
-        ' 
+        '
         WHERE db101_identificador='s2400-vs1';
         ";
         $this->execute($sql);
@@ -152,6 +152,6 @@ class Carga2400 extends AbstractMigration
 
     public function down()
     {
-        
+
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc15328 extends AbstractMigration
+class Oc15328 extends PostgresMigration
 {
     public function up()
     {
@@ -25,11 +25,11 @@ class Oc15328 extends AbstractMigration
 
                 /*Adicionando nova Situação Adjudicada a licitacao*/
                 insert into licsituacao values(13,'Adjudicacao','f');
-                
+
                 /*Alterado descricao do menu homologacao*/
                 update db_itensmenu set descricao = 'Homologação' where id_item in (select id_item from db_itensmenu where descricao like '%Homologação Adjudicação%');
-                
-                /*Adicionando campo fornecedor a tabela de itenshomologacao*/  
+
+                /*Adicionando campo fornecedor a tabela de itenshomologacao*/
                 ALTER TABLE itenshomologacao ADD COLUMN l203_fornecedor int8;
 SQL;
         $this->execute($sql);

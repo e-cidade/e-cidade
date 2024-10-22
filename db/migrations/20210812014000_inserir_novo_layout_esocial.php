@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class InserirNovoLayoutEsocial extends AbstractMigration
+class InserirNovoLayoutEsocial extends PostgresMigration
 {
 
     public function up()
@@ -23,7 +23,7 @@ TRUNCATE TABLE avaliacao CASCADE;
 UPDATE esocialversao SET rh210_versao = '1.0' WHERE rh210_sequencial=1;
 DELETE FROM esocialversao WHERE rh210_sequencial=2;
 
--- INSERT avaliacao 
+-- INSERT avaliacao
 INSERT INTO habitacao.avaliacao (db101_sequencial, db101_avaliacaotipo, db101_descricao, db101_obs, db101_ativo, db101_identificador, db101_cargadados, db101_permiteedicao) VALUES (3000016, 5, 'Formulário S-1010 versão S-1.0', 'Formulário S-1010 versão S-1.0', true, 's1010-vs1', 'SELECT rh27_rubric AS codigorubrica,
        rh27_instit AS instituicao,
        rh27_descr AS descricaorubrica,
@@ -94,33 +94,33 @@ INSERT INTO habitacao.avaliacao (db101_sequencial, db101_avaliacaotipo, db101_de
 INSERT INTO habitacao.avaliacao (db101_sequencial, db101_avaliacaotipo, db101_descricao, db101_obs, db101_ativo, db101_identificador, db101_cargadados, db101_permiteedicao) VALUES (4000109, 5, 'Formulário S-2231 versão S-1.0', 'Formulário S-2231 versão S-1.0', true, 's2231-vs1', NULL, false);
 INSERT INTO habitacao.avaliacao (db101_sequencial, db101_avaliacaotipo, db101_descricao, db101_obs, db101_ativo, db101_identificador, db101_cargadados, db101_permiteedicao) VALUES (4000101, 5, 'Formulário S-2190 versão S-1.0', 'Formulário S-2190 versão S-1.0', true, 's2190-vs1', NULL, false);
 INSERT INTO habitacao.avaliacao (db101_sequencial, db101_avaliacaotipo, db101_descricao, db101_obs, db101_ativo, db101_identificador, db101_cargadados, db101_permiteedicao) VALUES (4000093, 5, 'Formulário S-1299 versão S-1.0', 'Formulário S-1299 versão S-1.0', true, 's1299-vs1', '
-        SELECT 
+        SELECT
         cgm.z01_cgccpf as cpfTrab,
         cgm.z01_pis as nisTrab,
         cgm.z01_nome as nmTrab,
         cgm.z01_sexo as sexo,
         CASE WHEN rhpessoal.rh01_raca = 2 THEN 1
-        WHEN rhpessoal.rh01_raca = 4 THEN 2 
-        WHEN rhpessoal.rh01_raca = 8 THEN 3 
-        WHEN rhpessoal.rh01_raca = 6 THEN 4 
-        WHEN rhpessoal.rh01_raca = 1 THEN 5 
+        WHEN rhpessoal.rh01_raca = 4 THEN 2
+        WHEN rhpessoal.rh01_raca = 8 THEN 3
+        WHEN rhpessoal.rh01_raca = 6 THEN 4
+        WHEN rhpessoal.rh01_raca = 1 THEN 5
         ELSE 6 END AS racaCor,
-        CASE WHEN rhpessoal.rh01_estciv = 1 THEN 1 
-        WHEN rhpessoal.rh01_estciv = 2 THEN 2 
+        CASE WHEN rhpessoal.rh01_estciv = 1 THEN 1
+        WHEN rhpessoal.rh01_estciv = 2 THEN 2
         WHEN rhpessoal.rh01_estciv = 5 THEN 3
         WHEN rhpessoal.rh01_estciv = 4 THEN 4
         WHEN rhpessoal.rh01_estciv = 3 THEN 5 END AS estCiv,
         CASE WHEN rhpessoal.rh01_instru = 10 THEN \'11\'
         WHEN rhpessoal.rh01_instru = 11 THEN \'12\'
         ELSE \'0\'||rhpessoal.rh01_instru::varchar END AS grauInstr,
-        CASE WHEN rhpessoal.rh01_tipadm = 1 THEN \'S\' 
+        CASE WHEN rhpessoal.rh01_tipadm = 1 THEN \'S\'
         ELSE \'N\' END AS indPriEmpr,
         -- nmSoc será preenchido manualmente
         cgm.z01_nasc AS dtNascto,
         cgm.z01_ibge AS codMunicNascto,
         (SELECT cadenderestado.db71_sigla
         FROM cadendermunicipio
-        INNER JOIN cadendermunicipiosistema 
+        INNER JOIN cadendermunicipiosistema
         ON cadendermunicipiosistema.db125_cadendermunicipio = cadendermunicipio.db72_sequencial
         INNER JOIN cadenderestado ON cadendermunicipio.db72_cadenderestado = cadenderestado.db71_sequencial
         WHERE cadendermunicipiosistema.db125_codigosistema = cgm.z01_ibge) AS ufNascto,
@@ -196,7 +196,7 @@ INSERT INTO habitacao.avaliacao (db101_sequencial, db101_avaliacaotipo, db101_de
         -- ideTrabSubstituido vamos pular
         -- aprend Não será preenchido
         CASE WHEN rhregime.rh30_regime != 2 THEN \'1\' ELSE \'N\' END AS indProvim,
-        CASE WHEN rhregime.rh30_regime != 2 THEN 
+        CASE WHEN rhregime.rh30_regime != 2 THEN
         (CASE WHEN h13_tipocargo = 1 THEN \'1\'
             WHEN h13_tipocargo = 2 OR h13_tipocargo = 3  THEN \'2\'
             ELSE \'99\' END) ELSE \'N\' END AS tpProv,
@@ -238,11 +238,11 @@ INSERT INTO habitacao.avaliacao (db101_sequencial, db101_avaliacaotipo, db101_de
                    END) AS horaintevalo
                FROM jornadahoras
                WHERE jornadahoras.rh189_jornada = jornada.rh188_sequencial) AS x)::integer AS jornadasemanal
-            FROM gradeshorariosjornada 
-            inner join jornada on jornada.rh188_sequencial = gradeshorariosjornada.rh191_jornada 
+            FROM gradeshorariosjornada
+            inner join jornada on jornada.rh188_sequencial = gradeshorariosjornada.rh191_jornada
             JOIN gradeshorarios ON gradeshorariosjornada.rh191_gradehorarios = gradeshorarios.rh190_sequencial
             JOIN escalaservidor ON gradeshorarios.rh190_sequencial = escalaservidor.rh192_gradeshorarios
-            WHERE escalaservidor.rh192_regist = rhpessoal.rh01_regist 
+            WHERE escalaservidor.rh192_regist = rhpessoal.rh01_regist
             AND escalaservidor.rh192_instit = fc_getsession(\'DB_instit\')::int
             AND jornada.rh188_tipo = \'T\'
             GROUP by jornada.rh188_sequencial) AS horcontratual) AS qtdHrsSem,
@@ -258,7 +258,7 @@ INSERT INTO habitacao.avaliacao (db101_sequencial, db101_avaliacaotipo, db101_de
         -- mudancaCPF será preenchido manualmente
         -- afastamento Buscar na hora de enviar afastamentos que estejam na data de envio
         -- desligamento será preenchido manualmente (observar necessidade conforme o layout)
-        FROM cgm 
+        FROM cgm
         JOIN rhpessoal ON cgm.z01_numcgm = rhpessoal.rh01_numcgm
         JOIN rhpesdoc ON rhpessoal.rh01_regist = rhpesdoc.rh16_regist
         JOIN rhpessoalmov ON rhpessoal.rh01_regist = rhpessoalmov.rh02_regist
@@ -276,7 +276,7 @@ INSERT INTO habitacao.avaliacao (db101_sequencial, db101_avaliacaotipo, db101_de
         JOIN cgmendereco ON cgm.z01_numcgm = cgmendereco.z07_numcgm
         JOIN endereco ON cgmendereco.z07_endereco = endereco.db76_sequencial
         JOIN cadenderlocal ON endereco.db76_cadenderlocal = cadenderlocal.db75_sequencial
-        JOIN cadenderbairrocadenderrua 
+        JOIN cadenderbairrocadenderrua
         ON cadenderlocal.db75_cadenderbairrocadenderrua = cadenderbairrocadenderrua.db87_sequencial
         JOIN cadenderbairro ON cadenderbairrocadenderrua.db87_cadenderbairro = cadenderbairro.db73_sequencial
         JOIN cadenderrua ON cadenderbairrocadenderrua.db87_cadenderrua = cadenderrua.db74_sequencial
@@ -289,7 +289,7 @@ INSERT INTO habitacao.avaliacao (db101_sequencial, db101_avaliacaotipo, db101_de
         AND cadenderpaissistema.db135_db_sistemaexterno = 3
         JOIN cadenderruaruastipo ON cadenderrua.db74_sequencial = cadenderruaruastipo.db85_cadenderrua
         JOIN ruastipo ON cadenderruaruastipo.db85_ruastipo = ruastipo.j88_codigo
-        -- FIM ENDERECO TRABALHADOR 
+        -- FIM ENDERECO TRABALHADOR
         WHERE db_config.codigo = fc_getsession(\'DB_instit\')::int', false);
 INSERT INTO habitacao.avaliacao (db101_sequencial, db101_avaliacaotipo, db101_descricao, db101_obs, db101_ativo, db101_identificador, db101_cargadados, db101_permiteedicao) VALUES (3000015, 5, 'S-1000 - INFORMAÇÕES DO EMPREGADOR/CONTRIBUINTE/ÓRGÃO PÚBLICO', 'Formulário S-1000', true, 's1000-vs1', 'SELECT eso05_codclassificacaotributaria,
        eso05_indicativocooperativa,
@@ -360,25 +360,25 @@ FROM eventos1005
 WHERE eso06_instit = fc_getsession(\'DB_instit\')::int', false);
 INSERT INTO habitacao.avaliacao (db101_sequencial, db101_avaliacaotipo, db101_descricao, db101_obs, db101_ativo, db101_identificador, db101_cargadados, db101_permiteedicao) VALUES (3000014, 5, 'Formulário S-1020 versão S-1.0', 'Formulário S-1020 versão S-1.0', true, 's1020-vs1', 'SELECT eso08_sequencial
 ,eso08_codempregadorlotacao
-,case 
-   when eso08_codtipolotacao = \'1\' then \'3003558\' 
-   when eso08_codtipolotacao = \'2\' then \'3003559\' 
-   when eso08_codtipolotacao = \'3\' then \'3003560\' 
-   when eso08_codtipolotacao = \'4\' then \'3003561\' 
-   when eso08_codtipolotacao = \'5\' then \'3003562\' 
-   when eso08_codtipolotacao = \'6\' then \'3003563\' 
-   when eso08_codtipolotacao = \'7\' then \'3003564\' 
-   when eso08_codtipolotacao = \'8\' then \'3003565\' 
-   when eso08_codtipolotacao = \'9\' then \'3003566\' 
-   when eso08_codtipolotacao = \'10\' then \'3003567\' 
-   when eso08_codtipolotacao = \'21\' then \'3003568\' 
-   when eso08_codtipolotacao = \'24\' then \'3003569\' 
-   when eso08_codtipolotacao = \'90\' then \'3003570\' 
+,case
+   when eso08_codtipolotacao = \'1\' then \'3003558\'
+   when eso08_codtipolotacao = \'2\' then \'3003559\'
+   when eso08_codtipolotacao = \'3\' then \'3003560\'
+   when eso08_codtipolotacao = \'4\' then \'3003561\'
+   when eso08_codtipolotacao = \'5\' then \'3003562\'
+   when eso08_codtipolotacao = \'6\' then \'3003563\'
+   when eso08_codtipolotacao = \'7\' then \'3003564\'
+   when eso08_codtipolotacao = \'8\' then \'3003565\'
+   when eso08_codtipolotacao = \'9\' then \'3003566\'
+   when eso08_codtipolotacao = \'10\' then \'3003567\'
+   when eso08_codtipolotacao = \'21\' then \'3003568\'
+   when eso08_codtipolotacao = \'24\' then \'3003569\'
+   when eso08_codtipolotacao = \'90\' then \'3003570\'
    when eso08_codtipolotacao = \'91\' then \'3003571\'
    end eso08_codtipolotacao
 ,
-case 
-   when eso08_codtipoinscricao = \'1\' then \'3003572\' 
+case
+   when eso08_codtipoinscricao = \'1\' then \'3003572\'
    when eso08_codtipoinscricao = \'2\' then \'3003573\'
    when eso08_codtipoinscricao = \'4\' then \'3003574\'
    end eso08_codtipoinscricao
@@ -389,30 +389,30 @@ case
 ,eso08_codterceirosprocjudicial
 ,eso08_nroprocessojudicial
 ,eso08_codindicasuspensao
-,case 
+,case
    when eso08_tipoinscricaocontratante = \'1\' then \'3003607\'
    when eso08_tipoinscricaocontratante = \'2\' then \'3003608\'
    else  \'4\' end as eso08_tipoinscricaocontratante
 ,eso08_numeroinscricaocontratante
-,case 
+,case
    when eso08_tipoinscricaoproprietario = \'1\' then \'3003610\'
    when eso08_tipoinscricaoproprietario = \'2\' then \'3003611\'
-   else \'5\' end as eso08_tipoinscricaoproprietario 
+   else \'5\' end as eso08_tipoinscricaoproprietario
 ,eso08_nroinscricaoproprietario
 ,eso08_aliquotarat
 ,eso08_fatoracidentario
-,eso08_instit 
+,eso08_instit
 FROM eventos1020
 WHERE eso08_instit = fc_getsession(\'DB_instit\')::int', true);
 INSERT INTO habitacao.avaliacao (db101_sequencial, db101_avaliacaotipo, db101_descricao, db101_obs, db101_ativo, db101_identificador, db101_cargadados, db101_permiteedicao) VALUES (4000088, 5, 'Formulário S-1070 versão S-1.0', 'Formulário S-1070 versão S-1.0', true, 's1070-vs1', 'select
     eso09_sequencial
-    ,case 
+    ,case
         when eso09_tipoprocesso = \'1\' then \'4000147\'
         when eso09_tipoprocesso = \'2\' then \'4000148\'
         when eso09_tipoprocesso = \'4\' then \'4000150\'
     end eso09_tipoprocesso
     ,eso09_nroprocessoadm
-    ,case 
+    ,case
         when eso09_indautoria = \'1\' then \'4000154\'
         when eso09_indautoria = \'2\' then \'4000155\'
     end eso09_indautoria
@@ -425,7 +425,7 @@ INSERT INTO habitacao.avaliacao (db101_sequencial, db101_avaliacaotipo, db101_de
     ,eso09_codmuniibge
     ,eso09_idvara
     ,eso09_codsusp
-        ,case 
+        ,case
         when eso09_codsuspexigi= \'0\' then \'9\'
         when eso09_codsuspexigi= \'1\' then \'4000170\'
         when eso09_codsuspexigi= \'2\' then \'4000171\'
@@ -443,16 +443,16 @@ INSERT INTO habitacao.avaliacao (db101_sequencial, db101_avaliacaotipo, db101_de
         when eso09_codsuspexigi= \'92\' then \'4000183\'
     end eso09_codsuspexigi
     ,eso09_dtdecisao
-        ,case 
+        ,case
         when eso09_inddeposito= \'0\' then \'0\'
         when eso09_inddeposito= \'N\' then \'4000185\'
         when eso09_inddeposito= \'S\' then \'4000186\'
     end eso09_inddeposito
     ,eso09_instit
 from
-    eventos1070 
+    eventos1070
 where eso09_instit = fc_getsession(\'DB_instit\')::int', false);
--- INSERT esocialformulariotipo 
+-- INSERT esocialformulariotipo
 INSERT INTO recursoshumanos.esocialformulariotipo (rh209_sequencial, rh209_descricao) VALUES (1, 'Empregador');
 INSERT INTO recursoshumanos.esocialformulariotipo (rh209_sequencial, rh209_descricao) VALUES (2, 'Rubrica');
 INSERT INTO recursoshumanos.esocialformulariotipo (rh209_sequencial, rh209_descricao) VALUES (3, 'Servidor');
@@ -496,7 +496,7 @@ INSERT INTO recursoshumanos.esocialformulariotipo (rh209_sequencial, rh209_descr
 INSERT INTO recursoshumanos.esocialformulariotipo (rh209_sequencial, rh209_descricao) VALUES (60, 'S-2210 - Comunicação de Acidente de Trabalho');
 INSERT INTO recursoshumanos.esocialformulariotipo (rh209_sequencial, rh209_descricao) VALUES (61, 'S-2220 - Monitoramento da Saúde do Trabalhador');
 INSERT INTO recursoshumanos.esocialformulariotipo (rh209_sequencial, rh209_descricao) VALUES (62, 'S-2240 - Condições Ambientais do Trabalho - Agentes Nocivos');
--- INSERT esocialversaoformulario 
+-- INSERT esocialversaoformulario
 INSERT INTO recursoshumanos.esocialversaoformulario (rh211_sequencial, rh211_versao, rh211_avaliacao, rh211_esocialformulariotipo) VALUES (7, '1.0', 3000014, 4);
 INSERT INTO recursoshumanos.esocialversaoformulario (rh211_sequencial, rh211_versao, rh211_avaliacao, rh211_esocialformulariotipo) VALUES (9, '1.0', 3000015, 1);
 INSERT INTO recursoshumanos.esocialversaoformulario (rh211_sequencial, rh211_versao, rh211_avaliacao, rh211_esocialformulariotipo) VALUES (10, '1.0', 3000016, 2);
@@ -539,7 +539,7 @@ INSERT INTO recursoshumanos.esocialversaoformulario (rh211_sequencial, rh211_ver
 INSERT INTO recursoshumanos.esocialversaoformulario (rh211_sequencial, rh211_versao, rh211_avaliacao, rh211_esocialformulariotipo) VALUES (54, '1.0', 4000106, 60);
 INSERT INTO recursoshumanos.esocialversaoformulario (rh211_sequencial, rh211_versao, rh211_avaliacao, rh211_esocialformulariotipo) VALUES (55, '1.0', 4000107, 61);
 INSERT INTO recursoshumanos.esocialversaoformulario (rh211_sequencial, rh211_versao, rh211_avaliacao, rh211_esocialformulariotipo) VALUES (56, '1.0', 4000110, 62);
--- INSERT avaliacaogrupopergunta 
+-- INSERT avaliacaogrupopergunta
 INSERT INTO habitacao.avaliacaogrupopergunta (db102_sequencial, db102_avaliacao, db102_descricao, db102_identificador, db102_identificadorcampo, db102_ordem) VALUES (4000133, 3000014, 'Informações do operador portuário.', 'detalhamento-das-informacoes-do-operador-port-4000133', 'dadosOpPort', 0);
 INSERT INTO habitacao.avaliacaogrupopergunta (db102_sequencial, db102_avaliacao, db102_descricao, db102_identificador, db102_identificadorcampo, db102_ordem) VALUES (4000085, 4000088, 'Identificação do processo e período de validade das informações', 'informacoes-de-identificacao-do-processo-4000085', 'ideProcesso', 0);
 INSERT INTO habitacao.avaliacaogrupopergunta (db102_sequencial, db102_avaliacao, db102_descricao, db102_identificador, db102_identificadorcampo, db102_ordem) VALUES (4000088, 4000088, 'Informações de suspensão de exigibilidade de tributos em virtude de processo administrativo ou judicial (infoSusp)', 'informacoes-suspensao-exigibilidade-4000088', 'infoSusp', 0);
@@ -868,7 +868,7 @@ INSERT INTO habitacao.avaliacaogrupopergunta (db102_sequencial, db102_avaliacao,
 INSERT INTO habitacao.avaliacaogrupopergunta (db102_sequencial, db102_avaliacao, db102_descricao, db102_identificador, db102_identificadorcampo, db102_ordem) VALUES (3000208, 4000128, 'Informações de apuração da alíquota GILRAT do estabelecimento', 'informacoes-de-apuracao-da-aliquota-g5a2ac5a461f30', 'aliqGilrat', 0);
 INSERT INTO habitacao.avaliacaogrupopergunta (db102_sequencial, db102_avaliacao, db102_descricao, db102_identificador, db102_identificadorcampo, db102_ordem) VALUES (3000209, 4000128, 'Processo administrativo ou judicial em que houve decisão/sentença favorável ao contribuinte modificando a alíquota RAT da empresa', 'processo-administrativo-ou-judicial-5a2ac5a466622', 'procAdmJudRat', 0);
 INSERT INTO habitacao.avaliacaogrupopergunta (db102_sequencial, db102_avaliacao, db102_descricao, db102_identificador, db102_identificadorcampo, db102_ordem) VALUES (3000211, 4000128, 'Informações relativas ao Cadastro de Atividade Econômica da Pessoa Física - CAEPF', 'informacoes-relativas-ao-cadastro-da-5a2ac5a46ff97', 'infoCaepf', 0);
--- INSERT avaliacaopergunta 
+-- INSERT avaliacaopergunta
 INSERT INTO habitacao.avaliacaopergunta (db103_sequencial, db103_avaliacaotiporesposta, db103_avaliacaogrupopergunta, db103_descricao, db103_obrigatoria, db103_ativo, db103_ordem, db103_identificador, db103_tipo, db103_mascara, db103_dblayoutcampo, db103_perguntaidentificadora, db103_camposql, db103_identificadorcampo) VALUES (3000888, 2, 3000197, 'Data de Emissão do Certificado/publicação da Lei', false, true, 3, 'data-de-emissao-do-certificadopublic5a2ac5a42c3d7', 5, '', 0, false, 'eso05_dtemitcertificado', 'dtEmisCertif');
 INSERT INTO habitacao.avaliacaopergunta (db103_sequencial, db103_avaliacaotiporesposta, db103_avaliacaogrupopergunta, db103_descricao, db103_obrigatoria, db103_ativo, db103_ordem, db103_identificador, db103_tipo, db103_mascara, db103_dblayoutcampo, db103_perguntaidentificadora, db103_camposql, db103_identificadorcampo) VALUES (3000889, 2, 3000197, 'Data de Vencimento do Certificado.', false, true, 4, 'data-de-vencimento-do-certificado5a2ac5a42d837', 5, '', 0, false, 'eso05_dtvalcertificado', 'dtVencCertif');
 INSERT INTO habitacao.avaliacaopergunta (db103_sequencial, db103_avaliacaotiporesposta, db103_avaliacaogrupopergunta, db103_descricao, db103_obrigatoria, db103_ativo, db103_ordem, db103_identificador, db103_tipo, db103_mascara, db103_dblayoutcampo, db103_perguntaidentificadora, db103_camposql, db103_identificadorcampo) VALUES (3000916, 1, 3000206, 'Preencher com o código correspondente ao tipo de inscrição', true, true, 1, 'preencher-com-o-codigo-correspondente5a2ac5a45a097', 1, '', 0, false, 'eso06_tipoinscricao', 'tpInsc');
@@ -2045,7 +2045,7 @@ do art. 25, §7o, da Lei 8.870/1994.', false, true, 7, 'indicativo-da-opcao-pelo-
 INSERT INTO habitacao.avaliacaopergunta (db103_sequencial, db103_avaliacaotiporesposta, db103_avaliacaogrupopergunta, db103_descricao, db103_obrigatoria, db103_ativo, db103_ordem, db103_identificador, db103_tipo, db103_mascara, db103_dblayoutcampo, db103_perguntaidentificadora, db103_camposql, db103_identificadorcampo) VALUES (4000359, 1, 3000196, 'Indicativo de microempresa (ME) ou empresa de pequeno porte (EPP) para
 permissão de acesso ao módulo simplificado', false, true, 8, 'indicativo-de-microempresa-me-ou-empresa', 1, '', 0, false, 'eso05_microempresa', 'indPorte');
 INSERT INTO habitacao.avaliacaopergunta (db103_sequencial, db103_avaliacaotiporesposta, db103_avaliacaogrupopergunta, db103_descricao, db103_obrigatoria, db103_ativo, db103_ordem, db103_identificador, db103_tipo, db103_mascara, db103_dblayoutcampo, db103_perguntaidentificadora, db103_camposql, db103_identificadorcampo) VALUES (3000863, 1, 3000192, 'Preencher com o código correspondente ao tipo de inscrição', true, true, 1, 'codigo-correspondente-ao-tipo-de-inscricao', 1, '', 0, false, 'eso08_codtipoinscricao', 'tpInsc');
--- INSERT avaliacaoperguntaopcao 
+-- INSERT avaliacaoperguntaopcao
 INSERT INTO habitacao.avaliacaoperguntaopcao (db104_sequencial, db104_avaliacaopergunta, db104_descricao, db104_aceitatexto, db104_identificador, db104_peso, db104_valorresposta, db104_identificadorcampo) VALUES (4002798, 4000120, '', true, 'codSusp-4002798', 0, '', 'codSusp');
 INSERT INTO habitacao.avaliacaoperguntaopcao (db104_sequencial, db104_avaliacaopergunta, db104_descricao, db104_aceitatexto, db104_identificador, db104_peso, db104_valorresposta, db104_identificadorcampo) VALUES (4002799, 4000122, '', true, 'dtDecisao-4002799', 0, '', 'dtDecisao');
 INSERT INTO habitacao.avaliacaoperguntaopcao (db104_sequencial, db104_avaliacaopergunta, db104_descricao, db104_aceitatexto, db104_identificador, db104_peso, db104_valorresposta, db104_identificadorcampo) VALUES (4001434, 4000798, '', true, 'cep-4001434', 0, '', 'cep');
@@ -4408,10 +4408,10 @@ INSERT INTO habitacao.avaliacaoperguntaopcao (db104_sequencial, db104_avaliacaop
 INSERT INTO habitacao.avaliacaoperguntaopcao (db104_sequencial, db104_avaliacaopergunta, db104_descricao, db104_aceitatexto, db104_identificador, db104_peso, db104_valorresposta, db104_identificadorcampo) VALUES (9, 4000121, 'Selecionar', false, 'Selecionar-9', 0, '0', 'Selecionar');
 INSERT INTO habitacao.avaliacaoperguntaopcao (db104_sequencial, db104_avaliacaopergunta, db104_descricao, db104_aceitatexto, db104_identificador, db104_peso, db104_valorresposta, db104_identificadorcampo) VALUES (10, 4000123, 'Selecionar', false, 'selecionar-10', 0, '0', 'selecionar');
 INSERT INTO habitacao.avaliacaoperguntaopcao (db104_sequencial, db104_avaliacaopergunta, db104_descricao, db104_aceitatexto, db104_identificador, db104_peso, db104_valorresposta, db104_identificadorcampo) VALUES (11, 3000866, 'Selecionar', false, 'selecionar-11', 0, '0', 'selecionar');
--- INSERT avaliacaoperguntaopcaolayoutcampo 
--- INSERT avaliacaoperguntadb_formulas 
+-- INSERT avaliacaoperguntaopcaolayoutcampo
+-- INSERT avaliacaoperguntadb_formulas
 INSERT INTO public.avaliacaoperguntadb_formulas (eso01_sequencial, eso01_db_formulas, eso01_avaliacaopergunta) VALUES (8, 1, 3000877);
--- INSERT avaliacaogruporesposta 
+-- INSERT avaliacaogruporesposta
 INSERT INTO habitacao.avaliacaogruporesposta (db107_sequencial, db107_usuario, db107_datalancamento, db107_hora) VALUES (1, 41, '2020-11-25', '09:42');
 INSERT INTO habitacao.avaliacaogruporesposta (db107_sequencial, db107_usuario, db107_datalancamento, db107_hora) VALUES (2, 41, '2020-11-25', '09:42');
 INSERT INTO habitacao.avaliacaogruporesposta (db107_sequencial, db107_usuario, db107_datalancamento, db107_hora) VALUES (3, 41, '2020-11-25', '09:42');
@@ -4573,7 +4573,7 @@ INSERT INTO habitacao.avaliacaogruporesposta (db107_sequencial, db107_usuario, d
 INSERT INTO habitacao.avaliacaogruporesposta (db107_sequencial, db107_usuario, db107_datalancamento, db107_hora) VALUES (235, 106, '2021-11-08', '18:23');
 INSERT INTO habitacao.avaliacaogruporesposta (db107_sequencial, db107_usuario, db107_datalancamento, db107_hora) VALUES (236, 106, '2021-11-08', '18:23');
 INSERT INTO habitacao.avaliacaogruporesposta (db107_sequencial, db107_usuario, db107_datalancamento, db107_hora) VALUES (237, 106, '2021-11-08', '18:29');
--- INSERT avaliacaoresposta 
+-- INSERT avaliacaoresposta
 INSERT INTO habitacao.avaliacaoresposta (db106_sequencial, db106_avaliacaoperguntaopcao, db106_resposta) VALUES (935, 4002028, '85');
 INSERT INTO habitacao.avaliacaoresposta (db106_sequencial, db106_avaliacaoperguntaopcao, db106_resposta) VALUES (936, 3003669, '3003669');
 INSERT INTO habitacao.avaliacaoresposta (db106_sequencial, db106_avaliacaoperguntaopcao, db106_resposta) VALUES (937, 3003673, '3003673');
@@ -5668,7 +5668,7 @@ INSERT INTO habitacao.avaliacaoresposta (db106_sequencial, db106_avaliacaopergun
 INSERT INTO habitacao.avaliacaoresposta (db106_sequencial, db106_avaliacaoperguntaopcao, db106_resposta) VALUES (1487, 3003748, '3003748');
 INSERT INTO habitacao.avaliacaoresposta (db106_sequencial, db106_avaliacaoperguntaopcao, db106_resposta) VALUES (1488, 4000532, '');
 INSERT INTO habitacao.avaliacaoresposta (db106_sequencial, db106_avaliacaoperguntaopcao, db106_resposta) VALUES (1489, 4000534, '');
--- INSERT avaliacaogrupoperguntaresposta 
+-- INSERT avaliacaogrupoperguntaresposta
 INSERT INTO habitacao.avaliacaogrupoperguntaresposta (db108_sequencial, db108_avaliacaogruporesposta, db108_avaliacaoresposta) VALUES (1, 1, 1);
 INSERT INTO habitacao.avaliacaogrupoperguntaresposta (db108_sequencial, db108_avaliacaogruporesposta, db108_avaliacaoresposta) VALUES (2, 1, 2);
 INSERT INTO habitacao.avaliacaogrupoperguntaresposta (db108_sequencial, db108_avaliacaogruporesposta, db108_avaliacaoresposta) VALUES (3, 1, 3);

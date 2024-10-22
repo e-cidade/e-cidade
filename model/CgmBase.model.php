@@ -149,6 +149,13 @@ abstract class CgmBase {
      * @var string
      */
     protected $sLogradouroComercial;
+    
+    /**
+     * Ano Óbito
+     *
+     * @var string
+     */
+    protected $iAnoObito;
 
     /**
      * Número do Endereço Comercial
@@ -247,6 +254,16 @@ abstract class CgmBase {
      * @var boolean
      */
     private $lNotificalEmail;
+
+    /**
+     * @var boolean
+     */
+    private $lProdutorRural;
+    
+    /**
+     * @var boolean
+     */
+    private $lSituacaoCadastral;
 
     /**
      * Objeto contendo tipo empresa
@@ -648,7 +665,35 @@ abstract class CgmBase {
     public function getCadastro() {
         return $this->dCadastro;
     }
+    
+    /**
+     * @param Date $dCadastro
+     */
+    public function setDataAbertura($dAbertura) {
+        $this->dAbertura = $dAbertura;
+    }
 
+    /**
+     * @return date do cadastro
+     */
+    public function getDataAbertura() {
+        return $this->dAbertura;
+    }
+
+        
+    /**
+     * @param Date $dCadastro
+     */
+    public function setDataSituacaoEspecial($dSituacaoEspecial) {
+        $this->dSituacaoEspecial = $dSituacaoEspecial;
+    }
+
+    /**
+     * @return date do cadastro
+     */
+    public function getDataSituacaoEspecial() {
+        return $this->dSituacaoEspecial;
+    }
 
     /**
      * @return string
@@ -707,10 +752,24 @@ abstract class CgmBase {
     }
 
     /**
+     * @return integer
+     */
+    public function getAnoObito() {
+        return $this->iAnoObito;
+    }
+
+    /**
      * @param string $sLogradouroComercial
      */
     public function setLogradouroComercial ($sLogradouroComercial) {
         $this->sLogradouroComercial = $sLogradouroComercial;
+    }    
+    
+    /**
+     * @param integer $iAnoObito
+     */
+    public function setAnoObito($iAnoObito) {
+        $this->iAnoObito = $iAnoObito;
     }
 
     /**
@@ -846,6 +905,50 @@ abstract class CgmBase {
      */
     public function getNotificalEmail(){
         return $this->lNotificalEmail;
+    }
+    
+    /**
+     * Método verifica se CGM recebe email
+     *
+     * @return boolean
+     */
+    public function getProdutorRural(){
+        return $this->lProdutorRural;
+    }
+    
+    /**
+     * @return boolean
+     */
+    public function getSituacaoCadastral(){
+        return $this->lSituacaoCadastral;
+    }    
+
+    /**
+     * @return boolean
+     */
+    public function getSituacaoEspecial(){
+        return $this->lSituacaoEspecial;
+    }
+
+    /**
+     * @param boolean
+     */
+    public function setProdutorRural($lProdutorRural) {
+        $this->lProdutorRural = $lProdutorRural;
+    }
+    
+    /**
+     * @param boolean
+     */
+    public function setSituacaoCadastral($lSituacaoCadastral) {
+        $this->lSituacaoCadastral = $lSituacaoCadastral;
+    }
+    
+    /**
+     * @param boolean
+     */
+    public function setSituacaoEspecial($lSituacaoEspecial) {
+        $this->lSituacaoEspecial = $lSituacaoEspecial;
     }
 
     /**
@@ -1022,8 +1125,6 @@ abstract class CgmBase {
         } else {
             throw new Exception("{$sMsgErro}, {$oDaoDBConfig->erro_msg}");
         }
-
-
         /**
          * Inclui os registros na tabela CGM
          */
@@ -1042,6 +1143,7 @@ abstract class CgmBase {
         $oDaoCgm->z01_incest     = $this->getInscricaoEstadual();
         $oDaoCgm->z01_incmunici  = $this->getInscricaoMunicipal();
         $oDaoCgm->z01_telcel     = $this->getCelular();
+        $oDaoCgm->z01_anoobito   = $this->getAnoObito();
         $oDaoCgm->z01_email      = addslashes($this->getEmail());
         $oDaoCgm->z01_endcon     = addslashes($this->getLogradouroComercial());
         $oDaoCgm->z01_numcon     = $this->getNumeroComercial();
@@ -1060,8 +1162,13 @@ abstract class CgmBase {
         $oDaoCgm->z01_obs        = $this->getObs();
         $oDaoCgm->z01_hora       = db_hora();
         $oDaoCgm->z01_notificaemail = $this->getNotificalEmail();
+        $oDaoCgm->z01_produtorrural = $this->getProdutorRural();
+        $oDaoCgm->z01_situacaocadastral = $this->getSituacaoCadastral();
+        $oDaoCgm->z01_situacaoespecial = $this->getSituacaoEspecial();
+        $oDaoCgm->z01_dtabertura = $this->getDataAbertura();
+        $oDaoCgm->z01_datasituacaoespecial = $this->getDataSituacaoEspecial();
 
-        //echo "<pre>"; var_dump($oDaoCgm->z01_notificaemail); die;
+        // echo "<pre>"; var_dump($oDaoCgm->z01_notificaemail); die;
 
         if ( trim($this->getCodigo()) == '' ) {
             $oDaoCgm->incluir(null);

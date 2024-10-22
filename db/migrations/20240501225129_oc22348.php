@@ -1,15 +1,15 @@
 <?php
 
 use App\Support\Database\InsertMenu;
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc22348 extends AbstractMigration
+class Oc22348 extends PostgresMigration
 {
     use InsertMenu;
 
     public function up()
     {
-        
+
         $descrMenuPai   = 'Contas';
         $helperMenuPai  = 'Manutenção de contas';
         $idModuloPai    =  39;
@@ -36,7 +36,7 @@ class Oc22348 extends AbstractMigration
         $descrNovoMenu  = "Inclusão";
         $linkNovoMenu   = "con1_cadcontabancaria001.php";
         $helperNovoMenu = $descrMenuPai." - Inclusão";
-        
+
         $this->insertItemMenu($descrNovoMenu, $linkNovoMenu, $helperNovoMenu);
 
         $this->insertMenu($descrMenuPai, null, $idModuloPai, $helperMenuPai);
@@ -47,7 +47,7 @@ class Oc22348 extends AbstractMigration
         $descrNovoMenu  = "Alteração";
         $linkNovoMenu   = "con1_cadcontabancaria002.php";
         $helperNovoMenu = $descrMenuPai." - Alteração";
-        
+
         $this->insertItemMenu($descrNovoMenu, $linkNovoMenu, $helperNovoMenu);
 
         $this->insertMenu($descrMenuPai, null, $idModuloPai, $helperMenuPai);
@@ -58,7 +58,7 @@ class Oc22348 extends AbstractMigration
         $descrNovoMenu  = "Exclusão";
         $linkNovoMenu   = "con1_cadcontabancaria003.php";
         $helperNovoMenu = $descrMenuPai." - Exclusão";
-        
+
         $this->insertItemMenu($descrNovoMenu, $linkNovoMenu, $helperNovoMenu);
 
         $this->insertMenu($descrMenuPai, null, $idModuloPai, $helperMenuPai);
@@ -73,10 +73,10 @@ class Oc22348 extends AbstractMigration
 
         ALTER TABLE caixa.caiparametro ADD k29_estrutcontacorrente varchar(15) NULL;
         ALTER TABLE caixa.caiparametro ADD k29_estrutcontaaplicacao varchar(15) NULL;
-        
+
         COMMIT;
 
 SQL;
         $this->execute($sql);
-    }    
+    }
 }

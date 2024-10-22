@@ -4,31 +4,32 @@ CREATE TABLE empenhos_diarias (
                 id INTEGER NOT NULL DEFAULT nextval('empenhos_diarias_id_seq'),
                 codord INTEGER NOT NULL,
                 dtautorizacao DATE NOT NULL,
-                matricula INTEGER NOT NULL NOT NULL,
+                matricula INTEGER NOT NULL ,
                 cargo VARCHAR(60) NOT NULL,
                 dtinicial DATE NOT NULL,
                 dtfinal DATE NOT NULL,
                 origem VARCHAR(60) NOT NULL,
                 destino VARCHAR(60) NOT NULL,
-                qtddiarias NUMERIC(15,2) DEFAULT 0 NOT NULL,
-                vrldiariauni NUMERIC(15,2) DEFAULT 0 NOT NULL,
+                qtddiarias NUMERIC(15,2) DEFAULT 0 ,
+                vrldiariauni NUMERIC(15,2) DEFAULT 0 ,
                 transporte VARCHAR(60),
-                vlrtransport NUMERIC(15,2) DEFAULT 0 NOT NULL,
+                vlrtransport NUMERIC(15,2) DEFAULT 0 ,
                 objetivo VARCHAR(500),
                 horainicial VARCHAR(5) NOT NULL DEFAULT '00:00',
                 horafinal VARCHAR(5) NOT NULL DEFAULT '00:00',
-                qtdhospedagens NUMERIC(15,2) DEFAULT 0 NOT NULL,
-                vrlhospedagemuni NUMERIC(15,2) DEFAULT 0 NOT NULL,
-                qtddiariaspernoite NUMERIC(15,2) DEFAULT 0 NOT NULL,
-                vrldiariaspernoiteuni NUMERIC(15,2) DEFAULT 0 NOT NULL,
+                qtdhospedagens NUMERIC(15,2) DEFAULT 0 ,
+                vrlhospedagemuni NUMERIC(15,2) DEFAULT 0 ,
+                qtddiariaspernoite NUMERIC(15,2) DEFAULT 0 ,
+                vrldiariaspernoiteuni NUMERIC(15,2) DEFAULT 0 ,
                 codempenho NUMERIC(15,2) DEFAULT 0 NOT NULL,
                 codnota NUMERIC(15,2),
                 CONSTRAINT empenhos_diarias_id_pk PRIMARY KEY (id)
 );
+
 COMMENT ON TABLE empenhos_diarias IS 'Cadastro de Diarias';
 COMMENT ON COLUMN empenhos_diarias.id IS 'ID da Diaria';
 COMMENT ON COLUMN empenhos_diarias.codord IS 'Número da Ordem';
-COMMENT ON COLUMN empenhos_diarias.dtautorizacao IS 'Data de AutorizaÃ§Ã£o';
+COMMENT ON COLUMN empenhos_diarias.dtautorizacao IS 'Data de Autorização';
 COMMENT ON COLUMN empenhos_diarias.matricula IS 'Numero Matricula';
 COMMENT ON COLUMN empenhos_diarias.cargo IS 'Cargo';
 COMMENT ON COLUMN empenhos_diarias.dtinicial IS 'Data Final';

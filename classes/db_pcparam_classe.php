@@ -89,6 +89,7 @@ class cl_pcparam
   var $pc30_emitedpsolicitante = false;
   var $pc30_emitedpcompras = false;
   var $pc30_liboccontrato = false;
+  var $pc30_prazoent = 0;
   // cria propriedade com as variaveis do arquivo
   var $campos = "
                  pc30_instit = int4 = Codigo da instituicao 
@@ -137,6 +138,7 @@ class cl_pcparam
                  pc30_emitedpsolicitante = bool = Emite Email DP Solicitante 
                  pc30_emitedpcompras = bool = Emite Email DP Compras
                  pc30_liboccontrato = bool = Libera gerar ordem de compra com contrato vencido 
+                 pc30_prazoent = int4 = Prazo de Entrega - Ordem de Compra
                  ";
   //funcao construtor da classe 
   function cl_pcparam()
@@ -205,6 +207,8 @@ class cl_pcparam
       $this->pc30_emitedpsolicitante = ($this->pc30_emitedpsolicitante == "" ? @$GLOBALS["HTTP_POST_VARS"]["pc30_emitedpsolicitante"] : $this->pc30_emitedpsolicitante);
       $this->pc30_emitedpcompras = ($this->pc30_emitedpcompras == "" ? @$GLOBALS["HTTP_POST_VARS"]["pc30_emitedpcompras"] : $this->pc30_emitedpcompras);
       $this->pc30_liboccontrato = ($this->pc30_liboccontrato == "" ? @$GLOBALS["HTTP_POST_VARS"]["pc30_liboccontrato"] : $this->pc30_liboccontrato);
+      $this->pc30_prazoent = ($this->pc30_prazoent == "" ? @$GLOBALS["HTTP_POST_VARS"]["pc30_prazoent"] : $this->pc30_prazoent);
+      
     } else {
       $this->pc30_instit = ($this->pc30_instit == "" ? @$GLOBALS["HTTP_POST_VARS"]["pc30_instit"] : $this->pc30_instit);
     }
@@ -429,6 +433,15 @@ class cl_pcparam
       $this->erro_status = "0";
       return false;
     }
+    if ($this->pc30_prazoent == null) {
+      $this->erro_sql = " Campo Prazo de entrega - Ordem de Compra nao Informado.";
+      $this->erro_campo = "pc30_prazoent";
+      $this->erro_banco = "";
+      $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+      $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+      $this->erro_status = "0";
+      return false;
+    }
     if ($this->pc30_emiteemail == null) {
       $this->pc30_emiteemail = "f";
     }
@@ -598,7 +611,8 @@ class cl_pcparam
                                       ,pc30_consultarelatoriodepartamento
                                       ,pc30_emitedpsolicitante
                                       ,pc30_emitedpcompras
-                                      ,pc30_liboccontrato 
+                                      ,pc30_liboccontrato
+                                      ,pc30_prazoent 
                        )
                 values (
                                 $this->pc30_instit 
@@ -647,6 +661,7 @@ class cl_pcparam
                                ,'$this->pc30_emitedpsolicitante'
                                ,'$this->pc30_emitedpcompras' 
                                ,'$this->pc30_liboccontrato
+                               ,$this->pc30_prazoent
                       )";
     $result = db_query($sql);
     if ($result == false) {
@@ -721,6 +736,8 @@ class cl_pcparam
       $resac = db_query("insert into db_acount values($acount,1058,17638,'','" . AddSlashes(pg_result($resaco, 0, 'pc30_notificacarta')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
       $resac = db_query("insert into db_acount values($acount,1058,17712,'','" . AddSlashes(pg_result($resaco, 0, 'pc30_permitirgerarnotifdebitos')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
       $resac = db_query("insert into db_acount values($acount,1058,18828,'','" . AddSlashes(pg_result($resaco, 0, 'pc30_consultarelatoriodepartamento')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
+      $resac = db_query("insert into db_acount values($acount,1058,10548,'','" . AddSlashes(pg_result($resaco, 0, 'pc30_prazoent')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
+
     }
     return true;
   }
@@ -1055,6 +1072,19 @@ class cl_pcparam
         return false;
       }
     }
+    if (trim($this->pc30_prazoent) != "" || isset($GLOBALS["HTTP_POST_VARS"]["pc30_prazoent"])) {
+      $sql  .= $virgula . " pc30_prazoent = $this->pc30_prazoent ";
+      $virgula = ",";
+      if (trim($this->pc30_prazoent) == null) {
+        $this->erro_sql = " Campo Prazo de Entrega - Ordem de Compra";
+        $this->erro_campo = "pc30_prazoent";
+        $this->erro_banco = "";
+        $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+        $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+        $this->erro_status = "0";
+        return false;
+      }
+    }
     if (trim($this->pc30_emiteemail) != "" || isset($GLOBALS["HTTP_POST_VARS"]["pc30_emiteemail"])) {
       $sql  .= $virgula . " pc30_emiteemail = '$this->pc30_emiteemail' ";
       $virgula = ",";
@@ -1345,6 +1375,8 @@ class cl_pcparam
           $resac = db_query("insert into db_acount values($acount,1058,17712,'" . AddSlashes(pg_result($resaco, $conresaco, 'pc30_permitirgerarnotifdebitos')) . "','$this->pc30_permitirgerarnotifdebitos'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
         if (isset($GLOBALS["HTTP_POST_VARS"]["pc30_consultarelatoriodepartamento"]) || $this->pc30_consultarelatoriodepartamento != "")
           $resac = db_query("insert into db_acount values($acount,1058,18828,'" . AddSlashes(pg_result($resaco, $conresaco, 'pc30_consultarelatoriodepartamento')) . "','$this->pc30_consultarelatoriodepartamento'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
+          if (isset($GLOBALS["HTTP_POST_VARS"]["pc30_prazoent"]) || $this->pc30_prazoent != "")
+          $resac = db_query("insert into db_acount values($acount,1058,10548,'" . AddSlashes(pg_result($resaco, $conresaco, 'pc30_prazoent')) . "','$this->pc30_prazoent'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
       }
     }
     $result = db_query($sql);
@@ -1436,6 +1468,8 @@ class cl_pcparam
         $resac = db_query("insert into db_acount values($acount,1058,17638,'','" . AddSlashes(pg_result($resaco, $iresaco, 'pc30_notificacarta')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
         $resac = db_query("insert into db_acount values($acount,1058,17712,'','" . AddSlashes(pg_result($resaco, $iresaco, 'pc30_permitirgerarnotifdebitos')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
         $resac = db_query("insert into db_acount values($acount,1058,18828,'','" . AddSlashes(pg_result($resaco, $iresaco, 'pc30_consultarelatoriodepartamento')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
+        $resac = db_query("insert into db_acount values($acount,1058,10548,'','" . AddSlashes(pg_result($resaco, $iresaco, 'pc30_prazoent')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
+
       }
     }
     $sql = " delete from pcparam

@@ -10,7 +10,7 @@ use ECidade\RecursosHumanos\ESocial\Model\Formulario\EventoCargaInterface;
  * retorno dos dados da carga
  * @package ECidade\RecursosHumanos\ESocial\Model\Formulario
  */
-class EventoCargaFactory 
+class EventoCargaFactory
 {
 	/**
 	 * @var ECidade\RecursosHumanos\ESocial\Model\Formulario\EventoCargaInterface
@@ -18,16 +18,18 @@ class EventoCargaFactory
 	private $eventoCarga;
 
 	/**
-	 * Cria uma instancia de EventoCargaInterface específico
-	 * @param $tipo Integer
+	 * Cria uma instância de EventoCargaInterface específico
+	 * @param $anoCompetencia int
+	 * @param $mesCompetencia int
+	 * @return ECidade\RecursosHumanos\ESocial\Model\Formulario\EventoCargaInterface
 	 */
-	public function __construct($tipo) 
+	public function __construct($tipo, $anoCompetencia, $mesCompetencia)
 	{
-		$eventoClassName = "ECidade\RecursosHumanos\ESocial\Model\Formulario\EventoCarga".Tipo::getVinculacaoTipo($tipo);
-		$this->eventoCarga = new $eventoClassName;
+		$eventoClassName = "ECidade\RecursosHumanos\ESocial\Model\Formulario\EventoCarga" . Tipo::getVinculacaoTipo($tipo);
+		$this->eventoCarga = new $eventoClassName($anoCompetencia, $mesCompetencia);
 	}
 
-    /**
+	/**
 	 * Cria uma instancia de EventoCargaInterface específico
 	 * @return ECidade\RecursosHumanos\ESocial\Model\Formulario\EventoCargaInterface
 	 */

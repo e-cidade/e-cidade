@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use App\Contracts\MyServiceInterface;
-use App\Services\MyService;
+use App\Providers\Database\DatabaseServiceProvider;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -15,7 +15,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(MyServiceInterface::class, MyService::class);
+        $this->app->register(DatabaseServiceProvider::class);
     }
 
     /**
@@ -25,6 +25,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Paginator::useBootstrap();
     }
 }

@@ -80,6 +80,7 @@ class cl_emite_nota_empenho {
         $sqlemp .= "        controleinterno.z01_nome AS controleinterno ";
         $sqlemp .= " FROM empempenho ";
         $sqlemp .= " LEFT JOIN db_usuarios ON db_usuarios.id_usuario = e60_id_usuario";
+        $sqlemp .= " LEFT JOIN pagordem on e50_numemp = e60_numemp and e50_data = e60_emiss";
         $sqlemp .= " LEFT JOIN pctipocompra ON pc50_codcom = e60_codcom ";
         $sqlemp .= " INNER JOIN orcdotacao ON o58_coddot = e60_coddot AND o58_instit = {$iInstit} AND o58_anousu = e60_anousu ";
         $sqlemp .= " INNER JOIN orcorgao ON o58_orgao = o40_orgao AND o40_anousu = {$iAnoUsu} ";
@@ -92,9 +93,21 @@ class cl_emite_nota_empenho {
         $sqlemp .= " INNER JOIN orctiporec ON o58_codigo = o15_codigo ";
         $sqlemp .= " INNER JOIN cgm ON z01_numcgm = e60_numcgm ";
         $sqlemp .= " INNER JOIN concarpeculiar ON concarpeculiar.c58_sequencial = empempenho.e60_concarpeculiar ";
-        $sqlemp .= " LEFT JOIN cgm AS ordena ON ordena.z01_numcgm = o41_orddespesa ";
+        $sqlemp .= " LEFT JOIN cgm AS ordena 
+                            ON ordena.z01_numcgm = 
+                                CASE 
+                                    WHEN e60_numcgmordenador IS NOT NULL
+                                    THEN e60_numcgmordenador
+                                    ELSE o41_orddespesa
+                                END ";
         $sqlemp .= " LEFT JOIN cgm AS paga ON paga.z01_numcgm = o41_ordpagamento ";
-        $sqlemp .= " LEFT JOIN cgm AS liquida ON liquida.z01_numcgm = o41_ordliquidacao ";
+        $sqlemp .= " LEFT JOIN cgm AS liquida 
+                            ON liquida.z01_numcgm = 
+                                CASE 
+                                    WHEN e50_numcgmordenador IS NOT NULL
+                                    THEN e50_numcgmordenador
+                                    ELSE o41_ordliquidacao
+                                END ";
         $sqlemp .= " LEFT JOIN identificacaoresponsaveis contad ON contad.si166_instit= e60_instit ";
         $sqlemp .= " AND contad.si166_tiporesponsavel=2 ";
         $sqlemp .= " AND (contad.si166_dataini <=  e60_emiss ";

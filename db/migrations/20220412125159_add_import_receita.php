@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AddImportReceita extends AbstractMigration
+class AddImportReceita extends PostgresMigration
 {
 
     public function up()
@@ -17,7 +17,7 @@ class AddImportReceita extends AbstractMigration
             'Importar Nomes Receita',
             't');
 
-        INSERT INTO db_menu 
+        INSERT INTO db_menu
         VALUES (4354,
             (SELECT MAX(id_item) FROM db_itensmenu),
             6,

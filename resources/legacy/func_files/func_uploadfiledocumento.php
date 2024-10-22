@@ -25,11 +25,15 @@
  *                                licenca/licenca_pt.txt
  */
 
+use App\Helpers\FileHelper;
+
 require("libs/db_stdlib.php");
 require("libs/db_conecta.php");
 include("libs/db_sessoes.php");
 include("libs/db_usuariosonline.php");
 include("dbforms/db_funcoes.php");
+require_once("app/Helpers/FileHelper.php");
+
 db_postmemory($HTTP_POST_VARS);
 parse_str($HTTP_SERVER_VARS["QUERY_STRING"]);
 $clrotulo = new rotulocampo;
@@ -38,6 +42,7 @@ if(isset($uploadfile)) {
 
   // Nome do novo arquivo
   $nomearq = $_FILES["uploadfile"]["name"];
+  $nomearq = FileHelper::sanitizeFileName(FileHelper::replaceSpecialChars($nomearq));
 
   // Nome do arquivo temporário gerado no /tmp
   $nometmp = $_FILES["uploadfile"]["tmp_name"];

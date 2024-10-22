@@ -5727,7 +5727,7 @@ function duplicaReceitaaCorrenteLiquida($iAnoUsu, $iCodigoRelatorio)
  * Busca saldo conta contarrente
  *
  */
-function getSaldoTotalContaCorrente($iAnousu, $iReduz, $iCC, $iMes, $iInstit)
+function getSaldoTotalContaCorrente($iAnousu, $iReduz, $iCC, $iMes, $iInstit, $sDataInicial=null,$sDataFinal=null)
 {
     $sSaldoInicialAno = "select coalesce((SELECT sum(CASE WHEN c29_debito > 0 THEN c29_debito
                                WHEN c29_credito > 0 THEN -1 * c29_credito
@@ -5753,9 +5753,13 @@ function getSaldoTotalContaCorrente($iAnousu, $iReduz, $iCC, $iMes, $iInstit)
                           INNER JOIN conhistdoc ON conlancamdoc.c71_coddoc = conhistdoc.c53_coddoc
                           INNER JOIN contacorrentedetalheconlancamval ON contacorrentedetalheconlancamval.c28_conlancamval = conlancamval.c69_sequen
                           INNER JOIN contacorrentedetalhe ON contacorrentedetalhe.c19_sequencial = contacorrentedetalheconlancamval.c28_contacorrentedetalhe
-                   WHERE c28_tipo = 'C'
-                     AND DATE_PART('MONTH',c69_data) < $iMes
-                     AND DATE_PART('YEAR',c69_data) = $iAnousu
+                   WHERE c28_tipo = 'C'";
+    if ($iMes == null && $sDataInicial != null && $sDataFinal != null) {
+        $sTotalCreditoAno .= " AND c69_data < '{$sDataInicial}'";
+    } else {
+        $sTotalCreditoAno .= " AND DATE_PART('MONTH',c69_data) < {$iMes}";
+    }
+    $sTotalCreditoAno .= " AND DATE_PART('YEAR',c69_data) = $iAnousu
                      AND contacorrentedetalhe.c19_reduz = $iReduz
                      AND c19_instit = $iInstit
                    GROUP BY c28_tipo),0) as creditoano ";
@@ -5770,9 +5774,13 @@ function getSaldoTotalContaCorrente($iAnousu, $iReduz, $iCC, $iMes, $iInstit)
                           INNER JOIN conhistdoc ON conlancamdoc.c71_coddoc = conhistdoc.c53_coddoc
                           INNER JOIN contacorrentedetalheconlancamval ON contacorrentedetalheconlancamval.c28_conlancamval = conlancamval.c69_sequen
                           INNER JOIN contacorrentedetalhe ON contacorrentedetalhe.c19_sequencial = contacorrentedetalheconlancamval.c28_contacorrentedetalhe
-                   WHERE c28_tipo = 'D'
-                     AND DATE_PART('MONTH',c69_data) < $iMes
-                     AND DATE_PART('YEAR',c69_data) = $iAnousu
+                   WHERE c28_tipo = 'D'";
+    if ($iMes == null && $sDataInicial != null && $sDataFinal != null) {
+        $sTotalDebitoAno .= " AND c69_data < '{$sDataInicial}'";
+    } else {
+        $sTotalDebitoAno .= " AND DATE_PART('MONTH',c69_data) < {$iMes}";
+    }
+    $sTotalDebitoAno .= " AND DATE_PART('YEAR',c69_data) = $iAnousu
                      AND contacorrentedetalhe.c19_reduz = $iReduz
                      AND c19_instit = $iInstit
                    GROUP BY c28_tipo),0) as debito ";
@@ -5789,9 +5797,13 @@ function getSaldoTotalContaCorrente($iAnousu, $iReduz, $iCC, $iMes, $iInstit)
                           INNER JOIN conhistdoc ON conlancamdoc.c71_coddoc = conhistdoc.c53_coddoc
                           INNER JOIN contacorrentedetalheconlancamval ON contacorrentedetalheconlancamval.c28_conlancamval = conlancamval.c69_sequen
                           INNER JOIN contacorrentedetalhe ON contacorrentedetalhe.c19_sequencial = contacorrentedetalheconlancamval.c28_contacorrentedetalhe
-                   WHERE c28_tipo = 'C'
-                     AND DATE_PART('MONTH',c69_data) = $iMes
-                     AND DATE_PART('YEAR',c69_data) = $iAnousu
+                   WHERE c28_tipo = 'C'";
+    if ($iMes == null && $sDataInicial != null && $sDataFinal != null) {
+        $sTotalCreditoMes .= " AND c69_data BETWEEN '{$sDataInicial}' AND '{$sDataFinal}'";
+    } else {
+        $sTotalCreditoMes .= " AND DATE_PART('MONTH',c69_data) = {$iMes}";
+    }
+    $sTotalCreditoMes .= " AND DATE_PART('YEAR',c69_data) = $iAnousu
                      AND contacorrentedetalhe.c19_reduz = $iReduz
                      AND c19_instit = $iInstit
                    GROUP BY c28_tipo),0) as creditomes";
@@ -5806,9 +5818,13 @@ function getSaldoTotalContaCorrente($iAnousu, $iReduz, $iCC, $iMes, $iInstit)
                           INNER JOIN conhistdoc ON conlancamdoc.c71_coddoc = conhistdoc.c53_coddoc
                           INNER JOIN contacorrentedetalheconlancamval ON contacorrentedetalheconlancamval.c28_conlancamval = conlancamval.c69_sequen
                           INNER JOIN contacorrentedetalhe ON contacorrentedetalhe.c19_sequencial = contacorrentedetalheconlancamval.c28_contacorrentedetalhe
-                   WHERE c28_tipo = 'D'
-                     AND DATE_PART('MONTH',c69_data) = $iMes
-                     AND DATE_PART('YEAR',c69_data) = $iAnousu
+                   WHERE c28_tipo = 'D'";
+    if ($iMes == null && $sDataInicial != null && $sDataFinal != null) {
+        $sTotalDebitosMes .= " AND c69_data BETWEEN '{$sDataInicial}' AND '{$sDataFinal}'";
+    } else {
+        $sTotalDebitosMes .= " AND DATE_PART('MONTH',c69_data) = {$iMes}";
+    }
+    $sTotalDebitosMes .= " AND DATE_PART('YEAR',c69_data) = $iAnousu
                      AND contacorrentedetalhe.c19_reduz = $iReduz
                      AND c19_instit = $iInstit
                    GROUP BY c28_tipo),0) as debitomes";

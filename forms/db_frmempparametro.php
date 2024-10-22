@@ -331,6 +331,30 @@ $clempparametro->rotulo->label();
                     ?>
                 </td>
             </tr>
+            <tr>
+                <td nowrap title="<?= @$Te30_obrigadivida ?>">
+                    <?= @$Le30_obrigadivida?>
+                </td>
+                <td><?
+                    $matriz = array("f" => "Não", "t" => "Sim");
+                    db_select("e30_obrigadivida", $matriz, true, 1);
+                    ?>
+                </td>
+            </tr>
+            <tr>
+                <td nowrap title="<?= @$Te30_buscarordenadores ?>"> <?= @$Le30_buscarordenadores ?> </td>
+                <td><? $matriz = array("1" => "Cadastro de Unidades", "2" => "Cadastro de Assinantes", "3" => "CGM");
+                    db_select("e30_buscarordenadores", $matriz, true, 1);
+                    ?>
+                </td>
+            </tr>
+            <tr>
+                <td nowrap title="<?= @$Te30_buscarordenadoresliqui ?>"> <?= @$Le30_buscarordenadoresliqui ?> </td>
+                <td><? $matriz = array("1" => "Cadastro de Unidades", "2" => "Cadastro de Assinantes", "3" => "CGM");
+                    db_select("e30_buscarordenadoresliqui", $matriz, true, 1);
+                    ?>
+                </td>
+            </tr>
         </table>
     </fieldset>
     <center>

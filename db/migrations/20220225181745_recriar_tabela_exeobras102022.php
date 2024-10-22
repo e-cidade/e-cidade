@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class RecriarTabelaExeobras102022 extends AbstractMigration
+class RecriarTabelaExeobras102022 extends PostgresMigration
 {
 
     public function up()
@@ -10,7 +10,7 @@ class RecriarTabelaExeobras102022 extends AbstractMigration
         $sql = "
         BEGIN;
             DROP TABLE exeobras102022;
-            
+
             CREATE TABLE exeobras102022 (
                 si197_sequencial int8 NULL,
                 si197_tiporegistro int8 NULL,

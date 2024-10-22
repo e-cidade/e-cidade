@@ -1,24 +1,24 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc14109 extends AbstractMigration
+class Oc14109 extends PostgresMigration
 {
     public function up(){
         $sql = "
                 BEGIN;
 
                 SELECT fc_startsession();
-                
+
                 ALTER TABLE acordo ADD COLUMN ac16_providencia integer;
-                
+
                 CREATE TABLE providencia(codigo integer PRIMARY KEY, descricao varchar(20));
-                
+
                 INSERT INTO providencia(codigo, descricao)
                 VALUES (1, 'Finalizado'),
                        (2, 'Aditado');
 
-                ALTER TABLE parametroscontratos ADD COLUMN pc01_liberargerenciamentocontratos boolean DEFAULT FALSE;                       
+                ALTER TABLE parametroscontratos ADD COLUMN pc01_liberargerenciamentocontratos boolean DEFAULT FALSE;
 
                 INSERT INTO db_syscampo(codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel)
                     VALUES(
@@ -35,7 +35,7 @@ class Oc14109 extends AbstractMigration
                         5,
                         'text',
                         'Liberar gerenciamento');
-                        
+
                 COMMIT;
         ";
 
@@ -48,7 +48,7 @@ class Oc14109 extends AbstractMigration
                 BEGIN;
 
                 SELECT fc_startsession();
-                
+
                 DROP TABLE providencia;
 
                 ALTER TABLE acordo DROP COLUMN ac16_providencia;
@@ -61,6 +61,6 @@ class Oc14109 extends AbstractMigration
         ";
 
         $this->execute($sql);
-        
+
     }
 }

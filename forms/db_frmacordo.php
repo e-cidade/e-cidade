@@ -833,7 +833,7 @@ db_app::load("dbtextFieldData.widget.js");
                                                 >
                                                     <strong>Valor da Parcela:</strong>
                                                 </td>
-                                                <td><?php db_input('ac16_vlrparcela', 10, true, true, 'float', $db_opcao); ?></td>
+                                                <td><?php db_input('ac16_vlrparcela', 10, 4, true, 'float', $db_opcao); ?></td>
                                             </tr>
 
                                             <tr>
@@ -1599,7 +1599,7 @@ db_app::load("dbtextFieldData.widget.js");
             js_OpenJanelaIframe(
                 '(window.CurrentWindow || parent.CurrentWindow).corpo.iframe_acordo',
                 'db_iframe_contratado',
-                'func_pcforne.php?validacaoCadastroFornecedor=true&validaRepresentante=true&funcao_js=parent.js_mostracontratado1|z01_nome|pc60_numcgm|z01_cgccpf|z01_telef|z01_email',
+                'func_pcforne.php?infoValidacaoRepresentanteAcordo=true&validacaoCadastroFornecedor=true&validaRepresentante=true&funcao_js=parent.js_mostracontratado1|z01_nome|pc60_numcgm|z01_cgccpf|z01_telef|z01_email',
                 'Pesquisa',
                 true,
                 '0',
@@ -1615,7 +1615,7 @@ db_app::load("dbtextFieldData.widget.js");
             js_OpenJanelaIframe(
                 '(window.CurrentWindow || parent.CurrentWindow).corpo.iframe_acordo',
                 'db_iframe_contratado',
-                'func_pcforne.php?validaRepresentante=true&pesquisa_chave=' + $F('ac16_contratado') + 'funcao_js=parent.js_mostracontratado1|z01_nome|pc60_numcgm|z01_cgccpf',
+                'func_pcforne.php?infoValidacaoRepresentanteAcordo=true&validaRepresentante=true&pesquisa_chave=' + $F('ac16_contratado') + 'funcao_js=parent.js_mostracontratado1|z01_nome|pc60_numcgm|z01_cgccpf',
                 'Pesquisa',
                 false,
                 '0',

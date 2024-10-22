@@ -65,8 +65,8 @@ class AssinaturaDigital
         }
         $this->oUsuario = new UsuarioSistema(db_getsession("DB_id_usuario"));
         $this->client = new Client([
-            'timeout' => 10, // Definir timeout de 10 segundos
-            'connect_timeout' => 5, // Timeout para conexão de 5 segundos
+            'timeout' => 600, // Definir timeout de 10 segundos
+            'connect_timeout' => 600, // Timeout para conexão de 5 segundos
             'http_errors' => false, // Para evitar exceções HTTP
         ]);
         $this->curl_init = curl_init();
@@ -81,23 +81,28 @@ class AssinaturaDigital
      */
     public function solicitarAssinturaPorDotacao(int $iDotacao, int $iAnoUsu, $dData, $nomeDocumento, $tipo_doc, $codDocumento)
     {
-        $aAssinantes = $this->getAssinatesPorDotacao($iDotacao, $iAnoUsu, $dData, $tipo_doc, $codDocumento);
-        $data = json_encode([
-            'file' => ['base64' => $this->base64Arquivo],
-            'users' => $aAssinantes,
-            'name' => utf8_encode(str_replace(".pdf", "", $nomeDocumento)),
-        ]);
+        try{
+            $aAssinantes = $this->getAssinatesPorDotacao($iDotacao, $iAnoUsu, $dData, $tipo_doc, $codDocumento);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new Exception('Erro ao decodificar JSON: ' . json_last_error_msg());
+            if(empty($aAssinantes)) {
+                throw new Exception(" Documento {$codDocumento} não enviado para assinar. Por falta de assinates.");
+            }
+            $data = json_encode([
+                'file' => ['base64' => $this->base64Arquivo],
+                'users' => $aAssinantes,
+                'name' => utf8_encode(str_replace(".pdf", "", $nomeDocumento)),
+            ]);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception('Erro ao decodificar JSON: ' . json_last_error_msg());
+            }
+            $retorno = $this->postLibresing($data);
+            if($retorno->data->message != "Sucesso") {
+                throw new Exception(" Documento {$codDocumento} não enviado para assinar. Motivo: ".$retorno->data->message);
+            }
+            return $retorno->data->data;
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
         }
-
-        $retorno = $this->postLibresing($data);
-
-        if($retorno->data->message != "Sucesso"){
-            throw new Exception("Documento {$codDocumento} não enviado para assinar. Motivo: ".$retorno->data->message);
-        }
-        return $retorno->data->data;
     }
 
     /**
@@ -115,6 +120,7 @@ class AssinaturaDigital
             'users' => $aAssinantes,
             'name' => utf8_encode(str_replace(".pdf", "", $nomeDocumento)),
         ]);
+
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new Exception('Erro ao decodificar JSON: ' . json_last_error_msg());
         }
@@ -170,7 +176,7 @@ class AssinaturaDigital
         $oDocumentoAssinado = $this->solicitarAssinturaPorDotacao($iDotacao, $iAnoUsu, $dData, $nomeDocumento, self::TIPO_DOC_PAGAMENTO, $codDoc);
         if($oDocumentoAssinado->uuid){
             $empord  = Empord::find($iMovimento);
-            if(!$empord){
+            if (!$empord) {
                 throw new Exception("Ordem Pagamento não encontrada!");
             }
             if($empord->e82_id_documento_assinado && $oDocumentoAssinado->nodeId){
@@ -178,7 +184,7 @@ class AssinaturaDigital
             }
             $empord->e82_id_documento_assinado = $oDocumentoAssinado->uuid;
             $empord->e82_node_id_libresing     = $oDocumentoAssinado->nodeId;
-            if(!$empord->save()){
+            if(!$empord->save()) {
                 throw new Exception("Erro ao salvar alteração da ordem pagamento!");
             }
         }
@@ -232,14 +238,31 @@ class AssinaturaDigital
 
     protected function postLibresing($data)
     {
+        $this->curl_init = curl_init();
         curl_setopt($this->curl_init, CURLOPT_URL, $this->assinaturaDigitalParametro->db242_assinador_url.self::URL_SOLICITAR_ASSINATURA);
+        curl_setopt($this->curl_init, CURLOPT_VERBOSE, true);
         curl_setopt($this->curl_init, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->curl_init, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($this->curl_init, CURLOPT_TIMEOUT, 600); // tempo limite de 10 minutos
+        curl_setopt($this->curl_init, CURLOPT_CONNECTTIMEOUT, 600); // tempo limite de 10 minutos para a conexão
+        curl_setopt($this->curl_init, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1); // Desativa HTTP/2
         $user = self::USUARIO_ADMINISTRADOR;
         $password = $this->assinaturaDigitalParametro->db242_assinador_token;
         curl_setopt($this->curl_init, CURLOPT_HTTPHEADER, ['Accept: application/json', 'Authorization: Basic ' . base64_encode($user. ':' . $password), 'Content-Type: application/json']);
         curl_setopt($this->curl_init, CURLOPT_POSTFIELDS, $data);
         $response = curl_exec($this->curl_init);
+        if($response === false)
+        {
+            file_put_contents('libresign.log',
+                file_get_contents('libresign.log') . "\n" .
+                json_encode([
+                    'response' => print_r($response, true),
+                    'data' => $data,
+                    'curl_error' => curl_error($this->curl_init),
+                ]));
+        }
+
+
         curl_close($this->curl_init);
         return json_decode($response)->ocs;
     }
@@ -252,16 +275,17 @@ class AssinaturaDigital
         return false;
     }
 
-    private function getAssinatesPorDotacao(int $iDotacao, int $iAnoUsu, string $dData, int $tipo_doc, $codDoc): array
+    private function getAssinatesPorDotacao(int $iDotacao, int $iAnoUsu, string $dData, int $tipo_doc, $codDoc)
     {
-        $aAssinantes = $this->assinaturaDigitalAssinanteRepository->getAssinantesPorDotacao($iDotacao, $iAnoUsu, $tipo_doc,  $dData);
+        $aAssinantes = $this->assinaturaDigitalAssinanteRepository->getAssinantesPorDotacao($iDotacao, $iAnoUsu, $tipo_doc, $dData);
         $usuarios = [];
         $usuariosHash = [];
-        foreach ($aAssinantes as $assinante){
 
-            if(!isset($usuariosHash[$assinante->login])){
+        foreach ($aAssinantes as $assinante) {
+
+            if (!isset($usuariosHash[$assinante->login])) {
                 $usuarios[] = [
-                    'displayName' => utf8_encode($assinante->nome)." (".iconv("ISO-8859-1", "UTF-8" ,AssinaturaDigitalAssinante::ASSINTAURA_CARGOS[$assinante->db243_cargo]).")",
+                    'displayName' => iconv("ISO-8859-1", "UTF-8", $assinante->nome) . " (" . iconv("ISO-8859-1", "UTF-8", AssinaturaDigitalAssinante::ASSINTAURA_CARGOS[$assinante->db243_cargo]) . ")",
                     'description' => 'Assinar este documento',
                     'identify' => ['account' => $assinante->login],
                     'notify' => true
@@ -269,12 +293,7 @@ class AssinaturaDigital
                 $usuariosHash[$assinante->login] = $assinante->login;
             }
         }
-
-        if(empty($usuarios)){
-            throw new Exception(" Não foi localizado nenhum pessoa para assinar o documento: {$codDoc}. Revise o cadastro e envie novamente para assinatura.");
-        }
         return $usuarios;
-
     }
 
     private function getAssinatesContadorGestor(string $dData, int $tipo_doc, $coddocumento): array
@@ -285,7 +304,7 @@ class AssinaturaDigital
         foreach ($aAssinantes as $assinante){
             if(!isset($usuariosHash[$assinante->login])){
                 $usuarios[] = [
-                    'displayName' => utf8_encode($assinante->nome)." (".AssinaturaDigitalAssinante::ASSINTAURA_CARGOS[$assinante->db243_cargo].")",
+                    'displayName' => iconv("ISO-8859-1", "UTF-8" ,$assinante->nome)." (".iconv("ISO-8859-1", "UTF-8" ,AssinaturaDigitalAssinante::ASSINTAURA_CARGOS[$assinante->db243_cargo]).")",
                     'description' => 'Assinar este documento',
                     'identify' => ['account' => $assinante->login],
                     'notify' => true
@@ -348,10 +367,10 @@ class AssinaturaDigital
 
     }
 
-    public function getDocumentosPorUsuario()
+    public function getDocumentosPorUsuario(?int $iPagina = 1)
     {
         try {
-            $url = $this->assinaturaDigitalParametro->db242_assinador_url . self::URL_LISTA_DOCUMENTOS . '?page=1&length=100000000';
+            $url = $this->assinaturaDigitalParametro->db242_assinador_url . self::URL_LISTA_DOCUMENTOS . '?page=' . $iPagina . '&length=1000';
             $headers = [
                 'Accept' => 'application/json',
                 'Authorization' => 'Basic ' . base64_encode($this->oUsuario->getLogin() . ':' . $this->oUsuario->getSenha()),
@@ -361,7 +380,7 @@ class AssinaturaDigital
                 'headers' => $headers
             ]);
             return $response->getBody()->getContents();
-        } catch (RequestException $error) {
+        } catch (Exception $error) {
             throw new Exception($error->getMessage());
         }
     }
@@ -388,7 +407,7 @@ class AssinaturaDigital
                 ],
             ]);
             return $response->getBody()->getContents();
-        } catch (RequestException $error) {
+        } catch (Exception $error) {
             throw new Exception($error->getMessage());
         }
     }
@@ -396,13 +415,9 @@ class AssinaturaDigital
     public function getDocumentoAssinado($uuid)
     {
         try {
-//            $pdf = file_get_contents($this->assinaturaDigitalParametro->db242_assinador_url.self::URL_ARQUIVO.$uuid);
-////            if ($pdf === false) {
-////                throw new Exception(error_get_last()['message']);
-////            }
+
             return file_get_contents($this->assinaturaDigitalParametro->db242_assinador_url.self::URL_ARQUIVO.$uuid);
         }catch (Exception $error){
-
             throw new Exception($error->getMessage());
         }
     }
@@ -412,7 +427,9 @@ class AssinaturaDigital
         try {
 
             $aEmpenhos = $this->assinaturaDigitalAssinanteRepository->getEmpenhosAssinados($oParametros);
-
+            if(!$aEmpenhos){
+                db_redireciona('db_erros.php?fechar=true&db_erro=Nenhum registro encontrado para o filtro!');
+            }
             $root_temp_dir = sys_get_temp_dir();
             $temp_name = md5(serialize($oParametros));
             $temp_dir = $root_temp_dir."/libresign/".$temp_name;
@@ -421,14 +438,16 @@ class AssinaturaDigital
             }
             mkdir($temp_dir,0755, true);
             $aNomesArquivos = [];
-
             foreach ($aEmpenhos as $oEmpenho){
                 if(!$oEmpenho->e60_id_documento_assinado){
                     continue;
                 }
                 $aNomesArquivos[] = $temp_dir."/".$oEmpenho->e60_id_documento_assinado.".pdf";
                 file_put_contents($temp_dir."/".$oEmpenho->e60_id_documento_assinado.".pdf", $this->getDocumentoAssinado($oEmpenho->e60_id_documento_assinado));
-
+                sleep(4);
+            }
+            if(!$aNomesArquivos){
+                db_redireciona('db_erros.php?fechar=true&db_erro=Nenhum registro encontrado para o filtro!');
             }
             if(!empty($aNomesArquivos)){
                 $cmd = "gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=$temp_dir/$temp_name.pdf  -dBATCH  ". implode(' ', $aNomesArquivos);
@@ -452,6 +471,9 @@ class AssinaturaDigital
     {
         try {
             $aLiquidacoes = $this->assinaturaDigitalAssinanteRepository->getLiquidacaoesAssinadas($oParametros);
+            if(!$aLiquidacoes){
+                db_redireciona('db_erros.php?fechar=true&db_erro=Nenhum registro encontrado para o filtro!');
+            }
 
             $root_temp_dir = sys_get_temp_dir();
             $temp_name = md5(serialize($oParametros));
@@ -467,6 +489,10 @@ class AssinaturaDigital
                 }
                 $aNomesArquivos[] = $temp_dir."/".$oLiquidacao->e69_id_documento_assinado.".pdf";
                 file_put_contents($temp_dir."/".$oLiquidacao->e69_id_documento_assinado.".pdf", $this->getDocumentoAssinado($oLiquidacao->e69_id_documento_assinado));
+                sleep(4);
+            }
+            if(!$aNomesArquivos){
+                db_redireciona('db_erros.php?fechar=true&db_erro=Nenhum registro encontrado para o filtro!');
             }
             if(!empty($aNomesArquivos)){
                 $cmd = "gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=$temp_dir/$temp_name.pdf  -dBATCH -f ". implode(' ', $aNomesArquivos);
@@ -484,6 +510,9 @@ class AssinaturaDigital
 
         try {
             $aAnulacoesEmpenho = $this->assinaturaDigitalAssinanteRepository->getAnulacaoEmpenhoAssinadas($oParametros);
+            if(!$aAnulacoesEmpenho){
+                db_redireciona('db_erros.php?fechar=true&db_erro=Nenhum registro encontrado para o filtro!');
+            }
             $root_temp_dir = sys_get_temp_dir();
             $temp_name = md5(serialize($oParametros));
             $temp_dir = $root_temp_dir."/libresign/".$temp_name;
@@ -498,6 +527,10 @@ class AssinaturaDigital
                 }
                 $aNomesArquivos[] = $temp_dir."/".$oAnulacaoEmpenho->e94_id_documento_assinado.".pdf";
                 file_put_contents($temp_dir."/".$oAnulacaoEmpenho->e94_id_documento_assinado.".pdf", $this->getDocumentoAssinado($oAnulacaoEmpenho->e94_id_documento_assinado));
+                sleep(4);
+            }
+            if(!$aNomesArquivos){
+                db_redireciona('db_erros.php?fechar=true&db_erro=Nenhum registro encontrado para o filtro!');
             }
             if(!empty($aNomesArquivos)){
                 $cmd = "gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=$temp_dir/$temp_name.pdf  -dBATCH -f ". implode(' ', $aNomesArquivos);
@@ -525,12 +558,17 @@ class AssinaturaDigital
             }
             mkdir($temp_dir,0755, true);
             $aNomesArquivos = [];
+
             foreach ($aOrdensPagamento as $oOrdemPagamento){
                 if(!$oOrdemPagamento->e82_id_documento_assinado){
                     continue;
                 }
                 $aNomesArquivos[] = $temp_dir."/".$oOrdemPagamento->e82_id_documento_assinado.".pdf";
                 file_put_contents($temp_dir."/".$oOrdemPagamento->e82_id_documento_assinado.".pdf", $this->getDocumentoAssinado($oOrdemPagamento->e82_id_documento_assinado));
+                sleep(4);
+            }
+            if(!$aNomesArquivos){
+                db_redireciona('db_erros.php?fechar=true&db_erro=Nenhum registro encontrado para o filtro!');
             }
             if(!empty($aNomesArquivos)){
                 $cmd = "gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=$temp_dir/$temp_name.pdf  -dBATCH -f ". implode(' ', $aNomesArquivos);
@@ -547,6 +585,9 @@ class AssinaturaDigital
     {
         try {
             $aSlips = $this->assinaturaDigitalAssinanteRepository->getSlipAssinadas($oParametros);
+            if(!$aSlips){
+                db_redireciona('db_erros.php?fechar=true&db_erro=Nenhum registro encontrado para o filtro!');
+            }
             $root_temp_dir = sys_get_temp_dir();
             $temp_name = md5(serialize($oParametros));
             $temp_dir = $root_temp_dir."/libresign/".$temp_name;
@@ -561,6 +602,11 @@ class AssinaturaDigital
                 }
                 $aNomesArquivos[] = $temp_dir."/".$oOrdemPagamento->k17_id_documento_assinado.".pdf";
                 file_put_contents($temp_dir."/".$oOrdemPagamento->k17_id_documento_assinado.".pdf", $this->getDocumentoAssinado($oOrdemPagamento->k17_id_documento_assinado));
+                sleep(4);
+            }
+
+            if(!$aNomesArquivos){
+                db_redireciona('db_erros.php?fechar=true&db_erro=Nenhum registro encontrado para o filtro!');
             }
             if(!empty($aNomesArquivos)){
                 $cmd = "gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=$temp_dir/$temp_name.pdf  -dBATCH -f ". implode(' ', $aNomesArquivos);
@@ -585,6 +631,24 @@ class AssinaturaDigital
                 $formularioLiquicao = new FormularioLiquidacao();
                 $formularioLiquicao->gerarFormularioLiquidacao($iEmpenho);
                 $formularioLiquicao->solitarAssinaturaLiquidacao();
+            }
+        }catch (Exception $error){
+            throw new Exception($error->getMessage());
+        }
+    }
+
+    public function enviarOrdemaPagamentoAssinaturaLote($oParametros)
+    {
+        try {
+            $aOrdensPagamento = $this->assinaturaDigitalAssinanteRepository->getOrdemPagamento($oParametros);
+            if(empty($aOrdensPagamento)){
+                throw new Exception(" Nenhuma Ordem de pagamento localizada!");
+            }
+            foreach ($aOrdensPagamento as $oOrdensPagamento){
+                $formularioOrdemPagamento = new FormularioOrdemPagamento();
+                $formularioOrdemPagamento->gerarFormularioOrdemPagamento($oOrdensPagamento->e82_codmov);
+                $formularioOrdemPagamento->solitarAssinatura();
+                sleep(4);
             }
         }catch (Exception $error){
             throw new Exception($error->getMessage());

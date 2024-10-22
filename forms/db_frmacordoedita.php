@@ -1147,7 +1147,7 @@ db_app::load("dbtextFieldData.widget.js");
           js_OpenJanelaIframe(
             'CurrentWindow.corpo.iframe_acordo',
             'db_iframe_contratado',
-            'func_pcforne.php?validaRepresentante=true&funcao_js=parent.js_mostracontratado1|z01_nome|pc60_numcgm',
+            'func_pcforne.php?infoValidacaoRepresentanteAcordo=true&validaRepresentante=true&funcao_js=parent.js_mostracontratado1|z01_nome|pc60_numcgm',
             'Pesquisa',
             true,
             '0',
@@ -1161,7 +1161,7 @@ db_app::load("dbtextFieldData.widget.js");
               js_OpenJanelaIframe(
                 'CurrentWindow.corpo.iframe_acordo',
                 'db_iframe_contratado',
-                'func_pcforne.php?validaRepresentante=true&pesquisa_chave=' + $F('ac16_contratado') + 'funcao_js=parent.js_mostracontratado1|z01_nome|pc60_numcgm',
+                'func_pcforne.php?infoValidacaoRepresentanteAcordo=true&validaRepresentante=true&pesquisa_chave=' + $F('ac16_contratado') + 'funcao_js=parent.js_mostracontratado1|z01_nome|pc60_numcgm',
                 'Pesquisa',
                 false,
                 '0',

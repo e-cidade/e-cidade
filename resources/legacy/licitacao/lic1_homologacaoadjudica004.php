@@ -8,6 +8,8 @@
     include("classes/db_db_config_classe.php");
     include("classes/db_db_documento_classe.php");
     include("lic1_relatorio_helper.php");
+    use \Mpdf\Mpdf;
+    use \Mpdf\MpdfException;
 
 
     $clhomologacaoadjudica = new cl_homologacaoadjudica();
@@ -21,6 +23,18 @@
     $oGet = db_utils::postMemory($_GET);
     parse_str($HTTP_SERVER_VARS['QUERY_STRING']);
     db_postmemory($HTTP_POST_VARS);
+
+    $instits = str_replace('-', ', ', db_getsession("DB_instit"));
+    $aInstits = explode(",", $instits);
+
+    if (count($aInstits) > 1) {
+        $oInstit = new Instituicao();
+        $oInstit = $oInstit->getDadosPrefeitura();
+    } else {
+        foreach ($aInstits as $iInstit) {
+            $oInstit = new Instituicao($iInstit);
+        }
+    }
 
     $result = $cldb_documento->sql_record($cldb_documento->sql_query("", "*", "", "db03_descr like 'HOMOLOGACAO RELATORIO'"));
     $result1 = db_utils::fieldsMemory($result, 0);
@@ -166,13 +180,71 @@
     $head5 = "Sequencial: $codigo_preco";
     $head8 = "Data: " . $data;
 
-    $mPDF = new Relatorio('', 'A4', 0, "", 7, 7, 50);
+/**
+ * mPDF
+ * @param string $mode              | padrão: BLANK
+ * @param mixed $format             | padrão: A4
+ * @param float $default_font_size  | padrão: 0
+ * @param string $default_font      | padrão: ''
+ * @param float $margin_left        | padrão: 15
+ * @param float $margin_right       | padrão: 15
+ * @param float $margin_top         | padrão: 16
+ * @param float $margin_bottom      | padrão: 16
+ * @param float $margin_header      | padrão: 9
+ * @param float $margin_footer      | padrão: 9
+ *
+ * Nenhum dos parâmetros é obrigatório
+ */
 
-    $mPDF
-        ->addInfo($head3, 2)
-        ->addInfo($head5, 4)
-        ->addInfo($head8, 7);
-    ob_start();
+    $mPDF = new Mpdf([
+        'mode' => '',
+        'format' => 'A4',
+        'orientation' => 'P',
+        'margin_left' => 15,
+        'margin_right' => 15,
+        'margin_top' => 20,
+        'margin_bottom' => 15,
+        'margin_header' => 2,
+        'margin_footer' => 11,
+    ]);
+/*Nome do relatório.*/
+$header = " <header class='teste'>
+                <div style=\" height: 120px; font-family:Arial\">
+                    <div style=\"width:33%; float:left; padding:5px; font-size:10px;\">
+                        <b><i>{$oInstit->getDescricao()}</i></b><br/>
+                        <i>{$oInstit->getLogradouro()}, {$oInstit->getNumero()}</i><br/>
+                        <i>{$oInstit->getMunicipio()} - {$oInstit->getUf()}</i><br/>
+                        <i>{$oInstit->getTelefone()} - CNPJ: " . db_formatar($oInstit->getCNPJ(), "cnpj") . "</i><br/>
+                        <i>{$oInstit->getSite()}</i>
+                    </div>
+                    <div style=\"width:40%; float:right\" class=\"box\">
+                    <b>Homologação</b><br/>
+                    <b>Sequencial: $codigo_preco </b>";
+
+/*Período do relatório.*/
+$header .= "<br/><b>Data:  $data </b>
+                    </div>
+                </div>
+            </header>";
+
+
+$footer  = "<footer style='padding-top: 150px;'>";
+$footer .= "   <div style='border-top:1px solid #000; width:100%; font-family:sans-serif; font-size:7px; height:5px;padding-bottom: -12px;'>";
+$footer .= "    <div style='text-align:left;font-style:italic;width:90%;float:left;padding-bottom: -82px;'>";
+$footer .= "       Licitações>Homologação>Alteração>lic1_homologacaoadjudica004.php";
+$footer .= "       Emissor: " . db_getsession("DB_login") . " Exerc: " . db_getsession("DB_anousu") . " Data:" . date("d/m/Y H:i:s", db_getsession("DB_datausu"))  . "";
+$footer .= "      <div style='text-align:right;float:right;width:10%;padding-bottom: -122px;'>";
+$footer .= "                        {PAGENO}";
+$footer .= "      </div>";
+$footer .= "    </div>";
+$footer .= "   </div>";
+$footer .= "</footer>";
+
+$mPDF->WriteHTML(file_get_contents('estilos/tab_relatorio.css'), 1);
+$mPDF->setHTMLHeader(utf8_encode($header), 'O', true);
+$mPDF->setHTMLFooter(utf8_encode($footer), 'O');
+
+ob_start();
 
     ?>
 
@@ -204,7 +276,6 @@
 
             .cabecalho1 {
                 margin-left: 25%;
-                margin-top: -100px !important;
             }
 
             .col-item {
@@ -355,12 +426,23 @@
                 background: #f5f5f0;
             }
 
-            td
+
+            .title-relatorio {
+                border-top: 1px SOLID #000000;
+                text-align: center;
+            }
+
+
         </style>
+
     </head>
 
     <body>
-        <h1 class="cabecalho1">HOMOLOGAÇÃO DE PROCESSO</h1>
+    <div class="title-relatorio"><br/>
+            <h1>
+                <font size="60">Homologação de Processo</font>
+        </h1><br/>
+        </div>
         <br>
         <?php
 

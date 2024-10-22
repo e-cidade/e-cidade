@@ -1,10 +1,10 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc16820 extends AbstractMigration 
+class Oc16820 extends PostgresMigration
 {
-    
+
     public function up()
     {
 
@@ -13,7 +13,7 @@ class Oc16820 extends AbstractMigration
         BEGIN;
 
         SELECT fc_startsession();
-        
+
         CREATE TEMP TABLE temp_contabancaria ON COMMIT DROP AS
         SELECT db83_sequencial,
         CASE
@@ -33,27 +33,27 @@ class Oc16820 extends AbstractMigration
         ALTER TABLE contabancaria ENABLE TRIGGER ALL;
 
         ALTER TABLE contabancaria ALTER COLUMN db83_codigoopcredito TYPE int4 USING db83_codigoopcredito::int4;
-        
-        ALTER TABLE contabancaria 
-        DROP COLUMN db83_dataassinaturacop ;  
-      
-        ALTER TABLE contabancaria 
-        DROP COLUMN db83_numerocontratooc ;           
-              
-        ALTER TABLE db_operacaodecredito add unique(op01_sequencial);  
-     
+
+        ALTER TABLE contabancaria
+        DROP COLUMN db83_dataassinaturacop ;
+
+        ALTER TABLE contabancaria
+        DROP COLUMN db83_numerocontratooc ;
+
+        ALTER TABLE db_operacaodecredito add unique(op01_sequencial);
+
         ALTER TABLE contabancaria
         add constraint db83_codigoopcredito foreign key (db83_codigoopcredito)
-        references db_operacaodecredito(op01_sequencial);     
-        
+        references db_operacaodecredito(op01_sequencial);
+
         INSERT INTO db_syscampo
                 (codcam,nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel)
                 VALUES
-                ((select max(codcam)+1 from db_syscampo),'db83_codigoopcredito', 'int', 'Operação de Crédito', '0', 'Operação de Crédito', 11, false, false, false, 1, 'text', 'Operação de Crédito');            
+                ((select max(codcam)+1 from db_syscampo),'db83_codigoopcredito', 'int', 'Operação de Crédito', '0', 'Operação de Crédito', 11, false, false, false, 1, 'text', 'Operação de Crédito');
 
         COMMIT;
 
 SQL;
         $this->execute($sql);
-    } 
+    }
 }

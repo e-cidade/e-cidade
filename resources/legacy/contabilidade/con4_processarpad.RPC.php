@@ -1151,7 +1151,7 @@ switch ($oParam->exec) {
 									ELSE l20_exercicioedital
 							END )AS exercicio,
 						   pctipocompratribunal.l44_sequencial AS tipo_tribunal,
-						   pctipocompratribunal.l44_codigotribunal AS tipoProcesso,
+						   liclicita.l20_tipoprocesso as tipoProcesso,
 						       (SELECT CASE
 									WHEN o41_subunidade != 0
 										 OR NOT NULL THEN lpad((CASE

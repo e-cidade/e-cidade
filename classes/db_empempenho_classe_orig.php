@@ -63,7 +63,7 @@ class cl_empempenho {
                  e60_instit = int4 = codigo da instituicao 
                  e60_codcom = int4 = Código compra 
                  e60_tipol = char(1) = Tipo da Licitacao 
-                 e60_numerol = char(8) = Controle de Numercao 
+                 e60_numerol = char(8) = Controle de Numercao
                  ";
    //funcao construtor da classe 
    function cl_empempenho() { 
@@ -117,6 +117,7 @@ class cl_empempenho {
        $this->e60_codcom = ($this->e60_codcom == ""?@$GLOBALS["HTTP_POST_VARS"]["e60_codcom"]:$this->e60_codcom);
        $this->e60_tipol = ($this->e60_tipol == ""?@$GLOBALS["HTTP_POST_VARS"]["e60_tipol"]:$this->e60_tipol);
        $this->e60_numerol = ($this->e60_numerol == ""?@$GLOBALS["HTTP_POST_VARS"]["e60_numerol"]:$this->e60_numerol);
+
      }else{
        $this->e60_numemp = ($this->e60_numemp == ""?@$GLOBALS["HTTP_POST_VARS"]["e60_numemp"]:$this->e60_numemp);
      }
@@ -253,6 +254,7 @@ class cl_empempenho {
        $this->erro_status = "0";
        return false;
      }
+
      if($e60_numemp == "" || $e60_numemp == null ){
        $result = @pg_query("select nextval('empempenho_e60_numemp_seq')"); 
        if($result==false){
@@ -305,7 +307,7 @@ class cl_empempenho {
                                       ,e60_instit 
                                       ,e60_codcom 
                                       ,e60_tipol 
-                                      ,e60_numerol 
+                                      ,e60_numerol
                        )
                 values (
                                 $this->e60_numemp 
@@ -327,7 +329,7 @@ class cl_empempenho {
                                ,$this->e60_instit 
                                ,$this->e60_codcom 
                                ,'$this->e60_tipol' 
-                               ,'$this->e60_numerol' 
+                               ,'$this->e60_numerol'
                       )";
      $result = @pg_exec($sql); 
      if($result==false){ 
@@ -505,6 +507,7 @@ class cl_empempenho {
          }
        }
      }
+
      if(trim($this->e60_vlrorc)!="" || isset($GLOBALS["HTTP_POST_VARS"]["e60_vlrorc"])){ 
        $sql  .= $virgula." e60_vlrorc = $this->e60_vlrorc ";
        $virgula = ",";

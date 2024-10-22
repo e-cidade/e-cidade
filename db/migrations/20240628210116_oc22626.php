@@ -2,9 +2,9 @@
 
 use App\Support\Database\AsFunction;
 use App\Support\Database\Instituition;
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc22626 extends AbstractMigration
+class Oc22626 extends PostgresMigration
 {
     use AsFunction;
     use Instituition;

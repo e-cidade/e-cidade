@@ -10,7 +10,7 @@ class M8799Esocial extends PostgresMigration
      * Write your reversible migrations using this method.
      *
      * More information on writing migrations is available here:
-     * http://docs.phinx.org/en/latest/migrations.html#the-abstractmigration-class
+     * http://docs.phinx.org/en/latest/migrations.html#the-PostgresMigration-class
      *
      * The following commands can be used in this method and Phinx will
      * automatically reverse them when rolling back:
@@ -89,13 +89,13 @@ class M8799Esocial extends PostgresMigration
     $this->execute("insert into db_menu ( id_item ,id_item_filho ,menusequencia ,modulo ) values ( 32 ,10425 ,483 ,10216 )");
     $this->execute("insert into db_itensmenu ( id_item ,descricao ,help ,funcao ,itemativo ,manutencao ,desctec ,libcliente ) values ( 10426 ,'Manutenção S1010 - Tabela de Rubricas' ,'Manutenção S1010 - Tabela de Rubricas' ,'con4_manutencaoformulario001.php?formulario=3000010' ,'1' ,'1' ,'Realiza a manutençãod e formulários para o cadastro de Rubricas' ,'true' )");
     $this->execute("insert into db_menu ( id_item ,id_item_filho ,menusequencia ,modulo ) values ( 32 ,10426 ,484 ,10216 )");
-    $this->execute("insert into db_itensmenu ( id_item ,descricao ,help ,funcao ,itemativo ,manutencao ,desctec ,libcliente ) values ( 10427 ,'Conferência' ,'Conferência' ,'eso4_conferenciadados001.php' ,'1' ,'1' ,'Conferência' ,'true')");    
+    $this->execute("insert into db_itensmenu ( id_item ,descricao ,help ,funcao ,itemativo ,manutencao ,desctec ,libcliente ) values ( 10427 ,'Conferência' ,'Conferência' ,'eso4_conferenciadados001.php' ,'1' ,'1' ,'Conferência' ,'true')");
     $this->execute("insert into db_menu ( id_item ,id_item_filho ,menusequencia ,modulo ) values ( 10220 ,10427 ,1 ,10216 );");
     $this->execute("update db_itensmenu set descricao = 'Manutenção S2100 - Dados do Servidor' , help = 'Manutenção S2100 - Dados do Servidor', desctec = 'Manutenção S2100 - Dados do Servidor' , libcliente = 'true' where id_item = 10220;");
     $this->execute("update db_itensmenu set id_item = 10219 , descricao = 'Preenchimento' , help = 'Preenchimento' , funcao = 'eso4_preenchimento001.php' , itemativo = '1' , manutencao = '1' , desctec = 'Preenche o formulário do e-social.' , libcliente = 'true' where id_item = 10219;");
     $this->execute("delete from db_menu where id_item_filho = 10219 AND modulo = 10216;");
     $this->execute("insert into db_menu ( id_item ,id_item_filho ,menusequencia ,modulo ) values ( 10220 ,10219 ,2 ,10216 );");*/
-    
+
   }
 
   public function criarTabelas() {
@@ -139,8 +139,8 @@ class M8799Esocial extends PostgresMigration
     $this->execute("delete from db_menu where id_item = 29 and id_item_filho = 8528");
     $this->execute("delete from db_menu where id_item = 32 and id_item_filho = 10423");
     $this->execute("delete from db_menu where id_item = 32 and id_item_filho = 10425");
-    $this->execute("delete from db_menu where id_item = 32 and id_item_filho = 10426");       
-    $this->execute("delete from db_menu where id_item_filho = 10427");   
+    $this->execute("delete from db_menu where id_item = 32 and id_item_filho = 10426");
+    $this->execute("delete from db_menu where id_item_filho = 10427");
     $this->execute("delete from db_itensmenu where id_item in (10423, 10425, 10426, 10427)");
   }
 
@@ -157,7 +157,7 @@ class M8799Esocial extends PostgresMigration
 
     $this->execute(
 <<<STRING
-  
+
 --INSERT INTO avaliacao VALUES (3000010, 5, 'S1010 - TABELA DE RUBRICAS', 'Registros do evento S-1010 - Tabela de Rubricas', true, 'S1010', 'select rh27_rubric as codigorubrica,  rh27_descr as descricaorubrica from rhrubricas where rh27_instit = fc_getsession(\'DB_instit\')::int', true);
 
 

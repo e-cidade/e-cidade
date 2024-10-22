@@ -1884,8 +1884,10 @@ class cl_formulario_rel_pes {
   var $arr_mostord = Array(); // Array com values e tipos de ordem em que deseja mostrar.
   var $arr_mosttot = Array(); // Array com values e tipos de totalização.
   var $arr_tipoarq = Array(); //Array com os tipos de arquivos
+  var $arr_rescindidos = Array();
 
   var $mbgerar = false;       // Colocar um botão gerar no final, já buscando os dados.
+  var $mostrescindidos = false;
   var $jsgerar = "js_gerar_consrel();"; // JavaScript que será chamado ao clicar no botão gerar.
   var $relarqu = "";          // Nome do arquivo que será chamado
   var $formnam = "form1";     // Nome do formulário do arquivo
@@ -1911,7 +1913,9 @@ class cl_formulario_rel_pes {
   var $comnome      = "complementar";     // Nome do campo com as complementares
   var $tipresumo    = "Tipo de Resumo";   // Label do tipo de resumo
   var $tipordem     = "Ordem";            // Label da ordem
+  var $tiporescindidos = "";
   var $testarescisaoregi = "";            // Testar se funcionário foi rescindido ou não.
+  var $rescindidosnome = "";
   var $whereprevid  = "";     // Where que será usado ao buscar tabelas da previdência e INSS
   var $camposprevid = "r33_codtab, r33_nome";     // Campos que serão usados ao buscar tabelas da previdência e INSS
   var $linhasSelecion = 12;
@@ -2467,7 +2471,9 @@ class cl_formulario_rel_pes {
     if($this->mostord == true){
       $this->monta_select_tdrtable($this->arr_mostord,$this->mornome,$this->tipordem.":",$this->tipordem);
     }
-
+    if($this->mostrescindidos == true){
+        $this->monta_select_tdrtable($this->arr_rescindidos,$this->rescindidosnome,$this->tiporescindidos.":",$this->tiporescindidos);
+      }
     if($this->mostasc == true){
       $arr_mostasc = Array("a"=>"Ascendente","d"=>"Descendente");
       $this->monta_select_tdrtable($arr_mostasc,$this->masnome,"Tipo de Ordem:","Tipo de Ordem");
@@ -2901,6 +2907,10 @@ class cl_formulario_rel_pes {
               ".$this->monta_script_gerarif($this->formnam,$this->selnome,"")."
               ".$this->monta_script_gerarif($this->formnam,$this->previdnome,"")."
          ";
+          if($this->mostrescindidos == true){
+            echo " ".$this->monta_script_gerarif($this->formnam,$this->rescindidosnome,"")." ";
+      }
+  
           if(trim($this->relarqu) != ""){
             echo "jan = window.open('".$this->relarqu."'+qry,'','width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0 ');";
           }else{

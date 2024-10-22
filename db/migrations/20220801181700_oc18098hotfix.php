@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc18098hotfix extends AbstractMigration
+class Oc18098hotfix extends PostgresMigration
 {
     public function up()
     {
@@ -13,11 +13,11 @@ class Oc18098hotfix extends AbstractMigration
 
         SELECT fc_startsession();
 
-        ALTER TABLE pagordem ADD COLUMN e50_cattrabalhadorremurenacao int4; 
+        ALTER TABLE pagordem ADD COLUMN e50_cattrabalhadorremurenacao int4;
 
         COMMIT;
 
 SQL;
         $this->execute($sql);
-    } 
+    }
 }

@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc20695 extends AbstractMigration {
+class Oc20695 extends PostgresMigration {
     public function up() {
         $sql = "
         INSERT INTO db_itensmenu VALUES (

@@ -222,7 +222,7 @@ class cl_veicmanutitem {
        $resac = db_query("insert into db_acount values($acount,1604,9342,'','".AddSlashes(pg_result($resaco,0,'ve63_vlruni'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
      }
      //apos a solicitacao da ocorrencia 4864, sempre que um item e' adicionado, e' atualizada o valor total
-     db_query("update veicmanut set ve62_valor = (select sum(ve63_vlrtot) from veicmanutitem where ve63_veicmanut = '".$this->ve63_veicmanut."')");
+     //db_query("update veicmanut set ve62_valor = (select sum(ve63_vlrtot) from veicmanutitem where ve63_veicmanut = '".$this->ve63_veicmanut."')");
      return true;
    }
    // funcao para alteracao

@@ -1,10 +1,10 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class UpdateRhrubricasEsocial extends AbstractMigration
+class UpdateRhrubricasEsocial extends PostgresMigration
 {
- 
+
     public function up()
     {
         $sql = "

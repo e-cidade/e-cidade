@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class CreateSeqProcessoLote extends AbstractMigration
+class CreateSeqProcessoLote extends PostgresMigration
 {
     public function up()
     {

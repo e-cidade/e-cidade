@@ -18,7 +18,7 @@ $parametrosRedesim = RedesimSettings::query()->first();
             frameDadosInscricao.mostraMsg();
             frameDadosInscricao.show();
             frameDadosInscricao.focus();
-        } else if (F.inscricaoredesim.value.length > 0) {
+        } else if (F.inscricaoredesim && F.inscricaoredesim.value.length > 0) {
             frameDadosInscricao.jan.location.href = 'iss3_consinscr003.php?inscricaoredesim=' + F.inscricaoredesim.value;
             frameDadosInscricao.mostraMsg();
             frameDadosInscricao.show();

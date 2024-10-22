@@ -1,10 +1,10 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Addresposata2230 extends AbstractMigration
+class Addresposata2230 extends PostgresMigration
 {
-    
+
     public function up()
     {
         $sql = <<<SQL
@@ -82,7 +82,7 @@ class Addresposata2230 extends AbstractMigration
             SET db103_camposql = LOWER(db103_identificadorcampo)
             WHERE db103_avaliacaogrupopergunta = 4000266;
 
-            
+
             UPDATE db_itensmenu
             SET funcao = 'con4_manutencaoformulario001.php?esocial=40'
             WHERE descricao LIKE '%S-2230%';
@@ -101,14 +101,14 @@ class Addresposata2230 extends AbstractMigration
             UPDATE avaliacaopergunta
             SET db103_avaliacaotiporesposta = 2
             WHERE db103_sequencial = 4000847;
-            
+
             DELETE
             FROM avaliacaoperguntaopcao
             WHERE db104_avaliacaopergunta = 4000847;
 
             INSERT INTO avaliacaoperguntaopcao(db104_sequencial,db104_avaliacaopergunta,db104_descricao,db104_identificador,db104_aceitatexto,db104_peso,db104_identificadorcampo,db104_valorresposta)
             VALUES ((SELECT max(db104_sequencial)+1 FROM avaliacaoperguntaopcao), 4000847,'','codCateg-4003009','true',0,'codCateg','');
-                                
+
         COMMIT;
 SQL;
         $this->execute($sql);

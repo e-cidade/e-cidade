@@ -13,26 +13,7 @@ $clpcproc = new cl_pcproc;
 $clprecoreferenciaacount = new cl_precoreferenciaacount;
 $db_botao = false;
 $db_opcao = 33;
-if(isset($excluir)){
-  db_inicio_transacao();
-  $db_opcao = 3;
-  $sSql = $clpcproc->sql_query_dados_licitacao(null, '*', '', 'pc80_codproc ='.$si01_processocompra);
-  $rSql = $clpcproc->sql_record($sSql);
-  if(!$clpcproc->numrows){
-    $clprecoreferencia->excluir($si01_sequencial);
-
-    $clprecoreferenciaacount->si233_precoreferencia = $si01_sequencial;
-    $clprecoreferenciaacount->si233_acao =  'Excluir';
-    $clprecoreferenciaacount->si233_idusuario = db_getsession("DB_id_usuario");
-    $clprecoreferenciaacount->si233_datahr =  date("Y-m-d", db_getsession("DB_datausu"));
-    $clprecoreferenciaacount->incluir(null);  
-    
-  }else{
-    $db_botao = true;
-    $db_opcao = 33;
-  }
-  db_fim_transacao();
-}else if(isset($chavepesquisa)){
+if(isset($chavepesquisa)){
    $db_opcao = 3;
    $result = $clprecoreferencia->sql_record($clprecoreferencia->sql_query($chavepesquisa));
    db_fieldsmemory($result,0);
@@ -40,36 +21,36 @@ if(isset($excluir)){
 }
 ?>
 <html>
+
 <head>
-<title>DBSeller Inform&aacute;tica Ltda - P&aacute;gina Inicial</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<meta http-equiv="Expires" CONTENT="0">
-<script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
-<link href="estilos.css" rel="stylesheet" type="text/css">
+    <title>DBSeller Inform&aacute;tica Ltda - P&aacute;gina Inicial</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <meta http-equiv="Expires" CONTENT="0">
+    <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
+    <?php
+    db_app::load("estilos.bootstrap.css");
+    db_app::load("just-validate.js");
+    ?>
 </head>
-<body bgcolor=#CCCCCC leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="a=1" >
-<table width="790" border="0" cellpadding="0" cellspacing="0" bgcolor="#5786B2">
-  <tr>
-    <td width="360" height="18">&nbsp;</td>
-    <td width="263">&nbsp;</td>
-    <td width="25">&nbsp;</td>
-    <td width="140">&nbsp;</td>
-  </tr>
-</table>
-<table width="790" border="0" cellspacing="0" cellpadding="0">
-  <tr>
-    <td height="430" align="left" valign="top" bgcolor="#CCCCCC">
-    <center>
-	<?
-	include("forms/db_frmprecoreferencia.php");
-	?>
-    </center>
-	</td>
-  </tr>
-</table>
-<?
-db_menu(db_getsession("DB_id_usuario"),db_getsession("DB_modulo"),db_getsession("DB_anousu"),db_getsession("DB_instit"));
-?>
+<style>
+    .container {
+        margin-top: 140px; /* Espaço acima do container */
+        background-color: #f5fffb;
+        padding: 20px;
+        max-width: 1250px; /* Largura máxima do conteudo */
+        width: 100%; /* Para garantir responsividade */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra leve */
+        font-family: Arial;
+        font-size: 12px;
+    }
+</style>
+<body bgcolor=#f5fffb leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="a=1">
+<div class="container">
+    <?php
+    include("forms/db_frmprecoreferencia.php");
+    db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsession("DB_anousu"), db_getsession("DB_instit"));
+    ?>
+</div>
 </body>
 </html>
 <?

@@ -119,6 +119,11 @@ if ( isset($alterar) ) {
       throw new Exception("Nenhum item lançado para prestação de contas.");
     }
 
+    $clEmpempenho = new cl_empempenho;
+    $rsEmpenho = $clEmpempenho->sql_record($clEmpempenho->sql_query($e45_numemp,"o15_codigo"));
+    $sRecurso = db_utils::fieldsMemory($rsEmpenho, 0)->o15_codigo;
+    $oEmpenhoFinanceiro->setRecurso($sRecurso);
+
     $oPrestacaoConta->processarLancamento($observacao_lancamento);
 
   } catch (Exception $eException) {

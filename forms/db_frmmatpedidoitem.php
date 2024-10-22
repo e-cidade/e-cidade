@@ -43,6 +43,7 @@ $clmatunid                = new cl_matunid;
 $clmatmater               = new cl_matmater;
 $clmatmaterunisai         = new cl_matmaterunisai;
 $clrotulo                 = new rotulocampo;
+$cldb_depusu              = new cl_db_depusu;
 
 $sSql                     = $clmatparam->sql_query_file();
 $rsParam                  = $clmatparam->sql_record($sSql);
@@ -89,6 +90,9 @@ if (!empty($m98_matmater) && $db_opcao == 1 && !empty($incluir)) {
     $m60_descr = "";
   }
 }
+
+  $matpedido = pg_fetch_all($cldb_depusu->sql_record($cldb_depusu->sql_query_depto_from_matpedido($m97_sequencial)));
+  $deptoRequisitado = $matpedido[0]['m91_depto'];
 ?>
 <form name="form1" method="post" action="<?=basename($_SERVER['PHP_SELF'])?>" >
   <table border="0" cellspacing="0" cellpadding="0">
@@ -302,10 +306,10 @@ if (!empty($m98_matmater) && $db_opcao == 1 && !empty($incluir)) {
 
   function js_pesquisa_codmater(mostra){
     if (mostra==true){
-      js_OpenJanelaIframe('','db_iframe_mater','func_matmater.php?funcao_js=parent.js_mostra1|m60_codmater|m60_descr','Pesquisa',true);
+      js_OpenJanelaIframe('','db_iframe_mater','func_matmater.php?funcao_js=parent.js_mostra1|m60_codmater|m60_descr&deptoRequisitado=' + <?= $deptoRequisitado ?>,'Pesquisa',true);
     } else {
       if (document.form1.m98_matmater.value != ''){
-        js_OpenJanelaIframe('','db_iframe_mater','func_matmater.php?pesquisa_chave='+document.form1.m98_matmater.value+'&funcao_js=parent.js_mostra','Pesquisa',false);
+        js_OpenJanelaIframe('','db_iframe_mater','func_matmater.php?pesquisa_chave='+document.form1.m98_matmater.value+'&funcao_js=parent.js_mostra&deptoRequisitado=' + <?= $deptoRequisitado ?>,'Pesquisa',false);
       } else {
         document.form1.m60_descr.value = "";
       }

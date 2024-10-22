@@ -1,10 +1,10 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc18619 extends AbstractMigration
+class Oc18619 extends PostgresMigration
 {
-    
+
     public function up()
     {
         $nomeCampo = "k29_liquidacaodataanterior";
@@ -12,7 +12,7 @@ class Oc18619 extends AbstractMigration
         $sql = "
             BEGIN;
                 SELECT fc_startsession();
-                
+
                 -- Insere novo campo
                 INSERT INTO db_syscampo
                 VALUES (

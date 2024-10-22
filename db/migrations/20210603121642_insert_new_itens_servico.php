@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class InsertNewItensServico extends AbstractMigration
+class InsertNewItensServico extends PostgresMigration
 {
 
     public function up()
@@ -39,7 +39,7 @@ class InsertNewItensServico extends AbstractMigration
                                    '17.25',
                                    '25.05',
                                    '06.06');
-               
+
         COMMIT;
 
 SQL;

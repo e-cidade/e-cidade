@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class InserirRespostaRubricaCodIncidIrrf extends AbstractMigration
+class InserirRespostaRubricaCodIncidIrrf extends PostgresMigration
 {
     public function up()
     {

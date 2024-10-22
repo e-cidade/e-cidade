@@ -265,6 +265,11 @@ db_fieldsmemory($rsCgm, 0);
   <input name="pesquisar" type="button" id="pesquisar" value="Pesquisar" onclick="js_pesquisa();">
 </form>
 <script>
+
+  if(document.getElementById('pc60_numcgm').value != "" && document.getElementById('db_opcao').value == "Incluir"){
+    js_pesquisapc60_numcgm(false);
+  }
+
   js_verificabloqueio();
 
   function js_verificabloqueio() {

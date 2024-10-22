@@ -1,18 +1,18 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 require_once("model/orcamento/ControleOrcamentario.model.php");
-class Oc21524 extends AbstractMigration
+class Oc21524 extends PostgresMigration
 {
     public function up(){
 
 
-        $sqlConsulta = $this->query("select * from empempenho 
+        $sqlConsulta = $this->query("select * from empempenho
         inner join orcdotacao on o58_coddot = e60_coddot and o58_anousu = e60_anousu where e60_anousu = 2023");
         $resultado = $sqlConsulta->fetchAll(\PDO::FETCH_ASSOC);
 
         foreach ($resultado as $dados){
-            
+
             $oCodigoAcompanhamento  = new ControleOrcamentario();
             $oCodigoAcompanhamento->setTipoDespesa( $dados['e60_tipodespesa']);
             $oCodigoAcompanhamento->setFonte($dados['o58_codigo']);
@@ -23,7 +23,7 @@ class Oc21524 extends AbstractMigration
             if ($e60_codco != '0000') {
                 $this->atualizaCodCO($e60_codco,$dados['e60_numemp'],$dados['e60_anousu']);
             }
-            
+
         }
 
         $sSqlCampos = " e60_numemp,e60_tipodespesa , e60_emendaparlamentar, e60_esferaemendaparlamentar,e60_anousu,
@@ -181,14 +181,14 @@ class Oc21524 extends AbstractMigration
           ELSE o58_codigo
         END as o58_codigo " ;
 
-        $sqlRestos = $this->query("select $sSqlCampos from empresto        
-                                        join empempenho on (e91_numemp,e91_anousu) = (e60_numemp,2023) 
-                                        join orcdotacao on o58_coddot = e60_coddot and o58_anousu = e60_anousu 
+        $sqlRestos = $this->query("select $sSqlCampos from empresto
+                                        join empempenho on (e91_numemp,e91_anousu) = (e60_numemp,2023)
+                                        join orcdotacao on o58_coddot = e60_coddot and o58_anousu = e60_anousu
                                         where e91_anousu = 2023");
-        $restos = $sqlRestos->fetchAll(\PDO::FETCH_ASSOC);    
-       
+        $restos = $sqlRestos->fetchAll(\PDO::FETCH_ASSOC);
+
         foreach ($restos as $dados){
-            
+
             $oCodigoAcompanhamento  = new ControleOrcamentario();
             $oCodigoAcompanhamento->setTipoDespesa( $dados['e60_tipodespesa']);
             $oCodigoAcompanhamento->setFonte($dados['o58_codigo']);
@@ -196,24 +196,24 @@ class Oc21524 extends AbstractMigration
             $oCodigoAcompanhamento->setEsferaEmendaParlamentar($dados['e60_esferaemendaparlamentar']);
             $oCodigoAcompanhamento->setDeParaFonteCompleta();
             $e60_codco = $oCodigoAcompanhamento->getCodigoParaEmpenho();
-           
+
             if ($e60_codco != '0000') {
                 $this->atualizaCodCO($e60_codco,$dados['e60_numemp'],$dados['e60_anousu']);
             }
-            
+
         }
     }
-    
+
     public function atualizaCodCO($codco,$numemp,$ano){
-        
-        $sql = " 
+
+        $sql = "
             BEGIN;
-            UPDATE empempenho SET 
+            UPDATE empempenho SET
             e60_codco = '$codco'
             WHERE e60_numemp =  $numemp and e60_anousu = $ano;
             COMMIT;
         ";
-        
+
         $this->execute($sql);
     }
 

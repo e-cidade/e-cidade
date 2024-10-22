@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AddMenuAnexo8Fundeb extends AbstractMigration
+class AddMenuAnexo8Fundeb extends PostgresMigration
 {
     public function up()
     {

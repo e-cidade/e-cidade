@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class oc21127 extends AbstractMigration
+class oc21127 extends PostgresMigration
 {
 
     public function up(){
@@ -11,9 +11,9 @@ class oc21127 extends AbstractMigration
         $this->criaTabelaPagordemreinf();
         $this->insereNovosCamposPagordem();
     }
-    
+
     public function atualizaTabelaDeNatureza(){
-        $sql = " 
+        $sql = "
             BEGIN;
 
             DROP TABLE IF EXISTS empenho.naturezabemservico;
@@ -26,16 +26,16 @@ class oc21127 extends AbstractMigration
                 e101_aliquota float8 NOT NULL DEFAULT 0
             );
 
-            UPDATE db_itensmenu SET 
-            descricao = 'Natureza do Rendimento', 
-            help = 'Cadastro de Natureza do Rendimento', 
+            UPDATE db_itensmenu SET
+            descricao = 'Natureza do Rendimento',
+            help = 'Cadastro de Natureza do Rendimento',
             desctec = 'Cadastro de Natureza do Rendimento'
             WHERE descricao = 'Natureza de Bem ou Serviço';
 
-            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
             VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e101_codnaturezarendimento' ,'int4' ,'Cod. Natureza do Rendimento' ,'' ,'Cod. Natureza do Rendimento' ,15 ,'false' ,'false' ,'false' ,4 ,'text' ,'Cod. Natureza do Rendimento' );
 
-            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
             VALUES (
             (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'naturezabemservico'),
             (SELECT codcam FROM db_syscampo WHERE nomecam = 'e101_codnaturezarendimento'),
@@ -51,8 +51,8 @@ class oc21127 extends AbstractMigration
             BEGIN;
 
             INSERT INTO empenho.naturezabemservico (e101_descr, e101_resumo,e101_aliquota,e101_codnaturezarendimento) VALUES
-            ('Alimentação','Alimentação','1.2', 17001), 
-            ('Energia elétrica','Energia elétrica','1.2', 17002), 
+            ('Alimentação','Alimentação','1.2', 17001),
+            ('Energia elétrica','Energia elétrica','1.2', 17002),
             ('Serviços prestados com emprego de materiais','Serviços prestados com emprego de materiais','1.2', 17003),
             ('Construção Civil por empreitada com emprego de materiais','Construção Civil por empreitada com emprego de materiais','1.2', 17004),
             ('Serviços hospitalares de que trata o art. 30','Serviços hospitalares de que trata o art. 30','1.2', 17005),
@@ -88,7 +88,7 @@ class oc21127 extends AbstractMigration
             ('Administração, locação ou cessão de bens imóveis, móveis e direitos de qualquer natureza','Administração, locação ou cessão de bens imóveis, móveis e direitos de qualquer natureza','4.80', 17035),
             ('Factoring','Factoring','4.80', 17036),
             ('Plano de saúde humano, veterinário ou odontológico com valores fixos por servidor, por empregado ou por animal','Plano de saúde humano, veterinário ou odontológico com valores fixos por servidor, por empregado ou por animal','4.80', 17037),
-            ('Demais serviços','Demais serviços','4.80', 17099),         
+            ('Demais serviços','Demais serviços','4.80', 17099),
             ('Pagamento efetuado a sociedade cooperativa pelo fornecimento de bens, conforme art. 24, da IN 1234/12','Pagamento efetuado a sociedade cooperativa pelo fornecimento de bens, conforme art. 24, da IN 1234/12',0,17038),
             ('Pagamento a Cooperativa de produção, em relação aos atos decorrentes da comercialização ou da industrialização de produtos de seus associados, excetuado o previsto no §§ 1º e 2º do art. 25 da IN 1.234/12','Pagamento a Cooperativa de produção, em relação aos atos decorrentes da comercialização ou da industrialização de pro...', 0, 17039),
             ('Serviços prestados por associações profissionais ou assemelhadas e cooperativas que envolver parcela de serviços fornecidos por terceiros não cooperados ou não associados, contratados ou conveniados, para cumprimento de contratos - Serviços prestados com emprego de materiais, inclusive o de que trata a alínea \"C\" do Inciso II do art. 27 da IN 1.1234.','Serviços prestados por associações profissionais ou assemelhadas e cooperativas que envolver parcela de serviços forn...', 0, 17040),
@@ -285,7 +285,7 @@ class oc21127 extends AbstractMigration
             ('Importâncias a título de comissões e corretagens relativas a administração de cartões de crédito','Importâncias a título de comissões e corretagens relativas a administração de cartões de crédito',0,20007),
             ('Importâncias a título de comissões e corretagens relativas a prestação de serviços de distribuição de refeições pelo sistema de refeições-convênio','Importâncias a título de comissões e corretagens relativas a prestação de serviços de distribuição de refeições pelo ...',0,20008),
             ('Importâncias a título de comissões e corretagens relativas a prestação de serviço de administração de convênios','Importâncias a título de comissões e corretagens relativas a prestação de serviço de administração de convênios',0,20009);
-            
+
 
             COMMIT;
         ";
@@ -298,47 +298,47 @@ class oc21127 extends AbstractMigration
 
         CREATE TABLE IF NOT EXISTS empenho.pagordemreinf
         (
-            e102_codord int4 NOT NULL,	
+            e102_codord int4 NOT NULL,
             e102_numcgm int4 NOT NULL,
             e102_vlrbruto float8 NOT NULL DEFAULT 0,
             e102_vlrbase float8 NOT NULL DEFAULT 0,
             e102_vlrir float8 NOT NULL DEFAULT 0
         );
-        
+
         INSERT INTO db_sysarquivo VALUES ((SELECT max(codarq)+1 FROM db_sysarquivo), 'pagordemreinf', 'Tabela de Retenção Realizada por Terceiro', 'e102', CURRENT_DATE, 'Retenção Realizada por Terceiro', 0, 'f', 'f', 'f', 'f' );
         INSERT INTO db_sysarqmod VALUES (38,(SELECT codarq FROM db_sysarquivo WHERE nomearq = 'pagordemreinf'));
-        
-        INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+
+        INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
         VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e102_codord' ,'int4' ,'Ordem de Pagamento' ,'0' ,'Ordem de Pagamento' ,10 ,'false' ,'false' ,'false' ,1 ,'text' ,'Ordem de Pagamento' );
-        INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+        INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
         VALUES (
         (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'pagordemreinf'),
         (SELECT codcam FROM db_syscampo WHERE nomecam = 'e102_codord'),1 ,0 );
-        
-        INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+
+        INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
         VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e102_numcgm' ,'int4' ,'Num. CGM' ,'0' ,'Num. CGM' ,10 ,'false' ,'false' ,'false' ,1 ,'text' ,'Num. CGM' );
-        INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+        INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
         VALUES (
         (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'pagordemreinf'),
         (SELECT codcam FROM db_syscampo WHERE nomecam = 'e102_numcgm'),1 ,0 );
-        
-        INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+
+        INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
         VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e102_vlrbruto' ,'float8' ,'Valor Bruto' ,'' ,'Valor Bruto' ,15 ,'false' ,'false' ,'false' ,4 ,'text' ,'Valor Bruto' );
-        INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+        INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
         VALUES (
         (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'pagordemreinf'),
         (SELECT codcam FROM db_syscampo WHERE nomecam = 'e102_vlrbruto'),4 ,0 );
-        
-        INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+
+        INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
         VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e102_vlrbase' ,'float8' ,'Valor Base' ,'' ,'Valor Base' ,15 ,'false' ,'false' ,'false' ,4 ,'text' ,'Valor Base' );
-        INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+        INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
         VALUES (
         (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'pagordemreinf'),
         (SELECT codcam FROM db_syscampo WHERE nomecam = 'e102_vlrbase'),4 ,0 );
-        
-        INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+
+        INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
         VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e102_vlrir' ,'float8' ,'Valor IR' ,'' ,'Valor IR' ,15 ,'false' ,'false' ,'false' ,4 ,'text' ,'Valor IR' );
-        INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+        INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
         VALUES (
         (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'pagordemreinf'),
         (SELECT codcam FROM db_syscampo WHERE nomecam = 'e102_vlrir'),4 ,0 );

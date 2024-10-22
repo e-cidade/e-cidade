@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc11271CorrecaoCampo extends AbstractMigration
+class Oc11271CorrecaoCampo extends PostgresMigration
 {
     public function up()
     {
@@ -10,8 +10,8 @@ class Oc11271CorrecaoCampo extends AbstractMigration
 				ALTER TABLE obrasdadoscomplementares ALTER COLUMN db150_segundolatitude TYPE numeric,
 				ALTER COLUMN db150_segundolongitude TYPE numeric,
 				ALTER COLUMN db150_bdi TYPE numeric;
-				
-				ALTER TABLE ralic122020 ALTER COLUMN si182_segundolatitude TYPE NUMERIC, 
+
+				ALTER TABLE ralic122020 ALTER COLUMN si182_segundolatitude TYPE NUMERIC,
 										ALTER COLUMN si182_segundolongitude TYPE NUMERIC;
 		";
 		$this->execute($sql);
@@ -22,8 +22,8 @@ class Oc11271CorrecaoCampo extends AbstractMigration
 				ALTER TABLE obrasdadoscomplementares ALTER COLUMN db150_segundolatitude TYPE float,
 				ALTER COLUMN db150_segundolongitude TYPE float,
 				ALTER COLUMN db150_bdi TYPE float;
-				
-				ALTER TABLE ralic122020 ALTER COLUMN si182_segundolatitude TYPE FLOAT, 
+
+				ALTER TABLE ralic122020 ALTER COLUMN si182_segundolatitude TYPE FLOAT,
 										ALTER COLUMN si182_segundolongitude TYPE FLOAT;
 		";
 		$this->execute($sql);

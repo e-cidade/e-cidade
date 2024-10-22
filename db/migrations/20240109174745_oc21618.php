@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc21618 extends AbstractMigration
+class Oc21618 extends PostgresMigration
 {
 
     public function up()
@@ -143,7 +143,7 @@ class Oc21618 extends AbstractMigration
             );
 
             $data = array($c72_sequencial, $contaPcasp['c60_codcon'], $codconOrc, 2024);
-            $sSqlVerifica = "SELECT c72_conplanoorcamento FROM conplanoconplanoorcamento 
+            $sSqlVerifica = "SELECT c72_conplanoorcamento FROM conplanoconplanoorcamento
                              WHERE (c72_conplano, c72_conplanoorcamento, c72_anousu) = ({$contaPcasp['c60_codcon']}, {$codconOrc}, 2024)";
             $aVerifica = $this->fetchRow($sSqlVerifica);
             if (empty($aVerifica)) {
@@ -166,11 +166,11 @@ class Oc21618 extends AbstractMigration
                 $estrut = $aContaExiste['c60_estrut'];
                 $descricao = $contasAlterar->Descricao;
 
-                $this->execute("UPDATE conplanoorcamento 
+                $this->execute("UPDATE conplanoorcamento
                                      SET c60_descr = '{$descricao}', c60_finali = '{$descricao}'
                                      WHERE (c60_codcon, c60_anousu) = ({$codcon}, 2024)");
 
-                $this->execute("UPDATE orcelemento 
+                $this->execute("UPDATE orcelemento
                                      SET o56_descr = '{$descricao}', o56_finali = '{$descricao}'
                                      WHERE (o56_codele, o56_anousu, o56_elemento) = ({$codcon}, 2024, '{$estrut}')");
             }
@@ -191,11 +191,11 @@ class Oc21618 extends AbstractMigration
                 $estrut = $aContaExiste['c60_estrut'];
 
                 $alterarDescr = $contasInativar->AlterarDescr;
-                $this->execute("UPDATE conplanoorcamento 
+                $this->execute("UPDATE conplanoorcamento
                                      SET c60_descr = '{$alterarDescr}', c60_finali = '{$alterarDescr}'
                                      WHERE (c60_codcon, c60_anousu) = ({$codcon}, 2024)");
 
-                $this->execute("UPDATE orcelemento 
+                $this->execute("UPDATE orcelemento
                                      SET o56_descr = '{$alterarDescr}', o56_finali = '{$alterarDescr}'
                                      WHERE (o56_codele, o56_anousu, o56_elemento) = ({$codcon}, 2024, '{$estrut}')");
 

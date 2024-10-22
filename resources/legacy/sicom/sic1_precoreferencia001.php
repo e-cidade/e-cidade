@@ -19,6 +19,7 @@ $clliccomissaocgm      = new cl_liccomissaocgm();
 $clprecoreferenciaacount = new cl_precoreferenciaacount;
 
 $db_opcao = 1;
+$itemmeepp = "2";
 $db_botao = true;
 $respCotacaocodigoV = $respCotacaocodigo;
 $respOrcacodigoV = $respOrcacodigo;
@@ -34,8 +35,15 @@ if (isset($incluir)) {
     $clprecoreferencia->si01_numcgmOrcamento = $respOrcacodigo;
     $clprecoreferencia->si01_impjustificativa = $si01_impjustificativa;
     $clprecoreferencia->si01_casasdecimais = $si01_casasdecimais;
+    $clprecoreferencia->si01_datacotacao = $si01_datacotacao;
+
     $datesistema = date("d/m/Y", db_getsession('DB_datausu'));
-    if ($si01_datacotacao > $datesistema) {
+    $data = (implode("/",(array_reverse(explode("-",$si01_datacotacao)))));
+
+    $dataCotacao = DateTime::createFromFormat('d/m/Y', $data);
+    $datesistema = DateTime::createFromFormat('d/m/Y', $datesistema);
+
+    if ($dataCotacao > $datesistema) {
         $msg = "Data da Cotação maior que data do Sistema";
         unset($incluir);
         db_msgbox($msg);
@@ -57,18 +65,6 @@ if (isset($incluir)) {
             }
         }
 
-        // if(!empty($si01_datacotacao)){
-        //     $anousu = db_getsession('DB_anousu');
-        //     $instituicao = db_getsession('DB_instit');
-        //     $datacotacao = strtotime(implode("-",(array_reverse(explode("/",$si01_datacotacao)))));
-        //     $result = $clcondataconf->sql_record($clcondataconf->sql_query_file($anousu,$instituicao,"c99_datapat",null,null));
-        //     $c99_datapat = strtotime(db_utils::fieldsMemory($result, 0)->c99_datapat);
-        //     if ($datacotacao <= $c99_datapat) {
-        //         echo "<script>alert('O período já foi encerrado para envio do SICOM. Verifique os dados do lançamento e entre em contato com o suporte.');</script>";
-        //         $processoValidado  = false;
-        //     }
-        // }
-
         if ($processoValidado) {
             $clprecoreferencia->incluir(null);
         }
@@ -83,8 +79,6 @@ if (isset($incluir)) {
         } else {
             $sFuncao = "min";
         }
-
-
 
         $sSql = "select pc23_orcamitem,count(pc23_vlrun) as valor
                       from pcproc
@@ -129,15 +123,6 @@ if (isset($incluir)) {
 
         for ($iCont = 0; $iCont < $cont; $iCont++) {
             $valor = $arrayValores[$iCont];
-            /*$sSql = "select pc23_orcamitem,round($sFuncao(pc23_vlrun),4) as valor,
-                    round($sFuncao(pc23_perctaxadesctabela),2) as percreferencia1,
-                    round($sFuncao(pc23_percentualdesconto),2) as percreferencia2
-                      from pcproc
-                      join pcprocitem on pc80_codproc = pc81_codproc
-                      join pcorcamitemproc on pc81_codprocitem = pc31_pcprocitem
-                      join pcorcamitem on pc31_orcamitem = pc22_orcamitem
-                      join pcorcamval on pc22_orcamitem = pc23_orcamitem
-                      where pc80_codproc = $si01_processocompra and pc23_orcamitem = $valor group by pc23_orcamitem";*/
 
                       $sSql = "select
                       pc23_orcamitem,
@@ -266,16 +251,7 @@ if (isset($incluir)) {
 
     db_fim_transacao($sqlerro);
     if ($clprecoreferencia->erro_status != 0) {
-        echo "<script>
-      jan = window.open('sic1_precoreferencia007.php?impjust=$si01_impjustificativa&codigo_preco='+{$clprecoreferencia->si01_processocompra}+
-      '&tipoprecoreferencia='+$si01_tipoprecoreferencia+'&quant_casas='+$si01_casasdecimais,
-                    '',
-                      'width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0 ');
-      jan.moveTo(0,0);
-      </script>";
-    }
-    if ($clprecoreferencia->erro_status != 0) {
-        db_redireciona("sic1_precoreferencia002.php?chavepesquisa=" . $clprecoreferencia->si01_sequencial);
+     db_redireciona("sic1_precoreferencia002.php?chavepesquisa=" . $clprecoreferencia->si01_sequencial);
     }
 }
 ?>
@@ -286,32 +262,31 @@ if (isset($incluir)) {
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <meta http-equiv="Expires" CONTENT="0">
     <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
-    <link href="estilos.css" rel="stylesheet" type="text/css">
-</head>
-
-<body bgcolor=#CCCCCC leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="a=1">
-    <table width="790" border="0" cellpadding="0" cellspacing="0" bgcolor="#5786B2">
-        <tr>
-            <td width="360" height="18">&nbsp;</td>
-            <td width="263">&nbsp;</td>
-            <td width="25">&nbsp;</td>
-            <td width="140">&nbsp;</td>
-        </tr>
-    </table>
-    <table width="790" border="0" cellspacing="0" cellpadding="0">
-        <tr>
-            <td height="430" align="left" valign="top" bgcolor="#CCCCCC">
-                <center>
-                    <?php
-                    include("forms/db_frmprecoreferencia.php");
-                    ?>
-                </center>
-            </td>
-        </tr>
-    </table>
-    <?
-    db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsession("DB_anousu"), db_getsession("DB_instit"));
+    <?php
+    db_app::load("estilos.bootstrap.css");
+    db_app::load("just-validate.js");
     ?>
+</head>
+<style>
+    .container {
+        margin-top: 140px; /* Espaço acima do container */
+        background-color: #f5fffb;
+        padding: 20px;
+        max-width: 1250px; /* Largura máxima do conteudo */
+        width: 100%; /* Para garantir responsividade */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra leve */
+        font-family: Arial;
+        font-size: 12px;
+    }
+</style>
+
+<body bgcolor=#f5fffb leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="a=1">
+<div class="container">
+    <?php
+        include("forms/db_frmprecoreferencia.php");
+        db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsession("DB_anousu"), db_getsession("DB_instit"));
+    ?>
+</div>
 </body>
 
 </html>

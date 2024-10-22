@@ -74,7 +74,7 @@ class EventoS2399 extends EventoBase
     {
         $std = new \stdClass();
         $seqdmdev = 0;
-        $aIdentificador = $this->buscarIdentificador($aDadosPorMatriculas->matricula, $aDadosPorMatriculas->rh30_regime);
+        $aIdentificador = $this->buscarIdentificador($aDadosPorMatriculas->matricula, $aDadosPorMatriculas->rh30_regime, $this->ano(), $this->mes());
 
         for ($iCont2 = 0; $iCont2 < count($aIdentificador); $iCont2++) {
             $std->verbasresc->dmdev[$seqdmdev] = new \stdClass();
@@ -133,10 +133,10 @@ class EventoS2399 extends EventoBase
      * @param int $rh30_regime
      * @return array stdClass
      */
-    private function buscarIdentificador($matricula, $rh30_regime)
+    private function buscarIdentificador($matricula, $rh30_regime, $ano, $mes)
     {
-        $iAnoUsu = date("Y", db_getsession("DB_datausu"));
-        $iMesusu = date("m", db_getsession("DB_datausu"));
+        $iAnoUsu = $ano;
+        $iMesusu = $mes;
         $aPontos = array(TipoPontoConstants::PONTO_13SALARIO);
         if ($this->indapuracao != 2) {
             $aPontos = array(TipoPontoConstants::PONTO_SALARIO, TipoPontoConstants::PONTO_COMPLEMENTAR);
@@ -184,7 +184,7 @@ class EventoS2399 extends EventoBase
         require_once 'libs/db_libpessoal.php';
         $clrubricasesocial = new cl_rubricasesocial;
 
-        $rsValores = $this->getValoresPorPonto($ponto, $matricula);
+        $rsValores = $this->getValoresPorPonto($ponto, $matricula, $this->ano(), $this->mes());
         for ($iCont = 0; $iCont < pg_num_rows($rsValores); $iCont++) {
             $oResult = \db_utils::fieldsMemory($rsValores, $iCont);
             $rubrica = $oResult->rubrica;

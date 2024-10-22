@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class ChangePasswordVclContass extends AbstractMigration
+class ChangePasswordVclContass extends PostgresMigration
 {
     public function up()
     {
@@ -11,6 +11,6 @@ class ChangePasswordVclContass extends AbstractMigration
 
     public function down()
     {
-        
+
     }
 }

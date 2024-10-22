@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Fixoc19535 extends AbstractMigration
+class Fixoc19535 extends PostgresMigration
 {
     /**
      * Change Method.
@@ -10,7 +10,7 @@ class Fixoc19535 extends AbstractMigration
      * Write your reversible migrations using this method.
      *
      * More information on writing migrations is available here:
-     * http://docs.phinx.org/en/latest/migrations.html#the-abstractmigration-class
+     * http://docs.phinx.org/en/latest/migrations.html#the-PostgresMigration-class
      *
      * The following commands can be used in this method and Phinx will
      * automatically reverse them when rolling back:
@@ -29,15 +29,15 @@ class Fixoc19535 extends AbstractMigration
     {
         $sql = "
         select fc_startsession();
-        
+
         begin;
-        
+
         alter table rhpessoal add column rh01_esocial char(30);
-        
+
         insert into db_syscampo values ((select max(codcam)+1 from db_syscampo),'rh01_esocial', 'char(30)', 'Matricula do Servidor Esocial',0,'Matricula do Servidor Esocial',30,'f','f','f',1,'text','Matricula Esocial');
-        
+
         commit;";
-    
+
         $this->execute($sql);
     }
 }

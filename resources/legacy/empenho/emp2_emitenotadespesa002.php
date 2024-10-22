@@ -214,7 +214,7 @@ if (pg_numrows($result2) > 0) {
   db_fieldsmemory($result2, 0);
   $pdf1->nvias = $e30_nroviaord;
 }
-
+$notas = 0;
 for ($i = 0; $i < $clpagordem->numrows; $i++) {
   db_fieldsmemory($result, $i);
 
@@ -306,6 +306,20 @@ for ($i = 0; $i < $clpagordem->numrows; $i++) {
       $vlrEstorno = $e81_valor;
     }
 
+    if ($e50_contafornecedor != null) {
+      if ($e50_contafornecedor != 0) {
+        $sSqlContaFornecedor = "SELECT * FROM pcfornecon WHERE pc63_contabanco = {$e50_contafornecedor}";
+        db_fieldsmemory(db_query($sSqlContaFornecedor),0);      
+      } else {
+        $pc63_banco       = '';
+        $pc63_agencia     = '';
+        $pc63_agencia_dig = '';
+        $pc63_conta       = '';
+        $pc63_tipoconta   = '';
+        $pc63_conta_dig   = '';
+      }
+    }
+
     $sqlTesoureiro = $clReponsaveis->sql_query(null,'z01_nome',null, " si166_tiporesponsavel = 5 and ('$e80_data' between si166_dataini and si166_datafim) and si166_instit = ".db_getsession("DB_instit"));
     $tesoureiro = db_utils::fieldsMemory(db_query($sqlTesoureiro), 0)->z01_nome;
 
@@ -393,8 +407,13 @@ for ($i = 0; $i < $clpagordem->numrows; $i++) {
     }
 
     $pdf1->imprime();
+    $notas++;
   }
   }
+}
+
+if ($notas == 0){
+  db_redireciona('db_erros.php?fechar=true&db_erro=Dados não encontrados. Verifique!');
 }
 
 if ($oConfiguracaoGed->utilizaGED()) {

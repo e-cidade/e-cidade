@@ -200,6 +200,8 @@ $sWhereContratos = " and 1 = 1 ";
                           WHERE l202_licitacao = liclicita.l20_codigo))";
             }
 
+            $whereHab .= "AND l03_pctipocompratribunal NOT IN (100,101,102,103)";
+
             if(!isset($pesquisa_chave)){
 
                 if(isset($campos)==false){

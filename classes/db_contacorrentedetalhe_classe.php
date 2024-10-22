@@ -1119,7 +1119,7 @@ class cl_contacorrentedetalhe {
                 ORDER BY credor_emp, beneficiario, e60_numemp, 2, 5 DESC, valor_irrf DESC ";
     }
 
-    function detalhamentoPorFonte($iAnoUsu,$c61_reduz, $aInstit, $iMes){
+    function detalhamentoPorFonte($iAnoUsu,$c61_reduz, $aInstit, $iMes, $sDataInicial=null, $sDataFinal=null){
       $sSql = "select 
           c19_orctiporec as codtri,
           round(substr(fc_saldocontacorrente, 43, 15)::float8, 2)::float8 AS saldo_anterior,
@@ -1132,9 +1132,13 @@ class cl_contacorrentedetalhe {
           (
           select
               c19_sequencial,
-              c19_orctiporec,
-              fc_saldocontacorrente({$iAnoUsu}, c19_sequencial, 103, {$iMes}, c19_instit)
-          from
+              c19_orctiporec,";
+      if ($iMes == null && $sDataInicial != null && $sDataFinal != null) {
+        $sSql .= "fc_saldocontacorrenteperiodo({$iAnoUsu}, c19_sequencial, 103, '{$sDataInicial}', '{$sDataFinal}', c19_instit) as fc_saldocontacorrente";
+      } else {
+        $sSql .= "fc_saldocontacorrente({$iAnoUsu}, c19_sequencial, 103, {$iMes}, c19_instit)";
+      }
+      $sSql .= " from
               contabilidade.contacorrentedetalhe
           where
               c19_instit in ({$aInstit})
@@ -1150,7 +1154,6 @@ class cl_contacorrentedetalhe {
       foreach ($aContaCorrente as $aCC){
             $clDeParaRecurso = new DeParaRecurso;
             $codtri = substr($clDeParaRecurso->getDePara($aCC['codtri']), 0, -1);
-  
         if (isset($aTotalPorCodtri[$codtri])){
             $saldoAnterior = $aTotalPorCodtri[$codtri]['sinal_anterior'] == 'D' ? $aTotalPorCodtri[$codtri]['saldo_anterior'] * -1 : $aTotalPorCodtri[$codtri]['saldo_anterior'];
             $aCCSaldoAnterior = $aCC['sinal_anterior'] == 'D' ? $aCC['saldo_anterior'] * -1 : $aCC['saldo_anterior'];

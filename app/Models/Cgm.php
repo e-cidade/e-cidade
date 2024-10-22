@@ -25,14 +25,6 @@ class Cgm extends LegacyModel
      */
     public $incrementing = false;
     public $timestamps = false;
-    /**
-     * @var string
-     */
-    protected $table = 'cgm';
-    /**
-     * @var string
-     */
-    protected $primaryKey = 'z01_numcgm';
 
     protected string $sequenceName = 'protocolo.cgm_z01_numcgm_seq';
     /**

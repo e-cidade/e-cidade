@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class CampoCargoTabelaFolha extends AbstractMigration
+class CampoCargoTabelaFolha extends PostgresMigration
 {
 
     public function up()

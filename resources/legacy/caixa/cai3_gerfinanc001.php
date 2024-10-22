@@ -383,7 +383,7 @@ if (isset($db21_usasisagua) && $db21_usasisagua != '') {
                         let sParam = "toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=1,resizable=1,height="+
                         (screen.height-100)+",width="+(screen.width-100);
                         let novadatavencimento = oParam.oDadosForm.forcarvencimento == "true" ? "&novadatavencimento="+oParam.oDadosForm.k00_dtoper : "";
-                        oJanela = window.open('reciboitbi.php?itbi='+oRetorno.it01_guia+'&tipoguia=n'+novadatavencimento,"",sParam);
+                        oJanela = window.open('resources/legacy/itbi/reciboitbi.php?itbi='+oRetorno.it01_guia+'&tipoguia=n'+novadatavencimento,"",sParam);
                         oJanela.moveTo(0,0);
                      }
                    }

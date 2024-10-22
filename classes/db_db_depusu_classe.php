@@ -613,5 +613,11 @@ class cl_db_depusu {
      }
      return $sql;
   }
+
+  function sql_query_depto_from_matpedido(int $m97_sequencial)
+  {
+    $sql = "select matpedido.m97_sequencial, db_almox.m91_depto from matpedido inner join db_almox on db_almox.m91_codigo = matpedido.m97_db_almox where matpedido.m97_sequencial = $m97_sequencial";
+    return $sql;
+  }
 }
 ?>

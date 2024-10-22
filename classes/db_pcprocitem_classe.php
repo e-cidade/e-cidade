@@ -390,17 +390,29 @@ class cl_pcprocitem {
      return $sql;
   }
 
-  function queryGetItens($pc81_codproc)
+  function queryGetItens(string $pc81_codproc, string $campos,string $where, string $order): string
   {
+      if($pc81_codproc){
+        $pc81_codproc = "pc81_codproc = $pc81_codproc";
+      }else{
+          $pc81_codproc = "";
+      }
+
     return "
-            SELECT pc01_codmater,pc11_seq,pc01_descrmater,pc01_complmater,pc11_quant,m61_descr,pc11_reservado,pc81_codprocitem
+            SELECT DISTINCT $campos
             FROM pcprocitem
-            inner join solicitem on pc11_codigo = pc81_solicitem
-            inner join solicitempcmater on pc16_solicitem = pc11_codigo
-            inner join solicitemunid on pc17_codigo = pc11_codigo
-            inner join matunid on m61_codmatunid = pc17_unid
-            inner join pcmater on pc01_codmater = pc16_codmater
-            WHERE pc81_codproc = $pc81_codproc
+            INNER JOIN pcorcamitemproc ON pc31_pcprocitem = pc81_codprocitem
+            INNER JOIN pcorcamitem ON pc22_orcamitem = pc31_orcamitem
+            INNER JOIN solicitem on pc11_codigo = pc81_solicitem
+            INNER JOIN solicitempcmater on pc16_solicitem = pc11_codigo
+            INNER JOIN solicitemunid on pc17_codigo = pc11_codigo
+            INNER JOIN matunid on m61_codmatunid = pc17_unid
+            INNER JOIN pcmater on pc01_codmater = pc16_codmater
+            INNER join precoreferencia ON si01_processocompra = pc81_codproc
+            INNER join itemprecoreferencia ON si02_precoreferencia = si01_sequencial AND pc22_orcamitem = si02_itemproccompra
+            and si02_coditem = pc01_codmater
+            WHERE {$pc81_codproc} {$where}
+            order by $order
     ";
   }
 
@@ -844,4 +856,27 @@ class cl_pcprocitem {
     return $sSql;
   }
 
+  public function getItensonSolicitem($campos, $pc81_codprocitem){
+      return "
+            SELECT $campos
+            FROM pcprocitem
+            INNER JOIN solicitem ON pc11_codigo=pc81_solicitem
+            INNER JOIN solicita ON pc11_numero = pc10_numero
+            INNER JOIN solicitempcmater ON pc16_solicitem = pc11_codigo
+            INNER JOIN solicitemunid ON pc17_codigo = pc11_codigo
+            LEFT JOIN  solicitemregistropreco ON pc57_solicitem = pc11_codigo
+            WHERE pc81_codprocitem=$pc81_codprocitem";
+  }
+
+  public function getOrcamento($pc81_codprocitem)
+  {
+      return "
+              SELECT pc22_codorc,pcorcamval.*
+        FROM pcprocitem
+        INNER JOIN pcorcamitemproc ON pc31_pcprocitem = pc81_codprocitem
+        inner join pcorcamitem on pc31_orcamitem = pc22_orcamitem
+        inner join pcorcamval on pc23_orcamitem = pc22_orcamitem
+        WHERE pc81_codprocitem = $pc81_codprocitem
+      ";
+  }
 }

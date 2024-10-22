@@ -1,19 +1,19 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc20323 extends AbstractMigration
+class Oc20323 extends PostgresMigration
 {
     public function up()
     {
         $nomeCampo = "c50_descrcompl";
         $descricaoCampo = "Descrição do Complemento";
         $nomeArquivo = "conhist";
-        
-            $sql = "    
+
+            $sql = "
             BEGIN;
                 SELECT fc_startsession();
-                
+
                     -- Insere novo campo
                     INSERT INTO db_syscampo
                     VALUES (
@@ -24,7 +24,7 @@ class Oc20323 extends AbstractMigration
                     VALUES ((SELECT codarq FROM db_sysarquivo WHERE nomearq = '{$nomeArquivo}'),
                         (SELECT codcam FROM db_syscampo WHERE nomecam = '{$nomeCampo}'),
                         (SELECT max(seqarq) + 1 FROM db_sysarqcamp WHERE codarq = (SELECT codarq FROM db_sysarquivo WHERE nomearq = '{$nomeArquivo}')), 0);
-               
+
                         ALTER TABLE {$nomeArquivo} ADD COLUMN {$nomeCampo} varchar(500) NULL;
 
                         INSERT INTO conhist
@@ -47,15 +47,15 @@ class Oc20323 extends AbstractMigration
 
                         UPDATE {$nomeArquivo} SET c50_descrcompl='VALOR REFERENTE À PAGAMENTO EXTRAORÇAMENTÁRIO' WHERE c50_codhist = 9030;
 
-                    
+
                         ALTER TABLE slip ADD k17_numdocumento varchar NULL;
 
                         ALTER TABLE slip ADD k17_tiposelect varchar NULL;
-                    
-                    
-                    COMMIT";  
-               
-            $this->execute($sql);            
-        
+
+
+                    COMMIT";
+
+            $this->execute($sql);
+
     }
 }

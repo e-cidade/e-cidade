@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc19967 extends AbstractMigration
+class Oc19967 extends PostgresMigration
 {
 
     public function up()
@@ -10,12 +10,12 @@ class Oc19967 extends AbstractMigration
         $sql =  "begin;
 
         INSERT INTO db_itensmenu values ((select max(id_item)+1 from db_itensmenu),'Lançamento de Manutenção','Lançamento de Manutenção','',1,1,'Lançamento de Manutenção','t');
-        
+
         INSERT INTO db_menu VALUES(32,(select max(id_item) from db_itensmenu),16,439);
-        
-        
+
+
         INSERT INTO db_itensmenu values ((select max(id_item)+1 from db_itensmenu),'Inclusão','Inclusão','pat1_lancmanutencao001.php',1,1,'Inclusão','t');
-        
+
         INSERT INTO db_menu VALUES((select id_item from db_itensmenu where descricao ='Lançamento de Manutenção'),(select max(id_item) from db_itensmenu),1,439);
 
         INSERT INTO db_itensmenu values ((select max(id_item)+1 from db_itensmenu),'Alteração','Alteração','pat1_lancmanutencao002.php',1,1,'Alteração','t');
@@ -59,7 +59,7 @@ INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select
 
 CREATE TABLE bemmanutencao (
 	t98_sequencial int8 not null
-    ,t98_bem int NOT NULL 
+    ,t98_bem int NOT NULL
     ,t98_data date not null
     ,t98_descricao  varchar(500) not null
     ,t98_vlrmanut float not null
@@ -68,8 +68,8 @@ CREATE TABLE bemmanutencao (
     ,t98_horaservidor time not null
     ,t98_tipo int4 not null
     ,t98_manutencaoprocessada bool not null default false);
-        
-       
+
+
 CREATE SEQUENCE bemmanutencao_t98_sequencial_seq
 INCREMENT 1
 MINVALUE 1
@@ -108,14 +108,14 @@ INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select
 
 CREATE TABLE manutbensitem (
 	t99_sequencial int8 not null
-    ,t99_itemsistema int4 NOT NULL 
+    ,t99_itemsistema int4 NOT NULL
     ,t99_valor float not null
     ,t99_descricao  varchar(200) not null
     ,t99_codpcmater int null
     ,t99_codbensdispensatombamento int null
     ,t99_codbemmanutencao int not null);
-        
-       
+
+
 CREATE SEQUENCE manutbensitem_t99_sequencial_seq
 INCREMENT 1
 MINVALUE 1
@@ -132,8 +132,8 @@ ALTER TABLE manutbensitem ADD CONSTRAINT manutbensitem_t99_codbemmanutencao_fk F
 
 
 
-        
-        
+
+
         commit;";
 
         $this->execute($sql);

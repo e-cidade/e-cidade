@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class oc21279 extends AbstractMigration
+class oc21279 extends PostgresMigration
 {
 
     public function up(){
@@ -10,16 +10,16 @@ class oc21279 extends AbstractMigration
         $this->atualizaTabelaEmpparametro();
         $this->criaTabelaEmpdiaria();
     }
-    
+
     public function atualizaTabelaPagordem(){
-        $sql = " 
+        $sql = "
             BEGIN;
 
             ALTER TABLE empenho.pagordem ADD COLUMN e50_dtvencimento date;
 
-            insert into db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+            insert into db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
             values ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e50_dtvencimento' ,'date' ,'Data de Vencimento' ,'null' ,'Vencimento' ,10 ,'false' ,'false' ,'false' ,1 ,'text' ,'Vencimento' );
-            insert into db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+            insert into db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
             values (
             (select codarq from db_sysarquivo where nomearq = 'pagordem'),
             (SELECT codcam FROM db_syscampo WHERE nomecam = 'e50_dtvencimento'),
@@ -35,9 +35,9 @@ class oc21279 extends AbstractMigration
 
             ALTER TABLE empenho.empparametro ADD COLUMN e30_obrigadiarias bool default true;
 
-            insert into db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+            insert into db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
             values ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e30_obrigadiarias' ,'bool' ,'Obriga Informar Diarias na Liquidação' ,'true' ,'Obriga Informar Diarias na Liquidação' ,5 ,'false' ,'false' ,'false' ,1 ,'text' ,'Obriga Informar Diarias na Liquidação' );
-            insert into db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+            insert into db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
             values (
             (select codarq from db_sysarquivo where nomearq = 'empparametro'),
             (SELECT codcam FROM db_syscampo WHERE nomecam = 'e30_obrigadiarias'),
@@ -70,120 +70,120 @@ class oc21279 extends AbstractMigration
             e140_objetivo varchar(500)
         );
 
-            INSERT INTO db_sysarquivo 
+            INSERT INTO db_sysarquivo
             VALUES ((SELECT max(codarq)+1 FROM db_sysarquivo), 'empdiaria', 'Tabela de Diárias', 'e140', CURRENT_DATE, 'Diárias', 0, 'f', 'f', 'f', 'f' );
-            
-            INSERT INTO db_sysarqmod 
+
+            INSERT INTO db_sysarqmod
             VALUES (38,(SELECT codarq FROM db_sysarquivo WHERE nomearq = 'empdiaria'));
 
-            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
             VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e140_sequencial' ,'int8' ,'Sequencial' ,'0' ,'Sequencial' ,10 ,'false' ,'false' ,'false' ,1 ,'text' ,'Sequencial' );
-            
-            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+
+            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
             VALUES (
             (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'empdiaria'),
             (SELECT codcam FROM db_syscampo WHERE nomecam = 'e140_sequencial'),1 ,0 );
-           
-            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+
+            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
             VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e140_codord' ,'int8' ,'Codigo de Ordem de Pagamento' ,'0' ,'Codigo de Ordem de Pagamento' ,10 ,'false' ,'false' ,'false' ,1 ,'text' ,'Codigo de Ordem de Pagamento' );
-            
-            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+
+            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
             VALUES (
             (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'empdiaria'),
             (SELECT codcam FROM db_syscampo WHERE nomecam = 'e140_codord'),2 ,0 );
 
-            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
             VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e140_dtautorizacao' ,'date' ,'Data de Autorização' ,'' ,'Data de Autorização' ,10 ,'false' ,'false' ,'false' ,0 ,'text' ,'Data de Autorização' );
-            
-            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+
+            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
             VALUES (
             (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'empdiaria'),
             (SELECT codcam FROM db_syscampo WHERE nomecam = 'e140_dtautorizacao'),3 ,0 );
-           
-            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+
+            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
             VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e140_matricula' ,'int8' ,'Matricula' ,'0' ,'Matricula' ,10 ,'false' ,'false' ,'false' ,1 ,'text' ,'Matricula' );
-            
-            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+
+            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
             VALUES (
             (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'empdiaria'),
             (SELECT codcam FROM db_syscampo WHERE nomecam = 'e140_matricula'),4 ,0 );
 
-            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
             VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e140_cargo' ,'varchar(60)' ,'Cargo' ,'' ,'Cargo' ,60,'false' ,'false' ,'false' ,3 ,'text' ,'Cargo' );
-            
-            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+
+            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
             VALUES (
             (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'empdiaria'),
             (SELECT codcam FROM db_syscampo WHERE nomecam = 'e140_cargo'),5 ,0 );
-           
-            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+
+            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
             VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e140_dtinicial' ,'date' ,'Data Inicial da Viagem' ,'' ,'Data Inicial da Viagem' ,10 ,'false' ,'false' ,'false' ,0 ,'text' ,'Data Inicial da Viagem' );
-            
-            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+
+            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
             VALUES (
             (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'empdiaria'),
             (SELECT codcam FROM db_syscampo WHERE nomecam = 'e140_dtautorizacao'),6 ,0 );
-           
-           	INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+
+           	INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
             VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e140_dtfinal' ,'date' ,'Data Final da Viagem' ,'' ,'Data Final da Viagem' ,10 ,'false' ,'false' ,'false' ,0 ,'text' ,'Data Final da Viagem' );
-            
-            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+
+            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
             VALUES (
             (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'empdiaria'),
             (SELECT codcam FROM db_syscampo WHERE nomecam = 'e140_dtfinal'),7 ,0 );
-           
-            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+
+            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
             VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e140_origem' ,'varchar(60)' ,'Origem' ,'' ,'Origem' ,60,'false' ,'false' ,'false' ,2 ,'text' ,'Origem' );
-            
-            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+
+            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
             VALUES (
             (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'empdiaria'),
             (SELECT codcam FROM db_syscampo WHERE nomecam = 'e140_origem'),8 ,0 );
-           
-            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+
+            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
             VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e140_destino' ,'varchar(60)' ,'Destino' ,'' ,'Destino' ,60,'false' ,'false' ,'false' ,2 ,'text' ,'Destino' );
-            
-            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+
+            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
             VALUES (
             (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'empdiaria'),
             (SELECT codcam FROM db_syscampo WHERE nomecam = 'e140_destino'),9 ,0 );
-           
-            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+
+            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
             VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e140_qtddiarias' ,'int4' ,'Quantidade de Diárias' ,'0' ,'Quantidade de Diárias' ,10 ,'false' ,'false' ,'false' ,1 ,'text' ,'Quantidade de Diárias' );
-            
-            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+
+            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
             VALUES (
             (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'empdiaria'),
-            (SELECT codcam FROM db_syscampo WHERE nomecam = 'e140_qtddiarias'),10 ,0 );       
+            (SELECT codcam FROM db_syscampo WHERE nomecam = 'e140_qtddiarias'),10 ,0 );
 
-            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
             VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e140_vrldiariauni' ,'float8' ,'Valor Unitario da Diária' ,'' ,'Valor Unitario da Diária' ,15 ,'false' ,'false' ,'false' ,4 ,'text' ,'Valor Unitario da Diária' );
-            
-            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+
+            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
             VALUES (
             (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'empdiaria'),
             (SELECT codcam FROM db_syscampo WHERE nomecam = 'e140_vrldiariauni'),11 ,0 );
-           
-            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+
+            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
             VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e140_transporte' ,'varchar(60)' ,'Transporte' ,'' ,'Transporte' ,60,'false' ,'false' ,'false' ,3 ,'text' ,'Transporte' );
-            
-            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+
+            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
             VALUES (
             (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'empdiaria'),
             (SELECT codcam FROM db_syscampo WHERE nomecam = 'e140_transporte'),12 ,0 );
-           
-            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+
+            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
             VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e140_vlrtransport' ,'float8' ,'Valor do Transporte' ,'' ,'Valor do Transporte' ,15 ,'false' ,'false' ,'false' ,4 ,'text' ,'Valor do Transporte' );
-            
-            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+
+            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
             VALUES (
             (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'empdiaria'),
-            (SELECT codcam FROM db_syscampo WHERE nomecam = 'e140_vlrtransport'),11 ,0 ); 
-           
-            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+            (SELECT codcam FROM db_syscampo WHERE nomecam = 'e140_vlrtransport'),11 ,0 );
+
+            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
             VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e140_objetivo' ,'varchar(500)' ,'Objetivo da Viagem' ,'' ,'Objetivo da Viagem' ,500,'false' ,'false' ,'false' ,3 ,'text' ,'Objetivo da Viagem' );
-            
-            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+
+            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
             VALUES (
             (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'empdiaria'),
             (SELECT codcam FROM db_syscampo WHERE nomecam = 'e140_objetivo'),13 ,0 );

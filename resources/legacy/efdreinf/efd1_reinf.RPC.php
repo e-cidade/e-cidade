@@ -50,11 +50,11 @@ try {
                         efd60_cessaomaoobra,
                         efd60_possuicno,
                         e60_codemp,
-                        e60_anousu,
-                        efd60_numcno";
+                        e60_anousu
+                        ";
             $sWhere  = " where length(cgm.z01_cgccpf) = 14 and e69_dtnota between '{$sDataInicialFiltros}' and '{$sDataFinalFiltros}' and e23_ativo = true and e21_retencaotipocalc in (4) and e60_instit = {$sInstituicao}";
             $clempnota           = new cl_empnota;
-            $rsEfdreinfR2010 = $clempnota->sql_record($clempnota->sqlRelRetencoesPJ($sWhere, null, " order by z01_cgccpf", $sCampos));
+            $rsEfdreinfR2010 = $clempnota->sql_record($clempnota->sqlRelRetencoesPJ($sWhere, null, " order by z01_cgccpf, efd60_numcno", $sCampos));
 
             $valorBruto = 0;
             $valorBase  = 0;
@@ -103,7 +103,7 @@ try {
                 } 
                 
                 if ($sHash != $sHashproximo) {
-               
+                    // echo $sHash."  -  ".$sHashproximo."  -   ".$valorBruto."<br>";
                     $oefdreinfr2010->Estabelecimento = db_formatar($oEfdreinfr2010->z01_cgccpf, 'cnpj')." - ".removeAccents($oEfdreinfr2010->z01_nome);
                     $oefdreinfr2010->CNPJPrestador   = $oEfdreinfr2010->efd60_numcno;
                     $oefdreinfr2010->ValorBruto      = "R$" . db_formatar($valorBruto, 'f');
@@ -256,7 +256,11 @@ try {
             efd05_mescompetencia,
             efd05_cnpjprestador,
             efd05_estabelecimento,
-            case when efd05_status = 2 or efd05_dscresp like 'Não é permitido o envio de mais de um evento para o mesmo contribuinte, num mesmo período de apuração%'  then 2 else efd05_status end as efd05_status,
+            case 
+                when efd05_status = 2 and efd05_dscresp = '' then 2
+                when efd05_dscresp like 'Não é permitido o envio de mais de um evento para o mesmo contribuinte, num mesmo período de apuração%' then 3 
+                else efd05_status 
+            end as efd05_status,
             efd05_dscresp,
             efd05_descResposta,
             efd05_ambiente,
@@ -273,10 +277,8 @@ try {
             if ($oParam->sStatus) {
                 $status = " and efd05_status = $oParam->sStatus ";
                 if ($oParam->sStatus == 2)
-                    $status = " and (efd05_status = 2 or efd05_dscresp like 'Não é permitido o envio de mais de um evento para o mesmo contribuinte, num mesmo período de apuração%') ";
-                if ($oParam->sStatus == 3)
-                    $status = " and (( efd05_status = 3 or efd05_status is null ) and efd05_dscresp not like 'Não é permitido o envio de mais de um evento para o mesmo contribuinte, num mesmo período de apuração%') ";
-          
+                    $status = " and ('efd05_status = 2 and efd05_dscresp = '') ";
+              
             }
 
             $instituicao = db_getsession("DB_instit");
@@ -506,16 +508,18 @@ try {
                         efd07_valorgilrat,
                         efd07_valorsenar,
                         efd07_dataenvio,
-                        case when efd07_status = 2 or efd07_dscresp like 'Não é permitido o envio de mais de um evento para o contribuinte, num mesmo período de apuração%'  then 2 else efd07_status end as efd07_status,
+                        case 
+                            when efd07_status = 2 and efd07_dscresp = '' then 2
+                            when efd07_status = 2 and efd07_dscresp like 'Não é permitido o envio de mais de um evento para o contribuinte, num mesmo período de apuração%'  then 3
+                            else efd07_status 
+                        end as efd07_status,
                         efd07_dscresp,
                         efd07_descResposta
             ";
             if ($oParam->sStatus) {
                 $status = " and efd07_status = $oParam->sStatus ";
                 if ($oParam->sStatus == 2)
-                    $status = " and (efd07_status = 2 OR efd07_dscresp LIKE 'Não é permitido o envio de mais de um evento para o contribuinte, num mesmo período de apuração%') ";
-                if ($oParam->sStatus == 3)
-                    $status = " and ((efd07_status = 3 or efd07_status is null ) and efd07_dscresp NOT LIKE 'Não é permitido o envio de mais de um evento para o contribuinte, num mesmo período de apuração%') ";
+                    $status = " and ( efd07_status = 2 and efd07_dscresp = '' ) ";
             }
             $instituicao = db_getsession("DB_instit");
             $sWhere = " efd07_mescompetencia = '{$oParam->sMescompetencia}' and efd07_anocompetencia = '$oParam->sAnocompetencia' and efd07_ambiente = '$oParam->sAmbiente' and efd07_instit = {$instituicao} $status  ";
@@ -826,9 +830,8 @@ try {
                         efd03_protocolo,
                         efd03_dataenvio,
                         case
-                            when efd03_status = 2
-                            or efd03_dscresp like 'Não é permitido o envio de mais de um evento num mesmo período de apuração, mesmo estabelecimento%' then 2
-                            else efd03_status
+                            when efd03_status = 2 and efd03_dscresp = '' then 2
+                            when efd03_status = 2 and efd03_dscresp like 'Não é permitido o envio de mais de um evento num mesmo período de apuração, mesmo estabelecimento%' then 3                            else efd03_status
                         end as efd03_status,
                         efd03_dscresp,
                         efd03_descResposta
@@ -837,10 +840,7 @@ try {
             if ($oParam->sStatus) {
                 $status = " and efd03_status = $oParam->sStatus ";
                 if ($oParam->sStatus == "2") {
-                    $status = " and ( efd03_status = 2 or efd03_dscresp like 'Não é permitido o envio de mais de um evento num mesmo período de apuração, mesmo estabelecimento%') "; 
-                }
-                if ($oParam->sStatus == "3") {
-                    $status = " and (( efd03_status = 3 or efd03_status is null ) and efd03_dscresp not like 'Não é permitido o envio de mais de um evento num mesmo período de apuração, mesmo estabelecimento%') "; 
+                    $status = " and ( efd03_status = 2 and efd03_dscresp = '') "; 
                 }
             } 
             $instituicao = db_getsession("DB_instit");
@@ -1022,8 +1022,8 @@ try {
                 efd02_protocolo,
                 efd02_dataenvio,
                 case
-                    when efd02_status = 2
-                    or efd02_dscresp like 'Não é permitido o envio de mais de um evento num mesmo período de apuração, mesmo estabelecimento%' then 2
+                    when efd02_status = 2 and efd02_dscresp = '' then 2
+		            when efd02_status = 2 and efd02_dscresp like 'Não é permitido o envio de mais de um evento num mesmo período de apuração, mesmo estabelecimento%' then 3
                     else efd02_status
                 end as efd02_status,
                 efd02_dscresp,
@@ -1032,10 +1032,7 @@ try {
                 if ($oParam->sStatus) {
                     $status = " and efd02_status = $oParam->sStatus ";
                     if ($oParam->sStatus == "2") {
-                        $status = " and ( efd02_status = 2 or efd02_dscresp like 'Não é permitido o envio de mais de um evento num mesmo período de apuração, mesmo estabelecimento%') "; 
-                    }
-                    if ($oParam->sStatus == "3") {
-                        $status = " and ( ( efd02_status = 3 or efd02_status is null ) and efd02_dscresp not like 'Não é permitido o envio de mais de um evento num mesmo período de apuração, mesmo estabelecimento%') "; 
+                        $status = " and ( efd02_status = 2 and efd02_dscresp = '') "; 
                     }
                 } 
                 $instituicao = db_getsession("DB_instit");

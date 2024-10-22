@@ -37,35 +37,36 @@ require_once("phplot/PHPlotReport.php");
 $oJson        = new services_json();
 $oGet         = db_utils::postMemory($HTTP_GET_VARS);
 $iInstituicao = db_getsession("DB_instit");
-$oParametros  = $oJson->decode(str_replace("\\","",$oGet->json));
+$oParametros  = $oJson->decode(str_replace("\\", "", $oGet->json));
 
 try {
 
   /**
    * constantes para o Relatorio
    */
-  define( "TIPO_RELATORIO_GERAL"              , "0" );
-  define( "TIPO_RELATORIO_ORGAO"              , "1" );
-  define( "TIPO_RELATORIO_LOTACAO"            , "2" );
-  define( "TIPO_RELATORIO_MATRICULA"          , "3" );
-  define( "TIPO_RELATORIO_LOCAIS_TRABALHO"    , "4" );
-  define( "TIPO_RELATORIO_CARGO"              , "5" );
-  define( "TIPO_RELATORIO_RECURSO"            , "6" );
+  define("TIPO_RELATORIO_GERAL", "0");
+  define("TIPO_RELATORIO_ORGAO", "1");
+  define("TIPO_RELATORIO_LOTACAO", "2");
+  define("TIPO_RELATORIO_MATRICULA", "3");
+  define("TIPO_RELATORIO_LOCAIS_TRABALHO", "4");
+  define("TIPO_RELATORIO_CARGO", "5");
+  define("TIPO_RELATORIO_RECURSO", "6");
 
-  define( "TIPO_FILTRO_GERAL"                 , 0 );
-  define( "TIPO_FILTRO_INTERVALO"             , 1 );
-  define( "TIPO_FILTRO_SELECIONADOS"          , 2 );
+  define("TIPO_FILTRO_GERAL", 0);
+  define("TIPO_FILTRO_INTERVALO", 1);
+  define("TIPO_FILTRO_SELECIONADOS", 2);
 
-  define( "TIPO_VINCULO_GERAL"                , "g" );
-  define( "TIPO_VINCULO_ATIVOS"               , "a" );
-  define( "TIPO_VINCULO_INATIVOS"             , "i" );
-  define( "TIPO_VINCULO_PENSIONISTAS"         , "p" );
-  define( "TIPO_VINCULO_INATIVOS_PENSIONISTAS", "ip");
+  define("TIPO_VINCULO_GERAL", "g");
+  define("TIPO_VINCULO_ATIVOS", "a");
+  define("TIPO_VINCULO_INATIVOS", "i");
+  define("TIPO_VINCULO_PENSIONISTAS", "p");
+  define("TIPO_VINCULO_INATIVOS_PENSIONISTAS", "ip");
 
-  define( "TIPO_PREVIDENCIA_SEM_PREVIDENCIA"  , 5   );
+  define("TIPO_PREVIDENCIA_SEM_PREVIDENCIA", 5);
 
-  define( "ORDENACAO_RELATORIO_NUMERICA"      , "n" );
-  define( "ORDENACAO_RELATORIO_ALFABETICA"    , "a" );
+  define("ORDENACAO_RELATORIO_NUMERICA", "n");
+  define("ORDENACAO_RELATORIO_ALFABETICA", "a");
+  define("ORDENACAO_RELATORIO_LOTACAO", "l");
 
   $aWhere            = array();
   $sDescricaoSelecao = '';
@@ -83,14 +84,14 @@ try {
   /**
    * Valida se existe seleção
    */
-  if ( !empty($oParametros->iSelecao) ) {
+  if (!empty($oParametros->iSelecao)) {
 
-    $sSelecao = trim( db_utils::getDao( "selecao" )->getCondicaoSelecao( $oParametros->iSelecao ) );
+    $sSelecao = trim(db_utils::getDao("selecao")->getCondicaoSelecao($oParametros->iSelecao));
 
-    if ( !empty($sSelecao) ) {
+    if (!empty($sSelecao)) {
       $aWhere['selecao'] = $sSelecao;
 
-      $sDescricaoSelecao = trim( db_utils::getDao( "selecao" )->getDescricaoSelecao( $oParametros->iSelecao ) );
+      $sDescricaoSelecao = trim(db_utils::getDao("selecao")->getDescricaoSelecao($oParametros->iSelecao));
       $sDescricaoSelecao = "\nSELEÇÃO : " . $sDescricaoSelecao;
     }
   }
@@ -98,14 +99,14 @@ try {
   /**
    * Valida se existe Regime
    */
-  if ( !empty($oParametros->iRegime) ) {
+  if (!empty($oParametros->iRegime)) {
 
     $aWhere['regime']  = "rh30_regime = {$oParametros->iRegime}";
   }
 
   $head3 = 'TIPO FILTRO : ';
 
-  switch ( $oParametros->iTipoRelatorio ) {
+  switch ($oParametros->iTipoRelatorio) {
 
     default:
 
@@ -115,7 +116,7 @@ try {
       $sCampoDescricaoTipoRelatorio  = "'GERAL'";
       $head3                        .= 'GERAL';
 
-    break;
+      break;
 
     case TIPO_RELATORIO_CARGO:
 
@@ -125,7 +126,7 @@ try {
       $sCampoDescricaoTipoRelatorio  = "rh37_descr";
       $head3                        .= 'CARGOS';
 
-    break;
+      break;
 
     case TIPO_RELATORIO_LOTACAO:
 
@@ -135,99 +136,99 @@ try {
       $sCampoDescricaoTipoRelatorio    = "r70_descr";
       $head3                          .= 'LOTAÇÕES';
 
-    break;
+      break;
 
     case TIPO_RELATORIO_ORGAO:
 
       $sLabelTipoRelatorio          = "Órgãos:";
       $sCampoCondicaoTipoRelatorio  = "rh26_orgao";
-      $sCampoEstruturalTipoRelatorio= "rh26_orgao";
+      $sCampoEstruturalTipoRelatorio = "rh26_orgao";
       $sCampoDescricaoTipoRelatorio = "o40_descr";
       $head3                       .= 'ÓRGÃOS';
 
-    break;
+      break;
 
     case TIPO_RELATORIO_LOCAIS_TRABALHO:
 
       $sLabelTipoRelatorio          = "Locais de Trabalho:";
       $sCampoCondicaoTipoRelatorio  = "rh55_codigo";
-      $sCampoEstruturalTipoRelatorio= "rh55_estrut";
+      $sCampoEstruturalTipoRelatorio = "rh55_estrut";
       $sCampoDescricaoTipoRelatorio = "rh55_descr";
       $head3                       .= 'LOCAIS DE TRABALHO';
 
-    break;
+      break;
 
     case TIPO_RELATORIO_MATRICULA:
 
       $sLabelTipoRelatorio          = "Matrículas:";
       $sCampoCondicaoTipoRelatorio  = "rh02_regist";
-      $sCampoEstruturalTipoRelatorio= "rh02_regist";
+      $sCampoEstruturalTipoRelatorio = "rh02_regist";
       $sCampoDescricaoTipoRelatorio = "z01_nome";
       $head3                       .= 'MATRÍCULAS';
 
-    break;
+      break;
 
     case TIPO_RELATORIO_RECURSO:
 
       $sLabelTipoRelatorio          = "Recursos:";
       $sCampoCondicaoTipoRelatorio  = "o15_codigo";
-      $sCampoEstruturalTipoRelatorio= "o15_codigo";
+      $sCampoEstruturalTipoRelatorio = "o15_codigo";
       $sCampoDescricaoTipoRelatorio = "o15_descr";
       $head3                       .= 'RECURSOS';
 
-    break;
+      break;
   }
 
-  if ( $oParametros->iTipoRelatorio <> TIPO_RELATORIO_GERAL ) {
+  if ($oParametros->iTipoRelatorio <> TIPO_RELATORIO_GERAL) {
 
-    switch ( $oParametros->iTipoFiltro ) {
+    switch ($oParametros->iTipoFiltro) {
 
       case TIPO_FILTRO_GERAL:
         //Sem Filtros
-      break;
+        break;
       case TIPO_FILTRO_INTERVALO:
         $aWhere['tipo_filtro' . $oParametros->iTipoRelatorio] = "{$sCampoCondicaoTipoRelatorio} between $oParametros->iIntervaloInicial and $oParametros->iIntervaloFinal";
-      break;
+        break;
       case TIPO_FILTRO_SELECIONADOS:
         $aWhere['tipo_filtro' . $oParametros->iTipoRelatorio] = "{$sCampoCondicaoTipoRelatorio} in (" . implode(", ", $oParametros->iRegistros) . ")";
-      break;
+        break;
     }
   }
 
   /**
    * Definições Sobre Vinculo
    */
-  if ( !empty($oParametros->sVinculo) ) {
+  if (!empty($oParametros->sVinculo)) {
 
-    switch ( $oParametros->sVinculo ) {
+    switch ($oParametros->sVinculo) {
 
       default:
         $sTituloVinculo   = "GERAL";
         $sCondicaoVinculo = null;
-      break;
+        break;
 
       case TIPO_VINCULO_ATIVOS:
         $sTituloVinculo   = "ATIVOS";
         $sCondicaoVinculo = " rh30_vinculo = 'A' ";
-      break;
+        break;
 
       case TIPO_VINCULO_INATIVOS:
         $sTituloVinculo   = "INATIVOS";
         $sCondicaoVinculo = " rh30_vinculo = 'I' ";
-      break;
+        break;
 
       case TIPO_VINCULO_PENSIONISTAS:
         $sTituloVinculo   = "PENSIONISTAS";
         $sCondicaoVinculo = " rh30_vinculo = 'P' ";
-      break;
+        break;
 
       case TIPO_VINCULO_INATIVOS_PENSIONISTAS:
         $sTituloVinculo   = "INATIVOS / PENSIONISTAS";
         $sCondicaoVinculo = " rh30_vinculo in ('I','P') ";
-      break;
+        break;
     }
 
-    if (!empty($sCondicaoVinculo) ) {
+    if (!empty($sCondicaoVinculo)) {
       $aWhere['vinculo'] = $sCondicaoVinculo;
     }
   }
@@ -235,11 +236,11 @@ try {
   /**
    * Validando Previdencia
    */
-  if ( !empty($oParametros->iPrevidencia) ) {
-    $oParametros->iPrevidencia = str_replace("5","0",$oParametros->iPrevidencia);
+  if (!empty($oParametros->iPrevidencia)) {
+    $oParametros->iPrevidencia = str_replace("5", "0", $oParametros->iPrevidencia);
     $aWhere['previdencia'] = "rh02_tbprev in ({$oParametros->iPrevidencia})";
 
-    if ( $oParametros->iPrevidencia != TIPO_PREVIDENCIA_SEM_PREVIDENCIA ) {
+    if ($oParametros->iPrevidencia != TIPO_PREVIDENCIA_SEM_PREVIDENCIA) {
       $head4 = "PREVIDÊNCIA : {$oParametros->sPrevidencia}";
     } else {
       $head4 = "PREVIDÊNCIA : FUNCIONÁRIOS SEM PREVIDÊNCIA";
@@ -248,8 +249,8 @@ try {
     $head4 = "PREVIDÊNCIA : Todos";
   }
 
-  if( !empty($sDescricaoSelecao) ){
-      $head3 .= $sDescricaoSelecao;
+  if (!empty($sDescricaoSelecao)) {
+    $head3 .= $sDescricaoSelecao;
   }
 
   $oDaoRhPessoalMov = db_utils::getDao("rhpessoalmov");
@@ -262,23 +263,24 @@ try {
   $sAgrupamento     = "rh01_regist,rh02_anousu,rh02_mesusu,rh02_tbprev, {$sCampoCondicaoTipoRelatorio}, {$sCampoDescricaoTipoRelatorio}, {$sCampoEstruturalTipoRelatorio}";
   $sAgrupamento     = $oParametros->iTipoRelatorio == TIPO_RELATORIO_GERAL ? "" : $sAgrupamento;
 
-  $sSqlServidores   = $oDaoRhPessoalMov->sql_query_baseServidores($oParametros->iMes,
-                                                                  $oParametros->iAno,
-                                                                  $iInstituicao,
-                                                                  $sCampos,
-                                                                  $sWhere,
-                                                                  "agrupador_codigo",
-                                                                  $sAgrupamento,
-                                                                  $oParametros->iMesFinal,
-                                                                  $oParametros->iAnoFinal
-                                                                );
+  $sSqlServidores   = $oDaoRhPessoalMov->sql_query_baseServidores(
+    $oParametros->iMes,
+    $oParametros->iAno,
+    $iInstituicao,
+    $sCampos,
+    $sWhere,
+    "agrupador_codigo",
+    $sAgrupamento,
+    $oParametros->iMesFinal,
+    $oParametros->iAnoFinal
+  );
   $rsServidores = db_query($sSqlServidores);
 
-  if ( !$rsServidores ) {
-    throw new DBException( "Erro ao Buscar os Servidores pelos filtros selecionados. \n" . pg_last_error() );
+  if (!$rsServidores) {
+    throw new DBException("Erro ao Buscar os Servidores pelos filtros selecionados. \n" . pg_last_error());
   }
 
-  if ( pg_num_rows( $rsServidores ) == 0 ) {
+  if (pg_num_rows($rsServidores) == 0) {
     throw new BusinessException("Nenhum Servidor encontrado nos Filtros Selecionados");
   }
 
@@ -292,10 +294,10 @@ try {
   /**
    * Agrupa servidores pelo tipo de relatório
    */
-  foreach ( db_utils::getCollectionByRecord($rsServidores) as $oDadosPesquisados  ) {
+  foreach (db_utils::getCollectionByRecord($rsServidores) as $oDadosPesquisados) {
 
     $agrupador = $oDadosPesquisados->agrupador_estrutural . '-' . $oDadosPesquisados->agrupador_codigo;
-    if ( $agrupador == "-" ) {
+    if ($agrupador == "-") {
       continue;
     }
 
@@ -335,7 +337,7 @@ try {
           }
           $aEventoFinanceiro = db_utils::getCollectionByRecord($rsResult);
           break;
-        
+
         default:
 
           $rsResult = db_query(getSqlMovimentacaoFinanceira($sTipoFolha, $aTipoFolhas[$sTipoFolha], $oDadosPesquisados));
@@ -343,7 +345,7 @@ try {
           break;
       }
 
-      foreach($aEventoFinanceiro as $oEventoFinanceiro) {
+      foreach ($aEventoFinanceiro as $oEventoFinanceiro) {
 
 
         $lExisteCalculo    = true; // Exibe Relatório se existir movimentação financeira
@@ -352,20 +354,24 @@ try {
         $iMatricula        = $oDadosPesquisados->rh01_regist;
         $oEventoFinanceiro->tabela_previdencia = $oDadosPesquisados->rh02_tbprev;
 
-        $aRubricasOrdenacao        [$agrupador][$sRubrica]              = $sDescricaoRubrica;
-        $aTotalServidoresRubrica   [$agrupador][$sRubrica][$iMatricula] = $iMatricula;
+        $aRubricasOrdenacao[$agrupador][$sRubrica]              = $sDescricaoRubrica;
+        $aTotalServidoresRubrica[$agrupador][$sRubrica][$iMatricula] = $iMatricula;
         $aTotalServidoresEstrutural[$agrupador][$iMatricula]            = $iMatricula;
-        $aRubricas                 [$agrupador][$sRubrica][]            = $oEventoFinanceiro;
+        $aRubricas[$agrupador][$sRubrica][]            = $oEventoFinanceiro;
         if ($oParametros->lGrafico == 't') {
-          if ($oEventoFinanceiro->provento_desconto == EventoFinanceiroFolha::PROVENTO
-              && ($oParametros->sTipoGrafico == 'bruto' || $oParametros->sTipoGrafico == 'liquido')) {
+          if (
+            $oEventoFinanceiro->provento_desconto == EventoFinanceiroFolha::PROVENTO
+            && ($oParametros->sTipoGrafico == 'bruto' || $oParametros->sTipoGrafico == 'liquido')
+          ) {
 
             $aDadosGrafico["$oDadosPesquisados->rh02_mesusu/$oDadosPesquisados->rh02_anousu"] += $oEventoFinanceiro->valor_rubrica;
-          } else if($oEventoFinanceiro->provento_desconto == EventoFinanceiroFolha::DESCONTO
-                    && $oParametros->sTipoGrafico == 'liquido') {
+          } else if (
+            $oEventoFinanceiro->provento_desconto == EventoFinanceiroFolha::DESCONTO
+            && $oParametros->sTipoGrafico == 'liquido'
+          ) {
 
             $aDadosGrafico["$oDadosPesquisados->rh02_mesusu/$oDadosPesquisados->rh02_anousu"] -= $oEventoFinanceiro->valor_rubrica;
-          } else if($oParametros->sTipoGrafico == 'empenhos') {
+          } else if ($oParametros->sTipoGrafico == 'empenhos') {
 
             $oRubrica = RubricaRepository::getInstanciaByCodigo($sRubrica);
             if ($oRubrica->getTipoEmpenho() == 'e' && $oEventoFinanceiro->provento_desconto == EventoFinanceiroFolha::PROVENTO) {
@@ -394,16 +400,19 @@ try {
    */
   foreach ($aRubricasOrdenacao as $sCodigoOrdenacao => $aRubricasGrupo) {
 
-    if ( $oParametros->sOrdem == ORDENACAO_RELATORIO_NUMERICA ) {
+    if ($oParametros->sOrdem == ORDENACAO_RELATORIO_LOTACAO) {
+      // Ordenar pelo código r70_codigo
+      usort($aRubricasOrdenacao[$sCodigoOrdenacao], function ($a, $b) {
+        return strcmp($a['r70_codigo'], $b['r70_codigo']);
+      });
+    } elseif ($oParametros->sOrdem == ORDENACAO_RELATORIO_NUMERICA) {
       DBArray::keyNatSort($aRubricasOrdenacao[$sCodigoOrdenacao]);
-    }
-
-    if ( $oParametros->sOrdem == ORDENACAO_RELATORIO_ALFABETICA ) {
+    } elseif ($oParametros->sOrdem == ORDENACAO_RELATORIO_ALFABETICA) {
       natcasesort($aRubricasOrdenacao[$sCodigoOrdenacao]);
     }
   }
 
-  if ( !$lExisteCalculo ) {
+  if (!$lExisteCalculo) {
     throw new BusinessException("Não Existe Cálculo para a Competência Selecionada.");
   }
 
@@ -447,12 +456,12 @@ try {
    */
   $iAlt = 4;
 
-  $oPdf->setfont('arial','b',8);
+  $oPdf->setfont('arial', 'b', 8);
 
   /**
    * Percorre array com os dados do filtro
    */
-  foreach ( $aRubricas as $sEstruturalFiltro => $aRubricas ) {
+  foreach ($aRubricas as $sEstruturalFiltro => $aRubricas) {
 
     $oTotais                         = new stdClass();
     $oTotais->nValorProventos        = 0;
@@ -492,20 +501,20 @@ try {
 
     $oPdf->addpage();
 
-    $oPdf->setfont('arial','b',8);
-    $oPdf->cell($oTamanhoColunas->total       ,$iAlt,"{$sEstruturalFiltro} - ".strtoupper($aGrupos[$sEstruturalFiltro]), 1, 1, "L", 1);
-    $oPdf->cell($oTamanhoColunas->rubrica     ,$iAlt,'RUBRICA'  ,1,0,"C",1);
-    $oPdf->cell($oTamanhoColunas->funcionarios,$iAlt,'N.FUNC.'  ,1,0,"C",1);
-    $oPdf->cell($oTamanhoColunas->quantidade  ,$iAlt,'QUANT.'   ,1,0,"C",1);
-    $oPdf->cell($oTamanhoColunas->descricao   ,$iAlt,'DESCRIÇÃO',1,0,"C",1);
-    $oPdf->cell($oTamanhoColunas->proventos   ,$iAlt,'PROVENTOS',1,0,"C",1);
-    $oPdf->cell($oTamanhoColunas->descontos   ,$iAlt,'DESCONTOS',1,1,"C",1);
+    $oPdf->setfont('arial', 'b', 8);
+    $oPdf->cell($oTamanhoColunas->total, $iAlt, "{$sEstruturalFiltro} - " . strtoupper($aGrupos[$sEstruturalFiltro]), 1, 1, "L", 1);
+    $oPdf->cell($oTamanhoColunas->rubrica, $iAlt, 'RUBRICA', 1, 0, "C", 1);
+    $oPdf->cell($oTamanhoColunas->funcionarios, $iAlt, 'N.FUNC.', 1, 0, "C", 1);
+    $oPdf->cell($oTamanhoColunas->quantidade, $iAlt, 'QUANT.', 1, 0, "C", 1);
+    $oPdf->cell($oTamanhoColunas->descricao, $iAlt, 'DESCRIÇÃO', 1, 0, "C", 1);
+    $oPdf->cell($oTamanhoColunas->proventos, $iAlt, 'PROVENTOS', 1, 0, "C", 1);
+    $oPdf->cell($oTamanhoColunas->descontos, $iAlt, 'DESCONTOS', 1, 1, "C", 1);
 
-    foreach ( $aRubricasOrdenacao[$sEstruturalFiltro] as $sCodigoRubrica => $sDescricaoRubrica ) {
+    foreach ($aRubricasOrdenacao[$sEstruturalFiltro] as $sCodigoRubrica => $sDescricaoRubrica) {
 
-      $aEventosFinanceiros = $aRubricas[ $sCodigoRubrica ];
+      $aEventosFinanceiros = $aRubricas[$sCodigoRubrica];
 
-      $oPdf->setfont('arial','',8);
+      $oPdf->setfont('arial', '', 8);
       $oRubrica = RubricaRepository::getInstanciaByCodigo($sCodigoRubrica);
 
       $oTotalEventosRubricas                       = new stdClass();
@@ -515,32 +524,32 @@ try {
       $oTotalEventosRubricas->nQuantidadeDescontos = 0;
       $oTotalEventosRubricas->sDescricaoRubrica    = $oRubrica->getDescricao();
 
-      foreach ( $aEventosFinanceiros as $oEventoFinanceiro ) {
+      foreach ($aEventosFinanceiros as $oEventoFinanceiro) {
 
-        switch ( $oEventoFinanceiro->provento_desconto ) {
+        switch ($oEventoFinanceiro->provento_desconto) {
 
           default:
             continue;
-          break;
+            break;
 
           case EventoFinanceiroFolha::BASE:
 
-            switch ( $oRubrica->getCodigo() ) {
+            switch ($oRubrica->getCodigo()) {
 
-              case 'R981'://Valor Base do IRRF
+              case 'R981': //Valor Base do IRRF
                 $oTotais->nValorBaseIRRF += $oEventoFinanceiro->valor_rubrica;
-              break;
+                break;
 
-              case 'R991'://Valor Base do FGTS
+              case 'R991': //Valor Base do FGTS
                 $oTotais->nValorBaseFGTS += $oEventoFinanceiro->valor_rubrica;
-              break;
+                break;
 
-              /**
-               * Caso for rubrica de base de previdencia
-               *  Soma ao total das previdencias
-               *  e as Separa por tabela.
-               */
-              case 'R992' :
+                /**
+                 * Caso for rubrica de base de previdencia
+                 *  Soma ao total das previdencias
+                 *  e as Separa por tabela.
+                 */
+              case 'R992':
 
                 $oTotais->nTotalBasePrevidencia += $oEventoFinanceiro->valor_rubrica;
 
@@ -550,34 +559,34 @@ try {
                  * OBS.: A lógica dos valores abaixos são a mesma da rotina de geração de empenhos. Segue a lógica:
                  *       Multiplica cada valor do evento fincanceiro pelo percentual da base respectivo e após arredonda o valor.
                  */
-                switch ( $oEventoFinanceiro->tabela_previdencia ) {
+                switch ($oEventoFinanceiro->tabela_previdencia) {
 
-                  case '1' :
+                  case '1':
                     $oTotais->nValorBasePrevidencia1 += round(($oEventoFinanceiro->valor_rubrica * $oDadosPatronais->aBasePrevidencia1->nValor / 100), 2);
-                  break;
+                    break;
 
-                  case '2' :
+                  case '2':
                     $oTotais->nValorBasePrevidencia2 += round(($oEventoFinanceiro->valor_rubrica * $oDadosPatronais->aBasePrevidencia2->nValor / 100), 2);
-                  break;
+                    break;
 
-                  case '3' :
+                  case '3':
                     $oTotais->nValorBasePrevidencia3 += round(($oEventoFinanceiro->valor_rubrica * $oDadosPatronais->aBasePrevidencia3->nValor / 100), 2);
-                  break;
+                    break;
 
-                  case '4' :
+                  case '4':
                     $oTotais->nValorBasePrevidencia4 += round(($oEventoFinanceiro->valor_rubrica * $oDadosPatronais->aBasePrevidencia4->nValor / 100), 2);
-                  break;
+                    break;
                 }
 
-              break;//FIM Case R992
+                break; //FIM Case R992
             }
             continue;
 
-          break;  //FIM Case TIPO EventoFinanceiro == BASE
+            break;  //FIM Case TIPO EventoFinanceiro == BASE
 
           case EventoFinanceiroFolha::PROVENTO:
 
-            if ( $oRubrica->getCodigo() >= 'R950' ) {
+            if ($oRubrica->getCodigo() >= 'R950') {
               continue;
             }
 
@@ -592,34 +601,34 @@ try {
              * Se é um elemento de receita/despesa e se
              * é Algum Tipo de Retenção
              */
-            switch ( $oRubrica->getTipoEmpenho() ) {
+            switch ($oRubrica->getTipoEmpenho()) {
 
               case 'e': //empenhos[
                 $oTotais->nValorEmpenhos   += $oEventoFinanceiro->valor_rubrica;
-              break;
+                break;
 
               case 'r': //retencao
                 $oTotais->nValorRetencao   -= $oEventoFinanceiro->valor_rubrica;
-              break;
+                break;
 
               case 'd': //deducao
                 $oTotais->nValorDeducao    += $oEventoFinanceiro->valor_rubrica;
-              break;
+                break;
 
               case 'p': //P.Extra
                 $oTotais->nValorPontoExtra += $oEventoFinanceiro->valor_rubrica;
-              break;
+                break;
 
-              case ''://Diferenca
+              case '': //Diferenca
                 $oTotais->nValorDiferenca  += $oEventoFinanceiro->valor_rubrica;
-              break;
+                break;
             }
 
-          break;
+            break;
 
           case EventoFinanceiroFolha::DESCONTO:
 
-            if ( $oRubrica->getCodigo() >= 'R950' ) {
+            if ($oRubrica->getCodigo() >= 'R950') {
               continue;
             }
 
@@ -629,30 +638,30 @@ try {
             $oTotais->nValorDescontos                    += $oEventoFinanceiro->valor_rubrica;
             $oTotais->nValorLiquido                      -= $oEventoFinanceiro->valor_rubrica;
 
-            switch ( $oRubrica->getTipoEmpenho() ) {
+            switch ($oRubrica->getTipoEmpenho()) {
 
               case 'e': //empenhos[
                 $oTotais->nValorEmpenhos   -= $oEventoFinanceiro->valor_rubrica;
-              break;
+                break;
 
               case 'r': //retencao
                 $oTotais->nValorRetencao   += $oEventoFinanceiro->valor_rubrica;
-              break;
+                break;
 
               case 'd': //deducao
                 $oTotais->nValorDeducao    -= $oEventoFinanceiro->valor_rubrica;
-              break;
+                break;
 
               case 'p': //P.Extra
                 $oTotais->nValorPontoExtra -= $oEventoFinanceiro->valor_rubrica;
-              break;
+                break;
 
-              case ''://Diferenca
+              case '': //Diferenca
                 $oTotais->nValorDiferenca  -= $oEventoFinanceiro->valor_rubrica;
-              break;
+                break;
             }
 
-          break;
+            break;
         }
       }
 
@@ -662,40 +671,39 @@ try {
       $iQuantidadeServidores       = count($aTotalServidoresRubrica[$sEstruturalFiltro][$sCodigoRubrica]);
       $oTotais->iTotalFuncionarios = count($aTotalServidoresEstrutural[$sEstruturalFiltro]);
 
-      if ( $oTotalEventosRubricas->nValorProventos > 0 ) {
+      if ($oTotalEventosRubricas->nValorProventos > 0) {
 
         $sValorProvento = db_formatar($oTotalEventosRubricas->nValorProventos, 'f');
-        $oPdf->cell($oTamanhoColunas->rubrica     , $iAlt, $sCodigoRubricaTipoEmpenho                    , 0, 0, "R", 0);
-        $oPdf->cell($oTamanhoColunas->funcionarios, $iAlt, $iQuantidadeServidores                        , 0, 0, "R", 0);
-        $oPdf->cell($oTamanhoColunas->quantidade  , $iAlt, db_formatar("{$oTotalEventosRubricas->nQuantidadeProventos}", "f")  , 0, 0, "R", 0);
-        $oPdf->cell($oTamanhoColunas->descricao   , $iAlt, $oRubrica->getDescricao()                     , 0, 0, "L", 0);
-        $oPdf->cell($oTamanhoColunas->proventos   , $iAlt, $sValorProvento                               , 0, 0, "R", 0);
-        $oPdf->cell($oTamanhoColunas->descontos   , $iAlt, ''                                            , 0, 1, "R", 0);
+        $oPdf->cell($oTamanhoColunas->rubrica, $iAlt, $sCodigoRubricaTipoEmpenho, 0, 0, "R", 0);
+        $oPdf->cell($oTamanhoColunas->funcionarios, $iAlt, $iQuantidadeServidores, 0, 0, "R", 0);
+        $oPdf->cell($oTamanhoColunas->quantidade, $iAlt, db_formatar("{$oTotalEventosRubricas->nQuantidadeProventos}", "f"), 0, 0, "R", 0);
+        $oPdf->cell($oTamanhoColunas->descricao, $iAlt, $oRubrica->getDescricao(), 0, 0, "L", 0);
+        $oPdf->cell($oTamanhoColunas->proventos, $iAlt, $sValorProvento, 0, 0, "R", 0);
+        $oPdf->cell($oTamanhoColunas->descontos, $iAlt, '', 0, 1, "R", 0);
       }
 
-      if ( $oTotalEventosRubricas->nValorDescontos > 0 ) {
+      if ($oTotalEventosRubricas->nValorDescontos > 0) {
 
         $sValorDesconto = db_formatar($oTotalEventosRubricas->nValorDescontos, 'f');
-        $oPdf->cell($oTamanhoColunas->rubrica     , $iAlt, $sCodigoRubricaTipoEmpenho                    , 0, 0, "R", 0);
-        $oPdf->cell($oTamanhoColunas->funcionarios, $iAlt, $iQuantidadeServidores                        , 0, 0, "R", 0);
-        $oPdf->cell($oTamanhoColunas->quantidade  , $iAlt, db_formatar("{$oTotalEventosRubricas->nQuantidadeDescontos}", "f")  , 0, 0, "R", 0);
-        $oPdf->cell($oTamanhoColunas->descricao   , $iAlt, $oRubrica->getDescricao()                     , 0, 0, "L", 0);
-        $oPdf->cell($oTamanhoColunas->proventos   , $iAlt, ''                                            , 0 ,0, "R", 0);
-        $oPdf->cell($oTamanhoColunas->descontos   , $iAlt, $sValorDesconto                               , 0 ,1, "R", 0);
+        $oPdf->cell($oTamanhoColunas->rubrica, $iAlt, $sCodigoRubricaTipoEmpenho, 0, 0, "R", 0);
+        $oPdf->cell($oTamanhoColunas->funcionarios, $iAlt, $iQuantidadeServidores, 0, 0, "R", 0);
+        $oPdf->cell($oTamanhoColunas->quantidade, $iAlt, db_formatar("{$oTotalEventosRubricas->nQuantidadeDescontos}", "f"), 0, 0, "R", 0);
+        $oPdf->cell($oTamanhoColunas->descricao, $iAlt, $oRubrica->getDescricao(), 0, 0, "L", 0);
+        $oPdf->cell($oTamanhoColunas->proventos, $iAlt, '', 0, 0, "R", 0);
+        $oPdf->cell($oTamanhoColunas->descontos, $iAlt, $sValorDesconto, 0, 1, "R", 0);
       }
     }
 
     /**
      * Mostra o Totalizador
      */
-    mostraTotalizador( $oPdf, $aRubricas, $oTotais, $oDadosPatronais );
+    mostraTotalizador($oPdf, $aRubricas, $oTotais, $oDadosPatronais);
   }
 
   $oPdf->Output();
+} catch (Exception $eErro) {
 
-} catch ( Exception $eErro ) {
-
-  db_redireciona('db_erros.php?fechar=true&db_erro='. $eErro->getMessage() );
+  db_redireciona('db_erros.php?fechar=true&db_erro=' . $eErro->getMessage());
   exit;
 }
 
@@ -707,7 +715,8 @@ try {
  * @access public
  * @return void
  */
-function mostraTotalizador ( $oPdf, $aRubricas, $oDadosFolha, $oDadosPatronais ) {
+function mostraTotalizador($oPdf, $aRubricas, $oDadosFolha, $oDadosPatronais)
+{
 
   $iAlt     = 4;
   $iEspacoX = 117;
@@ -715,73 +724,73 @@ function mostraTotalizador ( $oPdf, $aRubricas, $oDadosFolha, $oDadosPatronais )
   $oPdf->ln(3);
   $oPdf->setX($iEspacoX);
 
-  $oPdf->Line(10, $oPdf->getY() - 2, 202, $oPdf->getY() - 2) ;
+  $oPdf->Line(10, $oPdf->getY() - 2, 202, $oPdf->getY() - 2);
 
-  $oPdf->cell(45, $iAlt, 'TOTAL'                                                       , 0, 0, "L", 0);
-  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorProventos,'f')                , 0, 0, "R", 0);
-  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorDescontos,'f')                , 0, 1, "R", 0);
-
-  $oPdf->setX($iEspacoX);
-  $oPdf->cell(65, $iAlt, 'TOTAL LÍQUIDO '                                              , 0, 0, "L", 0);
-  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorLiquido  ,'f')                , 0, 1, "R", 0);
+  $oPdf->cell(45, $iAlt, 'TOTAL', 0, 0, "L", 0);
+  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorProventos, 'f'), 0, 0, "R", 0);
+  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorDescontos, 'f'), 0, 1, "R", 0);
 
   $oPdf->setX($iEspacoX);
-  $oPdf->cell(65, $iAlt, 'N. FUNCIONÁRIOS '                                            , 0, 0, "L", 0);
-  $oPdf->cell(20, $iAlt, $oDadosFolha->iTotalFuncionarios                              , 0, 1, "R", 0);
+  $oPdf->cell(65, $iAlt, 'TOTAL LÍQUIDO ', 0, 0, "L", 0);
+  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorLiquido, 'f'), 0, 1, "R", 0);
 
   $oPdf->setX($iEspacoX);
-  $oPdf->cell(65, $iAlt, 'BASE PREVIDÊNCIA '                                           , 0, 0, "L", 0);
-  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nTotalBasePrevidencia,'f')          , 0, 1, "R", 0);
+  $oPdf->cell(65, $iAlt, 'N. FUNCIONÁRIOS ', 0, 0, "L", 0);
+  $oPdf->cell(20, $iAlt, $oDadosFolha->iTotalFuncionarios, 0, 1, "R", 0);
 
   $oPdf->setX($iEspacoX);
-  $oPdf->cell(65, $iAlt, 'BASE I.R.R.F  '                                              , 0, 0, "L", 0);
-  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorBaseIRRF,'f')                 , 0, 1, "R", 0);
+  $oPdf->cell(65, $iAlt, 'BASE PREVIDÊNCIA ', 0, 0, "L", 0);
+  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nTotalBasePrevidencia, 'f'), 0, 1, "R", 0);
 
   $oPdf->setX($iEspacoX);
-  $oPdf->cell(65, $iAlt, 'EMPENHOS  '                                                  , 0, 0, "L", 0);
-  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorEmpenhos,'f')                 , 0, 1, "R", 0);
+  $oPdf->cell(65, $iAlt, 'BASE I.R.R.F  ', 0, 0, "L", 0);
+  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorBaseIRRF, 'f'), 0, 1, "R", 0);
 
   $oPdf->setX($iEspacoX);
-  $oPdf->cell(65, $iAlt, 'P.EXTRA   '                                                  , 0, 0, "L", 0);
-  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorPontoExtra,'f')               , 0, 1, "R", 0);
+  $oPdf->cell(65, $iAlt, 'EMPENHOS  ', 0, 0, "L", 0);
+  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorEmpenhos, 'f'), 0, 1, "R", 0);
 
   $oPdf->setX($iEspacoX);
-  $oPdf->cell(65, $iAlt, 'RETENCAO  '                                                  , 0, 0, "L", 0);
-  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorRetencao,'f')                 , 0, 1, "R", 0);
+  $oPdf->cell(65, $iAlt, 'P.EXTRA   ', 0, 0, "L", 0);
+  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorPontoExtra, 'f'), 0, 1, "R", 0);
 
   $oPdf->setX($iEspacoX);
-  $oPdf->cell(65, $iAlt, 'DEDUCAO  '                                                   , 0, 0, "L", 0);
-  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorDeducao,'f')                  , 0, 1, "R", 0);
+  $oPdf->cell(65, $iAlt, 'RETENCAO  ', 0, 0, "L", 0);
+  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorRetencao, 'f'), 0, 1, "R", 0);
 
   $oPdf->setX($iEspacoX);
-  $oPdf->cell(65, $iAlt, 'DIFERENCA '                                                  , 0, 0, "L", 0);
-  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorDiferenca,'f')                , 0, 1, "R", 0);
+  $oPdf->cell(65, $iAlt, 'DEDUCAO  ', 0, 0, "L", 0);
+  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorDeducao, 'f'), 0, 1, "R", 0);
+
+  $oPdf->setX($iEspacoX);
+  $oPdf->cell(65, $iAlt, 'DIFERENCA ', 0, 0, "L", 0);
+  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorDiferenca, 'f'), 0, 1, "R", 0);
 
   $oPdf->ln(3);
 
-  $oPdf->setfont('arial','',7);
-  
+  $oPdf->setfont('arial', '', 7);
+
   $nValorBasePrevidencia1 = $oDadosPatronais->aBasePrevidencia1->nValor ? $oDadosPatronais->aBasePrevidencia1->nValor : 1;
   $nValorBasePrevidencia2 = $oDadosPatronais->aBasePrevidencia2->nValor ? $oDadosPatronais->aBasePrevidencia2->nValor : 1;
   $nValorBasePrevidencia3 = $oDadosPatronais->aBasePrevidencia3->nValor ? $oDadosPatronais->aBasePrevidencia3->nValor : 1;
   $nValorBasePrevidencia4 = $oDadosPatronais->aBasePrevidencia4->nValor ? $oDadosPatronais->aBasePrevidencia4->nValor : 1;
-  
+
   $nValorPrevidencia1 = ($oDadosFolha->nValorBasePrevidencia1 * 100) / $nValorBasePrevidencia1;
   $nValorPrevidencia2 = ($oDadosFolha->nValorBasePrevidencia2 * 100) / $nValorBasePrevidencia2;
   $nValorPrevidencia3 = ($oDadosFolha->nValorBasePrevidencia3 * 100) / $nValorBasePrevidencia3;
   $nValorPrevidencia4 = ($oDadosFolha->nValorBasePrevidencia4 * 100) / $nValorBasePrevidencia4;
-  
-  $oPdf->cell(25, $iAlt, "{$oDadosPatronais->aBasePrevidencia1->sNome}:"             , 0, 0, "L", 0);
-  $oPdf->cell(20, $iAlt, db_formatar($nValorPrevidencia1,'f')         , 0, 0, "R", 0);
 
-  $oPdf->cell(25, $iAlt, "{$oDadosPatronais->aBasePrevidencia2->sNome}:"             , 0, 0, "L", 0);
-  $oPdf->cell(20, $iAlt, db_formatar($nValorPrevidencia2,'f')         , 0, 0, "R", 0);
+  $oPdf->cell(25, $iAlt, "{$oDadosPatronais->aBasePrevidencia1->sNome}:", 0, 0, "L", 0);
+  $oPdf->cell(20, $iAlt, db_formatar($nValorPrevidencia1, 'f'), 0, 0, "R", 0);
 
-  $oPdf->cell(25, $iAlt, "{$oDadosPatronais->aBasePrevidencia3->sNome}:"             , 0, 0, "L", 0);
-  $oPdf->cell(20, $iAlt, db_formatar($nValorPrevidencia3,'f')         , 0, 0, "R", 0);
+  $oPdf->cell(25, $iAlt, "{$oDadosPatronais->aBasePrevidencia2->sNome}:", 0, 0, "L", 0);
+  $oPdf->cell(20, $iAlt, db_formatar($nValorPrevidencia2, 'f'), 0, 0, "R", 0);
 
-  $oPdf->cell(25, $iAlt, "{$oDadosPatronais->aBasePrevidencia4->sNome}:"             , 0, 0, "L", 0);
-  $oPdf->cell(20, $iAlt, db_formatar($nValorPrevidencia4,'f')         , 0, 1, "R", 0);
+  $oPdf->cell(25, $iAlt, "{$oDadosPatronais->aBasePrevidencia3->sNome}:", 0, 0, "L", 0);
+  $oPdf->cell(20, $iAlt, db_formatar($nValorPrevidencia3, 'f'), 0, 0, "R", 0);
+
+  $oPdf->cell(25, $iAlt, "{$oDadosPatronais->aBasePrevidencia4->sNome}:", 0, 0, "L", 0);
+  $oPdf->cell(20, $iAlt, db_formatar($nValorPrevidencia4, 'f'), 0, 1, "R", 0);
 
   /**
    * Verifica se as folhas com siglas r35 ou r93 ou r94 foram escolhidas pelo usuário.
@@ -789,24 +798,23 @@ function mostraTotalizador ( $oPdf, $aRubricas, $oDadosFolha, $oDadosPatronais )
   $oPdf->ln(3);
 
   $oPdf->cell(25, $iAlt, "PATRONAL({$oDadosPatronais->aBasePrevidencia1->nValor}%): ", 0, 0, "L", 0);
-  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorBasePrevidencia1,'f')                            , 0, 0, "R", 0);
+  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorBasePrevidencia1, 'f'), 0, 0, "R", 0);
 
   $oPdf->cell(25, $iAlt, "PATRONAL({$oDadosPatronais->aBasePrevidencia2->nValor}%): ", 0, 0, "L", 0);
-  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorBasePrevidencia2,'f')                            , 0, 0, "R", 0);
+  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorBasePrevidencia2, 'f'), 0, 0, "R", 0);
 
   $oPdf->cell(25, $iAlt, "PATRONAL({$oDadosPatronais->aBasePrevidencia3->nValor}%): ", 0, 0, "L", 0);
-  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorBasePrevidencia3,'f')                            , 0, 0, "R", 0);
+  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorBasePrevidencia3, 'f'), 0, 0, "R", 0);
 
   $oPdf->cell(25, $iAlt, "PATRONAL({$oDadosPatronais->aBasePrevidencia4->nValor}%): ", 0, 0, "L", 0);
-  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorBasePrevidencia4,'f')                            , 0, 1, "R", 0);
+  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorBasePrevidencia4, 'f'), 0, 1, "R", 0);
 
   $oPdf->ln(3);
-  $oPdf->cell(25, $iAlt, "BASE F.G.T.S. :"                                             , 0, 0, "L", 0);
-  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorBaseFGTS,'f')                 , 0, 0, "R", 0);
+  $oPdf->cell(25, $iAlt, "BASE F.G.T.S. :", 0, 0, "L", 0);
+  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorBaseFGTS, 'f'), 0, 0, "R", 0);
 
-  $oPdf->cell(25, $iAlt, "F.G.T.S. EMPR :"                                             , 0, 0, "L", 0);
-  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorBaseFGTS * 0.08,'f')          , 0, 1, "R", 0);
-
+  $oPdf->cell(25, $iAlt, "F.G.T.S. EMPR :", 0, 0, "L", 0);
+  $oPdf->cell(20, $iAlt, db_formatar($oDadosFolha->nValorBaseFGTS * 0.08, 'f'), 0, 1, "R", 0);
 }
 
 /**
@@ -825,45 +833,45 @@ function mostraTotalizador ( $oPdf, $aRubricas, $oDadosFolha, $oDadosPatronais )
  *
  * @return string
  */
-function nomeFolhaAtual ($sNomeTabela) {
+function nomeFolhaAtual($sNomeTabela)
+{
 
   switch ($sNomeTabela) {
 
-    case CalculoFolha::CALCULO_SALARIO : // GERFSAL
+    case CalculoFolha::CALCULO_SALARIO: // GERFSAL
       $sNomeFolhaAtual = "FOLHA SALÁRIO";
-    break;
+      break;
 
-    case CalculoFolha::CALCULO_RESCISAO :  // GERFRES
+    case CalculoFolha::CALCULO_RESCISAO:  // GERFRES
       $sNomeFolhaAtual = "FOLHA RECISÃO";
-    break;
+      break;
 
-    case CalculoFolha::CALCULO_ADIANTAMENTO : // GERFADI
+    case CalculoFolha::CALCULO_ADIANTAMENTO: // GERFADI
       $sNomeFolhaAtual = "FOLHA ADIANTAMENTO";
-    break;
+      break;
 
-    case CalculoFolha::CALCULO_13o : // GERFS13
+    case CalculoFolha::CALCULO_13o: // GERFS13
       $sNomeFolhaAtual = "FOLHA 13º SALÁRIO";
-    break;
+      break;
 
-    case CalculoFolha::CALCULO_COMPLEMENTAR : // GERFCOM
+    case CalculoFolha::CALCULO_COMPLEMENTAR: // GERFCOM
       $sNomeFolhaAtual = "FOLHA COMPLEMENTAR";
-    break;
+      break;
 
-    case CalculoFolha::CALCULO_SUPLEMENTAR : // SUPLEMENTAR
+    case CalculoFolha::CALCULO_SUPLEMENTAR: // SUPLEMENTAR
       $sNomeFolhaAtual = "FOLHA SUPLEMENTAR";
       break;
 
-    case CalculoFolha::CALCULO_PROVISAO_FERIAS : // GERFPROVFER
+    case CalculoFolha::CALCULO_PROVISAO_FERIAS: // GERFPROVFER
       $sNomeFolhaAtual = "FOLHA PROVISÃO DE FÉRIAS";
-    break;
+      break;
 
-    case CalculoFolha::CALCULO_PROVISAO_13o : // GERFPROVS13
+    case CalculoFolha::CALCULO_PROVISAO_13o: // GERFPROVS13
       $sNomeFolhaAtual = "FOLHA PROVISÃO 13º SALÁRIO";
-    break;
+      break;
   }
 
   return $sNomeFolhaAtual;
-
 }
 
 /**
@@ -871,37 +879,42 @@ function nomeFolhaAtual ($sNomeTabela) {
  * @param array $aDados
  * @param string $sTipoGrafico
  */
-function mostrarGrafico($aDados, $sTipoGrafico) {
+function mostrarGrafico($aDados, $sTipoGrafico)
+{
 
-  $aTipoGrafico = array("bruto" => "Bruto",
-                        "liquido" => "Líquido",
-                        "empenhos" => "Empenhos");
+  $aTipoGrafico = array(
+    "bruto" => "Bruto",
+    "liquido" => "Líquido",
+    "empenhos" => "Empenhos"
+  );
 
-  $aMeses = array("1"=>"JAN",
-                  "2"=>"FEV",
-                  "3"=>"MAR",
-                  "4"=>"ABR",
-                  "5"=>"MAI",
-                  "6"=>"JUN",
-                  "7"=>"JUL",
-                  "8"=>"AGO",
-                  "9"=>"SET",
-                  "10"=>"OUT",
-                  "11"=>"NOV",
-                  "12"=>"DEZ");
+  $aMeses = array(
+    "1" => "JAN",
+    "2" => "FEV",
+    "3" => "MAR",
+    "4" => "ABR",
+    "5" => "MAI",
+    "6" => "JUN",
+    "7" => "JUL",
+    "8" => "AGO",
+    "9" => "SET",
+    "10" => "OUT",
+    "11" => "NOV",
+    "12" => "DEZ"
+  );
   $aDadosPHPlot = array();
   foreach ($aDados as $iChave => $nValor) {
     $aIndex = explode("/", $iChave);
-    $sIndex = $aMeses[$aIndex[0]]."/".$aIndex[1];
+    $sIndex = $aMeses[$aIndex[0]] . "/" . $aIndex[1];
     $aDadosPHPlot[] = array($sIndex, $nValor);
   }
-  
-  $oPHPlotReport = new PHPlotReport("Gráfico de Gastos com Folha de Pagamento - ".$aTipoGrafico[$sTipoGrafico]);
+
+  $oPHPlotReport = new PHPlotReport("Gráfico de Gastos com Folha de Pagamento - " . $aTipoGrafico[$sTipoGrafico]);
   $oPHPlotReport->DrawGraphReport($aDadosPHPlot);
   $oPdf = new PDF();
   $oPdf->Open();
   $oPdf->addpage('L');
-  $oPdf->Image(PHPlotReport::IMAGE,10 , 40, 278 , 150, strtoupper(PHPlotReport::IMAGE_TYPE));
+  $oPdf->Image(PHPlotReport::IMAGE, 10, 40, 278, 150, strtoupper(PHPlotReport::IMAGE_TYPE));
   $oPdf->Output();
 }
 
@@ -913,7 +926,8 @@ function mostrarGrafico($aDados, $sTipoGrafico) {
  * @param integer $iSemestre
  * @return string
  */
-function getSqlMovimentacaoFinanceira($sTabela, $sSigla, $oDadosPesquisados, $iSemestre = null) {
+function getSqlMovimentacaoFinanceira($sTabela, $sSigla, $oDadosPesquisados, $iSemestre = null)
+{
 
   $sSql = "SELECT {$sSigla}_rubric AS codigo_rubrica,
                    {$sSigla}_valor AS valor_rubrica,
@@ -927,7 +941,7 @@ function getSqlMovimentacaoFinanceira($sTabela, $sSigla, $oDadosPesquisados, $iS
             WHERE {$sSigla}_regist = {$oDadosPesquisados->rh01_regist}
                 AND {$sSigla}_anousu = {$oDadosPesquisados->rh02_anousu}
                 AND {$sSigla}_mesusu = {$oDadosPesquisados->rh02_mesusu}
-                AND {$sSigla}_instit = ".db_getsession("DB_instit");
+                AND {$sSigla}_instit = " . db_getsession("DB_instit");
 
   if (!empty($iSemestre)) {
     $sSql .= " AND {$sSigla}_semest  = {$iSemestre}";
@@ -942,8 +956,9 @@ function getSqlMovimentacaoFinanceira($sTabela, $sSigla, $oDadosPesquisados, $iS
  * @param integer $iSemestre
  * @return string
  */
-function getSqlMovimentacaoFinanceiraHistorico($oDadosPesquisados, $iTipoFolha, $iSemestre = null) {
-    
+function getSqlMovimentacaoFinanceiraHistorico($oDadosPesquisados, $iTipoFolha, $iSemestre = null)
+{
+
   $oDaoHistorico = db_utils::getDao("rhhistoricocalculo");
 
   $aCampo[] = 'rh143_rubrica    AS rubrica';
@@ -954,7 +969,7 @@ function getSqlMovimentacaoFinanceiraHistorico($oDadosPesquisados, $iTipoFolha, 
   $aWhere[] = "rh143_regist    = {$oDadosPesquisados->rh01_regist}";
   $aWhere[] = "rh141_anousu    = {$oDadosPesquisados->rh02_anousu}";
   $aWhere[] = "rh141_mesusu    = {$oDadosPesquisados->rh02_mesusu}";
-  $aWhere[] = "rh141_instit    = ".db_getsession("DB_instit");;
+  $aWhere[] = "rh141_instit    = " . db_getsession("DB_instit");;
   $aWhere[] = "rh141_tipofolha = {$iTipoFolha}";
 
   if ($iSemestre) {

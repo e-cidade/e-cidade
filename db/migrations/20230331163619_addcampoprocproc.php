@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Addcampoprocproc extends AbstractMigration
+class Addcampoprocproc extends PostgresMigration
 {
 
     public function up()

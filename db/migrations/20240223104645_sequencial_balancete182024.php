@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class SequencialBalancete182024 extends AbstractMigration
+class SequencialBalancete182024 extends PostgresMigration
 {
     public function up()
     {

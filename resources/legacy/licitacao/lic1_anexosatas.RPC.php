@@ -52,6 +52,7 @@ switch ($oParam->exec) {
             $cl_licanexoataspncp->l216_codigoata = $oParam->sequencial;
             $cl_licanexoataspncp->l216_tipoanexo = $oParam->tipoanexo;
             $cl_licanexoataspncp->l216_oid = $oOidBanco;
+            $cl_licanexoataspncp->l216_nomearquivo = $oParam->sNomeArquivo;
             $cl_licanexoataspncp->l216_instit = db_getsession('DB_instit');
             $cl_licanexoataspncp->incluir();
 
@@ -125,7 +126,7 @@ switch ($oParam->exec) {
         db_inicio_transacao();
 
         // Abrindo o objeto no modo leitura "r" passando como parâmetro o OID.
-        $sNomeArquivo = "tmp/$l216_oid.pdf";
+        $sNomeArquivo = $l216_nomearquivo == null ? "tmp/$l216_oid.pdf" : "tmp/$l216_nomearquivo.pdf" ;
         pg_lo_export($conn, $l216_oid, $sNomeArquivo);
 
         db_fim_transacao();

@@ -26,8 +26,9 @@
  */
 
 $campos = "conplanoorcamento.c60_codcon,
-					 conplanoorcamento.c60_estrut,
-					 conplanoorcamentoanalitica.c61_reduz,
+           conplanoorcamento.c60_estrut,
+           conplanoorcamentoanalitica.c61_reduz,
+           conplanoorcamentoanalitica.c61_codigo,
            conplanoorcamento.c60_descr,
            conplanoorcamento.c60_finali,
            conplanoorcamento.c60_codsis,

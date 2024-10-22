@@ -1,16 +1,16 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc16386 extends AbstractMigration
+class Oc16386 extends PostgresMigration
 {
-    
+
     public function up()
     {
         $sql = <<<SQL
-  
+
         BEGIN;
-        
+
             alter table aberlic102022 add column si46_leidalicitacao int;
 
             alter table aberlic102022 add column si46_dtpulicacaopncp date;
@@ -28,7 +28,7 @@ class Oc16386 extends AbstractMigration
             alter table dispensa102022 add column si74_leidalicitacao int;
 
             alter table regadesao102022 add column si67_leidalicitacao int;
-                    
+
         COMMIT;
 
 SQL;

@@ -23,7 +23,7 @@ $ano = db_getsession("DB_anousu"); //ano
 					<td>
 						<?
 						db_input('db83_sequencial', 10, $Idb83_sequencial, true, 'text', 3, "");
-						db_input('db83_descricao', 50, $Idb83_descricao, true, 'text', $db_opcao, "");
+						db_input('db83_descricao', 50, $Idb83_descricao, true, 'text', $db_opcao, "","","","",40);
 						?>
 					</td>
 				</tr>
@@ -97,7 +97,7 @@ $ano = db_getsession("DB_anousu"); //ano
 					<td>
 						<?
 						$x = array('' => 'Selecione','1' => 'Conta Corrente', '3' => 'Conta Aplicacao');
-						db_select('db83_tipoconta', $x, true, $db_opcao, "style='width: 150px;'");
+						db_select('db83_tipoconta', $x, true, $db_opcao, "style='width: 150px;'onchange='habilitarCampos(this.value)'");
 						?>
 					</td>
 				</tr>
@@ -249,17 +249,6 @@ $ano = db_getsession("DB_anousu"); //ano
 						?>
 					</td>
 				</tr>
-
-				<tr style="display: none;">
-					<td nowrap title="db83_nroseqaplicacao?>">
-						<b>Número sequencial da aplicação</b>
-					</td>
-					<td>
-						<?
-						db_input('db83_nroseqaplicacao', 11, 1, true, 'text', $db_opcao, "");
-						?>
-					</td>
-				</tr>
 				<tr>
 					<td nowrap title="db83_codigotce?>">
 						<b>Código TCE:</b>
@@ -319,6 +308,17 @@ $ano = db_getsession("DB_anousu"); //ano
 						?>
 					</td>
 				</tr>
+				<tr style="display: none;" id="nroseqaplicacao">
+					<td nowrap title="db83_nroseqaplicacao?>">
+						<b>Número sequencial da aplicação</b>
+					</td>
+					<td>
+						<?
+						$color =  $db_opcao == 3 ? '' : "#E6E4F1";
+						db_input('db83_nroseqaplicacao', 11, 1, true, 'text', $db_opcao, "","",$color);
+						?>
+					</td>
+				</tr>
 
 			</table>
 		</fieldset>
@@ -347,16 +347,41 @@ $ano = db_getsession("DB_anousu"); //ano
 
 	function js_pesquisaop01_db_operacaodecredito(mostra) 
 	{
+		var tiposLancamento = [3, 4, 6, 7];
+
 		if (mostra == true) {
-			js_OpenJanelaIframe('top.corpo', 'db_iframe_db_operacaodecredito', 'func_db_operacaodecredito.php?funcao_js=parent.js_mostraoperacaodecredito1|op01_sequencial|op01_numerocontratoopc|op01_dataassinaturacop', 'Pesquisa', true);
+			js_OpenJanelaIframe('top.corpo', 'db_iframe_db_operacaodecredito', 'func_db_operacaodecredito.php?tipos_lancamento=' +tiposLancamento+ '&funcao_js=parent.js_mostraoperacaodecredito1|op01_sequencial|op01_numerocontratoopc|op01_dataassinaturacop', 'Pesquisa', true);
 		} else {
-			if (document.form1.db83_codigoopcredito.value != '') {
-				js_OpenJanelaIframe('top.corpo', 'db_iframe_db_operacaodecredito', 'func_db_operacaodecredito.php?pesquisa_chave=' + document.form1.db83_codigoopcredito.value + '&funcao_js=parent.js_mostraoperacaodecredito', 'Pesquisa', false);
-			} else {
-				document.form1.op01_numerocontratoopc.value = '';
-				document.form1.op01_dataassinaturacop.value = '';
-			}
+			js_OpenJanelaIframe('top.corpo', 'db_iframe_db_operacaodecredito', 'func_db_operacaodecredito.php?tipos_lancamento=' +tiposLancamento+ '&pesquisa_chave=' + document.form1.db83_codigoopcredito.value + '&funcao_js=parent.js_mostraoperacaodecredito', 'Pesquisa', false);
 		}
+	}
+
+	function js_mostraoperacaodecredito1(chave, chave1, chave2, chave3, chave4) 
+	{
+		if(chave.includes('não Encontrado')) {
+			document.form1.db83_codigoopcredito.value   = '';
+			document.form1.op01_numerocontratoopc.value = '';
+			document.form1.op01_dataassinaturacop.value = '';
+        } else {
+			document.form1.db83_codigoopcredito.value = chave;
+			document.form1.op01_numerocontratoopc.value = chave1;
+			var data = chave2.split("-", 3);
+			document.form1.op01_dataassinaturacop.value = data[2] + "-" + data[1] + "-" + data[0];
+			db_iframe_db_operacaodecredito.hide();
+		}
+	}
+
+	function js_mostraoperacaodecredito(chave, chave1, erro) 
+	{
+		if(chave.includes('não Encontrado')) {
+			document.form1.db83_codigoopcredito.value   = '';
+            document.form1.op01_numerocontratoopc.value = chave;
+	    	document.form1.op01_dataassinaturacop.value = '';
+		} else {
+	    	document.form1.op01_numerocontratoopc.value = chave;
+            var data = chave1.split("-", 3);
+            document.form1.op01_dataassinaturacop.value = data[2] + "-" + data[1] + "-" + data[0];
+	  	}
 	}
 
 	function js_mostrabancoagencia(chave, chave1,chave2, erro) 
@@ -377,23 +402,6 @@ $ano = db_getsession("DB_anousu"); //ano
 		document.form1.db90_codban.value = chave4;
 		db_iframe_bancoagencia.hide();
 	}
-
-	function js_mostraoperacaodecredito1(chave, chave1, chave2, chave3, chave4) 
-	{
-		document.form1.db83_codigoopcredito.value = chave;
-		document.form1.op01_numerocontratoopc.value = chave1;
-		var data = chave2.split("-", 3);
-		document.form1.op01_dataassinaturacop.value = data[2] + "-" + data[1] + "-" + data[0];
-		db_iframe_db_operacaodecredito.hide();
-	}
-
-	function js_mostraoperacaodecredito(chave, chave1, erro) 
-	{
-		document.form1.op01_numerocontratoopc.value = chave;
-		var data = chave1.split("-", 3);
-		document.form1.op01_dataassinaturacop.value = data[2] + "-" + data[1] + "-" + data[0];
-	}
-
 
 	function js_pesquisa() 
 	{
@@ -636,6 +644,16 @@ $ano = db_getsession("DB_anousu"); //ano
 		}
     }
 
+	function habilitarCampos(value)
+	{
+		if (value == 3) {
+			document.getElementById('nroseqaplicacao').style.display = '';
+		} else {
+			document.getElementById('nroseqaplicacao').style.display = 'none';
+			document.form1.db83_nroseqaplicacao.value = '';
+		}
+	}
+
 	function alignForm() 
 	{
 		document.querySelectorAll('input[type="text"]').forEach(input => {
@@ -658,6 +676,14 @@ $ano = db_getsession("DB_anousu"); //ano
 		if (valoresPermitidos2.includes(codigoRecurso) && document.getElementById('db83_codigoopcredito').value != '') {
 			document.getElementById('idnumerocontratoopc').style.display = '';
 		}
+
+		window.onload = function() {
+		var valorInicial = '<?php echo $db83_tipoconta; ?>';
+		
+		if (valorInicial) {
+			habilitarCampos(valorInicial);
+		}
+		};
 
 		
 	} 

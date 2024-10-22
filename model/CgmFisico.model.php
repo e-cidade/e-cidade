@@ -763,6 +763,7 @@ class CgmFisico extends CgmBase  {
     $oDaoCgm->z01_localtrabalho = $this->getLocalTrabalho();
     $oDaoCgm->z01_renda         = $this->getRenda();
     $oDaoCgm->z01_pis           = $this->getPIS();
+    $oDaoCgm->z01_notificaemail = $this->getNotificalEmail();
 
     $oDaoCgm->alterar($this->getCodigo());
 

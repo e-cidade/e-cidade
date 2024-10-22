@@ -109,7 +109,8 @@ require_once("libs/db_liborcamento.php");
                 </tr>
             </table>
             <input style='margin-top: 10px;' id="btnSalvar" type="button" value="Salvar" onclick="salvarAssinantes();"/>
-            <input style='margin-top: 10px;' id="btnAlterar" type="hidden" value="Alterar" onclick="salvarAlteracao();"/>
+            <input style='margin-top: 10px;' id="" type="button" value="Alterar Vigência" onclick="alterarVigencia();"/>
+            <input style='margin-top: 10px;' id="btnExcluir" type="button" value="Excluir" onclick="excluirRegistro();"/>
             <fieldset style='width:900px; margin-top: 10px;'>
                 <legend>Assinantes</legend>
                 <div id='ctnGridAssinates'></div>
@@ -126,9 +127,9 @@ require_once("libs/db_liborcamento.php");
 
     var oGridAssinates          = new DBGrid('gridAssinates');
     oGridAssinates.nameInstance = 'oGridAssinates';
-    oGridAssinates.setCellWidth( [ '10%', '30%', '23%', '11%', '13%', '10%' ] );
-    oGridAssinates.setHeader( [  'Usuarios', 'Unidade', 'Início/Fim', 'Documentos', 'Cargo',  'Ação' ] );
-    oGridAssinates.setCellAlign( [ 'center', 'center', 'center', 'center', 'center' ] );
+    oGridAssinates.setCellWidth( ['7%', '10%', '30%', '23%', '11%', '13%'] );
+    oGridAssinates.setHeader( ['Sel.',  'Usuarios', 'Unidade', 'Início/Fim', 'Documentos', 'Cargo'] );
+    oGridAssinates.setCellAlign( ['center', 'center', 'center', 'center', 'center', 'center' ] );
     oGridAssinates.setHeight(130);
     oGridAssinates.show($("ctnGridAssinates"));
 
@@ -162,6 +163,12 @@ require_once("libs/db_liborcamento.php");
     function formatDateDB(date) {
         const aDate = date.split('/');
         return aDate[0]+"/"+aDate[1]+"/"+aDate[2];
+    }
+
+    function formatDateForSave(data) {
+        var parts = data.split('/');
+        var dateFormated = `${parts[2]}-${parts[1]}-${parts[0]}`;
+        return dateFormated;
     }
 
     init = function() {
@@ -222,23 +229,90 @@ require_once("libs/db_liborcamento.php");
      * Salda os dados enviando para o RPC
      */
     function salvarAssinantes() {
+
         if(js_validaCampos()){
 
-            js_divCarregando('Aguarde, salvando os dados!', 'msgBox');
             var oParametros = {};
             oParametros.sExecuta = 'salvarAssinantes';
 
             oParametros.oIntituicao = oCboIntituicao.getValue();
-            oParametros.oUsuario = oCboUsuarios.getValue();
-            oParametros.aUnidades = oCboUnidades.getValue();
-            oParametros.aCargos = oCboCargo.getValue();
+            oParametros.oUsuario    = oCboUsuarios.getValue();
+            oParametros.aUnidades   = oCboUnidades.getValue();
+            oParametros.aCargos     = oCboCargo.getValue();
             oParametros.aDocumentos = oCboDocumento.getValue();
-            oParametros.dataIncio = document.form1.db243_data_incio.value;
-            oParametros.dataFinal = document.form1.db243_data_fim.value;
+            oParametros.dataIncio   = document.form1.db243_data_incio.value;
+            oParametros.dataFinal   = document.form1.db243_data_fim.value;
 
-            var oAjaxRequest = new AjaxRequest(sRpc, oParametros, retornoSalvar);
-            oAjaxRequest.execute();
+            if(oParametros.dataIncio == '' || oParametros.dataFinal == '') {
 
+                alert('Necessário informar Data Início/Fim.');
+
+            } else {
+
+                js_divCarregando('Aguarde, salvando os dados!', 'msgBox');
+
+                var oAjaxRequest = new AjaxRequest(sRpc, oParametros, retornoSalvar);
+                oAjaxRequest.execute();
+            }
+        }
+    }
+
+    function alterarVigencia() {
+
+        var checkboxes = document.querySelectorAll('.class_check');
+        var marcados = [];
+
+        var dataIncio = formatDateDB(document.getElementById('db243_data_incio').value);
+        var dataFinal = formatDateDB(document.getElementById('db243_data_fim').value);
+
+        if(dataIncio == '/undefined/undefined' || dataFinal == '/undefined/undefined') {
+            alert('Para alterar a vigência, é necessário informar Data Início/Fim.');
+            return;
+        }
+
+        js_divCarregando('Aguarde, alterando vigência!', 'msgBox');
+
+        checkboxes.forEach(function(checkbox) {
+
+            if (checkbox.checked) {
+
+                marcados.push(checkbox.id);
+
+                var oParametros = {};
+                oParametros.sExecuta = 'getAssinante';
+                oParametros.db243_codigo = checkbox.id;
+            
+                var oAjax = new Ajax.Request(sRpc, {
+                    method: 'post',
+                    parameters: 'json=' + Object.toJSON(oParametros),
+                    onComplete: function(oResponse) {
+
+                        var objResponse = JSON.parse(oResponse.responseText);
+                        var oAssinante = objResponse.oAssinante;
+
+                        var oParametrosAlter = {};
+
+                        oParametrosAlter.sExecuta     = 'alterarAssinante';
+                        oParametrosAlter.iIntituicao  = oAssinante.db243_instit;
+                        oParametrosAlter.iUsuario     = oAssinante.db243_usuario;
+                        oParametrosAlter.iUnidade     = oAssinante.db243_unidade;
+                        oParametrosAlter.iOrgao       = oAssinante.db243_orgao;
+                        oParametrosAlter.iCargo       = oAssinante.db243_cargo;
+                        oParametrosAlter.iDocumento   = oAssinante.db243_documento;
+                        oParametrosAlter.dataIncio    = "'" + formatDateForSave(dataIncio) + "'";
+                        oParametrosAlter.dataFinal    = "'" + formatDateForSave(dataFinal) + "'";
+                        oParametrosAlter.db243_codigo = oAssinante.db243_codigo;
+                        
+                        var oAjaxRequest = new AjaxRequest(sRpc, oParametrosAlter, retornoSalvarVigencia);
+                        oAjaxRequest.execute();
+                    }
+                });
+            }
+        });
+
+        if(marcados.length === 0) {
+            alert('É necessário selecionar o(s) registro(s) para a alteração.')
+            js_removeObj('msgBox');
         }
     }
 
@@ -253,39 +327,47 @@ require_once("libs/db_liborcamento.php");
         js_getAssinantesSalvos();
     }
 
-   function salvarAlteracao() {
+    function salvarAlteracao() {
 
+        js_divCarregando('Aguarde, salvando os dados!', 'msgBox');
+        var oParametros = {};
+        oParametros.sExecuta = 'alterarAssinante';
 
-           js_divCarregando('Aguarde, salvando os dados!', 'msgBox');
-           var oParametros = {};
-           oParametros.sExecuta = 'alterarAssinante';
+        oParametros.iIntituicao = oCboIntituicao.getValue();
+        oParametros.iUsuario = oCboUsuarios.getValue();
+        oParametros.iUnidade = oCboUnidades.getValue();
+        oParametros.iCargo = oCboCargo.getValue();
+        oParametros.iDocumento = oCboDocumento.getValue();
+        oParametros.dataIncio = formatDateDB(document.form1.db243_data_incio.value);
+        oParametros.dataFinal = formatDateDB(document.form1.db243_data_fim.value);
+        oParametros.db243_codigo = document.form1.db243_codigo.value;
 
-           oParametros.iIntituicao = oCboIntituicao.getValue();
-           oParametros.iUsuario = oCboUsuarios.getValue();
-           oParametros.iUnidade = oCboUnidades.getValue();
-           oParametros.iCargo = oCboCargo.getValue();
-           oParametros.iDocumento = oCboDocumento.getValue();
-           oParametros.dataIncio = formatDateDB(document.form1.db243_data_incio.value);
-           oParametros.dataFinal = formatDateDB(document.form1.db243_data_fim.value);
-           oParametros.db243_codigo = document.form1.db243_codigo.value;
+        var oAjaxRequest = new AjaxRequest(sRpc, oParametros, retornoSalvarAlteracao);
+        oAjaxRequest.execute();
+    }
 
+    function retornoSalvarVigencia(oRetorno, lErro) {
+        js_removeObj('msgBox');
 
-           var oAjaxRequest = new AjaxRequest(sRpc, oParametros, retornoSalvarAlteracao);
-           oAjaxRequest.execute();
+        js_getAssinantesSalvos();
 
+        if (oRetorno.iStatus == 1) {
+            alert("Dados salvos com sucesso !");
+        } else {
+            alert(oRetorno.sMensagem);
+        }
+    }
 
-   }
-
-   function retornoSalvarAlteracao(oRetorno, lErro) {
-       js_removeObj('msgBox');
-       if (oRetorno.iStatus == 1) {
-           alert("Dados salvos com sucesso !");
-           js_limparAssinates();
-           js_getAssinantesSalvos();
-       } else {
-           alert(oRetorno.sMensagem);
-       }
-   }
+    function retornoSalvarAlteracao(oRetorno, lErro) {
+        js_removeObj('msgBox');
+        if (oRetorno.iStatus == 1) {
+            alert("Dados salvos com sucesso !");
+            js_limparAssinates();
+            js_getAssinantesSalvos();
+        } else {
+            alert(oRetorno.sMensagem);
+        }
+    }
 
     function js_excluirAssinante(db243_codigo) {
         var oParametros = {};
@@ -293,6 +375,25 @@ require_once("libs/db_liborcamento.php");
         oParametros.db243_codigo   = db243_codigo;
         var oAjaxRequest = new AjaxRequest(sRpc, oParametros, retornoExcluir);
         oAjaxRequest.execute();
+    }
+
+    function excluirRegistro() {
+
+        var checkboxes = document.querySelectorAll('.class_check');
+        var marcados = [];
+
+        checkboxes.forEach(function(checkbox) {
+
+            if (checkbox.checked) {
+                marcados.push(checkbox.id);
+                js_excluirAssinante(checkbox.id);
+            }
+        });
+
+        if(marcados.length === 0) {
+            alert('É necessário selecionar o(s) registro(s) para a exclusão.')
+            js_removeObj('msgBox');
+        }
     }
 
     function retornoExcluir(oRetorno, lErro) {
@@ -320,16 +421,18 @@ require_once("libs/db_liborcamento.php");
             method: 'post',
             parameters: 'json=' + Object.toJSON(oParametros),
             onComplete: function(oResponse) {
+
+                oGridAssinates.clearAll(true);
+
                 var oRetorno = eval("(" + oResponse.responseText + ")");
                 oRetorno.aAssinantes.each(function(oAssinante, iSeq) {
                     var aLinha = [];
+                    aLinha.push("<input type='checkbox' class='class_check' id='"+oAssinante.db243_codigo+"' />");
                     aLinha.push(oAssinante.login);
                     aLinha.push(oAssinante.db243_orgao.toString().padStart(2, '0')+oAssinante.db243_unidade.toString().padStart(3, '0')+" "+oAssinante.o41_descr);
                     aLinha.push(formatDate(oAssinante.db243_data_inicio.urlDecode())+' até '+formatDate(oAssinante.db243_data_final.urlDecode()));
                     aLinha.push(aDocumentos[oAssinante.db243_documento]);
                     aLinha.push(aCargos[oAssinante.db243_cargo]);
-                    aLinha.push("<input style='margin-right: 5px; background: red;' type='button' onclick=js_excluirAssinante(\'" + oAssinante.db243_codigo + "\') value='E'/>" +
-                        "<input type='button' style='background: blue; color: white;' onclick=js_alterarParametro(\'" + oAssinante.db243_codigo + "\') value='A'/>")
                     oGridAssinates.addRow(aLinha);
                 });
                 oGridAssinates.renderRows();

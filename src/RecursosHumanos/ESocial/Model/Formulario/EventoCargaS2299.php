@@ -5,7 +5,7 @@ namespace ECidade\RecursosHumanos\ESocial\Model\Formulario;
 use ECidade\RecursosHumanos\ESocial\Model\Formulario\EventoCargaInterface;
 
 /**
- * Classe responsï¿½vel por retornar dados da carga
+ * Classe responsável por retornar dados da carga
  * do evento 2299
  * @package ECidade\RecursosHumanos\ESocial\Model\Formulario
  */
@@ -27,10 +27,8 @@ class EventoCargaS2299 implements EventoCargaInterface
 	 */
 	private $mes;
 
-	public function __construct() 
+	public function __construct()
 	{
-		$this->ano = db_getsession("DB_anousu");
-		$this->mes = date("m", db_getsession("DB_datausu"));
 		$this->instit = db_getsession("DB_instit");
 	}
 
@@ -39,7 +37,7 @@ class EventoCargaS2299 implements EventoCargaInterface
 	 * @param integer|null $matricula
 	 * @return resource
 	 */
-	public function execute($matricula = null) 
+	public function execute($matricula = null, $ano, $mes)
 	{
 		$sql = "SELECT DISTINCT
 		--ideVinculo
@@ -60,9 +58,9 @@ class EventoCargaS2299 implements EventoCargaInterface
 		JOIN rhpesrescisao ON rhpessoalmov.rh02_seqpes = rhpesrescisao.rh05_seqpes
 		JOIN rhmotivorescisao ON lpad(rhpesrescisao.rh05_motivo::varchar, 2, '0') = rhmotivorescisao.rh173_codigo
 		JOIN rhregime ON rhpessoalmov.rh02_codreg = rhregime.rh30_codreg
-		WHERE (rh02_anousu,rh02_mesusu) = ({$this->ano},{$this->mes})
-		AND DATE_PART('YEAR',rh05_recis) = {$this->ano}
-		AND DATE_PART('MONTH',rh05_recis) = {$this->mes}
+		WHERE (rh02_anousu,rh02_mesusu) = ({$ano},{$mes})
+		AND DATE_PART('YEAR',rh05_recis) = {$ano}
+		AND DATE_PART('MONTH',rh05_recis) = {$mes}
 		AND rhpessoal.rh01_instit = {$this->instit}";
 
 		if (!empty($matricula)) {
@@ -71,10 +69,10 @@ class EventoCargaS2299 implements EventoCargaInterface
 
 		$rsResult = \db_query($sql);
 
-        if (!$rsResult) {
-            throw new \Exception("Erro ao buscar preenchimentos do S2299. ".pg_last_error());
-        }
-        return $rsResult;
+		if (!$rsResult) {
+			throw new \Exception("Erro ao buscar preenchimentos do S2299. " . pg_last_error());
+		}
+		return $rsResult;
 	}
 
 	/**
@@ -82,15 +80,15 @@ class EventoCargaS2299 implements EventoCargaInterface
 	 * @param integer $matricula
 	 * @return resource
 	 */
-	public function getVerbasResc($matricula)
+	public function getVerbasResc($matricula, $ano, $mes)
 	{
 		$sql = "SELECT DISTINCT 
 		verbas.*, 
 		CASE 
 		WHEN e990_sequencial = '1000' THEN '9000'
 		WHEN e990_sequencial = '5001' THEN '9001'
-		WHEN e990_sequencial = '1020' AND verbas.r20_tpp = 'P' THEN '9002'
-		WHEN e990_sequencial = '1020' AND verbas.r20_tpp = 'V' THEN '9003'
+		WHEN e990_sequencial in ('1020','1016') AND verbas.r20_tpp = 'P' THEN '9002'
+		WHEN e990_sequencial in ('1020','1016') AND verbas.r20_tpp = 'V' THEN '9003'
 		ELSE NULL END AS codrubresocial
 		FROM (
 		SELECT DISTINCT
@@ -134,17 +132,16 @@ class EventoCargaS2299 implements EventoCargaInterface
 				LEFT JOIN gerfres ON (rh02_anousu,rh02_mesusu,rh02_regist) = (r20_anousu,r20_mesusu,r20_regist) AND r20_pd != 3
 				LEFT JOIN gerfcom ON (rh02_anousu,rh02_mesusu,rh02_regist) = (r48_anousu,r48_mesusu,r48_regist) AND r48_pd != 3
 				LEFT JOIN gerfs13 ON (rh02_anousu,rh02_mesusu,rh02_regist) = (r35_anousu,r35_mesusu,r35_regist) AND r35_pd != 3
-				WHERE (rh02_instit,rh02_anousu,rh02_mesusu,rh02_regist) = ({$this->instit},{$this->ano},{$this->mes},{$matricula}) 
+				WHERE (rh02_instit,rh02_anousu,rh02_mesusu,rh02_regist) = ({$this->instit},{$ano},{$mes},{$matricula}) 
 			) AS verbas 
 		LEFT JOIN baserubricasesocial ON baserubricasesocial.e991_rubricas = verbas.codrubr AND e991_instit = {$this->instit}
-		LEFT JOIN rubricasesocial ON baserubricasesocial.e991_rubricasesocial = rubricasesocial.e990_sequencial AND e990_sequencial IN ('1000','5001','1020') ";
+		LEFT JOIN rubricasesocial ON baserubricasesocial.e991_rubricasesocial = rubricasesocial.e990_sequencial AND e990_sequencial IN ('1000','5001','1020','1016') ";
 
 		$rsResult = \db_query($sql);
 
-        if (!$rsResult) {
-            throw new \Exception("Erro ao buscar Verbas Rescisï¿½rias. ".pg_last_error());
-        }
-        return $rsResult;
-
+		if (!$rsResult) {
+			throw new \Exception("Erro ao buscar Verbas RescisÃ³rias. " . pg_last_error());
+		}
+		return $rsResult;
 	}
 }

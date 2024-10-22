@@ -66,6 +66,7 @@ $sWhereContratos = " and 1 = 1 ";
                                 ac213_numerocontrolepncp
                 FROM acocontratopncp
                 INNER JOIN acordo ON ac16_sequencial = ac213_contrato
+                ORDER BY ac16_sequencial DESC
                 ";
                 db_lovrot($sSql, 15, "()", "", $funcao_js);
                 ?>

@@ -59,3 +59,5 @@ docker/db-data
 extension/data/extension/Desktop.data
 extension/modification/data/modification/dbportal-v3-desktop.data
 docker/bd/pgsql
+extension/modification/data/group/modifications.data
+DEC_*.pdf

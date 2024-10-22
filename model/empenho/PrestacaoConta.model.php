@@ -146,6 +146,7 @@ class PrestacaoConta {
        */
       $oContaCorrenteDetalhe = new ContaCorrenteDetalhe();
       $oContaCorrenteDetalhe->setCredor($this->oEmpenhoFinanceiro->getCgm());
+      $oContaCorrenteDetalhe->setRecurso(new Recurso($this->oEmpenhoFinanceiro->getRecurso()));
       $oLancamentoAuxiliar->setContaCorrenteDetalhe($oContaCorrenteDetalhe);
 
   		$this->executarLancamentoContabil($oLancamentoAuxiliar, $iCodigoDocumento);
@@ -207,6 +208,7 @@ class PrestacaoConta {
      */
     $oContaCorrenteDetalhe = new ContaCorrenteDetalhe();
     $oContaCorrenteDetalhe->setCredor($this->oEmpenhoFinanceiro->getCgm());
+    $oContaCorrenteDetalhe->setRecurso(new Recurso($this->oEmpenhoFinanceiro->getRecurso()));
     $oLancamentoAuxiliar->setContaCorrenteDetalhe($oContaCorrenteDetalhe);
 
   	$this->executarLancamentoContabil($oLancamentoAuxiliar, $iCodigoDocumento);

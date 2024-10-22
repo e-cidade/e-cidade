@@ -1,13 +1,13 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc17258 extends AbstractMigration
+class Oc17258 extends PostgresMigration
 {
     public function up()
     {
         $sql = "
-        
+
         select fc_startsession();
 
         BEGIN;
@@ -16,7 +16,7 @@ class Oc17258 extends AbstractMigration
         ALTER TABLE hablic102022 ALTER COLUMN si57_presencalicitantes DROP DEFAULT;
         ALTER TABLE hablic102022 ALTER COLUMN si57_renunciarecurso DROP NOT NULL;
         ALTER TABLE hablic102022 ALTER COLUMN si57_renunciarecurso DROP DEFAULT;
-        
+
         ALTER TABLE julglic402022 ALTER COLUMN si62_presencalicitantes DROP NOT NULL;
         ALTER TABLE julglic402022 ALTER COLUMN si62_presencalicitantes DROP DEFAULT;
         ALTER TABLE julglic402022 ALTER COLUMN si62_renunciarecurso DROP NOT NULL;
@@ -24,9 +24,9 @@ class Oc17258 extends AbstractMigration
 
         ALTER TABLE resplic202022 ALTER COLUMN si56_codtipocomissao DROP NOT NULL;
         ALTER TABLE resplic202022 ALTER COLUMN si56_codtipocomissao DROP DEFAULT;
-        
+
         COMMIT;
-        
+
         ";
 
         $this->execute($sql);

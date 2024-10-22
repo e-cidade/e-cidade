@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class OcViradaGruposContratos extends AbstractMigration
+class OcViradaGruposContratos extends PostgresMigration
 {
     public function up()
     {

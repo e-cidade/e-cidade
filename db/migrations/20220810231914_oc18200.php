@@ -1,26 +1,26 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc18200 extends AbstractMigration
+class Oc18200 extends PostgresMigration
 {
     public function up()
     {
         $sql = "INSERT INTO db_itensmenu VALUES ((select max(id_item) + 1 from db_itensmenu), 'Importação de Receitas', 'Importação de Receitas', 'cai1_planilhaimportacaoreceita001.php', 1, 1, 'Importação de Receitas', 't');
         INSERT INTO db_menu VALUES(9419, (select max(id_item) from db_itensmenu), 6, 39);
-        
+
         INSERT INTO db_itensmenu VALUES ((select max(id_item) + 1 from db_itensmenu), 'Agentes Arrecadadores', 'Agentes Arrecadadores', '', 1, 1, 'Agentes Arrecadadores', 't');
         INSERT INTO db_menu VALUES(29, (select max(id_item) from db_itensmenu), 227, 39);
-        
+
         INSERT INTO db_itensmenu VALUES ((select max(id_item) + 1 from db_itensmenu), 'Inclusão', 'Inclusão', 'con1_agentearrecadador001.php', 1, 1, 'Inclusão', 't');
         INSERT INTO db_menu VALUES ((select id_item from db_itensmenu WHERE descricao = 'Agentes Arrecadadores'), (select max(id_item) from db_itensmenu), 1, 39);
-        
+
         INSERT INTO db_itensmenu VALUES ((select max(id_item) + 1 from db_itensmenu), 'Alteração', 'Alteração', 'con1_agentearrecadador002.php', 1, 1, 'Alteração', 't');
         INSERT INTO db_menu VALUES((select id_item from db_itensmenu WHERE descricao = 'Agentes Arrecadadores'), (select max(id_item) from db_itensmenu), 2, 39);
-        
+
         INSERT INTO db_itensmenu VALUES ((select max(id_item) + 1 from db_itensmenu), 'Exclusão', 'Exclusão', 'con1_agentearrecadador003.php', 1, 1, 'Exclusão', 't');
         INSERT INTO db_menu VALUES((select id_item from db_itensmenu WHERE descricao = 'Agentes Arrecadadores'), (select max(id_item) from db_itensmenu), 3, 39);
-        
+
         -- Criacao de sequenciais e tabela
         CREATE SEQUENCE agentearrecadador_k174_sequencial_seq;
         -- TABELAS E ESTRUTURA
@@ -40,7 +40,7 @@ class Oc18200 extends AbstractMigration
         ";
 
         $this->execute($sql);
-    } 
+    }
 
     public function down()
     {
