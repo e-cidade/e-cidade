@@ -1,60 +1,147 @@
-## e-Cidade
+## e-Cidade v3
+## Eloquent
+O Eloquent é um ORM utilizado nativamente pelo Laravel. Aqui no e-cidade usamos com o mesmo propósito, ou seja, de ser uma camada de acesso ao banco de dados.
+### Como usar?
 
-O e-Cidade destina-se a informatizar a gestão dos Municípios Brasileiros de forma integrada. Esta informatização contempla a integração entre os entes municipais: Prefeitura Municipal, Câmara Municipal, Autarquias, Fundações e outros.
+Para utilizar, basta criar uma classe em `app/Models` que `extends` de `LegacyModel` e pronto. De resto, basta seguir as convenções do ORM que são descritas na [doc do Eloquent](https://laravel.com/docs/5.8/eloquent):
 
-A economia de recursos é somente uma das vantagens na adoção do e-cidade, além da liberdade de escolha dos fornecedores e garantia de continuidade do sistema, uma vez apoiado pelo Ministério do Planejamento.
+```php
+<?php
 
-## Requisitos Mínimos
+namespace App\Models;
 
-* Apache 2
-* Firefox 
-* PHP 7.4.x 
-* PostgreSQL 12.5.x
-* Ubuntu Linux 20.04.x ou superior
+class Flight extends LegacyModel
+{
+    //
+}
+
+```
+
+### Account de Dados do E-cidade
+Mas e como fica os logs do e-cidade? Para solucionar essa dor, foi criada uma `Trait` chamada `LegacyAccount`. Fazendo o uso dessa `trait` o model irá realizar os logs de accout legacy do e-cidade de forma automática para os eventos de `save`, `update` e `delete`:
+
+```php
+
+<?php
+
+namespace App\Models;
+
+class Flight extends LegacyModel
+{
+    use LegacyAccount;
+}
+```
+
+### Legacy Labels
+Para tornar o eloquent compatível com a geracao de HTML nativa do e-cidade, utilize a trait `LegacyLabel`.
+
+1. Incula a trait `LegacyLabel` no model:
+
+```php
+<?php
+class ConfiguracaoPixBancoDoBrasil extends LegacyModel
+{
+    use LegacyLabel;
+}
+```
+2. Dessa forma voce será capaz de utilizar o método `label()` normalmente:
+
+```php
+<?php
+// Forma legada
+$clissbase->rotulo->label();
+db_input('q02_inscr',4,$Iq02_inscr,true,'text',$db_opcao,"")
+
+// Com eloquent
+use App\Models\ConfiguracaoPixBancoDoBrasil;
+
+$configuracaoPixBb = new ConfiguracaoPixBancoDoBrasil();
+$configuracaoPixBb->legacyLabel->label();
+
+db_input(
+    'k177_url_api',
+    '',
+    $Ik177_url_api,
+    true,
+    'text',
+    $db_opcao,
+    " style='width: 100%'",
+    '',
+    '',
+    '',
+    ''
+);
+```
+
+### Observacoes
+- O Eloquent nao coloca em desuso as classes DAO (classes/db_tabela_classe.php) nativas do e-cidade, apenas dá uma possibilidade a mais para o desenvolvedor de utilizar os Models do Eloquent no lugar das classes DAO legadas.
+- A versão atual do Eloquent é 9, no entanto estamos usando a 5.8 devido a outras dependências atuais do e-cidade.
 
 
-## Comunicação
+## Usando docker na v3
+Para configurar o docker primeiro edit o env com a porta para
+o apache
+```bash
+    $cp .env-exemplo .env
+```
 
-Acreditamos que o sucesso do projeto depende diretamente da interação clara e
-objetiva entre os membros da Comunidade. Por isso, estamos definindo algumas
-políticas para que estas interações nos ajudem a crescer juntos! Você pode
-consultar algumas destas boas práticas em nosso [código de
-conduta](./CODE-OF-CONDUCT.md)
+### Depois execute o comando para subir o docker do apache
+```bash
+    docker-compose up -d --build
+    docker exec -it <NOME-ou-ID-CONTAINER> /bin/bash
+    chmod -R 775 /var/www/html/*
+    chmod -R 777 /var/www/html/tmp/
+    cd /var/www/html/
+    composer install
+    cd /var/www/html/config/
+    cp preferencias.json.dist preferencias.json
+    cd ..
+    cd /var/www/e-cidade/extension/data/extension/
+    cp Desktop.data.dist Desktop.data  
+    cd /var/www/e-cidade/extension/modification/data/modification/
+    cp dbportal-v3-desktop.data.dist dbportal-v3-desktop.data
+    bin/v3/extension/install Desktop <NOME-DO-SEU-USUARIO>
+```
 
-Além disso, gostamos de meios de comunicação assíncrona, onde não há necessidade de
-respostas em tempo real. Isso facilita a produtividade individual dos
-colaboradores do projeto.
+### Configuração do banco de dados local
 
-| Canal de comunicação                                                         | Objetivos                                                                                                                                                                                                          |
-|------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Fórum](https://ecidade.softwarepublico.org/)                                           | - Tirar dúvidas <br>- Discussões de como instalar a plataforma<br> - Discussões de como usar funcionalidades<br> - Suporte entre membros de comunidade<br> - FAQ da comunidade (sobre o produto e funcionalidades) |
-| [Issues do Github](https://github.com/e-cidade/e-cidade/issues) | - Sugestão de novas funcionalidades<br> - Reportar bugs<br> - Discussões técnicas                                                                                                                                  |
-| [Telegram](https://t.me/eCidadeCE)                                            | - Comunicar novidades sobre o projeto<br> - Movimentar a comunidade<br>  - Falar tópicos que **não** demandem discussões profundas                                                                                 |
+Alterar o arquivo db_conn.php que esta na pasta libs. Caso não exista copio db_conn.php.dist 
+```
+    cd libs
+    cp db_conn.php.dist db_conn.php
+```
+Alterar as seguintes variáveis deixando igual ao exemplo.
 
-Qualquer outro grupo de discussão não é reconhecido oficialmente pela
-comunidade e-Cidade.
+    $DB_USUARIO   = "ecidade"; // Usuário do PostgreSQL 
+    $DB_SENHA     = "ecidade"; // Senha do usuário do PostgreSQL 
+    $DB_SERVIDOR = "bd"; // 
+    $DB_PORTA = "5432"; //
+    $DB_PORTA_ALT = "5432"; //
+    $DB_BASE      = "ecidade"; // Nome da base de dados
 
-## Como contribuir
+## Todos comandos php devem ser executando dentro do conteiner web
+```
+    docker exec -it <NOMEDOCONTAINER> /bin/bash
+```
+### Depois execute o comando para parar o docker do apache
+```bash
+    $docker-compose down
+```
 
-Contribuições são **super bem-vindas**! Se você tem vontade de construir o
-i-Educar junto conosco, veja o nosso [guia de contribuição](./CONTRIBUTING.md)
-onde explicamos detalhadamente como trabalhamos e de que formas você pode nos
-ajudar a alcançar nossos objetivos.
+### Recuperando backup 
 
+    psql -U ecidade ecidade -h localhost -f NOMEDOARQUIVO.SQL
 
-## Instalação
+### Para Acessar
+Acesse no navegador com o portal informada no .env: http://localhost:8888
 
-Consulte o passo a passo no [guia de instalação](INSTALL.md).
+Para acessar o banco de dados no navegador http://localhost:8484
 
-## Upgrade
+### Como usar xDebug no PHPSTORM
 
-Para realizar o _upgrade_ da versão do e-Cidade, considere seguir os passos no [guia de atualização](UPGRADE.md).
+...
 
-## Perguntas frequentes (FAQ)
+### Para Debugar no VSCode
 
-Algumas perguntas aparecem recorrentemente. Olhe primeiro por aqui: [FAQ](https://ecidade.softwarepublico.org/).
-
----
-
-Documento by [Contass](https://www.contassconsultoria.com.br/). Como fonte o documento criado pela comunidade i-Educar.
+...
 
