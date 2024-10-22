@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class UpdateDb61TextoOc17761 extends AbstractMigration
+class UpdateDb61TextoOc17761 extends PostgresMigration
 {
 
     public function up()

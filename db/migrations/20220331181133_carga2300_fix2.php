@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Carga2300Fix2 extends AbstractMigration
+class Carga2300Fix2 extends PostgresMigration
 {
     public function up()
     {
@@ -10,7 +10,7 @@ class Carga2300Fix2 extends AbstractMigration
         UPDATE avaliacaopergunta SET db103_avaliacaotiporesposta = 2 WHERE db103_identificador = 'preencher-com-o-codigo-correspondente-a-ca-4001087';
         INSERT INTO avaliacaoperguntaopcao VALUES (
             (SELECT max(db104_sequencial)+1 FROM avaliacaoperguntaopcao),
-            (SELECT db103_sequencial FROM avaliacaopergunta WHERE db103_identificador = 'preencher-com-o-codigo-correspondente-a-ca-4001087'), 
+            (SELECT db103_sequencial FROM avaliacaopergunta WHERE db103_identificador = 'preencher-com-o-codigo-correspondente-a-ca-4001087'),
             NULL,
             't',
             (SELECT db103_identificadorcampo FROM avaliacaopergunta WHERE db103_identificador = 'preencher-com-o-codigo-correspondente-a-ca-4001087')||'-'||(SELECT max(db104_sequencial)+1 FROM avaliacaoperguntaopcao)::varchar,
@@ -49,7 +49,7 @@ class Carga2300Fix2 extends AbstractMigration
             when rhpessoal.rh01_instru = 7 then 4001728
             when rhpessoal.rh01_instru = 8 then 4001729
             when rhpessoal.rh01_instru = 9 then 4001730
-            when rhpessoal.rh01_instru = 10 then 4001732 
+            when rhpessoal.rh01_instru = 10 then 4001732
             when rhpessoal.rh01_instru = 11 then 4001733
             when rhpessoal.rh01_instru = 0 then 4001722
             end as grauInstr,
@@ -62,7 +62,7 @@ class Carga2300Fix2 extends AbstractMigration
             else j88_sigla
             --brasil
             end as tpLograd,
-            cgm.z01_ender as dscLograd, 
+            cgm.z01_ender as dscLograd,
             cgm.z01_numero  as nrLograd,
             cgm.z01_compl as complemento,
             cgm.z01_bairro as bairro,
@@ -97,11 +97,11 @@ class Carga2300Fix2 extends AbstractMigration
             case when rh02_reabreadap = true then 4001766 else 4001767 end as reabReadap,
             \'\' as observacao,
             --dependente
-            --case when rh31_gparen \'C\' then \'01\' 
-            --when rh31_gparen \'F\' and rh31_irf IN(\'0\',\'2\') then \'03\' 
-            --when rh31_gparen \'F\' and rh31_irf IN(\'3\') then \'04\' 
-            --when rh31_gparen in(\'P\',\'M\',\'A\') then \'09\' 
-            --when rh31_gparen = \'O\' then \'99\' 
+            --case when rh31_gparen \'C\' then \'01\'
+            --when rh31_gparen \'F\' and rh31_irf IN(\'0\',\'2\') then \'03\'
+            --when rh31_gparen \'F\' and rh31_irf IN(\'3\') then \'04\'
+            --when rh31_gparen in(\'P\',\'M\',\'A\') then \'09\'
+            --when rh31_gparen = \'O\' then \'99\'
             --end as tpDep,
             --rh31_nome as nmDep,
             --rh31_dtnasc as dtNascto,
@@ -156,25 +156,25 @@ class Carga2300Fix2 extends AbstractMigration
             case when rhpessoal.rh01_tipadm in (3,4) and rh30_regime in (1,3) then 4001824
             when rhpessoal.rh01_tipadm in (3,4) and rh30_regime = 2 then 4001823
             else NULL end as tpRegTrab,
-            case 
+            case
             when rhpessoal.rh01_tipadm in (3,4) and r33_tiporegime = \'1\' then 4001825
             when rhpessoal.rh01_tipadm in (3,4) and r33_tiporegime = \'2\' then 4001826
             else NULL end as tpRegPrev,
             --infoMandElet
             case when h13_categoria = 304 then 4001832 ELSE NULL end as indRemunCargo,
-            case when h13_categoria = 304 and rh30_regime in (1,3) then 4001834 
-            when h13_categoria = 304 and rh30_regime = 2 then 4001833 
+            case when h13_categoria = 304 and rh30_regime in (1,3) then 4001834
+            when h13_categoria = 304 and rh30_regime = 2 then 4001833
             ELSE NULL end as tpRegTrabInfoMandElet,
-            case when h13_categoria = 304 and r33_tiporegime = \'1\' then 4001835 
-            when h13_categoria = 304 and r33_tiporegime = \'2\' then 4001836 
+            case when h13_categoria = 304 and r33_tiporegime = \'1\' then 4001835
+            when h13_categoria = 304 and r33_tiporegime = \'2\' then 4001836
             else NULL end as tpRegPrevInfoMandElet,
             --infoEstagiario
-            CASE 
+            CASE
             WHEN h83_naturezaestagio = \'O\' THEN 4001838
             WHEN h83_naturezaestagio = \'N\' THEN 4001839
             ELSE NULL
             END as natEstagio,
-            CASE 
+            CASE
             WHEN h83_nivelestagio = 1 THEN 4001840
             WHEN h83_nivelestagio = 2 THEN 4001841
             WHEN h83_nivelestagio = 3 THEN 4001842
@@ -224,7 +224,7 @@ class Carga2300Fix2 extends AbstractMigration
         left join cgm as cgmsupervisor ON cgmsupervisor.z01_numcgm = rhpessoalsupervisor.rh01_numcgm
         left join inssirf on (r33_codtab::integer-2,r33_anousu,r33_mesusu) = (rh02_tbprev,rh02_anousu,rh02_mesusu)
         left join rhpesrescisao on rh05_seqpes = rh02_seqpes
-        WHERE rhpessoal.rh01_instit = fc_getsession(\'DB_instit\')::int 
+        WHERE rhpessoal.rh01_instit = fc_getsession(\'DB_instit\')::int
         AND h13_categoria in (304,701,711,712,721,722,723,731,734,738,771,901,903)
         AND rh30_vinculo = \'A\'
         AND (
@@ -243,14 +243,14 @@ class Carga2300Fix2 extends AbstractMigration
                 and date_part(\'month\',rh05_recis::date) = 11
                 )
             or
-            ( 
+            (
             rh02_anousu > 2021
             and date_part(\'month\',rhpessoal.rh01_admiss::date) = date_part(\'month\',fc_getsession(\'DB_datausu\')::date)
             and date_part(\'year\',rhpessoal.rh01_admiss::date) = fc_getsession(\'DB_anousu\')::int
             )
         )
     )
-        ' 
+        '
         WHERE db101_identificador='s2300-vs1'";
         $this->execute($sql);
     }
@@ -289,7 +289,7 @@ class Carga2300Fix2 extends AbstractMigration
             when rhpessoal.rh01_instru = 7 then 4001728
             when rhpessoal.rh01_instru = 8 then 4001729
             when rhpessoal.rh01_instru = 9 then 4001730
-            when rhpessoal.rh01_instru = 10 then 4001732 
+            when rhpessoal.rh01_instru = 10 then 4001732
             when rhpessoal.rh01_instru = 11 then 4001733
             when rhpessoal.rh01_instru = 0 then 4001722
             end as grauInstr,
@@ -302,7 +302,7 @@ class Carga2300Fix2 extends AbstractMigration
             else j88_sigla
             --brasil
             end as tpLograd,
-            cgm.z01_ender as dscLograd, 
+            cgm.z01_ender as dscLograd,
             cgm.z01_numero  as nrLograd,
             cgm.z01_compl as complemento,
             cgm.z01_bairro as bairro,
@@ -337,11 +337,11 @@ class Carga2300Fix2 extends AbstractMigration
             case when rh02_reabreadap = true then 4001766 else 4001767 end as reabReadap,
             \'\' as observacao,
             --dependente
-            --case when rh31_gparen \'C\' then \'01\' 
-            --when rh31_gparen \'F\' and rh31_irf IN(\'0\',\'2\') then \'03\' 
-            --when rh31_gparen \'F\' and rh31_irf IN(\'3\') then \'04\' 
-            --when rh31_gparen in(\'P\',\'M\',\'A\') then \'09\' 
-            --when rh31_gparen = \'O\' then \'99\' 
+            --case when rh31_gparen \'C\' then \'01\'
+            --when rh31_gparen \'F\' and rh31_irf IN(\'0\',\'2\') then \'03\'
+            --when rh31_gparen \'F\' and rh31_irf IN(\'3\') then \'04\'
+            --when rh31_gparen in(\'P\',\'M\',\'A\') then \'09\'
+            --when rh31_gparen = \'O\' then \'99\'
             --end as tpDep,
             --rh31_nome as nmDep,
             --rh31_dtnasc as dtNascto,
@@ -400,10 +400,10 @@ class Carga2300Fix2 extends AbstractMigration
             else \'\' end as tpRegPrev,
             --infoMandElet
             case when h13_categoria = 304 then \'N\' end as indRemunCargo,
-            case when h13_categoria = 304 and rh30_regime in (1,3) then 2 
-            when h13_categoria = 304 and rh30_regime = 2 then 1 
+            case when h13_categoria = 304 and rh30_regime in (1,3) then 2
+            when h13_categoria = 304 and rh30_regime = 2 then 1
             end as tpRegTrabInfoMandElet,
-            case when h13_categoria = 304 and r33_tiporegime in (\'1\',\'2\') then r33_tiporegime 
+            case when h13_categoria = 304 and r33_tiporegime in (\'1\',\'2\') then r33_tiporegime
             else \'\' end as tpRegPrevInfoMandElet,
             --infoEstagiario
             h83_naturezaestagio as natEstagio,
@@ -449,7 +449,7 @@ class Carga2300Fix2 extends AbstractMigration
         left join cgm as cgmsupervisor ON cgmsupervisor.z01_numcgm = rhpessoalsupervisor.rh01_numcgm
         left join inssirf on (r33_codtab::integer-2,r33_anousu,r33_mesusu) = (rh02_tbprev,rh02_anousu,rh02_mesusu)
         left join rhpesrescisao on rh05_seqpes = rh02_seqpes
-        WHERE rhpessoal.rh01_instit = fc_getsession(\'DB_instit\')::int 
+        WHERE rhpessoal.rh01_instit = fc_getsession(\'DB_instit\')::int
         AND h13_categoria in (304,701,711,712,721,722,723,731,734,738,771,901,903)
         AND rh30_vinculo = \'A\'
         AND (
@@ -468,14 +468,14 @@ class Carga2300Fix2 extends AbstractMigration
                 and date_part(\'month\',rh05_recis::date) = 11
                 )
             or
-            ( 
+            (
             rh02_anousu > 2021
             and date_part(\'month\',rhpessoal.rh01_admiss::date) = date_part(\'month\',fc_getsession(\'DB_datausu\')::date)
             and date_part(\'year\',rhpessoal.rh01_admiss::date) = fc_getsession(\'DB_anousu\')::int
             )
         )
     )
-        ' 
+        '
         WHERE db101_identificador='s2300-vs1'";
         $this->execute($sql);
     }

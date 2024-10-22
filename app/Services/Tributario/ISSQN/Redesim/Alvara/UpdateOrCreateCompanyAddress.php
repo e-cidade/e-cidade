@@ -67,12 +67,12 @@ class UpdateOrCreateCompanyAddress
                 ['q02_inscr' => $inscricaoRedesim->q179_inscricao],
                 [
                     'j14_codigo' => $rua->j14_codigo,
-                    'q02_numero' => $data->endereco->numero,
+                    'q02_numero' => $data->endereco->getNumeroFormmated(),
                     'z01_cep' => $data->endereco->cep
                 ]
             );
 
-            $bairro = $this->bairro->nome($data->endereco->bairro)->first();
+            $bairro = $this->bairro->nome($data->endereco->getBairroEcidadeFormat())->first();
 
             if (empty($bairro)) {
                 $bairro = $this->createBairro($data);
@@ -113,7 +113,7 @@ class UpdateOrCreateCompanyAddress
     public function createBairro(CompanyDTO $data)
     {
         return  $this->bairro->newQuery()->create(
-            ['j13_descr' => $data->endereco->bairro]
+            ['j13_descr' => $data->endereco->getBairroEcidadeFormat()]
         );
     }
 }

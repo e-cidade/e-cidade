@@ -1,0 +1,49 @@
+/* Estilos para o container do select personalizado */
+.simple-choice {
+    width: 100%;
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.simple-choice .label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #1f2937;
+}
+
+.simple-choice .choice-content {
+    width: 100%;
+    max-width: 600px;
+}
+
+.simple-choice .choice-content .choices {
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.simple-choice .choice-content .choices[data-type*="select-one"] .choices__inner {
+    border-radius: 10px;
+}
+    
+.simple-choice .choice-content .choices__list--dropdown, .choices__list[aria-expanded] {
+    width: 97%;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.simple-choice .choice-content .choices__input {
+    width: 100%;
+    padding: 20px 10px 20px 10px;
+    border-bottom: 1px solid gray;
+}
+
+.simple-choice .choices__item {
+    white-space: nowrap; /* Quebra de linha em espaços em branco */
+    word-wrap: break-word; /* Quebra de linha em palavras longas se necessário */
+}

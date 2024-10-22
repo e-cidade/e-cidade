@@ -1230,6 +1230,230 @@ function db_dotacaosaldo($nivel = 8, $tipo_nivel = 1, $tipo_saldo = 2, $descr = 
 
   $result1 = db_query($sql);
 
+    /////// nivel 11 ///////////////
+
+    if (11 <= $primeiro_fim || ($desmembra_segundo_inicio == true && $segundo_inicio <= 11 || $desmembra_segundo_inicio == false && $segundo_inicio == 11)) {
+
+      $xnivel11 = '';
+      if ($nivel >= 11) {
+        if ($tipo_nivel == 1 || $tipo_nivel == 2) {
+          $xnivel11 = " o58_orgao,
+            o58_unidade,
+            o58_funcao,
+            o58_subfuncao,
+            o58_programa,
+            o58_projativ,";
+        } elseif ($tipo_nivel == 3) {
+          $xnivel11 = "   -1 as o58_orgao,
+            -1 as o58_unidade,
+            -1 as o58_funcao,
+            -1 as o58_subfuncao,
+            -1 as o58_programa,
+            -1 as o58_projativ,";
+        }
+      }
+      $nivel11 = "select
+        $xnivel11
+        o58_codele,
+        o58_elemento,
+        0 as o58_coddot,
+        0 as o58_codigo,
+        dot_ini,
+        saldo_anterior,
+        empenhado,
+        anulado,
+        liquidado,
+        pago,
+        suplementado,
+        reduzido,
+        atual,
+        reservado,
+        atual_menos_reservado,
+        atual_a_pagar,
+        atual_a_pagar_liquidado,
+        empenhado_acumulado,
+        anulado_acumulado,
+        liquidado_acumulado,
+        pago_acumulado,
+        suplementado_acumulado,
+        reduzido_acumulado,
+        proj,
+        ativ,
+        oper,
+        ordinario,
+        vinculado,
+        suplemen,
+        suplemen_acumulado,
+        especial,
+        especial_acumulado,
+        reservado_manual_ate_data,
+        reservado_automatico_ate_data,
+        reservado_ate_data
+        from (
+        select
+        $xnivel11
+        o58_codele,
+        o58_elemento,
+        sum(dot_ini)																		as dot_ini,
+        sum(saldo_anterior)															as saldo_anterior,
+        sum(empenhado)																	as empenhado,
+        sum(anulado)																		as anulado,
+        sum(liquidado)																	as liquidado,
+        sum(pago)																				as pago,
+        sum(suplementado+transfsup)											as suplementado,
+        sum(reduzido+transfred)													as reduzido,
+        sum(atual)																			as atual,
+        sum(reservado)																	as reservado,
+        sum(atual_menos_reservado)											as atual_menos_reservado,
+        sum(atual_a_pagar)															as atual_a_pagar,
+        sum(atual_a_pagar_liquidado)										as atual_a_pagar_liquidado,
+        sum(empenhado_acumulado)												as empenhado_acumulado,
+        sum(anulado_acumulado)													as anulado_acumulado,
+        sum(liquidado_acumulado)												as liquidado_acumulado,
+        sum(pago_acumulado)															as pago_acumulado,
+        sum(suplementado_acumulado+transfsup_acumulado) as suplementado_acumulado,
+        sum(reduzido_acumulado+transfred_acumulado)		  as reduzido_acumulado,
+        sum(proj)																				as proj,
+        sum(ativ)																				as ativ,
+        sum(oper)																				as oper,
+        sum(ordinario)																	as ordinario,
+        sum(vinculado)																	as vinculado,
+        sum(suplemen+transfsup)												  as suplemen,
+        sum(suplemen_acumulado+transfsup_acumulado)			as suplemen_acumulado,
+        sum(especial)																		as especial,
+        sum(especial_acumulado)													as especial_acumulado,
+        sum(reservado_manual_ate_data)									as reservado_manual_ate_data,
+        sum(reservado_automatico_ate_data)              as reservado_automatico_ate_data,
+        sum(reservado_ate_data)                         as reservado_ate_data
+        from work_dotacao
+        group by ";
+      if ($tipo_nivel != 3) {
+        $nivel11 .= "o58_orgao,
+          o58_unidade,
+          o58_funcao,
+          o58_subfuncao,
+          o58_programa,
+          o58_projativ,";
+      }
+      $nivel11 .= "   o58_codele,
+        o58_elemento
+        ) as g";
+    } else {
+      $nivel11 = '';
+    }
+
+  /////// nivel 10 ///////////////
+
+  if (10 <= $primeiro_fim || ($desmembra_segundo_inicio == true && $segundo_inicio <= 10 || $desmembra_segundo_inicio == false && $segundo_inicio == 10)) {
+
+    $xnivel10 = '';
+    if ($nivel >= 10) {
+      if ($tipo_nivel == 1 || $tipo_nivel == 2) {
+        $xnivel10 = " o58_orgao,
+          o58_unidade,
+          o58_funcao,
+          o58_subfuncao,
+          o58_programa,
+          o58_projativ,";
+      } elseif ($tipo_nivel == 3) {
+        $xnivel10 = "   -1 as o58_orgao,
+          -1 as o58_unidade,
+          -1 as o58_funcao,
+          -1 as o58_subfuncao,
+          -1 as o58_programa,
+          -1 as o58_projativ,";
+      }
+    }
+    $nivel10 = "select
+      $xnivel10
+      o58_codele,
+      o58_elemento,
+      0 as o58_coddot,
+      0 as o58_codigo,
+      dot_ini,
+      saldo_anterior,
+      empenhado,
+      anulado,
+      liquidado,
+      pago,
+      suplementado,
+      reduzido,
+      atual,
+      reservado,
+      atual_menos_reservado,
+      atual_a_pagar,
+      atual_a_pagar_liquidado,
+      empenhado_acumulado,
+      anulado_acumulado,
+      liquidado_acumulado,
+      pago_acumulado,
+      suplementado_acumulado,
+      reduzido_acumulado,
+      proj,
+      ativ,
+      oper,
+      ordinario,
+      vinculado,
+      suplemen,
+      suplemen_acumulado,
+      especial,
+      especial_acumulado,
+      reservado_manual_ate_data,
+      reservado_automatico_ate_data,
+      reservado_ate_data
+      from (
+      select
+      $xnivel10
+      o58_codele,
+      o58_elemento,
+      sum(dot_ini)																		as dot_ini,
+      sum(saldo_anterior)															as saldo_anterior,
+      sum(empenhado)																	as empenhado,
+      sum(anulado)																		as anulado,
+      sum(liquidado)																	as liquidado,
+      sum(pago)																				as pago,
+      sum(suplementado+transfsup)											as suplementado,
+      sum(reduzido+transfred)													as reduzido,
+      sum(atual)																			as atual,
+      sum(reservado)																	as reservado,
+      sum(atual_menos_reservado)											as atual_menos_reservado,
+      sum(atual_a_pagar)															as atual_a_pagar,
+      sum(atual_a_pagar_liquidado)										as atual_a_pagar_liquidado,
+      sum(empenhado_acumulado)												as empenhado_acumulado,
+      sum(anulado_acumulado)													as anulado_acumulado,
+      sum(liquidado_acumulado)												as liquidado_acumulado,
+      sum(pago_acumulado)															as pago_acumulado,
+      sum(suplementado_acumulado+transfsup_acumulado) as suplementado_acumulado,
+      sum(reduzido_acumulado+transfred_acumulado)		  as reduzido_acumulado,
+      sum(proj)																				as proj,
+      sum(ativ)																				as ativ,
+      sum(oper)																				as oper,
+      sum(ordinario)																	as ordinario,
+      sum(vinculado)																	as vinculado,
+      sum(suplemen+transfsup)												  as suplemen,
+      sum(suplemen_acumulado+transfsup_acumulado)			as suplemen_acumulado,
+      sum(especial)																		as especial,
+      sum(especial_acumulado)													as especial_acumulado,
+      sum(reservado_manual_ate_data)									as reservado_manual_ate_data,
+      sum(reservado_automatico_ate_data)              as reservado_automatico_ate_data,
+      sum(reservado_ate_data)                         as reservado_ate_data
+      from work_dotacao
+      group by ";
+    if ($tipo_nivel != 3) {
+      $nivel10 .= "o58_orgao,
+        o58_unidade,
+        o58_funcao,
+        o58_subfuncao,
+        o58_programa,
+        o58_projativ,";
+    }
+    $nivel10 .= "   o58_codele,
+      o58_elemento
+      ) as g";
+  } else {
+    $nivel10 = '';
+  }
+
   /////// nivel 8 ///////////////
 
   if (8 <= $primeiro_fim || ($desmembra_segundo_inicio == true && $segundo_inicio <= 8 || $desmembra_segundo_inicio == false && $segundo_inicio == 8)) {
@@ -2074,6 +2298,7 @@ function db_dotacaosaldo($nivel = 8, $tipo_nivel = 1, $tipo_saldo = 2, $descr = 
         $sql = $nivel3;
     }
   }
+
   if ($nivel >= 4) {
     if ($nivel4 != '') {
       if ($sql != '')
@@ -2083,6 +2308,7 @@ function db_dotacaosaldo($nivel = 8, $tipo_nivel = 1, $tipo_saldo = 2, $descr = 
         $sql = $nivel4;
     }
   }
+
   if ($nivel >= 5) {
     if ($nivel5 != '') {
       if ($sql != '')
@@ -2092,6 +2318,7 @@ function db_dotacaosaldo($nivel = 8, $tipo_nivel = 1, $tipo_saldo = 2, $descr = 
         $sql = $nivel5;
     }
   }
+
   if ($nivel >= 6) {
     if ($nivel6 != '') {
       if ($sql != '')
@@ -2101,6 +2328,7 @@ function db_dotacaosaldo($nivel = 8, $tipo_nivel = 1, $tipo_saldo = 2, $descr = 
         $sql = $nivel6;
     }
   }
+
   if ($nivel >= 7) {
     if ($nivel7 != '') {
       if ($sql != '')
@@ -2110,6 +2338,7 @@ function db_dotacaosaldo($nivel = 8, $tipo_nivel = 1, $tipo_saldo = 2, $descr = 
         $sql = $nivel7;
     }
   }
+
   if ($nivel >= 8) {
     if ($nivel8 != '') {
       if ($sql != '')
@@ -2117,6 +2346,26 @@ function db_dotacaosaldo($nivel = 8, $tipo_nivel = 1, $tipo_saldo = 2, $descr = 
       $sql .= $nivel8;
       if ($tipo_nivel > 1)
         $sql = $nivel8;
+    }
+  }
+
+  if ($nivel >= 10) {
+    if ($nivel10 != '') {
+      if ($sql != '')
+        $sql .= " union all ";
+      $sql .= $nivel10;
+      if ($tipo_nivel > 1)
+        $sql = $nivel10;
+    }
+  }
+
+  if ($nivel >= 11) {
+    if ($nivel11 != '') {
+      if ($sql != '')
+        $sql .= " union all ";
+      $sql .= $nivel11;
+      if ($tipo_nivel > 1)
+        $sql = $nivel11;
     }
   }
 
@@ -2170,6 +2419,16 @@ function db_dotacaosaldo($nivel = 8, $tipo_nivel = 1, $tipo_saldo = 2, $descr = 
   if ($primeiro_fim >= 8) {
     $junta .= "case when o58_coddot = -1 then 0 else o58_coddot end as o58_coddot,case when o58_codigo = -1 then 0 else o58_codigo end as o58_codigo,o15_descr,";
     $xordem .= "o58_codigo,o15_descr,o58_coddot ";
+  }
+
+  if ($primeiro_fim >= 10) {
+    $junta .= "o58_elemento,o56_descr,";
+    $xordem .= "o58_elemento,o56_descr,";
+  }
+
+  if ($primeiro_fim >= 11) {
+    $junta .= "o58_elemento,o56_descr,";
+    $xordem = "o58_elemento,o56_descr,";
   }
 
   $virg = '';
@@ -2232,8 +2491,24 @@ function db_dotacaosaldo($nivel = 8, $tipo_nivel = 1, $tipo_saldo = 2, $descr = 
       $virg = ',';
     }
     if ($segundo_inicio <= 8 && $tu_para == false) {
-      $junta .= $virg . "case when o58_coddot = -1 then 0 else o58_coddot end::integer as o58_coddot,case when o58_codigo = -1 then 0 else o58_codigo end::integer as o58_codigo,o15_descr";
+      $junta  .= $virg . "case when o58_coddot = -1 then 0 else o58_coddot end::integer as o58_coddot,case when o58_codigo = -1 then 0 else o58_codigo end::integer as o58_codigo,o15_descr";
       $xordem .= $virg . "o58_codigo,o15_descr,o58_coddot ";
+      if ($desmembra_segundo_inicio == false) {
+        $tu_para = true;
+      }
+      $virg = ',';
+    }
+    if ($segundo_inicio <= 10 && $tu_para == false) {
+      $junta  .=  $virg . "o58_elemento,o56_descr";
+      $xordem .=  $virg . "o58_elemento,o56_descr";
+      if ($desmembra_segundo_inicio == false) {
+        $tu_para = true;
+      }
+      $virg = ',';
+    }
+    if ($segundo_inicio <= 11 && $tu_para == false) {
+      $junta  .=  $virg . "o58_elemento,o56_descr";
+      $xordem .=  $virg . "o58_elemento,o56_descr";
       if ($desmembra_segundo_inicio == false) {
         $tu_para = true;
       }

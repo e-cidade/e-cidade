@@ -44,7 +44,7 @@ switch ($oParam->exec) {
                 $rsAnexosPNCP = $clcontroleanexosataspncp->sql_record($clcontroleanexosataspncp->sql_query_file(null, " * ", null, "l217_sequencialarquivo = " . $iDocumentos));
 
                 if (pg_num_rows($rsAnexosPNCP) > 0) {
-                    throw new Exception("O documento do codigo " . $iDocumentos . " ja foi enviado !");
+                    throw new Exception("O Anexo do código " . $iDocumentos . " já foi enviado !");
                 }
 
                 //validacao para enviar somente idocumentos de termos que ja foram enviados para PNCP
@@ -62,8 +62,7 @@ switch ($oParam->exec) {
 
                 //envio
                 $clataregistropreco = new AtaRegistroprecoPNCP();
-                $rsApiPNCP = $clataregistropreco->enviarAnexos($oDadosAtas->l213_anousu, $oDadosAtas->l213_numerocompra, $oDadosAtas->l215_ata, $oDadosAnexo->l216_oid, $oDadosAnexo->descricao, $oDadosAnexo->l216_tipoanexo);
-
+                $rsApiPNCP = $clataregistropreco->enviarAnexos($oDadosAtas->l213_anousu, $oDadosAtas->l213_numerocompra, $oDadosAtas->l215_ata, $oDadosAnexo->l216_oid, $oDadosAnexo->l216_nomearquivo, $oDadosAnexo->l216_tipoanexo);
                 if ($rsApiPNCP[0] == 201) {
 
                     $sAnexoPNCP = explode('x-content-type-options', $rsApiPNCP[1]);
@@ -105,13 +104,12 @@ switch ($oParam->exec) {
                 $oDadosAnexo = db_utils::fieldsMemory($rsAnexos, 0);
 
                 if (pg_num_rows($rsAnexos) == null) {
-                    throw new Exception("O documento do codigo " . $iDocumentos . " não foi enviado no PNCP!");
+                    throw new Exception("O Anexo do código " . $iDocumentos . " não foi enviado no PNCP!");
                 }
 
                 //envio exclusao
                 $clataregistropreco = new AtaRegistroprecoPNCP();
-                $rsApiPNCP = $clataregistropreco->excluirAnexos($oDadosAnexo->l217_anocompra, $oDadosAnexo->l213_numerocompra, $oDadosAnexo->l217_sequencialata,$oDadosAnexo->l217_sequencialpncp);
-
+                $rsApiPNCP = $clataregistropreco->excluirAnexos($oDadosAnexo->l217_anocompra, $oDadosAnexo->l213_numerocompra, $oDadosAnexo->l217_sequencialata,$oDadosAnexo->l217_sequencialpncp, $oParam->justificativa);
                 if ($rsApiPNCP[0] == 201) {
 
                     $clcontroleanexosataspncp->excluirAnexossequencial($iDocumentos);

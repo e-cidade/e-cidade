@@ -35,8 +35,13 @@ class EventoS1210 extends EventoBase
      */
     public function montarDados()
     {
-        $ano = date("Y", db_getsession("DB_datausu"));
-        $mes = date("m", db_getsession("DB_datausu"));
+        $anoPgto = $this->anoPgto();
+        $mesPgto = $this->mesPgto();
+        $diaPgto = $this->diaPgto();
+
+        $ano = $this->ano();
+        $mes = $this->mes();
+
         $dia = date("d", db_getsession("DB_datausu"));
         $data = "$ano-$mes-01";
         $data = new \DateTime($data);
@@ -62,9 +67,9 @@ class EventoS1210 extends EventoBase
                 $oDadosAPI->evtPgtos->nrRecibo            = null;
 
                 $oDadosAPI->evtPgtos->indapuracao         = $this->indapuracao;
-                $oDadosAPI->evtPgtos->perapur             = $ano . '-' . $mes;
+                $oDadosAPI->evtPgtos->perapur             = $anoPgto . '-' . $mesPgto;
                 if ($this->indapuracao == 2) {
-                    $oDadosAPI->evtPgtos->perapur         = $ano;
+                    $oDadosAPI->evtPgtos->perapur         = $anoPgto;
                 }
                 $oDadosAPI->evtPgtos->cpfbenef             = $aDadosPorMatriculas[0]->cpftrab;
 
@@ -77,7 +82,7 @@ class EventoS1210 extends EventoBase
 
                         $std->infopgto[$seqinfopag] = new \stdClass();
 
-                        $std->infopgto[$seqinfopag]->dtpgto = "$ano-$mes-$dia";
+                        $std->infopgto[$seqinfopag]->dtpgto = "$anoPgto-$mesPgto-$diaPgto";
                         $std->infopgto[$seqinfopag]->tppgto = $this->tppgto;
                         $std->infopgto[$seqinfopag]->perref = "$ano-$mes";
 
@@ -94,12 +99,7 @@ class EventoS1210 extends EventoBase
                             $std->infopgto[$seqinfopag]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfs13';
                         }
 
-                        //$std->infopgto[$seqinfopag]->idedmdev = '1';
-
                         $std->infopgto[$seqinfopag]->vrliq = $this->buscarValorLiquido($aDadosPorMatriculas[$iCont]->matricula, $aDadosPorMatriculas[$iCont]->rh30_regime, $aIdentificador[$iCont2]->idedmdev);
-                        // echo $std->infopgto[$seqinfopag]->vrliq;
-                        // exit;
-                        //$std->infopgto[$seqinfopag]->vrliq = (float) number_format($std->infopgto[$seqinfopag]->vrliq, 2, ',', '.');
 
                         $seqinfopag++;
                     }
@@ -119,9 +119,7 @@ class EventoS1210 extends EventoBase
 
                 $oDadosAPI->evtPgtos->indapuracao         = $this->indapuracao;
                 $oDadosAPI->evtPgtos->perapur             = $ano . '-' . $mes;
-                // if ($this->indapuracao == 2) {
-                //     $oDadosAPI->evtPgtos->perapur         = $ano;
-                // }
+
                 $oDadosAPI->evtPgtos->cpfbenef             = $aDadosContabilidade[0]->cpf_benef;
 
                 $std = $this->dmDevContabilidade($aDadosContabilidade);
@@ -144,8 +142,8 @@ class EventoS1210 extends EventoBase
      */
     private function buscarDadosPorMatricula($cpf, $tppgto)
     {
-        $ano = db_getsession("DB_anousu");
-        $mes = date("m", db_getsession("DB_datausu"));
+        $ano = $this->ano();
+        $mes = $this->mes();
 
         $sql = "SELECT
         distinct
@@ -214,7 +212,7 @@ class EventoS1210 extends EventoBase
             $sql .= " and (
                 (h13_categoria = '901' and rh30_vinculo = 'A')
                 or
-                (h13_categoria in ('101', '106', '111', '301', '302', '303', '305', '306', '309', '312', '313','410', '902','701','712','771','711')
+                (h13_categoria in ('101', '103', '106', '111', '301', '302', '303', '305', '306', '309', '312', '313','410', '902','701','712','771','711')
                 and rh30_vinculo = 'A'
                 and r33_tiporegime = '1')
             )
@@ -264,28 +262,155 @@ class EventoS1210 extends EventoBase
     private function buscarValorLiquido($matricula, $rh30_regime, $ponto)
     {
         require_once 'libs/db_libpessoal.php';
-        $rsValores = $this->getValoresPorPonto($ponto, $matricula);
-        $proventos  = 0;
-        $descontos  = 0;
-        for ($iCont = 0; $iCont < pg_num_rows($rsValores); $iCont++) {
-            $oResult = \db_utils::fieldsMemory($rsValores, $iCont);
-            $proventos  += ($oResult->provdesc == 'Provento') ? $oResult->provento : 0;
-            $descontos  += ($oResult->provdesc == 'Desconto') ? $oResult->desconto : 0;
+        $clrubricasesocial = new cl_rubricasesocial;
+
+        $iAnoUsu = $this->ano();
+        $iMesusu = $this->mes();
+
+        $xtipo = "'x'";
+
+        $proventos = 0;
+        $descontos = 0;
+
+        if ($ponto == 1)
+            $opcao = 'salario';
+        if ($ponto == 2)
+            $opcao = 'rescisao';
+        if ($ponto == 3)
+            $opcao = 'complementar';
+        if ($ponto == 4)
+            $opcao = '13salario';
+
+        switch ($opcao) {
+            case 'salario':
+                $sigla          = 'r14_';
+                $arquivo        = 'gerfsal';
+                $sTituloCalculo = 'Sal?rio';
+                break;
+
+            case 'complementar':
+                $sigla          = 'r48_';
+                $arquivo        = 'gerfcom';
+                $sTituloCalculo = 'Complementar';
+                break;
+
+            case '13salario':
+                $sigla          = 'r35_';
+                $arquivo        = 'gerfs13';
+                $sTituloCalculo = '13? Sal?rio';
+                break;
+            case 'rescisao':
+                $sigla          = 'r20_';
+                $arquivo        = 'gerfres';
+                $xtipo          = ' r20_tpp ';
+                $sTituloCalculo = 'Rescis?o';
+                break;
+
+            default:
+                continue;
+                break;
         }
-        return round($proventos - $descontos, 2);
+        if ($opcao) {
+
+            $sql = "  select '1' as ordem ,
+                               {$sigla}rubric as rubrica,
+                               case
+                                 when rh27_pd = 3 then 0
+                                 else case
+                                        when {$sigla}pd = 1 then {$sigla}valor
+                                        else 0
+                                      end
+                               end as Provento,
+                               case
+                                 when rh27_pd = 3 then 0
+                                 else case
+                                        when {$sigla}pd = 2 then {$sigla}valor
+                                        else 0
+                                      end
+                               end as Desconto,
+                               {$sigla}quant as quant,
+                               rh27_descr,
+                               {$xtipo} as tipo ,
+                               case
+                                 when rh27_pd = 3 then 'Base'
+                                 else case
+                                        when {$sigla}pd = 1 then 'Provento'
+                                        else 'Desconto'
+                                      end
+                               end as provdesc,
+                               case
+                                when '{$arquivo}' = 'gerfsal' then 1
+                                when '{$arquivo}' = 'gerfcom' then 3
+                                when '{$arquivo}' = 'gerfs13' then 4
+                                when '{$arquivo}' = 'gerfres' then 2
+                                end as ideDmDev
+                          from {$arquivo}
+                               inner join rhrubricas on rh27_rubric = {$sigla}rubric
+                                                    and rh27_instit = " . db_getsession("DB_instit") . "
+                          " . bb_condicaosubpesproc($sigla, $iAnoUsu . "/" . $iMesusu) . "
+                           and {$sigla}regist = $matricula
+                           and {$sigla}pd != 3
+                           and {$sigla}rubric not in ('R985','R993','R981')
+                           order by {$sigla}pd,{$sigla}rubric";
+        }
+        $rsValores = db_query($sql);
+        // echo $sql;
+        // db_criatabela($rsValores);
+        // exit;
+        if ($opcao != 'rescisao') {
+            for ($iCont = 0; $iCont < pg_num_rows($rsValores); $iCont++) {
+                $oResult = \db_utils::fieldsMemory($rsValores, $iCont);
+                $proventos  += ($oResult->provdesc == 'Provento') ? $oResult->provento : 0;
+                $descontos  += ($oResult->provdesc == 'Desconto') ? $oResult->desconto : 0;
+            }
+            $vrliq = $proventos - $descontos;
+        } else {
+            for ($iCont2 = 0; $iCont2 < pg_num_rows($rsValores); $iCont2++) {
+                $oResult = \db_utils::fieldsMemory($rsValores, $iCont2);
+                $rsRubEspeciais = db_query($clrubricasesocial->sql_query(null, "e990_sequencial,e990_descricao", null, "baserubricasesocial.e991_rubricas = '{$oResult->rubrica}' AND e990_sequencial IN ('1000','5001','1020')"));
+                $rubrica = $oResult->rubrica;
+                if (pg_num_rows($rsRubEspeciais) > 0) {
+                    $oRubEspeciais = db_utils::fieldsMemory($rsRubEspeciais);
+                    switch ($oRubEspeciais->e990_sequencial) {
+                        case '1000':
+                            $rubrica = '9000';
+                            $rh27_descr = 'Saldo de Salário na Rescisão';
+                            break;
+                        case '5001':
+                            $rubrica = '9001';
+                            $rh27_descr = '13º Salário na Rescisão';
+                            break;
+                        case '1020':
+                            $rubrica = '9002';
+                            $rh27_descr = 'Férias Proporcional na Rescisão';
+                            break;
+                        case '1020':
+                            $rubrica = '9003';
+                            $rh27_descr = 'Férias Vencidas na Rescisão';
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+                $proventos  += ($oResult->provdesc == 'Provento') ? $oResult->provento : 0;
+                $descontos  += ($oResult->provdesc == 'Desconto') ? $oResult->desconto : 0;
+            }
+            $vrliq = $proventos - $descontos;
+        }
+        return round($vrliq, 2);
     }
 
     /**
-     * Busca o identificador de acordo com os pontos existentes para o periodo
-     * no formado requerido pela API sped-esocial
-     * @param int $matricula
-     * @param int $rh30_regime
+     * Retorna dados dos dependentes no formato necessario para envio
+     * pela API sped-esocial
      * @return array stdClass
      */
     private function buscarIdentificador($matricula, $rh30_regime)
     {
-        $iAnoUsu = date("Y", db_getsession("DB_datausu"));
-        $iMesusu = date("m", db_getsession("DB_datausu"));
+        $iAnoUsu = $this->ano();
+        $iMesusu = $this->mes();
+
         if ($rh30_regime == 1 || $rh30_regime == 3) {
             $aPontos = array(TipoPontoConstants::PONTO_13SALARIO);
             if ($this->indapuracao != 2)
@@ -325,8 +450,8 @@ class EventoS1210 extends EventoBase
 
     public function buscarDadosContabilidade($cpf, $ultimoDiaDoMes, $mes, $ano)
     {
-        $ano = date("Y", db_getsession("DB_datausu"));
-        $mes = date("m", db_getsession("DB_datausu"));
+        $ano = $this->ano();
+        $mes = $this->mes();
         $sql = "SELECT *
             FROM (
                     select e60_numcgm as num_cgm,

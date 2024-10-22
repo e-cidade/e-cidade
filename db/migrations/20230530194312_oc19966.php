@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc19966 extends AbstractMigration
+class Oc19966 extends PostgresMigration
 {
     /**
      * Change Method.
@@ -10,7 +10,7 @@ class Oc19966 extends AbstractMigration
      * Write your reversible migrations using this method.
      *
      * More information on writing migrations is available here:
-     * http://docs.phinx.org/en/latest/migrations.html#the-abstractmigration-class
+     * http://docs.phinx.org/en/latest/migrations.html#the-PostgresMigration-class
      *
      * The following commands can be used in this method and Phinx will
      * automatically reverse them when rolling back:
@@ -28,8 +28,8 @@ class Oc19966 extends AbstractMigration
     public function up()
     {
         $sql = "BEGIN;
-        
-        alter table liclicitemlote add l04_numerolote INT; 
+
+        alter table liclicitemlote add l04_numerolote INT;
 
         alter table licobras add obr01_licitacaolote INT;
 
@@ -63,7 +63,7 @@ class Oc19966 extends AbstractMigration
 
         ALTER TABLE acordoobra ADD CONSTRAINT acordoobra_acordoitem_fk
         FOREIGN KEY (obr08_acordoitem) REFERENCES acordoitem (ac20_sequencial);
-        
+
         COMMIT;";
 
         $this->execute($sql);

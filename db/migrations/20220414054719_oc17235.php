@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc17235 extends AbstractMigration
+class Oc17235 extends PostgresMigration
 {
     /**
      * @throws Exception

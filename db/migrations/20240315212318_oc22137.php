@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc22137 extends AbstractMigration
+class Oc22137 extends PostgresMigration
 {
     public function up()
     {
@@ -14,7 +14,7 @@ class Oc22137 extends AbstractMigration
         UPDATE db_itensmenu
         SET funcao='con4_gerarpca.php'
         WHERE descricao='Documentos DCASP Consolidado' and help='Contribuição' ;
-        
+
         COMMIT;
 
 SQL;

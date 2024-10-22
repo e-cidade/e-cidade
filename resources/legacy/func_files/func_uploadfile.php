@@ -1,28 +1,28 @@
 <?
 /*
- *     E-cidade Software Publico para Gestao Municipal                
- *  Copyright (C) 2009  DBselller Servicos de Informatica             
- *                            www.dbseller.com.br                     
- *                         e-cidade@dbseller.com.br                   
- *                                                                    
- *  Este programa e software livre; voce pode redistribui-lo e/ou     
- *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme  
- *  publicada pela Free Software Foundation; tanto a versao 2 da      
- *  Licenca como (a seu criterio) qualquer versao mais nova.          
- *                                                                    
- *  Este programa e distribuido na expectativa de ser util, mas SEM   
- *  QUALQUER GARANTIA; sem mesmo a garantia implicita de              
- *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM           
- *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais  
- *  detalhes.                                                         
- *                                                                    
- *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU     
- *  junto com este programa; se nao, escreva para a Free Software     
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA          
- *  02111-1307, USA.                                                  
- *  
- *  Copia da licenca no diretorio licenca/licenca_en.txt 
- *                                licenca/licenca_pt.txt 
+ *     E-cidade Software Publico para Gestao Municipal
+ *  Copyright (C) 2009  DBselller Servicos de Informatica
+ *                            www.dbseller.com.br
+ *                         e-cidade@dbseller.com.br
+ *
+ *  Este programa e software livre; voce pode redistribui-lo e/ou
+ *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme
+ *  publicada pela Free Software Foundation; tanto a versao 2 da
+ *  Licenca como (a seu criterio) qualquer versao mais nova.
+ *
+ *  Este programa e distribuido na expectativa de ser util, mas SEM
+ *  QUALQUER GARANTIA; sem mesmo a garantia implicita de
+ *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM
+ *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais
+ *  detalhes.
+ *
+ *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU
+ *  junto com este programa; se nao, escreva para a Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ *  02111-1307, USA.
+ *
+ *  Copia da licenca no diretorio licenca/licenca_en.txt
+ *                                licenca/licenca_pt.txt
  */
 
 require("libs/db_stdlib.php");
@@ -36,10 +36,10 @@ $clrotulo = new rotulocampo;
 $lFail    = false;
 
 if(isset($uploadfile)) {
-  
+
   // Nome do novo arquivo
   $nomearq = $_FILES["uploadfile"]["name"];
-  
+
   // Nome do arquivo temporário gerado no /tmp
   $nometmp = $_FILES["uploadfile"]["tmp_name"];
 
@@ -68,17 +68,17 @@ if(isset($uploadfile)) {
             }
         }
     }
-    if (filesize($arquivofoto) > 100000) {
-      
+    if (filesize($arquivofoto) > 2000000) {
+
       db_msgbox("Arquivo com Tamanho inválido");
       $href   = '';
       $lFail  = true;
       unlink($arquivofoto);
     } else {
-      $href = $arquivofoto;  
-    } 
+      $href = $arquivofoto;
+    }
   }else{
-    
+
   	db_msgbox("Erro ao enviar arquivo.");
   	unlink($nometmp);
   	$lFail = true;
@@ -118,25 +118,25 @@ function js_testacampo(){
 <? if (isset($_GET["clone"]) && !isset($href)) {
   echo "var cloneFormulario='{$_GET["clone"]}';\n";
  ?>
-  
+
  if (parent.$(cloneFormulario)) {
    var formteste = parent.$(cloneFormulario).cloneNode(true);
    $('teste').appendChild(formteste);
    formteste.submit();
  }
- <?} 
+ <?}
   if (isset($href)) {
-    
+
     if (!$lFail) {
-      
+
       echo "parent.$('preview').src=\"{$href}\";\n";
       echo "parent.$('namefile').value=\"{$href}\";\n";
     }
     echo "parent.endLoading();";
     echo "parent.$('teste').removeChild(parent.$('uploadIframe'));";
-    
+
 
   }
  ?>
- 
+
 </script>

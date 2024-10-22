@@ -78,6 +78,9 @@ class cl_empparametro
     var $e30_liquidacaodataanterior = 'f';
     var $e30_obrigadiarias = 't';
     var $e30_modeloop = 2;
+    var $e30_obrigadivida = 't';
+    var $e30_buscarordenadores = 0;
+    var $e30_buscarordenadoresliqui = 0;
     // cria propriedade com as variaveis do arquivo
     var $campos = "
                  e39_anousu = int4 = Exercício
@@ -112,6 +115,9 @@ class cl_empparametro
                  e30_modeloautempenho = int8 = Controla o modelo de autorização de emepnho
                  e30_obrigadiarias = bool = Obriga Informar Diárias na Liquidação
                  e30_modeloop = int4 = Modelo da Ordem de Pagamento
+                 e30_obrigadivida = bool = Controla Dívida Consolidada
+                 e30_buscarordenadores = int8 =  Buscar Ordenadores Despesas
+                 e30_buscarordenadoresliqui = int8 =  Buscar Ordenadores Liquidação
                  ";
 
     //funcao construtor da classe
@@ -172,7 +178,11 @@ class cl_empparametro
             $this->e30_empordemcron = ($this->e30_empordemcron == "f" ? @$GLOBALS["HTTP_POST_VARS"]["e30_empordemcron"] : $this->e30_empordemcron);
             $this->e30_liquidacaodataanterior = ($this->e30_liquidacaodataanterior == "f"?@$GLOBALS["HTTP_POST_VARS"]["e30_liquidacaodataanterior"]:$this->e30_liquidacaodataanterior);
             $this->e30_obrigadiarias = ($this->e30_obrigadiarias == "t"?@$GLOBALS["HTTP_POST_VARS"]["e30_obrigadiarias"]:$this->e30_obrigadiarias);
+            $this->e30_obrigadivida = ($this->e30_obrigadivida == "t"?@$GLOBALS["HTTP_POST_VARS"]["e30_obrigadivida"]:$this->e30_obrigadivida);
             $this->e30_modeloop = ($this->e30_modeloop == "t"?@$GLOBALS["HTTP_POST_VARS"]["e30_modeloop"]:$this->e30_modeloop);
+            $this->e30_buscarordenadores = ($this->e30_buscarordenadores == "f"?@$GLOBALS["HTTP_POST_VARS"]["e30_buscarordenadores"]:$this->e30_buscarordenadores);
+            $this->e30_buscarordenadoresliqui = ($this->e30_buscarordenadoresliqui == "f"?@$GLOBALS["HTTP_POST_VARS"]["e30_buscarordenadoresliqui"]:$this->e30_buscarordenadoresliqui);
+
         } else {
         }
     }
@@ -422,7 +432,22 @@ class cl_empparametro
             $this->erro_status = "0";
             return false;
         }
-
+        if ($this->e30_buscarordenadores == null) {
+            $this->erro_campo = "e30_buscarordenadores";
+            $this->erro_banco = "";
+            $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+            $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+            $this->erro_status = "0";
+            return false;
+        }
+        if ($this->e30_buscarordenadoresliqui == null) {
+            $this->erro_campo = "e30_buscarordenadoresliqui";
+            $this->erro_banco = "";
+            $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+            $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+            $this->erro_status = "0";
+            return false;
+        }
         if ($this->e30_modeloautempenho == null) {
             $this->erro_sql = " Campo modelo de autorizao de empenho nao Informado.";
             $this->erro_campo = "e30_modeloautempenho";
@@ -435,6 +460,16 @@ class cl_empparametro
         if ($this->e30_obrigadiarias == null) {
             $this->erro_sql = " Campo Obriga Informar Diárias na Liquidação nao Informado.";
             $this->erro_campo = "e30_obrigadiarias";
+            $this->erro_banco = "";
+            $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+            $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+            $this->erro_status = "0";
+            return false;
+        }
+
+        if ($this->e30_obrigadivida == null) {
+            $this->erro_sql = " Campo Controla Divida Consolidada nao Informado.";
+            $this->erro_campo = "e30_obrigadivida";
             $this->erro_banco = "";
             $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
             $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
@@ -473,6 +508,9 @@ class cl_empparametro
                                       ,e30_modeloautempenho
                                       ,e30_obrigadiarias
                                       ,e30_modeloop
+                                      ,e30_obrigadivida
+                                      ,e30_buscarordenadores
+                                      ,e30_buscarordenadoresliqui
                        )
                 values (
                                 $this->e39_anousu
@@ -506,6 +544,9 @@ class cl_empparametro
                                ,$this->e30_modeloautempenho
                                ,$this->e30_obrigadiarias
                                ,$this->e30_modeloop
+                               ,$this->e30_obrigadivida
+                               ,$this->e30_buscarordenadores
+                               ,$this->e30_buscarordenadoresliqui
                       )";
 
         $result = db_query($sql);
@@ -564,6 +605,7 @@ class cl_empparametro
             $resac = db_query("insert into db_acount values($acount,893,2012400,'','" . AddSlashes(pg_result($resaco, 0, 'e30_prazoentordcompra')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
             $resac = db_query("insert into db_acount values($acount,893,2012515,'','" . AddSlashes(pg_result($resaco, 0, 'e30_obrigactapagliq')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
             $resac = db_query("insert into db_acount values($acount,893,2012515,'','" . AddSlashes(pg_result($resaco, 0, 'e30_obrigadiarias')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
+            $resac = db_query("insert into db_acount values($acount,893,2012515,'','" . AddSlashes(pg_result($resaco, 0, 'e30_obrigadivida')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
         }
         return true;
     }
@@ -953,12 +995,51 @@ class cl_empparametro
                 return false;
             }
         }
+        if(trim($this->e30_buscarordenadores)!="" || isset($GLOBALS["HTTP_POST_VARS"]["e30_buscarordenadores"])){
+            $sql  .= $virgula." e30_buscarordenadores = '$this->e30_buscarordenadores' ";
+            $virgula = ",";
+            if(trim($this->e30_buscarordenadores) == null ){
+                $this->erro_sql = " Campo Buscar Ordenadores nao Informado.";
+                $this->erro_campo = "e30_buscarordenadores Despesas";
+                $this->erro_banco = "";
+                $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+                $this->erro_status = "0";
+                return false;
+            }
+        }
+        if(trim($this->e30_buscarordenadoresliqui)!="" || isset($GLOBALS["HTTP_POST_VARS"]["e30_buscarordenadoresliqui"])){
+            $sql  .= $virgula." e30_buscarordenadoresliqui = '$this->e30_buscarordenadoresliqui' ";
+            $virgula = ",";
+            if(trim($this->e30_buscarordenadoresliqui) == null ){
+                $this->erro_sql = " Campo Buscar Ordenadores Liquidação nao Informado.";
+                $this->erro_campo = "e30_buscarordenadoresliqui";
+                $this->erro_banco = "";
+                $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+                $this->erro_status = "0";
+                return false;
+            }
+        }
         if(trim($this->e30_obrigadiarias)!="" || isset($GLOBALS["HTTP_POST_VARS"]["e30_obrigadiarias"])){
             $sql  .= $virgula." e30_obrigadiarias = '$this->e30_obrigadiarias' ";
             $virgula = ",";
             if(trim($this->e30_obrigadiarias) == null ){
                 $this->erro_sql = " Campo Obriga Informar Diárias na Liquidação nao Informado.";
                 $this->erro_campo = "e30_obrigadiarias";
+                $this->erro_banco = "";
+                $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+                $this->erro_status = "0";
+                return false;
+            }
+        }
+        if(trim($this->e30_obrigadivida)!="" || isset($GLOBALS["HTTP_POST_VARS"]["e30_obrigadivida"])){
+            $sql  .= $virgula." e30_obrigadivida = '$this->e30_obrigadivida' ";
+            $virgula = ",";
+            if(trim($this->e30_obrigadivida) == null ){
+                $this->erro_sql = " Campo Controla Dívida Consolidada nao Informado.";
+                $this->erro_campo = "e30_obrigadivida";
                 $this->erro_banco = "";
                 $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
                 $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
@@ -1043,8 +1124,10 @@ class cl_empparametro
                 if (isset($GLOBALS["HTTP_POST_VARS"]["e30_obrigactapagliq"]) || $this->e30_obrigactapagliq != "")
                     $resac = db_query("insert into db_acount values($acount,893,2012515,'" . AddSlashes(pg_result($resaco, $conresaco, 'e30_obrigactapagliq')) . "','$this->e30_obrigactapagliq'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
                 if (isset($GLOBALS["HTTP_POST_VARS"]["e30_obrigadiarias"]) || $this->e30_obrigadiarias != "")
-                $resac = db_query("insert into db_acount values($acount,893,2012515,'" . AddSlashes(pg_result($resaco, $conresaco, 'e30_obrigadiarias')) . "','$this->e30_obrigadiarias'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");            
-                }
+                    $resac = db_query("insert into db_acount values($acount,893,2012515,'" . AddSlashes(pg_result($resaco, $conresaco, 'e30_obrigadiarias')) . "','$this->e30_obrigadiarias'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");            
+                if (isset($GLOBALS["HTTP_POST_VARS"]["e30_obrigadivida"]) || $this->e30_obrigadivida != "")
+                    $resac = db_query("insert into db_acount values($acount,893,2012515,'" . AddSlashes(pg_result($resaco, $conresaco, 'e30_obrigadivida')) . "','$this->e30_obrigadivida'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
+            }
         }
         $result = db_query($sql);
         if ($result == false) {
@@ -1115,6 +1198,7 @@ class cl_empparametro
                 $resac = db_query("insert into db_acount values($acount,893,2012352,'','" . AddSlashes(pg_result($resaco, $iresaco, 'e30_atestocontinterno')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
                 $resac = db_query("insert into db_acount values($acount,893,2012400,'','" . AddSlashes(pg_result($resaco, $iresaco, 'e30_prazoentordcompra')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
                 $resac = db_query("insert into db_acount values($acount,893,2012515,'','" . AddSlashes(pg_result($resaco, $iresaco, 'e30_obrigactapagliq')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
+                $resac = db_query("insert into db_acount values($acount,893,2012515,'','" . AddSlashes(pg_result($resaco, $iresaco, 'e30_obrigadivida')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
             }
         }
         $sql = " delete from empparametro

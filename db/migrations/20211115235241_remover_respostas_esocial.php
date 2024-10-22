@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class RemoverRespostasEsocial extends AbstractMigration
+class RemoverRespostasEsocial extends PostgresMigration
 {
 
     public function up()

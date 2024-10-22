@@ -157,7 +157,7 @@ switch ($oParam->exec) {
                     //classe modelo
                     $clResultadoItensPNCP = new ResultadoItensPNCP($aItensLicitacao);
                     //monta o json com os dados da licitacao
-                    $odadosResultado = $clResultadoItensPNCP->montarDados();
+                    $odadosResultado = $clResultadoItensPNCP->montarRetificacao();
 
                     //envia para pncp
                     $rsApiPNCP = $clResultadoItensPNCP->retificarResultado($odadosResultado, $oDadosAvisoPNCP->l213_numerocompra, $oDadosAvisoPNCP->l213_anousu, $item->l21_ordem, $oDadosResultado->l214_sequencialresultado);
@@ -166,7 +166,12 @@ switch ($oParam->exec) {
                         throw new Exception(utf8_decode($rsApiPNCP[1]));
                     }
                 }
+            } catch (Exception $eErro) {
+                $oRetorno->status  = 2;
+                $oRetorno->message = urlencode($eErro->getMessage());
+            }
 
+            try {
                 //Retificar Item de Contratação
                 foreach ($oParam->aItensLicitacao as $item) {
 
@@ -190,7 +195,7 @@ switch ($oParam->exec) {
                     //classe modelo
                     $clResultadoItensPNCP = new RetificaitensPNCP($aItensRetificaItemLicitacao);
                     //monta o json com os dados da licitacao
-                    $odadosItensRetifica = $clResultadoItensPNCP->montarDados();
+                    $odadosItensRetifica = $clResultadoItensPNCP->montarRetificacao();
 
                     //envia para pncp
                     $rsApiretitensPNCP = $clResultadoItensPNCP->retificarItem($odadosItensRetifica, $oDadosAvisoPNCP->l213_numerocompra, $oDadosAvisoPNCP->l213_anousu, $item->l21_ordem);

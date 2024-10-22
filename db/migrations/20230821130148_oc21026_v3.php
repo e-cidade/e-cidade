@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc21026V3 extends AbstractMigration
+class Oc21026V3 extends PostgresMigration
 {
     public function up()
     {
@@ -25,5 +25,5 @@ class Oc21026V3 extends AbstractMigration
 
 SQL;
         $this->execute($sql);
-    } 
+    }
 }

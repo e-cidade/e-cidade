@@ -398,18 +398,26 @@ switch ($oParam->exec) {
         $oRetorno->clabens = 2;
       }
      
-      if ($oParam->emp_sistema == "SIM") {
+      if ($oParam->emp_sistema == "SIM" || $oParam->emp_sistema == "s") {
         $sqlerro=false;
         if($sqlerro==false){
           db_inicio_transacao();
           $codbem = $oBem->getCodigoBem();
           $clbensmater = new cl_bensmater;
+          $clbensmater->sql_record($clbensmater->sql_query($codbem));
+        
           $clbensmater->t53_codbem = $codbem; 
           $clbensmater->t53_ntfisc = $oParam->cod_notafiscal; 
           $clbensmater->t53_ordem  = $oParam->cod_ordemdecompra; 
           $clbensmater->t53_garant = $oParam->garantia;
           $clbensmater->t53_empen  = $oParam->t53_empen;
-          $clbensmater->incluir($oBem->getCodigoBem());
+
+          if($clbensmater->numrows == 0){
+            $clbensmater->incluir($oBem->getCodigoBem());
+          } else {
+            $clbensmater->t53_garant  = formateDateReverse($oParam->garantia);
+            $clbensmater->alterar($codbem);
+          }
 
           if($clbensmater->erro_status==0){
             $sqlerro=true;
@@ -798,7 +806,35 @@ switch ($oParam->exec) {
             $oRetorno->status  = 2;
             $oRetorno->message = urlencode($eErro->getMessage());
         }      
-        break;     
+        break;    
+    case 'buscarDadosMaterial':
+    
+          $clbensmater = new cl_bensmater;
+          $result = $clbensmater->sql_record($clbensmater->sql_query($oParam->iCodigoBem));
+
+          $oDaoBensEmpNotaItem = new cl_bensempnotaitem();
+          $sSqlBuscaItem       = $oDaoBensEmpNotaItem->sql_query_file(
+            null,
+            "e136_empnotaitem",
+            null,
+            "e136_bens = {$oParam->iCodigoBem}"
+          );
+
+          $rsBuscaItem = $oDaoBensEmpNotaItem->sql_record($sSqlBuscaItem);
+          $oRetorno->lEmpenhoVinculado = false;
+          if ($oDaoBensEmpNotaItem->numrows > 0) {
+            $oRetorno->lEmpenhoVinculado = true;
+          }
+          if($clbensmater->numrows > 0){
+             db_fieldsmemory($result,0);
+             $oRetorno->t53_ntfisc = $t53_ntfisc;
+             $oRetorno->t53_empen  = $t53_empen;
+             $oRetorno->t53_ordem  = $t53_ordem;
+             $oRetorno->t53_garant = $t53_garant;
+          }  
+          break;   
+
+        
 }
 
 /**
@@ -1049,6 +1085,13 @@ function getDataImplantacaoDepreciacao()
     return db_utils::fieldsMemory($rsImplantacaoDepreciacao, 0)->t59_dataimplanatacaodepreciacao;
   }
   return null;
+}
+
+function formateDateReverse(string $date): string
+{ 
+    $data_objeto = DateTime::createFromFormat('d/m/Y', $date);
+    $data_formatada = $data_objeto->format('Y-m-d');
+    return date('Y-m-d', strtotime($data_formatada));
 }
 
 echo $oJson->encode($oRetorno);

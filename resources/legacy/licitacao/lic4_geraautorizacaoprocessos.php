@@ -41,11 +41,12 @@ if ($oPost->lSelecionaPc == "f") {
    */
   $sSqlDataHomologacao = "select l202_datahomologacao from homologacaoadjudica where l202_licitacao = {$oPost->l20_codigo}";
   if(pg_num_rows(db_query($sSqlDataHomologacao)) > 0) {
-      if (strtotime(db_utils::fieldsMemory(db_query($sSqlDataHomologacao), 0)->l202_datahomologacao) < db_getsession('DB_datausu')) {
-          db_redireciona("lic4_geraaut002.php?l20_codigo={$oPost->l20_codigo}");
+      if (date("Y-m-d", db_getsession("DB_datausu")) < db_utils::fieldsMemory(db_query($sSqlDataHomologacao), 0)->l202_datahomologacao) {
+        $sMsgErro = "Usuário: Inclusão Abortada. Não é permitido gerar autorizações de licitações cuja data da autorização (" . date("d/m/Y", db_getsession("DB_datausu")) . ") seja menor que a data de Ratificação/Homologação (" . date("d/m/Y", strtotime(db_utils::fieldsMemory(db_query($sSqlDataHomologacao), 0)->l202_datahomologacao)) . ").";
+        echo "<script> alert('$sMsgErro')</script>";
+        db_redireciona("lic4_geraaut001.php");
       } else {
-          echo "<script> alert('Não é permitido gerar autorizações de licitações cuja data de homologadação (".date("d/m/Y",strtotime(db_utils::fieldsMemory(db_query($sSqlDataHomologacao), 0)->l202_datahomologacao)) .") seja maior que a data da autorização (".date("d/m/Y",db_getsession('DB_datausu')).").')</script>";
-          db_redireciona("lic4_geraaut001.php");
+          db_redireciona("lic4_geraaut002.php?l20_codigo={$oPost->l20_codigo}");
       }
   }else{
       echo "<script> alert('Não é permitido gerar autorizações de licitações não homologadas.')</script>";

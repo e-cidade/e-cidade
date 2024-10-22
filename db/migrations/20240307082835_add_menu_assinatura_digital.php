@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AddMenuAssinaturaDigital extends AbstractMigration
+class AddMenuAssinaturaDigital extends PostgresMigration
 {
     public function up()
     {

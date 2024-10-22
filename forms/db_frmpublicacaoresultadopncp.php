@@ -35,7 +35,13 @@ db_app::load("estilos.css, grid.style.css");
         </tr>
     </table>
     </br>
-    <input type="button" value="Processar" onclick="js_getItens();">
+    <?php $component->render('buttons/solid', [
+        'designButton' => 'success',
+        'type' => 'button',
+        'onclick' => 'js_getItens()',
+        'size' => 'md',
+        'message' => 'Processar'
+    ]); ?>
     </br>
 
     <table style="width: 100%">
@@ -53,7 +59,13 @@ db_app::load("estilos.css, grid.style.css");
         <div id='cntgriditens'></div>
     </fieldset>
     </br>
-    <input type="button" value="Enviar para PNCP" onclick="js_enviarresultado();">
+    <?php $component->render('buttons/solid', [
+        'designButton' => 'success',
+        'type' => 'button',
+        'onclick' => 'js_enviarresultado()',
+        'size' => 'md',
+        'message' => 'Enviar para PNCP'
+    ]); ?>
 </form>
 <script>
     function js_showGrid() {

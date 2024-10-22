@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Addcamposigiloso extends AbstractMigration
+class Addcamposigiloso extends PostgresMigration
 {
     public function up()
     {

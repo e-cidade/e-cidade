@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Ocsicomlayout2023 extends AbstractMigration
+class Ocsicomlayout2023 extends PostgresMigration
 {
 
 
@@ -10,7 +10,7 @@ class Ocsicomlayout2023 extends AbstractMigration
     {
         $sql = "
         BEGIN;
-        ALTER TABLE acordo ADD ac16_reajuste BOOLEAN; 
+        ALTER TABLE acordo ADD ac16_reajuste BOOLEAN;
         ALTER TABLE acordo ADD ac16_criterioreajuste  INT;
         ALTER TABLE acordo ADD ac16_datareajuste DATE;
         ALTER TABLE acordo ADD ac16_indicereajuste INT;

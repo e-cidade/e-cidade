@@ -1,17 +1,17 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc11425 extends AbstractMigration
+class Oc11425 extends PostgresMigration
 {
     public function up()
     {
         $sql = <<<SQL
-        
+
         BEGIN;
-        
+
         DROP TABLE bpdcasp102019;
-        
+
         CREATE TABLE bpdcasp102019 (
           si208_sequencial integer DEFAULT 0 NOT NULL,
           si208_tiporegistro integer DEFAULT 0 NOT NULL,

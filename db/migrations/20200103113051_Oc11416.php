@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc11416 extends AbstractMigration
+class Oc11416 extends PostgresMigration
 {
     /**
      * Change Method.
@@ -10,7 +10,7 @@ class Oc11416 extends AbstractMigration
      * Write your reversible migrations using this method.
      *
      * More information on writing migrations is available here:
-     * http://docs.phinx.org/en/latest/migrations.html#the-abstractmigration-class
+     * http://docs.phinx.org/en/latest/migrations.html#the-PostgresMigration-class
      *
      * The following commands can be used in this method and Phinx will
      * automatically reverse them when rolling back:
@@ -57,7 +57,7 @@ class Oc11416 extends AbstractMigration
                 2,
                 '2099-12-31',
                 (SELECT max(db121_sequencial) FROM db_estruturavalor WHERE db121_estrutural = '160'),
-                19900000), 
+                19900000),
                 (260,
                 'Transf. da Uniao Bonus de Ass. Cont. de Partilha de Producao',
                 '260',
@@ -247,9 +247,9 @@ class Oc11416 extends AbstractMigration
         ORDER BY 3;
 
         COMMIT;
-        
+
 SQL;
-    
+
         $this->execute($sql);
 
     }

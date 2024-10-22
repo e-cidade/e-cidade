@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AlterarCamposEvt5001Consulta extends AbstractMigration
+class AlterarCamposEvt5001Consulta extends PostgresMigration
 {
 
     public function up()
@@ -48,7 +48,7 @@ class AlterarCamposEvt5001Consulta extends AbstractMigration
         DELETE FROM db_syscampo WHERE codcam = {$rh218_indapuracao};
         DELETE FROM db_syscampo WHERE codcam = {$rh218_nrrecarqbase};
         DELETE FROM db_syscampo WHERE codcam = {$rh218_tpcr};
-        
+
         INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel) VALUES ((select max(codcam)+1 from db_syscampo), 'rh218_vlrbasecalc', 'float8', 'Base Calc Contrib Social', '0', 'Base Calc Contrib Social', 14, false, false, false, 4, 'text', 'Base Calc Contrib Social');
         INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select codarq from db_sysarquivo where nomearq = 'evt5001consulta'), (select codcam from db_syscampo where nomecam = 'rh218_vlrbasecalc'), 12, 0);
         ";
@@ -74,7 +74,7 @@ class AlterarCamposEvt5001Consulta extends AbstractMigration
         $sql = "
         DELETE FROM db_sysarqcamp WHERE codcam = {$rh218_vlrbasecalc};
         DELETE FROM db_syscampo WHERE codcam = {$rh218_vlrbasecalc};
-        
+
         INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel) VALUES ((select max(codcam)+1 from db_syscampo), 'rh218_indapuracao', 'int4', 'Tipo Período Apuração', '0', 'Tipo Período Apuração', 11, false, false, false, 1, 'text', 'Tipo Período Apuração');
         INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel) VALUES ((select max(codcam)+1 from db_syscampo), 'rh218_nrrecarqbase', 'varchar(100)', 'Recibo', '', 'Recibo', 100, false, true, false, 0, 'text', 'Recibo');
         INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel) VALUES ((select max(codcam)+1 from db_syscampo), 'rh218_tpcr', 'varchar(10)', 'Código de Receita', '', 'Código de Receita', 10, false, true, false, 0, 'text', 'Código de Receita');

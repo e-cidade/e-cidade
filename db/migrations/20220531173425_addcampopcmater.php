@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Addcampopcmater extends AbstractMigration
+class Addcampopcmater extends PostgresMigration
 {
 
     public function up()

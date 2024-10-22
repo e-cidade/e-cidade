@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class CreateDicionarioPregrao extends AbstractMigration
+class CreateDicionarioPregrao extends PostgresMigration
 {
     public function up()
     {

@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc15584 extends AbstractMigration
+class Oc15584 extends PostgresMigration
 {
     /**
      * Change Method.
@@ -10,7 +10,7 @@ class Oc15584 extends AbstractMigration
      * Write your reversible migrations using this method.
      *
      * More information on writing migrations is available here:
-     * http://docs.phinx.org/en/latest/migrations.html#the-abstractmigration-class
+     * http://docs.phinx.org/en/latest/migrations.html#the-PostgresMigration-class
      *
      * The following commands can be used in this method and Phinx will
      * automatically reverse them when rolling back:
@@ -32,7 +32,7 @@ class Oc15584 extends AbstractMigration
             INSERT INTO db_itensmenu VALUES((select max(id_item)+1 from db_itensmenu),\'Ratificação(novo)\',\'Ratificação(novo)\',\'rat2_ratificacaoprocnovo001.php\',1,1,\'Ratificação(novo)\',\'t\');
             INSERT INTO db_menu VALUES(1797,(select max(id_item) from db_itensmenu),1002,381);
             INSERT INTO db_tipodoc VALUES ((SELECT max(db08_codigo)+1 from db_tipodoc),\'RATIFICACAO NOVO\');
-                   
+
             INSERT INTO db_documentopadrao VALUES ((SELECT max(db60_coddoc) FROM db_documentopadrao)+1, \'RATIFICACAO NOVO\', (select max(db08_codigo) from db_tipodoc), 1);
             insert into db_documento values ((select max(db03_docum)+1 from db_documento),\'RATIFICACAO NOVO\',(select max(db08_codigo) from db_tipodoc), 1);
             INSERT INTO db_paragrafo
@@ -40,13 +40,13 @@ class Oc15584 extends AbstractMigration
                         (SELECT MAX(db02_idparag)+1
                          FROM db_paragrafo),
                      \'RATIFICACAO NOVO\',
-                     \'PROCEDIMENTO ADMINISTRATIVO Nº #$l20_edital# 
+                     \'PROCEDIMENTO ADMINISTRATIVO Nº #$l20_edital#
             TERMO DE #$l44_descricao#  Nº #$l20_numero#
-            
+
             O PREFEITO, NO USO DE SUAS ATRIBUIÇÕES LEGAIS,
-            
+
             RESOLVE,
-            
+
             RATIFICAR E HOMOLOGAR, o Procedimento Licitatório nº #$l20_edital#, Termo de #$l44_descricao# nº #$l20_numero# conforme justificativa apresentada pela Comissão de Licitação da #$instit#, e Parecer da Assessoria Jurídica, AUTORIZANDO a #$l20_objeto#  no valor total de R$ #$totallicitacao# para contratação do(s) fornecedor(es) relacionado(s) abaixo.\',
                      0,
                      0,
@@ -261,7 +261,7 @@ for($i = 0; $i < $numrows; $i++){
                      3,
                      1);
          insert into db_docparag values ((select max(db03_docum) from db_documento),(SELECT MAX(db02_idparag)FROM db_paragrafo),3);
-commit;          
+commit;
         ');
         $this->execute($sql);
     }

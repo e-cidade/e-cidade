@@ -1,13 +1,13 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc16572 extends AbstractMigration
+class Oc16572 extends PostgresMigration
 {
     public function up()
     {
         $sql = <<<SQL
-  
+
         BEGIN;
         SELECT fc_startsession();
 

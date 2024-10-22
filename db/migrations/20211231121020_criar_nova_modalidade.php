@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class CriarNovaModalidade extends AbstractMigration
+class CriarNovaModalidade extends PostgresMigration
 {
     public function up()
     {

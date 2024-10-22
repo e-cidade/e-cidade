@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc19320 extends AbstractMigration
+class Oc19320 extends PostgresMigration
 {
     public function up()
     {
@@ -41,9 +41,9 @@ class Oc19320 extends AbstractMigration
         FROM ORCDOTACAO D
             INNER JOIN ORCELEMENTO O ON O.O56_CODELE = D.O58_CODELE AND O.O56_ANOUSU = D.O58_ANOUSU
         WHERE D.O58_ANOUSU = ANOUSU AND D.O58_CODDOT = CODDOT;
-        
+
         RETURN ESTRUTURAL;
-        
+
         END;
         $$
         ;
@@ -80,19 +80,19 @@ class Oc19320 extends AbstractMigration
         FROM ORCRECEITA R
             INNER JOIN ORCFONTES O ON O.O57_CODFON = R.O70_CODFON AND O.O57_ANOUSU = R.O70_ANOUSU
         WHERE R.O70_ANOUSU = ANOUSU AND R.O70_CODREC = CODREC;
-        
+
         RETURN ESTRUTURAL;
-        
+
         END;
         $$
         ;
 
         update db_syscampo set tamanho = '8' where nomecam = 'o58_codigo' and rotulo = 'Tipo de Recurso';
 
-        
+
         COMMIT;
 
 SQL;
         $this->execute($sql);
-    } 
+    }
 }

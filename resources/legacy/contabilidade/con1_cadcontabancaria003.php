@@ -16,22 +16,24 @@ $cloperacaodecredito = new cl_db_operacaodecredito;
 $clsaltes            = new cl_saltes;
 $mostrarCampo        = "none";
 $mostrarCampo2       = "none";
+$db_opcao = 33;
 $cloperacaodecredito->rotulo->label();
 
-$db_opcao = 3;
-$result   = $clcontabancaria->sql_record($clcontabancaria->sql_query_cadcontanovo($chavepesquisa));
-db_fieldsmemory($result, 0);
+if (isset($chavepesquisa)) {
+  $db_opcao = 3;
+  $result   = $clcontabancaria->sql_record($clcontabancaria->sql_query_cadcontanovo($chavepesquisa));
+  db_fieldsmemory($result, 0);
 
-$iCodigoRecurso    = $c61_codigo;
-$sDescricaoRecurso = $o15_descr;
-$db83_codigotce    = $c61_codtce;
-$db83_reduzido     = $k13_reduz;
-$dtImplantacao     = explode("-", $k13_dtimplantacao, 3);
-$db83_dataimplantaoconta_dia = $dtImplantacao[2];
-$db83_dataimplantaoconta_mes = $dtImplantacao[1];
-$db83_dataimplantaoconta_ano = $dtImplantacao[0];
-$db_botao = true;
-
+  $iCodigoRecurso    = $c61_codigo;
+  $sDescricaoRecurso = $o15_descr;
+  $db83_codigotce    = $c61_codtce;
+  $db83_reduzido     = $k13_reduz;
+  $dtImplantacao     = explode("-", $k13_dtimplantacao, 3);
+  $db83_dataimplantaoconta_dia = $dtImplantacao[2];
+  $db83_dataimplantaoconta_mes = $dtImplantacao[1];
+  $db83_dataimplantaoconta_ano = $dtImplantacao[0];
+  $db_botao = true;
+}
 ?>
 <html>
 
@@ -69,7 +71,7 @@ if (isset($excluir)) {
   } else {
     $clcontabancaria->erro(true, true);
   }
-}
+} 
 if ($db_opcao == 33) {
   echo "<script>document.form1.pesquisar.click();</script>";
 }

@@ -1,11 +1,11 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc16190Correcao extends AbstractMigration
+class Oc16190Correcao extends PostgresMigration
 {
     public function up()
-    {  
+    {
 
         $sql = <<<SQL
 
@@ -14,13 +14,13 @@ class Oc16190Correcao extends AbstractMigration
         SELECT fc_startsession();
 
         DELETE FROM db_sysarqcamp where codcam = (select codcam from db_syscampo where nomecam = 'k81_regrepasse');
-        
-        INSERT INTO db_sysarqcamp 
-                (codarq, codcam, seqarq, codsequencia) 
-        VALUES 
+
+        INSERT INTO db_sysarqcamp
+                (codarq, codcam, seqarq, codsequencia)
+        VALUES
                 ((select codarq from db_sysarquivo where nomearq = 'placaixarec'),
                 (select codcam from db_syscampo where nomecam = 'k81_regrepasse'), 14, 0);
-        COMMIT; 
+        COMMIT;
 SQL;
         $this->execute($sql);
     }

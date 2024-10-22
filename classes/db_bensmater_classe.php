@@ -230,7 +230,7 @@ class cl_bensmater {
      if(trim($this->t53_garant)!="" || isset($GLOBALS["HTTP_POST_VARS"]["t53_garant_dia"]) &&  ($GLOBALS["HTTP_POST_VARS"]["t53_garant_dia"] !="") ){ 
        $sql  .= $virgula." t53_garant = '$this->t53_garant' ";
        $virgula = ",";
-       if($this->verificaEstrutBem($this->t53_codbem)){
+       if($this->t53_garant == null){
          $this->erro_sql = " Campo Garantia nao Informado.";
          $this->erro_campo = "t53_garant_dia";
          $this->erro_banco = "";
@@ -243,7 +243,7 @@ class cl_bensmater {
        if(trim($this->t53_garant) == null ){ 
          $sql  .= $virgula." t53_garant = null ";
          $virgula = ",";
-         if($this->verificaEstrutBem($this->t53_codbem)){
+         if($this->t53_garant == null){
            $this->erro_sql = " Campo Garantia nao Informado.";
            $this->erro_campo = "t53_garant_dia";
            $this->erro_banco = "";

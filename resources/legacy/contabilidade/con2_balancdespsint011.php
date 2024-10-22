@@ -118,7 +118,7 @@ function js_emite(){
                  <td align="right" ><strong>Nível :</strong></td>
                  <td> 
                  <?
-                   $xy = array('1B'=>'Órgão','2A'=>'Unidade','3B'=>'Função','4B'=>'Subfunção','5B'=>'Programa','6B'=>'Proj/Ativ','7B'=>'Elemento','8B'=>'Recurso','9B'=>'Categoria Econômica');
+                   $xy = array('1B'=>'Órgão','2A'=>'Unidade','3B'=>'Função','4B'=>'Subfunção','5B'=>'Programa','6B'=>'Proj/Ativ','7B'=>'Elemento','8B'=>'Recurso','9B'=>'Categoria Econômica', '10B' => 'Grupo de Natureza da Despesa', '11B' => 'Modalidade de Aplicação');
               	   db_select('nivel',$xy,true,2,"");
 	               ?>
                  </td>
@@ -201,5 +201,25 @@ function js_emite(){
 </body>
 </html>
 <script>
-   document.forms[0].nivel.multiple = true;
+  document.forms[0].nivel.multiple = true;
+
+  var selectElement = document.getElementById("nivel");
+
+  selectElement.addEventListener("change", function() {
+
+      var selectedOptions = Array.from(selectElement.options)
+                            .filter(option => option.selected)
+                            .map(option => option.value);
+ 
+      if(selectedOptions.includes("11B")) {
+        Array.from(selectElement.options).forEach(option => {
+            option.selected = option.value === "11B";
+        });
+      } else if(selectedOptions.includes("10B")) {
+        Array.from(selectElement.options).forEach(option => {
+            option.selected = option.value === "10B";
+        }); 
+      }
+  });
+   
 </script>

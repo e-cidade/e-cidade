@@ -1,15 +1,15 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class CorrigeCodAfastamento extends AbstractMigration
+class CorrigeCodAfastamento extends PostgresMigration
 {
 
     public function up()
     {
         $sql = "
         UPDATE afasta SET r45_mesmadoenca = 'N' WHERE r45_codigoafasta IS NULL;
-        
+
         UPDATE afasta SET r45_codigoafasta = (
             CASE WHEN r45_situac IN (2,4,7,9) THEN '05'
             WHEN r45_situac = 5 THEN '17'

@@ -1,13 +1,13 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AlterarTabelahablic112021 extends AbstractMigration
+class AlterarTabelahablic112021 extends PostgresMigration
 {
     public function up(){
         $sql = "
         DROP TABLE IF EXISTS hablic112022 CASCADE;
-        
+
         CREATE TABLE hablic112022 (
             si58_sequencial bigint DEFAULT 0 NOT NULL,
             si58_tiporegistro bigint DEFAULT 0 NOT NULL,
@@ -26,10 +26,10 @@ class AlterarTabelahablic112021 extends AbstractMigration
         );
 
         ALTER TABLE ONLY hablic112022 ADD CONSTRAINT hablic112022_sequ_pk PRIMARY KEY (si58_sequencial);
-        
+
         CREATE INDEX hablic112022_si58_reg10_index ON hablic112022 USING btree (si58_mes);
-        
-        ALTER TABLE ONLY hablic112022 ADD CONSTRAINT hablic112022_reg10_fk FOREIGN KEY (si58_reg10) REFERENCES hablic102022(si57_sequencial);        
+
+        ALTER TABLE ONLY hablic112022 ADD CONSTRAINT hablic112022_reg10_fk FOREIGN KEY (si58_reg10) REFERENCES hablic102022(si57_sequencial);
         ";
 
         $this->execute($sql);
@@ -38,7 +38,7 @@ class AlterarTabelahablic112021 extends AbstractMigration
     public function down(){
         $sql = "
             drop index hablic112022_si58_reg10_index;
-            drop table hablic112022;        
+            drop table hablic112022;
         ";
 
         $this->execute($sql);

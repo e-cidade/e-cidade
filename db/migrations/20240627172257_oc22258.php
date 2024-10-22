@@ -1,21 +1,21 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc22258 extends AbstractMigration
+class Oc22258 extends PostgresMigration
 {
 
     public function up()
     {
         $sSql = "
-               
+
         BEGIN;
-      
+
         update db_menu set menusequencia = 6 where menusequencia = 5 and id_item = (select id_item from db_itensmenu where descricao = 'PNCP') and modulo = 381;
-       
+
         INSERT INTO db_itensmenu values ((select max(id_item)+1 from db_itensmenu),
          'Anexos de Empenho','Anexos de Empenho','lic1_anexoempenho.php',1,1,'Anexos Empenho','t');
-        
+
         INSERT INTO db_menu VALUES((select id_item from db_itensmenu where descricao = 'PNCP'),(select max(id_item) from db_itensmenu),5,381);
 
         CREATE TABLE empanexo(
@@ -43,7 +43,7 @@ class Oc22258 extends AbstractMigration
                     MAXVALUE 9223372036854775807
                     START 1
                     CACHE 1;
-        
+
         COMMIT;";
 
         $this->execute($sSql);

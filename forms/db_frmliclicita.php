@@ -424,7 +424,17 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
                                         ?>
                                     </td>
                                 </tr>
-
+                                <tr style="display: none;">
+                                    <td nowrap title="<?= @$Tl20_lances ?>">
+                                        <strong><?= "Apuração de lances pelo sistema: " ?></strong>
+                                    </td>
+                                    <td>
+                                        <?php 
+                                        $alances = array("f" => "Não","t"=> "Sim");
+                                        db_select("l20_lances",$alances,true,"");
+                                        ?>
+                                    </td>
+                                </tr> 
                                 <tr id="tr_l20_tipnaturezaproced">
                                     <td nowrap title="<?= @$Tl20_tipnaturezaproced ?>" id="tipnaturezaproced">
                                         <?= @$Ll20_tipnaturezaproced ?>
@@ -571,7 +581,6 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
 
                                 </tr>
 
-
                                 <tr>
                                     <td nowrap title="<?= @$Tl20_execucaoentrega ?>">
                                         <?= @$Ll20_execucaoentrega ?>
@@ -583,9 +592,6 @@ $lBloqueadoRegistroPreco = (empty($itens_lancados) ? $db_opcao : 3);
                                         ?>
                                     </td>
                                 </tr>
-
-
-
                             </table>
                         </fieldset>
 

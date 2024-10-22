@@ -41,7 +41,7 @@ pmnovaporteirinha_consulta 5432 prefeituras2
 
 cmnavarro			    5432 cmnavarro
 cmfranciscodumont		5432 cmnavarro
-    
+
 ammesf				    5432	e-cidade
 cii-amaje			    5432	e-cidade
 cimams				    5432	e-cidade
@@ -124,7 +124,7 @@ cias                   5432 e-cidadev3
 treinamento_consorcio  5432 e-cidadev3
 pmverdelandia          5432 e-cidadev3
 demoecidade            5432 e-cidadev3
- 
+
 e-cidade            5432 pmmonteazulv3
 
 e-cidade            5432 pmmontalvaniav3
@@ -162,4 +162,6 @@ prevcap				    5432 e-cidadev3-prod
 cmmirabela			    5432 e-cidadev3-prod
 cmpatis			        5432 e-cidadev3-prod
 cmbrasilandia			5432 e-cidadev3-prod
+arsarp		         	5432 e-cidadev3-prod
 e-cidade                5432 cmcapitaoeneasv3
+prevponte   			5432 e-cidadev3-prod

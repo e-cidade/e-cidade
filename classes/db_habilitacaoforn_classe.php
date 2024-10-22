@@ -907,5 +907,44 @@ class cl_habilitacaoforn {
     inner join cgm on z01_numcgm = pc21_numcgm
     where pc31_liclicita = $codigoLicitacao ";
   }
+
+  function validacaoRepresentanteLegal($iCodigoFornecedor){
+    
+    $representanteLegal = false;
+    $demaisMembros = false;
+    $rsRepresentantesLegais = db_query("select z01_numcgm,z01_nome,pc81_tipopart,pc81_cgmresp,pc81_cgmforn, case when LENGTH(z01_cgccpf) = 11 then 'cpf' else 'cnpj' end as cpfcnpj from cgm left join pcfornereprlegal on pc81_cgmforn = z01_numcgm where z01_numcgm = $iCodigoFornecedor ");
+
+    $cpfcnpj = db_utils::fieldsMemory($rsRepresentantesLegais, 0)->cpfcnpj;
+    if($cpfcnpj == "cpf") return;
+
+    $sFornecedor = db_utils::fieldsMemory($rsRepresentantesLegais, 0)->z01_numcgm ." - ". db_utils::fieldsMemory($rsRepresentantesLegais, 0)->z01_nome;
+
+    for ($i = 0; $i < pg_num_rows($rsRepresentantesLegais); $i++) {
+      $representante = db_utils::fieldsMemory($rsRepresentantesLegais, $i);
+      if($representante->pc81_tipopart == "1") $representanteLegal = true;
+      if($representante->pc81_tipopart == "2") $demaisMembros = true;
+      if(in_array($representante->pc81_tipopart, array("3","4","5","6"))){
+        return;
+      }
+      if($representante->pc81_cgmresp == $iCodigoFornecedor){
+        return "Usuário: No cadastro do fornecedor selecionado, o CGM do Representante está o mesmo CNPJ do CGM do Fornecedor. Corrija o cadastro e selecione novamente o fornecedor.";
+      }
+    }
+
+    if($representanteLegal == true && $demaisMembros == true) return ;
+
+    if($representanteLegal == false && $demaisMembros == false){
+      return "Usuário: O fornecedor $sFornecedor não possui composição de representates legais válida. Verifique!";
+    }
+
+    if($representanteLegal == true && $demaisMembros == false){
+      return "Usuário: O fornecedor $sFornecedor não possui demais membros nos representantes legais. Verifique!";
+    }
+
+    if($representanteLegal == false && $demaisMembros == true){
+      return "Usuário: O fornecedor $sFornecedor não possui representante legal. Verifique!";
+    }
+
+  }
 }
 ?>

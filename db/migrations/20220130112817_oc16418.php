@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc16418 extends AbstractMigration
+class Oc16418 extends PostgresMigration
 {
     public function up()
     {
@@ -16,130 +16,130 @@ class Oc16418 extends AbstractMigration
 
         $sql = <<<SQL
         BEGIN;
-            
+
             INSERT INTO db_itensmenu VALUES
             ((select max(id_item) + 1 from db_itensmenu), 'DIPR - Dem. Inf. Previdenciárias e Repasses', 'DIPR - Dem. Inf. Previdenciárias e Repasses', ' ', 1, 1, 'DIPR - Dem. Inf. Previdenciárias e Repasses', 't');
-    
+
             INSERT INTO db_menu VALUES
             (3332, (select max(id_item) from db_itensmenu), 300, 209);
-                    
-            INSERT INTO db_itensmenu VALUES 
+
+            INSERT INTO db_itensmenu VALUES
             ((select max(id_item) + 1 from db_itensmenu), 'Cadastro Informações Previdenciárias', 'Cadastro Informações Previdenciárias', ' ', 1, 1, 'Cadastro Informações Previdenciárias', 't');
-            
+
             INSERT INTO db_menu VALUES
             ((select id_item from db_itensmenu where descricao like '%DIPR - Dem. Inf. Previdenciárias e Repasses%'), (select max(id_item) from db_itensmenu), 1, 209);
-            
-            INSERT INTO db_itensmenu VALUES 
+
+            INSERT INTO db_itensmenu VALUES
             ((select max(id_item) + 1 from db_itensmenu), 'Inclusão', 'Inclusão', 'con1_diprcadastro001.php', 1, 1, 'Inclusão', 't');
-                    
+
             INSERT INTO db_menu VALUES
             ((select id_item from db_itensmenu where descricao like '%Cadastro Informações Previdenciárias%'), (select max(id_item) from db_itensmenu), 1, 209);
-            
-            INSERT INTO db_itensmenu VALUES 
+
+            INSERT INTO db_itensmenu VALUES
             ((select max(id_item) + 1 from db_itensmenu), 'Alteração', 'Alteração', 'con1_diprcadastro002.php', 1, 1, 'Alteração', 't');
-            
+
             INSERT INTO db_menu VALUES
             ((select id_item from db_itensmenu where descricao like '%Cadastro Informações Previdenciárias%'), (select max(id_item) from db_itensmenu), 2, 209);
-            
-            INSERT INTO db_itensmenu VALUES 
+
+            INSERT INTO db_itensmenu VALUES
             ((select max(id_item) + 1 from db_itensmenu), 'Exclusão', 'Exclusão', 'con1_diprcadastro003.php', 1, 1, 'Exclusão', 't');
 
             INSERT INTO db_menu VALUES
             ((select id_item from db_itensmenu where descricao like '%Cadastro Informações Previdenciárias%'), (select max(id_item) from db_itensmenu), 2, 209);
-            
-            INSERT INTO db_itensmenu VALUES 
+
+            INSERT INTO db_itensmenu VALUES
             ((select max(id_item) + 1 from db_itensmenu), 'Base de Cálculo da Contribuição Previdenciária', 'Base de Cálculo da Contribuição Previdenciária', ' ', 1, 1, 'Base de Cálculo da Contribuição Previdenciária', 't');
-            
+
             INSERT INTO db_menu VALUES
             ((select id_item from db_itensmenu where descricao like '%DIPR - Dem. Inf. Previdenciárias e Repasses%'), (select max(id_item) from db_itensmenu), 2, 209);
-            
-            INSERT INTO db_itensmenu VALUES 
+
+            INSERT INTO db_itensmenu VALUES
             ((select max(id_item) + 1 from db_itensmenu), 'Inclusão', 'Inclusão', 'con1_diprcontribuicao001.php', 1, 1, 'Inclusão', 't');
-                    
+
             INSERT INTO db_menu VALUES
             ((select id_item from db_itensmenu where descricao like '%Base de Cálculo da Contribuição Previdenciária%'), (select max(id_item) from db_itensmenu), 1, 209);
-            
-            INSERT INTO db_itensmenu VALUES 
+
+            INSERT INTO db_itensmenu VALUES
             ((select max(id_item) + 1 from db_itensmenu), 'Alteração', 'Alteração', 'con1_diprcontribuicao002.php', 1, 1, 'Alteração', 't');
-            
+
             INSERT INTO db_menu VALUES
             ((select id_item from db_itensmenu where descricao like '%Base de Cálculo da Contribuição Previdenciária%'), (select max(id_item) from db_itensmenu), 2, 209);
-            
-            INSERT INTO db_itensmenu VALUES 
+
+            INSERT INTO db_itensmenu VALUES
             ((select max(id_item) + 1 from db_itensmenu), 'Exclusão', 'Exclusão', 'con1_diprcontribuicao003.php', 1, 1, 'Exclusão', 't');
-            
+
             INSERT INTO db_menu VALUES
             ((select id_item from db_itensmenu where descricao like '%Base de Cálculo da Contribuição Previdenciária%'), (select max(id_item) from db_itensmenu), 2, 209);
-            
-            INSERT INTO db_itensmenu VALUES 
+
+            INSERT INTO db_itensmenu VALUES
             ((select max(id_item) + 1 from db_itensmenu), 'Contribuições Previdenciárias Repassadas', 'Contribuições Previdenciárias Repassadas', ' ', 1, 1, 'Contribuições Previdenciárias Repassadas', 't');
-            
+
             INSERT INTO db_menu VALUES
             ((select id_item from db_itensmenu where descricao like '%DIPR - Dem. Inf. Previdenciárias e Repasses%'), (select max(id_item) from db_itensmenu), 3, 209);
-            
-            INSERT INTO db_itensmenu VALUES 
+
+            INSERT INTO db_itensmenu VALUES
             ((select max(id_item) + 1 from db_itensmenu), 'Inclusão', 'Inclusão', 'con1_diprbaseprevidencia001.php', 1, 1, 'Inclusão', 't');
-                    
+
             INSERT INTO db_menu VALUES
             ((select id_item from db_itensmenu where descricao like '%Contribuições Previdenciárias Repassadas%'), (select max(id_item) from db_itensmenu), 1, 209);
-            
-            INSERT INTO db_itensmenu VALUES 
+
+            INSERT INTO db_itensmenu VALUES
             ((select max(id_item) + 1 from db_itensmenu), 'Alteração', 'Alteração', 'con1_diprbaseprevidencia002.php', 1, 1, 'Alteração', 't');
-            
-            INSERT INTO db_menu VALUES
-            ((select id_item from db_itensmenu where descricao like '%Contribuições Previdenciárias Repassadas%'), (select max(id_item) from db_itensmenu), 2, 209);
-            
-            INSERT INTO db_itensmenu VALUES 
-            ((select max(id_item) + 1 from db_itensmenu), 'Exclusão', 'Exclusão', 'con1_diprbaseprevidencia003.php', 1, 1, 'Exclusão', 't');
-            
+
             INSERT INTO db_menu VALUES
             ((select id_item from db_itensmenu where descricao like '%Contribuições Previdenciárias Repassadas%'), (select max(id_item) from db_itensmenu), 2, 209);
 
-            INSERT INTO db_itensmenu VALUES 
+            INSERT INTO db_itensmenu VALUES
+            ((select max(id_item) + 1 from db_itensmenu), 'Exclusão', 'Exclusão', 'con1_diprbaseprevidencia003.php', 1, 1, 'Exclusão', 't');
+
+            INSERT INTO db_menu VALUES
+            ((select id_item from db_itensmenu where descricao like '%Contribuições Previdenciárias Repassadas%'), (select max(id_item) from db_itensmenu), 2, 209);
+
+            INSERT INTO db_itensmenu VALUES
             ((select max(id_item) + 1 from db_itensmenu), 'Deduções', 'Deduções', ' ', 1, 1, 'Deduções', 't');
-            
+
             INSERT INTO db_menu VALUES
             ((select id_item from db_itensmenu where descricao like '%DIPR - Dem. Inf. Previdenciárias e Repasses%'), (select max(id_item) from db_itensmenu), 4, 209);
-            
-            INSERT INTO db_itensmenu VALUES 
+
+            INSERT INTO db_itensmenu VALUES
             ((select max(id_item) + 1 from db_itensmenu), 'Inclusão', 'Inclusão', 'con1_diprdeducoes001.php', 1, 1, 'Inclusão', 't');
-                    
+
             INSERT INTO db_menu VALUES
             ((select id_item from db_itensmenu where descricao like '%Deduções%'), (select max(id_item) from db_itensmenu), 1, 209);
-            
-            INSERT INTO db_itensmenu VALUES 
+
+            INSERT INTO db_itensmenu VALUES
             ((select max(id_item) + 1 from db_itensmenu), 'Alteração', 'Alteração', 'con1_diprdeducoes002.php', 1, 1, 'Alteração', 't');
-            
-            INSERT INTO db_menu VALUES
-            ((select id_item from db_itensmenu where descricao like '%Deduções%'), (select max(id_item) from db_itensmenu), 2, 209);
-            
-            INSERT INTO db_itensmenu VALUES 
-            ((select max(id_item) + 1 from db_itensmenu), 'Exclusão', 'Exclusão', 'con1_diprdeducoes003.php', 1, 1, 'Exclusão', 't');
-            
+
             INSERT INTO db_menu VALUES
             ((select id_item from db_itensmenu where descricao like '%Deduções%'), (select max(id_item) from db_itensmenu), 2, 209);
 
-            INSERT INTO db_itensmenu VALUES 
+            INSERT INTO db_itensmenu VALUES
+            ((select max(id_item) + 1 from db_itensmenu), 'Exclusão', 'Exclusão', 'con1_diprdeducoes003.php', 1, 1, 'Exclusão', 't');
+
+            INSERT INTO db_menu VALUES
+            ((select id_item from db_itensmenu where descricao like '%Deduções%'), (select max(id_item) from db_itensmenu), 2, 209);
+
+            INSERT INTO db_itensmenu VALUES
             ((select max(id_item) + 1 from db_itensmenu), 'Aportes e Transferências de Recursos', 'Aportes e Transferências de Recursos', ' ', 1, 1, 'Deduções', 't');
-            
+
             INSERT INTO db_menu VALUES
             ((select id_item from db_itensmenu where descricao like '%DIPR - Dem. Inf. Previdenciárias e Repasses%'), (select max(id_item) from db_itensmenu), 5, 209);
-            
-            INSERT INTO db_itensmenu VALUES 
+
+            INSERT INTO db_itensmenu VALUES
             ((select max(id_item) + 1 from db_itensmenu), 'Inclusão', 'Inclusão', 'con1_dipraportes001.php', 1, 1, 'Inclusão', 't');
-                    
+
             INSERT INTO db_menu VALUES
             ((select id_item from db_itensmenu where descricao like '%Aportes e Transferências de Recursos%'), (select max(id_item) from db_itensmenu), 1, 209);
-            
-            INSERT INTO db_itensmenu VALUES 
+
+            INSERT INTO db_itensmenu VALUES
             ((select max(id_item) + 1 from db_itensmenu), 'Alteração', 'Alteração', 'con1_dipraportes002.php', 1, 1, 'Alteração', 't');
-            
+
             INSERT INTO db_menu VALUES
             ((select id_item from db_itensmenu where descricao like '%Aportes e Transferências de Recursos%'), (select max(id_item) from db_itensmenu), 2, 209);
-            
-            INSERT INTO db_itensmenu VALUES 
+
+            INSERT INTO db_itensmenu VALUES
             ((select max(id_item) + 1 from db_itensmenu), 'Exclusão', 'Exclusão', 'con1_dipraportes003.php', 1, 1, 'Exclusão', 't');
-       
+
             INSERT INTO db_menu VALUES
             ((select id_item from db_itensmenu where descricao like '%Aportes e Transferências de Recursos%'), (select max(id_item) from db_itensmenu), 2, 209);
         COMMIT;
@@ -279,7 +279,7 @@ SQL;
         $sql = <<<SQL
                 BEGIN;
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c236_coddirp', 'int8', 'Código DIRP', '0', 'Código DIRP', 11, false, false, false, 5, 'text', 'Código DIRP');
-                    
+
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c236_massainstituida', 'bool', 'Massa instituída?', '0', 'Massa instituída?', 1, false, false, false, 5, 'text', 'Massa instituída?');
 
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c236_beneficiotesouro', 'bool',
@@ -296,91 +296,91 @@ SQL;
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c236_numcgmgestora', 'int8', 'Unidade Gestora', '0', 'Unidade Gestora', 11, false, false, false, 1, 'text', 'Unidade Gestora');
 
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c236_orgao', 'int', 'Orgão', '0', 'Orgão', 5, false, false, false, 1, 'text', 'Orgão');
-                
+
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_sequencial', 'int8', 'Sequencial', '0', 'Sequencial', 11, false, false, false, 5, 'text', 'Sequencial');
- 
+
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_coddipr', 'int8', 'Código DIRP', '0', 'Códigp DIPR', 11, false, false, false, 5, 'text', 'Código DIRP');
-                    
+
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_tipoente', 'int8', 'Ente', '0', 'Ente', 11, false, false, false, 5, 'text', 'Ente');
 
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_datasicom', 'date', 'Data SICOM', 'null', 'Data SICOM', 10, false, false, false, 1, 'text', 'Data SICOM');
 
-                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_basecalculocontribuinte', 'int4', 'Base Calculo', '0', 'Base Calculo', 1, 
+                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_basecalculocontribuinte', 'int4', 'Base Calculo', '0', 'Base Calculo', 1,
                     false, false, false, 1, 'text', 'Base Calculo');
 
-                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_mescompetencia', 'int4', 'Mes Competencia', '0', 'Mes Competencia', 1, 
+                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_mescompetencia', 'int4', 'Mes Competencia', '0', 'Mes Competencia', 1,
                     false, false, false, 1, 'text', 'Mes Competencia');
 
-                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_exerciciocompetencia', 'int4', 'Exercicio Competencia', '0', 'Exercicio Competencia', 1, 
+                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_exerciciocompetencia', 'int4', 'Exercicio Competencia', '0', 'Exercicio Competencia', 1,
                     false, false, false, 1, 'text', 'Exercicio Competencia');
 
-                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_tipofundo', 'int4', 'Tipo Fundo', '0', 'Tipo Fundo', 1, 
+                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_tipofundo', 'int4', 'Tipo Fundo', '0', 'Tipo Fundo', 1,
                     false, false, false, 1, 'text', 'Tipo Fundo');
 
-                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_remuneracao', 'float', 'Remuneração', '0', 'Remuneração', 1, 
+                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_remuneracao', 'float', 'Remuneração', '0', 'Remuneração', 1,
                     false, false, false, 1, 'text', 'Remuneração');
 
-                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_basecalculoorgao', 'int4', 'Base Calculo Orgao', '0', 'Base Calculo Orgao', 1, 
+                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_basecalculoorgao', 'int4', 'Base Calculo Orgao', '0', 'Base Calculo Orgao', 1,
                     false, false, false, 1, 'text', 'Base Calculo Orgao');
 
-                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_basecalculosegurados', 'int4', 'Base Calculo Segurados', '0', 'Base Calculo Segurados', 1, 
+                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_basecalculosegurados', 'int4', 'Base Calculo Segurados', '0', 'Base Calculo Segurados', 1,
                     false, false, false, 1, 'text', 'Base Calculo Segurados');
 
-                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_valorbasecalculo', 'float', 'Valor Base Calculo', '0', 'Valor Base Calculo', 1, 
+                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_valorbasecalculo', 'float', 'Valor Base Calculo', '0', 'Valor Base Calculo', 1,
                     false, false, false, 1, 'text', 'Valor Base Calculo');
 
-                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_tipocontribuinte', 'int4', 'Tipo Contribuinte', '0', 'Tipo Contribuinte', 1, 
+                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_tipocontribuinte', 'int4', 'Tipo Contribuinte', '0', 'Tipo Contribuinte', 1,
                     false, false, false, 1, 'text', 'Tipo Contribuinte');
 
-                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_aliquota', 'float', 'Aliquota', '0', 'Aliquota', 1, 
+                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_aliquota', 'float', 'Aliquota', '0', 'Aliquota', 1,
                     false, false, false, 1, 'text', 'Aliquota');
 
-                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_valorcontribuicao', 'float', 'Valor Contribuição', '0', 'Valor Contribuição', 1, 
+                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c237_valorcontribuicao', 'float', 'Valor Contribuição', '0', 'Valor Contribuição', 1,
                     false, false, false, 1, 'text', 'Valor Contribuição');
 
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_sequencial', 'int8', 'Sequencial', '0', 'Sequencial', 11, false, false, false, 5, 'text', 'Sequencial');
- 
+
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_coddipr', 'int8', 'Código DIRP', '0', 'Códigp DIPR', 11, false, false, false, 5, 'text', 'Código DIRP');
-                            
+
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_tipoente', 'int8', 'Ente', '0', 'Ente', 11, false, false, false, 5, 'text', 'Ente');
 
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_datasicom', 'date', 'Data SICOM', 'null', 'Data SICOM', 10, false, false, false, 1, 'text', 'Data SICOM');
-                    
-                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_mescompetencia', 'int4', 'Mes Competencia', '0', 'Mes Competencia', 1, 
+
+                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_mescompetencia', 'int4', 'Mes Competencia', '0', 'Mes Competencia', 1,
                     false, false, false, 1, 'text', 'Mes Competencia');
 
-                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_exerciciocompetencia', 'int4', 'Exercicio Competencia', '0', 'Exercicio Competencia', 1, 
+                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_exerciciocompetencia', 'int4', 'Exercicio Competencia', '0', 'Exercicio Competencia', 1,
                     false, false, false, 1, 'text', 'Exercicio Competencia');
-                    
-                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_tipofundo', 'int4', 'Tipo Fundo', '0', 'Tipo Fundo', 1, 
+
+                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_tipofundo', 'int4', 'Tipo Fundo', '0', 'Tipo Fundo', 1,
                     false, false, false, 1, 'text', 'Tipo Fundo');
-                    
-                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_tiporepasse', 'int4', 'Tipo Repasse', '0', 'Tipo Repasse', 1, 
+
+                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_tiporepasse', 'int4', 'Tipo Repasse', '0', 'Tipo Repasse', 1,
                     false, false, false, 1, 'text', 'Tipo Repasse');
-            
-                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_tipocontribuicaopatronal', 'int4', 'Tipo Contribuicao Patronal', '0', 'Tipo Contribuicao Patronal', 1, 
+
+                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_tipocontribuicaopatronal', 'int4', 'Tipo Contribuicao Patronal', '0', 'Tipo Contribuicao Patronal', 1,
                     false, false, false, 1, 'text', 'Tipo Contribuicao Patronal');
-  
-                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_tipocontribuicaosegurados', 'int4', 'Tipo Contriibuicao Segurados', '0', 'Tipo Contriibuicao Segurados', 1, 
+
+                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_tipocontribuicaosegurados', 'int4', 'Tipo Contriibuicao Segurados', '0', 'Tipo Contriibuicao Segurados', 1,
                     false, false, false, 1, 'text', 'Tipo Contriibuicao Segurados');
-                    
-                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_tipocontribuicao', 'int4', 'Tipo Contribuicao', '0', 'Tipo Contribuicao', 1, 
+
+                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_tipocontribuicao', 'int4', 'Tipo Contribuicao', '0', 'Tipo Contribuicao', 1,
                     false, false, false, 1, 'text', 'Tipo Contribuicao');
 
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_datarepasse', 'date', 'Data Repasse', 'null', 'Data Repasse', 10, false, false, false, 1, 'text', 'Data Repasse');
-                      
+
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_datavencimentorepasse', 'date', 'Data Vencimento', 'null', 'Data Vencimento', 10, false, false, false, 1, 'text', 'Data Vencimento');
 
-                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_valororiginal', 'float', 'Valor', '0', 'Valor', 1, 
+                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_valororiginal', 'float', 'Valor', '0', 'Valor', 1,
                     false, false, false, 1, 'text', 'Valor');
 
-                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_valororiginalrepassado', 'float', 'Valor Repassado', '0', 'Valor Repassado', 1, 
-                    false, false, false, 1, 'text', 'Valor Repassado');      
+                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c238_valororiginalrepassado', 'float', 'Valor Repassado', '0', 'Valor Repassado', 1,
+                    false, false, false, 1, 'text', 'Valor Repassado');
 
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c239_sequencial', 'int8', 'Sequencial', '0', 'Sequencial', 11, false, false, false, 5, 'text', 'Sequencial');
- 
+
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c239_coddipr', 'int8', 'Código DIRP', '0', 'Códigp DIPR', 11, false, false, false, 5, 'text', 'Código DIRP');
-                
+
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c239_tipoente', 'int8', 'Ente', '0', 'Ente', 11, false, false, false, 5, 'text', 'Ente');
 
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c239_datasicom', 'date', 'Data SICOM', 'null', 'Data SICOM', 10, false, false, false, 1, 'text', 'Data SICOM');
@@ -402,14 +402,14 @@ SQL;
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c239_tipocontribuicao', 'int4', 'Tipo Contribuicao', '0', 'Tipo Contribuicao', 1, false, false, false, 1, 'text', 'Tipo Contribuicao');
 
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c239_descricao', 'text', 'Descrição', 'null', 'Descrição', 200, false, false, false, 1, 'text', 'Descrição');
-                    
-                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c239_valordeducao', 'float', 'Valor Dedução', '0', 'Valor Dedução', 1, false, false, false, 1, 'text', 'Valor Dedução');  
-                
+
+                    INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c239_valordeducao', 'float', 'Valor Dedução', '0', 'Valor Dedução', 1, false, false, false, 1, 'text', 'Valor Dedução');
+
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c240_sequencial', 'int8', 'Sequencial', '0', 'Sequencial', 11, false, false, false, 5, 'text', 'Sequencial');
- 
- 
+
+
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c240_coddipr', 'int8', 'Código DIRP', '0', 'Códigp DIPR', 11, false, false, false, 5, 'text', 'Código DIRP');
-                    
+
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c240_tipoente', 'int8', 'Ente', '0', 'Ente', 11, false, false, false, 5, 'text', 'Ente');
 
                     INSERT INTO db_syscampo VALUES ((select max(codcam) + 1 from db_syscampo), 'c240_datasicom', 'date', 'Data SICOM', 'null', 'Data SICOM', 10, false, false, false, 1, 'text', 'Data SICOM');

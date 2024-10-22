@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AddCampoSlip extends AbstractMigration
+class AddCampoSlip extends PostgresMigration
 {
     public function change()
     {

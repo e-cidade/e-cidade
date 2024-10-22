@@ -89,6 +89,9 @@ if (isset($m51_codordem) && $m51_codordem != '') {
         border-bottom-color: <?= $cor ?>;
         background-color: #cccccc;
     }
+    .hidden {
+    display: none !important;
+}
 </style>
 <form name="form1" method="post" action="" onsubmit="">
     <center>
@@ -266,13 +269,18 @@ if (isset($m51_codordem) && $m51_codordem != '') {
                                     db_inputdata('m51_data', @$m51_data_dia, @$m51_data_mes, @$m51_data_ano, true, 'text', 2);
                                     ?>
                                 </td>
-                                <td nowrap align="right" title="<?= @$Tm51_prazoent ?>">
+                                <td id="prazoent" nowrap align="right" title="<?= @$Tm51_prazoent ?>">
                                     <?= @$Lm51_prazoent ?>
                                 </td>
-                                <td>
+                                <td id="m51_prazoent">
                                     <?
                                     db_input('m51_prazoent', 6, $Im51_prazoent, true, 'text', 1);
                                     ?>
+                                </td>
+                                <td id="prazoNovo" class="hidden"><b>Prazo de Entrega</b></td>
+                                <td id="prazoNovoValue" class="hidden">
+                                    <select name="pc97_descricao" id="pc97_descricao" onchange="getPrazos()">
+                                    </select>
                                 </td>
                             <tr>
                                 <td nowrap align="right" title="<?= @$Tm51_deptoorigem ?>">
@@ -419,6 +427,81 @@ if (isset($m51_codordem) && $m51_codordem != '') {
         js_OpenJanelaIframe('', 'db_iframe_altcgm', 'prot1_cadcgm002.php?chavepesquisa=' + cgm + '&testanome=true&autoc=true', 'Altera Cgm', true);
     }
 
+    getPrazos();
+  function getPrazos() {
+    let oParam = {};
+    oParam.ordem = document.getElementById('m51_codordem').value;
+    oParam.exec = 'getPrazoAltera';
+
+    const oAjax = new Ajax.Request(
+        'com4_ordemdecompra001.RPC.php', {
+            parameters: 'json=' + Object.toJSON(oParam),
+            asynchronous: false,
+            method: 'post',
+            onComplete: function(response) {
+                js_retornoGetPrazos(response);
+            }
+        }
+    );
+}
+
+function js_retornoGetPrazos(response) {
+    let oRetorno = JSON.parse(response.responseText);
+    let prazos = oRetorno.prazoCadastrado;
+
+    let selectPrazo = document.getElementById('pc97_descricao');
+    
+    let selectedValue = selectPrazo.value;
+
+    selectPrazo.innerHTML = '';
+
+    prazos.forEach(function(oPrazo) {
+        let option = document.createElement("option");
+        option.value = oPrazo.pc97_descricao;
+        option.text = oPrazo.pc97_descricao;
+        selectPrazo.appendChild(option);
+    });
+
+    if (selectedValue) {
+        selectPrazo.value = selectedValue;
+    }
+}
+    definePrazoEntregaAlteracao();
+  function definePrazoEntregaAlteracao(){
+        let oParam = {};
+        oParam.exec = 'buscarPrazo';
+
+        const oAjax = new Ajax.Request(
+          'com4_ordemdecompra001.RPC.php', {
+                parameters: 'json=' + Object.toJSON(oParam),
+                asynchronous: false,
+                method: 'post',
+                onComplete: js_retornoPrazoAlteracao
+            });
+    }
+        function js_retornoPrazoAlteracao(oAjax) {
+            let oRetorno = JSON.parse(oAjax.responseText);
+            let prazo = oRetorno.prazo;
+            let prazoent = document.getElementById('prazoent');
+            let prazoentvalue = document.getElementById('m51_prazoent');
+            let prazoNovo = document.getElementById('prazoNovo');
+            let prazoNovoValue = document.getElementById('prazoNovoValue');
+            console.log(prazo)
+                if (prazo == 2) {
+                if (prazoent) prazoent.classList.add('hidden');
+                if (prazoentvalue) prazoentvalue.classList.add('hidden');
+                
+                if (prazoNovo) prazoNovo.classList.remove('hidden');
+                if (prazoNovoValue) prazoNovoValue.classList.remove('hidden');
+            }else{
+                if (prazoent) prazoent.classList.remove('hidden');
+                if (prazoentvalue) prazoentvalue.classList.remove('hidden');
+                
+                if (prazoNovo) prazoNovo.classList.add('hidden');
+                if (prazoNovoValue) prazoNovoValue.classList.add('hidden');
+            }
+        }
+
     function js_buscavalores() {  
         obj = itens.document.form1;
 
@@ -485,6 +568,7 @@ if (isset($m51_codordem) && $m51_codordem != '') {
         let oParam = new Object();
         let body = document.form1;
         let obs = body.m51_obs.value.toUpperCase();
+        oParam.m51_prazoentnovo = body.pc97_descricao.value;
         oParam.m51_prazoent = body.m51_prazoent.value;
         oParam.m51_codordem = body.m51_codordem.value;
         oParam.coddepto = body.coddepto.value;

@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Carga2306 extends AbstractMigration
+class Carga2306 extends PostgresMigration
 {
 
     public function up()
@@ -16,7 +16,7 @@ class Carga2306 extends AbstractMigration
         UPDATE avaliacaopergunta SET db103_avaliacaotiporesposta = 2 WHERE db103_identificador = 'preencher-com-o-codigo-da-categoria-do-tr-4001123';
         INSERT INTO avaliacaoperguntaopcao VALUES (
             (SELECT max(db104_sequencial)+1 FROM avaliacaoperguntaopcao),
-            (SELECT db103_sequencial FROM avaliacaopergunta WHERE db103_identificador = 'preencher-com-o-codigo-da-categoria-do-tr-4001123'), 
+            (SELECT db103_sequencial FROM avaliacaopergunta WHERE db103_identificador = 'preencher-com-o-codigo-da-categoria-do-tr-4001123'),
             NULL,
             't',
             (SELECT db103_identificadorcampo FROM avaliacaopergunta WHERE db103_identificador = 'preencher-com-o-codigo-da-categoria-do-tr-4001123')||'-'||(SELECT max(db104_sequencial)+1 FROM avaliacaoperguntaopcao)::varchar,
@@ -52,17 +52,17 @@ class Carga2306 extends AbstractMigration
         --tpRegPrev
         --infoMandElet
         4001943 as indRemunCargo,
-        case 
-        when r33_tiporegime = \'1\' then 4001945 
-        when r33_tiporegime = \'2\' then 4001946 
+        case
+        when r33_tiporegime = \'1\' then 4001945
+        when r33_tiporegime = \'2\' then 4001946
         else NULL end as tpRegPrev,
         --infoEstagiario
-        CASE 
+        CASE
         WHEN h83_naturezaestagio = \'O\' THEN 4001948
         WHEN h83_naturezaestagio = \'N\' THEN 4001949
         ELSE NULL
         END as natEstagio,
-        CASE 
+        CASE
         WHEN h83_nivelestagio = 1 THEN 4001950
         WHEN h83_nivelestagio = 2 THEN 4001951
         WHEN h83_nivelestagio = 3 THEN 4001952
@@ -102,13 +102,13 @@ class Carga2306 extends AbstractMigration
         left join cgm as cgmsupervisor ON cgmsupervisor.z01_numcgm = rhpessoalsupervisor.rh01_numcgm
         left join inssirf on (r33_codtab::integer-2,r33_anousu,r33_mesusu) = (rh02_tbprev,rh02_anousu,rh02_mesusu)
         left join rhpesrescisao on rh05_seqpes = rh02_seqpes
-        WHERE rhpessoal.rh01_instit = fc_getsession(\'DB_instit\')::int 
+        WHERE rhpessoal.rh01_instit = fc_getsession(\'DB_instit\')::int
         AND h13_categoria in (304,701,711,712,721,722,723,731,734,738,771,901,903)
         AND rh30_vinculo = \'A\'
         AND ((rh02_anousu,rh02_mesusu) = (2021,12) OR rh02_anousu > 2021)
-        AND rh02_salari != (SELECT rh02_salari FROM rhpessoalmov mov 
+        AND rh02_salari != (SELECT rh02_salari FROM rhpessoalmov mov
             WHERE mov.rh02_regist = rhpessoalmov.rh02_regist AND mov.rh02_seqpes < rhpessoalmov.rh02_seqpes ORDER BY mov.rh02_seqpes desc limit 1)
-        ' 
+        '
         WHERE db101_identificador='s2306-vs1';
         ";
         $this->execute($sql);

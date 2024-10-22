@@ -256,8 +256,37 @@ switch ($oParam->exec) {
                     $clliccontrolepncp->l213_instit = db_getsession('DB_instit');
                     $clliccontrolepncp->incluir();
 
-                    $oRetorno->status  = 1;
-                    $oRetorno->message = "Retificada com Sucesso !";
+                    $rsDadosEnvioItens = $clProcesso->sql_record($clProcesso->sql_query_pncp_itens($aLicitacao->codigo));
+        
+                    for ($item = 0; $item < pg_numrows($rsDadosEnvioItens); $item++) {
+                        $oDadosLicitacaoItens = db_utils::fieldsMemory($rsDadosEnvioItens, $item);
+
+                        if ($oDadosLicitacaoItens->pc11_reservado == "t") {
+                            $rsReservado = $clLicitacao->sql_record($clLicitacao->sql_query_valor_item_reservado($oDadosLicitacaoItens->pc11_numero, $oDadosLicitacaoItens->pc01_codmater));
+                            db_fieldsmemory($rsReservado, 0);
+                            $oDadosLicitacaoItens->valorunitarioestimado = $valorunitarioestimado;
+                        }
+                        $oDadosLicitacaoItens->justificativa = $oParam->justificativa;
+                        $aItensLicitacaoItens[] = $oDadosLicitacaoItens;
+                    }
+        
+                    $oDadosLicitacaoItens = $aItensLicitacaoItens;
+                    $clDispensaPorValorItens = new DispensaPorValorPNCP($oDadosLicitacaoItens);
+                    $aDadosRatificacaoItens = $clDispensaPorValorItens->montarRetificacaoItens();
+                    
+                    $rsApiPNCPItensMessage = "";
+                    foreach ($aDadosRatificacaoItens as $key => $item) {
+                        $item['situacaoCompraItemId'] = '1';
+
+                        // Envia Retificacao dos itens para pncp
+                        $rsApiPNCPItens = $clDispensaporvalor->enviarRetificacaoItens($item, substr($aLicitacao->numerocontrole, 24), substr($aLicitacao->numerocontrole, 17, -5), $item['numeroItem']);
+                        if($rsApiPNCPItens['httpStatus'] !== 200) {
+                            $rsApiPNCPItensMessage .= $rsApiPNCPItens['message'] . "\n";
+                        }
+                    }
+
+                    $oRetorno->status  = (!empty($rsApiPNCPItensMessage)) ? 2 : 1;
+                    $oRetorno->message = (!empty($rsApiPNCPItensMessage)) ? $rsApiPNCPItensMessage : "Retificada com Sucesso !";
                 } else {
                     throw new Exception(utf8_decode($rsApiPNCP->message));
                 }
@@ -278,7 +307,7 @@ switch ($oParam->exec) {
                 $clliccontroleanexopncp = new cl_liccontroleanexopncp();
 
                 //envia exclusao de aviso
-                $rsApiPNCP = $clDispensaporvalor->excluirAviso(substr($aLicitacao->numerocontrole, 17, -5), substr($aLicitacao->numerocontrole, 24));
+                $rsApiPNCP = $clDispensaporvalor->excluirAviso(substr($aLicitacao->numerocontrole, 17, -5), substr($aLicitacao->numerocontrole, 24), $oParam->justificativa);
 
                 if ($rsApiPNCP == null) {
                     $clliccontrolepncp->excluir(null, "l213_processodecompras = $aLicitacao->codigo");
@@ -302,7 +331,7 @@ switch ($oParam->exec) {
             foreach ($oParam->aProcesso as $aLicitacao) {
                 $clAtaRegistroprecoPNCP = new AtaRegistroprecoPNCP();
                 //envia exclusao de Atas
-                $rsApiPNCP = $clAtaRegistroprecoPNCP->excluirAta(substr($aLicitacao->numerocontrole, 17, -5), substr($aLicitacao->numerocontrole, 24), $aLicitacao->numeroata);
+                $rsApiPNCP = $clAtaRegistroprecoPNCP->excluirAta(substr($aLicitacao->numerocontrole, 17, -5), substr($aLicitacao->numerocontrole, 24), $aLicitacao->numeroata, $oParam->justificativa);
 
                 if ($rsApiPNCP == null) {
                     $cllicontroleatarppncp->excluir(null, "l215_licitacao = $aLicitacao->codigo and l215_ata = $aLicitacao->numeroata");

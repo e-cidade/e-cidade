@@ -299,7 +299,7 @@
 
       CurrentWindow.alert = function(message, done, label) {
 
-        var message = message.replace(/\n/g, '<br />');
+        var message = String(message).replace(/\n/g, '<br />');
 
         if (message == lastMessage) {
           return;

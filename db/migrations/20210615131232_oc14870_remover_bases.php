@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc14870RemoverBases extends AbstractMigration
+class Oc14870RemoverBases extends PostgresMigration
 {
     public function up()
     {
@@ -35,6 +35,6 @@ class Oc14870RemoverBases extends AbstractMigration
         if (empty($result)) {
             return true;
         }
-        return false; 
+        return false;
     }
 }

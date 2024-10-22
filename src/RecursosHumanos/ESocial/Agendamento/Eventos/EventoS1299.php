@@ -8,7 +8,7 @@ use DBPessoal;
 use ECidade\RecursosHumanos\ESocial\Agendamento\Eventos\EventoBase;
 
 /**
- * Classe responsÃ¡vel por montar as informaÃ§Ãµes do evento S1210 Esocial
+ * Classe responsável por montar as informações do evento S1210 Esocial
  *
  * @package  ECidade\RecursosHumanos\ESocial\Agendamento\Eventos
  * @author   Marcelo Hernane
@@ -31,8 +31,8 @@ class EventoS1299 extends EventoBase
      */
     public function montarDados()
     {
-        $ano = date("Y", db_getsession("DB_datausu"));
-        $mes = date("m", db_getsession("DB_datausu"));
+        $ano = $this->ano();
+        $mes = $this->mes();
 
         $aDadosAPI = array();
         $iSequencial = 1;

@@ -532,7 +532,7 @@ class cl_acordo
             } elseif (strlen($this->ac16_urlcipi) > 14) {
                 $this->erro_sql = "Campo Url CIPI não pode ser maior que 14 caracteres.";
             }
-            
+
             $this->erro_campo = "ac16_urlcipi";
             $this->erro_banco = "";
             $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
@@ -1159,7 +1159,7 @@ class cl_acordo
                 } elseif (strlen($this->ac16_urlcipi) > 14) {
                     $this->erro_sql = "Campo Url CIPI não pode ser maior que 14 caracteres.";
                 }
-                
+
                 $this->erro_campo = "ac16_urlcipi";
                 $this->erro_banco = "";
                 $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
@@ -2684,7 +2684,7 @@ class cl_acordo
         return $sSql;
     }
 
-    public function sql_Contrato_PCNP()
+    public function sql_Contrato_PCNP($whereCustomParam = null)
     {
         $sSql = "
         SELECT * FROM (SELECT DISTINCT ac16_sequencial,
@@ -2723,14 +2723,13 @@ class cl_acordo
                     JOIN db_depart ON coddepto=ac16_deptoresponsavel
                     JOIN db_departorg ON db01_coddepto=coddepto
                     JOIN cgm ON z01_numcgm=ac16_contratado
-                    JOIN cgmtipoempresa ON z03_numcgm=z01_numcgm
-                    JOIN tipoempresa ON db98_sequencial=z03_tipoempresa
                     JOIN db_config ON codigo=instit
                     JOIN liccontrolepncp ON ac16_licitacao = l213_licitacao
                     LEFT JOIN acocontratopncp ON ac213_contrato = ac16_sequencial
                     WHERE ac16_instit = " . db_getsession('DB_instit') . "
                     AND ac16_acordosituacao in (4,2)
-                        AND ac16_anousu = " . db_getsession('DB_anousu') . "
+                    $whereCustomParam
+                    AND ac16_anousu = " . db_getsession('DB_anousu') . "
         union
                     SELECT DISTINCT ac16_sequencial,
                             ac213_numerocontrolepncp,
@@ -2772,15 +2771,72 @@ class cl_acordo
                     JOIN db_depart ON coddepto=ac16_deptoresponsavel
                     JOIN db_departorg ON db01_coddepto=coddepto
                     JOIN cgm ON z01_numcgm=ac16_contratado
-                    LEFT JOIN cgmtipoempresa ON z03_numcgm=z01_numcgm
-                    JOIN tipoempresa ON db98_sequencial=z03_tipoempresa
                     JOIN db_config ON codigo=instit
                     LEFT JOIN liccontrolepncp ON  l213_processodecompras = pc80_codproc
                     LEFT JOIN acocontratopncp ON ac213_contrato = ac16_sequencial
                     WHERE ac16_instit = " . db_getsession('DB_instit') . "
                     AND ac16_acordosituacao in (4,2)
+                    $whereCustomParam
                     AND ac16_anousu = " . db_getsession('DB_anousu') . "
-                    AND pc80_dispvalor = 't') AS X ORDER BY ac16_sequencial DESC
+                    AND pc80_dispvalor = 't'
+        union
+                    SELECT DISTINCT ac16_sequencial,
+                            ac213_numerocontrolepncp,
+                            l213_numerocompra,
+                            cgc AS cnpjCompra,
+                            ac16_anousu AS anoCompra,
+                            l213_numerocompra AS sequencialCompra,
+                            ac16_acordocategoria AS tipoContratoId,
+                            ac16_numero AS numeroContratoEmpenho,
+                            ac16_anousu AS anoContrato,
+                            liclicita.l20_edital||'/'||liclicita.l20_anousu AS processo,
+                            ac16_acordogrupo AS categoriaProcessoId,
+                            FALSE AS receita,
+                                     z01_cgccpf AS niFornecedor,
+                                     NULL AS tipoPessoaFornecedor,
+                                     z01_nome AS nomeRazaoSocialFornecedor,
+                                     NULL AS niFornecedorSubContratado,
+                                     NULL AS tipoPessoaFornecedorSubContratado,
+                                     NULL AS nomeRazaoSocialFornecedorSubContratado,
+                                     ac16_objeto AS objetoContrato,
+                                     NULL AS informacaoComplementar,
+                                     ac16_valor AS valorInicial,
+                                     ac16_qtdperiodo AS numeroParcelas,
+                                     NULL AS valorParcela,
+                                     ac16_valor AS valorGlobal,
+                                     NULL AS valorAcumulado,
+                                     ac16_dataassinatura AS dataAssinatura,
+                                     ac16_datainicio AS dataVigenciaInicio,
+                                     ac16_datafim AS datavigenciaFim,
+                                     NULL AS identificadorCipi,
+                                     NULL AS urlCipi
+            FROM acordo
+                    JOIN acordocategoria ON ac50_sequencial=ac16_acordocategoria
+                    JOIN acordoposicao ON ac26_acordo = ac16_sequencial
+                    JOIN acordoitem ON ac20_acordoposicao=ac26_sequencial
+                    JOIN acordopcprocitem ON ac23_acordoitem=ac20_sequencial
+                    JOIN pcprocitem ON pcprocitem.pc81_codprocitem = ac23_pcprocitem
+                    JOIN pcproc ON pcprocitem.pc81_codproc = pc80_codproc
+                    JOIN solicitem ON solicitem.pc11_codigo = pc81_solicitem
+                    JOIN solicitemvinculo ON pc55_solicitemfilho = pc11_codigo
+                    JOIN solicitem solicitempai ON solicitempai.pc11_codigo = solicitemvinculo.pc55_solicitempai
+                    JOIN solicita ON solicita.pc10_numero = solicitem.pc11_numero
+                    join pcprocitem pcprocitempai on pcprocitempai.pc81_solicitem = solicitempai.pc11_codigo
+                    join liclicitem on l21_codpcprocitem = pcprocitempai.pc81_codprocitem
+                    join liclicita on l20_codigo = l21_codliclicita
+                    JOIN db_depart ON coddepto=ac16_deptoresponsavel
+                    JOIN db_departorg ON db01_coddepto=coddepto
+                    AND db01_anousu = ac16_anousu
+                    JOIN cgm ON z01_numcgm=ac16_contratado
+                    JOIN db_config ON codigo=instit
+                    LEFT JOIN liccontrolepncp ON l213_licitacao = l21_codliclicita
+                    LEFT JOIN acocontratopncp ON ac213_contrato = ac16_sequencial
+                    WHERE ac16_instit = " . db_getsession('DB_instit') . "
+                    AND ac16_acordosituacao in (4,2)
+                    $whereCustomParam
+                    AND ac16_anousu = " . db_getsession('DB_anousu') . "
+                        AND solicita.pc10_solicitacaotipo IN (5)
+                    ) AS X ORDER BY ac16_sequencial DESC
         ";
 
         return $sSql;
@@ -2825,8 +2881,6 @@ class cl_acordo
             JOIN db_departorg ON db01_coddepto=coddepto
             AND db01_anousu = ac16_anousu
             JOIN cgm ON z01_numcgm=ac16_contratado
-            JOIN cgmtipoempresa ON z03_numcgm=z01_numcgm
-            JOIN tipoempresa ON db98_sequencial=z03_tipoempresa
             JOIN db_config ON codigo=instit
             JOIN liccontrolepncp ON ac16_licitacao = l213_licitacao
             LEFT JOIN acocontratopncp ON ac213_contrato = ac16_sequencial
@@ -2873,8 +2927,6 @@ class cl_acordo
                 JOIN db_depart ON coddepto=ac16_deptoresponsavel
                 JOIN db_departorg ON db01_coddepto=coddepto AND db01_anousu = ac16_anousu
                 JOIN cgm ON z01_numcgm=ac16_contratado
-                LEFT JOIN cgmtipoempresa ON z03_numcgm=z01_numcgm
-                JOIN tipoempresa ON db98_sequencial=z03_tipoempresa
                 JOIN db_config ON codigo=instit
                 LEFT JOIN liccontrolepncp ON l213_processodecompras = pc80_codproc
                 LEFT JOIN acocontratopncp ON ac213_contrato = ac16_sequencial
@@ -2882,6 +2934,63 @@ class cl_acordo
                     and ac16_sequencial = $iContratocodigo
                     AND ac16_anousu = " . db_getsession('DB_anousu') . "
                     AND pc80_dispvalor = 't'
+        UNION
+            SELECT DISTINCT ac16_sequencial,
+                ac213_numerocontrolepncp,
+                cgc AS cnpjCompra,
+                l213_anousu AS anoCompra,
+                l213_numerocompra AS sequencialCompra,
+                ac16_acordocategoria AS tipoContratoId,
+                ac16_numero AS numeroContratoEmpenho,
+                ac16_anousu AS anoContrato,
+                pc80_numdispensa||'/'||EXTRACT(YEAR
+                                               FROM pcproc.pc80_data) AS processo,
+                ac16_acordogrupo AS categoriaProcessoId,
+                FALSE AS receita,
+                         db01_unidade AS codigoUnidade,
+                         z01_cgccpf AS niFornecedor,
+                         NULL AS tipoPessoaFornecedor,
+                         z01_nome AS nomeRazaoSocialFornecedor,
+                         NULL AS niFornecedorSubContratado,
+                         NULL AS tipoPessoaFornecedorSubContratado,
+                         NULL AS nomeRazaoSocialFornecedorSubContratado,
+                         ac16_objeto AS objetoContrato,
+                         NULL AS informacaoComplementar,
+                         ac16_valor AS valorInicial,
+                         ac16_qtdperiodo AS numeroParcelas,
+                         0 AS valorParcela,
+                         ac16_valor AS valorGlobal,
+                         NULL AS valorAcumulado,
+                         ac16_dataassinatura AS dataAssinatura,
+                         ac16_datainicio AS dataVigenciaInicio,
+                         ac16_datafim AS datavigenciaFim,
+                         NULL AS identificadorCipi,
+                         NULL AS urlCipi
+                    FROM acordo
+                    JOIN acordocategoria ON ac50_sequencial=ac16_acordocategoria
+                    JOIN acordoposicao ON ac26_acordo = ac16_sequencial
+                    JOIN acordoitem ON ac20_acordoposicao=ac26_sequencial
+                    JOIN acordopcprocitem ON ac23_acordoitem=ac20_sequencial
+                    JOIN pcprocitem ON pcprocitem.pc81_codprocitem = ac23_pcprocitem
+                    JOIN pcproc ON pcprocitem.pc81_codproc = pc80_codproc
+                    JOIN solicitem ON solicitem.pc11_codigo = pc81_solicitem
+                    JOIN solicitemvinculo ON pc55_solicitemfilho = pc11_codigo
+                    JOIN solicitem solicitempai ON solicitempai.pc11_codigo = solicitemvinculo.pc55_solicitempai
+                    JOIN solicita ON solicita.pc10_numero = solicitem.pc11_numero
+                    join pcprocitem pcprocitempai on pcprocitempai.pc81_solicitem = solicitempai.pc11_codigo
+                    join liclicitem on l21_codpcprocitem = pcprocitempai.pc81_codprocitem
+                    join liclicita on l20_codigo = l21_codliclicita
+                    JOIN db_depart ON coddepto=ac16_deptoresponsavel
+                    JOIN db_departorg ON db01_coddepto=coddepto
+                    AND db01_anousu = ac16_anousu
+                    JOIN cgm ON z01_numcgm=ac16_contratado
+                    JOIN db_config ON codigo=instit
+                    LEFT JOIN liccontrolepncp ON l213_licitacao = l21_codliclicita
+                    LEFT JOIN acocontratopncp ON ac213_contrato = ac16_sequencial
+                    WHERE ac16_instit = " . db_getsession('DB_instit') . "
+                            and ac16_sequencial = $iContratocodigo
+                            AND ac16_anousu = " . db_getsession('DB_anousu') . "
+                        AND solicita.pc10_solicitacaotipo IN (5)
         ";
         return $sSql;
     }
@@ -2935,8 +3044,6 @@ class cl_acordo
         join db_depart on coddepto=ac16_deptoresponsavel
         join db_departorg on db01_coddepto=coddepto
         join cgm on z01_numcgm=ac16_contratado
-        join cgmtipoempresa on z03_numcgm=z01_numcgm
-        join tipoempresa on db98_sequencial=z03_tipoempresa
         join db_config on codigo=instit
         join liccontrolepncp on ac16_licitacao = l213_licitacao
         join acocontratopncp on ac213_contrato = ac16_sequencial
@@ -3362,13 +3469,13 @@ class cl_acordo
                 'numrows' => 0
             ];
         }
-    
+
         $justificativaPncp = pg_escape_string($justificativaPncp);
-    
+
         $sequenciais = implode(', ', array_map(function($obj) {
             return (int) $obj->codigo;
         }, $aSequenciais));
-    
+
         $sSql = "
             UPDATE
                 acordo
@@ -3377,14 +3484,14 @@ class cl_acordo
             WHERE
                 ac16_sequencial IN ($sequenciais);
         ";
-    
+
         $result = db_query($sSql);
-    
+
         $oReturn = new stdClass();
         if ($result === false) {
             $erroBanco = str_replace("\n", "", @pg_last_error());
             $erroSql = "Justificativas PNCP não efetuada. Exclusão abortada.\nValores: $sequenciais";
-    
+
             $oReturn->erro_banco = $erroBanco;
             $oReturn->erro_sql = $erroSql;
             $oReturn->erro_msg = "Usuário: $erroSql\nAdministrador: $erroBanco";
@@ -3392,10 +3499,10 @@ class cl_acordo
             $oReturn->numrows = 0;
         } else {
             $numRows = pg_affected_rows($result);
-    
+
             if ($numRows == 0) {
                 $erroSql = "Acordo não encontrado. Justificativas PNCP não efetuada.\nValores: $sequenciais";
-    
+
                 $oReturn->erro_banco = '';
                 $oReturn->erro_sql = $erroSql;
                 $oReturn->erro_msg = "Usuário: $erroSql\nAdministrador: ";
@@ -3403,7 +3510,7 @@ class cl_acordo
                 $oReturn->numrows = 0;
             } else {
                 $sucessoSql = "Justificativas PNCP efetuada com sucesso.\nValores: $sequenciais";
-    
+
                 $oReturn->erro_banco = '';
                 $oReturn->erro_sql = $sucessoSql;
                 $oReturn->erro_msg = "Usuário: $sucessoSql\nAdministrador: ";
@@ -3411,8 +3518,8 @@ class cl_acordo
                 $oReturn->numrows = $numRows;
             }
         }
-    
+
         return $oReturn;
     }
-    
+
 }

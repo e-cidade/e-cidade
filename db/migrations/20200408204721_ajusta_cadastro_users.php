@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AjustaCadastroUsers extends AbstractMigration
+class AjustaCadastroUsers extends PostgresMigration
 {
 
     public function up()

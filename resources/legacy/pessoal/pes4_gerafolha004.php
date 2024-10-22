@@ -5708,6 +5708,16 @@ function gerfsal($opcao_geral=null,$opcao_tipo=1)
         $oFeriasPremio = db_utils::fieldsMemory($rsFeriasPremio, 0);
         inserirFeriasPremio($pessoal[$Ipessoal]["r01_regist"], $cfpess[0]['r11_feriaspremio'], $oFeriasPremio, $anousu, $mesusu);
     }
+    
+    // //Calculo Plano de saude
+     $condicaops   = " r75_anousu = {$anousu} and r75_mesusu = {$mesusu} and r75_regist = " . db_sqlformat($pessoal[$Ipessoal]["r01_regist"]) ." group by r75_regist, r75_anousu, r75_mesusu, rh02_lota";
+     $joinps       = "inner join rhpessoalmov on rh02_regist = r75_regist and rh02_anousu = r75_anousu and r75_mesusu = rh02_mesusu";
+     $rsPlanoSaude = db_query("select sum(r75_valor) r75_valor,r75_regist,r75_anousu,r75_mesusu, rh02_lota from planosaude " .$joinps ." where " . $condicaops);
+     if ($opcao_geral == 1 && pg_num_rows($rsPlanoSaude) > 0 && !empty($cfpess[0]['r11_planosaude'])) {
+
+         $oPlanoSaude = db_utils::fieldsMemory($rsPlanoSaude, 0);
+         inserirPlanoSaude($pessoal[$Ipessoal]["r01_regist"], $cfpess[0]['r11_planosaude'], $oPlanoSaude, $anousu, $mesusu);
+     }
 }
 
   if ($db_debug == "true"){
@@ -14359,6 +14369,36 @@ function insertRubricasEspeciaisAviso($matriz1, $matriz2, $cfpess, $arrValoresAv
     }
     db_insert( "gerfres",$matriz1, $matriz_especifica );
   }
+
+}
+
+function inserirPlanoSaude($regist, $r11_planosaude, $oPlanoSaude, $anousu, $mesusu){
+
+    $r75_valor = $oPlanoSaude->r75_valor;
+    $r75_lotac = $oPlanoSaude->rh02_lota;
+
+    $matriz_insertps1[1]  = "r14_regist";
+    $matriz_insertps1[2]  = "r14_rubric";
+    $matriz_insertps1[3]  = "r14_lotac";
+    $matriz_insertps1[4]  = "r14_valor";
+    $matriz_insertps1[5]  = "r14_quant";
+    $matriz_insertps1[6]  = "r14_pd";
+    $matriz_insertps1[7]  = "r14_semest";
+    $matriz_insertps1[8]  = "r14_anousu";
+    $matriz_insertps1[9]  = "r14_mesusu";
+    $matriz_insertps1[10] = "r14_instit";
+
+    $matriz_insertps2[1]  = $regist;
+    $matriz_insertps2[2]  = $r11_planosaude;
+    $matriz_insertps2[3]  = $r75_lotac;
+    $matriz_insertps2[4]  = $r75_valor;
+    $matriz_insertps2[5]  = 1;
+    $matriz_insertps2[6]  = 2;
+    $matriz_insertps2[7]  = 0;
+    $matriz_insertps2[8]  = $anousu;
+    $matriz_insertps2[9]  = $mesusu;
+    $matriz_insertps2[10] = db_getsession("DB_instit");
+    db_insert("gerfsal", $matriz_insertps1, $matriz_insertps2);
 
 }
 

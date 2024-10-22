@@ -1,12 +1,12 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc15187 extends AbstractMigration
+class Oc15187 extends PostgresMigration
 {
     public function up()
     {
-        
+
         $this->execute("INSERT INTO db_itensmenu VALUES ((select max(id_item)+1 from db_itensmenu), 'Importação', 'Importação', ' ', 1, 1, 'Importação Abastecimento', 't')");
         $this->execute("INSERT INTO db_menu VALUES(5338,(select max(id_item) from db_itensmenu),9,633)");
 
@@ -17,7 +17,7 @@ class Oc15187 extends AbstractMigration
         $this->execute("ALTER TABLE veicdevolucao ADD column ve61_importado bool");
         $this->execute("ALTER TABLE veicretirada ADD column ve60_importado bool");
 
-       
+
     }
-   
+
 }

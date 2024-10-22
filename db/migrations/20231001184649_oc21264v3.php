@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc21264v3 extends AbstractMigration
+class Oc21264v3 extends PostgresMigration
 {
     public function up()
     {
@@ -21,18 +21,18 @@ class Oc21264v3 extends AbstractMigration
                                     '',
                                     't'
                                 );
-                        
-                        
+
+
                         INSERT INTO db_menu
                         VALUES (
                                   (SELECT id_item FROM db_itensmenu WHERE descricao LIKE 'Relatorio de Conferencia'),
-                            
+
                                   (SELECT max(id_item) FROM db_itensmenu),
-                            
+
                                   (SELECT max(menusequencia)+1 FROM db_menu
                                    WHERE id_item = (SELECT id_item FROM db_itensmenu WHERE descricao LIKE 'Relatorio de Conferencia')
                                      AND modulo = 398),
-                            
+
                                   398
                                 )";
 

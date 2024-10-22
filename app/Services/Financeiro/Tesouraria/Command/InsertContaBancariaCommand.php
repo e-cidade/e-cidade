@@ -67,4 +67,16 @@ class InsertContaBancariaCommand
         }
     }
 
+    public function checkRepeated($agencia, $conta, $tipoconta, $fonte,$nroseqaplicacao)
+    {
+        $resultContaBancaria = $this->contaBancariaRepository->checkRepeated($agencia, $conta, $tipoconta, $fonte, $nroseqaplicacao);
+        $contaBancaria = $resultContaBancaria->first();
+        
+        if ($contaBancaria) {
+            return $contaBancaria;
+        } else {
+            throw new \Exception("Conta Bancaria Não Existe");
+        }
+    }
+
 }

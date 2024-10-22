@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc13416 extends AbstractMigration
+class Oc13416 extends PostgresMigration
 {
     CONST PMCAPITAOENEAS = '18017426000113';
     public function up()

@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc17075 extends AbstractMigration
+class Oc17075 extends PostgresMigration
 {
 
     public function up()
@@ -19,7 +19,7 @@ class Oc17075 extends AbstractMigration
         $this->execute($sSql);
     }
 
-    public function down() 
+    public function down()
     {
         $sSql = "
         ALTER TABLE rhpessoalmov DROP COLUMN rh02_art61ldboutros;

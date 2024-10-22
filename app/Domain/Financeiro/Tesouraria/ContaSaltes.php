@@ -95,7 +95,7 @@ class ContaSaltes
      */
     public function setK13Descr(string $k13_descr): self
     {
-        $this->k13_descr = mb_convert_encoding($k13_descr,  "UTF-8", "ISO-8859-1");
+        $this->k13_descr = $k13_descr;
         return $this;
     }
   

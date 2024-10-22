@@ -489,13 +489,18 @@ class BalancoPatrimonialDCASP2015 extends RelatoriosLegaisBase  {
    *
    * @return stdClass[]
    */
-  private function getSaldoPorRecurso($iAno) {
+  private function getSaldoPorRecurso($iAno, $exercicioAnterior = false) {
 
 
 
     $sIntituicoes = $this->getInstituicoes();
 
-    $sSqlfr = " select DISTINCT o15_codigo, o15_codtri,o15_descr  FROM orctiporec where o15_codtri is not null order by o15_codtri";
+    $and = "";
+    if ($iAno < 2023){
+        $and = " AND length(CAST(o15_codigo AS varchar)) < 5 ";
+    }
+
+    $sSqlfr = " SELECT DISTINCT o15_codigo, o15_codtri, o15_descr FROM orctiporec WHERE o15_codtri IS NOT NULL {$and} ORDER BY o15_codtri";
 
     $total = 0;
     $rsRecursos = db_query($sSqlfr) or die($sSqlfr);
@@ -506,16 +511,20 @@ class BalancoPatrimonialDCASP2015 extends RelatoriosLegaisBase  {
 
           $oRecursoConta = db_utils::fieldsMemory($rsRecursos, $iRecurso);
 
-          $rsSaldoFontes = db_query($this->sql_query_saldoInicialContaCorrente(false, $oRecursoConta->o15_codigo, $sIntituicoes, $iAno));
+          $sqlSaldoInicialContaCorrente = $this->sql_query_saldoInicialContaCorrente(false, $oRecursoConta->o15_codigo, $sIntituicoes, $iAno);
+          $rsSaldoFontes = db_query($sqlSaldoInicialContaCorrente);
 
           $oSaldoFontes = db_utils::fieldsMemory($rsSaldoFontes, 0);
           $nSaldoFinal = ($oSaldoFontes->saldoanterior + $oSaldoFontes->debito - $oSaldoFontes->credito);
 
           $clDeParaRecurso = new DeParaRecurso;
-          $iFonteRecurso = strlen($oRecursoConta->o15_codtri) == 7 ? $oRecursoConta->o15_codtri."0" : $oRecursoConta->o15_codtri; 
+          $iFonteRecurso = strlen($oRecursoConta->o15_codtri) == 7 ? $oRecursoConta->o15_codigo : $oRecursoConta->o15_codtri;
           $codtri = substr($clDeParaRecurso->getDePara($iFonteRecurso),0,7);
 
-          $sHash = $codtri;
+          $oRecursoConta->o15_codtri = ($exercicioAnterior && $iAno == 2022) ? $codtri : $oRecursoConta->o15_codtri;
+
+          $sHash =  $iAno >= 2023 ? $codtri : $oRecursoConta->o15_codtri;
+
           if($iAno==2016)
               $valores =  $oSaldoFontes->saldoanterior * -1;
           else
@@ -523,7 +532,7 @@ class BalancoPatrimonialDCASP2015 extends RelatoriosLegaisBase  {
 
           if ( !isset($aLinhas[$sHash]) ) {
               $oLinha            = new stdClass();
-              $oLinha->codigo    = $codtri;
+              $oLinha->codigo    = $iAno >= 2023 ? $codtri : $oRecursoConta->o15_codtri;
               $oLinha->descricao = $oRecursoConta->o15_descr;
               $oLinha->total     = $valores;
               $aLinhas[$sHash]   = $oLinha;
@@ -571,6 +580,11 @@ class BalancoPatrimonialDCASP2015 extends RelatoriosLegaisBase  {
 
         if (!$this->lExibirExercicioAnterior) break;
 
+        if (db_getsession("DB_anousu") == 2023){
+            $clDeParaRecurso = new DeParaRecurso;
+            $oAnterior->codigo = substr($clDeParaRecurso->getDePara($oAnterior->codigo),0,7);
+        }
+
         if ($oAtual->codigo == $oAnterior->codigo) {
 
           $oLinha->vlrexanter = $oAnterior->total;
@@ -606,7 +620,7 @@ class BalancoPatrimonialDCASP2015 extends RelatoriosLegaisBase  {
     $aDadosExercicioAtual    = $this->getSaldoPorRecurso($this->iAnoUsu);
     $aDadosExercicioAnterior = array();
     if ($this->lExibirExercicioAnterior) {
-      $aDadosExercicioAnterior = $this->getSaldoPorRecurso($this->iAnoUsu - 1);
+      $aDadosExercicioAnterior = $this->getSaldoPorRecurso($this->iAnoUsu - 1, true);
     }
 
     return $this->processaSuperavitDeficit($aDadosExercicioAtual, $aDadosExercicioAnterior);

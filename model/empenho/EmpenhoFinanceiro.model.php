@@ -200,6 +200,12 @@ class EmpenhoFinanceiro {
    * @var EmpenhoCotaMensal[]
    */
   private $aCotasMensais  = array();
+
+  /**
+   * Recurso
+   * @type string
+   */
+  private $sRecurso;
   /**
    * Carrega as propriedades de um empenho
    * @param integer  - Numero do Empenho
@@ -1271,5 +1277,21 @@ class EmpenhoFinanceiro {
       return false;
     }
     return db_utils::fieldsMemory($rsCotasMensais, 0)->cotas > 0;
+  }
+
+    /**
+   * Retorna o Recurso
+   * @return integer
+   */
+  public function getRecurso() {
+    return $this->sRecurso;
+  }
+
+  /**
+   * Seta o Recurso
+   * @param integer $sRecurso
+   */
+  public function setRecurso($sRecurso) {
+    $this->sRecurso = $sRecurso;
   }
 }

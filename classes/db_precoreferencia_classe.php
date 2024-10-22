@@ -3,7 +3,7 @@
 //CLASSE DA ENTIDADE precoreferencia
 class cl_precoreferencia
 {
-  // cria variaveis de erro 
+  // cria variaveis de erro
   var $rotulo     = null;
   var $query_sql  = null;
   var $numrows    = 0;
@@ -16,7 +16,7 @@ class cl_precoreferencia
   var $erro_msg   = null;
   var $erro_campo = null;
   var $pagina_retorno = null;
-  // cria variaveis do arquivo 
+  // cria variaveis do arquivo
   var $si01_sequencial = 0;
   var $si01_processocompra = 0;
   var $si01_datacotacao_dia = null;
@@ -33,25 +33,25 @@ class cl_precoreferencia
   var $si01_impjustificativa = false;
   var $si01_casasdecimais = 2;
 
-  // cria propriedade com as variaveis do arquivo 
+  // cria propriedade com as variaveis do arquivo
   var $campos = "
-                 si01_sequencial = int8 = codigo sequencial 
-                 si01_processocompra = int8 = numero do processo de compra 
-                 si01_datacotacao = date = data da cotacao 
-                 si01_tipoprecoreferencia = int8 = Tipo de Preco de Referencia 
+                 si01_sequencial = int8 = codigo sequencial
+                 si01_processocompra = int8 = numero do processo de compra
+                 si01_datacotacao = date = data da cotacao
+                 si01_tipoprecoreferencia = int8 = Tipo de Preco de Referencia
                  si01_justificativa = text = Justificativa
                  si01_cotacaoitem = int4 = Cotação Item
                  si01_tipo = int = Tipo de responsável
                  si01_numcgm = int  =   Num CGM responsável
                  ";
-  //funcao construtor da classe 
+  //funcao construtor da classe
   function cl_precoreferencia()
   {
     //classes dos rotulos dos campos
     $this->rotulo = new rotulo("precoreferencia");
     $this->pagina_retorno =  basename($GLOBALS["HTTP_SERVER_VARS"]["PHP_SELF"]);
   }
-  //funcao erro 
+  //funcao erro
   function erro($mostra, $retorna)
   {
     if (($this->erro_status == "0") || ($mostra == true && $this->erro_status != null)) {
@@ -131,7 +131,7 @@ class cl_precoreferencia
 
     if ($this->si01_numcgmCotacao == null) {
       $this->erro_sql = " Campo Responsável pela Cotação não Informado.";
-      $this->erro_campo = "si01_numcgmCotacao";
+      $this->erro_campo = "respCotacaocodigo";
       $this->erro_banco = "";
       $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
       $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
@@ -140,7 +140,7 @@ class cl_precoreferencia
     }
     if ($this->si01_numcgmOrcamento == null) {
       $this->erro_sql = " Campo Responsável pelo Recurso Orçamentário não Informado.";
-      $this->erro_campo = "si01_numcgmOrcamento";
+      $this->erro_campo = "respOrcacodigo";
       $this->erro_banco = "";
       $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
       $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
@@ -148,8 +148,8 @@ class cl_precoreferencia
       return false;
     }
 
-    $sSql = "select distinct pc21_orcamforne from pcproc 
-              join pcprocitem on pc80_codproc = pc81_codproc 
+    $sSql = "select distinct pc21_orcamforne from pcproc
+              join pcprocitem on pc80_codproc = pc81_codproc
               join pcorcamitemproc on pc81_codprocitem = pc31_pcprocitem
               join pcorcamitem on pc31_orcamitem = pc22_orcamitem
               join pcorcamval on pc22_orcamitem = pc23_orcamitem
@@ -204,32 +204,32 @@ class cl_precoreferencia
       return false;
     }
     $sql = "insert into precoreferencia(
-                                       si01_sequencial 
-                                      ,si01_processocompra 
-                                      ,si01_datacotacao 
-                                      ,si01_tipoprecoreferencia 
+                                       si01_sequencial
+                                      ,si01_processocompra
+                                      ,si01_datacotacao
+                                      ,si01_tipoprecoreferencia
                                       ,si01_justificativa
                                       ,si01_cotacaoitem
-                                      ,si01_tipoCotacao 
+                                      ,si01_tipoCotacao
                                       ,si01_numcgmCotacao
-                                      ,si01_tipoOrcamento 
-                                      ,si01_numcgmOrcamento 
+                                      ,si01_tipoOrcamento
+                                      ,si01_numcgmOrcamento
                                       ,si01_impjustificativa
                                       ,si01_casasdecimais
                        )
                 values (
-                                $this->si01_sequencial 
-                               ,$this->si01_processocompra 
-                               ," . ($this->si01_datacotacao == "null" || $this->si01_datacotacao == "" ? "null" : "'" . $this->si01_datacotacao . "'") . " 
-                               ,$this->si01_tipoprecoreferencia 
+                                $this->si01_sequencial
+                               ,$this->si01_processocompra
+                               ," . ($this->si01_datacotacao == "null" || $this->si01_datacotacao == "" ? "null" : "'" . $this->si01_datacotacao . "'") . "
+                               ,$this->si01_tipoprecoreferencia
                                ,'$this->si01_justificativa'
                                ,$this->si01_cotacaoitem
-                               ,$this->si01_tipoCotacao 
+                               ,$this->si01_tipoCotacao
                                ,$this->si01_numcgmCotacao
-                               ,$this->si01_tipoOrcamento 
+                               ,$this->si01_tipoOrcamento
                                ,$this->si01_numcgmOrcamento
-                               ,'$this->si01_impjustificativa'  
-                               ,$this->si01_casasdecimais  
+                               ,'$this->si01_impjustificativa'
+                               ,$this->si01_casasdecimais
                       )";
     $result = db_query($sql);
 
@@ -315,44 +315,49 @@ class cl_precoreferencia
         return false;
       }
     }
+      if (trim($this->si01_cotacaoitem) == "0") {
+          $this->erro_sql = " Campo cotação por item nao Informado.";
+          $this->erro_campo = "si01_cotacaoitem";
+          $this->erro_banco = "";
+          $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+          $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+          $this->erro_status = "0";
+          return false;
+      }
+
     if (trim($this->si01_cotacaoitem) != "" || isset($GLOBALS["HTTP_POST_VARS"]["si01_cotacaoitem"])) {
       $sql  .= $virgula . " si01_cotacaoitem = $this->si01_cotacaoitem ";
       $virgula = ",";
-      if (trim($this->si01_cotacaoitem) == null) {
-        $this->erro_sql = " Campo cotaçãop por item nao Informado.";
-        $this->erro_campo = "si01_cotacaoitem";
-        $this->erro_banco = "";
-        $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
-        $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
-        $this->erro_status = "0";
-        return false;
-      }
+
     }
+      if (trim($this->si01_numcgmCotacao) == null) {
+          $this->erro_sql = " Campo Responsavel pelos Recursos Orçamentarios não Informado.";
+          $this->erro_campo = "respOrcacodigo";
+          $this->erro_banco = "";
+          $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+          $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+          $this->erro_status = "0";
+          return false;
+      }
+
     if (trim($this->si01_numcgmCotacao) != "" || isset($GLOBALS["HTTP_POST_VARS"]["si01_numcgmCotacao"])) {
       $sql  .= $virgula . " si01_numcgmCotacao = $this->si01_numcgmCotacao ";
       $virgula = ",";
-      if (trim($this->si01_numcgmCotacao) == null) {
-        $this->erro_sql = " Campo cotaçãop por item nao Informado.";
-        $this->erro_campo = "si01_numcgmCotacao";
-        $this->erro_banco = "";
-        $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
-        $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
-        $this->erro_status = "0";
-        return false;
-      }
     }
+
+    if (trim($this->si01_numcgmOrcamento) == null) {
+          $this->erro_sql = " Campo cotação por item nao Informado.";
+          $this->erro_campo = "respOrcacodigo";
+          $this->erro_banco = "";
+          $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+          $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+          $this->erro_status = "0";
+        return false;
+   }
+
     if (trim($this->si01_numcgmOrcamento) != "" || isset($GLOBALS["HTTP_POST_VARS"]["si01_numcgmOrcamento"])) {
       $sql  .= $virgula . " si01_numcgmOrcamento = $this->si01_numcgmOrcamento ";
       $virgula = ",";
-      if (trim($this->si01_numcgmOrcamento) == null) {
-        $this->erro_sql = " Campo cotaçãop por item nao Informado.";
-        $this->erro_campo = "si01_numcgmOrcamento";
-        $this->erro_banco = "";
-        $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
-        $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
-        $this->erro_status = "0";
-        return false;
-      }
     }
     if (trim($this->si01_tipoCotacao) != "" || isset($GLOBALS["HTTP_POST_VARS"]["si01_tipoCotacao"])) {
       $sql  .= $virgula . " si01_tipoCotacao = $this->si01_tipoCotacao ";
@@ -422,7 +427,7 @@ class cl_precoreferencia
     }
 
     $sSql = "select distinct pc21_orcamforne from pcproc
-              join pcprocitem on pc80_codproc = pc81_codproc 
+              join pcprocitem on pc80_codproc = pc81_codproc
               join pcorcamitemproc on pc81_codprocitem = pc31_pcprocitem
               join pcorcamitem on pc31_orcamitem = pc22_orcamitem
               join pcorcamval on pc22_orcamitem = pc23_orcamitem
@@ -510,7 +515,7 @@ class cl_precoreferencia
       }
     }
   }
-  // funcao para exclusao 
+  // funcao para exclusao
   function excluir($si01_sequencial = null, $dbwhere = null)
   {
     if ($dbwhere == null || $dbwhere == "") {
@@ -580,7 +585,7 @@ class cl_precoreferencia
       }
     }
   }
-  // funcao do recordset 
+  // funcao do recordset
   function sql_record($sql)
   {
     $result = db_query($sql);
@@ -604,7 +609,7 @@ class cl_precoreferencia
     }
     return $result;
   }
-  // funcao do sql 
+  // funcao do sql
   function sql_query($si01_sequencial = null, $campos = "*", $ordem = null, $dbwhere = "")
   {
     $sql = "select ";
@@ -622,6 +627,8 @@ class cl_precoreferencia
     $sql .= "      inner join pcproc  on  pcproc.pc80_codproc = precoreferencia.si01_processocompra";
     $sql .= "      inner join db_usuarios  on  db_usuarios.id_usuario = pcproc.pc80_usuario";
     $sql .= "      inner join db_depart  on  db_depart.coddepto = pcproc.pc80_depto";
+    $sql .= "      INNER JOIN cgm cgmcotacao ON cgmcotacao.z01_numcgm = si01_numcgmcotacao";
+    $sql .= "      INNER JOIN cgm cgmorcamento ON cgmorcamento.z01_numcgm = si01_numcgmorcamento";
     $sql2 = "";
     if ($dbwhere == "") {
       if ($si01_sequencial != null) {
@@ -642,7 +649,7 @@ class cl_precoreferencia
     }
     return $sql;
   }
-  // funcao do sql 
+  // funcao do sql
   function sql_query_file($si01_sequencial = null, $campos = "*", $ordem = null, $dbwhere = "")
   {
     $sql = "select ";
@@ -688,5 +695,16 @@ class cl_precoreferencia
     $sSql = "select pc80_data from compras.pcproc where pc80_codproc = $codproc";
     $resSsql = db_query($sSql) or die(pg_last_error());
     return db_utils::fieldsMemory($resSsql, 0)->pc80_data;
+  }
+
+  public function verificaItemCota($pc80_codproc)
+  {
+      return "
+      SELECT si02_vltotalprecoreferencia
+            FROM precoreferencia
+            INNER JOIN itemprecoreferencia ON si02_precoreferencia = si01_sequencial
+            WHERE si01_processocompra = $pc80_codproc
+              AND si02_vltotalprecoreferencia >= 80000
+        ";
   }
 }

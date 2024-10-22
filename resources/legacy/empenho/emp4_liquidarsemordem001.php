@@ -62,7 +62,7 @@ require_once(modification("classes/db_conlancamcompl_classe.php"));
 require_once(modification("classes/db_conlancamord_classe.php"));
 
 require_once(modification("classes/empenho.php"));
-
+use Illuminate\Database\Capsule\Manager as DB;
 $clempnota         = new cl_empnota;
 $clempnotaele      = new cl_empnotaele;
 $clpagordem        = new cl_pagordem;
@@ -89,6 +89,7 @@ $clconlancamlr     = new cl_conlancamlr;
 $clconlancamcompl  = new cl_conlancamcompl;
 $clconlancamord    = new cl_conlancamord;
 $clpagordemtiporec = new cl_pagordemtiporec;
+$clcgm             = new cl_cgm;
 $clempenho         = new empenho; // rotinas para liquidação de empenho
 
 parse_str($HTTP_SERVER_VARS["QUERY_STRING"]);
@@ -98,6 +99,12 @@ $op           = 1;
 $db_opcao     = 22;
 $db_botao     = false;
 $tela_estorno = false;
+
+if ($e60_numemp){
+  $db_opcao = 1;
+  $db_botao = true;
+}  
+
 ?>
 <html>
 <head>
@@ -113,8 +120,8 @@ $tela_estorno = false;
 <link href="estilos.css" rel="stylesheet" type="text/css">
 <link href="estilos/grid.style.css" rel="stylesheet" type="text/css">
 </head>
-<body bgcolor=#CCCCCC leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
-  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#5786B2">
+<body bgcolor=#CCCCCC leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="<?=$db_opcao==22?"document.form1.pesquisar.click();":"js_pesquisa({$e60_numemp});"?>
+">  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#5786B2">
     <tr>
       <td width="360" height="18">&nbsp;</td>
       <td width="263">&nbsp;</td>
@@ -147,5 +154,5 @@ if(isset($confirmar_emitir)) {
            </script>";
   }
 }
-echo "<script>document.form1.pesquisar.click();</script>";
+
 ?>

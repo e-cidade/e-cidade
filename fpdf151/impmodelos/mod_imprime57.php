@@ -138,7 +138,7 @@
 	
   $this->objpdf->sety($xlin+24);
 	$posicao_atual=$this->objpdf->gety();
-	$this->objpdf->multicell(202,4,"PRAZO DE ENTREGA: " . $this->prazoent. " DIAS A CONTAR DA DATA DO RECEBIMENTO DESTA ORDEM DE COMPRA",1);
+	$this->objpdf->multicell(202,4,"PRAZO DE ENTREGA: " . $this->prazoent,1);
 	$this->objpdf->multicell(202,4,"CONDICOES DE PAGAMENTO: ". pg_result($this->recorddositens,0,$this->condpag),1);
 	$this->objpdf->multicell(202,4,"DESTINO: ". pg_result($this->recorddositens,0,$this->destino),1);
 	$posicao_depois=$this->objpdf->gety();

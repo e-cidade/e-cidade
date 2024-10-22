@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class UpdateModAlvaraNumeracao extends AbstractMigration
+class UpdateModAlvaraNumeracao extends PostgresMigration
 {
     const PMGRAOMOGOL = '20716627000150';
     const PMBURITIZEIRO = '18279067000172';

@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AtualizacaoRubricas extends AbstractMigration
+class AtualizacaoRubricas extends PostgresMigration
 {
 
     public function change()

@@ -8,9 +8,12 @@ use App\Models\Builders\LegacyBuilder;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model;
 use LogicException;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class LegacyModel extends Model
+class LegacyModel extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
+
     public array $legacy = [];
 
     protected string $builder = LegacyBuilder::class;
@@ -93,5 +96,46 @@ class LegacyModel extends Model
         $tableName['tableName'] = $tableNameParts[1];
 
         return $tableName;
+    }
+
+    public function transformAudit(array $data): array
+    {
+        // Aplicar utf8_encode ou utf8_decode nos valores antigos e novos
+        if (isset($data['new_values'])) {
+            $data['new_values'] = $this->convertToUtf8($data['new_values']);
+        }
+
+        if (isset($data['old_values'])) {
+            $data['old_values'] = $this->convertToUtf8($data['old_values']);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Método para codificar em UTF-8 os valores de um array
+     */
+    public function convertToUtf8($data, $encodingfrom = 'ISO-8859-1', $encodingto = 'UTF-8')
+    {
+        if (is_array($data)) {
+            return array_map(function($item) use ($encodingfrom, $encodingto) {
+                return $this->convertToUtf8($item, $encodingfrom, $encodingto);
+            }, $data);
+        } elseif (is_object($data)) {
+            foreach ($data as $key => $value) {
+                $data->$key = $this->convertToUtf8($value, $encodingfrom, $encodingto);
+            }
+            return $data;
+        } elseif (is_string($data)) {
+            // Verificar se a string já está na codificação desejada
+            $currentEncoding = mb_detect_encoding($data, [$encodingfrom, $encodingto], true);
+
+            // Só converter se a string estiver na codificação de origem esperada
+            if ($currentEncoding === $encodingfrom) {
+                return mb_convert_encoding($data, $encodingto, $encodingfrom);
+            }
+        }
+
+        return $data;
     }
 }

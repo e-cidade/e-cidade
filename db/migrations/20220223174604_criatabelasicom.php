@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Criatabelasicom extends AbstractMigration
+class Criatabelasicom extends PostgresMigration
 {
 
     public function up()
@@ -27,7 +27,7 @@ class Criatabelasicom extends AbstractMigration
             OIDS=TRUE
         );
         CREATE INDEX contratos132022_si86_reg10_index ON contratos132022 USING btree (si86_reg10);
-        
+
         ";
         $this->execute($sql);
     }

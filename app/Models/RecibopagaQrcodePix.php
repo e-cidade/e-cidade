@@ -18,13 +18,6 @@ class RecibopagaQrcodePix extends LegacyModel
      */
     protected $primaryKey = 'k176_sequencial';
 
-    /**
-     * Indicates if the IDs are auto-incrementing.
-     *
-     * @var bool
-     */
-    public $incrementing = false;
-
     public $timestamps = false;
 
     /**

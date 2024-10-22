@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class SetUserIfoContassToAdmin extends AbstractMigration
+class SetUserIfoContassToAdmin extends PostgresMigration
 {
     public function change()
     {

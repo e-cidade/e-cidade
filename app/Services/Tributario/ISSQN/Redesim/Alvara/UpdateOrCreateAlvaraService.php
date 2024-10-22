@@ -52,7 +52,7 @@ class UpdateOrCreateAlvaraService
 
         if (!empty($issbase)) {
             $actionType = IssbaseLogTipo::ALTERACAO_EMPRESA;
-            if (($issbase->cgm->z01_nome !== $data->razaoSocial) || ($issbase->cgm->z01_nomefanta !== $data->nomeFantasia)) {
+            if (($issbase->cgm->z01_nome !== $data->getRazaoSocialEcidade()) || ($issbase->cgm->z01_nomefanta !== $data->getNomeFantasiaEcidade())) {
                 $actionType = IssbaseLogTipo::ALTERACAO_RAZAO_SOCIAL_NOME_SOCIAL;
             }
 

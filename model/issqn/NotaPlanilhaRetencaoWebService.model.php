@@ -210,6 +210,7 @@ class NotaPlanilhaRetencaoWebService extends NotaPlanilhaRetencao{
              $oCGM->setMunicipio($oEnderecoPrimario[0]->smunicipio);
              $oCGM->setLogradouro($oEnderecoPrimario[0]->srua);
              $oCGM->setComplemento($oEnderecoPrimario[0]->scomplemento);
+             $oCGM->setNotificalEmail(true);
 
              $oCGM->save();
            }
@@ -243,6 +244,7 @@ class NotaPlanilhaRetencaoWebService extends NotaPlanilhaRetencao{
                $oCGM->setMunicipio($oEnderecoPrimario[0]->smunicipio);
                $oCGM->setLogradouro($oEnderecoPrimario[0]->srua);
                $oCGM->setComplemento($oEnderecoPrimario[0]->scomplemento);
+               $oCGM->setNotificalEmail(true);
 
                $oCGM->save();
            }

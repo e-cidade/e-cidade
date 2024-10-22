@@ -86,6 +86,7 @@ class Issbase extends LegacyModel
         return $this->newQuery()
             ->join('issbaseparalisacao', 'q140_issbase', 'q02_inscr')
             ->where('q02_inscr', $this->q02_inscr)
+            ->whereNull('q140_datafim')
             ->exists();
     }
 

@@ -112,7 +112,7 @@ db_input('z01_nome',40,$Iz01_nome,true,'text',3);
         $result_forne = $clpcorcamforne->sql_record($clpcorcamforne->sql_query_file(null,"pc21_codorc","","pc21_codorc=$pc21_codorc"));
         if($clpcorcamforne->numrows>0){
           echo "<input name='gera'    type='submit' id='gera'    value='Gerar relatório' onclick='js_gerarel(false);' ".($db_botao==false?"disabled":"").">&nbsp;";
-          echo "<input name='lancval' type='button' id='lancval' value='Lançar valores'  onclick='CurrentWindow.corpo.document.location.href=\"com1_orcamlancval001.php?pc20_codorc=$pc21_codorc&sol=$solic\"' ".($db_botao==false?"disabled":"").">";
+          echo "<input name='lancval' type='button' id='lancval' value='Lançar valores'  onclick='CurrentWindow.corpo.document.location.href=\"com1_orcamlancval001.php?pc20_codorc=$pc21_codorc&p80_codproc=$p80_codproc&sol=$solic\"' ".($db_botao==false?"disabled":"").">";
         }
       }
      ?>

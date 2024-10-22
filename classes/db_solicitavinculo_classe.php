@@ -550,5 +550,23 @@ class cl_solicitavinculo {
      }
      return $sql;
   }
+    public function sqlSolicitavinculo($compilacao)
+    {
+        return "select * from solicitavinculo where pc53_solicitafilho = $compilacao";
+    }
+
+    public function sqlEstimativas($abertura)
+    {
+        return "SELECT pc53_solicitafilho
+                        FROM solicitavinculo
+                        INNER JOIN solicita ON solicita.pc10_numero = solicitavinculo.pc53_solicitafilho
+                        LEFT JOIN solicitaanulada ON solicitaanulada.pc67_solicita = solicita.pc10_numero
+                        INNER JOIN db_config ON db_config.codigo = solicita.pc10_instit
+                        INNER JOIN db_usuarios ON db_usuarios.id_usuario = solicita.pc10_login
+                        INNER JOIN db_depart ON db_depart.coddepto = solicita.pc10_depto
+                        INNER JOIN solicitacaotipo ON solicitacaotipo.pc52_sequencial = solicita.pc10_solicitacaotipo
+                        WHERE pc53_solicitapai = $abertura
+                            AND pc10_solicitacaotipo = 4";
+    }
 }
 ?>

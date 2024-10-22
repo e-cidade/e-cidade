@@ -1,14 +1,14 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc18364 extends AbstractMigration
+class Oc18364 extends PostgresMigration
 {
-    
+
     public function up()
     {
         $sql = <<<SQL
-            begin;    
+            begin;
 
                 alter table matmater add column m60_instit int4;
             commit;

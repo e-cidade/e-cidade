@@ -508,5 +508,29 @@ class cl_cadendermunicipio {
      }
      return $sql;
   }
+
+    function getEstadoCidadeByIBGE($codigoIbge) 
+    {
+        $sql = " SELECT db71_sigla as estado, cadendermunicipio.db72_sequencial as codigo_cidade ";
+        $sql .= " FROM cadendermunicipio ";
+        $sql .= " INNER JOIN cadendermunicipiosistema ON cadendermunicipiosistema.db125_cadendermunicipio = cadendermunicipio.db72_sequencial";
+        $sql .= "   AND cadendermunicipiosistema.db125_db_sistemaexterno = 4";
+        $sql .= " INNER JOIN cadenderestado ON cadendermunicipio.db72_cadenderestado = cadenderestado.db71_sequencial";
+        $sql .= " INNER JOIN cadenderpais ON cadenderestado.db71_cadenderpais = cadenderpais.db70_sequencial";
+        $sql .= " INNER JOIN cadenderpaissistema ON cadenderpais.db70_sequencial = cadenderpaissistema.db135_db_cadenderpais";
+        $sql .= " WHERE db125_codigosistema = '{$codigoIbge}' ";
+
+        return $this->sql_record($sql);
+    }
+
+    function getMunicipiosPorEstado($estado)
+    {
+        return $this->sql_record("SELECT db72_sequencial, db72_descricao FROM cadendermunicipio INNER JOIN cadenderestado ON db72_cadenderestado = db71_sequencial WHERE db71_sigla = '{$estado}' ORDER BY db72_descricao");
+    }
+
+    function getMunicipiosPorEstadoECidade($estado, $cidade)
+    {
+        return $this->sql_record("SELECT db72_sequencial, db72_descricao FROM cadendermunicipio INNER JOIN cadenderestado ON db72_cadenderestado = db71_sequencial WHERE db71_sigla = '{$estado}' AND db72_descricao = '{$cidade}' ORDER BY db72_descricao");
+    }
 }
 ?>

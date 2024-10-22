@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Createcompradiretapncp extends AbstractMigration
+class Createcompradiretapncp extends PostgresMigration
 {
     public function up()
     {
@@ -11,7 +11,7 @@ class Createcompradiretapncp extends AbstractMigration
         alter table pcproc add column pc80_dispvalor bool;
         alter table pcproc add column pc80_orcsigiloso bool;
         alter table pcproc add column pc80_subcontratacao bool;
-        alter table pcproc add column pc80_dadoscomplementares text;        
+        alter table pcproc add column pc80_dadoscomplementares text;
         alter table pcproc add column pc80_amparolegal int8;
 
         INSERT INTO db_menu VALUES(32,(select id_item from db_itensmenu where descricao='PNCP'),51,28);
@@ -22,8 +22,8 @@ class Createcompradiretapncp extends AbstractMigration
         INSERT INTO db_itensmenu VALUES ((select max(id_item)+1 from db_itensmenu), 'Anexos PNCP', 'Anexos PNCP', 'com1_pncpanexosdispensaporvalor001.php', 1, 1, 'Anexos PNCP', 't');
         INSERT INTO db_menu VALUES((select id_item from db_itensmenu where descricao like'%Processo de compras'),(select max(id_item) from db_itensmenu),5,28);
 
-        alter table liccontrolepncp add column l213_processodecompras int8;   
-        
+        alter table liccontrolepncp add column l213_processodecompras int8;
+
         INSERT INTO db_sysarquivo VALUES((select max(codarq)+1 from db_sysarquivo),'anexocomprapncp','cadastro de anexos pncp','l216','2022-08-22','cadastro de anexos pncp',0,'f','f','f','f');
 
         CREATE TABLE anexocomprapncp(

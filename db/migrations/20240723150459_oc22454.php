@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc22454 extends AbstractMigration
+class Oc22454 extends PostgresMigration
 {
     public function up()
     {
@@ -34,9 +34,9 @@ class Oc22454 extends AbstractMigration
             INCREMENT BY 1
             NO MINVALUE
             NO MAXVALUE
-            CACHE 1;     
+            CACHE 1;
 
-        
+
         COMMIT;
 
 SQL;

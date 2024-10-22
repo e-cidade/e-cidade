@@ -1493,7 +1493,15 @@ class cl_pcproc
                     FALSE AS incentivoProdutivoBasico,
                             pcmater.pc01_descrmater AS descricao,
                             matunid.m61_descr AS unidadeMedida,
-                            solicitem.pc11_vlrun AS valorUnitarioEstimado,
+                            COALESCE(
+                                (
+                                    SELECT NULLIF(MIN(pc23_vlrun), NULL)
+                                    FROM pcorcamval
+                                    WHERE pcorcamval.pc23_orcamitem = pcorcamitem.pc22_orcamitem
+                                      AND pcorcamval.pc23_vlrun > 0
+                                ),
+                                solicitem.pc11_vlrun
+                            ) AS valorUnitarioEstimado,
                             pcproc.pc80_criteriojulgamento AS criterioJulgamentoId,
                             pcmater.pc01_codmater,
                             solicitem.pc11_numero,
@@ -1799,8 +1807,9 @@ class cl_pcproc
 
   }
 
-  public function queryProcessodeComprasLicitacao()
+  public function queryProcessodeComprasLicitacao(string $where)
   {
+      $instituicao = db_getsession('DB_instit');
       $sql = " SELECT DISTINCT pc80_codproc
                 FROM pcproc
                 INNER JOIN db_usuarios ON db_usuarios.id_usuario = pcproc.pc80_usuario
@@ -1814,8 +1823,7 @@ class cl_pcproc
                 WHERE (e55_sequen IS NULL
                        OR (e55_sequen IS NOT NULL
                            AND e54_anulad IS NOT NULL))
-                    AND pc10_instit = 1
-                    AND pc10_solicitacaotipo IN(1,2,8)
+                    AND pc10_instit = $instituicao
                     AND pc80_situacao = 2
                     AND NOT EXISTS
                         (SELECT 1
@@ -1828,7 +1836,6 @@ class cl_pcproc
                     AND pc80_codproc IN
                         (SELECT si01_processocompra
                          FROM precoreferencia)
-                    AND pc80_data <= '2024-06-24'
                     AND pc80_criterioadjudicacao = 3
                     AND NOT EXISTS
                         (SELECT *
@@ -1847,6 +1854,7 @@ class cl_pcproc
                         (SELECT si06_processocompra
                          FROM adesaoregprecos)
                     AND pc80_dispvalor = 'f'
+                $where
                 ORDER BY pc80_codproc
       ";
       return $sql;
@@ -1901,5 +1909,41 @@ class cl_pcproc
                     INNER JOIN db_depart ON db_depart.coddepto = pcproc.pc80_depto
                     AND db_depart.instit = 1
                     WHERE pcproc.pc80_codproc = $pc80_codproc";
+  }
+
+
+  public function sqlOrigemProcessoDecompras($pc80_codproc)
+  {
+      return "
+          SELECT DISTINCT pc10_solicitacaotipo
+            FROM pcprocitem
+            INNER JOIN solicitem ON pc11_codigo=pc81_solicitem
+            INNER JOIN solicita ON pc11_numero = pc10_numero
+          WHERE pc81_codproc=$pc80_codproc
+      ";
+  }
+
+  public function sqlEstimativas($pc80_codproc)
+  {
+      return "
+            SELECT DISTINCT pc11_numero
+                FROM pcprocitem
+                INNER JOIN solicitem ON pc11_codigo = pc81_solicitem
+                INNER JOIN solicitempcmater ON pc16_solicitem = pc11_codigo
+                INNER JOIN solicitemunid ON pc17_codigo = pc11_codigo
+                INNER JOIN matunid ON m61_codmatunid = pc17_unid
+                INNER JOIN pcmater ON pc01_codmater = pc16_codmater
+                WHERE pc81_codproc = $pc80_codproc
+      ";
+  }
+
+  public function getlicitacao($pc80_codproc)
+  {
+      return "
+            SELECT DISTINCT l21_codliclicita
+            FROM liclicitem
+            INNER JOIN pcprocitem ON l21_codpcprocitem = pc81_codprocitem
+            WHERE pc81_codproc= $pc80_codproc
+      ";
   }
 }

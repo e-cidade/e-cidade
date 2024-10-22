@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc18553 extends AbstractMigration
+class Oc18553 extends PostgresMigration
 {
 
     public function up()
@@ -23,7 +23,7 @@ class Oc18553 extends AbstractMigration
         l212_codigo int not null default 0,
         l212_lei varchar (100) not null ,
         CONSTRAINT amparolegal_sequ_pk PRIMARY KEY (l212_codigo));
-        
+
         INSERT INTO amparolegal VALUES (nextval('amparolegal_l212_codigo_seq'), 'Lei14.133/2021, Art. 28, I');
         INSERT INTO amparolegal VALUES (nextval('amparolegal_l212_codigo_seq'), 'Lei14.133/2021, Art. 28, II');
         INSERT INTO amparolegal VALUES (nextval('amparolegal_l212_codigo_seq'), 'Lei14.133/2021, Art. 28, III');
@@ -82,7 +82,7 @@ class Oc18553 extends AbstractMigration
         INSERT INTO amparolegal VALUES (nextval('amparolegal_l212_codigo_seq'), 'Lei 9.636/1998, Art. 11-C, II');
         INSERT INTO amparolegal VALUES (nextval('amparolegal_l212_codigo_seq'), 'Lei 9.636/1998, Art. 24-C, I');
         INSERT INTO amparolegal VALUES (nextval('amparolegal_l212_codigo_seq'), 'Lei 9.636/1998, Art. 24-C, II');
-        INSERT INTO amparolegal VALUES (nextval('amparolegal_l212_codigo_seq'), 'Lei 9.636/1998, Art. 24-C, III'); 
+        INSERT INTO amparolegal VALUES (nextval('amparolegal_l212_codigo_seq'), 'Lei 9.636/1998, Art. 24-C, III');
 
         create table amparocflicita(
             l213_amparo int not null,

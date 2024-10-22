@@ -1,19 +1,19 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class NovosCamposrhestagiocurricular extends AbstractMigration
+class NovosCamposrhestagiocurricular extends PostgresMigration
 {
 
     public function up()
     {
         $sql = "
         begin;
-        
+
         alter table rhestagiocurricular ADD COLUMN h83_naturezaestagio varchar(1);
         alter table rhestagiocurricular ADD COLUMN h83_nivelestagio int8;
         alter table rhestagiocurricular ADD COLUMN h83_numapoliceseguro int8;
-        
+
         commit;
         ";
         $this->execute($sql);
@@ -23,11 +23,11 @@ class NovosCamposrhestagiocurricular extends AbstractMigration
     {
         $sql = "
         begin;
-        
+
         alter table rhestagiocurricular DROP COLUMN h83_naturezaestagio;
         alter table rhestagiocurricular DROP COLUMN h83_nivelestagio;
         alter table rhestagiocurricular DROP COLUMN h83_numapoliceseguro;
-        
+
         commit;
         ";
         $this->execute($sql);

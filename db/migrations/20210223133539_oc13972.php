@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc13972 extends AbstractMigration
+class Oc13972 extends PostgresMigration
 {
     public function up(){
         $sql = "
@@ -21,10 +21,10 @@ class Oc13972 extends AbstractMigration
 
             -- Inverte a posição dos menus 'Processo de Compras' e 'Registro de Preço'
 
-            UPDATE db_menu 
-                SET menusequencia = 4 
+            UPDATE db_menu
+                SET menusequencia = 4
                 WHERE id_item_filho = 7941 AND id_item = 32 AND modulo = 28;
-                       
+
             UPDATE db_menu
                 SET menusequencia = 3
                 WHERE id_item_filho = 4071 AND id_item = 32 AND modulo = 28;
@@ -54,22 +54,22 @@ class Oc13972 extends AbstractMigration
             SELECT fc_startsession();
 
             -- Retorna a posição dos menus 'Processamento' e 'Cancelar Processamento'
-    
+
             DELETE FROM db_menu where id_item_filho IN (7968, 7969) and modulo = 28;
 
             INSERT INTO db_menu(id_item, id_item_filho, menusequencia, modulo)
                 VALUES (7941, 7968, 6, 28),
                        (7941, 7969, 6, 28);
 
-            -- Retorna as posições anteriores                       
+            -- Retorna as posições anteriores
 
-            UPDATE db_menu 
-                SET menusequencia = 3 
+            UPDATE db_menu
+                SET menusequencia = 3
                 WHERE id_item_filho = 7941 AND id_item = 32 AND modulo = 28;
-                        
+
             UPDATE db_menu
                 SET menusequencia = 4
-                WHERE id_item_filho = 4071 AND id_item = 32 AND modulo = 28;                       
+                WHERE id_item_filho = 4071 AND id_item = 32 AND modulo = 28;
 
             -- Retorna a nomenclatura de 'Incluir' para 'Outros' na rotina de Aditamento
 
@@ -82,7 +82,7 @@ class Oc13972 extends AbstractMigration
                         WHERE db_menu.modulo = 8251
                             AND descricao = 'Incluir'
                             AND funcao = 'ac04_aditaoutros.php');
-            
+
             COMMIT;
         ";
         $this->execute($sql);

@@ -1,12 +1,12 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc21015 extends AbstractMigration
+class Oc21015 extends PostgresMigration
 {
     public function up()
     {
-        $sSql = 
+        $sSql =
             "BEGIN;
             ALTER TABLE licitaparam ADD COLUMN l12_adjudicarprocesso bool default false;
             INSERT INTO db_syscampo VALUES ((select max(codcam)+1 from db_syscampo), 'l12_adjudicarprocesso','bool' ,'Adjudicar Processo RP','', 'Adjudicar Processo RP',1,false, false, false, 1, 'bool', 'Adjudicar Processo RP');

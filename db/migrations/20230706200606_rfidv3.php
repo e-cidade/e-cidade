@@ -1,27 +1,27 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Rfidv3 extends AbstractMigration
+class Rfidv3 extends PostgresMigration
 {
     public function up()
     {
         $sql = "
         BEGIN;
-            
+
         ALTER TABLE patrimonio.cfpatriinstituicao ADD t59_usuarioapi character varying(60);
         ALTER TABLE patrimonio.cfpatriinstituicao ADD t59_senhaapi character varying(40);
         ALTER TABLE patrimonio.cfpatriinstituicao ADD t59_enderecoapi character varying(250);
         ALTER TABLE patrimonio.cfpatriinstituicao ADD t59_ativo boolean;
         ALTER TABLE patrimonio.cfpatriinstituicao ADD t59_tokenapi character varying(5000);
- 
+
         INSERT INTO db_itensmenu VALUES ((select max(id_item) + 1 from db_itensmenu), 'Bens pendentes', 'Bens pendentes', 'pat1_benscontrolerfid001.php', 1, 1, 'Bens pendentes', 't');
 
         INSERT INTO db_menu VALUES (3647, (select max(id_item) from db_itensmenu), (select max(menusequencia)+1 from db_menu where id_item = 3647 and modulo = 439), 439);
 
         INSERT INTO db_itensmenu VALUES ((select max(id_item) + 1 from db_itensmenu), 'Bens pendentes de baixa', 'Bens pendentes de baixa', 'pat4_baixacontrolerfid001.php', 1, 1, 'Bens pendentes de baixa', 't');
 
-        INSERT INTO db_menu VALUES (9128, (select max(id_item) from db_itensmenu), (select max(menusequencia)+1 from db_menu where id_item = 9128 and modulo = 439), 439); 
+        INSERT INTO db_menu VALUES (9128, (select max(id_item) from db_itensmenu), (select max(menusequencia)+1 from db_menu where id_item = 9128 and modulo = 439), 439);
 
         CREATE TABLE patrimonio.benscontrolerfid(
             t214_sequencial int8 NOT NULL,
@@ -66,14 +66,14 @@ class Rfidv3 extends AbstractMigration
             PRIMARY KEY (t214_sequencial),
             FOREIGN KEY (t214_codigobem) REFERENCES bens (t52_bem)
         );
-            
+
         CREATE SEQUENCE patrimonio.benscontrolerfid_t214_sequencial_seq
         INCREMENT BY 1
         MINVALUE 1
         MAXVALUE 9223372036854775807
         START 1
         CACHE 1
-        NO CYCLE;  
+        NO CYCLE;
 
         COMMIT;
         ";

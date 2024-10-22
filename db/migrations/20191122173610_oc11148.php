@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc11148 extends AbstractMigration
+class Oc11148 extends PostgresMigration
 {
     /**
      * Change Method.
@@ -10,7 +10,7 @@ class Oc11148 extends AbstractMigration
      * Write your reversible migrations using this method.
      *
      * More information on writing migrations is available here:
-     * http://docs.phinx.org/en/latest/migrations.html#the-abstractmigration-class
+     * http://docs.phinx.org/en/latest/migrations.html#the-PostgresMigration-class
      *
      * The following commands can be used in this method and Phinx will
      * automatically reverse them when rolling back:
@@ -28,7 +28,7 @@ class Oc11148 extends AbstractMigration
     public function up()
     {
         $sql = <<<SQL
-        
+
         BEGIN;
 
           SELECT fc_startsession();
@@ -52,7 +52,7 @@ class Oc11148 extends AbstractMigration
             revisão, leitura, cópia e/ou divulgação do conteúdo deste "e-mail" são estritamente proibidas e não autorizadas. Por favor, apague o<br>
             conteúdo do "e-mail" e notifique a remetente imediatamente. Agradecemos a colaboração.',
                     1);
-            
+
             INSERT INTO tiposnotificacao
             VALUES (nextval('tiposnotificacao_p110_sequencial_seq'),
                     'Realização do pagamento',
@@ -69,7 +69,7 @@ class Oc11148 extends AbstractMigration
             revisão, leitura, cópia e/ou divulgação do conteúdo deste "e-mail" são estritamente proibidas e não autorizadas. Por favor, apague o<br>
             conteúdo do "e-mail" e notifique a remetente imediatamente. Agradecemos a colaboração.',
                     3);
-            
+
             INSERT INTO tiposnotificacao
             VALUES (nextval('tiposnotificacao_p110_sequencial_seq'),
                     'Previsão de pagamento',
@@ -87,13 +87,13 @@ class Oc11148 extends AbstractMigration
             revisão, leitura, cópia e/ou divulgação do conteúdo deste "e-mail" são estritamente proibidas e não autorizadas. Por favor, apague o<br>
             conteúdo do "e-mail" e notifique a remetente imediatamente. Agradecemos a colaboração.',
                     2);
-            
+
             INSERT INTO tiposnotificacao
             VALUES (nextval('tiposnotificacao_p110_sequencial_seq'),
                     'Atraso de Pagamento',
                     'Senhor fornecedor, Comunicamos o atraso do pagamento',
                     0);
-        COMMIT;            
+        COMMIT;
 SQL;
         $this->execute($sql);
     }

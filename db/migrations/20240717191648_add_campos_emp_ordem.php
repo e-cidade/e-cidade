@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AddCamposEmpOrdem extends AbstractMigration
+class AddCamposEmpOrdem extends PostgresMigration
 {
     public function change()
     {

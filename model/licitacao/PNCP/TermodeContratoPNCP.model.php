@@ -62,7 +62,7 @@ class TermodeContrato extends ModeloBasePNCP
         return $aDadosAPI;
     }
 
-    public function montarRetificacao()
+    public function montarRetificacao($sJustificativa = null)
     {
 
         $aDadosAPI = array();
@@ -71,28 +71,32 @@ class TermodeContrato extends ModeloBasePNCP
         $oDadosAPI                                          = new \stdClass;
         $oDadosAPI->tipoTermoContratoId                     = $oDado[0]->tipotermocontratoid;
         $oDadosAPI->numeroTermoContrato                     = $oDado[0]->numerotermocontrato;
-        $oDadosAPI->objetoTermoContrato                     = $oDado[0]->objetotermocontrato;
-        $oDadosAPI->qualificacaoAcrescimoSupressao          = $oDado[0]->qualificacaoacrescimosupressao;
-        $oDadosAPI->qualificacaoVigencia                    = $oDado[0]->qualificacaovigencia;
-        $oDadosAPI->qualificacaoFornecedor                  = $oDado[0]->qualificacaofornecedor;
+        $oDadosAPI->objetoTermoContrato                     = utf8_encode($oDado[0]->objetotermocontrato);
+        $oDadosAPI->qualificacaoAcrescimoSupressao          = $oDado[0]->qualificacaoacrescimosupressao == 'f' ? 'false' : 'true';
+        $oDadosAPI->qualificacaoVigencia                    = $oDado[0]->qualificacaovigencia == 'f' ? 'false' : 'true';
+        $oDadosAPI->qualificacaoFornecedor                  = $oDado[0]->qualificacaofornecedor == 'f' ? 'false' : 'true';
         $oDadosAPI->qualificacaoInformativo                 = 'false';
-        $oDadosAPI->qualificacaoReajuste                    = $oDado[0]->qualificacaoreajuste;
+        $oDadosAPI->qualificacaoReajuste                    = $oDado[0]->qualificacaoreajuste == 'f' ? 'false' : 'true';
         $oDadosAPI->dataAssinatura                          = $this->formatDate($oDado[0]->dataassinatura);
         $oDadosAPI->niFornecedor                            = $oDado[0]->nifornecedor;
         $oDadosAPI->tipoPessoaFornecedor                    = $oDado[0]->tipopessoafornecedor;
         $oDadosAPI->nomeRazaoSocialFornecedor               = utf8_encode($oDado[0]->nomerazaosocialfornecedor);
-        //$oDadosAPI->niFornecedorSubContratado               = $oDado[0]->niFornecedorSubContratado;
-        //$oDadosAPI->tipoPessoaFornecedorSubContratado       = $oDado[0]->tipoPessoaFornecedorSubContratado;
-        //$oDadosAPI->nomeRazaoSocialFornecedorSubContratado  = $oDado[0]->nomeRazaoSocialFornecedorSubContratado;
-        //$oDadosAPI->informativoObservacao                   = $oDado[0]->informativoObservacao;
-        //$oDadosAPI->fundamentoLegal                         = $oDado[0]->fundamentoLegal;
-        //$oDadosAPI->valorAcrescido                          = $oDado[0]->valoracrescido;
-        //$oDadosAPI->numeroParcelas                          = $oDado[0]->numeroParcelas;
-        //$oDadosAPI->valorParcela                            = $oDado[0]->valorParcela;
-        //$oDadosAPI->valorGlobal                             = $oDado[0]->valorGlobal;
-        //$oDadosAPI->prazoAditadoDias                        = $oDado[0]->prazoAditadoDias;
-        //$oDadosAPI->dataVigenciaInicio                      = $oDado[0]->dataVigenciaInicio;
-        //$oDadosAPI->dataVigenciaFim                         = $oDado[0]->dataVigenciaFim;
+        // $oDadosAPI->niFornecedorSubContratado               = $oDado[0]->niFornecedorSubContratado;
+        // $oDadosAPI->tipoPessoaFornecedorSubContratado       = $oDado[0]->tipoPessoaFornecedorSubContratado;
+        // $oDadosAPI->nomeRazaoSocialFornecedorSubContratado  = $oDado[0]->nomeRazaoSocialFornecedorSubContratado;
+        // $oDadosAPI->informativoObservacao                   = $oDado[0]->informativoObservacao;
+        // $oDadosAPI->fundamentoLegal                         = $oDado[0]->fundamentoLegal;
+        // $oDadosAPI->valorAcrescido                          = $oDado[0]->valoracrescido;
+        // $oDadosAPI->numeroParcelas                          = $oDado[0]->numeroParcelas;
+        // $oDadosAPI->valorParcela                            = $oDado[0]->valorParcela;
+        // $oDadosAPI->valorGlobal                             = $oDado[0]->valorGlobal;
+        // $oDadosAPI->prazoAditadoDias                        = $oDado[0]->prazoAditadoDias;
+        // $oDadosAPI->dataVigenciaInicio                      = $oDado[0]->dataVigenciaInicio;
+        // $oDadosAPI->dataVigenciaFim                         = $oDado[0]->dataVigenciaFim;
+        if(!empty($sJustificativa)) {
+            $oDadosAPI->justificativa = $sJustificativa;
+        }
+
         $aDadosAPI = json_encode($oDadosAPI);
 
         return $aDadosAPI;
@@ -114,7 +118,7 @@ class TermodeContrato extends ModeloBasePNCP
             'Authorization: ' . $token
         );
 
-        $optionspncp = $this->getParancurl('POST',$oDados,$headers,false,true);
+        $optionspncp = $this->getParancurl('POST', $oDados, $headers, false, true);
         curl_setopt_array($chpncp, $optionspncp);
         $contentpncp = curl_exec($chpncp);
         curl_close($chpncp);
@@ -128,7 +132,29 @@ class TermodeContrato extends ModeloBasePNCP
         }
     }
 
-    public function excluirTermo($iAnoContrato, $iCodigoContrato, $iCodigoTermo)
+    public function enviarRetificao($oDados, $sCodigoControlePNCP, $iAnoContrato, $iCodigoTermo)
+    {
+        $token = $this->login();
+        $url = $this->envs['URL'] . "orgaos/" . $this->getCnpj() . "/contratos/$iAnoContrato/$sCodigoControlePNCP/termos/$iCodigoTermo";
+        $chpncp = curl_init($url);
+
+        $headers = array(
+            'Content-Type: application/json',
+            'Authorization: ' . $token
+        );
+
+        $optionspncp = $this->getParancurl('PUT', $oDados, $headers, false, false);
+
+        curl_setopt_array($chpncp, $optionspncp);
+        $contentpncp = curl_exec($chpncp);
+        curl_close($chpncp);
+
+        $retorno = json_decode($contentpncp);
+
+        return $retorno;
+    }
+
+    public function excluirTermo($iAnoContrato, $iCodigoContrato, $iCodigoTermo, $sJustificativa)
     {
         $token = $this->login();
 
@@ -141,12 +167,13 @@ class TermodeContrato extends ModeloBasePNCP
             'Authorization: ' . $token
         );
 
-        $optionspncp = $this->getParancurl('DELETE',null,$headers,false,false);
+        $aBody['justificativa'] = $sJustificativa;
+        
+        $optionspncp = $this->getParancurl('DELETE', $aBody, $headers, true, false);
 
         curl_setopt_array($chpncp, $optionspncp);
         $contentpncp = curl_exec($chpncp);
         curl_close($chpncp);
-
         $retorno = json_decode($contentpncp);
 
         return $retorno;
@@ -209,7 +236,7 @@ class TermodeContrato extends ModeloBasePNCP
         }
     }
 
-    public function excluirAnexos($iAnoContrato,$iCodigoContrato,$iCodigoTermo,$iSeqAnexo)
+    public function excluirAnexos($iAnoContrato, $iCodigoContrato, $iCodigoTermo, $iSeqAnexo, $justificativa)
     {
 
         $cnpj =  $this->getCnpj();
@@ -224,7 +251,8 @@ class TermodeContrato extends ModeloBasePNCP
             'Authorization: ' . $token
         );
 
-        $optionspncp = $this->getParancurl('DELETE',null,$headers,false,false);
+        $aJustificativa['justificativa'] = $justificativa;
+        $optionspncp = $this->getParancurl('DELETE', $aJustificativa, $headers, true, false);
 
         curl_setopt_array($chpncp, $optionspncp);
         $contentpncp = curl_exec($chpncp);

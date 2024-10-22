@@ -130,7 +130,7 @@ class AtaRegistroprecoPNCP extends ModeloBasePNCP
         }
     }
 
-    public function excluirAta($sCodigoControlePNCP, $iAnoCompra, $iCodigoAta)
+    public function excluirAta($sCodigoControlePNCP, $iAnoCompra, $iCodigoAta, $sJustificativa = null)
     {
         $token = $this->login();
 
@@ -146,7 +146,12 @@ class AtaRegistroprecoPNCP extends ModeloBasePNCP
             'Authorization: ' . $token
         );
 
-        $optionspncp = $this->getParancurl('DELETE',null,$headers,false,false);
+        if(!empty($sJustificativa)) {
+            $aBody['justificativa'] = $sJustificativa;
+            $optionspncp = $this->getParancurl('DELETE', $aBody, $headers, true, false);
+        } else {
+            $optionspncp = $this->getParancurl('DELETE',null,$headers,false,false);
+        }
 
         curl_setopt_array($chpncp, $optionspncp);
         $contentpncp = curl_exec($chpncp);
@@ -213,7 +218,7 @@ class AtaRegistroprecoPNCP extends ModeloBasePNCP
         }
     }
 
-    public function excluirAnexos($iAnoCompra,$iCodigoCompra,$iCodigoAta,$iSeqAnexo)
+    public function excluirAnexos($iAnoCompra, $iCodigoCompra, $iCodigoAta, $iSeqAnexo, $sJustificativa)
     {
 
         $cnpj =  $this->getCnpj();
@@ -228,7 +233,12 @@ class AtaRegistroprecoPNCP extends ModeloBasePNCP
             'Authorization: ' . $token
         );
 
-        $optionspncp = $this->getParancurl('DELETE',null,$headers,false,false);
+        if(!empty($sJustificativa)) {
+            $aBody['justificativa'] = $sJustificativa;
+            $optionspncp = $this->getParancurl('DELETE', $aBody, $headers, true, false);
+        } else {
+            $optionspncp = $this->getParancurl('DELETE', null, $headers, false, false);
+        }
 
         curl_setopt_array($chpncp, $optionspncp);
         $contentpncp = curl_exec($chpncp);

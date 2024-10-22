@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\LegacyController;
 use App\Services\Tributario\Arrecadacao\PixReturnService;
 use Symfony\Component\HttpFoundation\Response;
 
-class PixController extends Controller
+class PixController extends LegacyController
 {
     public function index(): Response
     {

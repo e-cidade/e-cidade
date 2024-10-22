@@ -34,6 +34,7 @@ require_once("classes/db_orcprojativ_classe.php");
 require_once("classes/db_orcdotacao_classe.php");
 require_once("dbforms/db_funcoes.php");
 require_once("fpdf151/assinatura.php");
+require_once("model/orcamento/DeParaRecurso.model.php");
 
 db_postmemory($HTTP_POST_VARS);
 //exit();
@@ -429,7 +430,8 @@ $sql_where_externo .= " and " . $sql_filtro;
 
 // Primeira consulta
 $sqlempresto = $clempresto->sql_rp_novo(db_getsession("DB_anousu"), $sele_work, $pdtini, $dtfim, $sele_work1, $sql_where_externo, "$sql_order ");
-$resconsulta = $clempresto->sql_record($sqlempresto);//die($sqlempresto);
+$resconsulta = $clempresto->sql_record($sqlempresto); 
+// die($sqlempresto);
 if ($clempresto->numrows == 0) {
     db_redireciona("db_erros.php?fechar=true&db_erro=Sem movimentação de restos a pagar.");
     exit;
@@ -559,21 +561,87 @@ $projativ = "";
 $o55anousu = "";
 $vprojativ = "";
 $uIndice = count($arr_tipos)-1;
+
+$clDeParaFonte = new DeParaRecurso;
+
 if ($formato != "csv") { 
-  // db_criatabela($res);
-  // echo "nro de linhas: ".$rows;
+    // db_criatabela($res);
+    // echo "nro de linhas: ".$rows;
+    // echo "nro de linhas: ".$rows;
+
+    /** 
+     * Reordenando em caso de fonte de recursos
+     * Como todo o dePara está organizado em uma classe, o controle de fonte de recursos do relatório não funciona pois seu agrupamento está na SQL
+     * O relatório funciona com uma base de agrupamento que acumula até que a fonte mude, sendo assim mesmo um dePara de 100 para 1500000 não funciona
+     * Pois quando outras fontes estão juntas as informações do 100 não ficam com 1500000 subsequente, assim sendo, o sistema agrupa duas vezes
+     * Alternativa inicial para não reescrever o relatório foi separar casos de relatório por fonte, agrupar em um array, aplicar o dePara, ordenar o array por fonte
+     * A função array_msort é responsavel por essa ordenação do array
+     * Author: widouglas
+    */
+    if (substr($arr_tipos[$uIndice], 0, 2) == "re") {
+        $resultadoConsulta = [];
+        for ($x = 0; $x < $rows; $x++) {
+            $resultadoConsulta[$x] = pg_fetch_array($resconsulta, $x);
+            if (db_getsession("DB_anousu") > 2022) {
+                $resultadoConsulta[$x][5] = $clDeParaFonte->getDePara($resultadoConsulta[$x][5]);
+                $resultadoConsulta[$x]['e91_recurso'] = $clDeParaFonte->getDePara($resultadoConsulta[$x]['e91_recurso']);
+            } 
+        }
+        $resultadoConsulta = array_msort($resultadoConsulta, array('e91_recurso' => SORT_ASC, 'e60_emiss' => SORT_ASC));
+
+        $i = 0;
+        foreach ($resultadoConsulta as $key => $resultado) {
+            $resultadoConsultaOrdenado[$i] = $resultado;
+            $i++;
+        }
+    }
+    // Final do bloco alternativo para o controle de fontes de recursos - widouglas
+ 
+
     for ($x = 0; $x < $rows; $x++) {
         db_fieldsmemory($resconsulta, $x);
+
+        /**
+         * Conversor de array para variaveis, substituindo o db_fieldsmemory para tratativas de controle de fonte de recursos - widouglas
+         */
+        if (substr($arr_tipos[$uIndice], 0, 2) == "re") {
+            $e91_vlremp = $resultadoConsultaOrdenado[$x]['e91_vlremp']; 
+            $e91_vlranu = $resultadoConsultaOrdenado[$x]['e91_vlranu'];
+            $e91_vlrliq = $resultadoConsultaOrdenado[$x]['e91_vlrliq'];
+            $e91_vlrpag = $resultadoConsultaOrdenado[$x] ['e91_vlrpag'];
+            $e91_recurso = $resultadoConsultaOrdenado[$x]['e91_recurso'];              
+            $o15_descr = $resultadoConsultaOrdenado[$x]['o15_descr'];
+            $o15_codtri = $resultadoConsultaOrdenado[$x]['o15_codtri'];
+            $vlranu = $resultadoConsultaOrdenado[$x]['vlranu'];
+            $vlrliq = $resultadoConsultaOrdenado[$x]['vlrliq'];
+            $vlrpag = $resultadoConsultaOrdenado[$x]['vlrpag']; 
+            $vlrpagnproc = $resultadoConsultaOrdenado[$x]['vlrpagnproc'];
+            $e91_codtipo = $resultadoConsultaOrdenado[$x]['e91_codtipo'];
+            $e90_descr = $resultadoConsultaOrdenado[$x]['e90_descr'];
+            $z01_numcgm = $resultadoConsultaOrdenado[$x]['z01_numcgm'];
+            $z01_nome = $resultadoConsultaOrdenado[$x]['z01_nome'];
+            $z01_cgccpf = $resultadoConsultaOrdenado[$x]['z01_cgccpf'];
+            $e60_codemp = $resultadoConsultaOrdenado[$x]['e60_codemp'];
+            $e60_emiss = $resultadoConsultaOrdenado[$x]['e60_emiss'];
+            $e60_anousu = $resultadoConsultaOrdenado[$x]['e60_anousu'];
+            $e64_codele = $resultadoConsultaOrdenado[$x]['e64_codele'];
+            $vlranuliq = $resultadoConsultaOrdenado[$x]['vlranuliq']; 
+            $vlranuliqnaoproc = $resultadoConsultaOrdenado[$x]['vlranuliqnaoproc'];
+        }
+        
         // inicio criando variaveis auxiliares para receber o valor da primentira consulta
         $auxliquidado_anterior = ($e91_vlremp - $e91_vlranu - $e91_vlrliq) + ($e91_vlrliq - $e91_vlrpag);
         $auxapagargeral = ($auxliquidado_anterior - $vlranu - $vlrpag - $vlrpagnproc);
         $auxaliquidargeral = $e91_vlremp - (($e91_vlranu + $vlranu) + ($vlrliq + $e91_vlrliq - $vlranuliq));
        
         // fim
-        db_fieldsmemory($res, $x);
+        if (substr($arr_tipos[$uIndice], 0, 2) != "re") {
+            db_fieldsmemory($res, $x);
+        }
+
         cabecalho($pdf, $troca);
         $troca = 0;
-                      
+
         if (substr($arr_tipos[$uIndice],0,2) == "ex") {
 
           if ($vexerciciosub != $e60_anousu) {
@@ -610,7 +678,6 @@ if ($formato != "csv") {
           }
         }
         
-
         //subtotal
         if(substr($arr_tipos[$uIndice],0,2) == "or") {
           $indice   = array_search('or', $arr_tipos);
@@ -1038,57 +1105,57 @@ if ($formato != "csv") {
         }
 
         // Recurso
-        if (substr($arr_tipos[$uIndice],0,2) == "re") {
-          $indice   = array_search('re', $arr_tipos);
-          $controle = 0;
-          for ($i=0; $i < $indice-1; $i++) {
-            $controle1 = $arr_vcampo[$i];
-            $controle2 = $arr_campo[$i];
+        if (substr($arr_tipos[$uIndice], 0, 2) == "re") {
+            $indice = array_search('re', $arr_tipos);
+            $controle = 0;
+
+            for ($i = 0; $i < $indice - 1; $i++) {
+                $controle1 = $arr_vcampo[$i];
+                $controle2 = $arr_campo[$i];
+
+                if ($controle1 != "" && $controle2 != "" && $$controle1 != "") {
+                    if ($$controle1 != $$controle2) {
+                        $controle++;
+                    }
+                }
+            }
+            $controle1 = $arr_vcampo[$indice - 1];
+            $controle2 = $arr_campo[$indice - 1];
 
             if ($controle1 != "" && $controle2 != "" && $$controle1 != "") {
-              if ($$controle1 != $$controle2) {
-                $controle++;
-              }
+                if ($$controle1 != $$controle2 && $vrecursosub == $e91_recurso || $controle > 0) {
+                    $vrecursosub = 0.1;
+                }
             }
-          }
-          $controle1 = $arr_vcampo[$indice-1];
-          $controle2 = $arr_campo[$indice-1];
-          if ($controle1 != "" && $controle2 != "" && $$controle1 != "") {
-            if ($$controle1 != $$controle2 && $vrecursosub == $e91_recurso || $controle > 0) {
-              $vrecursosub = 0.1;
+
+            if ($vrecursosub != $e91_recurso) {
+                if ($vrecursosub != 0) {
+                    $pdf->Cell(80, $tam, "Subtotal", "TBR", 0, "C", 1);
+                    $pdf->Cell(20, $tam, db_formatar(abs($subtotal_rp_n_proc), 'f'), 1, 0, "R", 1);
+                    $pdf->Cell(20, $tam, db_formatar(abs($subtotal_rp_proc), 'f'), 1, 0, "R", 1);
+                    $pdf->Cell(20, $tam, db_formatar(abs($subtotal_anula_rp_n_proc), 'f'), 1, 0, "R", 1);
+                    $pdf->Cell(20, $tam, db_formatar(abs($subtotal_anula_rp_proc), 'f'), 1, 0, "R", 1);
+                    $pdf->Cell(20, $tam, db_formatar($subtotal_mov_liquida, 'f'), 1, 0, "R", 1);
+                    $pdf->Cell(20, $tam, db_formatar(abs($subtotal_mov_pagnproc), 'f'), 1, 0, "R", 1);
+                    $pdf->Cell(20, $tam, db_formatar(abs($subtotal_mov_pagmento), 'f'), 1, 0, "R", 1);
+                    $pdf->Cell(20, $tam, db_formatar(abs($subtotal_aliquidar_finais), 'f'), 1, 0, "R", 1);
+                    $pdf->Cell(20, $tam, db_formatar(abs($subtotal_liquidados_finais), 'f'), 1, 0, "R", 1);
+                    $pdf->Cell(20, $tam, db_formatar(abs($subtotal_geral_finais), 'f'), "TBL", 1, "R", 1);
+
+
+                    $subtotal_rp_n_proc = 0;
+                    $subtotal_rp_proc = 0;
+                    $subtotal_anula_rp_n_proc = 0;
+                    $subtotal_anula_rp_proc = 0;
+                    $subtotal_mov_liquida = 0;
+                    $subtotal_mov_pagmento = 0;
+                    $subtotal_mov_pagnproc = 0;
+                    $subtotal_aliquidar_finais = 0;
+                    $subtotal_liquidados_finais = 0;
+                    $subtotal_geral_finais = 0;
+                }
+                $vrecursosub = $e91_recurso;
             }
-          }
-          if ($vrecursosub != $e91_recurso) {
-              if ($vrecursosub != 0) {
-
-                  $pdf->Cell(80, $tam, "Subtotal", "TBR", 0, "C", 1);
-                  $pdf->Cell(20, $tam, db_formatar(abs($subtotal_rp_n_proc), 'f'), 1, 0, "R", 1);
-                  $pdf->Cell(20, $tam, db_formatar(abs($subtotal_rp_proc), 'f'), 1, 0, "R", 1);
-                  $pdf->Cell(20, $tam, db_formatar(abs($subtotal_anula_rp_n_proc), 'f'), 1, 0, "R", 1);
-                  $pdf->Cell(20, $tam, db_formatar(abs($subtotal_anula_rp_proc), 'f'), 1, 0, "R", 1);
-                  $pdf->Cell(20, $tam, db_formatar($subtotal_mov_liquida, 'f'), 1, 0, "R", 1);
-                  $pdf->Cell(20, $tam, db_formatar(abs($subtotal_mov_pagnproc), 'f'), 1, 0, "R", 1);
-                  $pdf->Cell(20, $tam, db_formatar(abs($subtotal_mov_pagmento), 'f'), 1, 0, "R", 1);
-                  $pdf->Cell(20, $tam, db_formatar(abs($subtotal_aliquidar_finais), 'f'), 1, 0, "R", 1);
-                  $pdf->Cell(20, $tam, db_formatar(abs($subtotal_liquidados_finais), 'f'), 1, 0, "R", 1);
-                  $pdf->Cell(20, $tam, db_formatar(abs($subtotal_geral_finais), 'f'), "TBL", 1, "R", 1);
-
-
-                  $subtotal_rp_n_proc = 0;
-                  $subtotal_rp_proc = 0;
-                  $subtotal_anula_rp_n_proc = 0;
-                  $subtotal_anula_rp_proc = 0;
-                  $subtotal_mov_liquida = 0;
-                  $subtotal_mov_pagmento = 0;
-                  $subtotal_mov_pagnproc = 0;
-                  $subtotal_aliquidar_finais = 0;
-                  $subtotal_liquidados_finais = 0;
-                  $subtotal_geral_finais = 0;
-
-              }
-              $vrecursosub = $e91_recurso;
-          }
-
         }
 
         // Tipo de resto
@@ -1395,7 +1462,6 @@ if ($formato != "csv") {
 
         // Recurso
         if (in_array("re", $arr_tipos)) {
-
           if ($vrecurso != $e91_recurso) {
               if ((isset($quebradepagina) and $verifica == false) || ($pdf->getY() >= $pdf->h - 30)) {
                   $troca = 1;
@@ -1405,8 +1471,8 @@ if ($formato != "csv") {
                 $pdf->cell(0, 2, "", 0, 1, "", 0);
               }*/
               $pdf->SetFont('Arial', 'B', 7);
-              $pdf->cell(0, 5, "Recurso:$e91_recurso $o15_descr  ", 0, 1, "L", 0);
-
+              $pdf->cell(0, 5, "Recurso:" . $e91_recurso . " $o15_descr  ", 0, 1, "L", 0);
+            
               $vrecurso = $e91_recurso;
               $verifica = false;
               $indice  = array_search('re', $arr_tipos);
@@ -1530,7 +1596,7 @@ if ($formato != "csv") {
         $linha .= str_pad($o58_orgao, 10, ' ', STR_PAD_RIGHT);
         fputs($arquivo, "$linha\r\n");
 
-    }
+    } // Final do ($x = 0; $x < $rows; $x++)
 
 
     if ($subtotal_rp_n_proc != 0 ||
@@ -1544,7 +1610,6 @@ if ($formato != "csv") {
         $subtotal_liquidados_finais != 0 ||
         $subtotal_geral_finais != 0
     ) {
-
         $pdf->Cell(80, $tam, "Subtotal", "TBR", 0, "C", 1);
         $pdf->Cell(20, $tam, db_formatar(abs($subtotal_rp_n_proc), 'f'), 1, 0, "R", 1);
         $pdf->Cell(20, $tam, db_formatar(abs($subtotal_rp_proc), 'f'), 1, 0, "R", 1);
@@ -1574,7 +1639,7 @@ if ($formato != "csv") {
     $pdf->Cell(20, $tam, db_formatar(abs($total_geral_finais), 'f'), "TBL", 1, "R", 1);
 
     /*
-     *Melhoria para imprecao dos filtros selecionados
+     *Melhoria para impressao dos filtros selecionados
      */
     $pdf->SetAutoPageBreak(true, 20);
     $pdf->widths = array(200);
@@ -1623,4 +1688,30 @@ if ($formato != "csv") {
     echo "<html><body bgcolor='#cccccc'><center><a href='tmp/execucaorsp.csv'>Clique com botão direito para Salvar o arquivo <b>execucaorsp.csv</b></a></body></html>";
     fclose($fp);
     exit;
+}
+
+function array_msort($array, $cols)
+{
+    $colarr = array();
+    foreach ($cols as $col => $order) {
+        $colarr[$col] = array();
+        foreach ($array as $k => $row) {
+            $colarr[$col]['_' . $k] = strtolower($row[$col]);
+        }
+    }
+    $eval = 'array_multisort(';
+    foreach ($cols as $col => $order) {
+        $eval .= '$colarr[\'' . $col . '\'],' . $order . ',';
+    }
+    $eval = substr($eval, 0, -1) . ');';
+    eval($eval);
+    $ret = array();
+    foreach ($colarr as $col => $arr) {
+        foreach ($arr as $k => $v) {
+            $k = substr($k, 1);
+            if (!isset($ret[$k])) $ret[$k] = $array[$k];
+            $ret[$k][$col] = $array[$k][$col];
+        }
+    }
+    return $ret;
 }

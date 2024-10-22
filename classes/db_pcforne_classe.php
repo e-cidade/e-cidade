@@ -825,7 +825,10 @@ function sql_query ( $pc60_numcgm=null,$campos="*",$ordem=null,$dbwhere="", $lRe
  $sql .= "      inner join cgm  on  cgm.z01_numcgm = pcforne.pc60_numcgm";
  $sql .= "      inner join db_usuarios  on  db_usuarios.id_usuario = pcforne.pc60_usuario";
  if ($lRepresentanteLegal) {
-  $sql .= "      inner join pcfornereprlegal on pcfornereprlegal.pc81_cgmforn = cgm.z01_numcgm";
+  $sql .= "      left join pcfornereprlegal on pcfornereprlegal.pc81_cgmforn = cgm.z01_numcgm";
+  $and = $dbwhere != "" ? "and" : "";
+  $dbwhere = $pc60_numcgm!=null ? " pcforne.pc60_numcgm = $pc60_numcgm and " : "$dbwhere ";
+  $dbwhere.=" $and ((LENGTH(z01_cgccpf) = 11) or (LENGTH(z01_cgccpf) = 14 and pc81_sequencia is not null))";
 }
 $sql2 = "";
 if($dbwhere==""){

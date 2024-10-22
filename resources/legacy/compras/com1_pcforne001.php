@@ -61,8 +61,9 @@ $db_opcao = 1;
                                    "pcfornemov"                 => "Movimento",
                                    "subgrupo"                   => "Subgrupo",
                                    "pcforneidentificacaocredor" => "Identificação do Fornecedor");
-	  
-	 $clcriaabas->src        = array("pcforne" => "com1_pcforne004.php");
+
+	 $url = isset($pc60_numcgm) ? "com1_pcforne004.php?pc60_numcgm=$pc60_numcgm" : "com1_pcforne004.php";
+	 $clcriaabas->src        = array("pcforne" => $url);
 	 
 	 $clcriaabas->disabled   = array("pcfornecon"       => "true",
 	                                 "pcfornemov"       => "true",

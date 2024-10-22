@@ -1,14 +1,14 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc19762v3 extends AbstractMigration
+class Oc19762v3 extends PostgresMigration
 {
     public function up()
     {
         $sql = <<<SQL
-            begin;   
- 
+            begin;
+
             ALTER TABLE dclrf102023 DROP COLUMN si157_passivosreconhecidos;
 
             commit;

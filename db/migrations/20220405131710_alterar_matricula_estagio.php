@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AlterarMatriculaEstagio extends AbstractMigration
+class AlterarMatriculaEstagio extends PostgresMigration
 {
 
     public function up()

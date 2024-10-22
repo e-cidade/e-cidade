@@ -1,20 +1,20 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc16493 extends AbstractMigration
+class Oc16493 extends PostgresMigration
 {
 
     public function up()
     {
         $sql = "
         BEGIN;
-        
+
         SELECT fc_startsession();
 
         ALTER TABLE ralic102022
             ADD COLUMN si180_qtdlotes INTEGER DEFAULT NULL;
-        
+
         ALTER TABLE ralic112022
             ADD COLUMN si181_nrolote INTEGER DEFAULT NULL;
 
@@ -25,8 +25,8 @@ class Oc16493 extends AbstractMigration
             DROP COLUMN si182_graulongitude,
             DROP COLUMN si182_minutolongitude,
             DROP COLUMN si182_segundolongitude;
-          
-        ALTER TABLE ralic122022 
+
+        ALTER TABLE ralic122022
             ADD COLUMN si182_latitude numeric,
             ADD COLUMN si182_longitude numeric,
             ADD COLUMN si182_nrolote integer,
@@ -42,9 +42,9 @@ class Oc16493 extends AbstractMigration
             DROP COLUMN si185_graulongitude,
             DROP COLUMN si185_minutolongitude,
             DROP COLUMN si185_segundolongitude;
-                
+
         ALTER TABLE redispi122022
-            ADD COLUMN si185_latitude numeric, 
+            ADD COLUMN si185_latitude numeric,
             ADD COLUMN si185_longitude numeric,
             ADD COLUMN si185_codbempublico integer;
 

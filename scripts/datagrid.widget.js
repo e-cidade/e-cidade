@@ -188,6 +188,14 @@ function DBGrid(sName) {
      */
     this.hasPesquisaConteudo  = false;
 
+    this.tooltip = '';
+
+    this.container = '';
+
+    this.totalPages = 0;
+
+    this.currentPage = 1;
+
     var me = this;
 
 
@@ -435,6 +443,61 @@ function DBGrid(sName) {
         }
     }
 
+    this.addRowEnhanced = function(aRow, lRender = false, lDisabled = false, lChecked = false) {
+        // Verifica se o array de linhas existe, caso contrário, inicializa
+        if (!this.aRows) {
+            this.aRows = [];
+        }
+    
+        // Cria uma nova instância de tableRow
+        let oRow = new tableRow(this.sName + 'row' + this.aRows.length);
+    
+        // Se houver checkbox
+        if (this.hasCheckbox) {
+            let sDisabled = lDisabled ? " disabled " : "";
+            let sChecked = lChecked ? " checked " : "";
+            if (lChecked) {
+                oRow.classChecked = "marcado";
+                oRow.isSelected = true;
+            }
+    
+            // Cria o HTML para o checkbox
+            let sCheckbox = `<input type='checkbox' id='chk${this.sName}${aRow[this.checkBoxValue]}' ${sDisabled} ${sChecked}
+                onclick="${this.nameInstance}.selectSingle(this,'${this.sName}row${this.aRows.length}',${this.nameInstance}.aRows[${this.aRows.length}])"
+                value='${aRow[this.checkBoxValue]}' class='checkbox${this.sName}' style='height:12px;'>`;
+    
+            oRow.addCell(new tableCell(sCheckbox, this.sName + 'row' + this.aRows.length + 'checkbox', 21, 'checkbox'));
+        }
+    
+        // Adiciona as células ao row
+        aRow.forEach((cellContent, i) => {
+            let sId = `${this.sName}row${this.aRows.length}cell${i}`;
+            let sCellWidth = this.aWidths[i] || '';
+            let oCell = new tableCell(cellContent, sId, sCellWidth, 'cell');
+    
+            // Ajusta o alinhamento se necessário
+            if (this.aAligns[i]) {
+                oCell.setAlign(this.aAligns[i]);
+            }
+    
+            // Se o cabeçalho da coluna não estiver exibido, a célula também não será exibida
+            if (!this.aHeaders[i].lDisplayed) {
+                oCell.lDisplayed = false;
+            }
+    
+            oRow.addCell(oCell);
+        });
+    
+        // Adiciona a nova linha no array de linhas
+        this.aRows.push(oRow);
+    
+        // Renderiza as linhas se necessário
+        if (lRender) {
+            this.renderRows();
+        }
+    }
+    
+
     /**
      * define as colunas do Header da grid, criando para cada no da array um objeto do tipo tableHeader
      * @param {array} aHeader array com as colunas da grid
@@ -509,7 +572,8 @@ function DBGrid(sName) {
         sGrid    += "</table>"; // FECHA TABELA DO HEADER table-header
         sGrid    += "</div>";   // FECHA DIV "header-container"
         // FIM DO HEADER    ---    INICIO DO BODY
-        sGrid    += "<div id='body-container-"+this.sName+"' class='body-container' style='height:"+me.iHeight+"px;'>";
+        sGrid    += "<div id='body-container-"+this.sName+"' class='body-container' style='height:"+me.iHeight+"px; position: relative;'>";
+        sGrid    += "<div id='loader-"+this.sName+"' class='loader-overlay' style='display: none;'><div class='spinner'></div>Carregando...</div>";
         sGrid    += "<table  class='table-body'  id='"+this.sName+"body'>";
         sGrid    += this.renderRows(true, false);
         sGrid    += "</table>"; // FECHA TABELA DO HEADER table-body
@@ -536,11 +600,11 @@ function DBGrid(sName) {
 
         sGrid    += "</div></td></tr>";
         sGrid    += "</table>"; //  FECHA TABLE "table_footer"
+        sGrid    += "<div class='text-right pagination"+this.sName+"' style='padding: 5px 10px'></div>";
         sGrid    += "</div>";   //  FECHA DIV "footer-container"
         //
         sGrid    += "</div>";   //  FECHA DIV "container"
-
-
+        sGrid    += "<div id='tooltip"+this.sName+"' class='tooltip'></div>";
 
         /*
          * Se foi escolhido mostrar as colunas,
@@ -568,6 +632,160 @@ function DBGrid(sName) {
             }
         }
 
+    }
+
+    this.showLoading = function(){
+      document.getElementById(`loader-${this.sName}`).style.display = 'flex'
+    }
+
+    this.hideLoading = function(){
+      document.getElementById(`loader-${this.sName}`).style.display = 'none'
+    }
+
+    this.updatePagination = function() {
+      var buttonsHTML = '';
+      var { startPage, endPage } = this.getPaginationRange();
+      var showMoreLeft = startPage > 2;
+      var showMoreRight = endPage < this.totalPages - 1;
+
+      if (this.totalPages <= 1) {
+        this.container.innerHTML = '';
+        return false;
+      }
+
+      // Adiciona o botï¿½o "Anterior"
+      buttonsHTML += '<li class="disabled"><button id="prevBtn">Anterior</button></li>';
+
+      // Adiciona o botï¿½o "Primeira" e "Mais ï¿½ esquerda" se necessï¿½rio
+      if (showMoreLeft) {
+        buttonsHTML += '<li><button id="page1" class="page-btn">1</button></li>';
+        if (startPage > 3) {
+          buttonsHTML += '<li><button id="moreLeftBtn" class="more-btn">...</button></li>';
+        }
+      }
+
+      // Adiciona os botï¿½es de pï¿½gina
+      for (var i = startPage; i <= endPage; i++) {
+        buttonsHTML += `<li class="page-item${i === this.currentPage ? ' active' : ''}"><button id="page${i}" class="page-btn">${i}</button></li>`;
+      }
+
+      // Adiciona o botão "última" e "Mais á direita" se necessário
+      if (showMoreRight) {
+        if (endPage < this.totalPages - 1) {
+          buttonsHTML += '<li><button id="moreRightBtn" class="more-btn">...</button></li>';
+        }
+        buttonsHTML += `<li><button id="page${this.totalPages}" class="page-btn">${this.totalPages}</button></li>`;
+      }
+
+      // Adiciona o botão "Próximo"
+      buttonsHTML += '<li><button id="nextBtn">Próximo</button></li>';
+
+      this.container.innerHTML = `<div id="pagination-container"><ul class="pagination">${buttonsHTML}</ul></div>`;
+    }
+
+
+    this.getPaginationRange = function() {
+      var maxButtons = 10; // Limite máximo de botï¿½es a serem exibidos
+      var startPage, endPage;
+
+      if (this.totalPages <= maxButtons) {
+        // Se houver páginas suficientes para mostrar todas
+        startPage = 1;
+        endPage = this.totalPages;
+      } else {
+        // Se houver mais páginas do que o limite máximo
+        var half = Math.floor(maxButtons / 2);
+        if (this.currentPage <= half) {
+          startPage = 1;
+          endPage = maxButtons;
+        } else if (this.currentPage + half >= this.totalPages) {
+          startPage = this.totalPages - maxButtons + 1;
+          endPage = this.totalPages;
+        } else {
+          startPage = this.currentPage - half;
+          endPage = this.currentPage + half;
+        }
+      }
+      return { startPage, endPage };
+    }
+
+    this.paginatorInitialize = function(onPageClick) {
+      if (typeof onPageClick !== 'function') {
+        console.error('onPageClick must be a function');
+        return;
+      }
+      this.container = document.querySelector(`.pagination${this.sName}`);
+      this.container.addEventListener('click', (function(e) {
+        if (e.target.id === 'prevBtn') {
+          if (this.currentPage > 1) {
+            this.currentPage--;
+            onPageClick(this.currentPage);
+            this.updatePagination();
+          }
+        } else if (e.target.id === 'nextBtn') {
+          if (this.currentPage < this.totalPages) {
+            this.currentPage++;
+            onPageClick(this.currentPage);
+            this.updatePagination();
+          }
+        } else if (e.target.classList.contains('page-btn')) {
+          this.currentPage = parseInt(e.target.textContent);
+          onPageClick(this.currentPage);
+          this.updatePagination();
+        } else if (e.target.id === 'moreLeftBtn') {
+          this.expandLeft();
+          onPageClick(this.currentPage);
+        } else if (e.target.id === 'moreRightBtn') {
+          this.expandRight();
+          onPageClick(this.currentPage);
+        }
+      }).bind(this));
+    }
+
+    this.expandLeft = function() {
+      this.currentPage = Math.max(1, this.currentPage - 1); // Ajuste o início da faixa
+      this.updatePagination();
+    }
+
+    this.expandRight = function() {
+      this.currentPage = Math.min(this.totalPages, this.currentPage + 1); // Ajuste o fim da faixa
+      this.updatePagination();
+    }
+    this.renderPagination = function(totalPages, pageActive = 0) {
+      this.totalPages = totalPages;
+      this.currentPage = pageActive;
+      this.updatePagination();
+    }
+
+
+    this.inicializaTooltip = function(){
+      this.tooltip = document.querySelector(`#tooltip${this.sName}`);
+      const ancestor = document.body; // Ou qualquer outro elemento pai apropriado
+      const showTooltip = (function(e) {
+        const target = e.target;
+
+        if(target.classList.contains('tooltip')){
+          this.tooltip.style.display = 'block';
+        }else if (target.classList.contains('tooltip-target')) {
+          const rect = target.getBoundingClientRect();
+          const tooltipRect = this.tooltip.getBoundingClientRect();
+
+          this.tooltip.textContent = target.textContent;
+          this.tooltip.style.display = 'block';
+
+          // Calcular a posiï¿½ï¿½o
+          const top = rect.top - tooltipRect.height - 10; // 10px acima do mouse
+          const left = rect.left + (rect.width / 2) - (tooltipRect.width / 2); // Centralizado
+
+          this.tooltip.style.top = top + 'px';
+          this.tooltip.style.left = left + 'px';
+        } else {
+          this.tooltip.style.display = 'none';
+        }
+      }).bind(this);
+
+      ancestor.addEventListener('mouseenter', showTooltip);
+      ancestor.addEventListener('mouseover', showTooltip);
     }
 
     this.renderFooter = function() {

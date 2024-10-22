@@ -11,6 +11,8 @@ include("dbforms/db_funcoes.php");
 include("classes/db_condataconf_classe.php");
 include("classes/db_liclicitasituacao_classe.php");
 include("classes/db_licitemobra_classe.php");
+require_once("libs/renderComponents/index.php");
+
 db_postmemory($HTTP_POST_VARS);
 ?>
 <html>

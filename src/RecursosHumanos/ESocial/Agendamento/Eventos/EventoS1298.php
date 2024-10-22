@@ -30,8 +30,8 @@ class EventoS1298 extends EventoBase
      */
     public function montarDados()
     {
-        $ano = date("Y", db_getsession("DB_datausu"));
-        $mes = date("m", db_getsession("DB_datausu"));
+        $ano = $this->ano();
+        $mes = $this->mes();
         $dia = date("d", db_getsession("DB_datausu"));
         $data = "$ano-$mes-01";
         $data = new \DateTime($data);

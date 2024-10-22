@@ -254,6 +254,17 @@ class ReceitaPeriodoTesourariaPDF extends PDF
                     $this->preencherDadosAnaliticoReceita($sTitulo, $oReceita, 'O');
                     continue;
                 }
+
+                if ($tipo == "ESTRUTREC") {
+                    $this->preencherDadosContaEstruturalRec($sTitulo, $oReceita, 'O');
+                    continue;
+                }
+
+                if ($tipo == "CODCONTA") {
+                    $descrTotalizador = "TOTAL CONTA: ";
+                    $this->preencherDadosContaEstruturalRec($sTitulo, $oReceita, 'O', $descrTotalizador);
+                    continue;
+                }
                 
                 if ($tipo == "OPCREDITO") {
                     $this->preencherDadosOperacaoCredito($sTitulo, $oReceita, 'O');
@@ -306,6 +317,28 @@ class ReceitaPeriodoTesourariaPDF extends PDF
             }
             $this->setfont('arial', 'b', 7);
             $this->cell($this->PDFiTamanhoDescricaoTotal, 4, "TOTAL RECEITA...", 1, 0, "L", 0);
+            $this->cell(25, 4, db_formatar($this->totalReceita, 'f'), 1, 1, "R", 0);
+            $this->ln(2);
+        }
+    }
+
+    public function preencherDadosContaEstruturalRec($sTitulo, $oReceita, $sTipo, $tipo = null)
+    {
+        foreach ($oReceita as $codigoReceita => $oReceitaContribuinte) {
+            $this->ln(2);
+            $this->setfont('arial', 'b', 7);
+            $this->cell(($this->PDFiTamanhoDescricaoTotal + 25), 6, $codigoReceita, 1, 1, "L", 1);
+            $this->totalReceita = 0;
+            foreach ($oReceitaContribuinte as $oReceitaFinal) {
+                if ($sTipo == "O") {
+                    $this->preencherDadosReceita($sTitulo, $oReceitaFinal);
+                    continue;
+                }
+                $this->preencherDadosReceitaExtraOrcamentaria($sTitulo, $oReceitaFinal);
+            }
+            $this->setfont('arial', 'b', 7);
+            $descrTotalQuebra = $tipo ?? "TOTAL RECEITA...";
+            $this->cell($this->PDFiTamanhoDescricaoTotal, 4, $descrTotalQuebra, 1, 0, "L", 0);
             $this->cell(25, 4, db_formatar($this->totalReceita, 'f'), 1, 1, "R", 0);
             $this->ln(2);
         }
@@ -407,6 +440,17 @@ class ReceitaPeriodoTesourariaPDF extends PDF
 
                 if ($tipo == "RECEITA") {
                     $this->preencherDadosAnaliticoReceita($sTitulo, $oReceita, 'E');
+                    continue;
+                }
+
+                if ($tipo == "ESTRUTREC") {
+                    $this->preencherDadosContaEstruturalRec($sTitulo, $oReceita, 'E');
+                    continue;
+                }
+
+                if ($tipo == "CODCONTA") {
+                    $descrTotalizador = "TOTAL CONTA: ";
+                    $this->preencherDadosContaEstruturalRec($sTitulo, $oReceita, 'E', $descrTotalizador);
                     continue;
                 }
                 

@@ -427,11 +427,13 @@ class EventoContabil {
 	   * Começamos a efetuar os lançamentos contabeis
 	   */
 	  $oDaoLancamento             = new cl_conlancam();//db_utils::getDao("conlancam");
-	  $oDaoLancamento->c70_anousu = $iAnoUsu;
-	  $oDaoLancamento->c70_data   = $dtDataUsu;
-	  $oDaoLancamento->c70_valor  = $nValorTotal;
 	  $oDaoLancamento->c70_codlan = null;
+	  $oDaoLancamento->c70_anousu = $iAnoUsu;
+	  $oDaoLancamento->c70_valor  = $nValorTotal;
+	  $oDaoLancamento->c70_data   = $dtDataUsu;
+
 	  $oDaoLancamento->incluir(null);
+
 	  if ($oDaoLancamento->erro_status == 0) {	
 		if (substr($oDaoLancamento->erro_banco,8,13)  == 'DATA INVALIDA' ) {
 			$mensagemErro = substr($oDaoLancamento->erro_banco,8,65);
@@ -440,6 +442,7 @@ class EventoContabil {
 		else {
 			$sErroMsg = "Não foi Possível incluir lancamento\nErro Técnico:{$oDaoLancamento->erro_msg}";
 		}
+		
 	    throw new BusinessException($sErroMsg);
 	  }
 

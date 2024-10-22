@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc14865 extends AbstractMigration
+class Oc14865 extends PostgresMigration
 {
     /**
      * Change Method.
@@ -10,7 +10,7 @@ class Oc14865 extends AbstractMigration
      * Write your reversible migrations using this method.
      *
      * More information on writing migrations is available here:
-     * http://docs.phinx.org/en/latest/migrations.html#the-abstractmigration-class
+     * http://docs.phinx.org/en/latest/migrations.html#the-PostgresMigration-class
      *
      * The following commands can be used in this method and Phinx will
      * automatically reverse them when rolling back:
@@ -30,7 +30,7 @@ class Oc14865 extends AbstractMigration
         $sSql = "
         BEGIN;
 
-        ALTER TABLE empveiculos add column si05_item_empenho bool; 
+        ALTER TABLE empveiculos add column si05_item_empenho bool;
 
         COMMIT;
         ";

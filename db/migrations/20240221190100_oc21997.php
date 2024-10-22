@@ -1,12 +1,12 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc21997 extends AbstractMigration
+class Oc21997 extends PostgresMigration
 {
     public function up()
     {
-        $sSql = 
+        $sSql =
         "BEGIN;
 
         update obrasdadoscomplementareslote set db150_planilhatce = 2
@@ -14,7 +14,7 @@ class Oc21997 extends AbstractMigration
         inner join obrascodigos on db151_sequencial = db150_seqobrascodigos
         inner join liclicita on db151_liclicita = l20_codigo
         where l20_anousu <= 2023));
-        
+
         COMMIT;";
 
         $this->execute($sSql);

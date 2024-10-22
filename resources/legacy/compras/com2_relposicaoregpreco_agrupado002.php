@@ -246,7 +246,6 @@ for ($iInd = 0; $iInd  < $iRsSql; $iInd++) {
 
     $aDadosPosRegPreco[$oSolicita->pc10_numero]['oAbertura']      = $oCompilacao->getCodigoAbertura();
     $aDadosPosRegPreco[$oSolicita->pc10_numero]['oCompilacao']    = $oSolicita->pc11_numero;
-    $aDadosPosRegPreco[$oSolicita->pc10_numero]['reservado']      = $oSolicita->pc11_reservado;
     $aDadosPosRegPreco[$oSolicita->pc10_numero]['lControlaValor'] = $oDadosEstimativa->lControlaValor;
     $aDadosPosRegPreco[$oSolicita->pc10_numero]['sLicitacao']     = $sLicitacao;
 
@@ -262,6 +261,7 @@ for ($iInd = 0; $iInd  < $iRsSql; $iInd++) {
         $aDadosPosRegPreco[$oSolicita->pc10_numero][$oSolicita->pc11_numero][$oSolicita->pc11_seq]['nTotalQntMax']    = $nQuantMax;
         $aDadosPosRegPreco[$oSolicita->pc10_numero][$oSolicita->pc11_numero][$oSolicita->pc11_seq]['nTotalVlrUnid']   = $nVlrUnitario;
         $aDadosPosRegPreco[$oSolicita->pc10_numero][$oSolicita->pc11_numero][$oSolicita->pc11_seq]['nTotalQntSolic']  = $oSolicita->pc11_quant;
+        $aDadosPosRegPreco[$oSolicita->pc10_numero][$oSolicita->pc11_numero][$oSolicita->pc11_seq]['reservado']       = $oSolicita->pc11_reservado;
     } else {
 
         $aDadosPosRegPreco[$oSolicita->pc10_numero][$oSolicita->pc11_numero][$oSolicita->pc11_seq]['nTotalQntMin']   += $nQuantMin;
@@ -344,7 +344,7 @@ if (!strlen($oGet->fornecedores) && $oGet->lQuebraFornecedor == 'f') {
 
 
 
-                    if ($aDados['reservado'] == 't') {
+                    if ($aDadosSolicita['reservado'] == 't') {
                         $oPdf->MultiCell(67, 3, '[ITEM ME/EPP] - ' . substr(strtoupper($aDadosSolicita['oDados']->sDescrItem), 0, 120), 0, "J", $lPreenchimento, 0);
                     } else {
                         $oPdf->MultiCell(67, 3, substr(strtoupper($aDadosSolicita['oDados']->sDescrItem), 0, 120), 0, "J", $lPreenchimento, 0);
@@ -561,7 +561,7 @@ function imprimeCabecalho(&$oPdf, $alt, $iAbertura, $iCompilacao, $sLicitacao, $
     $oPdf->cell(15, $alt, "Seq.", 1, 0, "C", 1);
     $oPdf->cell(15, $alt, "Item", 1, 0, "C", 1);
     $oPdf->cell(67, $alt, "Descrição", 1, 0, "C", 1);
-    //$oPdf->cell(39, $alt, "Complemento", 1, 0, "C", 1); 
+    //$oPdf->cell(39, $alt, "Complemento", 1, 0, "C", 1);
 
 
     $oPdf->cell(16, $alt, "Unidade", 1, 0, "C", 1);

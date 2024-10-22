@@ -215,7 +215,7 @@ $val = false;
                 </tr>
                 <tr>
                     <td>
-                        <label class="bold">Contratação Direta:</label>
+                        <label class="bold">Enviar ao PNCP pelo Compras:</label>
                     </td>
                     <td>
                         <?php

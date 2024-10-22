@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AddEscalaJornada extends AbstractMigration
+class AddEscalaJornada extends PostgresMigration
 {
     public function up()
     {

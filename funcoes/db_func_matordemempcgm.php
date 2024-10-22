@@ -25,5 +25,5 @@
  *                                licenca/licenca_pt.txt 
  */
 
-$campos = "distinct matordem.m51_codordem,matordem.m51_data,matordemanu.m53_data,matordem.m51_numcgm,cgm.z01_nome,db_depart.descrdepto,m52_numemp as e60_numemp,e60_codemp ";
+$campos = "distinct matordem.m51_codordem,matordem.m51_data,matordemanu.m53_data, m51_valortotal, matordem.m51_valortotal -COALESCE(dl_A_Lançar.sum_valor, 0) as dl_A_Lançar ,matordem.m51_numcgm,cgm.z01_nome,db_depart.descrdepto,m52_numemp as e60_numemp,e60_codemp ";
 ?>

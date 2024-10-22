@@ -431,15 +431,7 @@ switch ($oParam->exec) {
 
                 $pcmater = substr($item->obr06_pcmater, 0, -1);
 
-                // Hotfix OC21089: Compatibilidade com anos anteriores à adição da ordem
-                if ((int) $oParam->ano < 2024) {
-                    $where = " obr06_pcmater = $pcmater ";
-                } else {
-                    $where = " obr06_pcmater = $pcmater AND obr06_ordem = $item->obr06_ordem ";
-                }
-
-                $verificaItem = $cllicitemobra->sql_record($cllicitemobra->sql_query_file(null, "obr06_sequencial", null, $where));
-                if (pg_num_rows($verificaItem) <= 0) {
+                if ($item->obr06_sequencial == "") {
                     db_inicio_transacao();
 
                     $cllicitemobra->obr06_sequencial        = null;
@@ -452,6 +444,7 @@ switch ($oParam->exec) {
                     $cllicitemobra->obr06_dtcadastro        = $item->obr06_dtcadastro;
                     $cllicitemobra->obr06_instit            = db_getsession("DB_instit");
                     $cllicitemobra->obr06_ordem             = $item->obr06_ordem;
+                    $cllicitemobra->obr06_solicitacao       = $cllicitemobra->getSequencialSolicitacao($oParam->licitacao,$oParam->processocompra,$pcmater,$item->obr06_ordem);
                     $cllicitemobra->incluir();
 
                     if ($cllicitemobra->erro_status == 0) {
@@ -467,7 +460,7 @@ switch ($oParam->exec) {
 
                     db_fieldsmemory($verificaItem, 0);
                     db_inicio_transacao();
-                    $cllicitemobra->obr06_sequencial        = $obr06_sequencial;
+                    $cllicitemobra->obr06_sequencial        = $item->obr06_sequencial;
                     $cllicitemobra->obr06_pcmater           = $pcmater;
                     $cllicitemobra->obr06_tabela            = $item->obr06_tabela;
                     $cllicitemobra->obr06_descricaotabela   = $item->obr06_descricaotabela;
@@ -498,27 +491,14 @@ switch ($oParam->exec) {
         break;
     case 'ExcluirItemObra':
 
+        $cllicitemobra = new cl_licitemobra();
+
         foreach ($oParam->itens as $item) {
-            $cllicitemobra = new cl_licitemobra();
 
-            $pcmater = substr($item->obr06_pcmater, 0, -1);
-            
-            // Hotfix OC21089: Compatibilidade com anos anteriores à adição da ordem
-            if ((int) $oParam->ano < 2024) {
-                $where = " obr06_pcmater = $pcmater ";
-            } else {
-                $where = " obr06_pcmater = $pcmater AND obr06_ordem = $item->obr06_ordem ";
-            }
+            if ($item->obr06_sequencial != "") {
 
-            $sql = $cllicitemobra->sql_query_file(null, "obr06_sequencial", null, $where);
-            $verificaItem = $cllicitemobra->sql_record($sql);
-            if (pg_num_rows($verificaItem) > 0) {
-                db_fieldsmemory($verificaItem, 0);
-                /*
-                 * excluindo item
-                 */
-                $cllicitemobra->obr06_sequencial = $obr06_sequencial;
-                $cllicitemobra->excluir($obr06_sequencial);
+                $cllicitemobra->obr06_sequencial = $item->obr06_sequencial;
+                $cllicitemobra->excluir($item->obr06_sequencial);
                 if ($cllicitemobra->erro_status == 0) {
                     $erro = $cllicitemobra->erro_msg;
                     $oRetorno->message = urlencode($erro);

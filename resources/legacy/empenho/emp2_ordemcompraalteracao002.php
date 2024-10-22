@@ -172,6 +172,14 @@ if ($clempparametro->numrows > 0) {
 	$e30_numdec = 4;
 
 }
+$sql = "SELECT * 
+      FROM pcparam 
+      WHERE pc30_prazoent = (SELECT MAX(pc30_prazoent) FROM pcparam);";
+      $rsResult = db_query($sql);
+      db_fieldsmemory($rsResult, 0);
+      $prazo = $pc30_prazoent;
+
+
 $pdf1->numdec = $e30_numdec;
 $pdf1->valoritem = 'm52_valor';
 $pdf1->vlrunitem = 'm52_vlruni'	;
@@ -179,7 +187,12 @@ $pdf1->descricaoitem = 'pc01_descrmater';
 $pdf1->codmater = 'pc01_codmater';
 $pdf1->observacaoitem = 'e62_descr';
 $pdf1->depto = $m51_depto;
-$pdf1->prazoent = $m51_prazoent;
+
+if($m51_prazoentnovo && $prazo == 2){
+    $pdf1->prazoent = $m51_prazoentnovo;
+  }else{
+    $pdf1->prazoent       = $m51_prazoent. " DIAS A CONTAR DA DATA DO RECEBIMENTO DESTA ORDEM DE COMPRA";
+  }
 
 $pdf1->Snumeroproc = "pc81_codproc";
 $pdf1->Snumero = "pc11_numero";

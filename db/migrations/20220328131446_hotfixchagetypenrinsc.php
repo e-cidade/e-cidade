@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Hotfixchagetypenrinsc extends AbstractMigration
+class Hotfixchagetypenrinsc extends PostgresMigration
 {
     public function up()
     {

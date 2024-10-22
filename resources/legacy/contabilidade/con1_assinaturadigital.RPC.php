@@ -154,9 +154,16 @@ try {
         case 'alterarAssinante':
 
             DB::beginTransaction();
-            $aOrgaoUnidade = explode('-', $oParam->iUnidade );
-            $iOrgao = $aOrgaoUnidade[0];
-            $iUnidade = $aOrgaoUnidade[1];
+
+            if(strpos($oParam->iUnidade, '-')) {
+                $aOrgaoUnidade = explode('-', $oParam->iUnidade );
+                $iOrgao = $aOrgaoUnidade[0];
+                $iUnidade = $aOrgaoUnidade[1];
+            } else {
+                $iOrgao =  $oParam->iOrgao;
+                $iUnidade = $oParam->iUnidade;
+            }
+
             AssinaturaDigitalAssinante::updateOrCreate(
                 [ 'db243_codigo' =>    $oParam->db243_codigo ],
                 [ 'db243_instit' => $oParam->iIntituicao,
@@ -203,6 +210,14 @@ try {
             DB::commit();
             break;
 
+        case 'checkParametroAtivoPorInstituicao':
+            DB::beginTransaction();
+            $oRetorno->oAssinadorAtivo = DB::table('configuracoes.assinatura_digital_parametro')
+                ->where('db242_instit', '=', $oParam->instituicao)
+                ->where('db242_assinador_ativo', '=', TRUE)
+                ->exists() ?? FALSE;
+            DB::commit();
+        break;
     }
 } catch ( Exception $oErro ) {
     DB::rollBack();

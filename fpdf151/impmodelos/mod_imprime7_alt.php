@@ -40,32 +40,53 @@ for ($xxx = 0; $xxx < $this->nvias; $xxx++) {
   $this->objpdf->rect($xcol, $xlin + 2, $xcol + 90, 41, 2, 'DF', '1234');
   $this->objpdf->Setfont('Arial', 'B', 8);
 
-  $this->objpdf->text($xcol + 2, $xlin + 5, 'Órgão');
-  $this->objpdf->text($xcol + 2, $xlin + 9, 'Unidade');
-  $this->objpdf->text($xcol + 2, $xlin + 13, 'Função');
-  $this->objpdf->text($xcol + 2, $xlin + 17, 'Subfunção');
+  $this->objpdf->text($xcol + 2, $xlin + 5.1, 'Órgão');
+  $this->objpdf->text($xcol + 2, $xlin + 8.9, 'Unidade');
+  $this->objpdf->text($xcol + 2, $xlin + 12.7, 'Função');
+  $this->objpdf->text($xcol + 2, $xlin + 16.5, 'Subfunção');
 
-  $this->objpdf->text($xcol + 2, $xlin + 21, 'Proj/Ativ');
-  $this->objpdf->text($xcol + 2, $xlin + 25, 'Elemento');
-  $this->objpdf->text($xcol + 2, $xlin + 32, 'Recurso');
-  $this->objpdf->text($xcol + 2, $xlin + 35.7, 'CO');
-  $this->objpdf->text($xcol + 2, $xlin + 39, 'Processo');
-  $this->objpdf->text($xcol + 2, $xlin + 42, 'Tipo Compra');
-  $this->objpdf->text($xcol + 70, $xlin + 39, 'Reduzido:');
+  $this->objpdf->text($xcol + 2, $xlin + 20.3, 'Proj/Ativ');
+  $this->objpdf->text($xcol + 2, $xlin + 24.1, 'Elemento');
+
+  $this->objpdf->text($xcol + 2, $xlin + 27.9, 'Recurso');
+  $this->objpdf->text($xcol + 2, $xlin + 31.7, 'CO');
+  $this->objpdf->text($xcol + 2, $xlin + 35.5, 'Reduzido');
+
+  if(!empty($this->contrato)) {
+    $this->objpdf->text($xcol + 2, $xlin + 42.4,'Contrato');
+  }
+
+  $this->objpdf->text($xcol + 2, $xlin + 39.3, 'Tipo Compra');
+
+  $this->objpdf->text($xcol + 69, $xlin + 35.5, 'Processo:');
+
+  if(!empty($this->contrato)) {
+    $this->objpdf->text($xcol + 69, $xlin + 42.4,'Cod.Contrato:');
+  }
+
   $this->objpdf->Setfont('Arial', '', 8);
-  $this->objpdf->text($xcol + 17, $xlin + 5, ' :  ' . db_formatar($this->orgao, 'orgao') . ' - ' . substr($this->descr_orgao, 0, 46));
-  $this->objpdf->text($xcol + 17, $xlin + 9, ' :  ' . db_formatar($this->unidade, 'unidade') . ' - ' . $this->descr_unidade);
-  $this->objpdf->text($xcol + 17, $xlin + 13, ' :  ' . db_formatar($this->funcao, 'funcao') . ' - ' . $this->descr_funcao);
-  $this->objpdf->text($xcol + 17, $xlin + 17, ' :  ' . db_formatar($this->subfuncao, 'funcao') . ' - ' . $this->descr_subfuncao);
+  $this->objpdf->text($xcol + 17, $xlin + 5.1, ' :  ' . db_formatar($this->orgao, 'orgao') . ' - ' . substr($this->descr_orgao, 0, 46));
+  $this->objpdf->text($xcol + 17, $xlin + 8.9, ' :  ' . db_formatar($this->unidade, 'unidade') . ' - ' . $this->descr_unidade);
+  $this->objpdf->text($xcol + 17, $xlin + 12.7, ' :  ' . db_formatar($this->funcao, 'funcao') . ' - ' . $this->descr_funcao);
+  $this->objpdf->text($xcol + 17, $xlin + 16.5, ' :  ' . db_formatar($this->subfuncao, 'funcao') . ' - ' . $this->descr_subfuncao);
 
-  $this->objpdf->text($xcol + 17, $xlin + 21, ' :  ' . db_formatar($this->projativ, 'projativ') . ' - ' . $this->descr_projativ);
-  $this->objpdf->text($xcol + 17, $xlin + 25, ' :  ' . db_formatar($this->elemento, 'elemento_alt'));
-  $this->objpdf->text($xcol + 17, $xlin + 28, '   ' . mb_strtoupper(substr($this->descr_elemento, 0, 55)));
-  $this->objpdf->text($xcol + 17, $xlin + 32, ' :  ' . substr($this->recurso . ' - ' . $this->descr_recurso, 0, 50));
-  $this->objpdf->text($xcol + 17, $xlin + 35.7, ' :  ' . $this->codco);
-  $this->objpdf->text($xcol + 17, $xlin + 39, ' :  ' . $this->processo);
-  $this->objpdf->text($xcol + 21, $xlin + 42, ':  ' . $this->descr_tipocompra);
-  $this->objpdf->text($xcol + 85, $xlin + 39, $this->coddot);
+  $this->objpdf->text($xcol + 17, $xlin + 20.3, ' :  ' . db_formatar($this->projativ, 'projativ') . ' - ' . $this->descr_projativ);
+  $this->objpdf->text($xcol + 17, $xlin + 24.1, ' :  ' . db_formatar($this->elemento, 'elemento_alt') . ' - ' . strtoupper(substr($this->descr_elemento, 0, 32)));
+
+  $this->objpdf->text($xcol + 17, $xlin + 27.9, ' :  ' . substr($this->recurso . ' - ' . $this->descr_recurso, 0, 50));
+  $this->objpdf->text($xcol + 17, $xlin + 31.7, ' :  ' . $this->codco);
+  $this->objpdf->text($xcol + 17, $xlin + 35.5, ' :  ' .  $this->coddot);
+
+  if(!empty($this->contrato)) {
+    $this->objpdf->text($xcol + 17, $xlin + 42.4, ' :  ' . $this->contrato . '/' . $this->contrato_ano);
+  }
+
+  $this->objpdf->text($xcol + 21, $xlin + 39.3, ':  ' . $this->descr_tipocompra);
+  $this->objpdf->text($xcol + 84, $xlin + 35.5, $this->processo);
+
+  if(!empty($this->contrato)) {
+    $this->objpdf->text($xcol + 89, $xlin + 42.4, $this->cod_contrato);
+  }
 
   // retangulo dos dados do credor
   $this->objpdf->rect($xcol + 106, $xlin + 2, 88, 32, 2, 'DF', '1234');

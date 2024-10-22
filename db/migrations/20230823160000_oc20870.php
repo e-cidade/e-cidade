@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class oc20870 extends AbstractMigration
+class oc20870 extends PostgresMigration
 {
 
     public function up(){
@@ -11,34 +11,34 @@ class oc20870 extends AbstractMigration
         $this->insereControleDaNovaTabela();
         $this->insereRegistrosIniciais();
     }
-    
+
     public function criaItensMenu(){
-        $sql = " 
+        $sql = "
             BEGIN;
 
             --Cria itens do menu
-            INSERT INTO db_itensmenu 
+            INSERT INTO db_itensmenu
             VALUES ((SELECT max(id_item)+1 FROM db_itensmenu), 'Natureza de Bem ou Serviço', 'Cadastro de Natureza de Bem ou Serviço', '', 1, 1, 'Cadastro de Natureza de Bem ou Serviço', 't');
-            
-            INSERT INTO db_itensmenu 
+
+            INSERT INTO db_itensmenu
             VALUES ((SELECT max(id_item)+1 FROM db_itensmenu), 'Inclusão', 'Inclusão de naturezabemserviço', 'emp1_naturezabemservico001.php', 1, 1, 'Inclusão de naturezabemserviço', 't');
-            
-            INSERT INTO db_itensmenu 
+
+            INSERT INTO db_itensmenu
             VALUES ((SELECT max(id_item)+1 FROM db_itensmenu), 'Alteração', 'Alteração de naturezabemserviço', 'emp1_naturezabemservico002.php', 1, 1, 'Alteração de naturezabemserviço', 't');
-            
-            INSERT INTO db_itensmenu 
+
+            INSERT INTO db_itensmenu
             VALUES ((SELECT max(id_item)+1 FROM db_itensmenu), 'Exclusão', 'Exclusão de naturezabemserviço', 'emp1_naturezabemservico003.php', 1, 1, 'Exclusão de naturezabemserviço', 't');
 
             --Registra ninho do menu
             INSERT INTO db_menu VALUES (29, (SELECT id_item FROM db_itensmenu WHERE help = 'Cadastro de Natureza de Bem ou Serviço'), ((SELECT max(menusequencia)+1 FROM db_menu WHERE id_item = 29) ), 398);
 
-            INSERT INTO db_menu 
+            INSERT INTO db_menu
             VALUES ((SELECT id_item FROM db_itensmenu WHERE descricao = 'Natureza de Bem ou Serviço'), (SELECT id_item FROM db_itensmenu WHERE help = 'Inclusão de naturezabemserviço'), 1, 398);
-            
-            INSERT INTO db_menu 
+
+            INSERT INTO db_menu
             VALUES ((SELECT id_item FROM db_itensmenu WHERE descricao = 'Natureza de Bem ou Serviço'), (SELECT id_item FROM db_itensmenu WHERE help = 'Alteração de naturezabemserviço'), 2, 398);
-            
-            INSERT INTO db_menu 
+
+            INSERT INTO db_menu
             VALUES ((SELECT id_item FROM db_itensmenu WHERE descricao = 'Natureza de Bem ou Serviço'), (SELECT id_item FROM db_itensmenu WHERE help = 'Exclusão de naturezabemserviço'), 3, 398);
 
             COMMIT;
@@ -66,42 +66,42 @@ class oc20870 extends AbstractMigration
     public function insereControleDaNovaTabela(){
         $sql="
             BEGIN;
-            
+
             --Cria registros da tabela naturezabemservico e de seus campos
-            INSERT INTO db_sysarquivo 
+            INSERT INTO db_sysarquivo
             VALUES ((SELECT max(codarq)+1 FROM db_sysarquivo), 'naturezabemservico', 'Tabela de Natureza de Bem ou Serviço', 'e101', CURRENT_DATE, 'Natureza de Bem ou Servico', 0, 'f', 'f', 'f', 'f' );
-            
-            INSERT INTO db_sysarqmod 
+
+            INSERT INTO db_sysarqmod
             VALUES (38,(SELECT codarq FROM db_sysarquivo WHERE nomearq = 'naturezabemservico'));
 
-            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
             VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e101_sequencial' ,'int4' ,'Sequencial' ,'0' ,'Sequencial' ,10 ,'false' ,'false' ,'false' ,1 ,'text' ,'Sequencial' );
-            
-            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+
+            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
             VALUES (
             (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'naturezabemservico'),
             (SELECT codcam FROM db_syscampo WHERE nomecam = 'e101_sequencial'),1 ,0 );
 
-            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
             VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e101_descr' ,'varchar' ,'Descrição da Natureza de Bem ou Serviço' ,'' ,'Descrição' ,9999 ,'false' ,'false' ,'false' ,0 ,'text' ,'Descrição' );
-            
-            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+
+            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
             VALUES (
             (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'naturezabemservico'),
             (SELECT codcam FROM db_syscampo WHERE nomecam = 'e101_descr'),2 ,0 );
 
-            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
             VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e101_resumo' ,'varchar' ,'Resumo da descrição da Natureza de Bem ou Serviço' ,'' ,'Resumo da descrição' ,120,'false' ,'false' ,'false' ,0 ,'text' ,'Resumo da descrição' );
-            
-            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+
+            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
             VALUES (
             (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'naturezabemservico'),
             (SELECT codcam FROM db_syscampo WHERE nomecam = 'e101_resumo'),3 ,0 );
 
-            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel ) 
+            INSERT INTO db_syscampo ( codcam ,nomecam ,conteudo ,descricao ,valorinicial ,rotulo ,tamanho ,nulo ,maiusculo ,autocompl ,aceitatipo ,tipoobj ,rotulorel )
             VALUES ((SELECT max(codcam) + 1 FROM db_syscampo) ,'e101_aliquota' ,'float8' ,'Aliquota' ,'' ,'Alíquota' ,15 ,'false' ,'false' ,'false' ,4 ,'text' ,'Alíquota' );
-            
-            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia ) 
+
+            INSERT INTO db_sysarqcamp ( codarq ,codcam ,seqarq ,codsequencia )
             VALUES (
             (SELECT codarq FROM db_sysarquivo WHERE nomearq = 'naturezabemservico'),
             (SELECT codcam FROM db_syscampo WHERE nomecam = 'e101_aliquota'),4 ,0 );
@@ -118,10 +118,10 @@ class oc20870 extends AbstractMigration
         $sql="
             BEGIN;
 
-            INSERT INTO empenho.naturezabemservico (e101_descr, e101_resumo,e101_aliquota) 
+            INSERT INTO empenho.naturezabemservico (e101_descr, e101_resumo,e101_aliquota)
             VALUES
-            ('Alimentação','Alimentação','1.2'), 
-            ('Energia elétrica','Energia elétrica','1.2'), 
+            ('Alimentação','Alimentação','1.2'),
+            ('Energia elétrica','Energia elétrica','1.2'),
             ('Serviços prestados com emprego de materiais','Serviços prestados com emprego de materiais','1.2'),
             ('Construção Civil por empreitada com emprego de materiais','Construção Civil por empreitada com emprego de materiais','1.2'),
             ('Serviços hospitalares de que trata o art. 30','Serviços hospitalares de que trata o art. 30','1.2'),

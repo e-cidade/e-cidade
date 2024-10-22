@@ -6,6 +6,7 @@ require_once("libs/db_utils.php");
 require_once("libs/db_usuariosonline.php");
 require_once("libs/db_app.utils.php");
 require_once("dbforms/db_funcoes.php");
+require_once("libs/renderComponents/index.php");
 
 $iOpcaoLicitacao = 1;
 $lExibirMenus   = true;
@@ -23,6 +24,13 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
     db_app::load("estilos.css, grid.style.css");
     db_app::load("scripts.js, prototype.js, strings.js, datagrid.widget.js");
     ?>
+    
+    <script type="text/javascript">
+        loadComponents([
+            'buttonsSolid',
+            'simpleModal'
+        ]);
+    </script>
 </head>
 
 <body bgcolor=#CCCCCC leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
@@ -81,8 +89,25 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
         </form>
     </fieldset>
 
-    <input type="button" id="btnSalvar" onClick="js_salvarDocumento();" value="Salvar" />
-    <input type="button" id="btnAlterar" onClick="js_alterar();" value="Alterar" />
+    <div style="width: 100%; display: flex; justify-content: center;">
+        <?php $component->render('buttons/solid', [
+            'designButton' => 'success',
+            'type' => 'button',
+            'onclick' => 'js_salvarDocumento()',
+            'size' => 'sm',
+            'id' => 'btnSalvar',
+            'message' => 'Salvar'
+        ]); ?>
+
+        <?php $component->render('buttons/solid', [
+            'designButton' => 'success',
+            'type' => 'button',
+            'onclick' => 'js_alterar()',
+            'size' => 'sm',
+            'id' => 'btnAlterar',
+            'message' => 'Alterar'
+        ]); ?>
+    </div>
 
 
     <fieldset style="margin-top:15px;">
@@ -90,8 +115,41 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
         <div id="ctnDbGridDocumentos"></div>
     </fieldset>
 
-    <input type="button" id="btnEnviarPNCP" value="Envia documento para o PNCP" onClick="js_enviarDocumentoPNCP();" />
-    <input type="button" id="btnExcluirPNCP" value="Excluir documento no PNCP" onClick="js_excluirDocumentoPNCP();" />
+    <div style="width: 100%; display: flex; justify-content: center;">
+        <?php $component->render('buttons/solid', [
+            'designButton' => 'success',
+            'type' => 'button',
+            'onclick' => 'js_enviarDocumentoPNCP()',
+            'size' => 'sm',
+            'message' => 'Envia documento para o PNCP'
+        ]); ?>
+
+        <?php $component->render('buttons/solid', [
+            'designButton' => 'danger',
+            'type' => 'button',
+            'onclick' => "openModal('justificativaModal')",
+            'size' => 'sm',
+            'message' => 'Excluir documento no PNCP'
+        ]); ?>
+    </div>
+
+    <?php $component->render('modais/simpleModal/startModal', [
+        'title' => 'Justificativa para o PNCP',
+        'id' => 'justificativaModal',
+        'size' => 'lg'
+    ], true); ?>
+
+        <?php db_textarea('justificativapncp', 10, 48, false, true, 'text', $db_opcao, "", "", "justificativapncp", "255"); ?>
+        
+        <div style="width: 100%; display: flex; justify-content: center;">
+            <?php $component->render('buttons/solid', [
+                'designButton' => 'success',
+                'onclick' => 'js_excluirDocumentoPNCP();',
+                'message' => 'Salvar justificativa PNCP',
+                'size' => 'md'
+            ]); ?>
+        </div>
+    <?php $component->render('modais/simpleModal/endModal', [], true); ?>
 
 </div>
 
@@ -103,6 +161,15 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
 </body>
 
 </html>
+
+<style>
+    #justificativapncp {
+        width: 100%;
+        margin-bottom: 7px;
+        font-size: 1rem;
+    }
+</style>
+
 <script type="text/javascript">
 
     const oGridDocumentos = new DBGrid('gridDocumentos');
@@ -110,7 +177,7 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
     oGridDocumentos.nameInstance = "oGridDocumentos";
     oGridDocumentos.setCheckbox(0);
     oGridDocumentos.setCellAlign(["center", "center", "center"]);
-    oGridDocumentos.setCellWidth(["30%", "30%", "30%"]);
+    oGridDocumentos.setCellWidth(["10%", "60%", "30%"]);
     oGridDocumentos.setHeader(["Código", "Tipo", "Ação"]);
     oGridDocumentos.allowSelectColumns(true);
     oGridDocumentos.show($('ctnDbGridDocumentos'));
@@ -198,6 +265,7 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
         oParam.sequencial = $F('l221_numata');
         oParam.tipoanexo  = $F('l216_tipoanexo');
         oParam.arquivo    = $F('namefile');
+        oParam.sNomeArquivo = $("uploadfile").files[0].name;
         js_divCarregando('Aguarde... Salvando Documento','msgbox');
         let oAjax         = new Ajax.Request('lic1_anexosatas.RPC.php',{
             parameters: 'json='+Object.toJSON(oParam),
@@ -343,6 +411,7 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
         let iSelecionados = documentosSelecionados.length;
         let iCodigoAta = $('l221_numata').value;
         let aDocumentos = [];
+        let justificativa = document.getElementById('justificativapncp').value;
 
         if (iSelecionados === 0) {
             alert('Selecione pelo menos um arquivo para Excluir')
@@ -370,6 +439,12 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
         oParametros.exec = 'ExcluirDocumentoPNCP';
         oParametros.iCodigoAta = iCodigoAta;
         oParametros.aDocumentos = aDocumentos;
+        oParametros.justificativa = justificativa;
+
+        if (justificativa == '') {
+            alert('A justificativa não pode estar vazia');
+            return false;
+        }
 
         let oAjax = new Ajax.Request(
             'lic1_envioanexosata.RPC.php', {

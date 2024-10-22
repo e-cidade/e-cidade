@@ -123,6 +123,9 @@ if (isset($oPost->incluir)){
 
 
   $clmatordem->m51_tipo       = 1;
+  $clmatordem->m51_sequencial = $oPost->sequencial;
+  $clmatordem->m51_prazoentnovo = $oPost->pc97_descricao;
+
   $clmatordem->incluir(null);
   if($clmatordem->erro_status==0){
     $sqlerro=true;

@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc16692 extends AbstractMigration
+class Oc16692 extends PostgresMigration
 {
     public function up()
     {
@@ -15,8 +15,8 @@ class Oc16692 extends AbstractMigration
 
         UPDATE contabancaria
                 SET db83_numerocontratooc = null
-                WHERE db83_numerocontratooc = ''; 
-       
+                WHERE db83_numerocontratooc = '';
+
         COMMIT;
 
 SQL;

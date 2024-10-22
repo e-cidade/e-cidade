@@ -520,7 +520,7 @@ switch($oParam->exec) {
 
 			}
       	}
-
+      
       $oRetorno->iCodigoOrdemAuxiliar = $iCodigoOrdemAuxiliar;
       db_fim_transacao(false);
 
@@ -777,4 +777,19 @@ switch($oParam->exec) {
         }
         echo $oJson->encode($oRetorno);
         break;
+        
+    case "alterarContaFornecedor":
+
+      $clPagordem = new cl_pagordem;
+      $clPagordem->alteraContaFornecedor($oParam->iCodord, $oParam->iContaFornecedor);
+      $oRetorno         = new stdClass();
+      $oRetorno->status = $clPagordem->erro_status;
+      if ($clPagordem->erro_status == 1){
+        $oRetorno->message = "Conta de fornecedor alterada com sucesso.";
+      } else {
+        $oRetorno->message = "Houve um erro na alteração da conta de fornecedor.";
+      }
+      echo $oJson->encode($oRetorno);
+
+    break;
 }

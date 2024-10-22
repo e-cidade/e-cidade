@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AlterarMenusEventosIniciais extends AbstractMigration
+class AlterarMenusEventosIniciais extends PostgresMigration
 {
     public function up()
     {

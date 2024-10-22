@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Eventos1070 extends AbstractMigration
+class Eventos1070 extends PostgresMigration
 {
 
     public function change()
@@ -11,7 +11,7 @@ class Eventos1070 extends AbstractMigration
         begin;
 
         INSERT INTO db_sysarquivo (codarq, nomearq, descricao, sigla, dataincl, rotulo, tipotabela, naolibclass, naolibfunc, naolibprog, naolibform) VALUES ((select max(codarq)+1 from db_sysarquivo), 'eventos1070                             ', 'eventos1070', 'eso09', '2021-09-08', 'eventos1070', 0, false, false, false, false);
-         
+
         INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel) VALUES ((select max(codcam)+1 from db_syscampo), 'eso09_sequencial                        ', 'int8                                    ', 'eso09_sequencial', '0', 'eso09_sequencial', 19, false, false, false, 1, 'text', 'eso09_sequencial');
         INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel) VALUES ((select max(codcam)+1 from db_syscampo), 'eso09_tipoprocesso                      ', 'bool                                    ', 'eso09_tipoprocesso', 'f', 'eso09_tipoprocesso', 1, false, false, false, 5, 'text', 'eso09_tipoprocesso');
         INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel) VALUES ((select max(codcam)+1 from db_syscampo), 'eso09_nroprocessoadm                    ', 'int8                                    ', 'eso09_nroprocessoadm', '0', 'eso09_nroprocessoadm', 21, false, false, false, 1, 'text', 'eso09_nroprocessoadm');
@@ -26,7 +26,7 @@ class Eventos1070 extends AbstractMigration
         INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel) VALUES ((select max(codcam)+1 from db_syscampo), 'eso09_dtdecisao                         ', 'date                                    ', 'eso09_dtdecisao', 'null', 'eso09_dtdecisao', 10, false, false, false, 1, 'text', 'eso09_dtdecisao');
         INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel) VALUES ((select max(codcam)+1 from db_syscampo), 'eso09_inddeposito                       ', 'bool                                    ', 'eso09_inddeposito', 'f', 'eso09_inddeposito', 1, false, false, false, 5, 'text', 'eso09_inddeposito');
         INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel) VALUES ((select max(codcam)+1 from db_syscampo), 'eso09_instit                            ', 'int4                                    ', 'eso09_instit', '0', 'eso09_instit', 5, false, false, false, 1, 'text', 'eso09_instit');
-         
+
         INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select max(codarq) from db_sysarquivo), (select codcam from db_syscampo where nomecam = 'eso09_sequencial'), 1, 0);
         INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select max(codarq) from db_sysarquivo), (select codcam from db_syscampo where nomecam = 'eso09_tipoprocesso'), 2, 0);
         INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select max(codarq) from db_sysarquivo), (select codcam from db_syscampo where nomecam = 'eso09_nroprocessoadm'), 3, 0);
@@ -41,11 +41,11 @@ class Eventos1070 extends AbstractMigration
         INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select max(codarq) from db_sysarquivo), (select codcam from db_syscampo where nomecam = 'eso09_dtdecisao'), 12, 0);
         INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select max(codarq) from db_sysarquivo), (select codcam from db_syscampo where nomecam = 'eso09_inddeposito'), 13, 0);
         INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select max(codarq) from db_sysarquivo), (select codcam from db_syscampo where nomecam = 'eso09_instit'), 14, 0);
-         
+
         --DROP TABLE:
         DROP TABLE IF EXISTS eventos1070 CASCADE;
-      
-        
+
+
         -- Módulo: esocial
         CREATE TABLE eventos1070(
         eso09_sequencial                int8 NOT NULL default 0,
@@ -62,27 +62,27 @@ class Eventos1070 extends AbstractMigration
         eso09_dtdecisao         		date NOT NULL default null,
         eso09_inddeposito               varchar(1) NOT NULL,
         eso09_instit            		int4 NOT NULL default 0);
-        
+
         CREATE SEQUENCE eventos1070_eso09_sequencial_seq
         INCREMENT 1
         MINVALUE 1
         MAXVALUE 9223372036854775807
         START 1
         CACHE 1;
-        
+
         -- Criando Menus
         INSERT INTO db_itensmenu VALUES((select max(id_item)+1 from db_itensmenu),'S-1070 - Tabela de Processos Administrativos/Judiciais','S-1070 - Tabela de Processos Administrativos/Judiciais','',1,1,'S-1070 - Tabela de Processos Administrativos/Judiciais','t');
         INSERT INTO db_menu VALUES((select id_item from db_itensmenu where help like'%Cadastro de Eventos%'),(select max(id_item) from db_itensmenu),4,10216);
-        
+
         INSERT INTO db_itensmenu values ((select max(id_item)+1 from db_itensmenu),'Inclusão','Inclusão','eso1_eventos1070001.php',1,1,'Inclusão','t');
         INSERT INTO db_menu VALUES((select id_item from db_itensmenu where help like'%S-1070 - Tabela de Processos Administrativos/Judiciais%'),(select max(id_item) from db_itensmenu),1,(select id_item from db_modulos where descr_modulo like'%eSocial%'));
-        
+
         INSERT INTO db_itensmenu values ((select max(id_item)+1 from db_itensmenu),'Alteração','Alteração','eso1_eventos1070002.php',1,1,'Alteração','t');
         INSERT INTO db_menu VALUES((select id_item from db_itensmenu where help like'%S-1070 - Tabela de Processos Administrativos/Judiciais%'),(select max(id_item) from db_itensmenu),2,(select id_item from db_modulos where descr_modulo like'%eSocial%'));
-        
+
         INSERT INTO db_itensmenu values ((select max(id_item)+1 from db_itensmenu),'Exclusão','Exclusão','eso1_eventos1070003.php',1,1,'Exclusão','t');
         INSERT INTO db_menu VALUES((select id_item from db_itensmenu where help like'%S-1070 - Tabela de Processos Administrativos/Judiciais%'),(select max(id_item) from db_itensmenu),3,(select id_item from db_modulos where descr_modulo like'%eSocial%'));
-        
+
         commit;
 SQL;
         $this->execute($sql);

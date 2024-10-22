@@ -11,7 +11,7 @@ use ECidade\RecursosHumanos\ESocial\Model\Formulario\EventoCargaS2299;
  * @package  ECidade\RecursosHumanos\ESocial\Agendamento\Eventos
  * @author   Robson de Jesus
  */
-class EventoS2299 extends EventoBase 
+class EventoS2299 extends EventoBase
 {
 
     private $eventoCarga;
@@ -37,7 +37,7 @@ class EventoS2299 extends EventoBase
 
         $iSequencial = 1;
         foreach ($this->dados as $oDados) {
-            
+
             $oDadosAPI                          = new \stdClass;
             $oDadosAPI->evtDeslig               = new \stdClass;
             $oDadosAPI->evtDeslig->sequencial   = $iSequencial;
@@ -58,7 +58,7 @@ class EventoS2299 extends EventoBase
             $oDtDeslig = new \DateTime($oDados->dtdeslig);
             $oDtInicioObrigatoriedadeEvtPeriodicos  = new \DateTime("2022-08-22");
             if ($oDados->rh30_regime == "2" && $oDtDeslig >= $oDtInicioObrigatoriedadeEvtPeriodicos) {
-                $oDadosAPI->evtDeslig->verbasresc = $this->buscarVerbasResc($oDados->matricula_sistema);
+                $oDadosAPI->evtDeslig->verbasresc = $this->buscarVerbasResc($oDados->matricula_sistema, $this->ano(), $this->mes());
             }
 
             $aDadosAPI[] = $oDadosAPI;
@@ -68,22 +68,22 @@ class EventoS2299 extends EventoBase
     }
 
     /**
-     * Retorna dados das verbas rescisï¿½rias formatados
+     * Retorna dados das verbas rescisórias formatados
      * @param integer $matricula
      * @return stdClass
      */
-    private function buscarVerbasResc($matricula)
+    private function buscarVerbasResc($matricula, $ano, $mes)
     {
-        $rsVerbas = $this->eventoCarga->getVerbasResc($matricula);
+        $rsVerbas = $this->eventoCarga->getVerbasResc($matricula, $ano, $mes);
         if (pg_num_rows($rsVerbas) == 0) {
             return null;
         }
-        $oVerbasResc = new \stdClass; 
+        $oVerbasResc = new \stdClass;
         $oVerbasResc->dmdev = array();
         $aHashDmDev = array();
         $aHashIdeEstabLotItens = array();
         for ($iCont = 0; $iCont < pg_num_rows($rsVerbas); $iCont++) {
-            
+
             $oVerbasSql = \db_utils::fieldsMemory($rsVerbas, $iCont);
             $hashDmDev = $oVerbasSql->idedmdev;
             if (!isset($oVerbasResc->dmdev[array_search($hashDmDev, $aHashDmDev)])) {
@@ -95,8 +95,8 @@ class EventoS2299 extends EventoBase
                 $oVerbasFormatado->infoperapur->ideestablot = array();
                 $oVerbasResc->dmdev[array_search($hashDmDev, $aHashDmDev)] = $oVerbasFormatado;
             }
-            
-            $sHashIdeEstabLotItens = $oVerbasSql->tpinsc.$oVerbasSql->nrinsc.$oVerbasSql->codlotacao;
+
+            $sHashIdeEstabLotItens = $oVerbasSql->tpinsc . $oVerbasSql->nrinsc . $oVerbasSql->codlotacao;
             if (!isset($oVerbasResc->dmdev[array_search($hashDmDev, $aHashDmDev)]->infoperapur->ideestablot[array_search($sHashIdeEstabLotItens, $aHashIdeEstabLotItens)])) {
                 $aHashIdeEstabLotItens[] = $sHashIdeEstabLotItens;
                 $oIdeEstabLotItens = new \stdClass;
@@ -116,7 +116,6 @@ class EventoS2299 extends EventoBase
             $oDetVerbasItems->vrrubr = $oVerbasSql->vrrubr;
             $oDetVerbasItems->indapurir = $oVerbasSql->indapurir;
             $oVerbasResc->dmdev[array_search($hashDmDev, $aHashDmDev)]->infoperapur->ideestablot[array_search($sHashIdeEstabLotItens, $aHashIdeEstabLotItens)]->detverbas[] = $oDetVerbasItems;
-            
         }
 
         if (!empty($oVerbasSql->indmv) && !isset($oVerbasResc->infomv->indmv)) {
@@ -137,15 +136,16 @@ class EventoS2299 extends EventoBase
      * com base na admissao e some esses dias a rescisao
      * @return integer
      */
-    private function getDtProjetadaAviso($recis,$admiss) {
+    private function getDtProjetadaAviso($recis, $admiss)
+    {
         $oDataRecis = new \DateTime($recis);
         $oDataAdmiss = new \DateTime($admiss);
         $oAnosAviso = $oDataRecis->diff($oDataAdmiss);
         $quantAviso = 0;
         if ($oAnosAviso->d > 0 || $oAnosAviso->m > 0) {
-            $quantAviso = $oAnosAviso->y*3+30;
+            $quantAviso = $oAnosAviso->y * 3 + 30;
         } else {
-            $quantAviso = $oAnosAviso->y*3+30-3;
+            $quantAviso = $oAnosAviso->y * 3 + 30 - 3;
         }
         $iDiasAviso = ($quantAviso < 90 ? $quantAviso : 90);
         $oDataRecis->add(new \DateInterval("P{$iDiasAviso}D"));

@@ -34,7 +34,6 @@ class RelatorioInscricoesService extends RelatorioInscricoes
             ->join("bairro", "j13_codi", "q13_bairro")
             ->join('redesim_log', 'z01_cgccpf', 'q190_cpfcnpj')
             ->whereRaw("TO_CHAR(q190_data, 'YYYY-MM-DD') BETWEEN ? AND ?", [$this->dataInicio, $this->dataFim])
-            ->limit(25)
             ->get();
 
         $this->setInscricoes($aInscricoesRedesim);

@@ -39,6 +39,8 @@ $clrotulo->label("e82_codord");
 $clrotulo->label("e87_descgera");
 $clrotulo->label("o15_descr");
 $clrotulo->label("o15_codigo");
+require_once("model/protocolo/AssinaturaDigital.model.php");
+$oAssintaraDigital = new AssinaturaDigital();
 $dados="ordem";
 require_once(modification("std/db_stdClass.php"));
 $iTipoControleRetencaoMesAnterior = 0;
@@ -50,6 +52,7 @@ if (count($aParametrosEmpenho) > 0) {
     $lUsaData = $aParametrosEmpenho[0]->e30_usadataagenda=="t"?true:false;
 
 }
+
 ?>
 <style type="text/css">
 
@@ -555,6 +558,8 @@ if (count($aParametrosEmpenho) > 0) {
 <div id='teste'></div>
 <script>
     sDataDia = "<?=date("d/m/Y",db_getsession("DB_datausu"))?>";
+
+
     iTipoControleRetencaoMesAnterior = <?=$iTipoControleRetencaoMesAnterior?>;
     var aAutenticacoesGlobal = new Array();
     let aContasPagadorasPermitidas = [];
@@ -998,7 +1003,7 @@ if (count($aParametrosEmpenho) > 0) {
                      */
                     if ( sConCarPeculiar == '' || new Number(sConCarPeculiar) == 0 ) {
                         if (e79_concarpeculiar == '') {
-                            e79_concarpeculiar = 'Selecione';
+                            e79_concarpeculiar = '000';
                         }
                         aLinha[3]  = "<a href='#' id='ccp_"+e81_codmov+"'";
                         aLinha[3] += "onclick='js_lookupConCarPeculiar("+e81_codmov+");' >"+e79_concarpeculiar+"</a>";
@@ -1008,7 +1013,7 @@ if (count($aParametrosEmpenho) > 0) {
                     aLinha[4]   = e50_codord;
                     aLinha[5]   = js_createComboContasPag(e81_codmov, aContasVinculadas, e85_codtipo, e50_contapag, lDisabled);
                     aLinha[6]   = z01_nome.urlDecode().substring(0,20);
-                    aLinha[7]   = js_createComboContasForne(aContasFornecedor, e98_contabanco, e81_codmov, z01_numcgm);
+                    aLinha[7]   = js_createComboContasForne(aContasFornecedor, e98_contabanco, e81_codmov, z01_numcgm, false, e50_codord);
                     aLinha[8]   = js_createComboForma(e97_codforma,e81_codmov, lDisabled);
 
                     if (e91_cheque != '') {
@@ -1112,6 +1117,7 @@ if (count($aParametrosEmpenho) > 0) {
         } else if (oResponse.status == 2) {
             gridNotas.setStatus("<b>Não foram encontrados movimentos.</b>");
         }
+        js_ajusteLayout();
     }
 
     function js_getContaSaltes(objInput){
@@ -1347,7 +1353,7 @@ if (count($aParametrosEmpenho) > 0) {
 
     }
 
-    function js_createComboContasForne(aContasForne, iContaForne, iCodMov, iNumCgm, lDisabled) {
+    function js_createComboContasForne(aContasForne, iContaForne, iCodMov, iNumCgm, lDisabled, iCodord) {
 
         var sDisabled = "";
         if (lDisabled == null) {
@@ -1358,28 +1364,38 @@ if (count($aParametrosEmpenho) > 0) {
         }
 
         var sRetorno  = "<select id='ctapagfor"+iCodMov+"' "+sDisabled+" class='cgm' style='width:100%'";
-        sRetorno     += " onchange='js_novaConta("+iCodMov+", "+iNumCgm+",this.value)'>";
+        sRetorno     += " onchange='js_novaConta("+iCodMov+", "+iNumCgm+",this.value, "+iCodord+")'>";
         sRetorno     += "<option value=''>Selecione</option>";
         sRetorno     += "<option value='n'>Nova Conta</option>";
+        let sSelecionado = null;
+        let sPadrao = null;
         if (aContasForne != null) {
 
 
             aContasForne.each(
                 function (oConta, iLinha) {
 
-                    var sSelecionado = "";
+                    // var sSelecionado = "";
                     /*comentado por solicitação de barbara OC 6184*/
                     // if (oConta.pc63_contabanco == oConta.conta_historico_fornecedor && iContaForne == "") {
                     //   sSelecionado = " selected ";
                     // } else if (iContaForne != "" && iContaForne == oConta.pc63_contabanco) {
                     //   sSelecionado = " selected ";
                     // } else
-                    if (oConta.padrao == "t") {
-                        sSelecionado = " selected ";
+                    if (oConta.conta_fornecedor != '') {
+                        if (oConta.conta_fornecedor == oConta.pc63_contabanco ) {
+                            sSelecionado = oConta.pc63_contabanco;
+                        } else if (oConta.conta_fornecedor == 0){
+                            sSelecionado = 0;
+                        }
+                    } else {
+                        if (oConta.padrao == "t"){
+                            sPadrao = oConta.pc63_contabanco;
+                        }
                     }
 
                     var sConferido = "";
-                    var sOption = "<option value='"+oConta.pc63_contabanco+"' "+sSelecionado+">";
+                    var sOption = "<option value='"+oConta.pc63_contabanco+"' >";
                     if (oConta.pc63_agencia_dig.trim() != ""){
                         oConta.pc63_agencia_dig = "/"+oConta.pc63_agencia_dig;
                     }
@@ -1399,6 +1415,11 @@ if (count($aParametrosEmpenho) > 0) {
 
         }
         sRetorno += "</select>";
+        if (sSelecionado != null) {
+            sRetorno = sRetorno.replace("value='"+sSelecionado+"'","value='"+sSelecionado+"' selected")
+        } else if (sPadrao != null) {
+            sRetorno = sRetorno.replace("value='"+sPadrao+"'","value='"+sPadrao+"' selected")
+        }
         return sRetorno;
     }
 
@@ -1422,12 +1443,32 @@ if (count($aParametrosEmpenho) > 0) {
         return sSaida;
     }
 
-    function js_novaConta(Movimento,iNumCgm, sOpcao ){
+    function js_novaConta(Movimento,iNumCgm, sOpcao, iCodord){
         erro = 0;
         if(sOpcao == 'n' || sOpcao == 'button'){
             js_OpenJanelaIframe('CurrentWindow.corpo','db_iframe_pcfornecon',
                 'com1_pcfornecon001.php?novo=true&reload=true&z01_numcgm='+iNumCgm,
                 'Cadastro de Contas de Fornecedores',true);
+        } else {
+            if (confirm("Deseja alterar a conta de fornecedor do movimento?")){
+                var aMovimentos = gridNotas
+                var sJson = js_objectToJson({
+                    "exec"             : "alterarContaFornecedor",
+                    "iCodord"          : iCodord,
+                    "iContaFornecedor" : sOpcao == '' ? 0 : sOpcao
+                });
+                var oAjax = new Ajax.Request(
+                    url,
+                    {
+                        method    : 'post',
+                        parameters: 'json='+sJson,
+                        onComplete: function (oAjax) {
+                            var oRetorno = eval("("+oAjax.responseText+")");
+                            alert(oRetorno.message);
+                        }
+                    }
+                );
+            }
         }
     }
     function js_setAjuda(sTexto,lShow) {
@@ -1703,13 +1744,14 @@ if (count($aParametrosEmpenho) > 0) {
         js_liberaBotoes(true);
         var oRetorno = eval("("+oAjax.responseText+")");
         if (oRetorno.iItipoAutent != 3 && oRetorno.status == 1) {
-
+            var bAssinadorAtivo = "<?=$oAssintaraDigital->verificaAssituraAtiva()?>";
             iCodigoOrdemAuxiliar = oRetorno.iCodigoOrdemAuxiliar;
             if ($('autenticar').checked) {
 
                 aAutenticacoes       = oRetorno.aAutenticacoes;
                 iIndice              = 0;
                 js_autenticar(oRetorno.aAutenticacoes[0],false);
+
                 if ($('reemisaoop').checked) {
                     js_emiteOrdens(oRetorno.aAutenticacoes);
                 }
@@ -1721,8 +1763,8 @@ if (count($aParametrosEmpenho) > 0) {
                 }
 
                 aAutenticacoesGlobal = oRetorno.aAutenticacoes
-                if ($('reemisaoop').checked) {
-
+                if ($('reemisaoop').checked  || bAssinadorAtivo) {
+                    console.log(bAssinadorAtivo);
                     var aMovimentosSelecionados = gridNotas.getSelection();
                     var aMovimentosImprimir = new Array();
                     aMovimentosSelecionados.each(function(aMovimento, iSeq) {
@@ -2529,6 +2571,13 @@ if (count($aParametrosEmpenho) > 0) {
         }
 
     }
+    js_ajusteLayout();
+    function js_ajusteLayout()
+    {
+        $('col1').style.width = "30px";
+        $('gridNotasrow0checkbox').style.width = "30px";
+    }
+
 
 
 </script>

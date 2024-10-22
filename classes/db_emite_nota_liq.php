@@ -72,9 +72,19 @@ class cl_emite_nota_liq {
 				and o58_anousu = o56_anousu
 				inner join orctiporec on o58_codigo = o15_codigo
 				inner join emptipo on emptipo.e41_codtipo = empempenho.e60_codtipo
-        left join cgm as ordena on ordena.z01_numcgm = o41_orddespesa
+        left join cgm as ordena on
+	        ordena.z01_numcgm = case
+                when e60_numcgmordenador is not null
+                then e60_numcgmordenador
+                else o41_orddespesa
+	        end
         left join cgm as paga on paga.z01_numcgm = o41_ordpagamento
-        left join cgm as liquida on liquida.z01_numcgm = o41_ordliquidacao
+        left join cgm as liquida on
+            liquida.z01_numcgm = case
+                when e50_numcgmordenador is not null
+                then e50_numcgmordenador
+                else o41_ordliquidacao
+            end
         left join identificacaoresponsaveis contad on contad.si166_instit= e60_instit
         and contad.si166_tiporesponsavel=2
         and {$iAnoUsu} between DATE_PART('YEAR',contad.si166_dataini) AND DATE_PART('YEAR',contad.si166_datafim)
@@ -125,6 +135,42 @@ class cl_emite_nota_liq {
             INNER JOIN empempenho ON e60_coddot = o58_coddot
             AND e60_anousu = o58_anousu
             INNER JOIN pagordem ON e50_numemp = e60_numemp
+            WHERE e50_codord = {$e50_codord}
+            AND o41_anousu = DATE_PART('YEAR',pagordem.e50_data)
+        ";
+
+      return $sql1;
+    }
+
+    function get_sql_assinaturas_ordenador($e50_codord) {
+
+        $sql1 = "SELECT desp.z01_nome assindsp,
+            liqu.z01_nome assinlqd,
+            orde.z01_nome assinord
+            FROM orcunidade
+            LEFT JOIN cgm orde ON orde.z01_numcgm = o41_ordpagamento
+            LEFT JOIN orcorgao ON o40_anousu = o41_anousu
+            AND o40_orgao = o41_orgao
+            INNER JOIN orcdotacao ON o58_orgao = o41_orgao
+            AND o58_unidade = o41_unidade
+            AND o58_instit = o41_instit
+            INNER JOIN empempenho ON e60_coddot = o58_coddot
+            AND e60_anousu = o58_anousu
+            INNER JOIN pagordem ON e50_numemp = e60_numemp
+            LEFT JOIN cgm desp ON
+	            desp.z01_numcgm = 
+                    CASE
+                        WHEN e60_numcgmordenador IS NOT NULL
+                        THEN e60_numcgmordenador
+                        ELSE o41_orddespesa
+                    END	
+            LEFT JOIN cgm liqu ON 
+                liqu.z01_numcgm = 
+                    CASE 
+                        WHEN e50_numcgmordenador IS NOT NULL
+                        THEN e50_numcgmordenador
+                        ELSE o41_ordliquidacao
+                    END 
             WHERE e50_codord = {$e50_codord}
             AND o41_anousu = DATE_PART('YEAR',pagordem.e50_data)
         ";

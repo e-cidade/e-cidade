@@ -26,7 +26,7 @@ $oRetorno->status   = 1;
 $sNomeZip           = "Siops";
 $sNomeSiopsRec      = "Receita_Siops";
 $index              = 0;
-
+$index2             = 0;
 switch ($oParam->exec) {
 
     case 'gerarSiops':
@@ -95,12 +95,40 @@ switch ($oParam->exec) {
                                 $oRetorno->message = "Não foi possível gerar a Receita. De/Para dos seguintes estruturais não encontrado: {$siopsReceita->sMensagem}";
                                 $oRetorno->status = 2;
                             }
-
+                            $index2 = $index+1;
                             $oRetorno->arquivos->$index->nome = "{$siopsReceita->getNomeArquivo()}.IMPT";
                             $sArquivosZip .= " {$siopsReceita->getNomeArquivo()}.IMPT ";
 
                         }
 
+                        if ($sArquivo == 'infocomplementares') {
+
+                            $sNomeSiopsInfComplementares = "Inf_Complementares";
+                            $siopsInfoComplementares = new Siops();
+                            $siopsInfoComplementares->setAno($iAnoUsu);
+                            $siopsInfoComplementares->setInstit($iInstit);
+                            $siopsInfoComplementares->setBimestre($iBimestre);
+                            $siopsInfoComplementares->setPeriodo();
+                            $siopsInfoComplementares->setFiltrosReceita();
+                            $siopsInfoComplementares->setOrcado();
+                            $siopsInfoComplementares->setInfoComplementares();
+                            $siopsInfoComplementares->agrupaInfoComplementares();
+                            $siopsInfoComplementares->setNomeArquivo($sNomeSiopsInfComplementares);
+                            $siopsInfoComplementares->gerarsiopsInfoComplementares();
+
+                            if ($siopsInfoComplementares->getErroSQL() > 0) {
+                                throw new Exception ("Ocorreu um erro ao gerar Siops " . $siopsInfoComplementares->getErroSQL());
+                            }
+
+                            if ($siopsInfoComplementares->status == 2) {
+                                $oRetorno->message = "Não foi possível gerar as Informações Complementares";
+                                $oRetorno->status = 2;
+                            }
+                            
+                            $oRetorno->arquivos->$index2->nome = "{$siopsInfoComplementares->getNomeArquivo()}.IMPT";
+                            $sArquivosZip .= " {$siopsInfoComplementares->getNomeArquivo()}.IMPT ";
+
+                        }
                     }
 
                     system("rm -f {$sNomeZip}.zip");

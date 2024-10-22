@@ -270,8 +270,26 @@ $clrotulo->label("pc63_conta");
 					<?php 
 					  echo $oCgmModel->getObs();
 					?>
+		
 				</td>
 			</tr> 
+			<?php 
+				$dadosInstituicao = db_query("SELECT db21_apirfb FROM db_config WHERE codigo = " . db_getsession("DB_instit"));
+				$oDadosInstituicao = db_utils::fieldsMemory($dadosInstituicao, 0);
+				if ($oDadosInstituicao->db21_apirfb <> 0) {
+			?>
+			<?php if ($oCgmModel->isJuridico()) { ?>
+			<tr>
+				<td>
+					<form name="form5" method="post" action="prot3_consultarfb001.php">
+						<input type="hidden" name="documento" value="<?= $oCgmModel->getCnpj(); ?>"/>
+					</form>
+					<input name="emiterel" value="Consultar na RFB" type="button" onclick="js_emite();">
+				</td>
+				<td></td>
+			</tr>
+			<?php } ?>
+			<?php } ?>
 		</table>
 	</fieldset>
 	<fieldset>
@@ -302,5 +320,19 @@ $clrotulo->label("pc63_conta");
 		  $oTabDetalhes->show();
 		?>
 	</fieldset>
+
+
+	
+    <script>
+        variavel = 1;
+
+        function js_emite() {
+            // pega dados da func_selorcdotacao_aba.php
+            jan = window.open('', 'safo' + variavel, 'width=' + (screen.availWidth - 5) + ',height=' + (screen.availHeight - 40) + ',scrollbars=1,location=0 ');
+            document.form5.target = 'safo' + variavel++;
+            setTimeout("document.form5.submit()", 1000);
+            return true;
+        }
+    </script>
 </body>
 </html>

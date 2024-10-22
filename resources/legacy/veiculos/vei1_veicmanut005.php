@@ -282,32 +282,48 @@ if(isset($alterar)){
     db_query("delete from veicmanutitempcmater where ve64_veicmanutitem in (select ve63_codigo from veicmanutitem where ve63_veicmanut = ".$ve62_codigo." )");
     db_query("delete from veicmanutitem where ve63_veicmanut = ".$ve62_codigo."");
 
-    foreach (json_decode(str_replace("\\",'',utf8_encode($itens)), true ) as $item) {
-      if($item!=null){
+    db_fim_transacao($sqlerro);
 
-        if($sqlerro==false){
-          $clveicmanutitem->incluir("",$item,$ve62_codigo);
-          $erro_msg = $clveicmanutitem->erro_msg;
-          if($clveicmanutitem->erro_status==0){
-            $sqlerro=true;
-          }
-          if ($sqlerro==false){
-            if (isset($item['ve64_pcmater'])&&$item['ve64_pcmater']){
-            //$clveicmanutitempcmater->ve64_veicmanutitem=$clveicmanutitem->ve63_codigo;
-              $clveicmanutitempcmater->incluir(null,$item,$clveicmanutitem->ve63_codigo);
+    $itemDescricoes = $_POST['itemDescricao']; // Isso será um array
+    $itemQuantidades = $_POST['itemQuantidade']; // Isso será um array
+    $itemValores = $_POST['itemVlrunitario']; // Isso será um array
+    $itemCodigos = $_POST['itemCodigo'];
+    $count = count($itemDescricoes); // Conta o número de elementos no array
+
+    // Usando um loop for para iterar sobre o array
+    for ($i = 0; $i < $count; $i++) {
+
+            $item = array(
+              "ve63_descr" => $itemDescricoes[$i],
+              "ve63_quant" => $itemQuantidades[$i],
+              "ve63_vlruni" => $itemValores[$i]
+            );
+
+            if($sqlerro==false){
+              db_inicio_transacao();
+              $clveicmanutitem->incluir("",$item,$ve62_codigo);
+              $erro_msg = $clveicmanutitem->erro_msg;
+              if($clveicmanutitem->erro_status==0){
+                $sqlerro=true;
+              }
+            }
+
+            if($sqlerro==false && $itemCodigos[$i] != ''){
+
+              $aPcmater = array("ve64_pcmater" => $itemCodigos[$i]);
+              $clveicmanutitempcmater->incluir(null,$aPcmater,$clveicmanutitem->ve63_codigo);
               if($clveicmanutitempcmater->erro_status==0){
                 $erro_msg = $clveicmanutitempcmater->erro_msg;
                 $sqlerro=true;
               }
+
             }
-          }
 
-        }
-      }
+            db_fim_transacao($sqlerro);
+
     }
-    db_fim_transacao($sqlerro);
 
-  }
+}
 
   $db_botao = true;
   ?>
@@ -375,12 +391,16 @@ if(isset($alterar)){
 </html>
 <?
 
-  if($sqlerro==true){
+  if($sqlerro==true && isset($alterar)){
     db_msgbox($erro_msg);
     if($clveicmanut->erro_campo!=""){
       echo "<script> document.form1.".$clveicmanut->erro_campo.".style.backgroundColor='#99A9AE';</script>";
       echo "<script> document.form1.".$clveicmanut->erro_campo.".focus();</script>";
     };
+  }
+
+  if($sqlerro==false && isset($alterar)){
+    db_msgbox("Alteração efetuada com sucesso");
   }
 
 ?>

@@ -1,14 +1,14 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc22382 extends AbstractMigration
+class Oc22382 extends PostgresMigration
 {
 
     public function up()
     {
         $sSql = "
-        
+
         BEGIN;
         ALTER TABLE pcorcamfornelic ADD COLUMN pc31_representante varchar(100);
         ALTER TABLE pcorcamfornelic ADD COLUMN pc31_cpf varchar(11);
@@ -20,6 +20,6 @@ class Oc22382 extends AbstractMigration
         COMMIT;";
 
         $this->execute($sSql);
-        
+
     }
 }

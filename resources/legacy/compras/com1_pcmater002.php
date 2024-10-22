@@ -94,6 +94,12 @@ if ((isset($HTTP_POST_VARS["db_opcao"]) && $HTTP_POST_VARS["db_opcao"]) == "Alte
     db_msgbox($erro_msg);
   }
 
+  if(strlen(trim($pc01_justificativa)) <= 5 && ($pc01_complmateranterior != $pc01_complmater || $pc01_descrmateranterior != $pc01_descrmater)){
+    $erro_msg = "Campo Justificativa é necessário possuir no mínimo 5 caracteres.";
+    $sqlerro  = true;
+    db_msgbox($erro_msg);
+  }
+
   $rsValidacaoAlteracaoDescricao = db_query("select * from pcmater where pc01_codmater = $pc01_codmater and pc01_descrmater = '$pc01_descrmater' and pc01_complmater = '$pc01_complmater' ");
   if(pg_num_rows($rsValidacaoAlteracaoDescricao) == 0){
     //Salva o item na tabela historicomaterial para gerar no sicom OC20960
@@ -117,8 +123,7 @@ if ((isset($HTTP_POST_VARS["db_opcao"]) && $HTTP_POST_VARS["db_opcao"]) == "Alte
         }
     }
 
-    $rsHistoricoMaterialTipo1 = $clhistoricomaterial->sql_record($clhistoricomaterial->sql_query(null,"*",null,"db150_pcmater =$pc01_codmater and db150_tipocadastro = 1 and db150_coditem not in (select db150_coditem from historicomaterial where db150_pcmater = $pc01_codmater and db150_tipocadastro = 2)"));
-
+    $rsHistoricoMaterialTipo1 = $clhistoricomaterial->sql_record($clhistoricomaterial->sql_query(null,"db150_coditem,db150_pcmater,db150_dscitem,db150_unidademedida",null,"db150_pcmater =$pc01_codmater and db150_tipocadastro = 1 and db150_coditem not in (select db150_coditem from historicomaterial where db150_pcmater = $pc01_codmater and db150_tipocadastro = 2)"));
     for($iMaterialTipo1 = 0; $iMaterialTipo1 < pg_num_rows($rsHistoricoMaterialTipo1); $iMaterialTipo1++ ){
         db_fieldsmemory($rsHistoricoMaterialTipo1, $iMaterialTipo1);
 

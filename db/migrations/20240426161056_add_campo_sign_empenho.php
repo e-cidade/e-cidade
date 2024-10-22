@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AddCampoSignEmpenho extends AbstractMigration
+class AddCampoSignEmpenho extends PostgresMigration
 {
     public function change()
     {

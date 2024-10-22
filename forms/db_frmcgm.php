@@ -109,11 +109,11 @@ function js_confirma(){
 
 </script>
 <?
+
 if($db_opcao == 2 || $db_opcao == 3){
-  include("prot1_cadastrocgm.php");
+  include("resources/legacy/protocolo/prot1_cadastrocgm.php");
   exit;
 }
-
 $sZero               = '';
 $lPermissaoCpfZerado = '';
 if( (isset($cnpj) && trim($cnpj)!="") || (isset($cpf) && trim($cpf)!="") ){
@@ -161,7 +161,7 @@ if( (isset($cnpj) && trim($cnpj)!="") || (isset($cpf) && trim($cpf)!="") ){
 	 exit;
     }
   }
-include("prot1_cadastrocgm.php");
+include("resources/legacy/protocolo/prot1_cadastrocgm.php");
 exit;
 }
 

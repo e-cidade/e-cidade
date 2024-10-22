@@ -2,18 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use ECidade\Api\V1\Controllers\GenericController;
-use ECidade\V3\Extension\Registry;
-use ECidade\V3\Extension\Session;
-use Symfony\Component\HttpFoundation\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Routing\Controller as BaseController;
 
-class Controller extends GenericController
+class Controller extends BaseController
 {
-    protected Session $session;
-
-    public function __construct(Request $request)
-    {
-        $this->session = Registry::get('app.request')->session();
-        parent::__construct($request);
-    }
+    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 }

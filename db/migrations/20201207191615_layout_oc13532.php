@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class LayoutOc13532 extends AbstractMigration
+class LayoutOc13532 extends PostgresMigration
 {
 
     public function up()
@@ -111,6 +111,6 @@ SQL;
 
     public function down()
     {
-        
+
     }
 }

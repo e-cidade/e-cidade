@@ -29,8 +29,6 @@ class EventoCargaS2400 implements EventoCargaInterface
 
     public function __construct()
     {
-        $this->ano = db_getsession("DB_anousu");
-        $this->mes = date("m", db_getsession("DB_datausu"));
         $this->instit = db_getsession("DB_instit");
     }
 
@@ -39,7 +37,7 @@ class EventoCargaS2400 implements EventoCargaInterface
      * @param integer|null $matricula
      * @return resource
      */
-    public function execute($matricula = null)
+    public function execute($matricula = null, $ano, $mes)
     {
         $sql = "SELECT DISTINCT z01_cgccpf AS cpfbenef,
         z01_nome AS nmbenefic,
@@ -120,12 +118,12 @@ class EventoCargaS2400 implements EventoCargaInterface
     AND (
     (
     (date_part('year',rhpessoal.rh01_admiss)::varchar || lpad(date_part('month',rhpessoal.rh01_admiss)::varchar,2,'0'))::integer <= 202207
-    and (date_part('year',fc_getsession('DB_datausu')::date)::varchar || lpad(date_part('month',fc_getsession('DB_datausu')::date)::varchar,2,'0'))::integer <= 202207
+    and (" . $ano . $mes . ") <= 202207
     and (rh05_recis is null or (date_part('year',rh05_recis)::varchar || lpad(date_part('month',rh05_recis)::varchar,2,'0'))::integer > 202207)
     ) or (
-    date_part('month',rhpessoal.rh01_admiss) = date_part('month',fc_getsession('DB_datausu')::date)
-    and date_part('year',rhpessoal.rh01_admiss) = date_part('year',fc_getsession('DB_datausu')::date)
-    and (date_part('year',fc_getsession('DB_datausu')::date)::varchar || lpad(date_part('month',fc_getsession('DB_datausu')::date)::varchar,2,'0'))::integer > 202207
+    date_part('month',rhpessoal.rh01_admiss) = " . $mes . "
+    and date_part('year',rhpessoal.rh01_admiss) = " . $ano . "
+    and (" . $ano . $mes . ") > 202207
     )
     )";
 
@@ -139,5 +137,4 @@ class EventoCargaS2400 implements EventoCargaInterface
         }
         return $rsResult;
     }
-
 }

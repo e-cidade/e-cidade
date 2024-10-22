@@ -375,6 +375,26 @@ class compilacaoRegistroPreco extends solicitacaoCompra {
     }
     return $this;
   }
+
+  public function alterarvigenciaregistropreco()
+  {
+      $oAbertura = $this->getAberturaRegistroPreco();
+      /**
+       * salvamos os dados da Abertura
+       */
+      $oDaoAberturaPreco = db_utils::getDao("solicitaregistropreco");
+      $oDaoAberturaPreco->pc54_datainicio = implode("-", array_reverse(explode("/", $this->getDataInicio())));
+      $oDaoAberturaPreco->pc54_datatermino = implode("-", array_reverse(explode("/", $this->getDataTermino())));
+      $oDaoAberturaPreco->pc54_liberado = $this->isLiberado() ? "true" : "false";
+      $oDaoAberturaPreco->pc54_formacontrole = $oAbertura->getFormaDeControle();
+      $oDaoAberturaPreco->pc54_sequencial = $this->iCodigoRegistro;
+      $oDaoAberturaPreco->alterar($this->iCodigoRegistro);
+
+      if ($oDaoAberturaPreco->erro_status == 0) {
+          throw new Exception("Erro ao salvar Abertura de Registro de Preço!\n{$oDaoAberturaPreco->erro_msg}");
+      }
+
+  }
   /**
    * @return unknown
    */

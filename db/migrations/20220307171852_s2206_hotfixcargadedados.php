@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class S2206Hotfixcargadedados extends AbstractMigration
+class S2206Hotfixcargadedados extends PostgresMigration
 {
     public function up()
     {

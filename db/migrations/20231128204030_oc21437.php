@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc21437 extends AbstractMigration
+class Oc21437 extends PostgresMigration
 {
     public function up()
     {
@@ -20,26 +20,26 @@ class Oc21437 extends AbstractMigration
 
         ALTER TABLE adesaoregprecos
         ADD si06_regimecontratacao int default null;
-        
+
         ALTER TABLE adesaoregprecos
         ADD si06_criterioadjudicacao int default null;
-        
+
         ALTER TABLE adesaoregprecos ALTER COLUMN si06_modalidade
         DROP NOT NULL;
 
         ALTER TABLE adesaoregprecos ALTER COLUMN si06_numlicitacao
         DROP NOT NULL;
 
-        ALTER TABLE adesaoregprecos 
+        ALTER TABLE adesaoregprecos
         ALTER COLUMN si06_modalidade SET DEFAULT null;
 
-        ALTER TABLE adesaoregprecos 
+        ALTER TABLE adesaoregprecos
         ALTER COLUMN si06_numlicitacao SET DEFAULT null;
 
         ALTER TABLE adesaoregprecos ALTER COLUMN si06_descontotabela
         DROP NOT NULL;
 
-        ALTER TABLE adesaoregprecos 
+        ALTER TABLE adesaoregprecos
         ALTER COLUMN si06_descontotabela SET DEFAULT null;
 
         COMMIT;";

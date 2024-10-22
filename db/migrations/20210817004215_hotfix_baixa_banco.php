@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class HotfixBaixaBanco extends AbstractMigration
+class HotfixBaixaBanco extends PostgresMigration
 {
     public function up()
     {
@@ -4117,16 +4117,16 @@ class HotfixBaixaBanco extends AbstractMigration
                                                     a.k00_receit,
                                                 (SELECT sum(b.k00_valor)
                                                 FROM recibopaga b
-                                                WHERE b.k00_numnov = (select k127_numpreoriginal 
-                                                                        from abatimentorecibo 
+                                                WHERE b.k00_numnov = (select k127_numpreoriginal
+                                                                        from abatimentorecibo
                                                                         inner join abatimento on k127_abatimento = k125_sequencial
                                                                         and k125_tipoabatimento <> 3
                                                                         where k127_numprerecibo = r_idret.numpre)
                                                     AND b.k00_receit = a.k00_receit
                                                     AND b.k00_valor > 0) AS k00_valor
                                             FROM recibopaga a
-                                            WHERE a.k00_numnov = (select k127_numpreoriginal 
-                                                                        from abatimentorecibo 
+                                            WHERE a.k00_numnov = (select k127_numpreoriginal
+                                                                        from abatimentorecibo
                                                                         inner join abatimento on k127_abatimento = k125_sequencial
                                                                         and k125_tipoabatimento <> 3
                                                                         where k127_numprerecibo = r_idret.numpre)
@@ -4529,16 +4529,16 @@ class HotfixBaixaBanco extends AbstractMigration
                                                     a.k00_receit,
                                                 (SELECT sum(b.k00_valor)
                                                 FROM recibopaga b
-                                                WHERE b.k00_numnov = (select k127_numpreoriginal 
-                                                                        from abatimentorecibo 
+                                                WHERE b.k00_numnov = (select k127_numpreoriginal
+                                                                        from abatimentorecibo
                                                                         inner join abatimento on k127_abatimento = k125_sequencial
                                                                         and k125_tipoabatimento <> 3
                                                                         where k127_numprerecibo = r_idret.numpre)
                                                     AND b.k00_receit = a.k00_receit
                                                     AND b.k00_valor > 0) AS k00_valor
                                             FROM recibopaga a
-                                            WHERE a.k00_numnov = (select k127_numpreoriginal 
-                                                                        from abatimentorecibo 
+                                            WHERE a.k00_numnov = (select k127_numpreoriginal
+                                                                        from abatimentorecibo
                                                                         inner join abatimento on k127_abatimento = k125_sequencial
                                                                         and k125_tipoabatimento <> 3
                                                                         where k127_numprerecibo = r_idret.numpre)

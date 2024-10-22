@@ -26,6 +26,7 @@
  */
 
 //MODULO: empenho
+$clcgm = new cl_cgm;
 $clempautoriza->rotulo->label();
 $clrotulo = new rotulocampo;
 $clrotulo->label("z01_nome");
@@ -152,6 +153,8 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
 ?>
 <form name="form1" method="post" action="<?= $ac ?>">
 
+    <input type="hidden" id="obriga_divida" name="obriga_divida">
+
     <fieldset style="width:900px">
         <legend><strong>Emissão do Empenho</strong></legend>
 
@@ -214,6 +217,64 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                         db_input('e54_numcgm', 8, $Ie54_numcgm, true, 'text', 3);
                         db_input('z01_nome', 100, $Iz01_nome, true, 'text', 3);
                         ?>
+                    </td>
+                </tr>
+                <tr>
+                    <?php 
+                        if ($buscarOrdenadores == 1 || $buscarOrdenadores == 2) {
+                    ?>        
+                        <td nowrap title="<?= @$Te54_numcgm ?>">
+                            <b> Ordenador da Despesa:</b>
+                        </td>  
+                    <td>
+                    <?php
+                        }
+                        $arrayCount = count($ordenadoresArray);  
+                        $cont       = 0;
+                        if ($buscarOrdenadores == 1 ) {
+                            $where = $o41_cgmordenador ? " z01_numcgm in ($o41_cgmordenador) " :  "z01_numcgm is null";
+                            $result_cgm = $clcgm->sql_record($clcgm->sql_buscar_ordenador(null," o41_nomeordenador asc ",$where));
+                            if ($clcgm->numrows == 0 ) {
+                                $result_cgm = $clcgm->sql_record($clcgm->sql_query_ordenador(null," o41_nomeordenador asc ",$where));
+                             } 
+                            db_selectrecord("o41_cgmordenador", $result_cgm, true, $db_opcao, "", "", "", "", "");
+                        } elseif ($buscarOrdenadores == 2 ) {
+                   
+                            if ($rowCount > 1) {
+                                foreach($ordenadoresArray as $ordenadores) {
+                                    $cont++; 
+                                    $numCgm .= "'";
+                                    $numCgm .= $ordenadores['z01_numcgm']; 
+                                    if ($arrayCount == $cont) {
+                                        $numCgm .= "'";   
+                                    } else {
+                                        $numCgm .= "',";  
+                                    }        
+                                }
+                                $where = " z01_numcgm in ($numCgm) ";
+                                $result_cgm = $clcgm->sql_record($clcgm->sql_query_ordenador(null," sort_order asc, o41_nomeordenador asc ",$where));
+                                db_selectrecord("o41_cgmordenador", $result_cgm, true, $db_opcao, "", "", "", "", "");
+                            } else {
+                                $where = $o41_cgmordenador ? " z01_numcgm in ($o41_cgmordenador) " :  "z01_numcgm is null";
+                                $result_cgm = $clcgm->sql_record($clcgm->sql_buscar_ordenador(null," o41_nomeordenador asc ",$where));
+                                if ($clcgm->numrows == 0 ) {
+                                    $result_cgm = $clcgm->sql_record($clcgm->sql_query_ordenador(null," o41_nomeordenador asc ",$where));
+                                 } 
+                                db_selectrecord("o41_cgmordenador", $result_cgm, true, $db_opcao, "", "", "", "", "");
+                               
+                            }
+                        } else {
+                            $o41_cgmordenador = '';
+                            ?>
+                            <td nowrap title="<?= @$Te54_numcgm ?>">
+                               <b><? db_ancora('<b>Ordenador da Despesa:</b>',"js_pesquisa_cgm(true);",$fimperiodocontabil);?></b>
+                            </td> 
+                            <td>
+                            <? 
+                                db_input("o41_cgmordenador",8,$Io41_cgmordenador,true,"text",$fimperiodocontabil,"onChange='js_pesquisa_cgm(false);'");
+                                db_input("o41_cgmordenadordescr",40,$Io41_cgmordenadordescr,true,"text",3);
+                        }
+                    ?>    
                     </td>
                 </tr>
                 <tr>
@@ -710,6 +771,15 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                     </td>
                 </tr>
                 <tr>
+                    <td nowrap title="Dívida Consolidada">
+                        <? db_ancora("Dívida Consolidada", "js_pesquisaDivida(true);", $db_opcao); ?>
+                    </td>
+                    <td>
+                        <? db_input("op01_numerocontratoopc",11,$op01_numerocontratoopc,true,"text",$db_opcao,"onChange='js_pesquisaDivida(false);'") ?>
+                        <? db_input("op01_text_numerocontratoopc",50, $op01_text_numerocontratoopc,true,"text",3) ?>
+                    </td>
+                </tr>
+                <tr>
                     <td nowrap title="Gestor do Empenho">
                         <?php
                         db_ancora('Gestor do Empenho:', "js_pesquisae54_gestaut(true);", $db_opcao);
@@ -901,6 +971,10 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
         width: 83px;
     }
 
+    #op01_numerocontratoopc {
+        width: 83px;
+    }
+
     #e54_resumo, #e60_resumo {
         width: 588px;
     }
@@ -912,6 +986,10 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
     #e60_emendaparlamentar,
     #e60_esferaemendaparlamentar {
         width: 442px
+    }
+
+    #e54_nomedodepartamento {
+        width: 20%;
     }
 </style>
 
@@ -930,6 +1008,56 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
         }
 
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+        document.getElementById('e56_codele').addEventListener('input', function(e) {
+
+            var obrigaDivida = obrigaPreenchimentoDivida();
+            document.getElementById('obriga_divida').value = obrigaDivida;
+        });
+
+        document.getElementById('op01_numerocontratoopc').addEventListener('input', function(e) {
+            var valor = e.target.value;
+            if(valor.trim() === '') {
+                document.getElementById('op01_text_numerocontratoopc').value = '';
+            }
+        });
+    });
+
+    function getRegrasFiltrarDivida() {
+
+        var desdobramento  = document.getElementById('e56_codele');
+        var optionSelected = desdobramento.options[desdobramento.selectedIndex].text;
+
+        var condicoes = "";
+
+        var prefixosOutrasDividas    = ['3271', '3273', '3274', '4671', '4673', '4674'];
+        var prefixoIntraorçamentaria = ['3291', '4691'];
+
+        if(prefixosOutrasDividas.some(prefixo => optionSelected.startsWith(prefixo))) {
+            condicoes = " AND op01_tipolancamento = 20 AND op01_detalhamentodivida = 15";
+        } else if (prefixoIntraorçamentaria.some(prefixo => optionSelected.startsWith(prefixo))) {
+            condicoes = " AND op01_tipocredor = 2";
+        } else {
+            condicoes = " AND op01_tipolancamento <> 20 AND op01_detalhamentodivida <> 15 AND op01_tipocredor <> 2";
+        }
+
+        return condicoes;
+    }
+
+    function obrigaPreenchimentoDivida() {
+
+        var desdobramento  = document.getElementById('e56_codele');
+        var optionSelected = desdobramento.options[desdobramento.selectedIndex].text;
+
+        if (optionSelected.startsWith('32') || optionSelected.startsWith('46')) {
+            return 'sim';
+        }
+
+        return 'nao';
+    }
+
     function showForm(selectElement)
     {
         var valor = selectElement
@@ -990,6 +1118,41 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
             parameters: 'json=' + Object.toJSON(oParam),
             onComplete: window[funcaoRetorno]
         });
+    }
+
+    function js_pesquisaDivida(mostra) {
+
+        var credor = document.getElementById('e54_numcgm').value;
+
+        var regrasFiltros = getRegrasFiltrarDivida();
+
+        if (mostra == true) {
+            js_OpenJanelaIframe('', 'db_iframe_db_operacaodecredito', 'func_db_operacaodecredito.php?credor='+ credor +'&regras='+regrasFiltros+'&funcao_js=parent.js_mostraDivida|op01_sequencial|op01_numerocontratoopc|op01_dataassinaturacop', 'Pesquisa', true);
+        } else {
+            if (document.form1.op01_numerocontratoopc.value != '') {
+                js_OpenJanelaIframe('', 'db_iframe_db_operacaodecredito', 'func_db_operacaodecredito.php?credor='+ credor +'&regras='+regrasFiltros+'&pesquisa_chave=' + document.form1.op01_numerocontratoopc.value + '&funcao_js=parent.js_completaDivida', 'Pesquisa', false);
+            } else {
+                document.form1.op01_numerocontratoopc.value = '';
+            }
+        }
+    }
+
+    function js_mostraDivida(chave, chave1, chave2, chave3, chave4) {
+        document.form1.op01_numerocontratoopc.value = chave;
+        document.form1.op01_text_numerocontratoopc.value = chave1;
+        db_iframe_db_operacaodecredito.hide();
+
+        if(chave1.includes('não Encontrado')) {
+            document.form1.op01_numerocontratoopc.value = '';
+        }
+    }
+
+    function js_completaDivida(chave, chave1, erro) {
+        document.form1.op01_text_numerocontratoopc.value = chave;
+
+        if(chave.includes('não Encontrado')) {
+            document.form1.op01_numerocontratoopc.value = '';
+        }
     }
 
     function js_handleTipoAutorizacao(oAjax) {
@@ -1114,6 +1277,51 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
         db_iframe_concarpeculiar.hide();
     }
 
+    function js_pesquisa_cgm(mostra)
+    {
+        if(mostra==true){
+            js_OpenJanelaIframe('','db_iframe_cgm','func_cgmordenador.php?funcao_js=parent.js_mostracgmordenador1|z01_numcgm|z01_nome|tipo','Pesquisa',true);
+        }else{
+            if(document.form1.o41_cgmordenador.value != ''){
+                js_OpenJanelaIframe('','db_iframe_cgm','func_cgmordenador.php?pesquisa_chave='+document.form1.o41_cgmordenador.value+'&funcao_js=parent.js_mostracgmordenador','Pesquisa',false);
+            }else{
+                document.form1.o41_cgmordenadordescr.value = '';
+            }
+        }
+    }
+
+    function js_mostracgmordenador(erro, chave,chave2)
+    { 
+        if (chave2 == 'JURIDICA') {
+            alert("É obrigatório que o ordenador seja uma pessoa física.")
+            document.form1.o41_cgmordenador.value = '';
+            document.form1.o41_cgmordenadordescr.value = '';
+            document.form1.o41_cgmordenador.focus();
+        } else {
+            document.form1.o41_cgmordenadordescr.value = chave;
+        }
+        if (erro == true) {
+            document.form1.o41_cgmordenador.focus();
+            document.form1.o41_cgmordenador.value = '';
+        }
+    }
+
+    function js_mostracgmordenador1(chave, chave1,chave2) 
+    {
+       
+        if (chave2 == 'JURIDICA') {
+            alert("É obrigatório que o ordenador seja uma pessoa física.")
+            document.form1.o41_cgmordenador.value = '';
+            document.form1.o41_cgmordenadordescr.value = '';
+            return false;
+        } else {
+            document.form1.o41_cgmordenador.value = chave;
+            document.form1.o41_cgmordenadordescr.value = chave1;
+            db_iframe_cgm.hide();
+        }
+      
+    }
+
     function js_naoimprimir() {
         if (!document.querySelector('#e54_codcom').value) {
             alert("Campo Tipo de Compra nao Informado.")
@@ -1216,6 +1424,15 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
     }
 
     function js_valida() {
+
+        var obrigaDivida = obrigaPreenchimentoDivida();
+        document.getElementById('obriga_divida').value = obrigaDivida;
+
+
+        if (!document.querySelector('#o41_cgmordenador').value || document.querySelector('#o41_cgmordenador').value == 0) {
+            alert("É obrigatório informar o ordenador da despesa!")
+            return false;
+        }
         if (!document.querySelector('#e54_codcom').value) {
             alert("Campo Tipo de Compra nao Informado.")
             return false;
@@ -1506,7 +1723,9 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
         }
         $('e54_destin').style.width = "68.6%";
         $('e60_numconvenio').style.width = "10%";
+        $('op01_numerocontratoopc').style.width = "10%";
         $('c206_objetoconvenio').style.width = "58%";
+        $('op01_text_numerocontratoopc').style.width = "58%";
         $('e54_gestaut').style.width = "10%";
         $('e54_nomedodepartamento').style.width = "58%";
         $('e57_codhist').style.width = "10%";
@@ -1522,11 +1741,13 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
         $('ac16_resumoobjeto').style.width = "58%";
         $('e54_codtipodescr').style.width = "58%";
         $('e44_tipo').style.width = "68.4%";
-        $('e56_codele2').style.width = "51.5%";
+        $('e56_codele2').style.width = "52.5%";
         $('e60_tipodespesa').style.width = "68.6%";
         $('efd60_cessaomaoobra').style.width = "68.6%";
         $('e60_emendaparlamentar').style.width = "68.6%";
         $('e60_esferaemendaparlamentar').style.width = "68.6%";
+        $('o41_cgmordenador').style.width = "10%";     
+        $('o41_cgmordenadordescr').style.width = "58%";
         $('e60_datasentenca').style.width = "10%";
 
     } else {
@@ -1540,6 +1761,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
         }
         $('e54_destin').style.width = "68.6%";
         $('e60_numconvenio').style.width = "10%";
+        $('op01_numerocontratoopc').style.width = "10%";
         $('e54_codcomdescr').style.width = "58%";
         $('e54_tipol2').style.width = "68.6%";
         $('e54_nummodalidade').style.width = "45%";
@@ -1552,6 +1774,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
         $('e60_resumo').style.width = "100%";
         $('e50_obs').style.width = "100%";
         $('c206_objetoconvenio').style.width = "58%";
+        $('op01_text_numerocontratoopc').style.width = "58%";
         $('e54_gestaut').style.width = "10%";
         $('e54_nomedodepartamento').style.width = "58%";
         $('e57_codhist').style.width = "10%";
@@ -1567,5 +1790,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
         if (aquisicaoprodrural !== null) {
             $('efd60_aquisicaoprodrural').style.width = "68.6%";
         }
+        $('o41_cgmordenadordescr').style.width = "58%";
+        $('o41_cgmordenador').style.width = "10%";
     }
 </script>

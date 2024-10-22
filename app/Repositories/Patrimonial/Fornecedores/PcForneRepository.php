@@ -6,6 +6,7 @@ use App\Models\PcForne;
 use App\Repositories\Contracts\Patrimonial\Fornecedores\PcForneRepositoryInterface;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Capsule\Manager as DB;
 
 class PcForneRepository implements PcForneRepositoryInterface
 {
@@ -69,4 +70,27 @@ class PcForneRepository implements PcForneRepositoryInterface
 
         return $result;
     }
+
+    /**
+     *
+     * @param array $aDados - dados dos fornecedor
+     * @return bool
+     */
+
+    public function cadastroAutomatico($aDados)
+    {
+        return DB::table('pcforne')->insert($aDados);
+    }
+
+    /**
+     *
+     * @param int $cgm - cgm
+     * @return PcForne
+     */
+
+    public function get($cgm)
+    {
+        return $this->model->find($cgm);
+    }
+    
 }

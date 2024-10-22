@@ -35,7 +35,7 @@ class PcprocService
         $pcproc['pcproc']->pc80_resumo = utf8_encode($rsPcproc[0]->pc80_resumo);
         $pcproc['pcproc']->usuario = utf8_encode($rsPcproc[0]->nome);
 
-        $rsPcprocItem = $this->pcprocitemRepository->getItens($codproc);
+        $rsPcprocItem = $this->pcprocitemRepository->getItensLicitacao($codproc);
 
         $pcproc['itens'] = $this->formatItems($rsPcprocItem);
 
@@ -63,7 +63,6 @@ class PcprocService
             $oItem->pc81_codprocitem = $item->pc81_codprocitem;
             $pcprocitem[] = $oItem;
         }
-
         return $pcprocitem;
     }
 }

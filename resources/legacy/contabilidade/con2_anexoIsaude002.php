@@ -28,21 +28,28 @@
 require_once("dbforms/db_funcoes.php");
 require_once "libs/db_stdlib.php";
 require_once "libs/db_conecta.php";
-include_once "libs/db_sessoes.php";
-include_once "libs/db_usuariosonline.php";
-include("libs/db_liborcamento.php");
-include("libs/db_libcontabilidade.php");
-include("libs/db_sql.php");
+require_once "libs/db_sessoes.php";
+require_once "libs/db_usuariosonline.php";
+require_once("libs/db_liborcamento.php");
+require_once("libs/db_libcontabilidade.php");
 require_once("classes/db_empresto_classe.php");
 require_once("classes/db_cgm_classe.php");
 require_once("classes/db_orcelemento_classe.php");
 require_once("classes/db_orcprojativ_classe.php");
 require_once("classes/db_orcdotacao_classe.php");
+require_once("model/contabilidade/relatorios/ensino/RelatorioReceitaeDespesaEnsino.model.php");
+require_once("libs/db_sql.php");
+require_once("classes/db_dadosexercicioanterior_classe.php");
+
+use Mpdf\Mpdf;
+use Mpdf\MpdfException;
 $clempresto = new cl_empresto;
 $clrotulo = new rotulocampo;
 $clorcelemento = new cl_orcelemento;
 $clorcprojativ = new cl_orcprojativ;
 $clselorcdotacao = new cl_selorcdotacao();
+$oReceitaeDespesaSaude = new RelatorioReceitaeDespesaEnsino();
+$cldadosexercicioanterior = new cl_dadosexercicioanterior;
 
 db_postmemory($HTTP_POST_VARS);
 
@@ -64,6 +71,11 @@ db_inicio_transacao();
 $sWhereReceita      = "o70_instit in ({$instits})";
 $oReceitas = db_receitasaldo(11, 1, 3, true, $sWhereReceita, $anousu, $dtini, $dtfim, false, ' * ', true, 0);
 $aReceitas = db_utils::getColectionByRecord($oReceitas);
+
+$sWhereDespesa      = " o58_instit in({$instits})";
+//Aqui passo o(s) exercicio(s) e a funcao faz o sql para cada exercicio
+criaWorkDotacao($sWhereDespesa,array($anousu), $dtini, $dtfim);
+
 $fIPTR = 0;
 $fIPTU = 0;
 $fIRRF = 0;
@@ -134,7 +146,7 @@ $fISO = 0;
 
 if ($anousu >=2022){
     $aReceitasImpostosIPTU = array(
-        array('(-) Deduções da Receita do IPTU', 'text', '49%11125001%',''),
+        array('(-) Deduções da Receita do IPTU', 'text', '49%111250%',''),
     );
     $aReceitasImpostosITBI = array(
         array('(-) Deduções da Receita do ITBI', 'text', '49%1112530%',''),
@@ -266,7 +278,7 @@ criarWorkReceita($sWhereReceita, array($anousu), $dtini, $dtfim);
 $agrupa_estrutural = false;
 $encerramento = false;
 $where = " c61_instit in ({$instits})";
-$where .= " and (c61_codigo = '102' or c61_codigo = '1102' or c61_codigo = '15000002') ";
+$where .= " and (c61_codigo = '102' or c61_codigo = '1102' or c61_codigo = '2102' or c61_codigo = '202' or c61_codigo = '15000002' or c61_codigo = '25000002') ";
 
 $result = db_planocontassaldo_matriz(db_getsession("DB_anousu"), ($DBtxt21_ano . '-' . $DBtxt21_mes . '-' . $DBtxt21_dia), $dtfim, false, $where);
 
@@ -489,7 +501,9 @@ if (($total_rp_proc + $total_rp_nproc) < $total_anterior || $total_mov_pagmento 
     $iRestosAPagar = $total_mov_pagmento - $total_anterior;
 }
 //
-$mPDF = new \Mpdf\Mpdf([
+
+try {
+$mPDF = new Mpdf([
     'mode' => '',
     'format' => 'A4',
     'orientation' => 'L',
@@ -508,7 +522,7 @@ $header = <<<HEADER
       <th>{$oInstit->getDescricao()}</th>
     </tr>
     <tr>
-      <th>ANEXO I - B</th>
+      <th>ANEXO IV</th>
     </tr>
     <tr>
       <td style="text-align:right;font-size:10px;font-style:oblique;">Período: De {$DBtxt21} a {$DBtxt22}</td>
@@ -843,6 +857,48 @@ ob_start();
             vertical-align: bottom;
             white-space: nowrap;
         }
+
+        .ritz .waffle .s23 {
+            background-color: #d8d8d8;
+            border-bottom: 1px SOLID #000000;
+            border-right: 1px SOLID #000000;
+            color: #000000;
+            direction: ltr;
+            font-family: 'Calibri', Arial;
+            font-size: 11pt;
+            font-weight: bold;
+            padding: 2px 3px 2px 3px;
+            text-align: center;
+            vertical-align: bottom;
+            white-space: nowrap;
+        }
+
+        .ritz .waffle .s24 {
+            background-color: #ffffff;
+            color: #000000;
+            direction: ltr;
+            font-family: 'Calibri', Arial;
+            font-size: 11pt;
+            font-weight: bold;
+            padding: 2px 3px 2px 3px;
+            text-align: center;
+            vertical-align: bottom;
+            white-space: nowrap;
+        }
+
+        .ritz .waffle .s25 {
+            background-color: #ffffff;
+            border-bottom: 1px SOLID #000000;
+            color: #000000;
+            direction: ltr;
+            font-family: 'Calibri', Arial;
+            font-size: 11pt;
+            font-weight: bold;
+            padding: 2px 3px 2px 3px;
+            text-align: center;
+            vertical-align: bottom;
+            white-space: nowrap;
+        }
     </style>
 
 </head>
@@ -871,16 +927,16 @@ ob_start();
                         <td class="s3 bdleft bdtop" colspan="10">&nbsp;</td>
                     </tr>
                     <tr style='height:20px;'>
-                        <td class="s4 bdleft" colspan="10">DEMONSTRATIVO DA APLICAÇÃO EM AÇÕES E SERVIÇOS PÚBLICOS DE SAÚDE</td>
+                        <td class="s4 bdleft" colspan="10">Demonstrativo das Receitas e Despesas com Ações e Serviços Públicos de Saúde</td>
                     </tr>
                     <tr style='height:20px;'>
-                        <td class="s4 bdleft" colspan="10">(ART. 198, § 2.º, III, DA CF/88)</td>
+                        <td class="s4 bdleft" colspan="10">(Art. 198, §2º, III da CF, LC 141/2012 e IN 05/2012)</td>
                     </tr>
                     <tr style='height:20px;'>
                         <td class="s5 bdleft" colspan="10">&nbsp;</td>
                     </tr>
                     <tr style='height:20px;'>
-                        <td class="s6 bdleft" colspan="8">1 - Receita de impostos </td>
+                        <td class="s6 bdleft" colspan="8">1 - RECEITA DE IMPOSTOS</td>
                         <td class="s3" colspan="2"></td>
                     </tr>
                     <tr style='height:20px;'>
@@ -973,12 +1029,12 @@ ob_start();
                     echo "<tr style='height:20px;'>";
                     echo "<td class='s6 bdleft' colspan='8'>{$receita[0]}</td>";
                     echo "<td class='s9' colspan='2'>";
-                    $aReceitas = getSaldoReceita(null, "sum(saldo_arrecadado_acumulado) as saldo_arrecadado_acumulado", null, "o57_fonte like '49%11125001%'");
+                    $aReceitas = getSaldoReceita(null, "sum(saldo_arrecadado_acumulado) as saldo_arrecadado_acumulado", null, "o57_fonte like '49%1112500%'");
                     $nReceita = count($aReceitas) > 0 ? $aReceitas[0]->saldo_arrecadado_acumulado : 0;
 
                     $nTotalReceitaDeducao = 0;
                     if($receita[3] != ''){
-                        $aReceitasDeducao = getSaldoReceita(null, "sum(saldo_arrecadado_acumulado) as saldo_arrecadado_acumulado", null, "o57_fonte like '49%11125001%'");
+                        $aReceitasDeducao = getSaldoReceita(null, "sum(saldo_arrecadado_acumulado) as saldo_arrecadado_acumulado", null, "o57_fonte like '49%1112500%'");
                         $nTotalReceitaDeducao = count($aReceitasDeducao) > 0 ? $aReceitasDeducao[0]->saldo_arrecadado_acumulado : 0;
                     }
                     $nTotalReceita = $nReceita + $nTotalReceitaDeducao;
@@ -1492,7 +1548,7 @@ ob_start();
                     </tr>
                      <!-- Cota -->
                      <tr style='height:20px;'>
-                        <td class="s6 bdleft" colspan="8">2 -    Receita de transferências constitucionais e legais</td>
+                        <td class="s6 bdleft" colspan="8">2 - RECEITA DE TRANSFERÊNCIAS CONSTITUCIONAIS E LEGAIS</td>
                         <td class="s3" colspan="2"></td>
                     </tr>
                     <tr style='height:20px;'>
@@ -1582,41 +1638,332 @@ ob_start();
                     </tr>
 
                     <tr style='height:20px;'>
-                        <td class="s20 bdleft" colspan="8">02 - Total das Receitas (A+B)</td>
+                        <td class="s20 bdleft" colspan="8">Total das Receitas (A)</td>
                         <td class="s21" colspan="2"><?php $fTotalReceitas = ($fSubTotalImposto + $fSubTotalOutrasCorrentes) - (abs($fTotalDeducoes));
                                                     echo db_formatar($fTotalReceitas, "f"); ?> </td>
                     </tr>
+                </tbody>
+                <tbody>
                     <tr style='height:20px;'>
-                        <td class="s20 bdleft" colspan="8">03 - Valor legal de Aplicação em Ações e Serviços de Saúde</td>
-                        <td class="s21" colspan="2"><?php echo db_formatar($fTotalReceitas * 0.15, "f"); ?></td>
+                        <td class="" colspan="10">&nbsp;</td>
                     </tr>
                     <tr style='height:20px;'>
-                        <?php
-                        db_query("drop table if exists work_receita");
-                        db_fim_transacao();
-                        $fTotalAnexoII = getTotalAnexoIISaude($instits, $dtini, $dtfim, $anousu);
-                        ?>
-                        <td class="s20 bdleft" dir="ltr" colspan="8">04 - Aplicação no exercício</td>
-                        <td class="s21" colspan="2"><?= db_formatar($fTotalAnexoII, "f") ?></td>
+                        <td class="s24" colspan="10">Resumo da Aplicação das Ações e Serviços Públicos de Saúde</td>
                     </tr>
+                    <tr style='height:20px;'>
+                        <td class="s25" colspan="10">&nbsp;</td>
+                    </tr>
+                    <tr style='height:20px;'>
+                        <td class="s23 bdleft" colspan="7">Exercício Atual</td>
+                        <td class="s23" colspan="2">Valor</td>
+                        <td class="s23" colspan="2">Percentual</td>
+                    </tr>
+                    <?php
+                     $funcaoTotal = 0;
+                     $fTotalGeral = 0;
+                     $fProgTotal  = 0;
+                     $aSubTotal   = array();
+                     $aSubFuncoes = array(122,128,271,272,273,301,302,303,304,305,306,511,512,843,844);
+                     $sFuncao     = "'10','28'";
+                     $aFonte      = array("'15000002','25000002','1102','102','2102','202'");
+                     foreach ($aSubFuncoes as $iSubFuncao) {
+                        $sDescrSubfunao = db_utils::fieldsMemory(db_query("select o53_descr from orcsubfuncao where o53_codtri = '{$iSubFuncao}'"), 0)->o53_descr;
+                        if ($anousu > 2022 )
+                            $aDespesasProgramas = getSaldoDespesa(null, "o58_programa,o58_anousu, coalesce(sum(pago),0) as pago", null, "o58_funcao in ({$sFuncao}) and o58_subfuncao in ({$iSubFuncao}) and o15_codigo in (".implode(",",$aFonte).") and o58_instit in ($instits) group by 1,2");
+                        else
+                            $aDespesasProgramas = getSaldoDespesa(null, "o58_programa,o58_anousu, coalesce(sum(pago),0) as pago", null, "o58_funcao in ({$sFuncao}) and o58_subfuncao in ({$iSubFuncao}) and o15_codtri in (".implode(",",$aFonte).") and o58_instit in ($instits) group by 1,2");
+                            if (count($aDespesasProgramas) > 0) {
+                                foreach ($aDespesasProgramas as $oDespesaPrograma) {
+                                    $funcaoTotal += $oDespesaPrograma->pago;
+                                    $fTotalGeral = $funcaoTotal;
+                                    if (!isset($aSubTotal[$iSubFuncao])) {
+                                    $aSubTotal[$iSubFuncao] = 0;
+                                }
+                                $aSubTotal[$iSubFuncao] += $oDespesaPrograma->pago;
+                                }
+                      }
+                     }
+                     //Linha 1,2,3,4
+                     $funcaoTotal = 0;
+                     $fProgTotal  = 0;
+                     $aSubTotal   = array();
+                     $aSubFuncoes = array(122,128,271,272,273,301,302,303,304,305,306,511,512,843,844);
+                     $sFuncao     = "'10','28'";
+                     $aFonte      = array("'15020002','25020002'");
+                     foreach ($aSubFuncoes as $iSubFuncao) {
+                         $sDescrSubfunao = db_utils::fieldsMemory(db_query("select o53_descr from orcsubfuncao where o53_codtri = '{$iSubFuncao}'"), 0)->o53_descr;
+                         if ($anousu > 2022 )
+                             $aDespesasProgramas = getSaldoDespesa(null, "o58_programa,o58_anousu, coalesce(sum(pago),0) as pago", null, "o58_funcao in ({$sFuncao}) and o58_subfuncao in ({$iSubFuncao}) and o15_codigo in (".implode(",",$aFonte).") and o58_instit in ($instits) group by 1,2");
+                         else
+                             $aDespesasProgramas = getSaldoDespesa(null, "o58_programa,o58_anousu, coalesce(sum(pago),0) as pago", null, "o58_funcao in ({$sFuncao}) and o58_subfuncao in ({$iSubFuncao}) and o15_codtri in (".implode(",",$aFonte).") and o58_instit in ($instits) group by 1,2");
+                         if (count($aDespesasProgramas) > 0) {
+                           foreach ($aDespesasProgramas as $oDespesaPrograma) {
+                             $funcaoTotal += $oDespesaPrograma->pago;
+                             $fTotalGeral = $funcaoTotal;
+                             if (!isset($aSubTotal[$iSubFuncao])) {
+                               $aSubTotal[$iSubFuncao] = 0;
+                           }
+                           $aSubTotal[$iSubFuncao] += $oDespesaPrograma->pago;
+                           }
+                       }
+                     }
+                     @pg_query("drop table work_pl");
+                     //Linha 5 e 6
+                     $valorLinha5    = 0;
+                     $valorLinha5_1  = 0;
+                     $valorLinha5_2  = 0;
+                     $valorLinha6    = 0;
+                     $nLiqAPagar101  = 0;
 
-                    <tr style='height:20px;'>
-                        <?php
-                        db_query("drop table if exists work_receita");
-                        db_fim_transacao();
-                        $fTotalAnexoII = getTotalAnexoIISaude($instits, $dtini, $dtfim, $anousu);
-                        ?>
-                        <td class="s20 bdleft" dir="ltr" colspan="8">05 - Restos a pagar pagos inscritos sem disponibilidade - (Consulta 932.736/2015)</td>
-                        <td class="s21" colspan="2"><?= db_formatar($iRestosAPagar, "f") ?></td>
+                     $dtfimExercicio = db_getsession("DB_anousu")."-12-31";
+                     $aFonte = array("'15000002','25000002','1102','102','2102','202'");
+                     if($dtfim == $dtfimExercicio){
+                         $oReceitaeDespesaSaude->setFontes($aFonte);
+                         $oReceitaeDespesaSaude->setDataInicial($dtini);
+                         $oReceitaeDespesaSaude->setDataFinal($dtfim);
+                         $oReceitaeDespesaSaude->setInstits($instits);
+                         $oReceitaeDespesaSaude->setTipo('ambos');
+                         $valorLinha5_1 = $oReceitaeDespesaSaude->getEmpenhosApagar();
+                     }
+
+                     $aFonte = array("'15020002','25020002'");
+                     if($dtfim == $dtfimExercicio){
+                         $oReceitaeDespesaSaude->setFontes($aFonte);
+                         $oReceitaeDespesaSaude->setDataInicial($dtini);
+                         $oReceitaeDespesaSaude->setDataFinal($dtfim);
+                         $oReceitaeDespesaSaude->setInstits($instits);
+                         $oReceitaeDespesaSaude->setTipo('ambos');
+                         $valorLinha5_2 = $oReceitaeDespesaSaude->getEmpenhosApagar();
+                     }
+
+                     $valorLinha5 = $valorLinha5_1 + $valorLinha5_2;
+                     $valorLinha6  = $valorLinha5 + $fTotalGeral;
+                     //Linha 7
+                     $totalLinha7   = 0;
+                     $totalLinha7_1 = 0;
+                     $totalLinha7_2 = 0;
+                     $totalLinha9   = 0;
+                     $totalLinha9   = $valorLinha6;
+                     $totalLinha7_1 = 0;
+                     $aFonte = array("'15000002','25000002','1102','102','2102','202'");
+                     $oReceitaeDespesaSaude->setFontes($aFonte);
+                     $oReceitaeDespesaSaude->setDataInicial($dtini);
+                     $oReceitaeDespesaSaude->setDataFinal($dtfim);
+                     $oReceitaeDespesaSaude->setInstits($instits);
+                     $oReceitaeDespesaSaude->setTipo('lqd');
+                     $nLiqAPagar101 = $oReceitaeDespesaSaude->getEmpenhosApagar();
+                     $oReceitaeDespesaSaude->setTipo('');
+                     $nNaoLiqAPagar101 = $oReceitaeDespesaSaude->getEmpenhosApagar();
+                     $dadosLinha9      = $oReceitaeDespesaSaude->getLinha10RestosaPagarInscritoSemDis();
+                     $aTotalPago101 = $nLiqAPagar101 + $nNaoLiqAPagar101;
+                     $dtfimExercicio = db_getsession("DB_anousu")."-12-31";
+
+                     if($dtfim == $dtfimExercicio){
+                         $nRPSemDesponibilidade101 = $dadosLinha9['2'];
+
+                         if($nRPSemDesponibilidade101 <= 0){
+                             $totalLinha7_1 = $aTotalPago101;
+                         }
+                         if($nRPSemDesponibilidade101 > 0){
+                             $totalLinha7_1 = $nRPSemDesponibilidade101 - $aTotalPago101;
+                             if($totalLinha7_1 >=0){
+                              $totalLinha7_1 = 0;
+                             }
+                             $totalLinha7_1 = abs($totalLinha7_1);
+                         }
+                     }
+                     $totalLinha7_2 = 0;
+                     $aFonte = array("'15020002','25020002'");
+                     $oReceitaeDespesaSaude->setFontes($aFonte);
+                     $oReceitaeDespesaSaude->setDataInicial($dtini);
+                     $oReceitaeDespesaSaude->setDataFinal($dtfim);
+                     $oReceitaeDespesaSaude->setInstits($instits);
+                     $oReceitaeDespesaSaude->setTipo('lqd');
+                     $nLiqAPagar101 = $oReceitaeDespesaSaude->getEmpenhosApagar();
+                     $oReceitaeDespesaSaude->setTipo('');
+                     $nNaoLiqAPagar101 = $oReceitaeDespesaSaude->getEmpenhosApagar();
+                     $aTotalPago101 = $nLiqAPagar101 + $nNaoLiqAPagar101;
+
+                     $dtfimExercicio = db_getsession("DB_anousu")."-12-31";
+                     if($dtfim == $dtfimExercicio){
+                         $nRPSemDesponibilidade101 = $dadosLinha9['3'];
+
+                         if($nRPSemDesponibilidade101 <= 0){
+                            $totalLinha7_2 = $aTotalPago101;
+                         }
+                         if($nRPSemDesponibilidade101 > 0){
+                             $totalLinha7_2 = $nRPSemDesponibilidade101 - $aTotalPago101;
+                             if($totalLinha7_2 >=0){
+                              $totalLinha7_2 = 0;
+                             }
+                             $totalLinha7_2 = abs($totalLinha7_2);
+                         }
+                     }
+                     $totalLinha7 = $totalLinha7_1 + $totalLinha7_2;
+
+                     $totalLinha9 -= $totalLinha7;
+
+                     // Linha 8
+                     $totalLinha8   = 0;
+                     $totalLinha8_1 = 0;
+                     $totalLinha8_2 = 0;
+                     $total_anterior = 0;
+                     $estrutural     = 0;
+                     $sFonte = ("'102','202','1102', '2102','15000002','25000002'");
+                     $whereLinha8 = " c61_instit in ({$instits}) and c61_codigo in ($sFonte) ";
+                     $resultLinha8 = db_planocontassaldo_matriz(db_getsession("DB_anousu"), $dtini, $dtfim, false, $whereLinha8,'',0);
+
+                     for ($x = 0; $x < pg_numrows($resultLinha8); $x++) {
+                         db_fieldsmemory($resultLinha8, $x);
+
+                         if(substr($estrutural,1,14) == '00000000000000'){
+                             if($sinal_anterior == "C")
+                                $total_anterior -= $saldo_anterior;
+                             else {
+                                $total_anterior += $saldo_anterior;
+                             }
+                         }
+                     }
+
+                     $nValorRecursoImposto = $total_anterior;
+                     $sele_work = " e60_instit in ({$instits}) ";
+                     $sele_work1       = " and e91_recurso in ($sFonte)";
+                     $sql_where_externo = " where $sele_work ";
+                     $sql_order = " order by e91_recurso, e91_numemp ";
+
+                     $clempresto = new cl_empresto;
+                     $sqlempresto = $clempresto->sql_rp_novo(db_getsession("DB_anousu"), $sele_work, $dtini, $dtfim, $sele_work1, $sql_where_externo, $sql_order);
+                     $res = $clempresto->sql_record($sqlempresto);
+                     $rows = $clempresto->numrows;
+                     $total_mov_liqui = 0;
+                     $total_mov_pagmento = 0;
+                     $total_mov_pagnproc = 0;
+                     $total_anterior = 0;
+                     for ($x = 0; $x < $rows; $x++) {
+                         db_fieldsmemory($res, $x);
+
+                         $total_mov_liqui += $e91_vlremp;
+                         $total_mov_pagmento += $vlrpag;
+                         $total_mov_pagnproc += $vlrpagnproc;
+                     }
+                     if ($clempresto->numrows == 0) {
+                        $total_mov_pagmento = 0;
+                        $total_mov_pagnproc = 0;
+                        $nValorRecursoImposto = 0;
+                     }
+                     //R$ 36.418.405,76
+                     $totalLinha8_1 = $total_mov_pagmento + $total_mov_pagnproc - $nValorRecursoImposto;
+                     $sFonte2 = ("'15020002','25020002'");
+                     $where2  = " c61_instit in ({$instits}) and c61_codigo in ($sFonte2) ";
+                     @pg_query("drop table work_pl");
+                     $result2 = db_planocontassaldo_matriz(db_getsession("DB_anousu"), $dtini, $dtfim, false, $where2,'',0);
+
+                     for ($x = 0; $x < pg_numrows($result2); $x++) {
+                         db_fieldsmemory($result2, $x);
+                         if(substr($estrutural,1,14) == '00000000000000'){
+                             if($sinal_anterior == "C")
+                                 $total_anterior -= $saldo_anterior;
+                             else {
+                                 $total_anterior += $saldo_anterior;
+                             }
+                         }
+                     }
+
+                     $nValorRecursoImposto = $total_anterior;
+                     $sele_work = " e60_instit in ({$instits}) ";
+                     $sele_work1       = " and e91_recurso in ($sFonte2)";
+                     $sql_where_externo = " where $sele_work ";
+                     $sql_order = " order by e91_recurso, e91_numemp ";
+
+                     $clempresto = new cl_empresto;
+                     $sqlempresto = $clempresto->sql_rp_novo(db_getsession("DB_anousu"), $sele_work, $dtini, $dtfim, $sele_work1, $sql_where_externo, $sql_order);
+                     $res = $clempresto->sql_record($sqlempresto);
+                     $rows = $clempresto->numrows;
+                     $total_mov_liqui = 0;
+                     $total_mov_pagmento = 0;
+                     $total_mov_pagnproc = 0;
+                     for ($x = 0; $x < $rows; $x++) {
+                         db_fieldsmemory($res, $x);
+                         $total_mov_liqui += $e91_vlremp;
+                         $total_mov_pagmento += $vlrpag;
+                         $total_mov_pagnproc += $vlrpagnproc;
+                     }
+                     if ($clempresto->numrows == 0) {
+                        $total_mov_pagmento = 0;
+                        $total_mov_pagnproc = 0;
+                        $nValorRecursoImposto = 0;
+                     }
+                     $totalLinha8_2 = $total_mov_pagmento + $total_mov_pagnproc - $nValorRecursoImposto;
+                     $totalLinha8 = $totalLinha8_1 + $totalLinha8_2;
+
+                     $totalLinha9 += $totalLinha8;
+                    ?>
+                      <tr style='height:20px;'>
+                        <td class="s6 bdleft" colspan="7">B - Aplicação Devida (art. 7º da LC nº 141/2012)</td>
+                        <td class="s9" colspan="2"><?php echo db_formatar($fTotalReceitas * 0.15, "f"); ?></td>
+                        <td class="s9" colspan="2">15,00%</td>
                     </tr>
                     <tr style='height:20px;'>
-                        <?php
-                        db_query("drop table if exists work_receita");
-                        db_fim_transacao();
-                        $fTotalAnexoII = getTotalAnexoIISaude($instits, $dtini, $dtfim, $anousu);
-                        ?>
-                        <td class="s20 bdleft" dir="ltr" colspan="8">06 - Aplicação total no exercício (Total do Anexo II-B) = <?php echo db_formatar(((($fTotalAnexoII + $iRestosAPagar) / ($fTotalReceitas * 0.15)) * 0.15) * 100, "f"); ?>%</td>
-                        <td class="s21" colspan="2"><?= db_formatar(($fTotalAnexoII + $iRestosAPagar), "f") ?></td>
+                        <td class="s6 bdleft " colspan="7">C - Valor da Aplicação</td>
+                        <td class="s9" colspan="2"><?php echo db_formatar($totalLinha9, "f"); ?></td>
+                        <td class="s9" colspan="2"><?php echo db_formatar(($totalLinha9 * 100) / $fTotalReceitas, "f");?>%</td>
+                    </tr>
+                    <tr style='height:20px;'>
+                        <td class="s20 bdleft " colspan="7">D - Diferença entre o Valor Aplicado e o Limite Constitucional (D = C - B)</td>
+                        <td class="s21" colspan="2"><?php echo db_formatar($totalLinha9 - ($fTotalReceitas * 0.15), "f"); ?></td>
+                        <td class="s21" colspan="2"><?php echo db_formatar((($totalLinha9 * 100) / $fTotalReceitas) - 15, "f"); ?>%</td>
+                    </tr>
+                    <tr style='height:20px;'>
+                        <td class="s5 bdleft" colspan="10">&nbsp;</td>
+                    </tr>
+                    <tr style='height:20px;'>
+                        <td class="s23 bdleft" colspan="8">Resíduo de Exercício Anterior</td>
+                        <td class="s23" colspan="2">Valor</td>
+                    </tr>
+                    <?php
+                           //Linha 1,2,3,4
+                     $funcaoTotal = 0;
+                     $fProgTotal  = 0;
+                     $aSubTotal   = array();
+                     $aSubFuncoes = array(122,128,271,272,273,301,302,303,304,305,306,511,512,843,844);
+                     $sFuncao     = "'10','28'";
+                     $aFonte      = array("'15000002','25000002','1102','102','15020002','25020002','2102','202'");
+                     foreach ($aSubFuncoes as $iSubFuncao) {
+                         $sDescrSubfunao = db_utils::fieldsMemory(db_query("select o53_descr from orcsubfuncao where o53_codtri = '{$iSubFuncao}'"), 0)->o53_descr;
+                         if ($anousu > 2022 )
+                             $aDespesasProgramas = getSaldoDespesa(null, "o58_programa,o58_anousu, coalesce(sum(pago),0) as pago", null, "o58_funcao in ({$sFuncao}) and o58_subfuncao in ({$iSubFuncao}) and o15_codigo in (".implode(",",$aFonte).") and o58_instit in ($instits) and substr(work_dotacao.o58_elemento,4,2) = '96' group by 1,2");
+                         else
+                             $aDespesasProgramas = getSaldoDespesa(null, "o58_programa,o58_anousu, coalesce(sum(pago),0) as pago", null, "o58_funcao in ({$sFuncao}) and o58_subfuncao in ({$iSubFuncao}) and o15_codtri in (".implode(",",$aFonte).") and o58_instit in ($instits) and substr(work_dotacao.o58_elemento,4,2) = '96' group by 1,2");
+                         if (count($aDespesasProgramas) > 0) {
+                           foreach ($aDespesasProgramas as $oDespesaPrograma) {
+                             $funcaoTotal += $oDespesaPrograma->pago;
+                             $fTotalGeral2 = $funcaoTotal;
+                             if (!isset($aSubTotal[$iSubFuncao])) {
+                               $aSubTotal[$iSubFuncao] = 0;
+                           }
+                           $aSubTotal[$iSubFuncao] += $oDespesaPrograma->pago;
+                           }
+                       }
+                     }
+
+                     $anoexercicio = db_getsession('DB_anousu');
+                     $result = $cldadosexercicioanterior->sql_record($cldadosexercicioanterior->sql_query(null, "c235_valornaoaplicsaude",null," c235_anousu = {$anoexercicio} "));
+
+                     if ($cldadosexercicioanterior->numrows != 0) {
+                         db_fieldsmemory($result, 0);
+                     }
+                    ?>
+                    <tr style='height:20px;'>
+                        <td class="s6 bdleft" colspan="8">E - Valor não Aplicado de Exercício Anterior</td>
+                        <td class="s9" colspan="2"><?php echo db_formatar($c235_valornaoaplicsaude, "f"); ?></td>
+                    </tr>
+                    <tr style='height:20px;'>
+                        <td class="s6 bdleft" colspan="8">F - Aplicação no Exercício Atual Referente ao Resíduo de Exercício Anterior</td>
+                        <td class="s9" colspan="2"><?php echo db_formatar($fTotalGeral2, "f"); ?></td>
+                    </tr>
+                    <tr style='height:20px;'>
+                        <td class="s20 bdleft " colspan="8">G - Diferença (F - E) </td>
+                        <td class="s21" colspan="2"><?php echo db_formatar($fTotalGeral2 - $c235_valornaoaplicsaude, "f"); ?></td>
                     </tr>
                 </tbody>
             <?php endif; ?>
@@ -2511,5 +2858,7 @@ $html = ob_get_contents();
 ob_end_clean();
 $mPDF->WriteHTML(utf8_encode($html));
 $mPDF->Output('Anexo I - Saúde', 'I');
-
+} catch (MpdfException $e) {
+    db_redireciona('db_erros.php?fechar=true&db_erro='.$e->getMessage());
+}
 ?>

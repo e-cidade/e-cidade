@@ -75,7 +75,7 @@ DBViewGeracaoAutorizacao = function (sInstancia, oNode, iTipoOrigemDados) {
          * Solicitação de Compras
          */
         case '2':
-            me.sRPC = 'sol4_geraAutorizacoes.RPC.php';
+            me.sRPC = 'com1_geraAutorizacoes.RPC.php';
             me.sArquivoOrigem = 'com1_geraautorizacao001.php';
             me.sTipoOrigem    = "Solicitação de Compras";
             break;
@@ -336,9 +336,9 @@ DBViewGeracaoAutorizacao = function (sInstancia, oNode, iTipoOrigemDados) {
             $('db_iframe_liclicita').style.zIndex = '10000';
 
         });
-        
+
         $('oTxtLicitacaoCodigo').observe('change', function() {
-            let codigoTipoCompraTribunal = $('oTxtTipoCompra').value;        
+            let codigoTipoCompraTribunal = $('oTxtTipoCompra').value;
             js_OpenJanelaIframe('', 'db_iframe_liclicita', 'func_liclicita.php?licitacaoemandamento='+true+'codigotipocompratribunal=' + codigoTipoCompraTribunal + '&autoriza=true&pesquisa_chave=' +
             $F('oTxtLicitacaoCodigo') + '&funcao_js=parent.js_mostraLicitacao','Pesquisa', false);
 
@@ -366,7 +366,7 @@ DBViewGeracaoAutorizacao = function (sInstancia, oNode, iTipoOrigemDados) {
                 const oRetorno = eval("(" + oResponse.responseText + ")");
                 let codigoTipoCompraTribunal = oRetorno.tipocompratribunal;
                 let tipolicitacaooutrosorgaos;
-    
+
                 /* Verificando o tipo da licitação com base no código do tribunal*/
                 switch(codigoTipoCompraTribunal) {
                     case "105":
@@ -380,7 +380,7 @@ DBViewGeracaoAutorizacao = function (sInstancia, oNode, iTipoOrigemDados) {
                         break;
                     case "108":
                         tipolicitacaooutrosorgaos = 8;
-                        break;                
+                        break;
                     case "109":
                         tipolicitacaooutrosorgaos = 9;
                         break;
@@ -392,7 +392,7 @@ DBViewGeracaoAutorizacao = function (sInstancia, oNode, iTipoOrigemDados) {
                     $('db_iframe_liclicitaoutrosorgaos').style.zIndex = '10000';
                     return;
                 }
-    
+
                 let sOpenWindow = "func_liclicitaoutrosorgaos.php?tipolicitacaooutrosorgaos=" + tipolicitacaooutrosorgaos + "&poo=true&pesquisa_chave="+$F('oTxtLicoutrosorgaosCod')+"&funcao_js=parent.js_mostrarlicoutroorgao";
                 js_OpenJanelaIframe('','db_iframe_liclicitaoutrosorgaos', sOpenWindow, 'Licitação de Outros Órgãos',false);
                 $('db_iframe_liclicitaoutrosorgaos').style.zIndex = '10000';
@@ -860,7 +860,7 @@ DBViewGeracaoAutorizacao = function (sInstancia, oNode, iTipoOrigemDados) {
                          * Item possui anulação na solicitação de compras
                          */
                         if(oItem.itemanulado != ""){
-                           
+
                             var sTextoInformacao = "Item indisponível para autorizar. Há anulação do item na solicitação de compras.";
                         }
 
@@ -1797,7 +1797,7 @@ DBViewGeracaoAutorizacao = function (sInstancia, oNode, iTipoOrigemDados) {
   }
 
   this.preencheLicitacao = function(oRetorno){
-            
+
     $('oTxtNumeroLicitacao').value  = oRetorno.numerolicitacao;
     $('oTxtModalidade').value       = oRetorno.l20_numero;
 

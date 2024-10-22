@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Redesim007 extends AbstractMigration
+class Redesim007 extends PostgresMigration
 {
 
     public function up()

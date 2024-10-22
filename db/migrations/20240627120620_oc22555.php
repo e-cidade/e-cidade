@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc22555 extends AbstractMigration
+class Oc22555 extends PostgresMigration
 {
     public function up()
     {
@@ -12,7 +12,7 @@ class Oc22555 extends AbstractMigration
         SELECT fc_startsession();
 
         ALTER TABLE caixa.saltes ADD k13_dtreativacaoconta date NULL;
-          
+
         COMMIT;
 
 SQL;

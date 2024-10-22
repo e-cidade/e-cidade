@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Additenshistoricomaterial extends AbstractMigration
+class Additenshistoricomaterial extends PostgresMigration
 {
 
     public function getItensSicom(){

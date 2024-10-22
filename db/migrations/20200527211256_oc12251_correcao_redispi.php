@@ -1,15 +1,15 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc12251CorrecaoRedispi extends AbstractMigration
+class Oc12251CorrecaoRedispi extends PostgresMigration
 {
     public function up()
     {
 		$sql = "
-				-- 
+				--
 				-- Tabela redispi122020
-				-- 
+				--
 					DROP TABLE redispi122020;
 				  	CREATE TABLE redispi122020(
 						si185_sequencial bigint DEFAULT 0 NOT NULL,
@@ -36,22 +36,22 @@ class Oc12251CorrecaoRedispi extends AbstractMigration
 						si185_mes bigint DEFAULT 0 NOT NULL,
 						si185_instit bigint DEFAULT 0
 				  	);
-				  
+
 				  	ALTER TABLE redispi122020 OWNER TO dbportal;
-				  
+
 					--
 					-- Name: redispi122020_si185_sequencial_seq; Type: SEQUENCE; Schema: public; Owner: dbportal
 					--
-				  
+
 				  	DROP SEQUENCE redispi122020_si185_sequencial_seq;
-				  	
+
 					CREATE SEQUENCE redispi122020_si185_sequencial_seq
 						START WITH 1
 						INCREMENT BY 1
 						NO MINVALUE
 						NO MAXVALUE
 						CACHE 1;
-				
+
 				  	ALTER TABLE redispi122020_si185_sequencial_seq OWNER TO dbportal;
 				  	ALTER TABLE ONLY redispi122020 ADD CONSTRAINT redispi122020_sequ_pk PRIMARY KEY (si185_sequencial);
 				  	ALTER TABLE ONLY redispi122020

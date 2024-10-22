@@ -50,14 +50,14 @@ function execucaoDeContratosQuebraPorEmpenho($aMateriais,$iFonte,$iAlt,$iAcordo,
                 foreach($oExecucaoDeContratos->quantidadeTotalEmOrdensDeCompra((int)$oEmp->codigoempenho,(int)$oItem->codigo_material) as $oOrdem){
 
                     if($oOrdem->quantidadeAnulada > 0){
-                        $iQtdEmOrdem = $oOrdem->quantidade - $oOrdem->quantidadeAnulada;
+                        $iQtdEmOrdem += $oOrdem->quantidade - $oOrdem->quantidadeAnulada;
                         $iQtdEmOrdemAnulado = $oOrdem->quantidadeAnulada;
                         $iVlrEmOrdemAnulado = $oOrdem->quantidadeAnulada * $sVlrUnitarioPosicao;
                         $iVlrEmOrdem = ($sVlrUnitarioPosicao * $oOrdem->quantidade) - $iVlrEmOrdemAnulado;
-                        $iVlrOrdem = $oOrdem->quantidadeAnulada * $oOrdem->valor;
+                        $iVlrOrdem += $oOrdem->quantidadeAnulada * $oOrdem->valor;
                     }else{
-                        $iQtdEmOrdem = $oOrdem->quantidade;
-                        $iVlrEmOrdem = $oOrdem->valor;
+                        $iQtdEmOrdem += $oOrdem->quantidade;
+                        $iVlrEmOrdem += $oOrdem->valor;
                     }
                 };
 

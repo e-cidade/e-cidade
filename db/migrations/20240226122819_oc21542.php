@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc21542 extends AbstractMigration
+class Oc21542 extends PostgresMigration
 {
     public function up()
     {
@@ -10,7 +10,7 @@ class Oc21542 extends AbstractMigration
 
         DROP TABLE public.flpgo122024;
         DROP TABLE public.flpgo112024;
-        
+
         -- public.flpgo102024 definition
 
         -- Drop table
@@ -168,7 +168,7 @@ class Oc21542 extends AbstractMigration
             MINVALUE 1
             MAXVALUE 9223372036854775807
             START 1;
-                
+
 
         -- public.respinf2024_si197_sequencial_seq definition
 

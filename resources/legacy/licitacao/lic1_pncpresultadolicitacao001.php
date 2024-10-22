@@ -11,6 +11,7 @@ include("dbforms/db_funcoes.php");
 include("classes/db_condataconf_classe.php");
 include("classes/db_liclicitasituacao_classe.php");
 include("classes/db_licitemobra_classe.php");
+require_once("libs/renderComponents/index.php");
 db_postmemory($HTTP_POST_VARS);
 ?>
 <html>
@@ -27,6 +28,12 @@ db_postmemory($HTTP_POST_VARS);
     db_app::load("time.js");
     db_app::load("estilos.css, grid.style.css");
     ?>
+
+    <script type="text/javascript">
+        loadComponents([
+            'buttonsSolid',
+        ]);
+    </script>
 </head>
 
 <body bgcolor=#CCCCCC leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="a=1">

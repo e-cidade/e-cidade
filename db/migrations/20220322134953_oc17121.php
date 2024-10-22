@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc17121 extends AbstractMigration
+class Oc17121 extends PostgresMigration
 {
     public function up()
     {
@@ -34,7 +34,7 @@ class Oc17121 extends AbstractMigration
           AND substr(c60_estrut,1,13) NOT IN
               (SELECT o56_elemento FROM orcelemento
               WHERE o56_anousu = c60_anousu);
-        
+
         COMMIT;
         ";
 

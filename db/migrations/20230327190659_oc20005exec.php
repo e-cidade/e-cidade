@@ -1,24 +1,24 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc20005exec extends AbstractMigration
+class Oc20005exec extends PostgresMigration
 {
     public function up()
     {
         $sql = "ALTER TABLE bpdcasp102022 ADD si208_vlativocircudemaiscredicurtoprazo float8 NOT NULL DEFAULT 0;
-                ALTER TABLE bpdcasp102022 ADD si208_vlativonaocircumantidovenda float8 NOT NULL DEFAULT 0;        
+                ALTER TABLE bpdcasp102022 ADD si208_vlativonaocircumantidovenda float8 NOT NULL DEFAULT 0;
                 ALTER TABLE bpdcasp102022 ADD si208_vlativonaocircurlp float8 NOT NULL DEFAULT 0;
                 ALTER TABLE bpdcasp102022 ADD si208_vlativocircuativobio float8 NOT NULL DEFAULT 0;
                 ALTER TABLE bpdcasp102023 ADD si208_vlativocircudemaiscredicurtoprazo float8 NOT NULL DEFAULT 0;
-                ALTER TABLE bpdcasp102023 ADD si208_vlativonaocircumantidovenda float8 NOT NULL DEFAULT 0;        
+                ALTER TABLE bpdcasp102023 ADD si208_vlativonaocircumantidovenda float8 NOT NULL DEFAULT 0;
                 ALTER TABLE bpdcasp102023 ADD si208_vlativonaocircurlp float8 NOT NULL DEFAULT 0;
                 ALTER TABLE bpdcasp102023 ADD si208_vlativocircuativobio float8 NOT NULL DEFAULT 0;
 
                 ALTER TABLE bpdcasp102022 ALTER COLUMN si208_exercicio DROP NOT NULL;
                 ALTER TABLE bpdcasp102022 ALTER COLUMN si208_vlativonaocircucredilongoprazo DROP NOT NULL;
                 ALTER TABLE bpdcasp102022 ALTER COLUMN si208_vlativonaocircuinvestemplongpraz DROP NOT NULL;
-                
+
                 ALTER TABLE bpdcasp102023 DROP COLUMN si208_exercicio;
                 ALTER TABLE bpdcasp102023 DROP COLUMN si208_vlativonaocircucredilongoprazo;
                 ALTER TABLE bpdcasp102023 DROP COLUMN si208_vlativonaocircuinvestemplongpraz;

@@ -237,12 +237,19 @@ $oAssintaraDigital = new AssinaturaDigital();
     //--------------------------------
     function js_solicitarImpressaoComAssinatura() {
         obj = document.form1;
-        if (obj.k17_codigo_de.value == '') {
-            alert("Selecione um SLIP!");
+        if (obj.k17_codigo_de.value == '' && dtini.value == '') {
+            alert("Selecione um SLIP ou uma Data!");
             return;
         }
         var oParametros = new Object();
         oParametros.k17_codigo_de = obj.k17_codigo_de.value;
+        oParametros.k17_codigo_ate = obj.k17_codigo_ate.value;
+        if ((obj.dtini.value != '')) {
+            oParametros.dtini=trata_data(obj.dtini.value);
+        }
+        if (obj.dtfim.value != '') {
+            oParametros.dtfim=trata_data(obj.dtfim.value);
+        }
         oParametros.method = 'post';
         oParametros.sExecuta = 'imprimirDocumentoAssinadoSlip';
         window.open('con1_assinaturaDigitalDocumentos.RPC.php?json=' + encodeURIComponent(JSON.stringify(oParametros)), "_blank");

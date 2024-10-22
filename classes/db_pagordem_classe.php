@@ -71,6 +71,8 @@ class cl_pagordem {
    var $e50_dtvencimento_mes = null;
    var $e50_dtvencimento_ano = null;
    var $e50_numliquidacao = null;
+   var $e50_contafornecedor = 0;
+   var $e50_numcgmordenador = null;
    // cria propriedade com as variaveis do arquivo
    var $campos = "
                  e50_codord = int4 = Ordem
@@ -93,6 +95,8 @@ class cl_pagordem {
                  e50_naturezabemservico = int4 = Codigo de Natureza de Bem ou Serviço
                  e50_dtvencimento = date = Vencimento
                  e50_numliquidacao = int8 = Número da Liquidação
+                 e50_contafornecedor = int8 = Conta do Fornecedor
+                 e50_numcgmordenador = int8 = Numero do CGM do Ordenador
                  ";
    //funcao construtor da classe
    function cl_pagordem() {
@@ -144,13 +148,16 @@ class cl_pagordem {
        $this->e50_datacompetencia = ($this->e50_datacompetencia == ""?@$GLOBALS["HTTP_POST_VARS"]["e50_datacompetencia"]:$this->e50_datacompetencia);
        $this->e50_retencaoir = ($this->e50_retencaoir == ""?@$GLOBALS["HTTP_POST_VARS"]["e50_retencaoir"]:$this->e50_retencaoir) == 'sim' ? 1 : 0; 
        $this->e50_naturezabemservico = ($this->e50_naturezabemservico == ""?@$GLOBALS["HTTP_POST_VARS"]["e50_naturezabemservico"]:$this->e50_naturezabemservico);
-       $this->e50_numliquidacao = ($this->e50_numliquidacao == ""?@$GLOBALS["HTTP_POST_VARS"]["e50_numliquidacao"]:$this->e50_numliquidacao);       if($this->e50_compdesp == ""){
+       $this->e50_numliquidacao = ($this->e50_numliquidacao == ""?@$GLOBALS["HTTP_POST_VARS"]["e50_numliquidacao"]:$this->e50_numliquidacao);       
+       $this->e50_numcgmordenador = ($this->e50_numcgmordenador == ""?@$GLOBALS["HTTP_POST_VARS"]["e50_numcgmordenador"]:$this->e50_numcgmordenador);       
+       if($this->e50_compdesp == ""){ 
         $this->e50_compdesp_dia = ($this->e50_compdesp_dia == ""?@$GLOBALS["HTTP_POST_VARS"]["e50_compdesp_dia"]:$this->e50_compdesp_dia);
         $this->e50_compdesp_mes = ($this->e50_compdesp_mes == ""?@$GLOBALS["HTTP_POST_VARS"]["e50_compdesp_mes"]:$this->e50_compdesp_mes);
         $this->e50_compdesp_ano = ($this->e50_compdesp_ano == ""?@$GLOBALS["HTTP_POST_VARS"]["e50_compdesp_ano"]:$this->e50_compdesp_ano);
         if($this->e50_compdesp_dia != ""){
            $this->e50_compdesp = $this->e50_compdesp_ano."-".$this->e50_compdesp_mes."-".$this->e50_compdesp_dia;
         }
+        $this->e50_contafornecedor = ($this->e50_contafornecedor == ""?@$GLOBALS["HTTP_POST_VARS"]["e50_contafornecedor"]:$this->e50_contafornecedor);
       }
      }else{
        $this->e50_codord = ($this->e50_codord == ""?@$GLOBALS["HTTP_POST_VARS"]["e50_codord"]:$this->e50_codord);
@@ -245,6 +252,20 @@ class cl_pagordem {
       $this->erro_status = "0";
       return false;
     }
+    if($this->e50_numcgmordenador == null ){
+      $this->erro_sql = " Campo Ordenador da Liquidação.";
+      $this->erro_campo = "e50_numcgmordenador";
+      $this->erro_banco = "";
+      $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+      $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+      $this->erro_status = "0";
+      return false;
+    }
+
+    if($this->e50_contafornecedor == null ||  $this->e50_contafornecedor == ""){
+      $this->e50_contafornecedor = 0;
+    }
+
      $sql = "insert into pagordem(
                                        e50_codord
                                       ,e50_numemp
@@ -266,6 +287,8 @@ class cl_pagordem {
                                       ,e50_naturezabemservico
                                       ,e50_dtvencimento
                                       ,e50_numliquidacao
+                                      ,e50_contafornecedor
+                                      ,e50_numcgmordenador
                        )
                 values (
                                 $this->e50_codord
@@ -288,8 +311,10 @@ class cl_pagordem {
                                ,".($this->e50_naturezabemservico == "null" || $this->e50_naturezabemservico == ""?"null":"'".$this->e50_naturezabemservico."'")."
                                ,".($this->e50_dtvencimento == "null" || $this->e50_dtvencimento == ""?"null":"'".$this->e50_dtvencimento."'")."
                                ,$this->e50_numliquidacao
+                               ,$this->e50_contafornecedor
+                               ,$this->e50_numcgmordenador
                       )";
-                //  echo $sql;exit;
+                
      $result = db_query($sql);
      if($result==false){
        $this->erro_banco = str_replace("\n","",@pg_last_error());
@@ -519,7 +544,17 @@ class cl_pagordem {
         $sql  .= $virgula." e50_datacompetencia = null ";
         $virgula = ",";
       }
-      
+      if(trim($this->e50_contafornecedor)!="" || isset($GLOBALS["HTTP_POST_VARS"]["e50_contafornecedor"])){
+        $sql  .= $virgula." e50_contafornecedor = $this->e50_contafornecedor ";
+        $virgula = ",";
+      }
+      if(trim($this->e50_numcgmordenador)!="" || isset($GLOBALS["HTTP_POST_VARS"]["e50_numcgmordenador"]) &&  ($GLOBALS["HTTP_POST_VARS"]["e50_numcgmordenador"] != "")){
+        $sql  .= $virgula." e50_numcgmordenador = '$this->e50_numcgmordenador' ";
+        $virgula = ",";
+      } else {
+        $sql  .= $virgula." e50_numcgmordenador = null ";
+        $virgula = ",";
+      }
      $sql .= " where ";
      if($e50_codord!=null){
        $e50_codord  = $this->e50_codord == '' ? $e50_codord : $this->e50_codord;
@@ -1717,6 +1752,29 @@ class cl_pagordem {
     return $e50_numliquidacao;
   }
 
+  function getContratoDataByEmpenho($iNumEmp) {
+    
+    $sql = "SELECT distinct
+                acordo.ac16_numero,
+                acordo.ac16_sequencial,
+                acordo.ac16_anousu
+            FROM 
+                pagordem
+            INNER JOIN 
+                empempaut on (empempaut.e61_numemp = pagordem.e50_numemp)
+            INNER JOIN 
+                acordoempautoriza on (acordoempautoriza.ac45_empautoriza = empempaut.e61_autori)
+            INNER JOIN 
+                acordo on (acordo.ac16_sequencial = acordoempautoriza.ac45_acordo)
+            WHERE
+                pagordem.e50_numemp IN ({$iNumEmp})
+          ";
+
+    $result = pg_exec($sql);
+
+    return $result;
+  }
+
   function consultaNotaDespesa ( $e50_codord=null, $campos="*", $ordem=null, $dbwhere=""){
     $sql = "select ";
     if($campos != "*" ){
@@ -1781,5 +1839,40 @@ class cl_pagordem {
     return $sql;
   }
 
+  function alteraContaFornecedor($e50_codord, $e50_contafornecedor){
+    $sql = "UPDATE pagordem SET e50_contafornecedor = {$e50_contafornecedor} WHERE e50_codord = {$e50_codord}";
+    $result = db_query($sql);
+
+    if($result==false){
+      $this->erro_banco = str_replace("\n","",@pg_last_error());
+      $this->erro_sql   = $sql."Ordens de pagamento nao Alterado. Alteracao Abortada.\\n";
+      $this->erro_sql .= "Valores : ".$e50_codord;
+      $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+      $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+      $this->erro_status = "0";
+      $this->numrows_alterar = 0;
+      return false;
+    }else{
+      if(pg_affected_rows($result)==0){
+        $this->erro_banco = "";
+        $this->erro_sql = "Ordens de pagamento nao foi Alterado. Alteracao Executada.\\n";
+        $this->erro_sql .= "Valores : ".$e50_codord;
+        $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+        $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+        $this->erro_status = "0";
+        $this->numrows_alterar = 0;
+        return true;
+      }else{
+        $this->erro_banco = "";
+        $this->erro_sql = $sql."Alteração efetuada com Sucesso\\n";
+        $this->erro_sql .= "Valores : ".$e50_codord;
+        $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+        $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+        $this->erro_status = "1";
+        $this->numrows_alterar = pg_affected_rows($result);
+        return true;
+      }
+    }
+  }
 }
 ?>

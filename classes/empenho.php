@@ -140,7 +140,7 @@ class empenho {
   function liquidar($numemp = "", $codele = "", $codnota = "", $valor = "", $historico = "", $sHistoricoOrdem='', $iCompDesp =''
                     ,$iContaPagadora = null, $lVerificaContaPagadora = true, $iCattrabalhador = null,$iNumempresa = null
                     ,$iContribuicaoPrev = null,$iCattrabalhadorremuneracao = null,$iValorremuneracao = null,$iValordesconto = null
-                    ,$iCompetencia = null, $bRetencaoIr = null, $iNaturezaBemServico = null, $dDataLiquidacao = null, $dDataVencimento = null) {
+                    ,$iCompetencia = null, $bRetencaoIr = null, $iNaturezaBemServico = null, $dDataLiquidacao = null, $dDataVencimento = null, $iContaFornecedor = null,$e50_numcgmordenador = null) {
 
     if ($dDataLiquidacao == null){
       $dDataLiquidacao = date("Y-m-d",db_getsession("DB_datausu"));
@@ -412,7 +412,27 @@ class empenho {
     if ($sHistoricoOrdem == "") {
       $sHistoricoOrdem = $historico;
     }
-    $this->lancaOP($numemp, $codele, $codnota, $valor, null, $sHistoricoOrdem, $iCompDesp, $iContaPagadora,$iCattrabalhador,$iNumempresa,$iContribuicaoPrev,$iCattrabalhadorremuneracao,$iValorremuneracao,$iValordesconto,$iCompetencia, $bRetencaoIr, $iNaturezaBemServico,$dDataLiquidacao,$dDataVencimento);
+  
+    $this->lancaOP($numemp,
+    $codele,
+    $codnota,
+    $valor,
+    null,
+    $sHistoricoOrdem,
+    $iCompDesp,
+    $iContaPagadora,
+    $iCattrabalhador,
+    $iNumempresa,
+    $iContribuicaoPrev,
+    $iCattrabalhadorremuneracao
+    ,$iValorremuneracao,
+    $iValordesconto,
+    $iCompetencia,
+    $bRetencaoIr,
+    $iNaturezaBemServico,
+    $dDataLiquidacao,
+    $dDataVencimento,
+    $iContaFornecedor,$e50_numcgmordenador);
 
 
     if ($this->erro_status != '0') {
@@ -1149,7 +1169,7 @@ class empenho {
   private function lancaOP($numemp = "", $codele = "", $codnota = "", $valor = "", $retencoes = "", $historico, $iCompDesp = ''
                           ,$iContaPagadora = null,$iCattrabalhador = null,$iNumempresa = null,$iContribuicaoPrev = null
                           ,$iCattrabalhadorremuneracao = null,$iValorremuneracao = null,$iValordesconto = null,$iCompetencia = null
-                          ,$bRetencaoIr = null, $iNaturezaBemServico = null, $dDataLiquidacao = null, $dDataVencimento = null) {
+                          ,$bRetencaoIr = null, $iNaturezaBemServico = null, $dDataLiquidacao = null, $dDataVencimento = null, $iContaFornecedor = null, $e50_numcgmordenador = null) {
 
     if ($dDataLiquidacao == null){
       $dDataLiquidacao = date("Y-m-d",db_getsession("DB_datausu"));
@@ -1205,6 +1225,8 @@ class empenho {
     $clpagordem->e50_naturezabemservico = $iNaturezaBemServico;
     $clpagordem->e50_dtvencimento = $dDataVencimento;
     $clpagordem->e50_numliquidacao = $clpagordem->pesquisaNumeroOP($e60_numemp) + 1;
+    $clpagordem->e50_contafornecedor = $iContaFornecedor;
+    $clpagordem->e50_numcgmordenador     = $e50_numcgmordenador;
     $clpagordem->incluir($clpagordem->e50_codord);
     if ($clpagordem->erro_status == 0) {
 
@@ -1562,6 +1584,9 @@ class empenho {
       $strJson["e60_resumo"] = "";
       $strJson["e60_informacaoop"] = "";
 
+      $clpcfornecon = new cl_pcfornecon;
+      $rsContaFornecedor = $clpcfornecon->sql_record($clpcfornecon->sql_query_lefpadrao(null,"pc63_contabanco, pc63_banco||' / '||pc63_agencia||'-'||pc63_agencia_dig||' / '||pc63_conta||'-'||pc63_conta_dig as conta,case when pc63_tipoconta = 1 then 'C/C' else 'C/I' end as tipoconta,case when pc64_contabanco is not null then 1 else 0 end as tipo","tipo DESC"," pc63_numcgm = {$this->dadosEmpenho->e60_numcgm} "));
+      $strJson["contas"] = db_utils::getCollectionByRecord($rsContaFornecedor);
       /**
        * query para retornar o  e64_codele da empelemento pelo e64_numemp
        *
@@ -1741,7 +1766,7 @@ class empenho {
    */
   function liquidarAjax($iEmpenho,$aNotas, $sHistorico = '', $iCompDesp = '', $iContaPagadora = null, $iCattrabalhador = null,$iNumempresa = null
                        ,$iContribuicaoPrev = null,$iCattrabalhadorremuneracao = null,$iValorremuneracao = null,$iValordesconto = null,$iCompetencia = null
-                       ,$bRetencaoIr = null,$iNaturezaBemServico = null, $dDataLiquidacao = null, $dDataVencimento = null){
+                       ,$bRetencaoIr = null,$iNaturezaBemServico = null, $dDataLiquidacao = null, $dDataVencimento = null, $iContaFornecedor = null,$e50_numcgmordenador = null){
 
     (boolean)$this->lSqlErro = false;
     (string) $this->sMsgErro = false;
@@ -1796,7 +1821,27 @@ class empenho {
         //trata string
         $sHistorico = addslashes(stripslashes($sHistorico));
 
-        $this->liquidar($iEmpenho, $objEmpElem->e64_codele, $objNota->e69_codnota, $objNota->e70_valor, $sHistorico, '', $iCompDesp, $iContaPagadora,$lVerificaContaPagadora,  $iCattrabalhador,$iNumempresa,$iContribuicaoPrev,$iCattrabalhadorremuneracao,$iValorremuneracao,$iValordesconto,$iCompetencia,$bRetencaoIr,$iNaturezaBemServico,$dDataLiquidacao,$dDataVencimento);
+        $this->liquidar($iEmpenho,
+                        $objEmpElem->e64_codele,
+                        $objNota->e69_codnota,
+                        $objNota->e70_valor,
+                        $sHistorico,
+                        '',
+                        $iCompDesp,
+                        $iContaPagadora,
+                        $lVerificaContaPagadora, 
+                        $iCattrabalhador,
+                        $iNumempresa,
+                        $iContribuicaoPrev,
+                        $iCattrabalhadorremuneracao,
+                        $iValorremuneracao,
+                        $iValordesconto,
+                        $iCompetencia,
+                        $bRetencaoIr,
+                        $iNaturezaBemServico,
+                        $dDataLiquidacao,
+                        $dDataVencimento,
+                        $iContaFornecedor,$e50_numcgmordenador);
         if ($this->erro_status == "0"){
 
           $this->lSqlErro = true;
@@ -2103,11 +2148,12 @@ class empenho {
                             $lIniciaTransacao=true, $oInfoNota = null, $iNfe = null, $sChaveAcesso = null, $sSerie = null,
                             $iCompDesp = '', $iContaPagadora = null, $lVerificaContaPagadora = true, $iCgmEmitente = 0,
                             $iCattrabalhador = null,$iNumempresa = null, $iContribuicaoPrev = null, $iCattrabalhadorremuneracao = null,
-                            $iValorremuneracao = null,$iValordesconto = null,$iCompetencia = null, $bRetencaoIr = null, $iNaturezaBemServico = null, $dDataLiquidacao = null, $dDataVencimento = null){
+                            $iValorremuneracao = null,$iValordesconto = null,$iCompetencia = null, $bRetencaoIr = null, $iNaturezaBemServico = null, $dDataLiquidacao = null, $dDataVencimento = null,
+                            $iContaFornecedor = null,$e50_numcgmordenador = null){
     $this->lSqlErro  = false;
     $this->sErroMsg  = '';
     $this->iPagOrdem = '';
-
+                              
     if($dDataLiquidacao == null){
       $dDataLiquidacao = date("Y-m-d",db_getsession("DB_datausu"));
     }
@@ -2443,7 +2489,7 @@ class empenho {
       $objNotaOrd->incluir($objEmpNota->e69_codnota, $objMatOrdem->m51_codordem);
     }
     if ($lLiquidar && !$this->lSqlErro){
-
+      
       $this->liquidar(
                 $this->numemp,
                 $objEmpElem->e64_codele,
@@ -2463,7 +2509,9 @@ class empenho {
                 $bRetencaoIr,
                 $iNaturezaBemServico,
                 $dDataLiquidacao,
-                $dDataVencimento
+                $dDataVencimento,
+                $iContaFornecedor,
+                $e50_numcgmordenador
                 );
       if ($this->erro_status == "0"){
 

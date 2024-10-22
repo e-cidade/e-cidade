@@ -1,10 +1,10 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AddNaturezasRubricas extends AbstractMigration
+class AddNaturezasRubricas extends PostgresMigration
 {
-    protected $arrNatureza = array(       
+    protected $arrNatureza = array(
 '1089' => 'Cesta básica ou refeição, não vinculada ao PAT ',
 '1022' => 'Férias - Abono ou gratificação de férias não excedente a 20 dias',
 '1216' => 'Adicional de localidade',
@@ -223,6 +223,6 @@ DELETE FROM rubricasesocial WHERE e990_sequencial = '9951';
         if (empty($result)) {
             return true;
         }
-        return false; 
+        return false;
     }
 }

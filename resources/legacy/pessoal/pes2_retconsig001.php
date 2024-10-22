@@ -119,6 +119,26 @@ $db_botao = true;
             ?>
           </td>
         </tr>
+        <tr>
+          <td align="right"><strong>Tipo de Empenho:</strong>
+          </td>
+          <td>
+            <?
+              $clcfpess = new cl_cfpess;
+              $sSql     = $clcfpess->sql_query(db_getsession("DB_anousu"),date('m', db_getsession("DB_datausu")),db_getsession("DB_instit"),'r11_tipoempenho');
+              $iTipoEmpenho   = db_utils::fieldsMemory($clcfpess->sql_record($sSql),0)->r11_tipoempenho;
+              if ($iTipoEmpenho == 1) {
+                $aTiposEmpenho = array("1" => "Dotação");
+              }else if ($iTipoEmpenho == 2) {
+                $aTiposEmpenho = array("2" => "Lotação");
+              } else {
+                $aTiposEmpenho = array("1" => "Dotação", "2" => "Lotação");
+              }
+
+            db_select('tipoEmpenho',$aTiposEmpenho,true,4);
+            ?>
+          </td>
+        </tr>
         <?
         include("dbforms/db_classesgenericas.php");
         $geraform = new cl_formulario_rel_pes;
@@ -174,6 +194,9 @@ db_menu(db_getsession("DB_id_usuario"),db_getsession("DB_modulo"),db_getsession(
 </body>
 </html>
 <script>
+
+$('anomes').getElementsByTagName('td')[0].setAttribute('align', 'right');
+
 function js_enviardados(){
 
   if(document.form1.anofolha.value == ""){
@@ -187,6 +210,7 @@ function js_enviardados(){
     stringretorno = "?ano=" + document.form1.anofolha.value;
     stringretorno+= "&mes=" + document.form1.mesfolha.value;
     stringretorno+= "&totaliza=" + document.form1.totaliza.value;
+    stringretorno+= "&tipoEmpenho=" + document.form1.tipoEmpenho.value;
     
     stringretorno+= "&ponts=";
     virstrretorno = "";

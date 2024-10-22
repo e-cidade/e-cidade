@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class InativarUserContass extends AbstractMigration
+class InativarUserContass extends PostgresMigration
 {
 
     public function up()

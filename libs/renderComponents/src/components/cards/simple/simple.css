@@ -1,0 +1,31 @@
+/* Contêiner do formulário */
+.simple-card-one {
+    width: 100%;
+    max-width: 432px;
+    padding: 16px;
+    background-color: rgba(255, 255, 255, 0);
+    border: 1px solid #e5e7eb;
+    box-shadow: 1px 3px 20px rgb(197 197 197);
+    border-radius: 8px;
+}
+
+/* Estilo para diferentes tamanhos de tela */
+@media (min-width: 640px) {
+    .simple-card-one {
+        padding: 24px;
+    }
+}
+
+@media (min-width: 768px) {
+    .simple-card-one {
+        padding: 32px;
+    }
+}
+
+/* Título do formulário */
+.simple-card-one h5 {
+    font-size: 15px;
+    font-weight: bold;
+    color: #111827;
+    margin-bottom: 24px;
+}

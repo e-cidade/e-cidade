@@ -41,6 +41,9 @@ $oGet  = db_utils::postMemory($_GET);
 $db_opcao = 1;
 $db_botao = true;
 
+db_postmemory($HTTP_POST_VARS);
+db_postmemory($HTTP_GET_VARS);
+
 $clcgm            = new cl_cgm;
 $clcgmtipoempresa = new cl_cgmtipoempresa;
 $cltipoempresa    = new cl_tipoempresa;
@@ -59,14 +62,11 @@ if(isset($oGet->chavepesquisa) && trim($oGet->chavepesquisa) != "") {
 $db_opcao = 22;
 $db_botao = false;
 if(isset($chavepesquisa)){
-
-   $result = $clcgm->sql_record($clcgm->sql_query($chavepesquisa));
-
+     $result = $clcgm->sql_record($clcgm->sql_query($chavepesquisa));
    if ($result !== false && $result != 0) {
    	$db_opcao = 2;
     $db_botao = true;
     $oCgm = db_utils::fieldsMemory($result,0);
-
     if (strlen($oCgm->z01_cgccpf) == 14){
     	$lPessoaFisica = false;
     }
@@ -82,7 +82,7 @@ if(isset($chavepesquisa)){
 <?
   db_app::load("scripts.js, prototype.js, widgets/windowAux.widget.js,strings.js,widgets/dbtextField.widget.js,
                dbViewCadEndereco.classe.js,dbmessageBoard.widget.js,dbautocomplete.widget.js,dbcomboBox.widget.js,
-               datagrid.widget.js");
+               datagrid.widget.js,redirectPage.js");
   db_app::load("estilos.css");
 ?>
 </head>

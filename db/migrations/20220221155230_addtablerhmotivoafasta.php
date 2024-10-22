@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Addtablerhmotivoafasta extends AbstractMigration
+class Addtablerhmotivoafasta extends PostgresMigration
 {
     public function up()
     {
@@ -51,7 +51,7 @@ class Addtablerhmotivoafasta extends AbstractMigration
 
             INSERT INTO db_itensmenu values ((select max(id_item)+1 from db_itensmenu),'Exclusão','Exclusão','pes1_rhmotivoafasta003.php',1,1,'Exclusão','t');
             INSERT INTO db_menu VALUES((select id_item from db_itensmenu where help like'%Cadastro de Motivos de Afastamentos eSocial%'),(select max(id_item) from db_itensmenu),3,952);
-            
+
             insert into rhmotivoafasta values(nextval('rhmotivoafasta_rh172_sequencial_seq'),'01', 'Acidente/doença do trabalho');
             insert into rhmotivoafasta values(nextval('rhmotivoafasta_rh172_sequencial_seq'),'03', 'Acidente/doença não relacionada ao trabalho');
             insert into rhmotivoafasta values(nextval('rhmotivoafasta_rh172_sequencial_seq'),'05', 'Afastamento/licença de servidor público prevista em estatuto, sem remuneração');

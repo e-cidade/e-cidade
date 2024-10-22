@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc19656 extends AbstractMigration
+class Oc19656 extends PostgresMigration
 {
     public function up()
     {
@@ -14,7 +14,7 @@ class Oc19656 extends AbstractMigration
                 ALTER TABLE emp112023 ADD COLUMN si107_codco varchar(4) DEFAULT 0;
                 ALTER TABLE anl112023 ADD COLUMN si111_codco varchar(4) DEFAULT NULL;
         ";
-        
+
         $this->execute($sql);
     }
 }

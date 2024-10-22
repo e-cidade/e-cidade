@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc16190 extends AbstractMigration
+class Oc16190 extends PostgresMigration
 {
     public function up()
     {
@@ -14,7 +14,7 @@ class Oc16190 extends AbstractMigration
         SELECT fc_startsession();
 
         ALTER TABLE contabancaria ADD COLUMN db83_dataassinaturacop varchar(30);
-        
+
         ALTER TABLE contabancaria ADD COLUMN db83_numerocontratooc  date;
 
         INSERT INTO db_syscampo
@@ -27,14 +27,14 @@ class Oc16190 extends AbstractMigration
         VALUES
         ((select max(codcam)+1 from db_syscampo),'db83_dataassinaturacop', 'date', 'Data de Assinatura do Contrato OP', '0', 'Data de Assinatura do Contrato OP,', 10, false, false, false, 1, 'text', 'Data de Assinatura do Contrato OP');
 
-        INSERT INTO db_sysarqcamp 
-        (codarq, codcam, seqarq, codsequencia) 
-        VALUES 
+        INSERT INTO db_sysarqcamp
+        (codarq, codcam, seqarq, codsequencia)
+        VALUES
         ('2740',(select codcam from db_syscampo where nomecam = 'db83_numerocontratooc'),'14','0');
 
-        INSERT INTO db_sysarqcamp 
-        (codarq, codcam, seqarq, codsequencia) 
-        VALUES 
+        INSERT INTO db_sysarqcamp
+        (codarq, codcam, seqarq, codsequencia)
+        VALUES
         ('2740',(select codcam from db_syscampo where nomecam = 'db83_dataassinaturacop'),'15','0');
 
 

@@ -78,7 +78,7 @@ foreach ($this->aLinhasRelatorio as $iInd => $oLinhaRelatorio) {
 	if ($this->lLotacao == true) {
 		$this->objpdf->SetFont($sFonte,"",$iFonte);
 		$this->objpdf->cell(8, $iAlt, $i, "TBR", 0, "R");
-		$this->objpdf->cell(8, $iAlt, $oLinhaRelatorio->rh76_lota, 1, 0, "R");
+		$this->objpdf->cell(8, $iAlt, $oLinhaRelatorio->rh02_lota, 1, 0, "R");
 		$this->objpdf->cell(17, $iAlt, $iNumeroEmpenho, 1, 0, "C");
 		$this->objpdf->cell(15, $iAlt, $oLinhaRelatorio->rh72_sequencial, 1, 0, "C");
 		$this->objpdf->cell(75, $iAlt, $oLinhaRelatorio->pc01_descrmater, 1, 0, "L");

@@ -1,0 +1,83 @@
+.solid {
+    border: none;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.solid:focus {
+    outline: 2px solid #333;
+    outline-offset: 2px;
+}
+
+.solid:active {
+    transform: scale(0.95);
+}
+
+.solid.primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.solid.primary:hover {
+    background-color: #0056b3;
+}
+
+.solid.secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.solid.secondary:hover {
+    background-color: #5a6268;
+}
+
+.solid.success {
+    background-color: #28a745;
+    color: white;
+}
+
+.solid.success:hover {
+    background-color: #218838;
+}
+
+.solid.danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.solid.danger:hover {
+    background-color: #c82333;
+}
+
+.solid.warning {
+    background-color: #ffc107;
+    color: black;
+}
+
+.solid.warning:hover {
+    background-color: #e0a800;
+}
+
+.solid.info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.solid.info:hover {
+    background-color: #138496;
+}
+
+.solid.disabled {
+    background-color: #6c757d;
+    color: white;
+    cursor: not-allowed;
+    transition: none !important;
+}
+
+.solid.disabled:focus {
+    outline: none !important;
+    outline-offset: none !important;
+}
+
+.solid.disabled:active {
+    transform: none !important;
+}

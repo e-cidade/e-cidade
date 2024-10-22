@@ -1,9 +1,9 @@
 <?php
 
 use App\Support\Database\InsertMenu;
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc21943 extends AbstractMigration
+class Oc21943 extends PostgresMigration
 {
     use InsertMenu;
 
@@ -34,7 +34,7 @@ class Oc21943 extends AbstractMigration
         $descrNovoMenu = "Inclusão";
         $linkNovoMenu = "con1_ajustafonterecurso001.php";
         $helperNovoMenu = $descrMenuPai." - Inclusão";
-        
+
         $this->insertItemMenu($descrNovoMenu, $linkNovoMenu, $helperNovoMenu);
 
         $this->insertMenu($descrMenuPai, null, $idModuloPai, $helperMenuPai);
@@ -45,7 +45,7 @@ class Oc21943 extends AbstractMigration
         $descrNovoMenu = "Alteração";
         $linkNovoMenu = "con1_ajustafonterecurso002.php";
         $helperNovoMenu = $descrMenuPai." - Alteração";
-        
+
         $this->insertItemMenu($descrNovoMenu, $linkNovoMenu, $helperNovoMenu);
 
         $this->insertMenu($descrMenuPai, null, $idModuloPai, $helperMenuPai);
@@ -56,7 +56,7 @@ class Oc21943 extends AbstractMigration
         $descrNovoMenu = "Exclusão";
         $linkNovoMenu = "con1_ajustafonterecurso003.php";
         $helperNovoMenu = $descrMenuPai." - Exclusão";
-        
+
         $this->insertItemMenu($descrNovoMenu, $linkNovoMenu, $helperNovoMenu);
 
         $this->insertMenu($descrMenuPai, null, $idModuloPai, $helperMenuPai);

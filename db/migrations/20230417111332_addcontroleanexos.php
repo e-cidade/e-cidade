@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Addcontroleanexos extends AbstractMigration
+class Addcontroleanexos extends PostgresMigration
 {
 
     public function up()
@@ -15,7 +15,7 @@ class Addcontroleanexos extends AbstractMigration
                 l218_numerocontrolepncp  text NOT NULL,
                 l218_tipoanexo           int8 NOT NULL,
                 l218_instit              int8 NOT NULL,
-                l218_ano                 int8 NOT NULL,    
+                l218_ano                 int8 NOT NULL,
                 l218_sequencialpncp      int8 NOT NULL,
                 l218_sequencialarquivo   int8 NOT NULL,
                 l218_processodecompras   int8,

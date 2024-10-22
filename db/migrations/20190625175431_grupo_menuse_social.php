@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class GrupoMenuseSocial extends AbstractMigration
+class GrupoMenuseSocial extends PostgresMigration
 {
 
     public function up()
@@ -21,7 +21,7 @@ class GrupoMenuseSocial extends AbstractMigration
             'Tabelas para envio eSocial',
             't');
 
-        INSERT INTO db_menu 
+        INSERT INTO db_menu
         VALUES (10466,
             (SELECT MAX(id_item) FROM db_itensmenu),
             2,
@@ -31,9 +31,9 @@ class GrupoMenuseSocial extends AbstractMigration
 
         UPDATE db_menu SET id_item = (SELECT MAX(id_item) FROM db_itensmenu) WHERE modulo = 10216 AND menusequencia >= 2 AND id_item = 10466 AND id_item_filho != (SELECT MAX(id_item) FROM db_itensmenu);
 
-        UPDATE db_itensmenu SET descricao = 'Tabela de Rubricas - S1010' WHERE id_item = 10426; 
+        UPDATE db_itensmenu SET descricao = 'Tabela de Rubricas - S1010' WHERE id_item = 10426;
 
-        UPDATE db_itensmenu SET descricao = 'Lotação Tributária - S1020' WHERE id_item = 10479; 
+        UPDATE db_itensmenu SET descricao = 'Lotação Tributária - S1020' WHERE id_item = 10479;
 
         INSERT INTO db_itensmenu
         VALUES ((SELECT MAX(id_item)+1 FROM db_itensmenu),
@@ -45,7 +45,7 @@ class GrupoMenuseSocial extends AbstractMigration
             'Eventos Periódicos',
             't');
 
-        INSERT INTO db_menu 
+        INSERT INTO db_menu
         VALUES (10466,
             (SELECT MAX(id_item) FROM db_itensmenu),
             3,
@@ -61,7 +61,7 @@ class GrupoMenuseSocial extends AbstractMigration
             'Eventos N�o Periódicos',
             't');
 
-        INSERT INTO db_menu 
+        INSERT INTO db_menu
         VALUES (10466,
             (SELECT MAX(id_item) FROM db_itensmenu),
             4,

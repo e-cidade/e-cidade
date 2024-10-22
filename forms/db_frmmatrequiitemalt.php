@@ -115,6 +115,10 @@ if ( !empty($m41_codmatmater) && $db_opcao == 1 && !isset($incluir) ) {
     $m60_descr = "";
   }
 }
+
+$matrequi = pg_fetch_all($clmatrequi->sql_record($clmatrequi->sql_query_depto_from_matrequi($m40_codigo)));
+$deptoRequisitado = $matrequi[0]['m91_depto'];
+
 ?>
 <form name="form1" method="post" action="<?=basename($_SERVER['PHP_SELF'])?>" >
 <fieldset style="width: 100%" >
@@ -363,10 +367,10 @@ function js_abre(){
 }
 function js_pesquisa_codmater(mostra){
   if(mostra==true){
-    js_OpenJanelaIframe('','db_iframe_mater','func_matmater.php?funcao_js=parent.js_mostra1|m60_codmater|m60_descr','Pesquisa',true);
+    js_OpenJanelaIframe('','db_iframe_mater','func_matmater.php?funcao_js=parent.js_mostra1|m60_codmater|m60_descr&deptoRequisitado=' + <?= $deptoRequisitado ?>,'Pesquisa',true);
   }else{
     if(document.form1.m41_codmatmater.value != ''){
-      js_OpenJanelaIframe('','db_iframe_mater','func_matmater.php?pesquisa_chave='+document.form1.m41_codmatmater.value+'&funcao_js=parent.js_mostra','Pesquisa',false);
+      js_OpenJanelaIframe('','db_iframe_mater','func_matmater.php?pesquisa_chave='+document.form1.m41_codmatmater.value+'&funcao_js=parent.js_mostra&deptoRequisitado=' + <?= $deptoRequisitado ?>,'Pesquisa',false);
     }else{
       document.form1.pc01_descrmater.value = "";
     }

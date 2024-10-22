@@ -116,7 +116,9 @@ $rotulo->label("e60_numemp");
        e53_valor,
        e53_vlranu,
        e53_vlrpag,
-       cgm.z01_cgccpf";
+       cgm.z01_cgccpf,
+       e50_contafornecedor as db_e50_contafornecedor,
+       e50_numcgmordenador";
 
           if (isset($campos) == false) {
 
@@ -133,6 +135,7 @@ $rotulo->label("e60_numemp");
             JOIN conlancamdoc ON c71_codlan = c80_codlan
             JOIN conhistdoc ON c53_coddoc = c71_coddoc
             WHERE c80_codord = pagordem.e50_codord and c53_tipo in (21)) end as data_anulacao,
+            pagordem.e50_contafornecedor as db_e50_contafornecedor,
             pagordem.e50_retencaoir,
             pagordem.e50_naturezabemservico";       
            }

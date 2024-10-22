@@ -9,7 +9,7 @@ use ECidade\RecursosHumanos\ESocial\Agendamento\Eventos\Traits\TipoPontoConstant
 use ECidade\RecursosHumanos\ESocial\Agendamento\Eventos\Traits\ValoresPontoEvento;
 
 /**
- * Classe responsável por montar as informações do evento S1202 Esocial
+ * Classe respons�vel por montar as informa��es do evento S1202 Esocial
  *
  * @package  ECidade\RecursosHumanos\ESocial\Agendamento\Eventos
  * @author   Robson de Jesus
@@ -34,8 +34,8 @@ class EventoS1202 extends EventoBase
      */
     public function montarDados()
     {
-        $ano = date("Y", db_getsession("DB_datausu"));
-        $mes = date("m", db_getsession("DB_datausu"));
+        $ano = $this->ano();
+        $mes = $this->mes();
         $aDadosAPI = array();
         $iSequencial = 1;
         foreach ($this->dados as $oDados) {
@@ -82,15 +82,14 @@ class EventoS1202 extends EventoBase
                     if ($aIdentificador[$iCont2]->idedmdev == 4) {
                         $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfs13'; //uniqid(); //$aIdentificador[$iCont2]->idedmdev; //Obrigat?rio
                     }
-                    $std->dmdev[$seqdmdev]->codcateg = $aDadosPorMatriculas[$iCont]->codcateg;  //Obritat�rio
+                    $std->dmdev[$seqdmdev]->codcateg = $aDadosPorMatriculas[$iCont]->codcateg;
 
-                    //Identifica��o da unidade do �rg�o p�blico na qual o servidor possui remunera��o.
-                    $std->dmdev[$seqdmdev]->infoperapur->ideestab[0] = new \stdClass(); //Obrigat�rio
-                    $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->tpinsc = 1; //Obrigat�rio somente pode ser 1 - cnpj
-                    $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->nrinsc = $aDadosPorMatriculas[$iCont]->nrinsc; //Obrigat?rio
+                    
+                    $std->dmdev[$seqdmdev]->infoperapur->ideestab[0] = new \stdClass(); 
+                    $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->tpinsc = 1; 
+                    $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->nrinsc = $aDadosPorMatriculas[$iCont]->nrinsc; 
 
-                    //Informa��es relativas � remunera��o do trabalhador no per�odo de apura��o.
-                    $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0] = new \stdClass(); //Obrigat�rio
+                    $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0] = new \stdClass(); 
                     $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->matricula = $aDadosPorMatriculas[$iCont]->matricula_esocial; //Opcional
 
                     $aDadosValoreRubrica = $this->buscarValorRubrica($aDadosPorMatriculas[$iCont]->matricula, $aIdentificador[$iCont2]->idedmdev);
@@ -99,14 +98,14 @@ class EventoS1202 extends EventoBase
 
                     for ($iCont4 = 0; $iCont4 < count($aDadosValoreRubrica); $iCont4++) {
                         //Rubricas que comp?em a remunera??o do trabalhador.
-                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4] = new \stdClass(); //Obrigat?rio
-                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4]->codrubr = $aDadosValoreRubrica[$iCont4]->codrubr; //Obrigat?rio
-                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4]->idetabrubr = $aDadosValoreRubrica[$iCont4]->idetabrubr; //Obrigat?rio
-                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4]->vrunit = $aDadosValoreRubrica[$iCont4]->vrrubr; //Obrigat?rio
-                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4]->vrrubr = $aDadosValoreRubrica[$iCont4]->vrrubr; //Obrigat?rio
+                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4] = new \stdClass(); 
+                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4]->codrubr = $aDadosValoreRubrica[$iCont4]->codrubr; 
+                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4]->idetabrubr = $aDadosValoreRubrica[$iCont4]->idetabrubr; 
+                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4]->vrunit = $aDadosValoreRubrica[$iCont4]->vrrubr; 
+                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4]->vrrubr = $aDadosValoreRubrica[$iCont4]->vrrubr; 
                         $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4]->indapurir = $aDadosValoreRubrica[$iCont4]->indapurir; //Opcional
 
-                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->infoagnocivo->grauexp = $aDadosPorMatriculas[$iCont]->grauexp; //Obrigat?rio
+                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->infoagnocivo->grauexp = $aDadosPorMatriculas[$iCont]->grauexp; 
                     }
                     $seqdmdev++;
                 }
@@ -120,8 +119,8 @@ class EventoS1202 extends EventoBase
 
     private function buscarDadosPorMatricula($cpf)
     {
-        $ano = db_getsession("DB_anousu");
-        $mes = date("m", db_getsession("DB_datausu"));
+        $ano = $this->ano();
+        $mes = $this->mes();
         $sql = "SELECT
         distinct
         1 as tpInsc,
@@ -230,7 +229,7 @@ class EventoS1202 extends EventoBase
         require_once 'libs/db_libpessoal.php';
         $clrubricasesocial = new cl_rubricasesocial;
 
-        $rsValores = $this->getValoresPorPonto($ponto, $matricula);
+        $rsValores = $this->getValoresPorPonto($ponto, $matricula, $this->ano(), $this->mes());
         for ($iCont = 0; $iCont < pg_num_rows($rsValores); $iCont++) {
             $oResult = \db_utils::fieldsMemory($rsValores, $iCont);
             $rubrica = $oResult->rubrica;
@@ -261,8 +260,8 @@ class EventoS1202 extends EventoBase
      */
     private function buscarIdentificador($matricula, $rh30_regime)
     {
-        $iAnoUsu = date("Y", db_getsession("DB_datausu"));
-        $iMesusu = date("m", db_getsession("DB_datausu"));
+        $iAnoUsu = $this->ano();
+        $iMesusu = $this->mes();
         $aPontos = array(TipoPontoConstants::PONTO_13SALARIO);
         if ($this->indapuracao != 2) {
             $aPontos = array(TipoPontoConstants::PONTO_SALARIO, TipoPontoConstants::PONTO_COMPLEMENTAR);

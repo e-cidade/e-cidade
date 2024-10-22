@@ -118,6 +118,27 @@ db_app::load("datagrid.widget.js")
                  ?>
                 </td>
               </tr>
+              <tr id='linhaTiposEmpenho'> 
+                <td>
+                  <b>Tipo de Empenho:</b>
+                </td>
+                <td>
+                 <?
+                    $clcfpess = new cl_cfpess;
+                    $sSql     = $clcfpess->sql_query(db_getsession("DB_anousu"),date('m', db_getsession("DB_datausu")),db_getsession("DB_instit"),'r11_tipoempenho');
+                    $iTipoEmpenho   = db_utils::fieldsMemory($clcfpess->sql_record($sSql),0)->r11_tipoempenho;
+                    if ($iTipoEmpenho == 1) {
+                      $aTiposEmpenho = array("1" => "Dotação");
+                    }else if ($iTipoEmpenho == 2) {
+                      $aTiposEmpenho = array("2" => "Lotação");
+                    } else {
+                      $aTiposEmpenho = array("1" => "Dotação", "2" => "Lotação");
+                    }
+                   
+                    db_select('tipoEmpenho',$aTiposEmpenho,true,4," style='width: 150px;'");
+                 ?>
+                </td>
+              </tr>
       		    <tr id='linhaComplementar' style='display:none'>
       		    </tr>
               <tr id='tabelasPrevidencia' style='display:none'>
@@ -367,6 +388,14 @@ function js_validaTipoPonto(){
     $('linhaComplementar').style.display = 'none';
     $('filtroRescisao').style.display    = 'none';
   }
+
+  if ($F('tipo') == 1 && ($F('ponto') == 'r48' || $F('ponto') == 'r14' || $F('ponto') == 'r35')) {
+    $('linhaTiposEmpenho').style.display = '';
+    $('tipoEmpenho').disabled = false;
+  } else {
+    $('linhaTiposEmpenho').style.display = 'none';
+    $('tipoEmpenho').disabled = true;
+  }  
 }
 
 function js_validaTipoGeracao(){
@@ -377,6 +406,11 @@ function js_validaTipoGeracao(){
     $('tabelasPrevidencia').style.display = 'none';
   }  
   
+  if ($F('tipo') == 1) {
+    $('linhaTiposEmpenho').style.display = '';
+  } else {
+    $('linhaTiposEmpenho').style.display = 'none';
+  }  
 }  
  
 function js_verifica(){
@@ -428,6 +462,9 @@ function js_getQueryTela() {
   oParam.sSigla    = $F('ponto');
   oParam.iTipo     = $F('tipo');        
   oParam.lRetencao = $F('lRetencao');
+  if ($('tipoEmpenho').disabled == false) {
+    oParam.iTipoEmpenho = $F('tipoEmpenho');
+  }   
   if ( $F('ponto') == 'r48' ) {
     if ($('semestre')) {
       oParam.sSemestre = $F('semestre');

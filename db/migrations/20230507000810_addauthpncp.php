@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Addauthpncp extends AbstractMigration
+class Addauthpncp extends PostgresMigration
 {
 
     public function up()
@@ -10,7 +10,7 @@ class Addauthpncp extends AbstractMigration
         $sql = "
             alter table licitaparam add l12_loginpncp varchar(40);
             alter table licitaparam add l12_passwordpncp varchar(20);
-            
+
 
             CREATE SEQUENCE licontroleatarppncp_l215_sequencial_seq
             INCREMENT 1

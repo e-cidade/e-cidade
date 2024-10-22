@@ -33,6 +33,7 @@ include_once "libs/db_usuariosonline.php";
 include("libs/db_liborcamento.php");
 include("libs/db_libcontabilidade.php");
 include("libs/db_sql.php");
+require_once("model/contabilidade/relatorios/ensino/RelatorioReceitaeDespesaEnsino.model.php");
 db_postmemory($HTTP_POST_VARS);
 
 $dtini = implode("-", array_reverse(explode("/", $DBtxt21)));
@@ -49,7 +50,7 @@ if(count($aInstits) > 1){
   }
 }
 db_inicio_transacao();
-
+$oReceitaeDespesaSaude = new RelatorioReceitaeDespesaEnsino();
 $sWhereDespesa      = " o58_instit in({$instits})";
 //Aqui passo o(s) exercicio(s) e a funcao faz o sql para cada exercicio
 criaWorkDotacao($sWhereDespesa,array($anousu), $dtini, $dtfim);
@@ -81,28 +82,41 @@ $mPDF = new \Mpdf\Mpdf([
     'margin_header' => 5,
     'margin_footer' => 11,
 ]);
-
-$header = <<<HEADER
+date_default_timezone_set('America/Sao_Paulo');
+$dataLocal = date('d/m/Y H:i:s', time());
+$header = "
 <header>
-  <table style="width:100%;text-align:center;font-family:sans-serif;border-bottom:1px solid #000;padding-bottom:6px;">
-    <tr>
-      <th>{$oInstit->getDescricao()}</th>
-    </tr>
-    <tr>
-      <th>ANEXO II - B</th>
-    </tr>
-    <tr>
-      <td style="text-align:right;font-size:10px;font-style:oblique;">Período: De {$DBtxt21} a {$DBtxt22}</td>
-    </tr>
-  </table>
-</header>
-HEADER;
+    <div style=\"font-family:Arial\">
+        <div style=\"width:33%;float:left;padding:5px;font-size:10px;\">
+            <b><i>{$oInstit->getDescricao()}</i></b><br/>
+            <i>{$oInstit->getLogradouro()}, {$oInstit->getNumero()}</i><br/>
+            <i>{$oInstit->getMunicipio()} - {$oInstit->getUf()}</i><br/>
+            <i>{$oInstit->getTelefone()} - CNPJ: " . db_formatar($oInstit->getCNPJ(), "cnpj") . "</i><br/>
+            <i>{$oInstit->getSite()}</i>
+        </div>
+        <div style=\"width:25%; float:right\" class=\"box\">
+            <b>Despesa Saúde (ANEXO V)</b><br/>
+            <b>INSTITUIÇÕES:</b> ";
+            foreach ($aInstits as $iInstit) {
+                $oInstituicao = new Instituicao($iInstit);
+                $header .= "(" . trim($oInstituicao->getCodigo()) . ") " . $oInstituicao->getDescricao() . " ";
+            }
+            $header .= "<br/> <b>PERÍODO:</b> {$DBtxt21} A {$DBtxt22} <br/>
+        </div>
+    </div>
+</header>";
 
-$footer = <<<FOOTER
-<div style='border-top:1px solid #000;width:100%;text-align:right;font-family:sans-serif;font-size:10px;height:10px;'>
-  {PAGENO}
-</div>
-FOOTER;
+$footer = "
+<footer>
+    <div style='border-top:1px solid #000;width:100%;font-family:sans-serif;font-size:10px;height:10px;'>
+        <div style='text-align:left;font-style:italic;width:90%;float:left;'>
+            Financeiro>Contabilidade>Relatórios de Acompanhamento>Despesa Saúde (ANEXO V)
+            Emissor: " . db_getsession("DB_login") . " Exerc: " . db_getsession("DB_anousu") . " Data:" . $dataLocal . "
+        <div style='text-align:right;float:right;width:10%;'>
+            {PAGENO}
+        </div>
+    </div>
+</footer>";
 
 
 $mPDF->WriteHTML(file_get_contents('estilos/tab_relatorio.css'), 1);
@@ -118,129 +132,624 @@ ob_start();
 
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <style type="text/css">
-      .ritz .waffle a { color : inherit; }
-      .ritz .waffle .s3 { background-color : #ffffff; border-right : 1px SOLID #000000; color : #000000; direction : ltr; font-family : 'Calibri',Arial; font-size : 10pt; padding : 2px 3px 2px 3px; text-align : left; vertical-align : bottom; white-space : nowrap; }
-      .ritz .waffle .s6 { background-color : #ffffff; border-bottom : 1px SOLID #000000; border-right : 1px SOLID #000000; color : #000000; direction : ltr; font-family : 'Calibri',Arial; font-size : 10pt; padding : 2px 3px 2px 3px; text-align : left; vertical-align : bottom; white-space : nowrap; }
-      .ritz .waffle .s4 { background-color : #ffffff; border-right : 1px SOLID #000000; color : #000000; direction : ltr; font-family : 'Calibri',Arial; font-size : 11pt; font-weight : bold; overflow : hidden; padding : 2px 3px 2px 3px; text-align : center; vertical-align : bottom; white-space : normal; word-wrap : break-word; }
-      .ritz .waffle .s10 { background-color : #ffffff; border-bottom : 1px SOLID #000000; color : #000000; direction : ltr; font-family : 'Calibri',Arial; font-size : 10pt; padding : 2px 3px 2px 3px; text-align : left; vertical-align : bottom; white-space : nowrap; }
-      .ritz .waffle .s18 { background-color : #d8d8d8; border-bottom : 1px SOLID #000000; border-right : 1px SOLID #000000; color : #000000; direction : ltr; font-family : 'Calibri',Arial; font-size : 11pt; font-weight : bold; padding : 2px 3px 2px 3px; text-align : right; vertical-align : bottom; white-space : nowrap; }
-      .ritz .waffle .s15 { background-color : #ffffff; border-bottom : 1px SOLID #000000; border-right : 1px SOLID #000000; color : #000000; direction : ltr; font-family : 'Calibri',Arial; font-size : 11pt; padding : 2px 3px 2px 3px; text-align : right; vertical-align : bottom; white-space : nowrap; }
-      .ritz .waffle .s2 { background-color : #ffffff; border-bottom : 1px SOLID #000000; color : #000000; direction : ltr; font-family : 'Calibri',Arial; font-size : 11pt; font-style : italic; padding : 2px 3px 2px 3px; text-align : right; vertical-align : bottom; white-space : nowrap; }
-      .ritz .waffle .s9 { background-color : #ffffff; border-right : 1px SOLID #000000; color : #000000; direction : ltr; font-family : 'Calibri',Arial; font-size : 11pt; padding : 2px 3px 2px 3px; text-align : center; vertical-align : bottom; white-space : nowrap; }
-      .ritz .waffle .s13 { background-color : #ffffff; border-right : 1px SOLID #000000; color : #000000; direction : ltr; font-family : 'Calibri',Arial; font-size : 11pt; padding : 2px 3px 2px 3px; text-align : right; vertical-align : bottom; white-space : nowrap; }
-      .ritz .waffle .s11 { background-color : #ffffff; border-bottom : 1px SOLID #000000; border-right : 1px SOLID #000000; color : #000000; direction : ltr; font-family : 'Calibri',Arial; font-size : 11pt; padding : 2px 3px 2px 3px; text-align : center; vertical-align : bottom; white-space : nowrap; }
-      .ritz .waffle .s8 { background-color : #ffffff; color : #000000; direction : ltr; font-family : 'Calibri',Arial; font-size : 11pt; padding : 2px 3px 2px 3px; text-align : center; vertical-align : bottom; white-space : nowrap; }
-      .ritz .waffle .s19 { background-color : #ffffff; border-right : 1px SOLID #000000; color : #000000; direction : ltr; font-family : 'Helvetica Neue',Arial; font-size : 9pt; padding : 2px 3px 2px 3px; text-align : left; vertical-align : bottom; white-space : nowrap; }
-      .ritz .waffle .s1 { background-color : #ffffff; color : #000000; direction : ltr; font-family : 'Calibri',Arial; font-size : 12pt; font-weight : bold; padding : 2px 3px 2px 3px; text-align : center; vertical-align : bottom; white-space : nowrap; }
-      .ritz .waffle .s16 { background-color : #ffffff; border-bottom : 1px SOLID #000000; border-right : 1px SOLID #000000; color : #000000; direction : ltr; font-family : 'Helvetica Neue',Arial; font-size : 9pt; padding : 2px 3px 2px 3px; text-align : left; vertical-align : bottom; white-space : nowrap; }
-      .ritz .waffle .s17 { background-color : #d8d8d8; border-bottom : 1px SOLID #000000; border-right : 1px SOLID transparent; color : #000000; direction : ltr; font-family : 'Calibri',Arial; font-size : 11pt; font-weight : bold; padding : 2px 3px 2px 3px; text-align : left; vertical-align : bottom; white-space : nowrap; }
-      .ritz .waffle .s14 { background-color : #ffffff; border-bottom : 1px SOLID #000000; border-right : 1px SOLID #000000; color : #000000; direction : ltr; font-family : 'Calibri',Arial; font-size : 11pt; padding : 2px 3px 2px 3px; text-align : left; vertical-align : bottom; white-space : nowrap; }
-      .ritz .waffle .s5 { background-color : #ffffff; border-right : 1px SOLID #000000; color : #000000; direction : ltr; font-family : 'Calibri',Arial; font-size : 11pt; font-weight : bold; padding : 2px 3px 2px 3px; text-align : center; vertical-align : bottom; white-space : nowrap; }
-      .ritz .waffle .s0 { background-color : #ffffff; color : #000000; direction : ltr; font-family : 'Calibri',Arial; font-size : 14pt; font-weight : bold; padding : 2px 3px 2px 3px; text-align : center; vertical-align : bottom; white-space : nowrap; }
-      .ritz .waffle .s7 { background-color : #ffffff; border-right : 1px SOLID #000000; color : #000000; direction : ltr; font-family : 'Calibri',Arial; font-size : 10pt; padding : 2px 3px 2px 3px; text-align : center; vertical-align : bottom; white-space : nowrap; }
-      .ritz .waffle .s12 { background-color : #ffffff; border-right : 1px SOLID #000000; color : #000000; direction : ltr; font-family : 'Calibri',Arial; font-size : 11pt; padding : 2px 3px 2px 3px; text-align : left; vertical-align : bottom; white-space : nowrap; }
+        .ritz .waffle a {
+            color: inherit;
+            font-family: 'Arial';
+            font-size: 12px;
+            width: 100%;
+        }
+
+        .title-relatorio {
+            text-align: center;
+        }
+
+        .th-despesa {
+            height: 20px;
+            width: 80%;
+            font-family: 'Arial';
+            font-size: 12px;
+            font-weight: bold;
+            padding: 2px 3px 2px 3px;
+            text-align: left;
+            vertical-align: bottom;
+            white-space: nowrap;
+        }
+
+        .th-fuction_sub {
+            height: 20px;
+            background-color: #d8d8d8;
+            width: 80%;
+            border: 1px SOLID #000000;
+            font-family: 'Arial';
+            font-size: 12px;
+            font-weight: bold;
+            padding: 2px 3px 2px 3px;
+            text-align: center;
+            vertical-align: bottom;
+            white-space: nowrap;
+        }
+
+        .th-sub_menu {
+            height: 20px;
+            background-color: #d8d8d8;
+            width: 80%;
+            border: 1px SOLID #000000;
+            font-family: 'Arial';
+            font-size: 12px;
+            font-weight: bold;
+            padding: 2px 3px 2px 3px;
+            text-align: left;
+            vertical-align: bottom;
+            white-space: nowrap;
+        }
+
+        .th-valor {
+            height: 20px;
+            background-color: #d8d8d8;
+            width: 20%;
+            border-right: 1px SOLID #000000;
+            border-top: 1px SOLID #000000;
+            border-bottom: 1px SOLID #000000;
+            font-family: 'Arial', Calibre;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 2px 3px 2px 3px;
+            text-align: center;
+            vertical-align: bottom;
+            white-space: nowrap;
+        }
+
+        .footer-row {
+            height: 20px;
+            background-color: #d8d8d8;
+            width: 80%;
+            border: 1px SOLID #000000;
+            font-family: 'Arial';
+            font-size: 12px;
+            font-weight: bold;
+            padding: 2px 3px 2px 3px;
+            text-align: right;
+            vertical-align: bottom;
+            white-space: nowrap;
+        }
+
+        .footer-row-valor {
+            height: 20px;
+            background-color: #d8d8d8;
+            width: 20%;
+            border-right: 1px SOLID #000000;
+            border-top: 1px SOLID #000000;
+            border-bottom: 1px SOLID #000000;
+            font-family: 'Arial', Calibre;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 2px 3px 2px 3px;
+            text-align: right;
+            vertical-align: bottom;
+            white-space: nowrap;
+        }
+
+        .footer-total-row {
+            height: 20px;
+            background-color: #d8d8d8;
+            width: 80%;
+            border: 1px SOLID #000000;
+            font-family: 'Arial';
+            font-size: 12px;
+            font-weight: bold;
+            padding: 2px 3px 2px 3px;
+            text-align: left;
+            vertical-align: bottom;
+            white-space: nowrap;
+        }
+
+        .footer-total-row-valor {
+            height: 20px;
+            background-color: #d8d8d8;
+            width: 20%;
+            border-right: 1px SOLID #000000;
+            border-top: 1px SOLID #000000;
+            border-bottom: 1px SOLID #000000;
+            font-family: 'Arial', Calibre;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 2px 3px 2px 3px;
+            text-align: right;
+            vertical-align: bottom;
+            white-space: nowrap;
+        }
+
+        .title-row-valor {
+            height: 20px;
+            background-color: #d8d8d8;
+            width: 20%;
+            border-right: 1px SOLID #000000;
+            border-bottom: 1px SOLID #d8d8d8;
+            font-family: 'Arial', Calibre;
+            font-size: 12px;
+            padding: 2px 3px 2px 3px;
+            text-align: right;
+            vertical-align: bottom;
+            white-space: nowrap;
+        }
+
+        .subtitle-row-valor {
+            height: 20px;
+            background-color: #d8d8d8;
+            width: 20%;
+            border-right: 1px SOLID #000000;
+            border-bottom: 1px SOLID #d8d8d8;
+            font-family: 'Arial', Calibre;
+            font-size: 12px;
+            padding: 2px 3px 2px 3px;
+            text-align: right;
+            vertical-align: bottom;
+            white-space: nowrap;
+        }
+
+        .text-row-valor {
+            height: 20px;
+            background-color: #ffffff;
+            width: 20%;
+            font-family: 'Arial', Calibre;
+            border-right: 1px SOLID #000000;
+            font-size: 12px;
+            padding: 2px 3px 2px 3px;
+            text-align: right;
+            vertical-align: bottom;
+            white-space: nowrap;
+        }
+
+        .ritz .title-row {
+            background-color: #d8d8d8;
+            color: #000000;
+            direction: ltr;
+            border-left: 1px SOLID #000000;
+            border-right: 1px SOLID #000000;
+            border-bottom: 1px SOLID #d8d8d8;
+            font-family: 'Arial', Calibre;
+            font-size: 12px;
+            padding: 2px 3px 2px 3px;
+            text-align: left;
+        }
+
+        .ritz .subtitle-row {
+            background-color: #d8d8d8;
+            color: #000000;
+            direction: ltr;
+            border-left: 1px SOLID #000000;
+            border-right: 1px SOLID #000000;
+            border-bottom: 1px SOLID #d8d8d8;
+            font-family: 'Arial', Calibre;
+            font-size: 12px;
+            padding: 2px 3px 2px 30px;
+            text-align: left;
+            vertical-align: bottom;
+            white-space: nowrap;
+        }
+
+        .ritz .text-row {
+            background-color: #ffffff;
+            color: #000000;
+            direction: ltr;
+            border-left: 1px SOLID #000000;
+            border-right: 1px SOLID #000000;
+            font-family: 'Arial', Calibre;
+            font-size: 12px;
+            padding: 2px 3px 2px 60px;
+            text-align: left;
+            vertical-align: bottom;
+            white-space: nowrap;
+        }
+
+        .ritz .text-white-left-row {
+            background-color: #ffffff;
+            color: #000000;
+            direction: ltr;
+            border-left: 1px SOLID #000000;
+            border-right: 1px SOLID #000000;
+            /* border-bottom: 1px SOLID #d8d8d8; */
+            font-family: 'Arial', Calibre;
+            font-size: 12px;
+            padding: 2px 3px 2px 3px;
+            text-align: left;
+        }
+
+        .ritz .waffle .clear {
+            background-color: #ffffff;
+            color: #000000;
+            direction: ltr;
+            font-size: 10pt;
+            padding: 2px 3px 2px 3px;
+            white-space: nowrap;
+        }
     </style>
   </head>
   <body>
+    <div class="ritz " >
+        <div class="title-relatorio">
+            <br/>
+            <strong>ANEXO V</strong><br />
+            <strong>DEMONSTRATIVO DOS GASTOS EM AÇÕES E SERVIÇOS PÚBLICOS DE SAÚDE</strong><br />
+            <strong>(Art. 198, §2º, III da CR/88, LC 141/2012 e IN 05/2012)</strong><br /><br />
+        </div>
+        <table class="waffle" width="600px" cellspacing="0" cellpadding="0" style="border: 1px #000" autosize="1">
+            <thead>
+                <tr>
+                    <th id="0C0" style="width:100%"  class="column-headers-background">&nbsp;</th>
 
-  <div class="ritz grid-container" dir="ltr">
-    <table class="waffle" cellspacing="0" cellpadding="0">
-      <thead>
-      <tr>
-        <th id="0C0" style="width:72px" class="column-headers-background">&nbsp;</th>
-        <th id="0C1" style="width:92px" class="column-headers-background">&nbsp;</th>
-        <th id="0C2" style="width:87px" class="column-headers-background">&nbsp;</th>
-        <th id="0C3" style="width:100px" class="column-headers-background">&nbsp;</th>
-        <th id="0C4" style="width:100px" class="column-headers-background">&nbsp;</th>
-        <th id="0C5" style="width:100px" class="column-headers-background">&nbsp;</th>
-        <th id="0C6" style="width:100px" class="column-headers-background">&nbsp;</th>
-        <th id="0C7" style="width:100px" class="column-headers-background">&nbsp;</th>
-        <th id="0C8" style="width:100px" class="column-headers-background">&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="th-despesa" colspan="8">I - DESPESAS</td>
+                </tr>
+                <tr>
+                    <td class="th-fuction_sub" colspan="8">FUNÇÃO / SUBFUNÇÃO / PROGRAMA</td>
+                    <td class="th-valor">VALOR PAGO</td>
+                </tr>
+                <?php
+                $funcaoTotal = 0;
+                $fTotalGeral = 0;
+                $fProgTotal  = 0;
+                $aSubTotal   = array();
+                $aSubFuncoes = array(122,128,271,272,273,301,302,303,304,305,306,511,512,843,844);
+                $sFuncao     = "'10','28'";
+                $aFonte      = array("'15000002','25000002','1102','102','2102','202'");
+                foreach ($aSubFuncoes as $iSubFuncao) {
+                    $sDescrSubfunao = db_utils::fieldsMemory(db_query("select o53_descr from orcsubfuncao where o53_codtri = '{$iSubFuncao}'"), 0)->o53_descr;
+                    if ($anousu > 2022 )
+                        $aDespesasProgramas = getSaldoDespesa(null, "o58_programa,o58_anousu, coalesce(sum(pago),0) as pago", null, "o58_funcao in ({$sFuncao}) and o58_subfuncao in ({$iSubFuncao}) and o15_codigo in (".implode(",",$aFonte).") and o58_instit in ($instits) group by 1,2");
+                    else
+                        $aDespesasProgramas = getSaldoDespesa(null, "o58_programa,o58_anousu, coalesce(sum(pago),0) as pago", null, "o58_funcao in ({$sFuncao}) and o58_subfuncao in ({$iSubFuncao}) and o15_codtri in (".implode(",",$aFonte).") and o58_instit in ($instits) group by 1,2");
+                    if (count($aDespesasProgramas) > 0) {
+                      foreach ($aDespesasProgramas as $oDespesaPrograma) {
+                        $funcaoTotal += $oDespesaPrograma->pago;
+                        $fTotalGeral = $funcaoTotal;
+                        if (!isset($aSubTotal[$iSubFuncao])) {
+                          $aSubTotal[$iSubFuncao] = 0;
+                      }
+                      $aSubTotal[$iSubFuncao] += $oDespesaPrograma->pago;
+                      }
+                  }
+                }
+                ?>
+                <tr style='height:20px;'>
+                      <td class="th-sub_menu" colspan="8">1 - FUNÇÕES 10 E 28 - IMPOSTOS E TRANSFERÊNCIAS DE IMPOSTOS</td>
+                      <td class="footer-total-row-valor">R$ <?=db_formatar($funcaoTotal,"f")?></td>
+                </tr>
+                <?php
+                    foreach ($aSubFuncoes as $iSubFuncao) {
+                      $sDescrSubfunao = db_utils::fieldsMemory(db_query("select o53_descr from orcsubfuncao where o53_codtri = '{$iSubFuncao}'"), 0)->o53_descr;
+                      if ($anousu > 2022 )
+                        $aDespesasProgramas = getSaldoDespesa(null, "o58_programa,o58_anousu, coalesce(sum(pago),0) as pago", null, "o58_funcao in ({$sFuncao}) and o58_subfuncao in ({$iSubFuncao}) and o15_codigo in (".implode(",",$aFonte).") and o58_instit in ($instits) group by 1,2");
+                      else
+                        $aDespesasProgramas = getSaldoDespesa(null, "o58_programa,o58_anousu, coalesce(sum(pago),0) as pago", null, "o58_funcao in ({$sFuncao}) and o58_subfuncao in ({$iSubFuncao}) and o15_codtri in (".implode(",",$aFonte).") and o58_instit in ($instits) group by 1,2");
+                      if (count($aDespesasProgramas) > 0) {
+
+                        ?>
+                        <tr style='height:20px;'>
+                          <td class="title-row" colspan="8"><?= db_formatar($iSubFuncao, 'subfuncao')." - ".$sDescrSubfunao ?></td>
+                          <td class="title-row-valor">R$ <?= db_formatar($aSubTotal[$iSubFuncao], "f") ?></td>
+                        </tr>
+                        <?php
+
+                        foreach ($aDespesasProgramas as $oDespesaPrograma) {
+                          $oPrograma = new Programa($oDespesaPrograma->o58_programa, $oDespesaPrograma->o58_anousu);
+                          ?>
+                          <tr style='height:20px;'>
+                            <td class="text-row" colspan="8"><?php echo db_formatar($oPrograma->getCodigoPrograma(), "programa")." - ".$oPrograma->getDescricao() ?></td>
+                            <td class="text-row-valor"><?= db_formatar($oDespesaPrograma->pago, "f") ?></td>
+                          </tr>
+                          <?php
+                          }
+                       }
+                    }
+                ?>
+                 <?php
+                $funcaoTotal = 0;
+                $fProgTotal  = 0;
+                $aSubTotal   = array();
+                $aSubFuncoes = array(122,128,271,272,273,301,302,303,304,305,306,511,512,843,844);
+                $sFuncao     = "'10','28'";
+                $aFonte      = array("'15020002','25020002'");
+                foreach ($aSubFuncoes as $iSubFuncao) {
+                    $sDescrSubfunao = db_utils::fieldsMemory(db_query("select o53_descr from orcsubfuncao where o53_codtri = '{$iSubFuncao}'"), 0)->o53_descr;
+                    if ($anousu > 2022 )
+                        $aDespesasProgramas = getSaldoDespesa(null, "o58_programa,o58_anousu, coalesce(sum(pago),0) as pago", null, "o58_funcao in ({$sFuncao}) and o58_subfuncao in ({$iSubFuncao}) and o15_codigo in (".implode(",",$aFonte).") and o58_instit in ($instits) group by 1,2");
+                    else
+                        $aDespesasProgramas = getSaldoDespesa(null, "o58_programa,o58_anousu, coalesce(sum(pago),0) as pago", null, "o58_funcao in ({$sFuncao}) and o58_subfuncao in ({$iSubFuncao}) and o15_codtri in (".implode(",",$aFonte).") and o58_instit in ($instits) group by 1,2");
+                    if (count($aDespesasProgramas) > 0) {
+                      foreach ($aDespesasProgramas as $oDespesaPrograma) {
+                        $funcaoTotal += $oDespesaPrograma->pago;
+                        $fTotalGeral = $funcaoTotal;
+                        if (!isset($aSubTotal[$iSubFuncao])) {
+                          $aSubTotal[$iSubFuncao] = 0;
+                      }
+                      $aSubTotal[$iSubFuncao] += $oDespesaPrograma->pago;
+                      }
+                  }
+                }
+                ?>
+                <tr style='height:20px;'>
+                  <td class="th-sub_menu" colspan="8">2 - FUNÇÕES 10 E 28 - COMPENSAÇÃO FINANCEIRA DAS PERDAS COM ARRECADAÇÃO DE ICMS- LC N° 194/2022 </td>
+                  <td class="footer-total-row-valor">R$ <?=db_formatar($funcaoTotal,"f")?></td>
+                </tr>
+                <?php
+                    foreach ($aSubFuncoes as $iSubFuncao) {
+                      $sDescrSubfunao = db_utils::fieldsMemory(db_query("select o53_descr from orcsubfuncao where o53_codtri = '{$iSubFuncao}'"), 0)->o53_descr;
+                      if ($anousu > 2022 )
+                        $aDespesasProgramas = getSaldoDespesa(null, "o58_programa,o58_anousu, coalesce(sum(pago),0) as pago", null, "o58_funcao in ({$sFuncao}) and o58_subfuncao in ({$iSubFuncao}) and o15_codigo in (".implode(",",$aFonte).") and o58_instit in ($instits) group by 1,2");
+                      else
+                        $aDespesasProgramas = getSaldoDespesa(null, "o58_programa,o58_anousu, coalesce(sum(pago),0) as pago", null, "o58_funcao in ({$sFuncao}) and o58_subfuncao in ({$iSubFuncao}) and o15_codtri in (".implode(",",$aFonte).") and o58_instit in ($instits) group by 1,2");
+                      if (count($aDespesasProgramas) > 0) {
+
+                        ?>
+                        <tr style='height:20px;'>
+                          <td class="title-row" colspan="8"><?= db_formatar($iSubFuncao, 'subfuncao')." - ".$sDescrSubfunao ?></td>
+                          <td class="title-row-valor">R$ <?= db_formatar($aSubTotal[$iSubFuncao], "f") ?></td>
+                        </tr>
+                        <?php
+
+                        foreach ($aDespesasProgramas as $oDespesaPrograma) {
+                          $oPrograma = new Programa($oDespesaPrograma->o58_programa, $oDespesaPrograma->o58_anousu);
+                          ?>
+                          <tr style='height:20px;'>
+                            <td class="text-row" colspan="8"><?php echo db_formatar($oPrograma->getCodigoPrograma(), "programa")." - ".$oPrograma->getDescricao() ?></td>
+                            <td class="text-row-valor"></td>
+                          </tr>
+                          <?php } ?>
+
+                          <tr style='height:20px;'>
+                            <td class="text-row" colspan="8"></td>
+                            <td class="text-row-valor"></td>
+                          </tr>
+                          <?php
+                       }
+                    }
+                ?>
+      <tr style='height:20px;'>
+        <td class="footer-total-row" colspan="8">3 - TOTAL DESPESAS (1 + 2 )</td>
+        <td class="footer-total-row-valor">R$ <?=db_formatar($fTotalGeral,"f")?></td>
       </tr>
-      </thead>
+      </tbody>
       <tbody>
-      <tr style='height:20px;'>
-        <td class="s3 bdleft" colspan="9">&nbsp;</td>
-      </tr>
-      <tr style='height:20px;'>
-        <td class="s4 bdleft" colspan="9">DEMONSTRATIVO DOS GASTOS EM AÇÕES E SERVIÇOS PÚBLICOS DE SAÚDE<br>(ART. 198, § 2.º, III, DA CF/88)</td>
-      </tr>
-      <tr style='height:20px;'>
-        <td class="s6 bdleft" colspan="9">&nbsp;</td>
-      </tr>
-      <tr style='height:20px;'>
-        <td class="s7 bdleft">Função</td>
-        <td class="s7">SubFunções</td>
-        <td class="s7">Programas</td>
-        <td class="s8" colspan="5">Especificação</td>
-        <td class="s9">Despesa (1)</td>
-      </tr>
-      <tr style='height:20px;'>
-        <td class="s6 bdleft"></td>
-        <td class="s6"></td>
-        <td class="s6"></td>
-        <td class="s10" colspan="5"></td>
-        <td class="s11">R$</td>
-      </tr>
-      <tr style='height:20px;'>
-        <td class="s9 bdleft">10</td>
-        <td class="s3"></td>
-        <td class="s3"></td>
-        <td class="s12" colspan="5">SAÚDE</td>
-        <td class="s3"></td>
-      </tr>
-      <?php
+                <tr>
+                    <td class="th-despesa" colspan="8">II - TOTAL DA APLICAÇÃO NA SAÚDE</td>
+                </tr>
+                <tr>
+                    <td class="th-fuction_sub" colspan="8">DESCRIÇÃO</td>
+                    <td class="th-valor">VALOR</td>
+                </tr>
+                <tr style='height:20px;'>
+                      <td class="text-white-left-row" colspan="8">4- VALOR PAGO</td>
+                      <td class="text-row-valor">R$ <?=db_formatar($fTotalGeral,"f")?></td>
+                </tr>
+                <?php
+                $valorLinha5    = 0;
+                $valorLinha5_1  = 0;
+                $valorLinha5_2  = 0;
+                $valorLinha6    = 0;
+                $nLiqAPagar101  = 0;
 
-      $fSubTotal = 0;
-      $aSubFuncoes = array(122,272,271,301,302,303,304,305,306);
-      $sFuncao     = "10";
-      $aFonte      = array("'102','1102','15000002'");
-      foreach ($aSubFuncoes as $iSubFuncao) {
-        $sDescrSubfunao = db_utils::fieldsMemory(db_query("select o53_descr from orcsubfuncao where o53_codtri = '{$iSubFuncao}'"), 0)->o53_descr;
-        if ($anousu > 2022 )
-          $aDespesasProgramas = getSaldoDespesa(null, "o58_programa,o58_anousu, coalesce(sum(pago),0) as pago", null, "o58_funcao = {$sFuncao} and o58_subfuncao in ({$iSubFuncao}) and o15_codigo in (".implode(",",$aFonte).") and o58_instit in ($instits) group by 1,2");
-        else
-          $aDespesasProgramas = getSaldoDespesa(null, "o58_programa,o58_anousu, coalesce(sum(pago),0) as pago", null, "o58_funcao = {$sFuncao} and o58_subfuncao in ({$iSubFuncao}) and o15_codtri in (".implode(",",$aFonte).") and o58_instit in ($instits) group by 1,2");
-        if (count($aDespesasProgramas) > 0) {
+                $dtfimExercicio = db_getsession("DB_anousu")."-12-31";
+                $aFonte = array("'15000002','25000002','1102','102','2102','202'");
+                if($dtfim == $dtfimExercicio){
+                    $oReceitaeDespesaSaude->setFontes($aFonte);
+                    $oReceitaeDespesaSaude->setDataInicial($dtini);
+                    $oReceitaeDespesaSaude->setDataFinal($dtfim);
+                    $oReceitaeDespesaSaude->setInstits($instits);
+                    $oReceitaeDespesaSaude->setTipo('ambos');
+                    $valorLinha5_1 = $oReceitaeDespesaSaude->getEmpenhosApagar();
+                }
 
-          ?>
-          <tr style='height:20px;'>
-            <td class="s3 bdleft"></td>
-            <td class="s9"><?= db_formatar($iSubFuncao, 'subfuncao') ?></td>
-            <td class="s3"></td>
-            <td class="s12" colspan="5"><?= $sDescrSubfunao ?></td>
-            <td class="s3"></td>
-          </tr>
-          <?php
+                $aFonte = array("'15020002','25020002'");
+                if($dtfim == $dtfimExercicio){
+                    $oReceitaeDespesaSaude->setFontes($aFonte);
+                    $oReceitaeDespesaSaude->setDataInicial($dtini);
+                    $oReceitaeDespesaSaude->setDataFinal($dtfim);
+                    $oReceitaeDespesaSaude->setInstits($instits);
+                    $oReceitaeDespesaSaude->setTipo('ambos');
+                    $valorLinha5_2 = $oReceitaeDespesaSaude->getEmpenhosApagar();
+                }
+                $valorLinha5 = $valorLinha5_1 + $valorLinha5_2;
+                $valorLinha6 = $valorLinha5 + $fTotalGeral;
+                ?>
+                <tr style='height:20px;'>
+                      <td class="title-row" colspan="8">5 - RESTOS A PAGAR INSCRITOS NO EXERCÍCIO</td>
+                      <td class="title-row-valor">R$ <?=db_formatar($valorLinha5,"f")?></td>
+                </tr>
+                <tr style='height:20px;'>
+                      <td class="text-white-left-row" colspan="8">5.1 - IMPOSTO E TRANSFERÊNCIA DE IMPOSTOS</td>
+                      <td class="text-row-valor">R$ <?=db_formatar($valorLinha5_1,"f")?></td>
+                </tr>
+                <tr style='height:20px;'>
+                      <td class="text-white-left-row" colspan="8">5.2 - COMPENSAÇÃO FINANCEIRA DAS PERDAS COM ARRECADAÇÃO DE ICMS ? LC Nº 194/2022</td>
+                      <td class="text-row-valor">R$ <?=db_formatar($valorLinha5_2,"f")?></td>
+                </tr>
+                <tr style='height:20px;'>
+                      <td class="title-row" colspan="8">6 - SUBTOTAL (4 + 5)</td>
+                      <td class="title-row-valor">R$ <?=db_formatar($valorLinha6,"f")?></td>
+                </tr>
+                <?php
+                   $totalLinha7   = 0;
+                   $totalLinha7_1 = 0;
+                   $totalLinha7_2 = 0;
+                   $totalLinha9   = 0;
+                   $totalLinha9   = $valorLinha6;
+                   $aFonte = array("'15000002','25000002','1102','102','2102','202'");
+                   $oReceitaeDespesaSaude->setFontes($aFonte);
+                   $oReceitaeDespesaSaude->setDataInicial($dtini);
+                   $oReceitaeDespesaSaude->setDataFinal($dtfim);
+                   $oReceitaeDespesaSaude->setInstits($instits);
+                   $oReceitaeDespesaSaude->setTipo('lqd');
+                   $nLiqAPagar101 = $oReceitaeDespesaSaude->getEmpenhosApagar();
+                   $oReceitaeDespesaSaude->setTipo('');
+                   $nNaoLiqAPagar101 = $oReceitaeDespesaSaude->getEmpenhosApagar();
+                   $dadosLinha9      = $oReceitaeDespesaSaude->getLinha10RestosaPagarInscritoSemDis();
+                   $aTotalPago101 = $nLiqAPagar101 + $nNaoLiqAPagar101;
 
-          foreach ($aDespesasProgramas as $oDespesaPrograma) {
-            $oPrograma = new Programa($oDespesaPrograma->o58_programa, $oDespesaPrograma->o58_anousu);
-            $fSubTotal += $oDespesaPrograma->pago;
-            ?>
-            <tr style='height:20px;'>
-              <td class="s3 bdleft"></td>
-              <td class="s3"></td>
-              <td class="s9"><?php echo db_formatar($oPrograma->getCodigoPrograma(), "programa"); ?></td>
-              <td class="s12" colspan="5"><?= $oPrograma->getDescricao() ?></td>
-              <td class="s13"><?= db_formatar($oDespesaPrograma->pago, "f") ?></td>
-            </tr>
-          <?php }
-          ?>
-          <tr style='height:20px;'>
-            <td class="s3 bdleft">&nbsp;</td>
-            <td class="s3"></td>
-            <td class="s3"></td>
-            <td class="s3" colspan="5"></td>
-            <td class="s3"></td>
-          </tr>
-          <?php
-        }
-      }
-      ?>
-      <tr style='height:20px;'>
-        <td class="s17 bdleft" colspan="8">TOTAL</td>
-        <td class="s18"><?=db_formatar($fSubTotal,"f")?></td>
-      </tr>
+                   $dtfimExercicio = db_getsession("DB_anousu")."-12-31";
+
+                   if($dtfim == $dtfimExercicio){
+                       $nRPSemDesponibilidade101 = $dadosLinha9['2'];
+
+                       if($nRPSemDesponibilidade101 <= 0){
+                           $totalLinha7_1 = $aTotalPago101;
+                       }
+                       if($nRPSemDesponibilidade101 > 0){
+                           $totalLinha7_1 = $nRPSemDesponibilidade101 - $aTotalPago101;
+                           if($totalLinha7_1 >=0){
+                            $totalLinha7_1 = 0;
+                           }
+                           $totalLinha7_1 = abs($totalLinha7_1);
+                       }
+                   }
+
+                   $totalLinha7_2 = 0;
+                   $aFonte = array("'15020002','25020002'");
+                   $oReceitaeDespesaSaude->setFontes($aFonte);
+                   $oReceitaeDespesaSaude->setDataInicial($dtini);
+                   $oReceitaeDespesaSaude->setDataFinal($dtfim);
+                   $oReceitaeDespesaSaude->setInstits($instits);
+                   $oReceitaeDespesaSaude->setTipo('lqd');
+                   $nLiqAPagar101 = $oReceitaeDespesaSaude->getEmpenhosApagar();
+                   $oReceitaeDespesaSaude->setTipo('');
+                   $nNaoLiqAPagar101 = $oReceitaeDespesaSaude->getEmpenhosApagar();
+                   $aTotalPago101 = $nLiqAPagar101 + $nNaoLiqAPagar101;
+
+                   $dtfimExercicio = db_getsession("DB_anousu")."-12-31";
+                   if($dtfim == $dtfimExercicio){
+                       $nRPSemDesponibilidade101 = $dadosLinha9['3'];
+
+                       if($nRPSemDesponibilidade101 <= 0){
+                          $totalLinha7_2 = $aTotalPago101;
+                       }
+                       if($nRPSemDesponibilidade101 > 0){
+                           $totalLinha7_2 = $nRPSemDesponibilidade101 - $aTotalPago101;
+                           if($totalLinha7_2 >=0){
+                            $totalLinha7_2 = 0;
+                           }
+                           $totalLinha7_2 = abs($totalLinha7_2);
+                       }
+                   }
+                   $totalLinha7 = $totalLinha7_1 + $aTotalPago101;
+                   $totalLinha9 -= $totalLinha7;
+                ?>
+                <tr style='height:20px;'>
+                      <td class="title-row" colspan="8">7 - RESTOS A PAGAR INSCRITOS NO EXERCÍCIO SEM DISPONIBILIDADE FINANCEIRA</td>
+                      <td class="title-row-valor">R$ <?=db_formatar($totalLinha7,"f")?></td>
+                </tr>
+                <tr style='height:20px;'>
+                      <td class="text-white-left-row" colspan="8">7.1 - IMPOSTO E TRANSFERÊNCIA DE IMPOSTOS</td>
+                      <td class="text-row-valor">R$ <?=db_formatar($totalLinha7_1,"f")?></td>
+                </tr>
+                <tr style='height:20px;'>
+                      <td class="text-white-left-row" colspan="8">7.2 - COMPENSAÇÃO FINANCEIRA DAS PERDAS COM ARRECADAÇÃO DE ICMS ? LC Nº 194/2022</td>
+                      <td class="text-row-valor">R$ <?=db_formatar($totalLinha7_2,"f")?></td>
+                </tr>
+                <?php
+                     $totalLinha8   = 0;
+                     $totalLinha8_1 = 0;
+                     $totalLinha8_2 = 0;
+                     $sFonte = ("'102','202','1102', '2102','15000002','25000002'");
+                     $where = " c61_instit in ({$instits}) and c61_codigo in ($sFonte) ";
+                     $result = db_planocontassaldo_matriz(db_getsession("DB_anousu"), $dtini, $dtfim, false, $where,'',0);
+                     for ($x = 0; $x < pg_numrows($result); $x++) {
+                         db_fieldsmemory($result, $x);
+                         if(substr($estrutural,1,14) == '00000000000000'){
+                             if($sinal_anterior == "C")
+                                 $total_anterior -= $saldo_anterior;
+                             else {
+                                 $total_anterior += $saldo_anterior;
+                             }
+                         }
+                     }
+                     $nValorRecursoImposto = $total_anterior;
+                     $sele_work = " e60_instit in ({$instits}) ";
+                     $sele_work1       = " and e91_recurso in ($sFonte)";
+                     $sql_where_externo = " where $sele_work ";
+                     $sql_order = " order by e91_recurso, e91_numemp ";
+
+                     $clempresto = new cl_empresto;
+                     $sqlempresto = $clempresto->sql_rp_novo(db_getsession("DB_anousu"), $sele_work, $dtini, $dtfim, $sele_work1, $sql_where_externo, $sql_order);
+                     $res = $clempresto->sql_record($sqlempresto);
+                     $rows = $clempresto->numrows;
+                     $total_mov_liqui = 0;
+                     $total_mov_pagmento = 0;
+                     $total_mov_pagnproc = 0;
+                     $total_anterior = 0;
+                     for ($x = 0; $x < $rows; $x++) {
+                         db_fieldsmemory($res, $x);
+
+                         $total_mov_liqui += $e91_vlremp;
+                         $total_mov_pagmento += $vlrpag;
+                         $total_mov_pagnproc += $vlrpagnproc;
+                     }
+                     if ($clempresto->numrows == 0) {
+                        $total_mov_pagmento = 0;
+                        $total_mov_pagnproc = 0;
+                        $nValorRecursoImposto = 0;
+                     }
+                     $totalLinha8_1 = $total_mov_pagmento + $total_mov_pagnproc - $nValorRecursoImposto;
+                     $sFonte2 = ("'15020002','25020002'");
+                     $where2  = " c61_instit in ({$instits}) and c61_codigo in ($sFonte2) ";
+                     $result2 = db_planocontassaldo_matriz(db_getsession("DB_anousu"), $dtini, $dtfim, false, $where2,'',0);
+
+                     for ($x = 0; $x < pg_numrows($result2); $x++) {
+                         db_fieldsmemory($result2, $x);
+                         if(substr($estrutural,1,14) == '00000000000000'){
+                             if($sinal_anterior == "C")
+                                 $total_anterior -= $saldo_anterior;
+                             else {
+                                 $total_anterior += $saldo_anterior;
+                             }
+                         }
+                     }
+                     $nValorRecursoImposto = $total_anterior;
+                     $sele_work = " e60_instit in ({$instits}) ";
+                     $sele_work1       = " and e91_recurso in ($sFonte2)";
+                     $sql_where_externo = " where $sele_work ";
+                     $sql_order = " order by e91_recurso, e91_numemp ";
+
+                     $clempresto = new cl_empresto;
+                     $sqlempresto = $clempresto->sql_rp_novo(db_getsession("DB_anousu"), $sele_work, $dtini, $dtfim, $sele_work1, $sql_where_externo, $sql_order);
+                     $res = $clempresto->sql_record($sqlempresto);
+                     $rows = $clempresto->numrows;
+                     $total_mov_liqui = 0;
+                     $total_mov_pagmento = 0;
+                     $total_mov_pagnproc = 0;
+                     for ($x = 0; $x < $rows; $x++) {
+                         db_fieldsmemory($res, $x);
+                         $total_mov_liqui += $e91_vlremp;
+                         $total_mov_pagmento += $vlrpag;
+                         $total_mov_pagnproc += $vlrpagnproc;
+                     }
+                     if ($clempresto->numrows == 0) {
+                        $total_mov_pagmento = 0;
+                        $total_mov_pagnproc = 0;
+                        $nValorRecursoImposto = 0;
+                     }
+                     $totalLinha8_2 = $total_mov_pagmento + $total_mov_pagnproc - $nValorRecursoImposto;
+                     $totalLinha8 = $totalLinha8_1 + $totalLinha8_2;
+                     $totalLinha9 += $totalLinha8;
+                ?>
+                <tr style='height:20px;'>
+                      <td class="title-row" colspan="8">8 - RESTOS A PAGAR DE EXERCÍCIOS ANTERIORES SEM DISPONIBILIDADE DE CAIXA PAGOS NO EXERCÍCIO ATUAL (CONSULTA 932.736)</td>
+                      <td class="title-row-valor">R$ <?=db_formatar($totalLinha8,"f")?></td>
+                </tr>
+                <tr style='height:20px;'>
+                      <td class="text-white-left-row" colspan="8">8.1 - IMPOSTO E TRANSFERÊNCIA DE IMPOSTOS</td>
+                      <td class="text-row-valor">R$ <?=db_formatar($totalLinha8_1,"f")?></td>
+                </tr>
+                <tr style='height:20px;'>
+                      <td class="text-white-left-row" colspan="8">8.2 - COMPENSAÇÃO FINANCEIRA DAS PERDAS COM ARRECADAÇÃO DE ICMS ? LC Nº 194/2022</td>
+                      <td class="text-row-valor">R$ <?=db_formatar($totalLinha8_2,"f")?></td>
+                </tr>
+                <tr style='height:20px;'>
+                      <td class="footer-total-row" colspan="8">9 - TOTAL APLICADO (6 - 7 + 8)</td>
+                      <td class="footer-total-row-valor">R$ <?=db_formatar($totalLinha9,"f")?></td>
+                </tr>
       </tbody>
     </table>
   </div>

@@ -36,8 +36,6 @@ $clrotulo->label('r06_pd');
 
 parse_str($HTTP_SERVER_VARS['QUERY_STRING']);
 //db_postmemory($HTTP_SERVER_VARS,2);exit;
-//$ano = 2006;
-//$mes = 3;
 
 $head3 = "EMPENHOS DO FGTS";
 $head5 = "PERÍODO : ".$mes." / ".$ano;
@@ -88,7 +86,7 @@ where r14_anousu = $ano
   and r14_instit = ".db_getsession("DB_instit")."                
   and r14_rubric in ('R991')
 
-union
+union all
 
 select rh02_regist as r01_regist,
        z01_nome,
@@ -109,7 +107,7 @@ where r48_anousu = $ano
   and r48_instit = ".db_getsession("DB_instit")."                
   and r48_rubric in ('R991')
 						     
-union
+union all
 
 select rh02_regist as r01_regist,
        z01_nome,
@@ -165,11 +163,10 @@ order by
        o15_descr,
        o55_descr
        ";
-//echo $sql ; exit;
 
 $result = pg_exec($sql);
-//db_criatabela($result);
-$xxnum = pg_numrows($result);
+
+$xxnum = pg_num_rows($result);
 if ($xxnum == 0){
    db_redireciona('db_erros.php?fechar=true&db_erro=Não existem movimentos no período de '.$mes.' / '.$ano);
 
@@ -190,16 +187,16 @@ $val_fgts     = 0;
 $val_fgts_tot = 0;
 $val_fgts_seg = 0;
 $val_fgts_pad = 0;
-$val_ded          = 0;
-$val_pat           = 0;
-$fgts1              = 0;
-$fgts1_seg      = 0;
-$fgts1_pad      = 0;
-$pat60              = 0;
-$pat40              = 0;
-$pat                   = 0;
+$val_ded      = 0;
+$val_pat      = 0;
+$fgts1        = 0;
+$fgts1_seg    = 0;
+$fgts1_pad    = 0;
+$pat60        = 0;
+$pat40        = 0;
+$pat          = 0;
 
-for($x = 0; $x < pg_numrows($result);$x++){
+for($x = 0; $x < pg_num_rows($result);$x++){
    db_fieldsmemory($result,$x);
    if ($pdf->gety() > $pdf->h - 30 || $troca != 0 ){
       $pdf->addpage();

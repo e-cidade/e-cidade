@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc18302 extends AbstractMigration
+class Oc18302 extends PostgresMigration
 {
 
     public function up()
@@ -11,11 +11,11 @@ class Oc18302 extends AbstractMigration
         select fc_startsession();
 
         begin;
-        
-        alter table atolegal add ed05_i_aparecerelatorio bool default false; 
-        
+
+        alter table atolegal add ed05_i_aparecerelatorio bool default false;
+
         commit;
-        
+
         ";
         $this->execute($sql);
     }

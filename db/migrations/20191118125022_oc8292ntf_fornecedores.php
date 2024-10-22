@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc8292ntfFornecedores extends AbstractMigration
+class Oc8292ntfFornecedores extends PostgresMigration
 {
     public function up()
     {
@@ -248,7 +248,7 @@ class Oc8292ntfFornecedores extends AbstractMigration
         CREATE UNIQUE INDEX p113_sequencial_index ON nfpagamentorealizado(p113_sequencial);
 
         -- Fim do script
-  
+
 SQL;
         $this->execute($sSQL);
     }

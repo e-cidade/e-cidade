@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc13956 extends AbstractMigration
+class Oc13956 extends PostgresMigration
 {
     public function change(){
         $sql = "
@@ -17,17 +17,17 @@ class Oc13956 extends AbstractMigration
 
         INSERT INTO db_menu(id_item, id_item_filho, menusequencia, modulo)
             VALUES (9198, 3963, 1, 28);
-    
+
         INSERT INTO db_menu(id_item, id_item_filho, menusequencia, modulo)
             values(9198, 3964, 1, 28);
-        
+
         INSERT INTO db_menu(id_item, id_item_filho, menusequencia, modulo)
-            values(9198, 3965, 1, 28);	
+            values(9198, 3965, 1, 28);
 
 
         -- Alteração do menu para cadastro de fornecedor no módulo Licitação
-        
-        UPDATE db_itensmenu 
+
+        UPDATE db_itensmenu
             SET descricao = 'Fornecedor',
                 help = 'Cadastro de Pcforne',
                 desctec = 'Cadastro de Pcforne'

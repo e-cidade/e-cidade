@@ -140,4 +140,15 @@ class DBNumber {
     }
     return $iAux;
   }
+
+    /**
+     * Converte números em formato BR para inteiro
+     * Exemplo: 1.234 -> 1234
+     * @param $number
+     * @return int
+     */
+  public static function brToInteger($number): int {
+      $number = str_replace('.', '', $number);
+      return intval(str_replace(',', '', $number));
+  }
 }

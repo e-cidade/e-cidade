@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class DpTabelassicom extends AbstractMigration
+class DpTabelassicom extends PostgresMigration
 {
     public function up()
     {

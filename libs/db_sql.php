@@ -1653,7 +1653,6 @@ class cl_gera_sql_folha
     var $usar_ban = false; // Se usar� inner ou left join com a tabela rhpesbanco.
     var $usar_pro = true; // Se usar� inner ou left join com a tabela orcprojativ.
     var $usar_rec = true; // Se usar� inner ou left join com a tabela orctiporec.
-    var $usar_rec_folha = false; // Se usar� inner ou left join com a tabela orctiporec usando tabela rhempenhofolha.
     var $usar_afa = false; // Se usar� inner ou left join com a tabela afasta.
     var $usar_inf = false; // Se usar� inner ou left join com a tabela infla;
     var $usar_exc = false; // Se usar� inner ou left join com a tabela rhempenhofolhaexcecaorubrica;
@@ -1693,7 +1692,7 @@ class cl_gera_sql_folha
     // A VARI�VEL where ser�: rh05_seqpes is null... Mas o where do SQL ser�:
     // where rh02_anousu = 2005 and rh02_mesusu = 11 and rh02_regist = 2870 and rh05_seqpes is null
 
-    function gerador_sql($sigla, $ano = null, $mes = null, $regist = null, $rubric = null, $campos = " * ", $order = "", $where = "", $instit = null, $sWhereSup = '', $iVinc = 0, $relRetencoes = null)
+    function gerador_sql($sigla, $ano = null, $mes = null, $regist = null, $rubric = null, $campos = " * ", $order = "", $where = "", $instit = null, $sWhereSup = '', $iVinc = 0)
     {
 
         if ($sigla == 'r14') {
@@ -1939,11 +1938,6 @@ class cl_gera_sql_folha
             }
             $sql .=       $inner . " rhrubricas on rhrubricas.rh27_rubric = " . ($this->subsqlrub == "" ? $arquivo . "." . $sigla . "_rubric::varchar " : "x." . $this->subsqlrub);
             $sql .=              "           and rhrubricas.rh27_instit = " . db_getsession("DB_instit") . " ";
-            if ($relRetencoes) {
-                $sql .= " left join rhempenhofolharubrica on rh73_seqpes = rh02_seqpes and rh73_instit = rh02_instit and rh73_rubric = {$sigla}_rubric  ";
-                $sql .= " left join rhempenhofolharhemprubrica on rh73_sequencial = rh81_rhempenhofolharubrica ";
-                $sql .= " left join rhempenhofolha on rh72_siglaarq = '{$sigla}' and (rh81_lancamento is null and rh81_lota is null and rh81_rhempenhofolha = rh72_sequencial) or (rh81_lancamento = rh72_sequencial) ";
-            }
             if ($this->usar_rel == true) {
                 $inner = " inner join ";
                 if ($this->inner_rel == false) {
@@ -2122,14 +2116,7 @@ class cl_gera_sql_folha
                     if ($this->inner_rec == false) {
                         $inner = " left join ";
                     }
-                    if ($this->usar_rec_folha == true) {
-                        $sql .=       $inner .= " orctiporec on orctiporec.o15_codigo = coalesce(rh72_recurso,rh25_recurso) ";
-                    } else {
-                        $sql .=       $inner .= " orctiporec on orctiporec.o15_codigo = rhlotavinc.rh25_recurso ";
-                    }
-                    if ($relRetencoes && $this->subsql == '') {
-                        $sql .= " left join rhempenhofolharubrica on rh73_seqpes = rh02_seqpes and rh73_instit = rh02_instit and rh73_rubric = {$sigla}_rubric  ";
-                    }
+                    $sql .=       $inner .= " orctiporec on orctiporec.o15_codigo = rhlotavinc.rh25_recurso ";
                 } else {
                     $inner = " inner join ";
                     if ($this->inner_rec == false) {

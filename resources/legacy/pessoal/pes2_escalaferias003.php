@@ -364,6 +364,7 @@ for ($i = 0; $i < $iTotalFuncionarios; $i++) {
   $oFuncionario                       = new stdClass();
   $oFuncionario->matricula            = $oDados->rh01_regist;
   $oFuncionario->nome                 = $oDados->z01_nome;
+  $oFuncionario->funcao               = $oDados->rh37_descr;
   $oFuncionario->dataadmissao         = db_formatar($oDados->rh01_admiss, "d");
   $oFuncionario->periodogozadoinicial = '';
   $oFuncionario->periodogozadofinal   = '';
@@ -523,6 +524,7 @@ echo "Tipo de Ordem:  $aDescricoes[$sTipoOrdem] \n\n";
 
 // $iCont = 0;
 echo "Funcionario;";
+echo "Funcao;";
 echo "Periodo Aquisitivo;";
 echo "Gozados;";
 echo "A Gozar;";
@@ -564,6 +566,7 @@ foreach ($aAgrupador as $iAgrupador => $oAgrupador) {
     if($oFuncionario->periodogozadofinal == null){
       $oFuncionario->periodogozadofinal = ' - ';
     }
+    $oDadosDaLinha->funcao = "$oFuncionario->funcao";
 
     $oDadosDaLinha->periodoGozado = "{$oFuncionario->periodogozadoinicial} a {$oFuncionario->periodogozadofinal}";
 
@@ -578,6 +581,7 @@ foreach ($aAgrupador as $iAgrupador => $oAgrupador) {
 
 
       echo "$oDadosDaLinha->funcionario;";
+      echo "$oDadosDaLinha->funcao;";
       echo "$oDadosDaLinha->periodoAquisitivo;";
       echo "$oDadosDaLinha->periodoDiasGozados;";
       echo "$oDadosDaLinha->periodoDiasGozo;";

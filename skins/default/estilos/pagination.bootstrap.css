@@ -1,0 +1,77 @@
+.pagination {
+  display: inline-flex;
+  padding-left: 0;
+  margin: 0;
+  border-radius: 0.25rem;
+  list-style: none;
+  gap: 0.5rem;
+}
+
+.pagination li.page-item button{
+  border-radius: 50%;
+}
+
+.pagination li {
+  display: list-item;
+  position: relative;
+  line-height: 1.5;
+}
+.pagination a, .pagination button {
+  position: relative;
+  display: block;
+  padding: 0.5rem 0.75rem;
+  margin-left: -1px;
+  line-height: 1.25;
+  color: #28a745;
+  text-align: center;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+.pagination a:hover, .pagination button:hover {
+  color: #28a745;
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+}
+.pagination .active a, .pagination .active button {
+  z-index: 1;
+  color: #fff;
+  background-color: #28a745;
+  border-color: #28a745;
+}
+.pagination .disabled a, .pagination .disabled button {
+  color: #6c757d;
+  pointer-events: none;
+  background-color: #fff;
+  border-color: #dee2e6;
+}
+
+.loader-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8); /* Fundo branco semi-transparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2; /* Garante que o loader esteja acima da tabela */
+  display: none;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 4px solid #3498db;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin-right: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

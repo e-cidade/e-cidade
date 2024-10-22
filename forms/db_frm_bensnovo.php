@@ -423,36 +423,40 @@ $integracao = ParametroIntegracaoPatrimonial::possuiIntegracaoPatrimonio($oDataA
     <fieldset id="dadosdomaterial">
 	      <legend class="bold" onclick="js_mostraToogleDadosMaterial();">Dados do Material</legend>
 	      <table>
+          <?php 
+            $bloquear = 1;
+          ?>
 	        <tr>
 	          <td><b>Nota Fiscal:</b></td>
-	          <td><? db_input('cod_notafiscal', 43, $It53_ntfisc,true, 'text', 3, '') ?></td>
+	          <td><? db_input('cod_notafiscal', 43, $Icod_notafiscal,true, 'text', $bloquear) ?></td>
 	        </tr>
 	        <tr>
 	          <td><b>Empenho do Sistema</b></td>
 	          <td>
               <?php
                 $aEmp_sistema = array('s' => 'SIM', 'n' => 'NÃO');
-                db_select("emp_sistema", $aEmp_sistema, true, 3, " ", "", "", "0", "");
+                db_select("emp_sistema_select_descr", $aEmp_sistema, true, $bloquear,"", "", "", "0", "");
                 ?>
             </td>
 	        </tr>
-	        <tr>
-	          <td><b>
-	            <span id="procAdm"><? db_ancora(@$Le60_numemp,"js_pesquisaEmpenho(true);",3) ?></span>
-	            <span id="procAdm1" style="display:none;"><?php echo @$Le60_numemp?>:</span>
-	          </b></td>
-	          <td>
-	            <?
-                db_input('t53_empen', 10, $It53_empen, true, 'text', 3, "");
+          <tr>
+          <td nowrap title="<?=@$Te60_numemp?>" id="tdAncoraEmpenho">
+              <label style="font-weight: bold;" id='procAdm'>
+                <? db_ancora(@$Le60_numemp,"js_pesquisae60_numemp(true);",$bloquear); ?>
+              </label>
+            </td>
+            <td>
+              <?
+                db_input('t53_empen',10,$Ie60_numemp,true,'text',$bloquear," onchange='js_pesquisae60_numemp(false);'","",$cor);
+                echo "<span id='procSis'>";
+                db_input('z01_nome_empenho',30,$Iz01_nome_empenho,true,'text',3,"");
+                echo "</span>";
               ?>
-              <span id="campoDescricao">
-                <?db_input('z01_nome_empenho',30,$Iz01_nome,true,'text',3,""); ?>
-              </span>
-	          </td>
-	        </tr>
+            </td>
+          </tr>
 	        <tr>
 	          <td><b>Ordem de compra:</b></td>
-	          <td><? db_input('cod_ordemdecompra', 10, '', true, 'text', 3, "") ?></td>
+	          <td><? db_input('cod_ordemdecompra', 10, '', true, 'text', $bloquear, "") ?></td>
 	        </tr>
 	        <tr>
 	          <td><b>Garantia:</b></td>
@@ -468,6 +472,7 @@ $integracao = ParametroIntegracaoPatrimonial::possuiIntegracaoPatrimonio($oDataA
     </fieldset>
     <?php
     db_input("iCodigoItemNota", 10, false, true, 'hidden', 3);
+    db_input("lEmpenhoVinculado", 10,$lEmpenhoVinculado, true, 'hidden', 1,"");
     ?>
   </form>
 </fieldset>
@@ -1131,7 +1136,6 @@ $integracao = ParametroIntegracaoPatrimonial::possuiIntegracaoPatrimonio($oDataA
     oObject.cod_ordemdecompra = $F("cod_ordemdecompra");
     oObject.emp_sistema       = $F("emp_sistema_select_descr");
     oObject.t53_empen         = $F("t53_empen");
-    oObject.z01_nome_empenho  = $F("z01_nome_empenho");
     oObject.garantia          = $F("garantia");
     oObject.contabilizado = encodeURIComponent(tagString($F("contabilizado")));
  
@@ -1314,12 +1318,76 @@ $integracao = ParametroIntegracaoPatrimonial::possuiIntegracaoPatrimonio($oDataA
       $("c-divisao").style.display = "table-cell";
       $("divisao").setValue(oRetorno.dados.divisao);
     }
-
+    getCodigoItemNaNota(oRetorno.dados.t52_bem);
     bemComCalculo = oRetorno.dados.bemComCalculo;
     js_controlaDadosFinanceiros(oRetorno.dados.bemComCalculo);
     js_liberarAbas();
 
   }
+
+  function getCodigoItemNaNota(iCodigoBem) 
+  { 
+
+    js_divCarregando("Aguarde, verificando vínculo do bem com empenho do sistema...", "msgBox");
+    var oParam = {"exec":"buscarDadosMaterial", "iCodigoBem": iCodigoBem};
+ 
+    new Ajax.Request("pat1_bensnovo.RPC.php",
+                      {method: 'post',
+                        parameters: 'json='+Object.toJSON(oParam),
+                        onComplete: js_retornoBusDadosMat
+                      });
+  }
+
+  function js_retornoBusDadosMat(oAjax)
+  {
+
+    js_removeObj("msgBox");
+
+    var oRetorno = eval("("+oAjax.responseText+")");
+  
+    let [year, month, day] = oRetorno.t53_garant.split('-');
+    let formattedDate = `${day}/${month}/${year}`;
+
+    $("t53_empen").value         = oRetorno.t53_empen;
+    $("cod_notafiscal").value    = oRetorno.t53_ntfisc.urlDecode();
+    $("cod_ordemdecompra").value = oRetorno.t53_ordem;
+    $("garantia").value          = formattedDate;
+    $("lEmpenhoVinculado").value = oRetorno.lEmpenhoVinculado;
+
+    if (oRetorno.lEmpenhoVinculado == true) {
+      sCor = '#DEB887';
+      $("t53_empen").disabled = true;
+      $("t53_empen").style.backgroundColor = sCor;
+      $("t53_empen").style.color = "#000";
+      $("cod_notafiscal").disabled = true;
+      $("cod_notafiscal").style.backgroundColor = sCor;
+      $("cod_notafiscal").style.color = "#000";
+      $("cod_ordemdecompra").disabled = true;
+      $("cod_ordemdecompra").style.backgroundColor = sCor;
+      $("cod_ordemdecompra").style.color = "#000";
+      $("emp_sistema_select_descr").disabled = true;
+      $("emp_sistema_select_descr").style.backgroundColor = sCor;
+      $("emp_sistema_select_descr").style.color = "#000";
+
+    } else {
+        sCor = '';
+        $("t53_empen").disabled = false;
+        $("t53_empen").style.backgroundColor = sCor;
+        $("t53_empen").style.color = "#000";
+        $("cod_notafiscal").disabled = false;
+        $("cod_notafiscal").style.backgroundColor = sCor;
+        $("cod_notafiscal").style.color = "#000";
+        $("cod_ordemdecompra").disabled = false;
+        $("cod_ordemdecompra").style.backgroundColor = sCor;
+        $("cod_ordemdecompra").style.color = "#000";
+        $("emp_sistema_select_descr").disabled = false;
+        $("emp_sistema_select_descr").style.backgroundColor = sCor;
+        $("emp_sistema_select_descr").style.color = "#000";
+    }
+    
+    js_pesquisae60_numemp(false);
+  }
+
 
   function js_calculaValorTotal() {
 
@@ -1434,6 +1502,34 @@ $integracao = ParametroIntegracaoPatrimonial::possuiIntegracaoPatrimonio($oDataA
       else return false;
     }
   }
+  function js_pesquisae60_numemp(mostra)
+  {
+    if(mostra==true){
+      js_OpenJanelaIframe('','db_iframe_empempenho','func_empempenho.php?funcao_js=parent.js_mostraempempenho1|e60_numemp|e60_codemp|e60_anousu|z01_nome','Pesquisa',true);
+    }else{
+      if(document.form1.t53_empen.value != ''){
+          js_OpenJanelaIframe('','db_iframe_empempenho','func_empempenhopat.php?pesquisa_chave='+document.form1.t53_empen.value+'&funcao_js=parent.js_mostraempempenho','Pesquisa',false);
+      }else{
+        document.form1.z01_nome_empenho.value = '';
+        document.form1.t53_empen.value = '';
+      }
+    }
+  }
+
+  function js_mostraempempenho(chave,chave2,chave3,erro)
+  {
+    document.form1.z01_nome_empenho.value = chave;
+    if(erro==true){
+      document.form1.t53_empen.focus();
+      document.form1.t53_empen.value = '';
+    }
+  }
+  function js_mostraempempenho1(chave1,chave2,chave3,chave4)
+  {
+    document.form1.t53_empen.value = chave1;;
+    document.form1.z01_nome_empenho.value = chave4;
+    db_iframe_empempenho.hide();
+  }
 
   /*Função para limitar texaarea*/
   //"onkeyup='limitaTextarea(this.value);'");
@@ -1456,13 +1552,6 @@ $integracao = ParametroIntegracaoPatrimonial::possuiIntegracaoPatrimonio($oDataA
   var oOutrosDados = new DBToogle($('outros-dados'), true);
   var oObservacoes = new DBToogle($('observacoes'), true);
   var oObservacoes = new DBToogle($('dadosdomaterial'), true);
-  $("t67_sequencial").style.width = "50px";
-  $("t66_sequencial").style.width = "50px";
-  $("t65_sequencial").style.width = "50px";
-  $("t67_sequencialdescr").style.width = "150px";
-  $("t66_sequencialdescr").style.width = "150px";
-  $("t65_sequencialdescr").style.width = "150px";
-  $("emp_sistema_select_descr").style.width = "83px";
 
   function statusAPI(statusbens)
   {
@@ -1488,4 +1577,13 @@ $integracao = ParametroIntegracaoPatrimonial::possuiIntegracaoPatrimonio($oDataA
       oDadosImovel.show(false);
     }
   }
+
+  $("t67_sequencial").style.width = "50px";
+  $("t66_sequencial").style.width = "50px";
+  $("t65_sequencial").style.width = "50px";
+  $("t67_sequencialdescr").style.width = "150px";
+  $("t66_sequencialdescr").style.width = "150px";
+  $("t65_sequencialdescr").style.width = "150px";
+  $("emp_sistema_select_descr").style.width = "83px";
+  $("lEmpenhoVinculado").focus();
 </script>

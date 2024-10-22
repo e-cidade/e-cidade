@@ -1,10 +1,10 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class InserirMenusNaoPeriodicos extends AbstractMigration
+class InserirMenusNaoPeriodicos extends PostgresMigration
 {
-    
+
     private $idVersaoFormulario = 29;
     private $idFormularioTipo = 35;
     private $idModEsocial = 10216;
@@ -85,7 +85,7 @@ class InserirMenusNaoPeriodicos extends AbstractMigration
             '{$descMenu}',
             't');
 
-        INSERT INTO db_menu 
+        INSERT INTO db_menu
         VALUES ((SELECT id_item FROM db_itensmenu WHERE descricao ILIKE 'N%o Peri%dicos'),
             (SELECT MAX(id_item) FROM db_itensmenu),
             (SELECT coalesce(MAX(menusequencia),0) FROM db_menu WHERE id_item = (SELECT id_item FROM db_itensmenu WHERE descricao ILIKE 'N%o Peri%dicos')),
@@ -97,7 +97,7 @@ class InserirMenusNaoPeriodicos extends AbstractMigration
     {
         if ($this->checkFormularioTipo()) {
             return "
-            INSERT INTO esocialformulariotipo 
+            INSERT INTO esocialformulariotipo
             (rh209_sequencial,rh209_descricao) VALUES ({$this->idFormularioTipo},'{$descMenu}');
             INSERT INTO esocialversaoformulario (rh211_sequencial, rh211_versao, rh211_avaliacao, rh211_esocialformulariotipo) VALUES ({$this->idVersaoFormulario}, '1.0', (SELECT db101_sequencial FROM avaliacao WHERE db101_identificador='{$keyMenu}-vs1'), (SELECT max(rh209_sequencial) FROM esocialformulariotipo));
             ";
@@ -111,6 +111,6 @@ class InserirMenusNaoPeriodicos extends AbstractMigration
         if (empty($result)) {
             return true;
         }
-        return false; 
+        return false;
     }
 }

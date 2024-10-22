@@ -47,6 +47,10 @@ $AssinaturaDigital = new AssinaturaDigital();
 $aDataEmpenho = explode("-", $e60_emiss);
 ?>
 <form name="form1" method="post" action="">
+
+    <input type=hidden id="chavepesquisa" value="">
+    <input type="hidden" id="obriga_divida" name="obriga_divida">
+
     <center>
         <table border="0">
             <tr>
@@ -76,6 +80,18 @@ $aDataEmpenho = explode("-", $e60_emiss);
                     <?
                     db_input('e60_numcgm',10,$Ie60_numcgm,true,'text',3);
                     db_input('z01_nome',40,$Iz01_nome,true,'text',3,'');
+                    ?>
+                </td>
+            </tr>
+            <tr>
+                <td nowrap title="<?=$Te60_numcgmordenador?>">
+                    <?db_ancora('Ordenador da Despesa',"js_pesquisa_cgm(true);",$fimperiodocontabil);?>
+                </td>
+                <td>
+                    <?  $e60_numcgmordenadoranterior = $e60_numcgmordenador;
+                        db_input("e60_numcgmordenador",10,$Ie60_numcgmordenador,true,"text",$fimperiodocontabil,"onChange='js_pesquisa_cgm(false);'");
+                        db_input("e60_nomeordenador",40,$Ie60_nomeordenador,true,"text",3);
+                        db_input("e60_numcgmordenadoranterior",10,$Ie60_numcgmordenador,true,"hidden");
                     ?>
                 </td>
             </tr>
@@ -613,6 +629,17 @@ $aDataEmpenho = explode("-", $e60_emiss);
                     ?>
                 </td>
             </tr>
+
+            <tr>
+                <td nowrap title="Dívida Consolidada">
+                    <? db_ancora("Dívida Consolidada", "js_pesquisaDivida(true);", $db_opcao); ?>
+                </td>
+                <td>
+                    <? db_input("op01_numerocontratoopc",11,$op01_numerocontratoopc,true,"text",$db_opcao,"onChange='js_pesquisaDivida(false);'") ?>
+                    <? db_input("op01_text_numerocontratoopc",50, $op01_text_numerocontratoopc,true,"text",3) ?>
+                </td>
+            </tr>
+
             <!--
             <tr>
                 <td nowrap title="<?//=@$Te60_dataconvenio?>">
@@ -650,14 +677,67 @@ $aDataEmpenho = explode("-", $e60_emiss);
 </form>
 
 <style>
-    #e60_tipodespesa{ width: 140px; }#e60_codtipodescr{width: 342px}#e63_codhistdescr{width: 342px}#pc50_descr{width: 333px}#e44_tipo{width: 228px;}#e57_codhistdescr{width: 158px;}#e54_codtipodescr{width: 158px;}#e54_codtipo{width: 67px;}#e54_tipol{width: 67px;}#e54_tipoldescr{width: 158px;}#e54_codcom{width: 67px;}#z01_nome{width: 333px;}#e54_destin{width: 424px;}#e54_gestaut{width: 67px;}#e54_nomedodepartamento{width: 354px;}#ac16_resumoobjeto{width: 364px;}#e60_numconvenio{width: 83px;}#e54_resumo,#e60_resumo,#e60_informacaoop{width: 588px;}#e50_obs{width: 588px;}#e56_codele{width: 140px}
+    #e60_tipodespesa{ width: 140px; }#e60_codtipodescr{width: 342px}#e63_codhistdescr{width: 342px}#pc50_descr{width: 333px}#e44_tipo{width: 228px;}#e57_codhistdescr{width: 158px;}#e54_codtipodescr{width: 158px;}#e54_codtipo{width: 67px;}#e54_tipol{width: 67px;}#e54_tipoldescr{width: 158px;}#e54_codcom{width: 67px;}#z01_nome{width: 333px;}#e54_destin{width: 424px;}#e54_gestaut{width: 67px;}#e54_nomedodepartamento{width: 354px;}#op01_text_numerocontratoopc{width: 349.96px;}#ac16_resumoobjeto{width: 364px;}#e60_numconvenio{width: 83px;}#op01_numerocontratoopc{width: 81.5px;}#e54_resumo,#e60_resumo,#e60_informacaoop{width: 588px;}#e50_obs{width: 588px;}#e56_codele{width: 140px}
 </style>
 
 
 <script>
+
     var lEsferaEmendaParlamentar = 'f';
     var bEmendaParlamentar = false;
     var bEsferaEmendaParlamentar = false;
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+        var eventoChange = new Event('change', { bubbles: true});
+        document.getElementById('op01_numerocontratoopc').dispatchEvent(eventoChange);
+
+        document.getElementById('e64_codele').addEventListener('input', function(e) {
+            var obrigaDivida = obrigaPreenchimentoDivida();
+            document.getElementById('obriga_divida').value = obrigaDivida;
+        });
+
+        document.getElementById('op01_numerocontratoopc').addEventListener('input', function(e) {
+            var valor = e.target.value;
+            if(valor.trim() === '') {
+                document.getElementById('op01_text_numerocontratoopc').value = '';
+            }
+        });
+
+    });
+
+    function getRegrasFiltrarDivida() {
+
+        var desdobramento  = document.getElementById('e64_codele');
+        var optionSelected = desdobramento.options[desdobramento.selectedIndex].text;
+
+        var condicoes = "";
+
+        var prefixosOutrasDividas    = ['3271', '3273', '3274', '4671', '4673', '4674'];
+        var prefixoIntraorçamentaria = ['3291', '4691'];
+
+        if(prefixosOutrasDividas.some(prefixo => optionSelected.startsWith(prefixo))) {
+            condicoes = " AND op01_tipolancamento = 20 AND op01_detalhamentodivida = 15";
+        } else if (prefixoIntraorçamentaria.some(prefixo => optionSelected.startsWith(prefixo))) {
+            condicoes = " AND op01_tipocredor = 2";
+        } else {
+            condicoes = " AND op01_tipolancamento <> 20 AND op01_detalhamentodivida <> 15 AND op01_tipocredor <> 2";
+        }
+
+        return condicoes;
+    }
+
+    function obrigaPreenchimentoDivida() {
+
+        var desdobramento  = document.getElementById('e64_codele');
+        var optionSelected = desdobramento.options[desdobramento.selectedIndex].text;
+
+        if (optionSelected.startsWith('32') || optionSelected.startsWith('46')) {
+            return 'sim';
+        }
+
+        return 'nao';
+    }
 
     function js_verificaresfera() {
         if ($F('e60_emendaparlamentar') != 3 && lEsferaEmendaParlamentar == 't') {
@@ -727,6 +807,9 @@ $aDataEmpenho = explode("-", $e60_emiss);
     }
     function js_valida()
     {
+        var obrigaDivida = obrigaPreenchimentoDivida();
+        document.getElementById('obriga_divida').value = obrigaDivida;
+
         if (document.form1.efd60_cessaomaoobra.value == 2) {
 
             if (document.form1.efd60_possuicno.value == 0) {
@@ -759,6 +842,11 @@ $aDataEmpenho = explode("-", $e60_emiss);
                 alert("Campo  Tipo de Serviço nao Informado.")
                 return false;
             }
+        }
+
+        if (document.form1.e60_numcgmordenadoranterior.value && !document.form1.e60_numcgmordenador.value) {
+                alert("Campo  Ordenador da Despesa nao Informado.")
+                return false;
         }
     }
 
@@ -833,9 +921,9 @@ $aDataEmpenho = explode("-", $e60_emiss);
         db_iframe_concarpeculiar.hide();
     }
     function js_pesquisa(){
-        js_OpenJanelaIframe('','db_iframe_empempenho','func_empempenho.php?funcao_js=parent.js_preenchepesquisa|e60_numemp|e60_codemp|e60_anousu','Pesquisa',true,'0');
+        js_OpenJanelaIframe('','db_iframe_empempenho','func_empempenho.php?funcao_js=parent.js_preenchepesquisa|e60_numemp|e60_codemp|e60_anousu|e60_numcgm','Pesquisa',true,'0');
     }
-    function js_preenchepesquisa(chave, chave2, ano){
+    function js_preenchepesquisa(chave, chave2, ano, chave3){
         db_iframe_empempenho.hide();
         <?
         echo " location.href = '".basename($GLOBALS["HTTP_SERVER_VARS"]["PHP_SELF"])."?chavepesquisa='+chave";
@@ -843,11 +931,43 @@ $aDataEmpenho = explode("-", $e60_emiss);
 
         parent.document.formaba.alteracaoop.disabled=false;
         empenho = chave2+'/'+ano;
-        CurrentWindow.corpo.iframe_alteracaoop.location.href='emp1_aba2ordempagamento002.php?pesquisa=1&empenho='+empenho;
+        CurrentWindow.corpo.iframe_alteracaoop.location.href='emp1_aba2ordempagamento002.php?pesquisa=1&empenho='+empenho+'&fornecedor='+chave3;
     }
 
+    function js_pesquisaDivida(mostra) {
 
+        var credor = document.getElementById('e60_numcgm').value;
 
+        var regrasFiltros = getRegrasFiltrarDivida();
+
+        if (mostra == true) {
+            js_OpenJanelaIframe('', 'db_iframe_db_operacaodecredito', 'func_db_operacaodecredito.php?credor='+ credor +'&regras='+regrasFiltros+'&funcao_js=parent.js_mostraDivida|op01_sequencial|op01_numerocontratoopc|op01_dataassinaturacop', 'Pesquisa', true);
+        } else {
+            if (document.form1.op01_numerocontratoopc.value != '') {
+                js_OpenJanelaIframe('', 'db_iframe_db_operacaodecredito', 'func_db_operacaodecredito.php?credor='+ credor +'&regras='+regrasFiltros+'&pesquisa_chave=' + document.form1.op01_numerocontratoopc.value + '&funcao_js=parent.js_completaDivida', 'Pesquisa', false);
+            } else {
+                document.form1.op01_numerocontratoopc.value = '';
+            }
+        }
+    }
+
+    function js_mostraDivida(chave, chave1, chave2, chave3, chave4) {
+        document.form1.op01_numerocontratoopc.value = chave;
+        document.form1.op01_text_numerocontratoopc.value = chave1;
+        db_iframe_db_operacaodecredito.hide();
+
+        if(chave1.includes('não Encontrado')) {
+            document.form1.op01_numerocontratoopc.value = '';
+        }
+    }
+
+    function js_completaDivida(chave, chave1, erro) {
+        document.form1.op01_text_numerocontratoopc.value = chave;
+
+        if(chave.includes('não Encontrado')) {
+            document.form1.op01_numerocontratoopc.value = '';
+        }
+    }
 
     function js_verificaFinalidadeEmpenho() {
 
@@ -941,6 +1061,51 @@ $aDataEmpenho = explode("-", $e60_emiss);
         document.getElementById("historico_alterado").value = true;
     }
 
+    function js_pesquisa_cgm(mostra)
+    {
+        if(mostra==true){
+            js_OpenJanelaIframe('','db_iframe_cgm','func_cgmordenador.php?funcao_js=parent.js_mostracgm1|z01_numcgm|z01_nome|tipo','Pesquisa',true);
+        }else{
+            if(document.form1.e60_numcgmordenador.value != ''){
+                js_OpenJanelaIframe('','db_iframe_cgm','func_cgmordenador.php?pesquisa_chave='+document.form1.e60_numcgmordenador.value+'&funcao_js=parent.js_mostracgm','Pesquisa',false);
+            }else{
+                document.form1.e60_nomeordenador.value = '';
+            }
+        }
+    }
+
+    function js_mostracgm(erro, chave,chave2)
+    { 
+        if (chave2 == 'JURIDICA') {
+            alert("É obrigatório que o ordenador seja uma pessoa física.")
+            document.form1.e60_numcgmordenador.value = '';
+            document.form1.e60_nomeordenador.value = '';
+            document.form1.e60_numcgmordenador.focus();
+        } else {
+            document.form1.e60_nomeordenador.value = chave;
+        }
+        if (erro == true) {
+            document.form1.e60_numcgmordenador.focus();
+            document.form1.e60_numcgmordenador.value = '';
+        }
+    }
+
+    function js_mostracgm1(chave, chave1,chave2) 
+    {
+       
+        if (chave2 == 'JURIDICA') {
+            alert("É obrigatório que o ordenador seja uma pessoa física.")
+            document.form1.e60_numcgmordenador.value = '';
+            document.form1.e60_nomeordenador.value = '';
+            return false;
+        } else {
+            document.form1.e60_numcgmordenador.value = chave;
+            document.form1.e60_nomeordenador.value = chave1;
+            db_iframe_cgm.hide();
+        }
+      
+    }
+
     showForm(document.form1.efd60_cessaomaoobra.value );
          /**
      * Ajustes no layout
@@ -949,6 +1114,8 @@ $aDataEmpenho = explode("-", $e60_emiss);
         $('e60_codemp').style.width = "15%";
         $('e60_numcgm').style.width = "15%";
         $('z01_nome').style.width = "64.4%";
+        $('e60_numcgmordenador').style.width = "15%";
+        $('e60_nomeordenador').style.width = "64.4%";
         $('e60_codcom').style.width = "15%";
         $('pc50_descr').style.width = "64.4%";
         $('e60_tipol').style.width = "15%";
@@ -969,8 +1136,10 @@ $aDataEmpenho = explode("-", $e60_emiss);
         $("e54_nomedodepartamento").style.width       = "64.4%";
         $("c58_descr").style.width       = "64.4%";
         $("c206_objetoconvenio").style.width       = "64.4%";
+        $("op01_text_numerocontratoopc").style.width       = "64.4%";
         $("e44_tipo").style.width         = "100%";
         $('e60_numconvenio').style.width = "15%";
+        $('op01_numerocontratoopc').style.width = "15%";
         $('e60_datasentenca').style.width = "15%";
         $('e60_concarpeculiar').style.width = "15%";
         $('e54_autori').style.width = "10%";

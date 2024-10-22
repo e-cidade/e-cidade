@@ -448,6 +448,46 @@ class cl_empautidot {
      }
      return $sql;
   }
+  function sql_query_dotacao_empenho ($e56_autori=null,$campos="*",$ordem=null,$dbwhere=""){ 
+    $sql = "select ";
+    if($campos != "*" ){
+      $campos_sql = split("#",$campos);
+      $virgula = "";
+      for($i=0;$i<sizeof($campos_sql);$i++){
+        $sql .= $virgula.$campos_sql[$i];
+        $virgula = ",";
+      }
+    }else{
+      $sql .= $campos;
+    }
+    $sql .= " from empautidot ";
+    $sql .= "      inner join orcdotacao  on  orcdotacao.o58_anousu = empautidot.e56_anousu and  orcdotacao.o58_coddot = empautidot.e56_coddot";
+    $sql .= "      inner join empautoriza  on  empautoriza.e54_autori = empautidot.e56_autori";
+    $sql .= "      inner join orcelemento  on  orcelemento.o56_codele = orcdotacao.o58_codele 
+                                          and orcelemento.o56_anousu = orcdotacao.o58_anousu";
+    $sql .= "      inner join empempaut ON e61_autori=e54_autori";
+    $sql .= "      inner join empelemento on e61_numemp = e64_numemp	"; 
+    $sql .= "  left join orctiporec on o15_codigo = e56_orctiporec";
+    $sql2 = "";
+    if($dbwhere==""){
+      if($e56_autori!=null ){
+        $sql2 .= " where empautidot.e56_autori = $e56_autori "; 
+      } 
+    }else if($dbwhere != ""){
+      $sql2 = " where $dbwhere";
+    }
+    $sql .= $sql2;
+    if($ordem != null ){
+      $sql .= " order by ";
+      $campos_sql = split("#",$ordem);
+      $virgula = "";
+      for($i=0;$i<sizeof($campos_sql);$i++){
+        $sql .= $virgula.$campos_sql[$i];
+        $virgula = ",";
+      }
+    }
+    return $sql;
+  }
    function sql_query_file ( $e56_autori=null,$campos="*",$ordem=null,$dbwhere=""){ 
      $sql = "select ";
      if($campos != "*" ){

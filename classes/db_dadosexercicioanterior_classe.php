@@ -21,6 +21,7 @@ class cl_dadosexercicioanterior {
   public $c235_naoaplicfundebimposttransf = 0;
   public $c235_superavit_fundeb_permitido = 0;
   public $c235_naoaplicfundebcompl = 0;
+  public $c235_valornaoaplicsaude = null;
   // cria propriedade com as variaveis do arquivo
   public $campos = "
                  c235_sequencial = int8 = Sequencial
@@ -28,6 +29,7 @@ class cl_dadosexercicioanterior {
                  c235_naoaplicfundebimposttransf = float8 = Valor não Aplic. do Fundeb - Impost. e Transf. Imp
                  c235_superavit_fundeb_permitido = float8 = Valor do superávit do Fundeb permitido
                  c235_naoaplicfundebcompl = float8 = Valor não aplic. Fundeb - Comple VAAT
+                 c235_valornaoaplicsaude float8
                  ";
 
   //funcao construtor da classe
@@ -55,7 +57,8 @@ class cl_dadosexercicioanterior {
        $this->c235_naoaplicfundebimposttransf = ($this->c235_naoaplicfundebimposttransf == ""?@$GLOBALS["HTTP_POST_VARS"]["c235_naoaplicfundebimposttransf"]:$this->c235_naoaplicfundebimposttransf);
        $this->c235_superavit_fundeb_permitido = ($this->c235_superavit_fundeb_permitido == ""?@$GLOBALS["HTTP_POST_VARS"]["c235_superavit_fundeb_permitido"]:$this->c235_superavit_fundeb_permitido);
        $this->c235_naoaplicfundebcompl = ($this->c235_naoaplicfundebcompl == ""?@$GLOBALS["HTTP_POST_VARS"]["c235_naoaplicfundebcompl"]:$this->c235_naoaplicfundebcompl);
-     } else {
+       $this->c235_valornaoaplicsaude = ($this->c235_valornaoaplicsaude == "" ? @$GLOBALS["HTTP_POST_VARS"]["c235_valornaoaplicsaude"] : $this->c235_valornaoaplicsaude);  
+      } else {
        $this->c235_sequencial = ($this->c235_sequencial == ""?@$GLOBALS["HTTP_POST_VARS"]["c235_sequencial"]:$this->c235_sequencial);
      }
    }
@@ -144,12 +147,15 @@ class cl_dadosexercicioanterior {
        $this->erro_status = "0";
        return false;
      }
+
+     $this->c235_valornaoaplicsaude = $this->c235_valornaoaplicsaude == '' ? 0 : $this->c235_valornaoaplicsaude;
      $sql = "insert into dadosexercicioanterior(
                                        c235_sequencial
                                       ,c235_anousu
                                       ,c235_naoaplicfundebimposttransf
                                       ,c235_superavit_fundeb_permitido
                                       ,c235_naoaplicfundebcompl
+                                      ,c235_valornaoaplicsaude
                        )
                 values (
                                 $this->c235_sequencial
@@ -157,6 +163,7 @@ class cl_dadosexercicioanterior {
                                ,$this->c235_naoaplicfundebimposttransf
                                ,$this->c235_superavit_fundeb_permitido
                                ,$this->c235_naoaplicfundebcompl
+                               ,$this->c235_valornaoaplicsaude
                       )";
      $result = db_query($sql);
      if ($result==false) {
@@ -282,6 +289,10 @@ class cl_dadosexercicioanterior {
          return false;
        }
      }
+     if (trim($this->c235_valornaoaplicsaude) != "" || isset($GLOBALS["HTTP_POST_VARS"]["c235_valornaoaplicsaude"])) {
+      $sql  .= $virgula . " c235_valornaoaplicsaude = '$this->c235_valornaoaplicsaude' ";
+      $virgula = ",";
+    }
      $sql .= " where ";
      if ($c235_sequencial!=null) {
        $sql .= " c235_sequencial = $this->c235_sequencial";

@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc20610 extends AbstractMigration
+class Oc20610 extends PostgresMigration
 {
     public function up()
     {
@@ -16,7 +16,7 @@ class Oc20610 extends AbstractMigration
             ADD COLUMN ac16_infcomplementares TEXT NULL,
             ADD COLUMN ac16_justificativapncp TEXT NULL,
         ";
-        
+
         $this->execute($querySQL);
     }
 
@@ -32,7 +32,7 @@ class Oc20610 extends AbstractMigration
             DROP COLUMN ac16_infcomplementares,
             DROP COLUMN ac16_justificativapncp,
         ";
-        
+
         $this->execute($querySQL);
     }
 }

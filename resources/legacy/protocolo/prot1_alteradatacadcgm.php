@@ -39,7 +39,6 @@ $cl_historicocgm = new cl_historicocgm;
 $error = false;
 
 if (isset($oPost->incluir)) {
-
     /*
      * Verifica o periodo de encerramento patrimonial
      * */

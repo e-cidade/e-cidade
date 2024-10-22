@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc21798 extends AbstractMigration
+class Oc21798 extends PostgresMigration
 {
     public function up()
     {
@@ -28,7 +28,7 @@ class Oc21798 extends AbstractMigration
                     o203_instit 	       bigint NOT NULL,
                     o203_totalbimestres       float8 NULL
                 );
-                
+
         CREATE SEQUENCE orcmetasarrecadacaoreceita_o203_sequencial_seq
             START WITH 1
             INCREMENT BY 1
@@ -36,9 +36,9 @@ class Oc21798 extends AbstractMigration
             NO MAXVALUE
             CACHE 1;
 
-    COMMIT; 
+    COMMIT;
 
 SQL;
         $this->execute($sql);
-    } 
+    }
 }

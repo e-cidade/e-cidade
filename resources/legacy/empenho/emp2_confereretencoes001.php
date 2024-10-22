@@ -238,7 +238,11 @@ $db_opcao = 1;
                         $aQuebras = array(1 => "Nenhuma",
                                           2 => "Conta",
                                           3 => "Credor",
-                                          4 => "Ano");
+                                          4 => "Ano",
+                                          5 => "Recurso",
+                                          6 => "Receita",
+                                          7 => "Retenção"
+                                        );
                        db_select("group", $aQuebras,true,1,"style='width:10em'");
                       ?>
                     </td>

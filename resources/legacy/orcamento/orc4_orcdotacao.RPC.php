@@ -207,7 +207,7 @@ try {
                                 $sWhere .= " AND ";
                             }
                         }
-                        $sWhere = rtrim($sWhere, " AND ");
+                        $sWhere .= " o58_anousu = {$rsDotacao->o58_anousu} ";
                         $rsDotacaoIgual = $oDotacao->sql_record($oDotacao->sql_query(null,null,'*',null,$sWhere));
                         if ($rsDotacaoIgual) {
                             $sDuplicidade .= " {$oItem->iCodDot},";

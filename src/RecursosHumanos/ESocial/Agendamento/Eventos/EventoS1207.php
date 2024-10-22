@@ -34,8 +34,8 @@ class EventoS1207 extends EventoBase
      */
     public function montarDados()
     {
-        $ano = date("Y", db_getsession("DB_datausu"));
-        $mes = date("m", db_getsession("DB_datausu"));
+        $ano = $this->ano();
+        $mes = $this->mes();
         $aDadosAPI = array();
         $iSequencial = 1;
         foreach ($this->dados as $oDados) {
@@ -110,8 +110,8 @@ class EventoS1207 extends EventoBase
 
     private function buscarDadosPorMatricula($cpf)
     {
-        $ano = db_getsession("DB_anousu");
-        $mes = date("m", db_getsession("DB_datausu"));
+        $ano = $this->ano();
+        $mes = $this->mes();
         $sql = "SELECT
         distinct
         1 as tpInsc,
@@ -272,7 +272,7 @@ where
     {
         require_once 'libs/db_libpessoal.php';
         $clrubricasesocial = new cl_rubricasesocial;
-        $rsValores = $this->getValoresPorPonto($ponto, $matricula);
+        $rsValores = $this->getValoresPorPonto($ponto, $matricula,$this->ano(),$this->mes());
         for ($iCont = 0; $iCont < pg_num_rows($rsValores); $iCont++) {
             $oResult = \db_utils::fieldsMemory($rsValores, $iCont);
             $rubrica = $oResult->rubrica;
@@ -303,8 +303,8 @@ where
      */
     private function buscarIdentificador($matricula, $rh30_regime)
     {
-        $iAnoUsu = date("Y", db_getsession("DB_datausu"));
-        $iMesusu = date("m", db_getsession("DB_datausu"));
+        $iAnoUsu = $this->ano();
+        $iMesusu = $this->mes();
         $aPontos = array(TipoPontoConstants::PONTO_13SALARIO);
         if ($this->indapuracao != 2) {
             $aPontos = array(TipoPontoConstants::PONTO_SALARIO, TipoPontoConstants::PONTO_COMPLEMENTAR);

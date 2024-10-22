@@ -42,6 +42,7 @@ $clempempenho = new cl_empempenho;
 $clrotulo = new rotulocampo;
 $clconlancam = new cl_conlancam;
 $clempdiaria = new cl_empdiaria;
+$clcgm            = new cl_cgm;
 
 $clempempenho->rotulo->label();
 $clmatordem->rotulo->label();
@@ -62,6 +63,7 @@ parse_str($HTTP_SERVER_VARS['QUERY_STRING'], $aFiltros);
 
 if (isset($aFiltros['empenho']) && !empty($aFiltros['empenho'])) {
     $empenho = $aFiltros['empenho'];
+    $fornecedor = $aFiltros['fornecedor'];
 }
 
 $sqlerro = false;
@@ -403,6 +405,7 @@ if (isset($alterar) && $ct01_codcategoria) {
           $clpagordemEsocial->e50_contribuicaoPrev          = $contribuicaoPrev;
           $clpagordemEsocial->e50_valorremuneracao          = str_replace(',', '', $valorremuneracao);
           $clpagordemEsocial->e50_valordesconto             = str_replace(',', '', $valordesconto);
+          $clpagordemEsocial->e50_numcgmordenador           = $e50_numcgmordenador;
 
           if ($competencia && $competencia != "undefined") {
             $clpagordemEsocial->e50_datacompetencia         = formateDateReverse($competencia);
@@ -419,6 +422,21 @@ if (isset($alterar) && $ct01_codcategoria) {
   } else{
      $erro_msg .= "\n\nFalhas ao Salvar Dados do Esocial.";
   }
+}
+ //Verifica se o periodo contabil esta encerrado na data do empenho
+ $sSqlConsultaFimPeriodoContabil   = "SELECT * FROM condataconf WHERE c99_anousu = ".db_getsession("DB_anousu")." and c99_instit = ".db_getsession('DB_instit');
+ $rsConsultaFimPeriodoContabil     = db_query($sSqlConsultaFimPeriodoContabil);
+ $fimperiodocontabil = 1;
+ if($sqlerro == false){
+     if (pg_num_rows($rsConsultaFimPeriodoContabil) > 0) {
+         $oFimPeriodoContabil = db_utils::fieldsMemory($rsConsultaFimPeriodoContabil, 0);
+         if ($oFimPeriodoContabil->c99_data != '' &&
+         ($e60_emiss && (db_strtotime($e60_emiss) <= db_strtotime($oFimPeriodoContabil->c99_data)) || ($data_empenho &&
+         db_strtotime($data_empenho) <= db_strtotime($oFimPeriodoContabil->c99_data)))) {
+             $fimperiodocontabil = 3;
+         }
+
+     }
 }
 db_fim_transacao($sqlerroEsocial);
 ?>

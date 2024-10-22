@@ -12,9 +12,9 @@ class ConPlanoConta extends LegacyModel
 
     public $timestamps = false;
 
-    protected $table = 'conplanoconta';
+    protected $table = 'contabilidade.conplanoconta';
 
-    protected $primaryKey = 'c63_codcon, c63_anousu';
+    protected $primaryKey = 'c63_codcon';
 
     public $incrementing = false;
 
@@ -29,7 +29,7 @@ class ConPlanoConta extends LegacyModel
         'c63_identificador',
         'c63_codigooperacao',
         'c63_funcao',
-        'c63_tipoconta',
+        'c63_tipoconta'
        
     ];
 

@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc21142v3 extends AbstractMigration
+class Oc21142v3 extends PostgresMigration
 {
     public function up()
     {
@@ -33,13 +33,13 @@ class Oc21142v3 extends AbstractMigration
 
 
         -- Inserindo menu Consultas
-        INSERT INTO db_menu VALUES((SELECT max(id_item) FROM db_modulos), 31, 2, (SELECT max(id_item) FROM db_modulos));   
+        INSERT INTO db_menu VALUES((SELECT max(id_item) FROM db_modulos), 31, 2, (SELECT max(id_item) FROM db_modulos));
 
         -- Inserindo itens de menu
         INSERT INTO db_itensmenu VALUES((SELECT max(id_item)+1 FROM db_itensmenu), 'Consultar Eventos EFD-Reinf', 'Consultar de Eventos EFD-Reinf', '', 1, 1, 'Consultar de Eventos EFD-Reinf', 't');
         INSERT INTO db_menu VALUES(31, (SELECT max(id_item) FROM db_itensmenu), 1, (SELECT max(id_item) FROM db_modulos));
 
-        -- Menus 
+        -- Menus
         -- Inserindo menu R-4010 Pessoa física
         INSERT INTO db_itensmenu VALUES((SELECT max(id_item)+1 FROM db_itensmenu), 'R-4010 Pessoa física', 'R-4010 Pagamentos/créditos a beneficiário pessoa física', 'efd3_reinf4010evento001.php', 1, 1, 'R-4010 Pagamentos/créditos a beneficiário pessoa física', 't');
         INSERT INTO db_menu VALUES((SELECT max(id_item) FROM db_itensmenu where descricao like 'Consultar Eventos EFD-Reinf'), (SELECT max(id_item) FROM db_itensmenu), 1, (SELECT max(id_item) FROM db_modulos));
@@ -61,7 +61,7 @@ class Oc21142v3 extends AbstractMigration
         INSERT INTO db_itensmenu VALUES((SELECT max(id_item)+1 FROM db_itensmenu), 'Envio de Eventos EFD-Reinf', 'Envio de Eventos EFD-Reinf', '', 1, 1, 'Envio de Eventos EFD-Reinf', 't');
         INSERT INTO db_menu VALUES(32, (SELECT max(id_item) FROM db_itensmenu), 1, (SELECT max(id_item) FROM db_modulos));
 
-        -- Menus 
+        -- Menus
         -- Inserindo menu R-4010 Pessoa física
         INSERT INTO db_itensmenu VALUES((SELECT max(id_item)+1 FROM db_itensmenu), 'R-4010 Pessoa física', 'R-4010 Pagamentos/créditos a beneficiário pessoa física', 'efd1_reinf4010evento001.php', 1, 1, 'R-4010 Pagamentos/créditos a beneficiário pessoa física', 't');
         INSERT INTO db_menu VALUES((SELECT max(id_item) FROM db_itensmenu where descricao like 'Envio de Eventos EFD-Reinf'), (SELECT max(id_item) FROM db_itensmenu), 1, (SELECT max(id_item) FROM db_modulos));
@@ -91,15 +91,15 @@ class Oc21142v3 extends AbstractMigration
                     efd01_dscResp  	     character varying(500) NULL,
                     efd01_dataenvio 	 character varying(50) NULL
                 );
-            
+
         CREATE SEQUENCE efdreinfr4099_efd01_sequencial_seq
                 START WITH 1
                 INCREMENT BY 1
                 NO MINVALUE
                 NO MAXVALUE
                 CACHE 1;
-                
-                
+
+
 
         CREATE TABLE efdreinfr4020 (
                     efd02_sequencial          int8 DEFAULT 0 NOT NULL,
@@ -120,16 +120,16 @@ class Oc21142v3 extends AbstractMigration
                     efd02_status    	      int8 NULL,
                     efd02_descResposta        character varying(500) NULL,
                     efd02_dscResp  	      character varying(500) NULL
-                
+
                 );
-            
+
         CREATE SEQUENCE efdreinfr4020_efd02_sequencial_seq
                 START WITH 1
                 INCREMENT BY 1
                 NO MINVALUE
                 NO MAXVALUE
                 CACHE 1;
-                
+
 
 
         CREATE TABLE efdreinfr4010 (
@@ -151,19 +151,19 @@ class Oc21142v3 extends AbstractMigration
                     efd03_status    	      int8 NULL,
                     efd03_descResposta        character varying(500) NULL,
                     efd03_dscResp  	      character varying(500) NULL
-                
+
                 );
-            
+
         CREATE SEQUENCE efdreinfr4010_efd03_sequencial_seq
                 START WITH 1
                 INCREMENT BY 1
                 NO MINVALUE
                 NO MAXVALUE
                 CACHE 1;
-                
-    COMMIT; 
+
+    COMMIT;
 
 SQL;
         $this->execute($sql);
-    } 
+    }
 }

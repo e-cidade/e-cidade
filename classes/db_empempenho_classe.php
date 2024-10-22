@@ -42,6 +42,7 @@ class cl_empempenho
     var $erro_msg   = null;
     var $erro_campo = null;
     var $pagina_retorno = null;
+    var $obriga_divida = null;
     // cria variaveis do arquivo
     var $e60_numemp = 0;
     var $e60_codemp = null;
@@ -95,8 +96,11 @@ class cl_empempenho
     /** FIM - OC19656 */
     var $e60_codco = null;
     var $e60_id_documento_assinado = null;
-
     var $e60_node_id_libresing = null;
+    var $op01_numerocontratoopc = null;
+    var $e60_dividaconsolidada = null;
+    var $e60_numcgmordenador = null;
+
     // cria propriedade com as variaveis do arquivo
     var $campos = "
                  e60_numemp = int4 = Número
@@ -134,6 +138,8 @@ class cl_empempenho
                  e60_codco = varchar(4) = codigo co
                  e60_id_documento_assinado = varchar = documento assinado
                  e60_node_id_libresing = varchar = e60_node_id_libresing
+                 e60_dividaconsolidada = int8 = Dívida Consolidada
+                 e60_numcgmordenador = int8 = Numero CGM do Ordenador
                  ";
     //funcao construtor da classe
     function cl_empempenho()
@@ -161,6 +167,7 @@ class cl_empempenho
             $this->e60_anousu = ($this->e60_anousu == "" ? @$GLOBALS["HTTP_POST_VARS"]["e60_anousu"] : $this->e60_anousu);
             $this->e60_coddot = ($this->e60_coddot == "" ? @$GLOBALS["HTTP_POST_VARS"]["e60_coddot"] : $this->e60_coddot);
             $this->e60_numcgm = ($this->e60_numcgm == "" ? @$GLOBALS["HTTP_POST_VARS"]["e60_numcgm"] : $this->e60_numcgm);
+            $this->e60_numcgmordenador = ($this->e60_numcgmordenador == "" ? @$GLOBALS["HTTP_POST_VARS"]["e60_numcgmordenador"] : $this->e60_numcgmordenador);
             $this->e60_vlrutilizado = ($this->e60_vlrutilizado == "" ? @$GLOBALS["HTTP_POST_VARS"]["e60_vlrutilizado"] : $this->e60_vlrutilizado);
             if ($this->e60_emiss == "") {
                 $this->e60_emiss_dia = ($this->e60_emiss_dia == "" ? @$GLOBALS["HTTP_POST_VARS"]["e60_emiss_dia"] : $this->e60_emiss_dia);
@@ -221,6 +228,9 @@ class cl_empempenho
         $this->e60_codco = ($this->e60_codco == "" ? @$GLOBALS["HTTP_POST_VARS"]["e60_codco"] : $this->e60_codco);
         $this->e60_id_documento_assinado = ($this->e60_id_documento_assinado == "" ? @$GLOBALS["HTTP_POST_VARS"]["e60_id_documento_assinado"] : $this->e60_id_documento_assinado);
         $this->e60_node_id_libresing = ($this->e60_node_id_libresing == "" ? @$GLOBALS["HTTP_POST_VARS"]["e60_node_id_libresing"] : $this->e60_node_id_libresing);
+        $this->e60_dividaconsolidada = ($this->e60_dividaconsolidada == "" ? @$GLOBALS["HTTP_POST_VARS"]["op01_numerocontratoopc"] : $this->e60_dividaconsolidada);
+        $this->obriga_divida = ($this->obriga_divida == "" ? @$GLOBALS["HTTP_POST_VARS"]["obriga_divida"] : $this->obriga_divida);
+
     }
     // funcao para inclusao
     function incluir($e60_numemp)
@@ -256,6 +266,15 @@ class cl_empempenho
         if ($this->e60_numcgm == null) {
             $this->erro_sql = " Campo Numcgm nao Informado.";
             $this->erro_campo = "e60_numcgm";
+            $this->erro_banco = "";
+            $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+            $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+            $this->erro_status = "0";
+            return false;
+        }
+        if ($this->e60_numcgmordenador == null) {
+            $this->erro_sql = " Campo Numcgm Ordenador nao Informado.";
+            $this->erro_campo = "e60_numcgmordenador";
             $this->erro_banco = "";
             $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
             $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
@@ -334,6 +353,23 @@ class cl_empempenho
             $this->erro_status = "0";
             return false;
         }
+
+        $controlaDivida = $this->getControlaDividaParam(db_getsession("DB_anousu"));
+
+        if(($this->e60_dividaconsolidada == null || $this->e60_dividaconsolidada == 'null') && ($this->obriga_divida == 'sim' && $controlaDivida == 't')) {
+
+            $this->erro_sql   = " Campo Dívida Consolidada é de preenchimento obrigatório!";
+            $this->erro_banco = "";
+            $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+            $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+            $this->erro_status = "0";
+            return false;
+        }
+        
+        if($this->e60_dividaconsolidada == null) {
+            $this->e60_dividaconsolidada = 'null';
+        }
+
         if ($this->e60_salant == null) {
             $this->e60_salant = "0";
         }
@@ -473,6 +509,8 @@ class cl_empempenho
                                       ,e60_codco
                                       ,e60_id_documento_assinado
                                       ,e60_node_id_libresing
+                                      ,e60_dividaconsolidada
+                                      ,e60_numcgmordenador
                        )
                 values (
                                 $this->e60_numemp
@@ -510,7 +548,9 @@ class cl_empempenho
                                ,'$this->e60_codco'
                                ,'$this->e60_id_documento_assinado'
                                ,'$this->e60_node_id_libresing'
-                      )";
+                               ,$this->e60_dividaconsolidada
+                               ,$this->e60_numcgmordenador
+                      )"; 
         $result = db_query($sql);
         if ($result == false) {
             $this->erro_banco = str_replace("\n", "", @pg_last_error());
@@ -637,6 +677,11 @@ class cl_empempenho
                 $this->erro_status = "0";
                 return false;
             }
+        }  
+        if (trim($this->e60_numcgmordenador) != "" || isset($GLOBALS["HTTP_POST_VARS"]["e60_numcgmordenador"])  &&  ($GLOBALS["HTTP_POST_VARS"]["e60_numcgmordenador"] != "")) {
+            $sql  .= $virgula . " e60_numcgmordenador = $this->e60_numcgmordenador ";
+            $virgula = ",";
+
         }
         if (trim($this->e60_emiss) != "" || isset($GLOBALS["HTTP_POST_VARS"]["e60_emiss_dia"]) &&  ($GLOBALS["HTTP_POST_VARS"]["e60_emiss_dia"] != "")) {
             $sql  .= $virgula . " e60_emiss = '$this->e60_emiss' ";
@@ -927,6 +972,32 @@ class cl_empempenho
                 }
             }
         }
+
+        $controlaDivida = $this->getControlaDividaParam(db_getsession("DB_anousu"));
+
+        if(($this->e60_dividaconsolidada == null || $this->e60_dividaconsolidada == 'null') && ($this->obriga_divida == 'sim' && $controlaDivida == 't')) {
+
+            $this->erro_sql = " Campo Dívida Consolidada é de preenchimento obrigatório!";
+            $this->erro_banco = "";
+            $this->erro_campo = "e60_dividaconsolidada";
+            $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+            $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+            $this->erro_status = "0";
+            return false;
+
+        } else {
+
+            if (trim($this->e60_dividaconsolidada) != "" || !empty($GLOBALS["HTTP_POST_VARS"]["op01_numerocontratoopc"])) {
+                $sql  .= $virgula . " e60_dividaconsolidada = '$this->e60_dividaconsolidada' ";
+                $virgula = ",";
+            } else {
+                if (isset($GLOBALS["HTTP_POST_VARS"]["op01_numerocontratoopc"])) {
+                    $sql  .= $virgula . " e60_dividaconsolidada = null ";
+                    $virgula = ",";
+                }
+            }
+        }
+
         if (trim($this->e60_datasentenca) != "" || isset($GLOBALS["HTTP_POST_VARS"]["e60_datasentenca_dia"]) &&  ($GLOBALS["HTTP_POST_VARS"]["e60_datasentenca_dia"] != "")) {
             $sql  .= $virgula . " e60_datasentenca = '$this->e60_datasentenca' ";
             $virgula = ",";
@@ -995,7 +1066,9 @@ class cl_empempenho
                     $resac = db_query("insert into db_acount values($acount,889,10817,'" . AddSlashes(pg_result($resaco, $conresaco, 'e60_concarpeculiar')) . "','$this->e60_concarpeculiar'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
             }
         }
+
         $result = db_query($sql);
+
         if ($result == false) {
             $this->erro_banco = str_replace("\n", "", @pg_last_error());
             $this->erro_sql   = "Empenhos na prefeitura nao Alterado. Alteracao Abortada.\\n";
@@ -1271,6 +1344,17 @@ class cl_empempenho
         return $sql;
     }
 
+    function getControlaDividaParam($e60_anousu) {
+
+        $sql    = "SELECT e30_obrigadivida FROM empenho.empparametro  WHERE e39_anousu = $e60_anousu;";
+        $result = db_query($sql);
+    
+        if ($result != false) {
+            $result = pg_result($result, 0, 0);
+        }
+    
+        return $result;
+    }
 
     // funcao do sql
     function sql_query_file($e60_numemp = null, $campos = "*", $ordem = null, $dbwhere = "")

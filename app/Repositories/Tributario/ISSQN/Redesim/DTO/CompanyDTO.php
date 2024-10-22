@@ -175,4 +175,14 @@ class CompanyDTO extends BaseDTO
     {
         return $this->situacao === self::STATUS_BAIXADA ? $this->dataDoAcontecimento->format('Y-m-d') : null;
     }
+
+    public function getRazaoSocialEcidade(): string
+    {
+        return substr($this->razaoSocial, 0, 100);
+    }
+
+    public function getNomeFantasiaEcidade(): string
+    {
+        return substr($this->nomeFantasia, 0, 100);
+    }
 }

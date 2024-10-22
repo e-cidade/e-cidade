@@ -172,7 +172,7 @@ $geraform = new cl_formulario_rel_pes;
               <td><b>Tipo :&nbsp;&nbsp;</b></td>
               <td>
                <?
-                 $x = array("r"=>"Relatório","a"=>"Arquivo","p"=>"Planilha");
+                 $x = array("r"=>"Relatório","a"=>"Arquivo","p"=>"Planilha", "e" =>"e-Consig");
                  db_select('tipo',$x,true,4,"");
                ?>
               </td>
@@ -310,7 +310,7 @@ $geraform = new cl_formulario_rel_pes;
           oDados.rubfim = rubrica.rubfim;
         }
 
-        if ( $F(tipo) == 'a' || $F(tipo) == 'p' ) {
+        if ( $F(tipo) == 'a' || $F(tipo) == 'p' || $F(tipo) == 'e') {
           js_OpenJanelaIframe('CurrentWindow.corpo','db_iframe_bbrubmescalculo','pes2_rubmescalculo002.php?sParametros='+Object.toJSON(oDados),'Gerando Arquivo',false);
         } else {
 

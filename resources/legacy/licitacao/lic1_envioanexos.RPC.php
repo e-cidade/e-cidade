@@ -34,14 +34,22 @@ switch ($oParam->exec) {
         $clliccontrolepncp = new cl_liccontrolepncp();
         $cllicanexopncp = new cl_licanexopncp();
 
-        foreach ($oParam->aDocumentos as $iDocumentos) {
+        $aDocumentos = $oParam->aDocumentos; 
+        $aCodigoAnexo = $oParam->aCodigoAnexo;
+
+        $numDocumentos = count($aDocumentos);
+
+        for ($i = 0; $i < $numDocumentos; $i++) {
+
+            $iDocumentos = $aDocumentos[$i];
+            $iCodigoAnexo = $aCodigoAnexo[$i];
+
 
             try {
 
-                $rsAnexos = $cl_liccontroleanexopncp->sql_record($cl_liccontroleanexopncp->sql_query_file(null, " * ", null, "l218_sequencialarquivo = " . $iDocumentos." and l218_licitacao ". $oParam->iCodigoProcesso));
-
+                $rsAnexos = $cl_liccontroleanexopncp->sql_record($cl_liccontroleanexopncp->sql_query_file(null, " * ", null, "l218_sequencialarquivo = " . $iDocumentos." and l218_licitacao = ". $oParam->iCodigoProcesso));
                 if (pg_num_rows($rsAnexos) > 0) {
-                    throw new Exception("O documento do codigo " . $iDocumentos . " ja foi enviado !");
+                    throw new Exception("O Anexo do código " . $iDocumentos . " já foi enviado !");
                 }
 
                 $rsAvisodeContratacao = $clliccontrolepncp->sql_record($clliccontrolepncp->sql_query_file(null, " * ", null, "l213_licitacao = " . $oParam->iCodigoProcesso));
@@ -64,7 +72,7 @@ switch ($oParam->exec) {
 
                 //envio
                 $clAvisoLicitacaoPNCP = new AvisoLicitacaoPNCP();
-                $rsApiPNCP = $clAvisoLicitacaoPNCP->enviarAnexos($oDadosAnexo->l216_tipoanexo, utf8_decode($oDadosAnexo->l213_descricao), $oDadosAnexo->l216_nomedocumento, $dadospncp->l213_anousu, $dadospncp->l213_numerocompra);
+                $rsApiPNCP = $clAvisoLicitacaoPNCP->enviarAnexos($oDadosAnexo->l216_tipoanexo, $oDadosAnexo->l216_nomedocumento, $oDadosAnexo->l216_documento, $dadospncp->l213_anousu, $dadospncp->l213_numerocompra);
 
                 if ($rsApiPNCP[0] == 201) {
 
@@ -91,6 +99,9 @@ switch ($oParam->exec) {
 
                     $oRetorno->status  = 1;
                     $oRetorno->message = "Enviado com Sucesso !";
+                }else{
+                    $oRetorno->status  = 2;
+                    $oRetorno->message = $rsApiPNCP[1];
                 }
             } catch (Exception $oErro) {
 
@@ -105,14 +116,22 @@ switch ($oParam->exec) {
         $clliccontrolepncp = new cl_liccontrolepncp();
         $cllicanexopncp = new cl_licanexopncp();
 
-        foreach ($oParam->aDocumentos as $iDocumentos) {
+        $aDocumentos = $oParam->aDocumentos; 
+        $aCodigoAnexo = $oParam->aCodigoAnexo;
+
+        $numDocumentos = count($aDocumentos);
+
+        for ($i = 0; $i < $numDocumentos; $i++) {
+
+            $iDocumentos = $aDocumentos[$i];
+            $iCodigoAnexo = $aCodigoAnexo[$i];
 
             try {
 
                 $rsAnexos = $cl_liccontroleanexopncp->sql_record($cl_liccontroleanexopncp->sql_query_file(null, " * ", null, "l218_sequencialarquivo = " . $iDocumentos));
 
                 if (pg_num_rows($rsAnexos) == null) {
-                    throw new Exception("O documento do codigo " . $iDocumentos . " não foi enviado no PNCP!");
+                    throw new Exception("O anexo do código " . $iDocumentos . " não foi enviado no PNCP!");
                 }
 
                 $rsAvisodeContratacao = $clliccontrolepncp->sql_record($clliccontrolepncp->sql_query_file(null, " * ", null, "l213_licitacao = " . $oParam->iCodigoProcesso));
@@ -132,7 +151,7 @@ switch ($oParam->exec) {
 
                 //envio exclusao
                 $clAvisoLicitacaoPNCP = new AvisoLicitacaoPNCP();
-                $rsApiPNCP = $clAvisoLicitacaoPNCP->excluirAnexos($dadospncp->l213_anousu, $dadospncp->l213_numerocompra, $oDadosAnexo->l218_sequencialpncp);
+                $rsApiPNCP = $clAvisoLicitacaoPNCP->excluirAnexos($dadospncp->l213_anousu, $dadospncp->l213_numerocompra, $oDadosAnexo->l218_sequencialpncp, $oParam->justificativa);
 
                 if ($rsApiPNCP[0] == 201) {
                     $clliccontroleanexopncp = new cl_liccontroleanexopncp();
@@ -152,4 +171,5 @@ switch ($oParam->exec) {
         }
         break;
 }
-echo json_encode($oRetorno);
+
+echo $oJson->encode(DBString::utf8_encode_all($oRetorno));

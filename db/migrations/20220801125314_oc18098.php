@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc18098 extends AbstractMigration
+class Oc18098 extends PostgresMigration
 {
     public function up()
     {
@@ -13,7 +13,7 @@ class Oc18098 extends AbstractMigration
 
         SELECT fc_startsession();
 
-         
+
         ALTER TABLE pagordem ADD COLUMN e50_cattrabalhador int4;
                     ALTER TABLE pagordem ADD COLUMN e50_empresadesconto int4;
                     ALTER TABLE pagordem ADD COLUMN e50_contribuicaoprev char;
@@ -25,7 +25,7 @@ class Oc18098 extends AbstractMigration
                     ct01_codcategoria int8 not null,
                     ct01_descricaocategoria varchar(500) not null
                 );
-       
+
         INSERT INTO CATEGORIATRABALHADOR (CT01_CODCATEGORIA,CT01_DESCRICAOCATEGORIA) VALUES
         ('101','EMPREGADO - GERAL  INCLUSIVE O EMPREGADO PÚBLICO DA ADMINISTRAÇÃO DIRETA OU INDIRETA CONTRATADO PELA CLT'),
         ('102','EMPREGADO - TRABALHADOR RURAL POR PEQUENO PRAZO DA LEI 11.718/2008'),
@@ -79,5 +79,5 @@ class Oc18098 extends AbstractMigration
 
 SQL;
         $this->execute($sql);
-    } 
+    }
 }

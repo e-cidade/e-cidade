@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc8403 extends AbstractMigration
+class Oc8403 extends PostgresMigration
 {
     /**
      * Change Method.
@@ -10,7 +10,7 @@ class Oc8403 extends AbstractMigration
      * Write your reversible migrations using this method.
      *
      * More information on writing migrations is available here:
-     * http://docs.phinx.org/en/latest/migrations.html#the-abstractmigration-class
+     * http://docs.phinx.org/en/latest/migrations.html#the-PostgresMigration-class
      *
      * The following commands can be used in this method and Phinx will
      * automatically reverse them when rolling back:
@@ -29,14 +29,14 @@ class Oc8403 extends AbstractMigration
     {
         $sSql = "
                  SELECT fc_startsession();
-                  
+
                  INSERT INTO empanuladotipo (e38_sequencial, e38_descr)
                  VALUES  (0, 'Selecione...'),
                          (3, 'FIM DA VIGENCIA CONTRATUAL'),
                          (4, 'FIM DO EXERCICIO FINANCEIRO'),
                          (5, 'RESCISAO CONTRATUAL');
                  ALTER TABLE empparametro ADD COLUMN e30_tipoanulacaopadrao INTEGER DEFAULT 2;
-                 
+
                  ALTER TABLE empparametro ADD FOREIGN KEY (e30_tipoanulacaopadrao) REFERENCES empanuladotipo(e38_sequencial);";
 
         $this->execute($sSql);

@@ -130,7 +130,7 @@ class cl_pcmater
       $this->pc01_obrigatorio = ($this->pc01_obrigatorio == "f" ? @$GLOBALS["HTTP_POST_VARS"]["pc01_obrigatorio"] : $this->pc01_obrigatorio);
       $this->pc01_liberaresumo = ($this->pc01_liberaresumo == "f" ? @$GLOBALS["HTTP_POST_VARS"]["pc01_liberaresumo"] : $this->pc01_liberaresumo);
       $this->pc01_obras = ($this->pc01_obras == "f" ? @$GLOBALS["HTTP_POST_VARS"]["pc01_obras"] : $this->pc01_obras);
-      $this->pc01_justificativa = ($this->pc01_justificativa == "f" ? @$GLOBALS["HTTP_POST_VARS"]["pc01_justificativa"] : $this->pc01_justificativa);
+      $this->pc01_justificativa = ($this->pc01_justificativa == "" ? @$GLOBALS["HTTP_POST_VARS"]["pc01_justificativa"] : $this->pc01_justificativa);
       $this->pc01_dataalteracao = ($this->pc01_dataalteracao == "f" ? @$GLOBALS["HTTP_POST_VARS"]["pc01_dataalteracao"] : $this->pc01_dataalteracao);
       $this->pc01_instit = ($this->pc01_instit == "f" ? @$GLOBALS["HTTP_POST_VARS"]["pc01_instit"] : $this->pc01_instit);
       $this->pc01_codmaterant = ($this->pc01_codmaterant == "f" ? @$GLOBALS["HTTP_POST_VARS"]["pc01_codmaterant"] : $this->pc01_codmaterant);

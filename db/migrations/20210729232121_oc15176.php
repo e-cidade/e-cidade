@@ -1,9 +1,9 @@
 <?php
 
 use Phinx\Console\Command\Rollback;
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc15176 extends AbstractMigration
+class Oc15176 extends PostgresMigration
 {
     public function up()
     {

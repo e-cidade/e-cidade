@@ -58,6 +58,10 @@ class DispensaPorValorPNCP extends ModeloBasePNCP
             $oDadosAPI->itensCompra[$key]->valorTotal                  = $vlrtotal;
             $oDadosAPI->itensCompra[$key]->criterioJulgamentoId        = $item->criteriojulgamentoid;
             $oDadosAPI->itensCompra[$key]->itemCategoriaId             = 3;
+
+            // TODO: Confirmar os dados corretos para esses campos com um consultor. Houve uma atualização durante a execução da tarefa. Futuramente, será criada uma tarefa específica para essa ocorrência.
+            $oDadosAPI->itensCompra[$key]->aplicabilidadeMargemPreferenciaNormal    = 0;
+            $oDadosAPI->itensCompra[$key]->aplicabilidadeMargemPreferenciaAdicional = 0;
         }
 
         $aDadosAPI = $oDadosAPI;
@@ -99,6 +103,40 @@ class DispensaPorValorPNCP extends ModeloBasePNCP
         return $aDadosAPI;
     }
 
+    public function montarRetificacaoItens()
+    {
+        $oDado      = $this->dados;
+        $aDadosAPI  = [];
+
+        $vlrtotal = 0;
+        foreach ($oDado as $key => $item) {
+            $vlrtotal = $item->pc11_quant * $item->valorunitarioestimado;
+
+            $aDadosAPI[$key]['numeroItem']                  = $item->numeroitem;
+            $aDadosAPI[$key]['materialOuServico']           = $item->materialouservico;
+            $aDadosAPI[$key]['tipoBeneficioId']             = $item->tipobeneficioid;
+            $aDadosAPI[$key]['incentivoProdutivoBasico']    = $item->incentivoprodutivobasico == 'f' ? 0 : 1;
+            $aDadosAPI[$key]['descricao']                   = utf8_encode($item->descricao);
+            $aDadosAPI[$key]['quantidade']                  = $item->pc11_quant;
+            $aDadosAPI[$key]['unidadeMedida']               = utf8_encode($item->unidademedida);
+            $aDadosAPI[$key]['orcamentoSigiloso']           = $item->l21_sigilo == 'f' ? 0 : 1;
+            $aDadosAPI[$key]['valorUnitarioEstimado']       = $item->valorunitarioestimado;
+            $aDadosAPI[$key]['valorTotal']                  = $vlrtotal;
+            $aDadosAPI[$key]['criterioJulgamentoId']        = $item->criteriojulgamentoid;
+            $aDadosAPI[$key]['itemCategoriaId']             = $item->itemcategoriaid;
+            
+            if(!empty($item->justificativa)) {
+                $aDadosAPI[$key]['justificativa']           = $item->justificativa;
+            }
+            
+            // TODO: Confirmar os dados corretos para esses campos com um consultor. Houve uma atualização durante a execução da tarefa. Futuramente, será criada uma tarefa específica para essa ocorrência.
+            $aDadosAPI[$key]['aplicabilidadeMargemPreferenciaNormal']    = 0;
+            $aDadosAPI[$key]['aplicabilidadeMargemPreferenciaAdicional'] = 0;
+        }
+        
+        return $aDadosAPI;
+    }
+
     /**
      * Realiza o requisicao na api do PNCP
      *
@@ -118,7 +156,7 @@ class DispensaPorValorPNCP extends ModeloBasePNCP
         $url = $this->envs['URL'] . "orgaos/" . $cnpj . "/compras";
 
         $file = 'model/licitacao/PNCP/arquivos/Compra' . $processo . '.json';
-        $filezip = curl_file_create('model/licitacao/PNCP/anexoslicitacao/' . $aAnexos[0]->l216_nomedocumento);
+        $filezip = curl_file_create('model/licitacao/PNCP/anexoslicitacao/' . $aAnexos[0]->l217_documento);
 
         $cfile = new \CURLFile($file, 'application/json', 'compra');
         //$cfilezip = new \CURLFile($filezip, 'application/zip', 'documento');
@@ -132,7 +170,7 @@ class DispensaPorValorPNCP extends ModeloBasePNCP
         $headers = array(
             'Content-Type: multipart/form-data',
             'Authorization: ' . $token,
-            'Titulo-Documento: ' . utf8_decode($aAnexos[0]->l213_descricao),
+            'Titulo-Documento: ' . utf8_decode($aAnexos[0]->l216_nomedocumento),
             'Tipo-Documento-Id:' . $aAnexos[0]->l213_sequencial
         );
 
@@ -183,7 +221,36 @@ class DispensaPorValorPNCP extends ModeloBasePNCP
         return $retorno;
     }
 
-    public function excluirAviso($sCodigoControlePNCP, $iAnoCompra)
+    public function enviarRetificacaoItens($oDados, $iAnoCompra, $sCodigoControlePNCP, $numeroItem)
+    {
+        $token  = $this->login();
+        $cnpj   = $this->getCnpj();
+        $url    = $this->envs['URL'] . "orgaos/$cnpj/compras/$iAnoCompra/$sCodigoControlePNCP/itens/$numeroItem";
+        $chpncp = curl_init($url);
+
+        $headers = array(
+            'Content-Type: application/json',
+            'Authorization: ' . $token
+        );
+
+        $optionspncp = $this->getParancurl('PUT', $oDados, $headers, true, false);
+
+        curl_setopt_array($chpncp, $optionspncp);
+        $contentpncp = curl_exec($chpncp);
+        $httpStatus = curl_getinfo($chpncp, CURLINFO_HTTP_CODE);
+        curl_close($chpncp);
+
+        $aRetorno['httpStatus'] = $httpStatus;
+        if ($httpStatus !== 200) {
+            $aRetorno['numeroItem'] = $oDados['numeroItem'];
+            $aRetorno['contentPncp'] = json_decode($contentpncp);
+            return $this->returnRetificacaoPncpMessage($aRetorno);
+        } else {
+            return $aRetorno;
+        }
+    }
+
+    public function excluirAviso($sCodigoControlePNCP, $iAnoCompra, $sJustificativa = null)
     {
         $token = $this->login();
 
@@ -199,7 +266,12 @@ class DispensaPorValorPNCP extends ModeloBasePNCP
             'Authorization: ' . $token
         );
 
-        $optionspncp = $this->getParancurl('DELETE',null,$headers,false,false);
+        if(!empty($sJustificativa)) {
+            $aBody['justificativa'] = $sJustificativa;
+            $optionspncp = $this->getParancurl('DELETE', $aBody, $headers, true, false);
+        } else {
+            $optionspncp = $this->getParancurl('DELETE',null,$headers,false,false);
+        }
 
         curl_setopt_array($chpncp, $optionspncp);
         $contentpncp = curl_exec($chpncp);
@@ -291,5 +363,49 @@ class DispensaPorValorPNCP extends ModeloBasePNCP
             return array(201, "Excluido com Sucesso !");
         }
         return $retorno;
+    }
+
+    private function returnRetificacaoPncpMessage($rsApiPNCPItens)
+    {
+        switch ($rsApiPNCPItens['httpStatus']) {
+            case 204:
+                $message = "Erro No Content.";
+                break;
+
+            case 400:
+                $messageError = "";
+                if (isset($rsApiPNCPItens['contentPncp']->error)) {
+                    $messageError = '- Erro Bad Request: ' . $rsApiPNCPItens['contentPncp']->message;
+                } elseif (isset($rsApiPNCPItens['contentPncp']->erros)) {
+                    foreach ($rsApiPNCPItens['contentPncp']->erros as $erro) {
+                        $messageError .= "- Erro Bad Request: " . $erro->nomeCampo . ": " . $erro->mensagem . "\n";
+                    }
+                } else {
+                    $messageError = '- Erro Bad Request: Erro desconhecido na requisição.';
+                }
+                $message = $messageError . "\n";
+                break;
+
+            case 401:
+                $message = "Erro Unauthorized.";
+                break;
+
+            case 422:
+                $message = "Erro Unprocessable Entity.";
+                break;
+
+            case 500:
+                $message = "Erro Internal Server Error.";
+                break;
+
+            default:
+                $message = "Erro desconhecido na requisição.";
+                break;
+        }
+
+        return [
+            "httpStatus" => $rsApiPNCPItens['httpStatus'],
+            "message" => "Numero Item: " . $rsApiPNCPItens['numeroItem'] . " \n" . $message
+        ];
     }
 }

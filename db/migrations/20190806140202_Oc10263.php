@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc10263 extends AbstractMigration
+class Oc10263 extends PostgresMigration
 {
     /**
      * Change Method.
@@ -10,7 +10,7 @@ class Oc10263 extends AbstractMigration
      * Write your reversible migrations using this method.
      *
      * More information on writing migrations is available here:
-     * http://docs.phinx.org/en/latest/migrations.html#the-abstractmigration-class
+     * http://docs.phinx.org/en/latest/migrations.html#the-PostgresMigration-class
      *
      * The following commands can be used in this method and Phinx will
      * automatically reverse them when rolling back:
@@ -74,7 +74,7 @@ class Oc10263 extends AbstractMigration
 
         -- Inserindo os novos Grupos do Plano Orçamentário e Regras dos novos documentos.
 
-        INSERT INTO congrupo VALUES 
+        INSERT INTO congrupo VALUES
         (25001, 'RETIFICACOES', 1),
         (25002, 'OUTRAS DEDUÇÕES DA RECEITA', 1),
         (25003, 'DESCONTOS CONCEDIDOS', 1);
@@ -117,7 +117,7 @@ class Oc10263 extends AbstractMigration
 
         -- Vinculando os estruturais das receitas específicos para as novas regras dos novos documentos.
 
-        INSERT INTO conplanoorcamentogrupo 
+        INSERT INTO conplanoorcamentogrupo
         SELECT DISTINCT ON (c60_codcon)
          nextval('conplanoorcamentogrupo_c21_sequencial_seq'),
          c60_anousu,
@@ -130,8 +130,8 @@ class Oc10263 extends AbstractMigration
          WHERE c60_estrut LIKE '493%'
           AND c60_anousu = 2019;
 
-        INSERT INTO conplanoorcamentogrupo 
-        SELECT DISTINCT ON (c60_codcon) 
+        INSERT INTO conplanoorcamentogrupo
+        SELECT DISTINCT ON (c60_codcon)
          nextval('conplanoorcamentogrupo_c21_sequencial_seq'),
          c60_anousu,
          c60_codcon,
@@ -143,7 +143,7 @@ class Oc10263 extends AbstractMigration
          WHERE c60_estrut LIKE '498%'
           AND c60_anousu = 2019;
 
-        INSERT INTO conplanoorcamentogrupo 
+        INSERT INTO conplanoorcamentogrupo
         SELECT DISTINCT ON (c60_codcon)
          nextval('conplanoorcamentogrupo_c21_sequencial_seq'),
          c60_anousu,
@@ -183,7 +183,7 @@ class Oc10263 extends AbstractMigration
                (SELECT c45_seqtrans FROM contrans
                 WHERE c45_coddoc = 124
                   AND c45_anousu = 2019
-                LIMIT 1), 
+                LIMIT 1),
                100,
                'PRIMEIRO LANCAMENTO',
                0,
@@ -197,7 +197,7 @@ class Oc10263 extends AbstractMigration
                (SELECT c45_seqtrans FROM contrans
                 WHERE c45_coddoc = 124
                   AND c45_anousu = 2019
-                LIMIT 1), 
+                LIMIT 1),
                100,
                'SEGUNDO LANCAMENTO',
                0,
@@ -211,7 +211,7 @@ class Oc10263 extends AbstractMigration
                (SELECT c45_seqtrans FROM contrans
                 WHERE c45_coddoc = 124
                   AND c45_anousu = 2019
-                LIMIT 1), 
+                LIMIT 1),
                100,
                'TERCEIRO LANCAMENTO',
                0,
@@ -225,7 +225,7 @@ class Oc10263 extends AbstractMigration
                (SELECT c45_seqtrans FROM contrans
                 WHERE c45_coddoc = 125
                   AND c45_anousu = 2019
-                LIMIT 1), 
+                LIMIT 1),
                101,
                'PRIMEIRO LANCAMENTO',
                0,
@@ -239,7 +239,7 @@ class Oc10263 extends AbstractMigration
                (SELECT c45_seqtrans FROM contrans
                 WHERE c45_coddoc = 125
                   AND c45_anousu = 2019
-                LIMIT 1), 
+                LIMIT 1),
                101,
                'SEGUNDO LANCAMENTO',
                0,
@@ -253,7 +253,7 @@ class Oc10263 extends AbstractMigration
                (SELECT c45_seqtrans FROM contrans
                 WHERE c45_coddoc = 125
                   AND c45_anousu = 2019
-                LIMIT 1), 
+                LIMIT 1),
                101,
                'TERCEIRO LANCAMENTO',
                0,
@@ -415,7 +415,7 @@ class Oc10263 extends AbstractMigration
                (SELECT c45_seqtrans FROM contrans
                 WHERE c45_coddoc = 126
                   AND c45_anousu = 2019
-                LIMIT 1), 
+                LIMIT 1),
                100,
                'PRIMEIRO LANCAMENTO',
                0,
@@ -429,7 +429,7 @@ class Oc10263 extends AbstractMigration
                (SELECT c45_seqtrans FROM contrans
                 WHERE c45_coddoc = 126
                   AND c45_anousu = 2019
-                LIMIT 1), 
+                LIMIT 1),
                100,
                'SEGUNDO LANCAMENTO',
                0,
@@ -443,7 +443,7 @@ class Oc10263 extends AbstractMigration
                (SELECT c45_seqtrans FROM contrans
                 WHERE c45_coddoc = 126
                   AND c45_anousu = 2019
-                LIMIT 1), 
+                LIMIT 1),
                100,
                'TERCEIRO LANCAMENTO',
                0,
@@ -457,7 +457,7 @@ class Oc10263 extends AbstractMigration
                (SELECT c45_seqtrans FROM contrans
                 WHERE c45_coddoc = 127
                   AND c45_anousu = 2019
-                LIMIT 1), 
+                LIMIT 1),
                101,
                'PRIMEIRO LANCAMENTO',
                0,
@@ -471,7 +471,7 @@ class Oc10263 extends AbstractMigration
                (SELECT c45_seqtrans FROM contrans
                 WHERE c45_coddoc = 127
                   AND c45_anousu = 2019
-                LIMIT 1), 
+                LIMIT 1),
                101,
                'SEGUNDO LANCAMENTO',
                0,
@@ -485,7 +485,7 @@ class Oc10263 extends AbstractMigration
                (SELECT c45_seqtrans FROM contrans
                 WHERE c45_coddoc = 127
                   AND c45_anousu = 2019
-                LIMIT 1), 
+                LIMIT 1),
                101,
                'TERCEIRO LANCAMENTO',
                0,
@@ -627,9 +627,9 @@ class Oc10263 extends AbstractMigration
         LIMIT 1;
 
         COMMIT;
-        
+
 SQL;
-    
+
         $this->execute($sql);
     }
 }

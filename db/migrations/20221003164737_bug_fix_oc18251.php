@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class BugFixOc18251 extends AbstractMigration
+class BugFixOc18251 extends PostgresMigration
 {
     public function up()
     {
@@ -13,7 +13,7 @@ class BugFixOc18251 extends AbstractMigration
         begin;
 
         alter table licitaparam add l12_pncp bool;
-        
+
         update licitaparam SET l12_pncp = false;
 
         commit;

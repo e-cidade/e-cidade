@@ -169,7 +169,7 @@ input {
 	    pg_exec("COMMIT");
 		
 		echo "<script>
-               window.open('reciboitbi.php?itbi=".$itbi."&itbinumpre=',\"\",\"toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=1,resizable=1,height=\"+(screen.height-100)+\",width=\"+(screen.width-100));
+               window.open('resources/legacy/itbi/reciboitbi.php?itbi=".$itbi."&itbinumpre=',\"\",\"toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=1,resizable=1,height=\"+(screen.height-100)+\",width=\"+(screen.width-100));
               </script>";
 		
 	    db_redireciona();

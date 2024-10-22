@@ -1054,5 +1054,11 @@ class cl_matrequi {
     }
     return $sql;
   }
+
+  function sql_query_depto_from_matrequi(int $m40_codigo)
+  {
+    $sql = "select db_almox.m91_depto from matrequi join db_almox on db_almox.m91_codigo = matrequi.m40_almox where matrequi.m40_codigo = $m40_codigo";
+    return $sql;
+  }
 }
 ?>

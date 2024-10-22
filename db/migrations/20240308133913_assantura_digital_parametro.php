@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class AssanturaDigitalParametro extends AbstractMigration
+class AssanturaDigitalParametro extends PostgresMigration
 {
     public function change()
     {

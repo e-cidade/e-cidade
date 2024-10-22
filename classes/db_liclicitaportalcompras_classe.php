@@ -87,6 +87,7 @@ class cl_liclicitaportalcompras
         end as descricaoitem,
         1 as natureza,
         m61_abrev as siglaunidade,
+        m61_descr as descunidade,
         pc11_quant as quantidadetotal,
         case when
                 pc11_reservado = 't' then pc11_quant
@@ -127,7 +128,7 @@ class cl_liclicitaportalcompras
         left join itemprecoreferencia on si02_itemproccompra=pc22_orcamitem
         left join solicitaregistropreco on pc54_solicita=pc10_numero
         where
-        l20_codigo=$codigo";
+        l20_codigo=$codigo order by numerointerno";
 
         return $this->sql_record($sql);
     }

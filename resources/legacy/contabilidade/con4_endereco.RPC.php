@@ -45,17 +45,13 @@ $oRetorno->status  = "1";
 $oRetorno->message = "";
 
 switch ($oParam->exec) {
-
-  case 'findCep':
-
-    $aRetorno->endereco = endereco::findCep($oParam->codigoCep, $oParam->sNomeBairro);
-    if ($aRetorno->endereco !== false) {
-      $aRetorno->estados  = endereco::findEstadoByCodigoPais($aRetorno->endereco[0]->ipais);
-    }
-
-    echo $oJson->encode($aRetorno);
-
-    break;
+    case 'findCep':
+        $aRetorno->endereco = endereco::findCep($oParam->codigoCep, $oParam->sNomeBairro);
+        if ($aRetorno->endereco !== false) {
+            $aRetorno->estados  = endereco::findEstadoByCodigoPais($aRetorno->endereco[0]->ipais);
+        }
+        echo $oJson->encode($aRetorno);
+        break;
 
   case 'findPaisByCodigo':
 
@@ -242,7 +238,7 @@ switch ($oParam->exec) {
       $aRetorno->icodigoMunicipio = $oEndereco->getCodigoMunicipio();
       $aRetorno->icodigoBairro    = $oEndereco->getCodigoBairro();
       $aRetorno->icodigoRua       = $oEndereco->getCodigoRua();
-      $aRetorno->message = urlencode("Endereco ($aRetorno->icodigoEndereco) incluído com sucesso!");
+      $aRetorno->message = urlencode("Endereco ($aRetorno->icodigoEndereco) includo com sucesso!");
       $aRetorno->status   = 1;
     } catch (Exception $erro) {
 
@@ -264,7 +260,7 @@ switch ($oParam->exec) {
       $oRetorno->valoresPadrao = endereco::findParametrosEndereco();
 
       if ($oRetorno->valoresPadrao === false) {
-        throw new Exception("usuário: \n\nParâmetros do endereço não configurados!\n\nContate o Administrador.\n\n");
+        throw new Exception("usurio: \n\nParmetros do endereo no configurados!\n\nContate o Administrador.\n\n");
       }
 
       $aEstados = array();
@@ -299,7 +295,7 @@ switch ($oParam->exec) {
       $oRetorno->estados   = endereco::findEstadoByCodigoPais($oRetorno->valoresPadrao[0]->db70_sequencial);
     } else {
       $oRetorno->status = 2;
-      $oRetorno->message = urlencode("\n\nusuário: \n\nParâmetros do endereço não configurados!\n\n Contate o Administrador.\n\n");
+      $oRetorno->message = urlencode("\n\nusurio: \n\nParmetros do endereo no configurados!\n\n Contate o Administrador.\n\n");
     }
     $oRetorno->bairroRuaMunicipio = endereco::buscaBairroRuaMunicipio(
       $oParam->icodigobairromunicipio,
@@ -420,7 +416,7 @@ switch ($oParam->exec) {
       $oRetorno->estados   = endereco::findEstadoByCodigoPais($oRetorno->valoresPadrao[0]->db70_sequencial);
     } else {
       $oRetorno->status = 2;
-      $oRetorno->message = urlencode("\n\nusuário: \n\nParâmetros do endereço não configurados!\n\n Contate o Administrador.\n\n");
+      $oRetorno->message = urlencode("\n\nusurio: \n\nParmetros do endereo no configurados!\n\n Contate o Administrador.\n\n");
     }
 
     $oRetorno->enderecocidadao = endereco::buscaEnderecoCidadao($oParam->ov02_sequencial, $oParam->ov02_seq);
@@ -517,7 +513,7 @@ switch ($oParam->exec) {
 
       if ($oParam->sequencial) {
         if (obrasDadosComplementares::isManyRegisters($oParam->sequencial, $oParam->licitacao)) {
-          throw new Exception("Primeiro Registro não pode ser excluído.\n\nRemova os demais registros para excluí-lo.\n\n");
+          throw new Exception("Primeiro Registro no pode ser excludo.\n\nRemova os demais registros para exclu-lo.\n\n");
         } else {
 
           $rsLicitacao = db_query('select l20_datacria, l20_tipojulg from liclicita where l20_codigo = ' . $oParam->licitacao);
@@ -572,7 +568,7 @@ switch ($oParam->exec) {
                 $clDadosComplementares->excluir($aLotes[$count]->db150_sequencial);
 
                 if (!$clDadosComplementares->numrows_excluir) {
-                  throw new Exception('Registros dos dados complementares do lote não podem ser excluídos');
+                  throw new Exception('Registros dos dados complementares do lote no podem ser excludos');
                 }
               }
             } else {
@@ -580,7 +576,7 @@ switch ($oParam->exec) {
               $clDadosComplementares->excluir($oParam->sequencial);
 
               if (!$clDadosComplementares->numrows_excluir) {
-                throw new Exception('Registros dos dados complementares do lote não pode ser excluído');
+                throw new Exception('Registros dos dados complementares do lote no pode ser excludo');
               }
             }
 
@@ -598,9 +594,9 @@ switch ($oParam->exec) {
             }
 
             if ($oLicitacao->l20_tipojulg == 1) {
-              $msg = urlencode('Endereço da obra excluído com sucesso!');
+              $msg = urlencode('Endereo da obra excludo com sucesso!');
             } else {
-              $msg = urlencode('Endereço do lote excluído com sucesso!');
+              $msg = urlencode('Endereo do lote excludo com sucesso!');
             }
           }
         }

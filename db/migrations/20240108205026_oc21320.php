@@ -1,14 +1,14 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc21320 extends AbstractMigration
+class Oc21320 extends PostgresMigration
 {
     public function up()
     {
         $this->verificaDados();
         $this->novosDados();
-    }   
+    }
     public function novosDados()
     {
         $sqlConsulta = $this->query("SELECT * FROM db_itensmenu WHERE funcao = 'efd1_reinf4099evento001.php'");
@@ -49,36 +49,36 @@ class Oc21320 extends AbstractMigration
 
                         UPDATE configuracoes.db_menu
                         SET menusequencia = 4
-                        WHERE id_item_filho = (select id_item from db_itensmenu where funcao = 'efd3_reinf4010evento001.php') ; 
-                
-                
+                        WHERE id_item_filho = (select id_item from db_itensmenu where funcao = 'efd3_reinf4010evento001.php') ;
+
+
                         -- Menus evento 2010
                         -- Inserindo menu R-2010
                         INSERT INTO db_itensmenu VALUES((SELECT max(id_item)+1 FROM db_itensmenu), 'R-2010 Retenção de contribuição previdenciária - Serviços Tomados','R-2010 Retenção de contribuição previdenciária - Serviços Tomados', 'efd1_reinf2010evento001.php', 1, 1, 'R-2010 Retenção de contribuição previdenciária - Serviços Tomados', 't');
                         INSERT INTO db_menu VALUES((SELECT max(id_item) FROM db_itensmenu where descricao like 'Envio de Eventos EFD-Reinf'), (SELECT max(id_item) FROM db_itensmenu),1, (SELECT max(id_item) FROM db_modulos));
-                
+
                         -- Inserindo menu R- 2010
                         INSERT INTO db_itensmenu VALUES((SELECT max(id_item)+1 FROM db_itensmenu), 'R-2010 Retenção de contribuição previdenciária - Serviços Tomados', 'R-2010 Retenção de contribuição previdenciária - Serviços Tomados', 'efd3_reinf2010evento001.php', 1, 1, 'R-2010 Retenção de contribuição previdenciária - Serviços Tomados', 't');
                         INSERT INTO db_menu VALUES((SELECT max(id_item) FROM db_itensmenu where descricao like 'Consultar Eventos EFD-Reinf'), (SELECT max(id_item) FROM db_itensmenu), 1, (SELECT max(id_item) FROM db_modulos));
-                
+
                         -- Menus evento 2055
                         -- Inserindo menu R-2055
                         INSERT INTO db_itensmenu VALUES((SELECT max(id_item)+1 FROM db_itensmenu), 'R-2055 Aquisição de produção rural','R-2055 Aquisição de produção rural', 'efd1_reinf2055evento001.php', 1, 1, 'R-2055 Aquisição de produção rural', 't');
                         INSERT INTO db_menu VALUES((SELECT max(id_item) FROM db_itensmenu where descricao like 'Envio de Eventos EFD-Reinf'), (SELECT max(id_item) FROM db_itensmenu),2, (SELECT max(id_item) FROM db_modulos));
-                        
+
                         -- Inserindo menu R- 2055
                         INSERT INTO db_itensmenu VALUES((SELECT max(id_item)+1 FROM db_itensmenu), 'R-2055 Aquisição de produção rural', 'R-2055 Aquisição de produção rural', 'efd3_reinf2055evento001.php', 1, 1, 'R-2055 Aquisição de produção rural', 't');
                         INSERT INTO db_menu VALUES((SELECT max(id_item) FROM db_itensmenu where descricao like 'Consultar Eventos EFD-Reinf'), (SELECT max(id_item) FROM db_itensmenu), 2, (SELECT max(id_item) FROM db_modulos));
-                        
+
                         -- Menus eventos 2098 e 2099
                         -- Inserindo menu R-2098 e 2099
                         INSERT INTO db_itensmenu VALUES((SELECT max(id_item)+1 FROM db_itensmenu), 'R-2099 e R-2098 Fechamento/reabertura dos eventos','R-2099 e R-2098 Fechamento/reabertura dos eventos', 'efd1_reinf2099evento001.php', 1, 1, 'R-2099 e R-2098 Fechamento/reabertura dos eventos', 't');
                         INSERT INTO db_menu VALUES((SELECT max(id_item) FROM db_itensmenu where descricao like 'Envio de Eventos EFD-Reinf'), (SELECT max(id_item) FROM db_itensmenu),3, (SELECT max(id_item) FROM db_modulos));
-                        
+
                         -- Inserindo menu R- 2099 Fechamento/reabertura dos eventos
                         INSERT INTO db_itensmenu VALUES((SELECT max(id_item)+1 FROM db_itensmenu), 'R-2099 e R-2098 Fechamento/reabertura dos eventos ', 'R-2099 e R-2098 Fechamento/reabertura dos eventos ', 'efd3_reinf2099evento001.php', 1, 1, 'R-2099 e R-2098 Fechamento/reabertura dos eventos ', 't');
                         INSERT INTO db_menu VALUES((SELECT max(id_item) FROM db_itensmenu where descricao like 'Consultar Eventos EFD-Reinf'), (SELECT max(id_item) FROM db_itensmenu), 3, (SELECT max(id_item) FROM db_modulos));
-                
+
 
                         CREATE TABLE efdreinfr2099 (
                                 efd04_sequencial     bigint DEFAULT 0 NOT NULL,
@@ -96,14 +96,14 @@ class Oc21320 extends AbstractMigration
                                 efd04_servicoprev    int8 NOT NULL,
                                 efd04_producaorural   int8 NOT NULL
                                 );
-                        
+
                         CREATE SEQUENCE efdreinfr2099_efd04_sequencial_seq
                                 START WITH 1
                                 INCREMENT BY 1
                                 NO MINVALUE
                                 NO MAXVALUE
                                 CACHE 1;
-                                
+
 
                         CREATE TABLE efdreinfr2010 (
                                 efd05_sequencial          int8 DEFAULT 0 NOT NULL,
@@ -123,9 +123,9 @@ class Oc21320 extends AbstractMigration
                                 efd05_status    	      int8 NULL,
                                 efd05_descResposta        character varying(500) NULL,
                                 efd05_dscResp  	      character varying(500) NULL
-                                
+
                                 );
-                        
+
                         CREATE SEQUENCE efdreinfr2010_efd05_sequencial_seq
                                 START WITH 1
                                 INCREMENT BY 1
@@ -152,15 +152,15 @@ class Oc21320 extends AbstractMigration
                                 efd06_vlrBase        float8  NULL,
                                 efd06_vlrRetido      float8  NULL
                                 );
-                        
+
                         CREATE SEQUENCE efdreinfnotasr2010_efd06_sequencial_seq
                                 START WITH 1
                                 INCREMENT BY 1
                                 NO MINVALUE
                                 NO MAXVALUE
                                 CACHE 1;
-                                
-                        
+
+
                         CREATE TABLE efdreinfr2055 (
                         efd07_sequencial          int8 DEFAULT 0 NOT NULL,
                         efd07_mescompetencia      character varying(2) NOT NULL,
@@ -177,16 +177,16 @@ class Oc21320 extends AbstractMigration
                         efd07_status    	      int8 NULL,
                         efd07_descResposta        character varying(500) NULL,
                         efd07_dscResp  	      character varying(500) NULL
-                        
+
                         );
-                
+
                         CREATE SEQUENCE efdreinfr2055_efd07_sequencial_seq
                                 START WITH 1
                                 INCREMENT BY 1
                                 NO MINVALUE
                                 NO MAXVALUE
                                 CACHE 1;
-                                
+
                         CREATE TABLE efdreinfnotasr2055 (
                                 efd08_sequencial       bigint DEFAULT 0 NOT NULL,
                                 efd08_mescompetencia   character varying(2) NOT NULL,
@@ -206,16 +206,16 @@ class Oc21320 extends AbstractMigration
                                 efd08_vlrGilrat      float8  NULL,
                                 efd08_vlrSenar       float8  NULL
                                 );
-                        
+
                         CREATE SEQUENCE efdreinfnotasr2055_efd08_sequencial_seq
                                 START WITH 1
                                 INCREMENT BY 1
                                 NO MINVALUE
                                 NO MAXVALUE
-                                CACHE 1;       
-                                
-                        
-                COMMIT; 
+                                CACHE 1;
+
+
+                COMMIT;
 
                 SQL;
                 try {
@@ -223,7 +223,7 @@ class Oc21320 extends AbstractMigration
                 } catch (\Exception $e) {
                         echo "Erro ao executar consulta SQL: " . $e->getMessage();
                 }
-        } 
+        }
 }
     public function verificaDados()
     {
@@ -232,7 +232,7 @@ class Oc21320 extends AbstractMigration
 
         $sqlConsulta2 = $this->query("SELECT EXISTS (
                                         SELECT 1
-                                        FROM   information_schema.tables 
+                                        FROM   information_schema.tables
                                         WHERE  table_schema = 'public'
                                         AND    table_name = 'efdreinfr4010'
                                 );");
@@ -242,7 +242,7 @@ class Oc21320 extends AbstractMigration
                 $sql = <<<SQL
         BEGIN;
                 SELECT fc_startsession();
-        
+
                 -- INSERE db_sysmodulo
                 INSERT INTO db_sysmodulo VALUES((SELECT max(codmod)+1 FROM db_sysmodulo), 'EFD-Reinf', 'EFD-Reinf', '2023-09-06', 't');
 
@@ -262,13 +262,13 @@ class Oc21320 extends AbstractMigration
                 INSERT INTO db_sysarqmod (codmod, codarq) VALUES ((SELECT codmod FROM db_sysmodulo WHERE nomemod LIKE '%EFD-Reinf%'), (SELECT max(codarq) FROM db_sysarquivo));
 
                 -- Inserindo menu Consultas
-                INSERT INTO db_menu VALUES((SELECT max(id_item) FROM db_modulos), 31, 2, (SELECT max(id_item) FROM db_modulos));   
+                INSERT INTO db_menu VALUES((SELECT max(id_item) FROM db_modulos), 31, 2, (SELECT max(id_item) FROM db_modulos));
 
                 -- Inserindo itens de menu
                 INSERT INTO db_itensmenu VALUES((SELECT max(id_item)+1 FROM db_itensmenu), 'Consultar Eventos EFD-Reinf', 'Consultar de Eventos EFD-Reinf', '', 1, 1, 'Consultar de Eventos EFD-Reinf', 't');
                 INSERT INTO db_menu VALUES(31, (SELECT max(id_item) FROM db_itensmenu), 1, (SELECT max(id_item) FROM db_modulos));
 
-                -- Menus 
+                -- Menus
                 -- Inserindo menu R-4010 Pessoa física
                 INSERT INTO db_itensmenu VALUES((SELECT max(id_item)+1 FROM db_itensmenu), 'R-4010 Pessoa física', 'R-4010 Pagamentos/créditos a beneficiário pessoa física', 'efd3_reinf4010evento001.php', 1, 1, 'R-4010 Pagamentos/créditos a beneficiário pessoa física', 't');
                 INSERT INTO db_menu VALUES((SELECT max(id_item) FROM db_itensmenu where descricao like 'Consultar Eventos EFD-Reinf'), (SELECT max(id_item) FROM db_itensmenu), 1, (SELECT max(id_item) FROM db_modulos));
@@ -290,7 +290,7 @@ class Oc21320 extends AbstractMigration
                 INSERT INTO db_itensmenu VALUES((SELECT max(id_item)+1 FROM db_itensmenu), 'Envio de Eventos EFD-Reinf', 'Envio de Eventos EFD-Reinf', '', 1, 1, 'Envio de Eventos EFD-Reinf', 't');
                 INSERT INTO db_menu VALUES(32, (SELECT max(id_item) FROM db_itensmenu), 1, (SELECT max(id_item) FROM db_modulos));
 
-                -- Menus 
+                -- Menus
                 -- Inserindo menu R-4010 Pessoa física
                 INSERT INTO db_itensmenu VALUES((SELECT max(id_item)+1 FROM db_itensmenu), 'R-4010 Pessoa física', 'R-4010 Pagamentos/créditos a beneficiário pessoa física', 'efd1_reinf4010evento001.php', 1, 1, 'R-4010 Pagamentos/créditos a beneficiário pessoa física', 't');
                 INSERT INTO db_menu VALUES((SELECT max(id_item) FROM db_itensmenu where descricao like 'Envio de Eventos EFD-Reinf'), (SELECT max(id_item) FROM db_itensmenu), 1, (SELECT max(id_item) FROM db_modulos));
@@ -320,15 +320,15 @@ class Oc21320 extends AbstractMigration
                         efd01_dscResp  	     character varying(500) NULL,
                         efd01_dataenvio 	 character varying(50) NULL
                         );
-                
+
                 CREATE SEQUENCE efdreinfr4099_efd01_sequencial_seq
                         START WITH 1
                         INCREMENT BY 1
                         NO MINVALUE
                         NO MAXVALUE
                         CACHE 1;
-                        
-                        
+
+
 
                 CREATE TABLE efdreinfr4020 (
                         efd02_sequencial          int8 DEFAULT 0 NOT NULL,
@@ -349,16 +349,16 @@ class Oc21320 extends AbstractMigration
                         efd02_status    	      int8 NULL,
                         efd02_descResposta        character varying(500) NULL,
                         efd02_dscResp  	      character varying(500) NULL
-                        
+
                         );
-                
+
                 CREATE SEQUENCE efdreinfr4020_efd02_sequencial_seq
                         START WITH 1
                         INCREMENT BY 1
                         NO MINVALUE
                         NO MAXVALUE
                         CACHE 1;
-                        
+
                 CREATE TABLE efdreinfr4010 (
                         efd03_sequencial          int8 DEFAULT 0 NOT NULL,
                         efd03_mescompetencia      character varying(2) NOT NULL,
@@ -378,18 +378,18 @@ class Oc21320 extends AbstractMigration
                         efd03_status    	      int8 NULL,
                         efd03_descResposta        character varying(500) NULL,
                         efd03_dscResp  	      character varying(500) NULL
-                        
+
                         );
-                
+
                 CREATE SEQUENCE efdreinfr4010_efd03_sequencial_seq
                         START WITH 1
                         INCREMENT BY 1
                         NO MINVALUE
                         NO MAXVALUE
                         CACHE 1;
-                
+
                         CREATE SEQUENCE IF NOT EXISTS efdreinfr4010_efd03_sequencial_seq START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
-        
+
         COMMIT;
         SQL;
 
@@ -399,9 +399,9 @@ class Oc21320 extends AbstractMigration
                                 echo "Erro ao executar consulta SQL: " . $e->getMessage();
                         }
                 }
-    }        
+    }
 
-                
+
 
 
 }

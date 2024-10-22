@@ -5,7 +5,7 @@ namespace ECidade\RecursosHumanos\ESocial\Model\Formulario;
 use ECidade\RecursosHumanos\ESocial\Model\Formulario\EventoCargaInterface;
 
 /**
- * Classe responsï¿½vel por retornar dados da carga
+ * Classe responsável por retornar dados da carga
  * do evento 2399
  * @package ECidade\RecursosHumanos\ESocial\Model\Formulario
  */
@@ -29,8 +29,6 @@ class EventoCargaS2399 implements EventoCargaInterface
 
     public function __construct()
     {
-        $this->ano = db_getsession("DB_anousu");
-        $this->mes = date("m", db_getsession("DB_datausu"));
         $this->instit = db_getsession("DB_instit");
     }
 
@@ -39,7 +37,7 @@ class EventoCargaS2399 implements EventoCargaInterface
      * @param integer|null $matricula
      * @return resource
      */
-    public function execute($matricula = null)
+    public function execute($matricula = null, $ano, $mes)
     {
         $sql = "
     	SELECT distinct
@@ -187,7 +185,7 @@ class EventoCargaS2399 implements EventoCargaInterface
             rhinssoutros.rh51_basefo
             FROM rhpessoal
             join cgm on rhpessoal.rh01_numcgm = cgm.z01_numcgm
-            join rhpessoalmov on rhpessoal.rh01_regist = rh02_regist and (rh02_anousu,rh02_mesusu) = ({$this->ano},{$this->mes})
+            join rhpessoalmov on rhpessoal.rh01_regist = rh02_regist and (rh02_anousu,rh02_mesusu) = ({$ano},{$mes})
             left join tpcontra ON tpcontra.h13_codigo = rhpessoalmov.rh02_tpcont
             left join rhregime ON rhregime.rh30_codreg = rhpessoalmov.rh02_codreg
             left join rhfuncao on rhfuncao.rh37_funcao = rhpessoalmov.rh02_funcao
@@ -198,7 +196,7 @@ class EventoCargaS2399 implements EventoCargaInterface
         left join rhestagiocurricular on rhpessoal.rh01_regist = h83_regist
         left join rhpessoal as rhpessoalsupervisor on h83_supervisor = rhpessoalsupervisor.rh01_regist
         left join cgm as cgmsupervisor ON cgmsupervisor.z01_numcgm = rhpessoalsupervisor.rh01_numcgm
-        left join inssirf on (r33_codtab::integer-2,r33_anousu,r33_mesusu) = (rh02_tbprev,{$this->ano},{$this->mes})
+        left join inssirf on (r33_codtab::integer-2,r33_anousu,r33_mesusu) = (rh02_tbprev,{$ano},{$mes})
         left join rhpesrescisao on rh05_seqpes = rh02_seqpes
         LEFT JOIN eventos1020 ON eventos1020.eso08_instit = {$this->instit}
         LEFT JOIN rhinssoutros ON rhpessoalmov.rh02_seqpes = rhinssoutros.rh51_seqpes
@@ -206,8 +204,8 @@ class EventoCargaS2399 implements EventoCargaInterface
         WHERE rhpessoal.rh01_instit = {$this->instit} 
         AND h13_categoria in (304,701,711,712,721,722,723,731,734,738,771,901,903,410)
         AND rh30_vinculo = 'A'
-        AND date_part('month',rh05_recis)::integer = {$this->mes}
-        AND date_part('year',rh05_recis)::integer = {$this->ano}
+        AND date_part('month',rh05_recis)::integer = {$mes}
+        AND date_part('year',rh05_recis)::integer = {$ano}
     	";
 
         if (!empty($matricula)) {

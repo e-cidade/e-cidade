@@ -26,7 +26,7 @@
  */
 
 //MODULO: empenho
-
+use Illuminate\Database\Capsule\Manager as DB;
 $clrotulo = new rotulocampo;
 $clrotulo->label("z01_nome");
 $clrotulo->label("o56_elemento");
@@ -115,31 +115,10 @@ if (USE_PCASP) {
                             db_input('estruturalDotacao', 55, 3, true, 'text', 3);?></td>
               </tr>
               <tr>
-                <td><?=db_ancora($Le60_numcgm,"js_JanelaAutomatica('cgm',\$F('e60_numcgm'))",$db_opcao_inf)?></td>
-                <td><? db_input('e60_numcgm', 13, $Ie60_numcgm, true, 'text', 3); ?> </td>
-                <!-- <td></td> -->
-                <td colspan=2><? db_input('z01_nome', 55, $Iz01_nome, true, 'text', 3, '');?></td>
-              </tr>
-              <tr>
-                <!-- Oc17910 -->
-                <td>
-                    <div class='cgm_emitente'><?php db_ancora("<strong><u>CGM Emitente:&nbsp;</u></strong>", "js_pesquisaz01_numcgm(true);", 1); ?></div>
-                    <div class="credor" hidden='true'><?=db_ancora('<b>Credor:</b>',"js_pesquisae49_numcgm(true)",1)?></div>
-                </td>
-                <td>
-                    <div class='cgm_emitente'>
-                        <?php db_input('z01_numcgm', 13, "", true, 'text', 1, " onchange='js_pesquisaz01_numcgm(false);'", "", "", ""); ?>
-                    </div>
-                    <div class="credor" hidden='true'>
-                        <? db_input('e49_numcgm', 13, $Ie60_numcgm, true, 'text', 1,"onchange='js_pesquisae49_numcgm(false)'"); ?>
-                    </div>
-                </td>
-                <!-- <td></td> -->
-                <td colspan=2>
-                    <div class="cgm_emitente"><? db_input('descricao_emitente', 55, "", true, 'text', 3, 'style="background-color: rgb(222, 184, 135);"');?> </div>
-                    <div class="credor" hidden='true'><? db_input('z01_credor', 55, $Iz01_nome, true, 'text', 3, '');?> </div>
-                </td>
-              </tr>
+                  <td><?=db_ancora($Le60_numcgm,"js_JanelaAutomatica('cgm',\$F('e60_numcgm'))",$db_opcao_inf)?></td>
+                  <td><? db_input('e60_numcgm', 13, $Ie60_numcgm, true, 'text', 3); ?> </td>
+                  <td colspan=2><? db_input('z01_nome', 55, $Iz01_nome, true, 'text', 3, '');?></td>
+                </tr>
               <tr>
                 <td><?db_ancora("<b>Conta Pagadora:</b>","js_pesquisa_contapagadora(true);",1);?></td>
                 <td>
@@ -153,6 +132,177 @@ if (USE_PCASP) {
                     ?>
                 <? db_input("e83_descr",55,"",true,"text",3); ?></td>
               </tr>
+              <tr>
+              <?php
+
+                $paramentosOrdenadores = buscarParamentosOrdenadores();
+                db_input('paramentosOrdenadores',10,$IparamentosOrdenadores,true,'hidden',3);
+             
+                if ($paramentosOrdenadores == 1) {
+                  
+                  $dado = listarOrdenadores($e60_numemp);
+                  foreach($dado as $dados) {
+                    $o41_cgmordenador = $dados['z01_numcgm'];
+                  }         
+
+                  $where = $o41_cgmordenador ? " z01_numcgm in ($o41_cgmordenador) " :  "z01_numcgm is null";
+                  $result_cgm = $clcgm->sql_record($clcgm->sql_buscar_ordenador(null," o41_nomeordenador asc ",$where));
+                  if ($clcgm->numrows == 0 ) {
+                    $result_cgm = $clcgm->sql_record($clcgm->sql_query_ordenador(null," o41_nomeordenador asc ",$where));
+                 } 
+                  if ($dados['erro'] == false) { 
+                  ?>
+
+                    <tr>
+                      <td nowrap title="<?=$To41_cgmordenador?>">
+                          <?
+                            db_ancora('<b>Ordenador da Liquidação</b>',"js_pesquisa_cgm(true);",$fimperiodocontabil);
+                          ?>
+                      </td>
+                      <td colspan="4">
+                          <?  
+                            db_input("o41_cgmordenador",10,$Io41_cgmordenador,true,"text",$fimperiodocontabil,"onChange='js_pesquisa_cgm(false);'");
+                            db_input("o41_cgmordenadordescr",40,$Io41_cgmordenadordescr,true,"text",3);
+                          ?>
+                      </td>
+                    </tr>
+                  <?php    
+                  } else {
+                  ?>
+                      <td nowrap title="<?= @$Te54_numcgm ?>">
+                        <b> Ordenador da Liquidação:</b>
+                      </td>
+                      <td colspan="4">
+                          <?=
+                             db_selectrecord("o41_cgmordenador", $result_cgm, true, $db_opcao, "", "", "", "","");
+                          ?>
+                      </td>  
+                  <?php 
+                  }
+                } elseif ($paramentosOrdenadores == 2) {
+                  if ($e60_numemp) {
+                    $ordenadoresArray = listarOrdenadores($e60_numemp);
+                    $arrayCount = count($ordenadoresArray); 
+                    $cont       = 0;
+                    $numCgm     = '';
+                   
+                    if ($arrayCount > 1) {
+                      foreach($ordenadoresArray as $ordenadores) {
+                        $cont++; 
+                        $numCgm .= "'";
+                        $numCgm .= $ordenadores['z01_numcgm']; 
+                        if ($arrayCount == $cont) {
+                          $numCgm .= "'";   
+                        } else {
+                          $numCgm .= "',";  
+                        }        
+                          }
+                        $where = " z01_numcgm in ($numCgm) ";
+                        $result_cgm = $clcgm->sql_record($clcgm->sql_query_ordenador(null," sort_order asc, o41_nomeordenador asc ",$where));
+                       
+                        if ($ordenadores['erro'] == false) { ?>
+
+                          <tr>
+                          <td nowrap title="<?=$To41_cgmordenador?>">
+                              <?db_ancora('<b>Ordenador da Liquidação</b>',"js_pesquisa_cgm(true);",$fimperiodocontabil);?>
+                          </td>
+                          <td colspan="4">
+                              <?  
+                                  db_input("o41_cgmordenador",10,$Io41_cgmordenador,true,"text",$fimperiodocontabil,"onChange='js_pesquisa_cgm(false);'");
+                                  db_input("o41_cgmordenadordescr",40,$Io41_cgmordenadordescr,true,"text",3);
+                                  db_input('db243_data_inicio',10,$Idb243_data_inicio,true,'hidden',3);
+                                  db_input('db243_data_final',10,$Idb243_data_final,true,'hidden',3);
+                              ?>
+                          </td>
+                          </tr>
+                          <?php    
+                          } else {
+                      ?>
+                       <td nowrap title="<?= @$Te54_numcgm ?>">
+                        <b> Ordenador da Liquidação:</b>
+                       </td>
+                        <td colspan="2"><?=
+                          db_selectrecord("o41_cgmordenador", $result_cgm, true, $db_opcao, "", "", "", "","js_dadosordenador(this.value,$e60_numemp)");
+                        ?></td>  
+                        <?php
+                        db_input('db243_data_inicio',10,$Idb243_data_inicio,true,'hidden',3);
+                        db_input('db243_data_final',10,$Idb243_data_final,true,'hidden',3);
+                          }
+                    } else {
+                     
+                          $dado = listarOrdenadores($e60_numemp);
+                          foreach($dado as $dados) {
+                            $o41_cgmordenador = $dados['z01_numcgm'];
+                          }
+                          
+                          $where = $o41_cgmordenador ? " z01_numcgm in ($o41_cgmordenador) " :  "z01_numcgm is null";
+                          $result_cgm = $clcgm->sql_record($clcgm->sql_buscar_ordenador(null," o41_nomeordenador asc ",$where));
+                          if ($clcgm->numrows == 0 ) {
+                             $result_cgm = $clcgm->sql_record($clcgm->sql_query_ordenador(null," o41_nomeordenador asc ",$where));
+                          } 
+                          if ($dados['erro'] == 0) { ?>
+
+                              <tr>
+                              <td nowrap title="<?=$To41_cgmordenador?>">
+                                  <?db_ancora('<b>Ordenador da Liquidação</b>',"js_pesquisa_cgm(true);",$fimperiodocontabil);?>
+                              </td>
+                              <td colspan="4">
+                                  <?  
+                                      db_input("o41_cgmordenador",8,$Io41_cgmordenador,true,"text",$fimperiodocontabil,"onChange='js_pesquisa_cgm(false);'");
+                                      db_input("o41_cgmordenadordescr",40,$Io41_cgmordenadordescr,true,"text",3);
+                                      db_input('db243_data_inicio',10,$Idb243_data_inicio,true,'hidden',3);
+                                      db_input('db243_data_final',10,$Idb243_data_final,true,'hidden',3);
+                                  
+                                  ?>
+                              </td>
+                              </tr>
+                              <?php    
+                              } else {
+                          ?>
+                           <td nowrap title="<?= @$Te54_numcgm ?>">
+                            <b> Ordenador da Liquidação:</b>
+                           </td>
+                          <td colspan="4">
+                              <?=
+                                 db_selectrecord("o41_cgmordenador", $result_cgm, true, $db_opcao, "onFocus='js_dadosordenador(this.value,$e60_numemp)'", "", "", "","js_dadosordenador(this.value,$e60_numemp)");
+                                 db_input('db243_data_inicio',10,$Idb243_data_inicio,true,'hidden',3);
+                                 db_input('db243_data_final',10,$Idb243_data_final,true,'hidden',3);
+                              ?>
+                          </td>  
+                      <?php
+                    }
+                  }
+                }
+                } else {
+                  ?>
+
+                    <tr>
+                      <td nowrap title="<?=$To41_cgmordenador?>">
+                        <?db_ancora('<b>Ordenador da Liquidação</b>',"js_pesquisa_cgm(true);",$fimperiodocontabil);?>
+                      </td>
+                      <td colspan="4">
+                        <?  
+                          db_input("o41_cgmordenador",8,$Io41_cgmordenador,true,"text",$fimperiodocontabil,"onChange='js_pesquisa_cgm(false);'");
+                          db_input("o41_cgmordenadordescr",40,$Io41_cgmordenadordescr,true,"text",3);
+                          db_input('db243_data_inicio',10,$Idb243_data_inicio,true,'hidden',3);
+                          db_input('db243_data_final',10,$Idb243_data_final,true,'hidden',3);
+                                 
+                        ?>
+                      </td>
+                      </tr>
+                   
+                      <?php
+                    }
+                  ?>     
+              </tr> 
+              <tr>
+                <td><strong>Conta Fornecedor: </strong></td>
+                <td colspan='3'>
+                  <?                
+                    db_select("e50_contafornecedor",null,true,1,"style='width:98%'");
+                  ?>
+                </td>
+              </tr>
                 <tr>
                     <!-- Oc17910 -->
                     <td><b>NF Matriz/Filial: </b></td>
@@ -163,6 +313,24 @@ if (USE_PCASP) {
                         </select>
                     </td>
                     <!-- end Oc1790 -->
+                </tr>
+                <tr id="cgm_emitente" >
+                  <td>
+                    <? db_ancora("<strong><u>CGM Emitente:&nbsp;</u></strong>", "js_pesquisaz01_numcgm(true);", 1); ?>
+                  </td>
+                  <td colspan=2>
+                    <? db_input('z01_numcgm', 13, "", true, 'text', 1, " onchange='js_pesquisaz01_numcgm(false);'", "", "", ""); ?>
+                    <? db_input('descricao_emitente', 55, "", true, 'text', 3, 'style="background-color: rgb(222, 184, 135);"');?>
+                  </td>
+                </tr>
+                <tr id="credor" style="display:none">
+                  <td>
+                    <? db_ancora('<b>Credor:</b>',"js_pesquisae49_numcgm(true)",1); ?>
+                  </td>
+                  <td colspan=2>
+                    <? db_input('e49_numcgm', 13, $Ie60_numcgm, true, 'text', 1,"onchange='js_pesquisae49_numcgm(false)'"); ?>
+                    <? db_input('z01_credor', 55, $Iz01_nome, true, 'text', 3, '');?>
+                  </td>
                 </tr>
               <tr>
               <td nowrap ><b>Nota Fiscal Eletronica: </b></td>
@@ -434,7 +602,7 @@ if (USE_PCASP) {
         <td colspan=2>
           <div style="display:flex; justify-content:center; gap:1%">
             <input name="confirmar"  type="button" id="confirmar"  value="Confirmar" onclick="return js_liquidar('<?=$metodo?>')" disabled>
-            <input name="pesquisar"  type="button" id="pesquisar"  value="Pesquisar" onclick="js_pesquisa();" >
+            <input name="pesquisar"  type="button" id="pesquisar"  value="Pesquisar" onclick="js_pesquisa('');" >
             <input name="zeraritens" type="button" id="zeraritens" value="Zerar Itens" onclick="js_zeraItens();" >
             <input name="preenche"   type="button" id="preenche"   value="Preencher Itens" onclick="js_preencheItens();" >
             <input name="retencoes"  type="button" id="retencoes"  disabled value="Retenções" onclick="js_lancarRetencao();" >
@@ -557,9 +725,13 @@ if (USE_PCASP) {
     jan = window.open('emp2_emitenotaliq002.php?codordem='+codordem,'','width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0');
     jan.moveTo(0,0);
   }
-  function js_pesquisa(){
-    document.form1.reset();
-    js_OpenJanelaIframe('top.corpo','db_iframe_empempenho','func_empempenho.php?funcao_js=parent.js_preenchepesquisa|e60_numemp|si172_nrocontrato|si172_datafinalvigencia|si174_novadatatermino','Pesquisa',true);
+  function js_pesquisa(iNumEmp){
+    if (iNumEmp == '') {
+      document.form1.reset();
+      js_OpenJanelaIframe('top.corpo','db_iframe_empempenho','func_empempenho.php?funcao_js=parent.js_preenchepesquisa|e60_numemp|si172_nrocontrato|si172_datafinalvigencia|si174_novadatatermino','Pesquisa',true);
+    } else {
+       js_consultaEmpenho(iNumEmp,<?=$operacao?>);
+  }  
   }
   function js_preenchepesquisa(chave,chave2,chave3,chave4){
     r = true;
@@ -581,6 +753,12 @@ if (USE_PCASP) {
     if(r == true) {
       db_iframe_empempenho.hide();
       js_consultaEmpenho(chave, <?=$operacao?>);
+      iNumEmp = chave;
+      if (iNumEmp){
+      <?
+        echo "location.href = '" . basename($_SERVER['PHP_SELF']) . "?e60_numemp=' + chave;";
+      ?>
+      }
     }
   }
   function casasdecimais(escolha){
@@ -888,6 +1066,28 @@ function validarVinculos(){
     $('reinfRetencaoEstabelecimento').value = 0;
     js_validarEstabelecimentos();
 
+    $("e50_contafornecedor").innerHTML = ''
+    opcaoPadrao = document.createElement('option');
+    opcaoPadrao.value = 0;
+    opcaoPadrao.textContent = "Sem conta definida.";
+    $("e50_contafornecedor").appendChild(opcaoPadrao);
+
+      if (obj.contas.length > 0) {      
+        obj.contas.forEach(function(conta) {
+          const novaConta = document.createElement('option');
+          novaConta.value = conta.pc63_contabanco;
+          if (conta.tipo == 1) {
+            novaConta.textContent = conta.conta+' - '+conta.tipoconta+' (Padrão)';
+          } else {
+            novaConta.textContent = conta.conta+' - '+conta.tipoconta;
+          }
+          $("e50_contafornecedor").appendChild(novaConta);
+          if (conta.tipo == 1) {
+            $("e50_contafornecedor").value = conta.pc63_contabanco;
+          }
+        })
+      }
+
     oDBToogleDiarias.show(obrigaDiaria);
 
     var lBloquearItens = false;
@@ -1142,7 +1342,10 @@ function validarVinculos(){
 
     // Condição de período
 
-
+    if($F('o41_cgmordenador') == '' || $F('o41_cgmordenador') == 0){
+        alert('É obrigatório informar o ordenador da liquidação!');
+        return false;
+    }
 
     if ($F('e69_numnota') == ''){
 
@@ -1172,6 +1375,30 @@ function validarVinculos(){
       return false;
     }
 
+    if ($F('paramentosOrdenadores') == 2 && $F('db243_data_inicio') && $F('db243_data_final')) {
+
+      let dataliquidacao = $F('dataLiquidacao').split('/');
+      let dataliquidacaoformatada = new Date(dataliquidacao[2], dataliquidacao[1] - 1, dataliquidacao[0]).toISOString();
+      var  datainicioformatada = new Date($F('db243_data_inicio')).toISOString();
+      
+      var datafimformatada = new Date($F('db243_data_final')).toISOString();
+      var datafinal = $F('db243_data_final').split('-');
+      datafinal     = datafinal[2]+'/'+datafinal[1]+'/'+datafinal[0];
+
+      var datainicial = $F('db243_data_inicio').split('-');
+      datainicial     = datainicial[2]+'/'+datainicial[1]+'/'+datainicial[0];
+
+      if (dataliquidacaoformatada.substring(0,10) < datainicioformatada.substring(0,10) || dataliquidacaoformatada.substring(0,10) > datafimformatada.substring(0,10)) {
+          if (dataliquidacaoformatada.substring(0,10) < datainicioformatada.substring(0,10)) {
+            alert('O ordenador selecionado está fora da vigência da liquidação, data início: '+datainicial);
+          }
+          if (dataliquidacaoformatada.substring(0,10) > datafimformatada.substring(0,10)) {
+            alert('O ordenador selecionado está fora da vigência da liquidação, data fim: '+datafinal);
+          }
+          $('o41_cgmordenador').focus();
+          return false;
+      } 
+    }
   if(document.form1.aIncide.value == 1){
    if(opcao != '3' && !document.form1.ct01_codcategoria.value &&  obj.Tipofornec =='cpf' && tipodesdobramento == '1' ){
       alert("Campo Categoria do Trabalhador Obrigatorio")
@@ -1486,6 +1713,7 @@ function validarVinculos(){
       oParam.valorTotal = valorTotal;
       oParam.iEmpenho   = $F('e60_numemp');
       oParam.iCgmEmitente = $F('z01_numcgm');
+      oParam.e50_numcgmordenador = $F('o41_cgmordenador');
       oParam.notas      = aNotas;
 
       if(encodeURIComponent(tagString($F("informacaoop"))) != '' || encodeURIComponent(tagString($F("informacaoop"))) != null){
@@ -1518,6 +1746,7 @@ function validarVinculos(){
       oParam.e50_naturezabemservico = $F('naturezaCod');
       oParam.dDataLiquidacao = $F('dataLiquidacao');
       oParam.dDataVencimento = $F('dataVencimento');
+      oParam.e50_contafornecedor = $F('e50_contafornecedor');
 
       var oInfoNota                      = new Object();
       oInfoNota.iCfop                = iCfop;
@@ -2158,26 +2387,19 @@ function js_mostraCatTrabalhadorremuneracao1(chave1,chave2){
     });
 
     function mostrar_cgm_emitente(condicao) {
-        var cgm_emitente = document.getElementsByClassName('cgm_emitente');
-        var credor = document.getElementsByClassName('credor');
-
         if (condicao == "s") {
-            cgm_emitente[0].hidden = false;
-            cgm_emitente[1].hidden = false;
-            cgm_emitente[2].hidden = false;
+            $("cgm_emitente").style.display = "table-row"
             return;
         }
-        cgm_emitente[0].hidden = true;
-        cgm_emitente[1].hidden = true;
-        cgm_emitente[2].hidden = true;
+        $("cgm_emitente").style.display = "none"
         return;
     }
 
     function js_pesquisaz01_numcgm(mostra){
         if(mostra==true){
             js_OpenJanelaIframe('',
-                'func_nome',
-                'func_nome.php?funcao_js=parent.js_mostracgm1|z01_numcgm|z01_nome',
+                'db_iframe_cgm',
+                'func_nome.php?funcao_js=parent.js_mostraEmitente1|z01_numcgm|z01_nome',
                 'Pesquisar CGM',
                 true,
                 22,
@@ -2188,9 +2410,9 @@ function js_mostraCatTrabalhadorremuneracao1(chave1,chave2){
             if(document.form1.z01_numcgm.value != ''){
 
                 js_OpenJanelaIframe('',
-                    'func_nome',
+                    'db_iframe_cgm',
                     'func_nome.php?pesquisa_chave='+document.form1.z01_numcgm.value+
-                    '&funcao_js=parent.js_mostracgm',
+                    '&funcao_js=parent.js_mostraEmitente',
                     'Pesquisar CGM',
                     false,
                     22,
@@ -2202,7 +2424,7 @@ function js_mostraCatTrabalhadorremuneracao1(chave1,chave2){
             }
         }
     }
-    function js_mostracgm(erro,chave){
+    function js_mostraEmitente(erro,chave){
         document.form1.descricao_emitente.value = chave;
         if(erro==true){
             document.form1.z01_numcgm.focus();
@@ -2210,15 +2432,90 @@ function js_mostraCatTrabalhadorremuneracao1(chave1,chave2){
         }
     }
 
-    function js_mostracgm1(chave1,chave2){
+    function js_mostraEmitente1(chave1,chave2){
         document.form1.z01_numcgm.value = chave1;
         document.form1.descricao_emitente.value = chave2;
-        func_nome.hide();
+        db_iframe_cgm.hide();
     }
+
+    function  js_dadosordenador(dadosOrdenador,numempenho)
+    {
+        var oParam = new Object();
+        oParam.method     = "getOrdenador";
+        oParam.sOrdenador = dadosOrdenador;
+        oParam.sNumEmpenho = numempenho;
+        js_divCarregando('Aguarde, Buscando dados ordenador', 'msgBox');
+        var oAjax = new Ajax.Request(
+            'emp4_liquidacao004.php', {
+                method: 'post',
+                parameters: 'json=' + Object.toJSON(oParam),
+                onComplete: js_retornogetOrdenador
+            }
+        );
+    }
+
+    function js_retornogetOrdenador(oAjax) 
+    {
+
+        js_removeObj('msgBox');
+        var oResposta = JSON.parse(oAjax.responseText);
+        document.getElementById('db243_data_inicio').value = oResposta.db243_data_inicio;
+        document.getElementById('db243_data_final').value = oResposta.db243_data_final;
+
+    }  
+
+    function js_pesquisa_cgm(mostra)
+    {
+        if(mostra==true){
+            js_OpenJanelaIframe('','db_iframe_cgm','func_cgmordenador.php?funcao_js=parent.js_mostracgm1|z01_numcgm|z01_nome|tipo','Pesquisa',true);
+        }else{
+            if(document.form1.o41_cgmordenador.value != ''){
+                js_OpenJanelaIframe('','db_iframe_cgm','func_cgmordenador.php?pesquisa_chave='+document.form1.o41_cgmordenador.value+'&funcao_js=parent.js_mostracgm','Pesquisa',false);
+            }else{
+                document.form1.o41_cgmordenadordescr.value = '';
+            }
+        }
+    }
+
+    function js_mostracgm(erro, chave,chave2)
+    { 
+        if (chave2 == 'JURIDICA') {
+            alert("É obrigatório que o ordenador seja uma pessoa física.")
+            document.form1.o41_cgmordenador.value = '';
+            document.form1.o41_cgmordenadordescr.value = '';
+            document.form1.o41_cgmordenador.focus();
+        } else {
+            document.form1.o41_cgmordenadordescr.value = chave;
+        }
+        if (erro == true) {
+            document.form1.o41_cgmordenador.focus();
+            document.form1.o41_cgmordenador.value = '';
+        }
+    }
+
+    function js_mostracgm1(chave, chave1,chave2) 
+    {
+       
+        if (chave2 == 'JURIDICA') {
+            alert("É obrigatório que o ordenador seja uma pessoa física.")
+            document.form1.o41_cgmordenador.value = '';
+            document.form1.o41_cgmordenadordescr.value = '';
+            return false;
+        } else {
+            document.form1.o41_cgmordenador.value = chave;
+            document.form1.o41_cgmordenadordescr.value = chave1;
+            db_iframe_cgm.hide();
+        }
+      
+    }
+
     $('contribuicaoPrev').style.width =' 495px';
     $('aIncide').style.width =' 120px';
     $('multiplosvinculos').style.width =' 120px';
-
+    $('o41_cgmordenador').style.width =' 107px';
+    $('o41_cgmordenadordescr').style.width ='76.5%';
+    $('nf_matriz_filial').style.width ='98%';
+    $('e69_notafiscaleletronica').style.width ='98%';
     $('e60_codemp').disabled = true;
     $('e60_coddot').disabled = true;
     $('estruturalDotacao').disabled = true;
@@ -2235,7 +2532,7 @@ function js_mostraCatTrabalhadorremuneracao1(chave1,chave2){
     $('nomeempresa').disabled = true;
     $('ct01_descricaocategoriaremuneracao').disabled = true;
     $('e69_nfserie').disabled           = true;
-
+    $('o41_cgmordenador').focus();
     document.addEventListener("DOMContentLoaded", function() {
     var elementosNoSelect = document.querySelectorAll('input:disabled');
     elementosNoSelect.forEach(function (elemento) {
@@ -2244,3 +2541,138 @@ function js_mostraCatTrabalhadorremuneracao1(chave1,chave2){
   });
 
 </script>
+<?php
+
+function buscarParamentosOrdenadores()
+{
+  $clempparametro    = new cl_empparametro;
+  return db_utils::fieldsMemory($clempparametro->sql_record($clempparametro->sql_query(db_getsession("DB_anousu"), "e30_buscarordenadoresliqui", null, "")), 0)->e30_buscarordenadoresliqui;
+}
+
+function listarOrdenadores($e60_numemp) 
+{
+ 
+  $o58_anousu  = 0;
+  $o58_instit  = 0;
+  $o58_orgao   = 0;
+  $o58_unidade = 0;
+  $e56_autori  = 0;
+  $clempautidot      = new cl_empautidot;
+  $clorcunidade      = new cl_orcunidade;
+  $oDaoElementos     = db_utils::getDao('orcelemento');
+
+  $sWhereEmpenho     = " e60_numemp =  {$e60_numemp}";
+  $sSqlBuscaElemento = $oDaoElementos->sql_query_estrut_empenho(null, "substr(o56_elemento,1,7) AS o56_elemento,e60_coddot,e60_emiss", null, $sWhereEmpenho);
+  $rsBuscaElemento   = $oDaoElementos->sql_record($sSqlBuscaElemento);
+  $coddotacao = db_utils::fieldsMemory($rsBuscaElemento, 0)->e60_coddot;
+
+  $anoUsu = db_getsession("DB_anousu");
+  $sWhere = "e56_coddot =	" . $coddotacao . " and ( e56_anousu = " . $anoUsu ."or e64_vlrpag > 0 ) and e61_numemp = ".$e60_numemp; 
+  $rsResult = $clempautidot->sql_record($clempautidot->sql_query_dotacao_empenho(null, "*", null, $sWhere));
+  $numrows = $clempautidot->numrows;
+
+  if ($numrows > 0) {
+     
+      $o58_anousu  = db_utils::fieldsMemory($rsResult, 0)->o58_anousu;
+      $o58_instit  = db_utils::fieldsMemory($rsResult, 0)->o58_instit;
+      $o58_orgao   = db_utils::fieldsMemory($rsResult, 0)->o58_orgao;
+      $o58_unidade = db_utils::fieldsMemory($rsResult, 0)->o58_unidade;
+      $e56_autori  = db_utils::fieldsMemory($rsResult, 0)->e56_autori;
+  }
+
+  $buscarOrdenadores = buscarParamentosOrdenadores();
+  if ($buscarOrdenadores == 1 ) {
+
+     $whereUnidades = " o41_anousu = {$anoUsu} and o41_instit = {$o58_instit} and o41_orgao = {$o58_orgao} and o41_unidade = {$o58_unidade} ";
+     $o41_cgmordenador =  db_utils::fieldsMemory($clorcunidade->sql_record($clorcunidade->sql_query($anoUsu,null,null, " o41_ordliquidacao ",null,$whereUnidades)), 0)->o41_ordliquidacao;
+     $result_cgmorliquidaca = db_query("SELECT z01_nome as nomeordenador FROM cgm WHERE z01_numcgm = {$o41_cgmordenador}");
+     $o41_nomeordenador = db_utils::fieldsMemory($result_cgmorliquidaca, 0)->nomeordenador;
+
+     if ($numrows > 0) {
+
+      $ordenadoresArray[] = [
+
+        'z01_numcgm' => $o41_cgmordenador,
+        'o41_nomeordenador' => $o41_nomeordenador,
+        'erro'        =>  true,
+      ];
+      return $ordenadoresArray; 
+     }
+
+     return ['erro' => false];
+    
+  } elseif ($buscarOrdenadores == 2 ) {
+
+   $anoUsu = db_getsession("DB_anousu");
+   $results = DB::table('empenho.empautidot')
+               ->join('orcdotacao', function($join) {
+               $join->on('orcdotacao.o58_anousu', '=', 'empautidot.e56_anousu')
+                    ->on('orcdotacao.o58_coddot', '=', 'empautidot.e56_coddot');
+               })
+               ->join('empautoriza', 'empautoriza.e54_autori', '=', 'empautidot.e56_autori')
+               ->join('orcelemento', function($join) {
+                   $join->on('orcelemento.o56_codele', '=', 'orcdotacao.o58_codele')
+                        ->on('orcelemento.o56_anousu', '=', 'orcdotacao.o58_anousu');
+               })
+               ->join('empempaut', 'empempaut.e61_autori', '=', 'empautidot.e56_autori')
+               ->join('empelemento', 'empelemento.e64_numemp', '=', 'empempaut.e61_numemp')
+               ->leftJoin('orctiporec', 'orctiporec.o15_codigo', '=', 'empautidot.e56_orctiporec')
+               ->select('*')
+               ->where('empenho.empautidot.e56_autori', '=',$e56_autori)
+               ->where(function ($query) {
+                $query->where('empenho.empautidot.e56_anousu', '=', $anoUsu)
+                      ->orWhere('empelemento.e64_vlrpag', '>', 0);
+               })
+               ->get()->toArray();
+
+   foreach ($results as $autorizacao) {  
+       $o58_instit  =  $autorizacao->o58_instit; 
+       $o58_orgao   =  $autorizacao->o58_orgao; 
+       $o58_unidade =  $autorizacao->o58_unidade; 
+       $o58_anousu  =  $autorizacao->o58_anousu; 
+   }   
+
+   $aAssinantes = DB::table('configuracoes.assinatura_digital_assinante')
+               ->join('configuracoes.db_usuarios', 'configuracoes.assinatura_digital_assinante.db243_usuario', '=', 'configuracoes.db_usuarios.id_usuario')
+               ->join('configuracoes.db_usuacgm', 'configuracoes.db_usuacgm.id_usuario', '=', 'configuracoes.db_usuarios.id_usuario')
+               ->join('protocolo.cgm', 'protocolo.cgm.z01_numcgm', '=', 'configuracoes.db_usuacgm.cgmlogin')
+               ->where('configuracoes.assinatura_digital_assinante.db243_instit', '=', $o58_instit)
+               ->where('configuracoes.assinatura_digital_assinante.db243_orgao', '=', $o58_orgao)
+               ->where('configuracoes.assinatura_digital_assinante.db243_unidade', '=', $o58_unidade)
+               ->where('configuracoes.assinatura_digital_assinante.db243_anousu', '=', $anoUsu)
+               ->where('configuracoes.assinatura_digital_assinante.db243_cargo', '=', 2)
+               ->where('configuracoes.assinatura_digital_assinante.db243_documento', '=', 1)
+               ->select('configuracoes.db_usuarios.login', 'configuracoes.db_usuarios.nome', 'configuracoes.db_usuarios.email', 'protocolo.cgm.z01_cgccpf' , 'configuracoes.assinatura_digital_assinante.db243_cargo','protocolo.cgm.z01_numcgm','configuracoes.assinatura_digital_assinante.db243_data_inicio','configuracoes.assinatura_digital_assinante.db243_data_final')
+               ->distinct('login', 'nome', 'z01_cgccpf', 'db243_cargo')
+               ->get()->toArray();         
+
+   $rowCount = count($aAssinantes);  
+   $ordenadoresArray = array(); 
+   $uniqueKeys = array(); 
+   
+   foreach ($aAssinantes as $assinante) {
+       $uniqueKey = $assinante->nome . '|' . $assinante->z01_numcgm;
+   
+    
+           if (!in_array($uniqueKey, $uniqueKeys)) {
+               $ordenadoresArray[] = [
+                   'nome' => $assinante->nome,
+                   'z01_numcgm' => $assinante->z01_numcgm,
+                   'db243_data_inicio' => $assinante->db243_data_inicio,
+                   'db243_data_final' => $assinante->db243_data_final,
+                   'rowCount'    => $rowCount,
+                   'erro'        =>  $numrows,
+               ];
+               $uniqueKeys[] = $uniqueKey;
+           }
+          
+      
+   }
+   if ($rowCount > 0) {
+      return $ordenadoresArray;
+   }
+
+   return ['erro' => false];
+  }
+}
+?>

@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc22452 extends AbstractMigration
+class Oc22452 extends PostgresMigration
 {
     use App\Support\Database\InsertMenu;
 

@@ -358,6 +358,17 @@ $clrotulo->label("c50_descr");
               ?>
             </td>
           </tr>
+          <tr>
+            <td nowrap align="left" title="<?=@$Tr11_tipoempenho?>">
+              <?=@$Lr11_tipoempenho?>
+            </td>
+            <td> 
+              <?
+                $x = array("1"=>"Dotação","2"=>"Lotação");
+                db_select('r11_tipoempenho',$x,true,$db_opcao," style='width: 135px;' ");
+              ?>
+            </td>
+          </tr>
         </table>
       </fieldset>
     </td>

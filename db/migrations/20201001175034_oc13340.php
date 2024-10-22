@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc13340 extends AbstractMigration
+class Oc13340 extends PostgresMigration
 {
     CONST PMPIRAPORA = '23539463000121';
     public function up()
@@ -56,5 +56,5 @@ class Oc13340 extends AbstractMigration
         }
         return $arr;
     }
-    
+
 }

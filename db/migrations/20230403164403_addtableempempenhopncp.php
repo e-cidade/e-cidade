@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Addtableempempenhopncp extends AbstractMigration
+class Addtableempempenhopncp extends PostgresMigration
 {
     public function up()
     {
@@ -28,7 +28,7 @@ class Addtableempempenhopncp extends AbstractMigration
                         ON UPDATE NO ACTION
                         ON DELETE NO ACTION
                 );
-                
+
                 CREATE SEQUENCE empempenhopncp_e213_sequencial_seq
                 INCREMENT 1
                 MINVALUE 1

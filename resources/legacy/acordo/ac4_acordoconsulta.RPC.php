@@ -70,7 +70,6 @@ switch ($oParam->exec) {
     inner join acordoitem on ac20_acordoposicao = ac26_sequencial
     inner join pcmater on ac20_pcmater = pc01_codmater
     inner join matunid on ac20_matunid = m61_codmatunid
-    inner join pcmaterele on pc07_codmater = pc01_codmater and pc07_codele = ac20_elemento
     where ac26_acordo = $oParam->ac16_sequencial and ac26_acordoposicaotipo = 1 order by ac20_ordem;");
 
     for ($i = 0; $i < pg_numrows($itens); $i++) {

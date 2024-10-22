@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc17733 extends AbstractMigration
+class Oc17733 extends PostgresMigration
 {
 
     public function up()
@@ -30,7 +30,7 @@ class Oc17733 extends AbstractMigration
         insert into db_syscampo values ((select max(codcam)+1 from db_syscampo),'pc28_solicitem','int8','Registro Item Solicitacao',0,'Registro Item Solicitacao',10,'f','f','f',1,'text','Registro Item Solicitacao');
         insert into db_syscampo values ((select max(codcam)+1 from db_syscampo),'pc28_vlranu','float8','Valor Anulado',0,'Valor Anulado',10,'f','f','f',4,'text','Valor Anulado');
         insert into db_syscampo values ((select max(codcam)+1 from db_syscampo),'pc28_qtd','float8','Quantidade Anulada',0,'Quantidade Anulada',10,'t','f','f',4,'text','Quantidade Anulada');
-        
+
         commit;";
 
         $this->execute($sSql);

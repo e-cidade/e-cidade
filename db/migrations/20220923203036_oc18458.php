@@ -1,14 +1,14 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc18458 extends AbstractMigration
+class Oc18458 extends PostgresMigration
 {
 
     public function up()
     {
         $sql=" BEGIN;
-        
+
         INSERT INTO db_sysarquivo VALUES((select max(codarq)+1 from db_sysarquivo),'situacaoitem','cadastro da situação do item de uma licitacao','l217','2022-09-14','cadastro da situação do item de uma licitacao',0,'f','f','f','f');
 
 
@@ -102,8 +102,8 @@ class Oc18458 extends AbstractMigration
         FOREIGN KEY (l218_liclicitem) REFERENCES liclicitem (l21_codigo);
 
 
-        
-         
+
+
 
         INSERT INTO db_sysarquivo VALUES((select max(codarq)+1 from db_sysarquivo),'situacaoitemlic','Acompanhamento do item do processo licitatorio','l219','2022-09-14','Acompanhamento do item do processo licitatorio',0,'f','f','f','f');
 
@@ -118,9 +118,9 @@ class Oc18458 extends AbstractMigration
         INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select max(codarq) from db_sysarquivo), (select codcam from db_syscampo where nomecam = 'l219_data'), 3, 0);
         INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select max(codarq) from db_sysarquivo), (select codcam from db_syscampo where nomecam = 'l219_id_usuario'), 4, 0);
         INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select max(codarq) from db_sysarquivo), (select codcam from db_syscampo where nomecam = 'l219_hora'), 5, 0);
-        
-        
-        
+
+
+
         CREATE TABLE situacaoitemlic(
         l219_codigo int8 NOT NULL default 0,
         l219_situacao int8 NOT NULL default 0,
@@ -137,7 +137,7 @@ class Oc18458 extends AbstractMigration
         FOREIGN KEY (l219_situacao) REFERENCES situacaoitem (l217_sequencial);
 
         COMMIT;
-        
+
         ";
 
         $this->execute($sql);

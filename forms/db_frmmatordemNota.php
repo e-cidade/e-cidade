@@ -105,6 +105,9 @@ if ($lBloquear) {
     border-bottom-color: <?= $cor ?>;
     background-color: #cccccc;
   }
+  .hidden {
+    display: none !important;
+}
 </style>
 <form name="form1" method="post" action="">
   <center>
@@ -179,9 +182,18 @@ if ($lBloquear) {
               <tr>
                 <td nowrap align="right" title="<?= @$Tz01_telef ?>"><?= @$Lz01_telef ?></td>
                 <td><? db_input('z01_telef', 20, $Iz01_telef, true, 'text', 3) ?></td>
-                <td nowrap align="right" title="<?= @$Tm51_prazoent ?>"><?= @$Lm51_prazoent ?></td>
-                <td><? db_input('m51_prazoent', 6, $Im51_prazoent, true, 'text', $dbopcao) ?></td>
-              </tr>
+                <td id="prazoent" nowrap align="right" title="<?= @$Tm51_prazoent ?>"><?= @$Lm51_prazoent ?></td>
+                <td id="m51_prazoent"><? db_input('m51_prazoent', 6, $Im51_prazoent, true, 'text', $dbopcao) ?></td>
+                
+                <td id="prazoNovo" class="hidden"><b>Prazo de Entrega</b></td>
+                <td id="prazoNovoValue" class="hidden">
+                    <select name="pc97_descricao" id="pc97_descricao" onchange="getPrazos()">
+                    </select>
+                </td>
+                <td class="hidden">
+                  <input type="text" name="sequencial" id="pc97_sequencial">
+                </td>
+            </tr>
               <tr>
                 <td nowrap align="right" title="<?= @$Tm51_data ?>"><b>Data:</b></td>
                 <td><? if (empty($m51_data_dia)) {
@@ -674,6 +686,104 @@ if ($lBloquear) {
 <script>
   
   var sUrlRC = 'com4_ordemdecompra001.RPC.php';
+
+  getPrazos();
+  function getPrazos() {
+    let oParam = {};
+    oParam.exec = 'getPrazo';
+
+    const oAjax = new Ajax.Request(
+        sUrlRC, {
+            parameters: 'json=' + Object.toJSON(oParam),
+            asynchronous: false,
+            method: 'post',
+            onComplete: function(response) {
+                js_retornoGetPrazos(response);
+            }
+        }
+    );
+}
+
+function js_retornoGetPrazos(response) {
+    let oRetorno = JSON.parse(response.responseText);
+    let prazos = oRetorno.prazoCadastrado;
+
+    let selectPrazo = document.getElementById('pc97_descricao');
+    let sequencialInput = document.getElementById('pc97_sequencial');
+    
+    let selectedValue = selectPrazo.value;
+
+    selectPrazo.innerHTML = '';
+
+    prazos.forEach(function(oPrazo) {
+        let option = document.createElement("option");
+        option.value = oPrazo.pc97_descricao;
+        option.text = oPrazo.pc97_descricao;
+        option.dataset.sequencial = oPrazo.pc97_sequencial; 
+        selectPrazo.appendChild(option);
+    });
+
+  
+    if (selectedValue) {
+        selectPrazo.value = selectedValue;
+    }
+
+    updateSequencial(selectPrazo);
+
+    selectPrazo.addEventListener('change', function() {
+        updateSequencial(selectPrazo);
+    });
+}
+
+function updateSequencial(selectElement) {
+    let selectedOption = selectElement.options[selectElement.selectedIndex];
+    let sequencialInput = document.getElementById('pc97_sequencial');
+    
+    if (selectedOption) {
+        sequencialInput.value = selectedOption.dataset.sequencial;
+    } else {
+        sequencialInput.value = ''; 
+    }
+}
+  
+
+
+  definePrazoEntrega();
+  function definePrazoEntrega(){
+        let oParam = {};
+        oParam.exec = 'buscarPrazo';
+
+        const oAjax = new Ajax.Request(
+          sUrlRC, {
+                parameters: 'json=' + Object.toJSON(oParam),
+                asynchronous: false,
+                method: 'post',
+                onComplete: js_retornoPrazo
+            });
+    }
+  function js_retornoPrazo(oAjax) {
+    let oRetorno = JSON.parse(oAjax.responseText);
+    let prazo = oRetorno.prazo;
+    let prazoent = document.getElementById('prazoent');
+    let prazoentvalue = document.getElementById('m51_prazoent');
+    let prazoNovo = document.getElementById('prazoNovo');
+    let prazoNovoValue = document.getElementById('prazoNovoValue');
+    
+    if (prazo == 2) {
+        if (prazoent) prazoent.classList.add('hidden');
+        if (prazoentvalue) prazoentvalue.classList.add('hidden');
+        
+        if (prazoNovo) prazoNovo.classList.remove('hidden');
+        if (prazoNovoValue) prazoNovoValue.classList.remove('hidden');
+      }else{
+        if (prazoent) prazoent.classList.remove('hidden');
+        if (prazoentvalue) prazoentvalue.classList.remove('hidden');
+        
+        if (prazoNovo) prazoNovo.classList.add('hidden');
+        if (prazoNovoValue) prazoNovoValue.classList.add('hidden');
+      }
+  }
+
 
   function js_init(empenho,item) {
 

@@ -424,46 +424,58 @@ db_app::load("estilos.css, grid.style.css");
                             </tr>
                             <tr>
                                 <td colspan="2" align="center">
-                                    <span style="cursor:pointer; height: 17px !important;background-color: #d9d5d5; border-radius: 2px;font-family: Arial, Helvetica, sans-serif, verdana; font-size: 12px; height: 17px; border: 1px solid #999999;padding: 1px 8px; color: #2d2d54;"> <a onclick="incluir_item(event);">Incluir item</a>
+                                    <!--
+                                    <span style="cursor:pointer; height: 17px !important; background-color: #d9d5d5; border-radius: 2px; font-family: Arial, Helvetica, sans-serif, verdana; font-size: 12px; height: 17px; border: 1px solid #999999; padding: 1px 8px; color: #2d2d54;">
+                                        <a onclick="incluir_item(event);">Incluir item</a>
                                     </span>
+                                    -->
+
+                                    <input id="alterarItem" style="margin-top:10px;display:none;" type='button' value="Alterar Item" />
+                                    <input id="incluirItem" style="margin-top:10px;" type='button' value="Incluir Item" onclick="incluiItem();" />
                                 </td>
                             </tr>
                         </table>
 
                     </fieldset>
-                    <fieldset style="display:none;" id="itensLancados">
-                        <legend>Itens lançados</legend>
-                        <table width="100%" height="100%" cellspacing="2px" cellpadding="1px" border="0" bgcolor="#cccccc">
-                            <tbody>
+                    <fieldset>
+                    <legend>Itens da Manutenção</legend>
+
+                    <div style="margin-top:10px;" id='gridItensManutencao'>
+
+                    </div>
+
+                    <div id='frmDadosAutorizacao' style='display: none'>
+                        <center>
+                            <table style='width: 100%' border='0'>
                                 <tr>
-                                    <td valign="top" align="center">
-                                        <table style="" width="100%" id="itens_lancados" cellspacing="0px" border="1px" bgcolor="#cccccc">
-
-                                            <tr class="cabec">
-                                                <td class="cabec"><strong>Código Seq.</strong></td>
-
-                                                <td class="cabec"><strong>Descrição do Item</strong></td>
-                                                <td class="cabec"><strong>Quantidade</strong></td>
-                                                <td class="cabec"><strong>Valor Unitário</strong></td>
-                                                <td class="cabec"><strong>Valor Total</strong></td>
-                                                <td class="cabec"><b>Opções</b></td>
+                                    <td width="100%">
+                                        <table width="100%">
+                                            <tr>
+                                                <td colspan='3'>
+                                                    <fieldset>
+                                                        <div id='ctnGridItens'>
+                                                        </div>
+                                                    </fieldset>
+                                                </td>
                                             </tr>
                                         </table>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td nowrap title="<?= @$Tve62_valor ?>" style="text-align:right;">
-                                        <br>
-                                        <b> Valor total: </b>
-                                        <?
-                                        db_input('ve62_valor', 10, $Ive62_valor, true, 'text', 3, "readonly")
-                                        ?>
+                                    <td style="text-align: center">
                                     </td>
-
-
                                 </tr>
-                            </tbody>
-                        </table>
+                            </table>
+                            <input type='button' id="salvarV" value='Salvar' onclick="js_enviarvalores();" style="margin-top: 10px;">
+
+                            </fieldset>
+                        </center>
+                    </div>
+
+                    <div align="right">
+                        <b>Valor total:</b>
+                        <?php db_input('ve62_valor', 10, $Ive62_valor, true, 'text', 3, "readonly"); ?>
+                    </div>
                     </fieldset>
 
                     <fieldset>
@@ -487,7 +499,6 @@ db_app::load("estilos.css, grid.style.css");
             </fieldset>
             </td>
             </tr>
-            <input type="hidden" name="itens" value="<?php if (isset($itens)) echo str_replace("\\", "", utf8_decode($itens)); ?>" id="sItens">
             <tr>
                 <td colspan="2" style='text-align:center;'>
                     <input name="<?= ($db_opcao == 1 ? "incluir" : ($db_opcao == 2 || $db_opcao == 22 ? "alterar" : "excluir")) ?>" type="submit" id="db_opcao" value="<?= ($db_opcao == 1 ? "Incluir" : ($db_opcao == 2 || $db_opcao == 22 ? "Alterar" : "Excluir")) ?>" <?= ($db_botao == false ? "disabled" : "") ?> onclick="return js_valida();">
@@ -497,36 +508,21 @@ db_app::load("estilos.css, grid.style.css");
             </table>
     </form>
 </center>
-<div id='frmDadosAutorizacao' style='display: none'>
-    <form name='form2'>
-        <center>
-            <table style='width: 100%' border='0'>
-                <tr>
-                    <td width="100%">
-                        <table width="100%">
-                            <tr>
-                                <td colspan='3'>
-                                    <fieldset>
-                                        <div id='ctnGridItens'>
-                                        </div>
-                                    </fieldset>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="text-align: center">
-                    </td>
-                </tr>
-            </table>
-            </fieldset>
-            <input type='button' id="salvarV" value='Salvar' onclick="js_enviarvalores();" style="margin-top: 10px;">
-        </center>
-    </form>
-</div>
+
 
 <script type="text/javascript">
+
+    const oGridItensManutencao        = new DBGrid('oGridItensManutencao');
+    oGridItensManutencao.nameInstance = 'oGridItensManutencao';
+    oGridItensManutencao.setCellWidth( ['0%','38%','15%','18%', '20%', '9%'] );
+    oGridItensManutencao.setHeader( [ '','Descrição do Item', 'Quantidade','Valor Unitário','Valor Total','Opções'] );
+    oGridItensManutencao.setCellAlign( [ 'center','center','center','center', 'center', ,'center'] );
+    oGridItensManutencao.aHeaders[0].lDisplayed = false;
+    oGridItensManutencao.setHeight(100);
+    oGridItensManutencao.show($('gridItensManutencao'));
+    oGridItensManutencao.clearAll(true);
+    oGridItensManutencao.renderRows();
+
     var el = document.getElementById("e60_codemp");
 
     el.onblur = function() {
@@ -552,31 +548,6 @@ db_app::load("estilos.css, grid.style.css");
     var itens = [];
     var cell7 = 0;
 
-
-
-    <?php
-    if (isset($itens)) {
-
-        foreach (json_decode(str_replace("\\", "", utf8_encode($itens))) as $item) {
-
-            $what = array("Â°", chr(13), chr(10), 'Ã¤', 'Ã£', 'Ã ', 'Ã¡', 'Ã¢', 'Ãª', 'Ã«', 'Ã¨', 'Ã©', 'Ã¯', 'Ã¬', 'Ã­', 'Ã¶', 'Ãµ', 'Ã²', 'Ã³', 'Ã´', 'Ã¼', 'Ã¹', 'Ãº', 'Ã»', 'Ã€', 'Ã', 'Ãƒ', 'Ã‰', 'Ã', 'Ã“', 'Ãš', 'Ã±', 'Ã‘', 'Ã§', 'Ã‡', ' ', '-', '(', ')', ',', ';', ':', '|', '!', '"', '#', '$', '%', '&', '/', '=', '?', '~', '^', '>', '<', 'Âª', 'Âº');
-            $by = array('', '', '', 'a', 'a', 'a', 'a', 'a', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'A', 'A', 'A', 'E', 'I', 'O', 'U', 'n', 'n', 'c', 'C', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
-            $valor = str_replace($what, $by, $item->ve63_descr);
-            $valorDescr = $valor;
-            if ($item->ve62_veiculos != "") {
-                echo "incluir_item_php('" . $item->ve62_veiculos . "',";
-                echo "'" . $valorDescr . "',";
-                echo "'" . $item->ve63_quant . "',";
-                echo "'" . $item->ve63_vlruni . "',";
-                echo "'" . $item->ve64_pcmater . "',";
-                echo "'" . $item->pc01_descrmater . "'); ";
-            }
-        }
-    }
-    ?>
-
-
-
     function mostrarCadastro() {
         var valItem = document.getElementById("ve62_itensempenho").value;
         if (valItem == 2) {
@@ -596,256 +567,6 @@ db_app::load("estilos.css, grid.style.css");
             document.getElementById("valorTotal").value = resullt.toFixed(2);
         }
 
-
-    }
-    var op = 0;
-
-    function js_apaga_linha(e, num, controle) {
-
-        item = [];
-        document.form1.ve62_valor.value = parseFloat(document.form1.ve62_valor.value - (itens[num].ve63_vlruni * itens[num].ve63_quant)).toFixed(2);
-        if (num_row == 1) {
-
-            cell7 = (itens[num].ve63_vlruni * itens[num].ve63_quant).toFixed(2) - (itens[num].ve63_vlruni * itens[num].ve63_quant).toFixed(2);
-        } else {
-
-            cell7 -= (itens[num].ve63_vlruni * itens[num].ve63_quant).toFixed(2);
-        }
-
-        e.parentNode.parentNode.parentNode.removeChild(e.parentNode.parentNode);
-        for (i = 0; i < itens.length; i++) {
-            if (i != num) {
-                item[i] = itens[i];
-            }
-        }
-        itens = item;
-
-        document.form1.itens.value = JSON.stringify(itens);
-
-
-
-        if (controle == 1) {
-            num_row--;
-            if (num_row == 0) {
-                document.getElementById("itensLancados").style.display = "none";
-            }
-        } else {
-            op++;
-            vNum_row = 0;
-            for (i = 0; i < num_row; i++) {
-                vNum_row = vNum_row + 1;
-            }
-
-            if (op == vNum_row) {
-                document.getElementById("itensLancados").style.display = "none";
-            }
-        }
-    }
-    var valorLExcluido = 0;
-
-    function js_apaga_linha_toda() {
-
-        for (j = valorLExcluido; j <= linhasLancadas; j++) {
-
-            item = [];
-            document.form1.ve62_valor.value = parseFloat(document.form1.ve62_valor.value - (itens[j].ve63_vlruni * itens[j].ve63_quant)).toFixed(2);
-            cell7 -= (itens[j].ve63_vlruni * itens[j].ve63_quant).toFixed(2);
-
-            var val = document.getElementById('linha_' + j);
-            val.parentNode.removeChild(val);
-
-            for (i = 0; i < itens.length; i++) {
-                if (i != j) {
-
-                    item[i] = itens[i];
-                }
-            }
-            itens = item;
-
-            document.form1.itens.value = JSON.stringify(itens);
-
-
-        }
-        valorLExcluido = linhasLancadas + 1;
-        return false;
-
-    }
-    var numGlobal = -1;
-
-    function js_editar_linha(e, num, controle) {
-        numGlobal = num;
-
-        for (i = 0; i < num_row; i++) {
-            if (i != num) {
-
-                var te = document.getElementById("edi_" + i);
-                if (te != null) {
-                    document.getElementById("edi_" + i).style.display = "none";
-                    document.getElementById("exc_" + i).style.display = "none";
-                }
-
-            }
-        }
-        document.form1.ve62_veiculos.value = itens[num].ve62_veiculos;
-        document.form1.ve63_descr.value = itens[num].ve63_descr;
-        document.form1.ve63_quant.value = itens[num].ve63_quant;
-        document.form1.ve63_vlruni.value = itens[num].ve63_vlruni;
-        document.form1.ve64_pcmater.value = itens[num].ve64_pcmater;
-        document.form1.pc01_descrmater.value = itens[num].pc01_descrmater;
-        js_apaga_linha(e, num, controle);
-
-    }
-
-    function incluir_item_php(ve62_veiculos, ve63_descr, ve63_quant, ve63_vlruni, ve64_pcmater, pc01_descrmater) {
-        var cell1 = ve62_veiculos;
-        var cell2 = ve63_descr;
-        var cell3 = ve63_quant;
-        var cell4 = ve63_vlruni;
-        var cell5 = ve64_pcmater;
-        var cell6 = pc01_descrmater;
-
-        cell7 += parseFloat(cell3) * parseFloat(cell4);
-        var it = $F("ve62_itensempenho");
-
-        if (it == 2) {
-            document.getElementById("itensCadastro").style.display = "block";
-        }
-
-        if (it == 1) {
-            var content = '<tr id="linha_' + num_row + '"><td style="border:1px solid #AACCCC;" class="corpo" align="center">' + cell1 + '</td> <td style="border:1px solid #AACCCC;" class="corpo" align="center">' + cell2 + '</td> <td style="border:1px solid #AACCCC;" class="corpo" align="center">' + cell3 + '</td> <td style="border:1px solid #AACCCC;" class="corpo" align="center">' + cell4 + '</td> <td style="border:1px solid #AACCCC;" class="corpo" align="center">' + (ve63_quant * ve63_vlruni).toFixed(2) + '</td>  <td align="center"class="corpo" nowrap=""><a title="EXCLUIR CONTEÚDO DA LINHA" <?php if ($db_opcao != 3) : ?>href="#" onclick="js_apaga_linha(this,' + num_row + ',1);return false;"<?php endif; ?>>E</a> </td> </tr>';
-        } else {
-            var content = '<tr id="linha_' + num_row + '"><td style="border:1px solid #AACCCC;" class="corpo" align="center">' + cell1 + '</td> <td style="border:1px solid #AACCCC;" class="corpo" align="center">' + cell2 + '</td> <td style="border:1px solid #AACCCC;" class="corpo" align="center">' + cell3 + '</td> <td style="border:1px solid #AACCCC;" class="corpo" align="center">' + cell4 + '</td> <td style="border:1px solid #AACCCC;" class="corpo" align="center">' + (ve63_quant * ve63_vlruni).toFixed(2) + '</td>  <td align="center"class="corpo" nowrap=""><a id="edi_' + num_row + '" title="EDITAR" <?php if ($db_opcao != 3) : ?>href="#" onclick="js_editar_linha(this,' + num_row + ',2);return false;"<?php endif; ?>>A</a> <a id="exc_' + num_row + '" title="EXCLUIR CONTEÚDO DA LINHA" <?php if ($db_opcao != 3) : ?>href="#" onclick="js_apaga_linha(this,' + num_row + ',1);return false;"<?php endif; ?>>E</a> </td> </tr>';
-        }
-
-
-        valores = {
-            "ve62_veiculos": cell1,
-            "ve63_descr": cell2,
-            "ve63_quant": cell3,
-            "ve63_vlruni": cell4,
-            //"ve64_pcmater" : cell5,
-            //"pc01_descrmater" : cell6,
-        }
-        itens[num_row] = valores;
-        num_row++;
-        document.form1.itens.value = JSON.stringify(itens);
-        document.form1.ve62_valor.value = cell7.toFixed(2);
-        document.getElementById('itens_lancados').innerHTML += content;
-    }
-    var linhasLancadas;
-
-    function incluir_item(event) {
-        var cell1 = document.form1.ve62_veiculos.value;
-        var cell2 = document.form1.ve63_descr.value;
-        var cell3 = document.form1.ve63_quant.value;
-        var cell4 = document.form1.ve63_vlruni.value;
-        var cell5 = document.form1.ve64_pcmater.value;
-        var cell6 = document.form1.pc01_descrmater.value;
-        var result = document.form1.ve63_vlruni.value * document.form1.ve63_quant.value;
-
-        quantidade = 50;
-        total = cell2.length;
-
-        if (total > quantidade) {
-            cell2 = cell2.substr(0, quantidade);
-            total = cell2.length;
-        }
-
-        var regex = /^[0-9.]+$/;
-        if (!regex.test(result)) {
-            alert('Usuário: Verificar os valores');
-            return false;
-        }
-        if (result == 0) {
-            alert('Usuário: Verificar os valores');
-            return false;
-        }
-        if (cell1 == '') {
-            alert('Preencha o campo Veículos');
-            return false;
-        }
-        if (cell2 == '') {
-            alert('Preencha o campo Descrição da Peça');
-            return false;
-        }
-        if (cell3 == '') {
-            alert('Preencha o campo Quantidade');
-            return false;
-        }
-        if (cell4 == '') {
-            alert('Preencha o campo Valor Unitário');
-            return false;
-        }
-        if (cell5 == '') {
-            //alert('Preencha o campo Material');
-            //return false;
-            cell5 = 0;
-        }
-        if (cell6 == '') {
-            //alert('Preencha o campo Material');
-            //return false;
-            cell6 = cell2;
-        }
-        var guardaNum = num_row;
-        if (numGlobal != -1) {
-
-            for (i = 0; i < num_row; i++) {
-                if (i != numGlobal) {
-                    var te = document.getElementById("edi__" + i);
-                    if (te != null) {
-                        document.getElementById("edi_" + i).style.display = "inline";
-                        document.getElementById("exc_" + i).style.display = "inline";
-                    }
-                }
-            }
-            num_row = numGlobal;
-        }
-
-        cell7 += parseFloat(document.form1.ve63_vlruni.value) * parseFloat(document.form1.ve63_quant.value);
-
-        var it = $F("ve62_itensempenho");
-
-        if (it == 2) {
-            document.getElementById("itensCadastro").style.display = "block";
-        }
-
-        if (it == 1) {
-            var content = '<tr id="linha_' + num_row + '"><td style="border:1px solid #AACCCC;" class="corpo" align="center">' + cell1 + '</td> <td style="border:1px solid #AACCCC;" class="corpo" align="center">' + cell2 + '</td> <td style="border:1px solid #AACCCC;" class="corpo" align="center">' + cell3 + '</td> <td style="border:1px solid #AACCCC;" class="corpo" align="center">' + cell4 + '</td> <td style="border:1px solid #AACCCC;" class="corpo" align="center">' + (parseFloat(document.form1.ve63_vlruni.value) * parseFloat(document.form1.ve63_quant.value)).toFixed(2) + '</td> <td align="center"class="corpo" nowrap=""><a title="EXCLUIR CONTEÚDO DA LINHA" href="#" onclick="js_apaga_linha(this,' + num_row + ',1);return false;">E</a> </td> </tr>';
-        } else {
-            var content = '<tr id="linha_' + num_row + '"><td style="border:1px solid #AACCCC;" class="corpo" align="center">' + cell1 + '</td> <td style="border:1px solid #AACCCC;" class="corpo" align="center">' + cell2 + '</td> <td style="border:1px solid #AACCCC;" class="corpo" align="center">' + cell3 + '</td> <td style="border:1px solid #AACCCC;" class="corpo" align="center">' + cell4 + '</td> <td style="border:1px solid #AACCCC;" class="corpo" align="center">' + (parseFloat(document.form1.ve63_vlruni.value) * parseFloat(document.form1.ve63_quant.value)).toFixed(2) + '</td> <td align="center"class="corpo" nowrap=""><a id="edi_' + num_row + '" title="EDITAR" href="#" onclick="js_editar_linha(this,' + num_row + ',2);return false;">A</a> <a id="exc_' + num_row + '"title="EXCLUIR CONTEÚDO DA LINHA" href="#" onclick="js_apaga_linha(this,' + num_row + ',1);return false;">E</a> </td> </tr>';
-        }
-
-
-        valores = {
-            "ve62_veiculos": cell1,
-            "ve63_descr": cell2,
-            "ve63_quant": cell3,
-            "ve63_vlruni": cell4,
-        }
-        itens[num_row] = valores;
-        if (numGlobal == -1) {
-            linhasLancadas = num_row;
-            num_row++;
-        } else {
-            num_row = guardaNum;
-        }
-
-        document.form1.itens.value = JSON.stringify(itens);
-
-        document.getElementById("itensLancados").style.display = "block";
-
-        document.form1.ve63_descr.value = "";
-        document.form1.ve63_quant.value = "";
-        document.form1.ve63_vlruni.value = "";
-        document.form1.ve64_pcmater.value = "";
-        document.form1.pc01_descrmater.value = "";
-        document.form1.valorTotal.value = "";
-        document.form1.ve62_valor.value = cell7.toFixed(2);
-        document.getElementById('itens_lancados').innerHTML += content;
-
-
-        numGlobal = -1;
-        op = 0;
 
     }
 
@@ -1216,6 +937,7 @@ db_app::load("estilos.css, grid.style.css");
 
     function js_enviarvalores() {
         var aItens = oGridItens.getSelection("object");
+        let itens = [];
         var retorno;
         var iCodigoVeiculo = $F('ve62_veiculos');
         var op = 0;
@@ -1287,19 +1009,17 @@ db_app::load("estilos.css, grid.style.css");
 
                         }
 
-                        document.getElementById("ve63_descr").value = oItem.descr;
-                        document.getElementById("ve63_quant").value = oItem.quantUti;
-                        document.getElementById("ve63_vlruni").value = oItem.valor;
-                        document.getElementById("ve64_pcmater").value = oItem.item;
-                        document.getElementById("pc01_descrmater").value = oItem.descr;
-
-                        retorno = incluir_item(iCodigoVeiculo, oItem.descr, oItem.quantUti, oItem.valor, oItem.item, oItem.descr);
+                        itens.push({ descr: oItem.descr, quantUti: oItem.quantUti, valor: oItem.valor, precoTo: oItem.precoTo, item: oItem.item })
                     }
                 }
-                if (retorno != false) {
-                    alert("Itens incluídos com sucesso!");
+                oGridItens.clearAll(true);
+
+                for (let item of itens) {
+                    incluiItemEmpenho(item.descr,item.quantUti,item.valor,item.precoTo,item.item)
                 }
-                document.getElementById("itensLancados").style.display = "block";
+
+                alert("Itens incluídos com sucesso!");
+                //document.getElementById("itensLancados").style.display = "block";
                 windowDadosAutorizacao.hide();
             } else {
                 alert("Usuário: Insira a quantidade do item selecionado");
@@ -1575,6 +1295,7 @@ db_app::load("estilos.css, grid.style.css");
         <?
         if ($db_opcao != 1) {
             echo " location.href = '" . basename($GLOBALS["HTTP_SERVER_VARS"]["PHP_SELF"]) . "?chavepesquisa='+chave";
+
         }
         ?>
     }
@@ -1583,10 +1304,36 @@ db_app::load("estilos.css, grid.style.css");
 
         <? if ($db_opcao != 3) { ?>
 
-            if (document.form1.sItens.value == "" || document.form1.sItens.value == "[]") {
-                alert("É necessário inserir itens para incluir a manutenção");
+            if(document.getElementById('ve65_veicretirada').value == ""){
+                alert("Usuário: é necessário informar a retirada.");
                 return false;
             }
+
+            if(document.getElementById('ultimamedida').value == "0"){
+                alert("Usuário: é necessário informar a ultima medida.");
+                return false;
+            }
+
+            if(document.getElementById('ve62_medida').value == ""){
+                alert("Usuário: é necessário informar a medida.");
+                return false;
+            }
+
+            if(document.getElementById('ve62_veiccadtiposervico').value == ""){
+                alert("Usuário: é necessário informar o tipo de serviço.");
+                return false;
+            }
+
+            if (oGridItensManutencao.aRows.length == 0) {
+                alert("É necessário inserir itens para incluir a manutenção.");
+                return false;
+            }
+
+            if(document.getElementById('ve62_dtmanut').value == ""){
+                alert("Usuário: é necessário informar a data da manutenção.");
+                return false;
+            }
+
             /**
              * Ocorrência 1193
              */
@@ -1708,4 +1455,168 @@ db_app::load("estilos.css, grid.style.css");
         js_pesquisa_medida();
 
     };
+
+    function getItens(){
+
+
+        if(document.getElementById('db_opcao').value == "Alterar" && document.getElementById('ve62_codigo').value != ""){
+
+            let oParametros = new Object();
+            oParametros.sExecuta = "getItensLancados";
+            oParametros.codigoManutencao = document.getElementById('ve62_codigo').value;
+
+            js_divCarregando('Carregando itens lançados...', 'msgBox');
+
+            let oAjax = new Ajax.Request('ve1_veicmanut.RPC.php', {
+                method: 'post',
+                asynchronous: false,
+                parameters: 'json=' + Object.toJSON(oParametros),
+                onComplete: retornoProcessamento
+
+            });
+        }
+    }
+
+    function retornoProcessamento(oAjax) {
+
+        js_removeObj('msgBox');
+
+        let oRetorno = JSON.parse(oAjax.responseText);
+
+        if (oRetorno.status == 1) {
+
+            oGridItensManutencao.clearAll(true);
+
+            oRetorno.dados.each(function (oItem, iItem) {
+                let aLinha = [];
+                aLinha.push(`<input name="itemCodigo[]" readonly type='text' style='text-align: center;width:100%;border: none;' value='' /> `);
+                aLinha.push(`<input name="itemDescricao[]" readonly type='text' title='${oItem.ve63_descr}' style='text-align: center;width:100%;border: none;' value='${oItem.ve63_descr}' /> `);
+                aLinha.push(`<input name="itemQuantidade[]" readonly type='text' style='text-align: center;width:100%;border: none;' value='${oItem.ve63_quant}' /> `);
+                aLinha.push(`<input name="itemVlrunitario[]" readonly type='text' style='text-align: center;width:100%;border: none;'  value='${oItem.ve63_vlruni}' /> `);
+                aLinha.push(`<input name="ItemVlrtotal[]" readonly type='text' style='text-align: center;width:100%;border: none;' value='${oItem.ve63_vlrtot}' /> `);
+                inputOpcoes = oItem.ve64_codigo == "" 
+                ? `<span style="text-align: center; display: block;">
+                <input type='button' value="A" onclick="getDadosItem(this.parentElement.parentElement.parentNode.rowIndex, '${oItem.ve63_descr}', ${oItem.ve63_quant}, ${oItem.ve63_vlruni}, ${oItem.ve63_vlrtot});">  
+                <input type='button' value="E" onclick="excluirItem(this.parentElement.parentElement.parentNode.rowIndex);"> </span>`
+                : `<span style="text-align: center; display: block;"> <input type='button' value="E" onclick="excluirItem(this.parentElement.parentElement.parentNode.rowIndex);"> </span>`;
+                aLinha.push(inputOpcoes);
+                oGridItensManutencao.addRow(aLinha);
+            });
+
+            oGridItensManutencao.renderRows();
+
+        }
+
+    }
+
+    function getDadosItem(linha,descricao,quantidade,vlrUnitario,vlrTotal){
+        document.getElementById('ve63_descr').value = descricao;
+        document.getElementById('ve63_quant').value = quantidade;
+        document.getElementById('ve63_vlruni').value = vlrUnitario;
+        document.getElementById('valorTotal').value = vlrTotal;
+        document.getElementById('incluirItem').style.display = "none";
+        document.getElementById('alterarItem').style.display = "";
+
+        const botao = document.getElementById("alterarItem");
+        botao.onclick = alteraItem.bind(null, linha); 
+
+    }
+
+    function alteraItem(linha){
+        document.getElementsByName("itemDescricao[]")[linha].value = document.getElementById('ve63_descr').value;
+        document.getElementsByName("itemQuantidade[]")[linha].value = document.getElementById('ve63_quant').value;
+        document.getElementsByName("itemVlrunitario[]")[linha].value = document.getElementById('ve63_vlruni').value;
+        document.getElementsByName("ItemVlrtotal[]")[linha].value = document.getElementById('valorTotal').value;
+        document.getElementById('ve63_descr').value = "";
+        document.getElementById('ve63_quant').value = "";
+        document.getElementById('ve63_vlruni').value = "";
+        document.getElementById('valorTotal').value = "";
+        document.getElementById('incluirItem').style.display = "";
+        document.getElementById('alterarItem').style.display = "none";
+        somaValorTotal();
+    }
+
+    function excluirItem(linha){
+        let aLinhasRemover = [];
+        aLinhasRemover.push(linha);
+        oGridItensManutencao.removeRow(aLinhasRemover);
+        oGridItensManutencao.renderizar2();
+        somaValorTotal();
+
+    }
+
+    function incluiItem(){
+        let aLinha = [];
+        let descricao = document.getElementById('ve63_descr').value;
+        let quantidade = document.getElementById('ve63_quant').value;
+        let valorUnitario = document.getElementById('ve63_vlruni').value;
+        let valorTotal = document.getElementById('valorTotal').value;
+        
+        var regex = /^[0-9.]+$/;
+        if (!regex.test(valorTotal) || valorTotal == 0) {
+            alert('Usuário: Valor Total Inválido.');
+            return false;
+        }
+
+        if(descricao == ""){
+            return alert("Usuário: é necessário preencher a descrição do item.");
+        }
+
+        if(quantidade == ""){
+            return alert("Usuário: é necessário preencher a quantidade do item.");
+        }
+
+        if(valorUnitario == ""){
+            return alert("Usuário: é necessário preencher o valor unitário do item.");
+        }
+
+        aLinha.push(`<input name="itemCodigo[]" readonly type='text' style='text-align: center;width:100%;border: none;' value='' /> `);
+        aLinha.push(`<input name="itemDescricao[]" readonly type='text' title='${descricao}' style='text-align: center;width:100%;border: none;' value='${descricao}' /> `);
+        aLinha.push(`<input name="itemQuantidade[]" readonly type='text' style='text-align: center;width:100%;border: none;' value='${quantidade}' /> `);
+        aLinha.push(`<input name="itemVlrunitario[]" readonly type='text' style='text-align: center;width:100%;border: none;'  value='${valorUnitario}' /> `);
+        aLinha.push(`<input name="ItemVlrtotal[]" readonly type='text' style='text-align: center;width:100%;border: none;' value='${valorTotal}' /> `);
+        aLinha.push(`<span style="text-align: center; display: block;"> <input type='button' value="A" onclick="getDadosItem(this.parentElement.parentElement.parentNode.rowIndex, '${descricao}', ${quantidade}, ${valorUnitario}, ${valorTotal});">  <input type='button' value="E" onclick="excluirItem(this.parentElement.parentElement.parentNode.rowIndex);"> </span>`);
+        oGridItensManutencao.addRow(aLinha);
+        oGridItensManutencao.renderRows();
+
+        document.getElementById('ve63_descr').value = "";
+        document.getElementById('ve63_quant').value = "";
+        document.getElementById('ve63_vlruni').value = "";
+        document.getElementById('valorTotal').value = "";
+
+        somaValorTotal();
+
+    }
+
+    function incluiItemEmpenho(descricao,quantidade,valorUnitario,valorTotal,itemCodigo){
+        let aLinha = [];
+        aLinha.push(`<input name="itemCodigo[]" readonly type='text' style='text-align: center;width:100%;border: none;' value='${itemCodigo}' /> `);
+        aLinha.push(`<input name="itemDescricao[]" readonly type='text' title='${descricao}' style='text-align: center;width:100%;border: none;' value='${descricao}' /> `);
+        aLinha.push(`<input name="itemQuantidade[]" readonly type='text' style='text-align: center;width:100%;border: none;' value='${quantidade}' /> `);
+        aLinha.push(`<input name="itemVlrunitario[]" readonly type='text' style='text-align: center;width:100%;border: none;'  value='${valorUnitario}' /> `);
+        aLinha.push(`<input name="ItemVlrtotal[]" readonly type='text' style='text-align: center;width:100%;border: none;' value='${valorTotal}' /> `);
+        aLinha.push(`<span style="text-align: center; display: block;"> <input type='button' value="E" onclick="excluirItem(this.parentElement.parentElement.parentNode.rowIndex);"> </span>`);
+        oGridItensManutencao.addRowEnhanced(aLinha);
+        oGridItensManutencao.renderizar2();
+        somaValorTotal();
+        //return true;
+    }
+
+    function somaValorTotal(){
+        const itens = document.querySelectorAll('input[name="ItemVlrtotal[]"]');
+        let valorTotal = 0;
+
+        for(i = 0; i < itens.length; i++){
+            valorItem = parseFloat(itens[i].value.replace('.', '').replace(',', '.'));
+            valorTotal = valorItem + valorTotal;
+        }
+
+        document.form1.ve62_valor.value = valorTotal.toFixed(2);
+    }
+
+    getItens();
+    mostrarCadastro();
+
+    js_pesquisa_medida();
+
 </script>

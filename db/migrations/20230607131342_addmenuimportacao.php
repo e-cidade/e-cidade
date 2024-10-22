@@ -1,10 +1,10 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Addmenuimportacao extends AbstractMigration
+class Addmenuimportacao extends PostgresMigration
 {
-   
+
     public function up()
     {
         $sql = "

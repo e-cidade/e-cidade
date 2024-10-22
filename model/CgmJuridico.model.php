@@ -58,6 +58,11 @@ class CgmJuridico  extends CgmBase {
    * @var string
    */
   protected $sContato;
+  
+  protected $sTipoEstabelecimento;
+  protected $sPorte;
+  protected $sOptanteSimples;
+  protected $sOptanteMei;
 
   /**
    * Código Nire
@@ -121,6 +126,34 @@ class CgmJuridico  extends CgmBase {
   	return $sNire;
   }
 
+
+  /**
+   * @param string
+   */
+  public function setCapitalSocial($sCapitalSocial) {
+  	$this->sCapitalSocial = $sCapitalSocial;
+  }
+
+    public function getCapitalSocial()
+    {
+        $sCampo = "";
+        $iNumCgm = $this->getCodigo();
+        if ($iNumCgm != "") {
+            $oDao = db_utils::getDao("cgmjuridico");
+            $sCampos = " z08_capitalsocial ";
+            $sWhere  = " z08_numcgm = " . $iNumCgm;
+
+            $sQuery = $oDao->sql_query_file(null, $sCampos, null, $sWhere);
+            $rsQuery = $oDao->sql_record($sQuery);
+            if ($rsQuery !== false) {
+                $oCampo = db_utils::fieldsMemory($rsQuery, 0);
+                $sCampo = $oCampo->z08_capitalsocial;
+            }
+        }
+
+        return $sCampo;
+    }
+
   /**
    * @return string
    */
@@ -179,6 +212,61 @@ class CgmJuridico  extends CgmBase {
   }
 
   /**
+   * @return unknown
+   */
+  public function getTipoEstabelecimento() {
+    return $this->sTipoEstabelecimento;
+  }
+
+/**
+   * @param unknown_type $sNaturalidade
+   */
+  public function setTipoEstabelecimento($sTipoEstabelecimento) {
+    $this->sTipoEstabelecimento = $sTipoEstabelecimento;
+  }
+  /**
+   * @return unknown
+   */
+  public function getPorte() {
+    return $this->sPorte;
+  }
+
+/**
+   * @param unknown_type $sNaturalidade
+   */
+  public function setPorte($sPorte) {
+    $this->sPorte = $sPorte;
+  }
+  
+  /**
+   * @return unknown
+   */
+  public function getOptanteSimples() {
+    return $this->sOptanteSimples;
+  }
+
+/**
+   * @param unknown_type $sNaturalidade
+   */
+  public function setOptanteSimples($sOptanteSimples) {
+    $this->sOptanteSimples = $sOptanteSimples;
+  }  
+
+  /**
+   * @return unknown
+   */
+  public function getOptanteMei() {
+    return $this->sOptanteMei;
+  }
+
+/**
+   * @param unknown_type $sNaturalidade
+   */
+  public function setOptanteMei($sOptanteMei) {
+    $this->sOptanteMei = $sOptanteMei;
+  }
+
+  /**
    * Salva os dados informados do CGM, caso o CGM já exista então
    * é alterado o registro apartir do código (numcgm) informado
    */
@@ -208,11 +296,19 @@ class CgmJuridico  extends CgmBase {
 
     $oDaoCgm->z01_numcgm    = $this->getCodigo();
     $oDaoCgm->z01_cgccpf    = $this->getCnpj();
+    $oDaoCgm->z01_ender      = addslashes($this->getLogradouro());
+    $oDaoCgm->z01_compl      = addslashes($this->getComplemento());
+    $oDaoCgm->z01_bairro     = addslashes($this->getBairro());
+    $oDaoCgm->z01_munic      = addslashes($this->getMunicipio());
     $oDaoCgm->z01_naturezajuridica    = $this->getNaturezaJuridica();
     $oDaoCgm->z01_nomefanta = addslashes($this->getNomeFantasia());
     $oDaoCgm->z01_tipcre    = $this->getTipoCredor();
     $oDaoCgm->z01_contato   = addslashes($this->getContato());
     $oDaoCgm->z01_ultalt    = date('Y-m-d',db_getsession('DB_datausu'));
+    $oDaoCgm->z01_tipoestabelecimento = $this->getTipoEstabelecimento();
+    $oDaoCgm->z01_porte = $this->getPorte();
+    $oDaoCgm->z01_optantesimples = $this->getOptanteSimples();
+    $oDaoCgm->z01_optantemei = $this->getOptanteMei();
 
     $oDaoCgm->alterar($this->getCodigo());
 
@@ -246,6 +342,10 @@ class CgmJuridico  extends CgmBase {
     if ($this->sNire != "" && $this->sNire != null) {
       $oDaoCgmJuridico->z08_nire   = $this->sNire;
     }
+
+    if ($this->sCapitalSocial != "" && $this->sCapitalSocial != null) {
+        $oDaoCgmJuridico->z08_capitalsocial   = $this->sCapitalSocial;
+      }
 
     if ($rsCgmJuridico !== false) {
     	$oDaoCgmJuridico->z08_sequencial = db_utils::fieldsMemory($rsCgmJuridico,0)->z08_sequencial;

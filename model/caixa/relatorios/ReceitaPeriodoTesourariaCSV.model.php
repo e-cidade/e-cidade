@@ -145,6 +145,16 @@ class ReceitaPeriodoTesourariaCSV
                     continue;
                 }
 
+                if ($tipo == "ESTRUTREC") {
+                    $this->aLinhas = array_merge($this->aLinhas, $this->preencherDadosAnaliticoReceita($oReceita, 'O'));
+                    continue;
+                }
+
+                if ($tipo == "CODCONTA") {
+                    $this->aLinhas = array_merge($this->aLinhas, $this->preencherDadosAnaliticoReceita($oReceita, 'O'));
+                    continue;
+                }
+
                 if ($tipo == "OPCREDITO") {
                     $this->aLinhas = array_merge($this->aLinhas, $this->preencherDadosOperacaoCredito($oReceita, 'O'));
                     continue;
@@ -172,6 +182,16 @@ class ReceitaPeriodoTesourariaCSV
                 }
 
                 if ($tipo == "RECEITA") {
+                    $this->aLinhas = array_merge($this->aLinhas, $this->preencherDadosAnaliticoReceita($oReceita, 'E'));
+                    continue;
+                }
+
+                if ($tipo == "ESTRUTREC") {
+                    $this->aLinhas = array_merge($this->aLinhas, $this->preencherDadosAnaliticoReceita($oReceita, 'E'));
+                    continue;
+                }
+
+                if ($tipo == "CODCONTA") {
                     $this->aLinhas = array_merge($this->aLinhas, $this->preencherDadosAnaliticoReceita($oReceita, 'E'));
                     continue;
                 }

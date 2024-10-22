@@ -526,6 +526,7 @@ class cl_acocontratopncp
             $sql .= $campos;
         }
         $sql .= " from acocontratopncp ";
+        $sql .= " join acordo on ac213_contrato = ac16_sequencial ";
         $sql2 = "";
         if ($dbwhere == "") {
         } else if ($dbwhere != "") {

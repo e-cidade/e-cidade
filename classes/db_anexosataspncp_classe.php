@@ -20,6 +20,7 @@ class cl_licanexoataspncp {
     public $l216_codigoata = 0;
     public $l216_oid = 0;
     public $l216_tipoanexo = 0;
+    public $l216_nomearquivo = null;
     public $l216_instit = 0;
     // cria propriedade com as variaveis do arquivo
     public $campos = "
@@ -27,6 +28,7 @@ class cl_licanexoataspncp {
                  l216_codigoata = int8 = codigo do termo na tabela de controle
                  l216_oid = oid = anexo
                  l216_tipoanexo = Varchar = tipo de anexo
+                 l216_nomearquivo = Varchar = nome do arquivo
                  l216_instit = int8 = instituicao
                  ";
 
@@ -54,6 +56,7 @@ class cl_licanexoataspncp {
             $this->l216_codigoata = ($this->l216_codigoata == ""?@$GLOBALS["HTTP_POST_VARS"]["l216_codigoata"]:$this->l216_codigoata);
             $this->l216_oid = ($this->l216_oid == ""?@$GLOBALS["HTTP_POST_VARS"]["l216_oid"]:$this->l216_oid);
             $this->l216_tipoanexo = ($this->l216_tipoanexo == ""?@$GLOBALS["HTTP_POST_VARS"]["l216_tipoanexo"]:$this->l216_tipoanexo);
+            $this->l216_nomearquivo = ($this->l216_nomearquivo == ""?@$GLOBALS["HTTP_POST_VARS"]["l216_nomearquivo"]:$this->l216_nomearquivo);
             $this->l216_instit = ($this->l216_instit == ""?@$GLOBALS["HTTP_POST_VARS"]["l216_instit"]:$this->l216_instit);
         }
 
@@ -101,12 +104,22 @@ class cl_licanexoataspncp {
             $this->erro_status = "0";
             return false;
         }
+        if ($this->l216_nomearquivo == null ) {
+            $this->erro_sql = " nome do arquivo não informado.";
+            $this->erro_campo = "l216_nomearquivo";
+            $this->erro_banco = "";
+            $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+            $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+            $this->erro_status = "0";
+            return false;
+        }
 
         $sql = "insert into licanexoataspncp(
                                        l216_sequencial
                                       ,l216_codigoata
                                       ,l216_tipoanexo
                                       ,l216_oid
+                                      ,l216_nomearquivo
                                       ,l216_instit
                        )
                 values (
@@ -114,6 +127,7 @@ class cl_licanexoataspncp {
                                ,$this->l216_codigoata
                                ,'$this->l216_tipoanexo'
                                ,$this->l216_oid
+                               ,'$this->l216_nomearquivo'
                                ,$this->l216_instit
                       )";
         $result = db_query($sql);

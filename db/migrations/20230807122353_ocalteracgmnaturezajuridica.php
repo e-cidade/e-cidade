@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Ocalteracgmnaturezajuridica extends AbstractMigration
+class Ocalteracgmnaturezajuridica extends PostgresMigration
 {
     public function getcgm(){
         return $this->fetchAll("select z01_numcgm,z01_cgccpf,length(trim(z01_cgccpf)) as tipo from cgm where z01_cgccpf !=''");

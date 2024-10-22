@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc10069 extends AbstractMigration
+class Oc10069 extends PostgresMigration
 {
 
     public function up()
@@ -10,14 +10,14 @@ class Oc10069 extends AbstractMigration
         $this->insertAssinatura();
     }
 
-    private function insertAssinatura() 
+    private function insertAssinatura()
     {
         $sql = <<<SQL
 
         BEGIN;
         SELECT fc_startsession();
 
-        INSERT INTO db_tipodoc(db08_codigo, db08_descr) VALUES ((SELECT max(db08_codigo) FROM db_tipodoc)+1, 
+        INSERT INTO db_tipodoc(db08_codigo, db08_descr) VALUES ((SELECT max(db08_codigo) FROM db_tipodoc)+1,
             'ASS. RESP. DEC. DE RECURSOS FINANCEIROS');
         SELECT * FROM db_tipodoc WHERE db08_descr = 'ASS. RESP. DEC. DE RECURSOS FINANCEIROS';
 
@@ -51,13 +51,13 @@ class Oc10069 extends AbstractMigration
 
             END LOOP;
             RETURN;
-        
+
         END
         $$
         LANGUAGE plpgsql;
 
         SELECT * FROM getAllCodigos();
- 
+
         DROP FUNCTION getAllCodigos();
 
         INSERT INTO db_docparag(db04_docum, db04_idparag, db04_ordem)

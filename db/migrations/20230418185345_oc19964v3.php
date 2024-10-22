@@ -1,14 +1,14 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc19964v3 extends AbstractMigration
+class Oc19964v3 extends PostgresMigration
 {
-    
+
     public function up()
     {
         $sql = "BEGIN;
-        
+
         INSERT INTO db_sysarquivo VALUES((select max(codarq)+1 from db_sysarquivo),'empordemtabela','Itens da ordem de tabela','l223','2022-08-22','Itens da ordem de tabela',0,'f','f','f','f');
 
 
@@ -21,8 +21,8 @@ class Oc19964v3 extends AbstractMigration
         INSERT INTO db_syscampo VALUES ((select max(codcam)+1 from db_syscampo), 'l223_numemp','int8' ,'Cod Empenho','', 'Cod Empenho',10	,false, false, false, 1, 'int8', 'Cod Empenho');
         INSERT INTO db_syscampo VALUES ((select max(codcam)+1 from db_syscampo), 'l223_codordem','int8' ,'Cod ordem','', 'Cod ordem',10	,false, false, false, 1, 'int8', 'Cod ordem');
         INSERT INTO db_syscampo VALUES ((select max(codcam)+1 from db_syscampo), 'l223_descr','varchar' ,'Descricao item tabela','', 'Descricao item tabela',300	,false, false, false, 1, 'varchar', 'Descricao item tabela');
-        
-        
+
+
         INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select max(codarq) from db_sysarquivo), (select codcam from db_syscampo where nomecam = 'l223_sequencial')		 	, 1, 0);
         INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select max(codarq) from db_sysarquivo), (select codcam from db_syscampo where nomecam = 'l223_pcmaterordem')			 	, 2, 0);
         INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select max(codarq) from db_sysarquivo), (select codcam from db_syscampo where nomecam = 'l223_pcmatertabela')		 	, 4, 0);
@@ -32,8 +32,8 @@ class Oc19964v3 extends AbstractMigration
         INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select max(codarq) from db_sysarquivo), (select codcam from db_syscampo where nomecam = 'l223_numemp')		 	, 8, 0);
         INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select max(codarq) from db_sysarquivo), (select codcam from db_syscampo where nomecam = 'l223_codordem')		 	, 9, 0);
         INSERT INTO db_sysarqcamp (codarq, codcam, seqarq, codsequencia) VALUES ((select max(codarq) from db_sysarquivo), (select codcam from db_syscampo where nomecam = 'l223_descr')		 	, 10, 0);
-        
-        
+
+
         CREATE TABLE empordemtabela(
         l223_sequencial         int8 NOT NULL default 0,
         l223_pcmaterordem          int8 NOT NULL default 0,
@@ -44,15 +44,15 @@ class Oc19964v3 extends AbstractMigration
         l223_numemp                int8 NOT NULL default 0,
         l223_codordem                int8 default 0,
         l223_descr varchar(300));
-        
-        
+
+
         CREATE SEQUENCE empordemtabela_l223_sequencial_seq
         INCREMENT 1
         MINVALUE 1
         MAXVALUE 9223372036854775807
         START 1
         CACHE 1;
-        
+
         COMMIT;";
 
         $this->execute($sql);

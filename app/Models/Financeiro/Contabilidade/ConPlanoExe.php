@@ -12,9 +12,9 @@ class ConPlanoExe extends LegacyModel
 
     public $timestamps = false;
 
-    protected $table = 'conplanoexe';
+    protected $table = 'contabilidade.conplanoexe';
 
-    protected $primaryKey = 'c62_anousu, c62_reduz';
+    protected $primaryKey = 'c62_reduz';
 
     public $incrementing = false;
 

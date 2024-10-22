@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc15317 extends AbstractMigration
+class Oc15317 extends PostgresMigration
 {
 
     public function up()
@@ -42,7 +42,7 @@ class Oc15317 extends AbstractMigration
         $this->execute($sSql);
     }
 
-    public function down() 
+    public function down()
     {
         $sSql = "
         DELETE FROM db_sysarqcamp WHERE codcam = (SELECT codcam FROM db_syscampo WHERE nomecam = 'rh02_tipcatprof');

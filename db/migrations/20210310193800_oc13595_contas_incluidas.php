@@ -1,13 +1,13 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc13595ContasIncluidas extends AbstractMigration
+class Oc13595ContasIncluidas extends PostgresMigration
 {
     public function up()
     {
         $sql = <<<SQL
-        
+
         BEGIN;
 
         select fc_startsession();
@@ -3388,14 +3388,14 @@ class Oc13595ContasIncluidas extends AbstractMigration
         *************************************************************************************
         */
 
-        INSERT INTO conplano 
+        INSERT INTO conplano
         SELECT nextval('conplano_c60_codcon_seq') AS c60_codcon,
             2021 AS c60_anousu,
             substr(estrutural||'00000000000',1,15) AS c60_estrut,
             substr(titulo,1,50) AS c60_descr,
             funcao AS c60_finali,
             CASE
-                WHEN sistema IS NULL OR sistema = '' OR sistema = '0' 
+                WHEN sistema IS NULL OR sistema = '' OR sistema = '0'
                     THEN 2
                 ELSE sistema::integer
             END AS c60_codsis,
@@ -3404,7 +3404,7 @@ class Oc13595ContasIncluidas extends AbstractMigration
             'F' AS c60_identificadorfinanceiro,
             nro_reg_obrig::integer AS c60_nregobrig
         FROM contas_incluidas
-        WHERE substr(estrutural||'00000000000',1,15) NOT IN 
+        WHERE substr(estrutural||'00000000000',1,15) NOT IN
         (SELECT c60_estrut FROM conplano WHERE c60_anousu = 2021);
 
 

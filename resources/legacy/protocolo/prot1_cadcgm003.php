@@ -214,6 +214,15 @@ if (isset ($HTTP_POST_VARS ["db_opcao"]) && $HTTP_POST_VARS ["db_opcao"] == "Exc
         $clhistoricocgm->excluir('', 'z09_numcgm = '.$z01_numcgm);
     }
   
+	if (!$lSqlErro) {
+     
+		$clcgm->excluirCnaes($z01_numcgm);
+		$sMsgErro = $clcgm->erro_msg;
+	  if ($clcgm->erro_status == 0) {
+	    $lSqlErro = true;
+	  }
+  }
+
   if (!$lSqlErro) {
      
 		$clcgm->excluir($z01_numcgm);

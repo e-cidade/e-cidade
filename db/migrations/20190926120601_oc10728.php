@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc10728 extends AbstractMigration
+class Oc10728 extends PostgresMigration
 {
     /**
      * Change Method.
@@ -10,7 +10,7 @@ class Oc10728 extends AbstractMigration
      * Write your reversible migrations using this method.
      *
      * More information on writing migrations is available here:
-     * http://docs.phinx.org/en/latest/migrations.html#the-abstractmigration-class
+     * http://docs.phinx.org/en/latest/migrations.html#the-PostgresMigration-class
      *
      * The following commands can be used in this method and Phinx will
      * automatically reverse them when rolling back:
@@ -28,43 +28,43 @@ class Oc10728 extends AbstractMigration
     public function up()
     {
         $sql = <<<SQL
- 
+
              ALTER TABLE cgmalt ADD COLUMN z05_obs text;
-                                   
+
              CREATE OR REPLACE FUNCTION public.fc_cgm_altexc()
              RETURNS trigger
              LANGUAGE plpgsql
-            AS 
+            AS
             $$
             DECLARE
-            
+
                 iSizeCnpjCpf   integer     default 0;
-                               
+
                 sCnpj          varchar(14) default '';
                 sCpf           varchar(14) default '';
-            
+
                 sSqlMatriculas text        default '';
                 rMatriculas    record;
-            
+
                 BEGIN
-                
+
                 select char_length(z01_cgccpf)
                   into iSizeCnpjCpf
-                  from cgm 
+                  from cgm
                  where z01_numcgm = OLD.z01_numcgm;
-                
-                if iSizeCnpjCpf > 11  then 
-                    
+
+                if iSizeCnpjCpf > 11  then
+
                   sCnpj := OLD.z01_numcgm;
-                else 
-            
-                  sCpf := OLD.z01_numcgm; 
+                else
+
+                  sCpf := OLD.z01_numcgm;
                 end if;
-            
-            
-                    IF (TG_OP = 'DELETE') THEN    
-                      
-                      INSERT 
+
+
+                    IF (TG_OP = 'DELETE') THEN
+
+                      INSERT
                         INTO cgmalt (
                                      z05_sequencia,
                                      z05_ufcon,
@@ -115,10 +115,10 @@ class Oc10728 extends AbstractMigration
                                      z05_sexo,
                                      z05_nasc,
                                      z05_fax,
-                                     z05_obs             
-                          
+                                     z05_obs
+
                                      ) values (
-                                                   
+
                                      nextval('cgmalt_z05_sequencia_seq'),
                                      OLD.z01_ufcon,
                                      OLD.z01_uf,
@@ -170,10 +170,10 @@ class Oc10728 extends AbstractMigration
                                      OLD.z01_fax,
                                      OLD.z01_obs
                                      );
-                        
+
                         RETURN OLD;
                         ELSIF (TG_OP = 'UPDATE') THEN
-                                    INSERT 
+                                    INSERT
                         INTO cgmalt (
                                      z05_sequencia,
                                      z05_ufcon,
@@ -224,7 +224,7 @@ class Oc10728 extends AbstractMigration
                                      z05_sexo,
                                      z05_nasc,
                                      z05_fax,
-                                     z05_obs             
+                                     z05_obs
                                      ) values (
                                      nextval('cgmalt_z05_sequencia_seq'),
                                      OLD.z01_ufcon,
@@ -277,29 +277,29 @@ class Oc10728 extends AbstractMigration
                                      OLD.z01_fax,
                                      OLD.z01_obs
                                      );
-                       
-            
-                          -- Verifica se CGM cont?m alguma matr?cula no sistema em que o c?digo do PIS esteja diferente 
-                          -- do atual cadastrado na tabela CGM, caso encontre algum registros, ent?o ? alterado o PIS 
-            
+
+
+                          -- Verifica se CGM cont?m alguma matr?cula no sistema em que o c?digo do PIS esteja diferente
+                          -- do atual cadastrado na tabela CGM, caso encontre algum registros, ent?o ? alterado o PIS
+
                           sSqlMatriculas := ' select rh01_regist
                                                 from rhpessoal
                                                      inner join rhpesdoc on rhpesdoc.rh16_regist = rhpessoal.rh01_regist
                                                where rh01_numcgm = '||new.z01_numcgm||'
                                                  and trim(coalesce(rhpesdoc.rh16_pis,\'\')) != \''||trim(coalesce(new.z01_pis,''))||'\'';
-                          
-            
+
+
                           for rMatriculas in execute sSqlMatriculas loop
-                        
+
                             update rhpesdoc
                                set rh16_pis = new.z01_pis
                              where rh16_regist = rMatriculas.rh01_regist;
-            
+
                           end  loop;
-            
-                          RETURN OLD;                                                     
+
+                          RETURN OLD;
                         END IF;
-                    RETURN NEW; 
+                    RETURN NEW;
                 END;
             $$
 SQL;

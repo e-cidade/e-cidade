@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Pncp extends AbstractMigration
+class Pncp extends PostgresMigration
 {
 
     public function up()
@@ -18,8 +18,8 @@ class Pncp extends AbstractMigration
                 INSERT INTO db_menu VALUES((select id_item from db_itensmenu where desctec like'%PNCP' and funcao = ' '),(select max(id_item) from db_itensmenu),1,381);
 
                 INSERT INTO db_itensmenu VALUES ((select max(id_item)+1 from db_itensmenu), 'Publicação Resultados', 'Publicação Resultados', 'lic1_pncpresultadolicitacao001.php', 1, 1, 'Publicação Resultados', 't');
-                INSERT INTO db_menu VALUES((select id_item from db_itensmenu where desctec like'%PNCP' and funcao = ' '),(select max(id_item) from db_itensmenu),2,381);  
-                
+                INSERT INTO db_menu VALUES((select id_item from db_itensmenu where desctec like'%PNCP' and funcao = ' '),(select max(id_item) from db_itensmenu),2,381);
+
                 INSERT INTO db_itensmenu VALUES ((select max(id_item)+1 from db_itensmenu), 'Publicação Ata Registro Preço', 'Publicação Ata Registro Preço', 'lic1_publicacaoatapncp.php', 1, 1, 'Publicação Ata Registro Preço', 't');
                 INSERT INTO db_menu VALUES((select id_item from db_itensmenu where desctec like'%PNCP' and funcao = ' '),(select max(id_item) from db_itensmenu),3,381);
 
@@ -35,7 +35,7 @@ class Pncp extends AbstractMigration
                     PRIMARY KEY (l215_sequencial),
                     FOREIGN KEY (l215_licitacao) REFERENCES liclicita (l20_codigo)
                 );
-    
+
         ";
         $this->execute($sql);
     }

@@ -202,7 +202,7 @@ if (isset($oPost->liberar)) {
         db_msgbox($sMsgErro);
         echo "<script>";
         echo "  if (confirm('Deseja emitir a guia?')){";
-        echo "    window.open('reciboitbi.php?itbi=" . $clitbiavalia->it14_guia . "',\"\",\"toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=1,resizable=1,height=\"+(screen.height-100)+\",width=\"+(screen.width-100));";
+        echo "    window.open('resources/legacy/itbi/reciboitbi.php?itbi=" . $clitbiavalia->it14_guia . "',\"\",\"toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=1,resizable=1,height=\"+(screen.height-100)+\",width=\"+(screen.width-100));";
         echo "  }";
         echo "</script>";
         db_redireciona("itb1_itbiavalia001.php");

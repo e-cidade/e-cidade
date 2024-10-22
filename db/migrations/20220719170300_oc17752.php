@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc17752 extends AbstractMigration
+class Oc17752 extends PostgresMigration
 {
     public function up()
     {
@@ -12,7 +12,7 @@ class Oc17752 extends AbstractMigration
         BEGIN;
 
         SELECT fc_startsession();
-        --Apagando os dados 
+        --Apagando os dados
         delete
         from
             public.naturrecsiope
@@ -9205,8 +9205,8 @@ class Oc17752 extends AbstractMigration
    ('422130101010000','422130011000000',2022),
    ('422130101020000','422130011000000',2022),
    ('411145111010000','411180231000000',2022),
-   ('413210401000000','413210041000000',2022); 
-   
+   ('413210401000000','413210041000000',2022);
+
    delete from elerecsiope  where c225_natrecsiope  ='41000000000'  and c225_anousu = 2022;
 delete from elerecsiope  where c225_natrecsiope  ='41100000000'  and c225_anousu = 2022;
 delete from elerecsiope  where c225_natrecsiope  ='41110000000'  and c225_anousu = 2022;
@@ -14613,7 +14613,7 @@ delete from elerecsiope  where c225_natrecsiope  ='49990000000'  and c225_anousu
 
 
 
-   INSERT INTO elerecsiope (c225_natrecsiope,c225_descricao,c225_anousu) VALUES 
+   INSERT INTO elerecsiope (c225_natrecsiope,c225_descricao,c225_anousu) VALUES
    ('41000000000','Receitas Correntes','2022'),
    ('41100000000','Impostos, Taxas e Contribuições de Melhoria','2022'),
    ('41110000000','Impostos','2022'),
@@ -20015,11 +20015,11 @@ delete from elerecsiope  where c225_natrecsiope  ='49990000000'  and c225_anousu
     ('42998011700','Receitas de Alienação de Certificados de Potencial Adicional de Construção - Cepac - Dívida Ativa -','2022'),
     ('42998011800','Receitas de Alienação de Certificados de Potencial Adicional de Construção - Cepac - Juros de Mora d','2022'),
     ('49990000000','Recursos Arrecadados Em Exercícios Anteriores','2022');
-    
-    
+
+
         COMMIT;
 
 SQL;
         $this->execute($sql);
-    } 
+    }
 }

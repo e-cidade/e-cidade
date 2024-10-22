@@ -1,10 +1,10 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Hotfixoc18252 extends AbstractMigration
+class Hotfixoc18252 extends PostgresMigration
 {
-    
+
     public function change()
     {
         $sql= "BEGIN;
@@ -14,7 +14,7 @@ class Hotfixoc18252 extends AbstractMigration
         UPDATE parametroscontratos SET pc01_liberarsaldoposicao = 'f';
         COMMIT;
         ";
-        
+
         $this->execute($sql);
     }
 }

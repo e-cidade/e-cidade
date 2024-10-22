@@ -37,10 +37,12 @@ class CompanyShutdownService
          */
         $atividades = $issbase->tabativ()->get();
         foreach ($atividades as $atividade) {
-            $this->tabativbaixa->newQuery()->insert(
+            $this->tabativbaixa->newQuery()->updateOrCreate(
                 [
                     'q11_inscr' => $issbase->q02_inscr,
-                    'q11_seq' => $atividade->q07_seq,
+                    'q11_seq' => $atividade->q07_seq
+                ],
+                [
                     'q11_oficio' => true,
                     'q11_obs' => $observacao,
                     'q11_login' => 1,

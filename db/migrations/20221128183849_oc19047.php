@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc19047 extends AbstractMigration
+class Oc19047 extends PostgresMigration
 {
 
     public function up()
@@ -11,7 +11,7 @@ class Oc19047 extends AbstractMigration
         ALTER TABLE liclicita ADD l20_amparolegal INT8;
         COMMIT;
         ";
-        
+
         $this->execute($sql);
     }
 }

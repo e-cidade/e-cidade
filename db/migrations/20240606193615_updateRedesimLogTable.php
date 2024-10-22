@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class UpdateRedesimLogTable extends AbstractMigration
+class UpdateRedesimLogTable extends PostgresMigration
 {
     public function up()
     {

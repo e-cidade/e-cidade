@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class OcContabilidade extends AbstractMigration
+class OcContabilidade extends PostgresMigration
 {
     public function up()
     {

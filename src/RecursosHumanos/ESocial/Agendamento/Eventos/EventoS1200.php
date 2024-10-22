@@ -34,8 +34,8 @@ class EventoS1200 extends EventoBase
      */
     public function montarDados()
     {
-        $ano = date("Y", db_getsession("DB_datausu"));
-        $mes = date("m", db_getsession("DB_datausu"));
+        $ano = $this->ano();
+        $mes = $this->mes();
         $data = "$ano-$mes-01";
         $data = new \DateTime($data);
         $data->modify('last day of this month');
@@ -149,7 +149,7 @@ class EventoS1200 extends EventoBase
         require_once 'libs/db_libpessoal.php';
         $clrubricasesocial = new cl_rubricasesocial;
 
-        $rsValores = $this->getValoresPorPonto($ponto, $matricula);
+        $rsValores = $this->getValoresPorPonto($ponto, $matricula, $this->ano(), $this->mes());
         for ($iCont = 0; $iCont < pg_num_rows($rsValores); $iCont++) {
             $oResult = \db_utils::fieldsMemory($rsValores, $iCont);
             $rubrica = $oResult->rubrica;
@@ -180,8 +180,8 @@ class EventoS1200 extends EventoBase
      */
     private function buscarIdentificador($matricula, $rh30_regime)
     {
-        $iAnoUsu = date("Y", db_getsession("DB_datausu"));
-        $iMesusu = date("m", db_getsession("DB_datausu"));
+        $iAnoUsu = $this->ano();
+        $iMesusu = $this->mes();
         $aPontos = array(TipoPontoConstants::PONTO_13SALARIO);
         if ($this->indapuracao != 2) {
             $aPontos = array(TipoPontoConstants::PONTO_SALARIO, TipoPontoConstants::PONTO_COMPLEMENTAR);
@@ -392,8 +392,8 @@ class EventoS1200 extends EventoBase
      */
     private function buscarDadosPorMatricula($cpf)
     {
-        $ano = db_getsession("DB_anousu");
-        $mes = date("m", db_getsession("DB_datausu"));
+        $ano = $this->ano();
+        $mes = $this->mes();
         $sql = "SELECT
         distinct
         1 as tpInsc,
@@ -463,7 +463,7 @@ class EventoS1200 extends EventoBase
                 and (
                             (h13_categoria = '901' and rh30_vinculo = 'A')
                             or
-                            (h13_categoria in ('101', '106', '111', '301', '302', '303', '305', '306', '309', '312', '313','410', '902','701','712','771','711')
+                            (h13_categoria in ('101', '103', '106', '111', '301', '302', '303', '305', '306', '309', '312', '313','410', '902','701','712','771','711')
                             and rh30_vinculo = 'A'
                             and r33_tiporegime = '1')
                         )
@@ -492,8 +492,8 @@ class EventoS1200 extends EventoBase
 
     public function buscarDadosContabilidade($cpf)
     {
-        $ano = date("Y", db_getsession("DB_datausu"));
-        $mes = date("m", db_getsession("DB_datausu"));
+        $ano = $this->ano();
+        $mes = $this->mes();
         $data = "$ano-$mes-01";
         $data = new \DateTime($data);
         $data->modify('last day of this month');

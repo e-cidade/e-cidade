@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Addtablerhmotivorescisao extends AbstractMigration
+class Addtablerhmotivorescisao extends PostgresMigration
 {
     public function up()
     {

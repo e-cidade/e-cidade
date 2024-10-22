@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Altertableliccontrolepncpitens extends AbstractMigration
+class Altertableliccontrolepncpitens extends PostgresMigration
 {
 
     public function up()

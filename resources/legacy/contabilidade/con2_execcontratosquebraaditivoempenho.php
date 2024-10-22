@@ -48,15 +48,15 @@ function execucaoDeContratosQuebraPorAditivoEmpenho($aMateriais,$iFonte,$iAlt,$i
 
                 foreach($oExecucaoDeContratos->quantidadeTotalEmOrdensDeCompra((int)$oEmp->codigoempenho,(int)$oItem->codigo_material) as $oOrdem){
 
-                    $iQtdEmOrdem = $oOrdem->quantidade;
+                    $iQtdEmOrdem += $oOrdem->quantidade;
 
                     if($oOrdem->quantidadeAnulada > 0){
                         $iQtdEmOrdemAnulado = $oOrdem->quantidadeAnulada;
                         $iVlrEmOrdemAnulado = $oOrdem->quantidadeAnulada * $oOrdem->valor;
-                        $iVlrEmOrdem = ($oOrdem->valor * $oOrdem->quantidadeAnulada) - $iVlrEmOrdemAnulado;
+                        $iVlrEmOrdem += ($oOrdem->valor * $oOrdem->quantidadeAnulada) - $iVlrEmOrdemAnulado;
 
                     }else{
-                        $iVlrEmOrdem = $oOrdem->valor;
+                        $iVlrEmOrdem += $oOrdem->valor;
                     }
 
                 };

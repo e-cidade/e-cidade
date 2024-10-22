@@ -26,13 +26,6 @@ class ConfiguracaoPixBancoDoBrasil extends LegacyModel implements IApiPixConfigu
      */
     protected $primaryKey = 'k177_sequencial';
 
-    /**
-     * Indicates if the IDs are auto-incrementing.
-     *
-     * @var bool
-     */
-    public $incrementing = false;
-
     public $timestamps = false;
 
     /**

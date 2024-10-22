@@ -57,7 +57,7 @@ class Empenhopagetipo
 
     public function setE83Descr(string $e83_descr): self
     {
-        $this->e83_descr = mb_convert_encoding($e83_descr,  "UTF-8", "ISO-8859-1");
+        $this->e83_descr = $e83_descr;
         return $this;
     }
 

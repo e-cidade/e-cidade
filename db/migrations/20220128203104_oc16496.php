@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc16496 extends AbstractMigration
+class Oc16496 extends PostgresMigration
 {
     public function up()
     {
@@ -18,7 +18,7 @@ class Oc16496 extends AbstractMigration
         ALTER TABLE dclrf202021 ADD COLUMN si191_dscnumeroinst varchar(3);
 
         ALTER TABLE dclrf202022 ADD COLUMN si191_dscnumeroinst varchar(3);
-       
+
         COMMIT;
 
 SQL;

@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc19110 extends AbstractMigration
+class Oc19110 extends PostgresMigration
 {
     public function up()
     {
@@ -19,11 +19,10 @@ class Oc19110 extends AbstractMigration
           o134_orcamentoaprovado = 't'
         WHERE
           o134_anousu = 2022;
-  
+
         COMMIT;
 
 SQL;
         $this->execute($sql);
-    } 
+    }
 }
- 

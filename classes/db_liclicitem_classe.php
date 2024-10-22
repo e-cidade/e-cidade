@@ -901,7 +901,7 @@ class cl_liclicitem
 
     function sql_query_portal_transparencia($l21_codigo = null, $campos = "*", $ordem = null, $dbwhere = "", $lTrazerApenasVencedor = false)
     {
-        $sql = "select ";
+        $sql = "select distinct ";
         if ($campos != "*") {
             $campos_sql = explode("#", $campos);
             $virgula = "";
@@ -1024,4 +1024,131 @@ class cl_liclicitem
                     FROM liclicitem
                     WHERE l21_codliclicita = {$l20_codigo}";
     }
+
+    public function getItensLicitacao($l20_codigo,$l224_forne,$lote)
+    {
+
+        return "
+    SELECT DISTINCT
+       l21_ordem,
+       pc01_codmater,
+       pc01_descrmater,
+       m61_descr AS unidade,
+       pc11_quant AS quantidade,
+       l224_porcent AS percentual,
+       l224_vlrun AS vlr_unitario,
+       l224_valor AS vlr_total,
+       l224_marca AS marca,
+       l224_codigo,
+       pc81_codprocitem,
+       l04_descricao,
+       l20_objeto,
+       l20_anousu,
+       l20_numero,
+       pc01_complmater,
+       pc01_taxa,
+       pc01_tabela,
+       l20_criterioadjudicacao
+    FROM liclicitem
+    INNER JOIN liclicita ON l20_codigo = l21_codliclicita
+    INNER JOIN pcprocitem ON pc81_codprocitem = l21_codpcprocitem
+    INNER JOIN solicitem ON pc11_codigo = pc81_solicitem
+    INNER JOIN solicitempcmater ON pc16_solicitem = pc11_codigo
+    INNER JOIN pcmater ON pc01_codmater = pc16_codmater
+    INNER JOIN solicitemunid ON pc17_codigo = pc11_codigo
+    INNER JOIN matunid ON m61_codmatunid = pc17_unid
+    INNER JOIN licpropostavinc ON l223_liclicita = l21_codliclicita
+    INNER JOIN licproposta ON l224_codigo = l223_codigo AND l224_propitem = l21_codpcprocitem
+    LEFT JOIN liclicitemlote ON liclicitemlote.l04_liclicitem = liclicitem.l21_codigo
+    WHERE l21_codliclicita = {$l20_codigo}
+    AND l223_fornecedor = {$l224_forne}
+    AND ('{$lote}' = 'Todos' OR l04_descricao = '{$lote}')
+
+    UNION
+
+    SELECT DISTINCT
+       l21_ordem,
+       pc01_codmater,
+       pc01_descrmater,
+       m61_descr AS unidade,
+       pc11_quant AS quantidade,
+       0 AS percentual,
+       0 AS vlr_unitario,
+       0 AS vlr_total,
+       '' AS marca,
+       0 AS l224_codigo,
+       pc81_codprocitem,
+       l04_descricao,
+       l20_objeto,
+       l20_anousu,
+       l20_numero,
+       pc01_complmater,
+       pc01_taxa,
+       pc01_tabela,
+       l20_criterioadjudicacao
+    FROM liclicitem
+    INNER JOIN liclicita ON l20_codigo = l21_codliclicita
+    INNER JOIN pcprocitem ON pc81_codprocitem = l21_codpcprocitem
+    INNER JOIN solicitem ON pc11_codigo = pc81_solicitem
+    INNER JOIN solicitempcmater ON pc16_solicitem = pc11_codigo
+    INNER JOIN pcmater ON pc01_codmater = pc16_codmater
+    INNER JOIN solicitemunid ON pc17_codigo = pc11_codigo
+    INNER JOIN matunid ON m61_codmatunid = pc17_unid
+    LEFT JOIN liclicitemlote ON liclicitemlote.l04_liclicitem = liclicitem.l21_codigo
+    WHERE l21_codliclicita = {$l20_codigo}
+    AND ('{$lote}' = 'Todos' OR l04_descricao = '{$lote}')
+    AND l21_codigo NOT IN (
+        SELECT l21_codigo
+        FROM liclicitem
+        INNER JOIN licpropostavinc ON l223_liclicita = l21_codliclicita
+        INNER JOIN licproposta ON l224_codigo = l223_codigo AND l224_propitem = l21_codpcprocitem
+        WHERE l21_codliclicita = {$l20_codigo}
+        AND l223_fornecedor = {$l224_forne}
+    )
+    ORDER BY l21_ordem;
+";
+
+    }
+
+    public function getPrecoReferencia($l20_codigo){
+
+        return"
+        SELECT DISTINCT
+        l21_ordem,
+        case
+           WHEN l20_criterioadjudicacao = 1
+           AND pc01_tabela = 't'
+           then si02_vlprecoreferencia
+            else null end as valortabela
+        FROM liclicitem
+        INNER JOIN liclicitemlote on l04_liclicitem=l21_codigo
+        INNER JOIN pcprocitem ON liclicitem.l21_codpcprocitem = pcprocitem.pc81_codprocitem
+        INNER JOIN pcproc ON pcproc.pc80_codproc = pcprocitem.pc81_codproc
+        INNER JOIN solicitem ON solicitem.pc11_codigo = pcprocitem.pc81_solicitem
+        INNER JOIN solicita ON solicita.pc10_numero = solicitem.pc11_numero
+        INNER JOIN db_depart ON db_depart.coddepto = solicita.pc10_depto
+        join pcorcamitemproc on pc31_pcprocitem=pc81_codprocitem
+        join pcorcamitem ocitemprc on ocitemprc.pc22_orcamitem=pc31_orcamitem
+        join itemprecoreferencia on si02_itemproccompra=ocitemprc.pc22_orcamitem
+        LEFT JOIN liclicita ON liclicita.l20_codigo = liclicitem.l21_codliclicita
+        LEFT JOIN cflicita ON cflicita.l03_codigo = liclicita.l20_codtipocom
+        LEFT JOIN pctipocompra ON pctipocompra.pc50_codcom = cflicita.l03_codcom
+        LEFT JOIN solicitemunid ON solicitemunid.pc17_codigo = solicitem.pc11_codigo
+        LEFT JOIN matunid ON matunid.m61_codmatunid = solicitemunid.pc17_unid
+        LEFT JOIN pcorcamitemlic ON l21_codigo = pc26_liclicitem
+        LEFT JOIN pcorcamval ON pc26_orcamitem = pc23_orcamitem
+        LEFT JOIN pcorcamjulg ON pcorcamval.pc23_orcamitem = pcorcamjulg.pc24_orcamitem
+        AND pcorcamval.pc23_orcamforne = pcorcamjulg.pc24_orcamforne
+        LEFT JOIN pcorcamforne ON pc21_orcamforne = pc23_orcamforne
+        LEFT JOIN cgm ON pc21_numcgm = z01_numcgm
+        LEFT JOIN db_usuarios ON pcproc.pc80_usuario = db_usuarios.id_usuario
+        LEFT JOIN solicitempcmater ON solicitempcmater.pc16_solicitem = solicitem.pc11_codigo
+        LEFT JOIN pcmater ON pcmater.pc01_codmater = solicitempcmater.pc16_codmater
+        left join pcorcamitem on pcorcamitem.pc22_orcamitem=pc26_orcamitem
+        left join situacaoitemcompra on l218_pcorcamitemlic=pcorcamitem.pc22_orcamitem
+        left join situacaoitemlic on l219_codigo=l218_codigo
+        left join situacaoitem on l217_sequencial=l219_situacao
+        WHERE l20_codigo=$l20_codigo;";
+    }
+
 }

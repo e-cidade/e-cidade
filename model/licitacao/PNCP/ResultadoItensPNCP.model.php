@@ -39,6 +39,9 @@ class ResultadoItensPNCP extends ModeloBasePNCP
         $oDadosAPI->ordemClassificacaoSrp           = 1;
         $oDadosAPI->dataResultado                   = $this->formatDate($oDado[0]->dataresultado);
         $oDadosAPI->situacaoCompraItemResultadoId   = 1;
+        $oDadosAPI->aplicacaoMargemPreferencia      = 0;
+        $oDadosAPI->aplicacaoBeneficioMeEpp         = 0;
+        $oDadosAPI->aplicacaoCriterioDesempate      = 0;
 
         //naturezaJuridicaId faltando campo nao obrigatorio
 
@@ -50,22 +53,24 @@ class ResultadoItensPNCP extends ModeloBasePNCP
 
         $oDado = $this->dados;
 
-        $oDadosAPI                                  = new \stdClass;
-        $oDadosAPI->codigoUnidadeCompradora         = $this->getUndCompradora();
-        $oDadosAPI->tipoInstrumentoConvocatorioId   = $oDado->tipoinstrumentoconvocatorioid;
-        $oDadosAPI->modalidadeId                    = $oDado->modalidadeid;
-        $oDadosAPI->modoDisputaId                   = $oDado->mododisputaid;
-        $oDadosAPI->numeroCompra                    = $oDado->numerocompra;
-        $oDadosAPI->anoCompra                       = $oDado->anocompra;
-        $oDadosAPI->numeroProcesso                  = $oDado->numeroprocesso;
-        $oDadosAPI->objetoCompra                    = $this->formatText($oDado->objetocompra);
-        $oDadosAPI->informacaoComplementar          = $oDado->informacaocomplementar;
-        $oDadosAPI->srp                             = $oDado->srp == 'f' ? 'false' : 'true';
-        $oDadosAPI->orcamentoSigiloso               = $oDado->orcamentosigiloso == 'f' ? 'false' : 'true';
-        $oDadosAPI->dataAberturaProposta            = $this->formatDate($oDado->dataaberturaproposta);
-        $oDadosAPI->dataEncerramentoProposta        = $this->formatDate($oDado->dataencerramentoproposta);
-        $oDadosAPI->amparoLegalId                   = $oDado->amparolegalid;
-        $oDadosAPI->linkSistemaOrigem               = $oDado->linksistemaorigem;
+        $oDadosAPI                                          = new \stdClass;
+        $oDadosAPI->quantidadeHomologada                    = $oDado[0]->quantidadehomologada;
+        $oDadosAPI->valorUnitarioHomologado                 = $oDado[0]->valorunitariohomologado;
+        $oDadosAPI->valorTotalHomologado                    = $oDado[0]->valortotalhomologado;
+        $oDadosAPI->percentualDesconto                      = $oDado[0]->percentualdesconto;
+        $oDadosAPI->tipoPessoaId                            = $oDado[0]->tipopessoaid;
+        $oDadosAPI->niFornecedor                            = $oDado[0]->nifornecedor;
+        $oDadosAPI->nomeRazaoSocialFornecedor               = utf8_encode($oDado[0]->nomerazaosocialfornecedor);
+        $oDadosAPI->porteFornecedorId                       = $oDado[0]->portefornecedorid;
+        $oDadosAPI->codigoPais                              = $oDado[0]->codigopais;
+        $oDadosAPI->indicadorSubcontratacao                 = $oDado[0]->indicadorsubcontratacao == 2 ? 'false' : 'true';
+        $oDadosAPI->ordemClassificacaoSrp                   = 1;
+        $oDadosAPI->dataResultado                           = $this->formatDate($oDado[0]->dataresultado);
+        $oDadosAPI->situacaoCompraItemResultadoId           = 1;
+        $oDadosAPI->aplicacaoMargemPreferencia              = 0;
+        $oDadosAPI->aplicacaoBeneficioMeEpp                 = 0;
+        $oDadosAPI->aplicacaoCriterioDesempate              = 0;
+        $oDadosAPI->aplicabilidadeMargemPreferenciaNormal   = true;
 
         return json_encode($oDadosAPI);
     }
@@ -86,7 +91,7 @@ class ResultadoItensPNCP extends ModeloBasePNCP
             'Authorization: ' . $token
         );
 
-        $optionspncp = $this->getParancurl('POST',$oDados,$headers,null,true);
+        $optionspncp = $this->getParancurl('POST', $oDados, $headers, false, true);
 
         curl_setopt_array($chpncp, $optionspncp);
         $contentpncp = curl_exec($chpncp);
@@ -116,7 +121,7 @@ class ResultadoItensPNCP extends ModeloBasePNCP
             'Authorization: ' . $token
         );
 
-        $optionspncp = $this->getParancurl('PUT',$oDados,$headers,false,true);
+        $optionspncp = $this->getParancurl('PUT', $oDados, $headers, false, true);
 
         curl_setopt_array($chpncp, $optionspncp);
         $contentpncp = curl_exec($chpncp);

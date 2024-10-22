@@ -89,7 +89,7 @@ db_input('descrdepto',40,$Idescrdepto,true,"text",3,"","descrdepartamentoorigem"
     </td>
     <td align="left" nowrap>
 <?
-$result = $cldb_almox->sql_record($cldb_almox->sql_query(null,"coddepto,descrdepto","descrdepto", " coddepto <> " . db_getsession("DB_coddepto")));
+$result = $cldb_almox->sql_record($cldb_almox->sql_query(null,"coddepto,descrdepto","descrdepto", " coddepto <> " . db_getsession("DB_coddepto") . " and db_depart.instit = " . $_SESSION['DB_instit']));
 db_selectrecord("coddepto",$result,true,(isset($mostrapesquisa)?"3":"1"),"","departamentodestino");
 //db_input('coddepto',10,$Icoddepto,true,"text",(isset($mostrapesquisa)?"3":"1"),"onchange='js_pesquisacoddepto(false);js_verificarcampos(true);'","departamentodestino");
 ?>

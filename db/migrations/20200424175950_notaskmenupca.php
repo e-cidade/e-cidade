@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Notaskmenupca extends AbstractMigration
+class Notaskmenupca extends PostgresMigration
 {
     public function up()
     {

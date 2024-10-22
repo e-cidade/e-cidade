@@ -1,10 +1,10 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class ParametrosContratosOc9835 extends AbstractMigration
+class ParametrosContratosOc9835 extends PostgresMigration
 {
-  
+
   public function up()
   {
     $sSQL = <<<SQL
@@ -14,7 +14,7 @@ class ParametrosContratosOc9835 extends AbstractMigration
 
       INSERT INTO db_syscampo (codcam, nomecam, conteudo, descricao, valorinicial, rotulo, tamanho, nulo, maiusculo, autocompl, aceitatipo, tipoobj, rotulorel)
       VALUES ((select max(codcam)+1 from db_syscampo), 'pc01_libcontratodepart', 'boolean', 'Controla alteração dados contrato departamento', '', 'Controla alteração dados contrato departamento', 1, false, true, false, 0, 'text', 'Ctrl alteração dados contrato depart');
-  
+
 SQL;
   $this->execute($sSQL);
   }

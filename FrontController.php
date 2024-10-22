@@ -10,6 +10,10 @@ try {
         return require_once 'public/index.php';
     }
 
+    if (preg_match('/[^?]*\/ui-blade/', $_SERVER['REQUEST_URI'])) {
+        return require_once 'public/index.php';
+    }
+
     return require('app.php');
 } catch (Exception $e) {
     if (config('app.debug')) {

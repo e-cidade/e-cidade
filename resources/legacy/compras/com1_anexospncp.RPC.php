@@ -66,6 +66,7 @@ try {
 
             if (!empty($oParam->sCaminhoArquivo)) {
                 $oProcessocomprasDocumento->setCaminhoArquivo($oParam->sCaminhoArquivo);
+                $oProcessocomprasDocumento->setNomeArquivo($oParam->sTitulo);
             }
 
             $oRetorno->sMensagem = urlencode($oProcessocomprasDocumento->salvar());

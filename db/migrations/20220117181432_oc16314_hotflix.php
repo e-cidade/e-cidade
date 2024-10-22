@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc16314Hotflix extends AbstractMigration
+class Oc16314Hotflix extends PostgresMigration
 {
     public function up()
     {
@@ -14,7 +14,7 @@ class Oc16314Hotflix extends AbstractMigration
         SELECT fc_startsession();
 
         ALTER TABLE configuracoes.contabancaria ALTER COLUMN db83_codigoopcredito TYPE varchar(11) USING db83_numerocontratooc::varchar;
-       
+
         COMMIT;
 
 SQL;

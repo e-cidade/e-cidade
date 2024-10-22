@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Dptabelassicom2024 extends AbstractMigration
+class Dptabelassicom2024 extends PostgresMigration
 {
     public function up()
     {

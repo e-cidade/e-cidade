@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Addcamporeceita extends AbstractMigration
+class Addcamporeceita extends PostgresMigration
 {
 
     public function up()

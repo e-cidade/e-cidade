@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Migrationoc18387 extends AbstractMigration
+class Migrationoc18387 extends PostgresMigration
 {
     /**
      * Change Method.
@@ -10,7 +10,7 @@ class Migrationoc18387 extends AbstractMigration
      * Write your reversible migrations using this method.
      *
      * More information on writing migrations is available here:
-     * http://docs.phinx.org/en/latest/migrations.html#the-abstractmigration-class
+     * http://docs.phinx.org/en/latest/migrations.html#the-PostgresMigration-class
      *
      * The following commands can be used in this method and Phinx will
      * automatically reverse them when rolling back:
@@ -47,7 +47,7 @@ class Migrationoc18387 extends AbstractMigration
             FOR r IN SELECT * FROM instituicoes
             LOOP
 
-                        
+
                 insert into db_documento values ((select max(db03_docum)+1 from db_documento),\'SOLICITACAO DE DISPO. FINANCEIRA1\',(select max(db08_codigo) from db_tipodoc),r.inst);
                 insert into db_paragrafo values ((select max(db02_idparag)+1 from db_paragrafo),\'PARTE1\',\'if($tipo==1){$pdf->x = 30;$pdf->cell(190,5,"De: Pregoeira/ Comissão permanente de Licitação",0,1,"L",0);$pdf->x = 30;$pdf->cell(190,5,"Para: Setor contábil",0,1,"L",0);}else if($tipo==2){echo "<div ><strong>SOLICITAÇÃO DE PARECER DE DISPONIBILIDADE FINANCEIRA</strong></div><div><p>De: Pregoeira/ Comissão permanente de Licitação<br>Para: Setor contábil</p></div>";}\',0,0,1,1,1,\'J\',3,r.inst);
                 insert into db_docparag values ((select max(db03_docum) from db_documento),(select max(db02_idparag) from db_paragrafo),r.inst);
@@ -64,7 +64,7 @@ class Migrationoc18387 extends AbstractMigration
                 insert into db_docparag values ((select max(db03_docum) from db_documento),(select max(db02_idparag) from db_paragrafo),2);
                 insert into db_paragrafo values ((select max(db02_idparag)+1 from db_paragrafo),\'PARTE3\',\'if($tipo==1){$pdf->cell(95,4,"________________________"                                ,0,0,"C",0);$pdf->cell(95,4,"________________________"                                ,0,1,"C",0);$pdf->cell(95,5,"Serviço contábil"                                        ,0,0,"C",0);$pdf->cell(95,5,"Serviço Financeiro"                                      ,0,0,"C",0);}else if($tipo==2){echo "<tr>                <td >  _________________________________________                  <p>Serviço contábil</p></td>                <td >  _________________________________________                 <p>Serviço Financeiro</p></td>";}\',0,0,1,1,1,\'J\',3,r.inst);
                 insert into db_docparag values ((select max(db03_docum) from db_documento),(select max(db02_idparag) from db_paragrafo),3);
-                
+
                 RETURN NEXT r;
 
             END LOOP;
@@ -74,9 +74,9 @@ class Migrationoc18387 extends AbstractMigration
         LANGUAGE plpgsql;
 
         SELECT * FROM getAllCodigos();
- 
+
         DROP FUNCTION getAllCodigos();
-        
+
         COMMIT;';
 
         $this->execute($sql);

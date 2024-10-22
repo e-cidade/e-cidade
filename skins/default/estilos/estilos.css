@@ -196,7 +196,7 @@ input[type=submit][disabled]:not(rel='DBInputData') {
 }
 
 /**
- * DB Âncora
+ * DB ï¿½ncora
  */
 .DBAncora {
   text-decoration: none;
@@ -219,7 +219,7 @@ legend {
     align-items: center;
 }
 /**
- * Estilos padrões do sistema
+ * Estilos padrï¿½es do sistema
  */
 body.body-default {
   margin: 0;
@@ -292,7 +292,7 @@ input.input-abas {
 
 input[type='button']:not([rel="ignore-css"]),
 input[type='reset']:not([rel="ignore-css"]),
-input[type='text']:not([rel="ignore-css"]),
+input[type='text']:not([rel="ignore-css"], .form-control),
 input[type='submit']:not([rel="ignore-css"]) {
   height: 18px !important;
 }
@@ -315,7 +315,7 @@ progress::-webkit-progress-bar {
 }
 
 /**
- * Padronização das cores das barras pelo shadow-dom
+ * Padronizaï¿½ï¿½o das cores das barras pelo shadow-dom
  * Firefox : 10.0+
  */
 progress::-webkit-progress-value {
@@ -324,7 +324,7 @@ progress::-webkit-progress-value {
   -webkit-linear-gradient( left, #4993F4, #006CFD);
 }
 /**
- * Padronização das cores das barras pelo shadow-dom
+ * Padronizaï¿½ï¿½o das cores das barras pelo shadow-dom
  * Chrome: Sim
  */
 progress::-moz-progress-bar {
@@ -334,8 +334,8 @@ progress::-moz-progress-bar {
 }
 
 /**
-* Div onde fica os botões
-* questionário e eSocial
+* Div onde fica os botï¿½es
+* questionï¿½rio e eSocial
 */
 .db-tooltip {
   position: absolute;
@@ -343,7 +343,7 @@ progress::-moz-progress-bar {
   right: 0;
 }
 
-/** Botão de release */
+/** Botï¿½o de release */
 .db-release-note-button,
 .db-tooltip-aviso-button {
   height: 35px;

@@ -4,6 +4,7 @@ require("libs/db_conecta.php");
 include("libs/db_sessoes.php");
 include("libs/db_usuariosonline.php");
 include("dbforms/db_funcoes.php");
+require_once("libs/renderComponents/index.php");
 
 db_app::load("scripts.js, strings.js, datagrid.widget.js, windowAux.widget.js,dbautocomplete.widget.js");
 db_app::load("dbmessageBoard.widget.js, prototype.js, dbtextField.widget.js, dbcomboBox.widget.js, widgets/DBHint.widget.js");
@@ -60,18 +61,59 @@ db_app::load("time.js");
         </br>
         <div id='cntgridlicitacoes'></div>
 
-        <input style="margin-left: 50%" type="button" value="Enviar para PNCP" onclick="js_enviar();">
+        <div style="width: 100%; display: flex; justify-content: center;">
+            <?php $component->render('buttons/solid', [
+                'designButton' => 'success',
+                'onclick' => 'js_clickSendPNCP()',
+                'type' => 'button',
+                'message' => 'Enviar para PNCP',
+                'size' => 'md'
+            ]); ?>
+        </div>
     </form>
+
+    <?php $component->render('modais/simpleModal/startModal', [
+        'title' => 'Justificativa para o PNCP',
+        'id' => 'justificativaModal',
+        'size' => 'lg'
+    ], true); ?>
+        <?php db_textarea('justificativapncp', 10, 48, false, true, 'text', $db_opcao, "", "", "justificativapncp", "255"); ?>
+                
+        <div style="width: 100%; display: flex; justify-content: center;">
+            <?php $component->render('buttons/solid', [
+                'designButton' => 'success',
+                'type' => 'button',
+                'message' => 'Salvar justificativa PNCP',
+                'onclick' => "js_enviar()",
+                'size' => 'md'
+            ]); ?>
+        </div>
+    <?php $component->render('modais/simpleModal/endModal', [], true); ?>
+
     <?php
     db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsession("DB_anousu"), db_getsession("DB_instit"));
     ?>
 </body>
 
 </html>
+
+<style>
+    #justificativapncp {
+        width: 100%;
+        margin-bottom: 7px;
+        font-size: 1rem;
+    }
+</style>
+
 <script>
+    loadComponents([
+        'buttonsSolid',
+        'simpleModal'
+    ]);
 
     var anoCompetenciaInput = document.getElementById("anocompetencia");
     var anoAtual = new Date().getFullYear();
+
     anoCompetenciaInput.value = anoAtual;
 
     function js_showGrid() {
@@ -101,7 +143,7 @@ db_app::load("time.js");
         oParam.ano = anocompetencia;
         oParam.tipo = tipo;
         oParam.exec = "getLicitacoes";
-        js_divCarregando('Aguarde, pesquisando Licitaes', 'msgBox');
+        js_divCarregando('Aguarde, pesquisando licitações', 'msgBox');
         var oAjax = new Ajax.Request(
             'lic1_enviopncp.RPC.php', {
                 method: 'post',
@@ -163,6 +205,7 @@ db_app::load("time.js");
 
     function js_enviar() {
         var aLicitacoes = oGridLicitacao.getSelection("object");
+        let justificativa = document.getElementById('justificativapncp').value.trim();
 
         if (aLicitacoes.length == 0) {
             alert('Nenhuma Licitao Selecionada');
@@ -179,6 +222,16 @@ db_app::load("time.js");
         } else {
             oParam.exec = "excluiraviso";
         }
+
+        if (tipo != 1) {
+            oParam.justificativa = justificativa;
+
+            if (justificativa === '') {
+                alert('A justificativa não pode estar vazia');
+                return false;
+            }
+        }
+
         oParam.ambiente = $F('ambiente');
         oParam.aLicitacoes = new Array();
 
@@ -220,4 +273,21 @@ db_app::load("time.js");
             }
         }
     }
+
+    function js_clickSendPNCP() {
+
+        let tipo = $F('tipo');
+        if (tipo == 0) {
+            alert('Selecione um Tipo');
+            return false;
+        }
+
+        if (tipo != 1) {
+            openModal('justificativaModal');
+        } else {
+            js_enviar();
+        }
+
+    }
+
 </script>

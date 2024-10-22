@@ -98,6 +98,8 @@ class LicitacaoDocumento
    */
   private $sCaminhoArquivo;
 
+  private $sNomeArquivo;
+
   /**
    * Contrutor da classe, executa lazy load
    *
@@ -268,6 +270,11 @@ class LicitacaoDocumento
     return $this->iTipoanexo;
   }
 
+  public function setNomeArquivo($sNomeArquivo)
+  {
+      $this->sNomeArquivo = $sNomeArquivo;
+  }
+
   /**
    * Validar arquivo
    * - tamanho limite
@@ -356,7 +363,7 @@ class LicitacaoDocumento
     $oDaoLicanexopncpdocumento->l216_sequencial    = null;
     $oDaoLicanexopncpdocumento->l216_licanexospncp  = $this->getProcessoProtocolo()->getProcessoLicitacao();
     $oDaoLicanexopncpdocumento->l216_documento     = $this->sNomeDocumento;
-    $oDaoLicanexopncpdocumento->l216_nomedocumento = $this->sNomeDocumento;
+    $oDaoLicanexopncpdocumento->l216_nomedocumento = $this->sNomeArquivo;
     $oDaoLicanexopncpdocumento->l216_tipoanexo = $this->iTipoanexo;
     $oDaoLicanexopncpdocumento->incluir(null);
 
@@ -402,21 +409,17 @@ class LicitacaoDocumento
   public function download()
   {
 
-
     $sCaracteres = "/[^a-z0-9\\_\.]/i";
     $sNomeArquivo = str_replace(" ", '_', $this->sNomeDocumento);
     $sNomeArquivo = preg_replace($sCaracteres, '', $sNomeArquivo);
     $sCaminhoArquivo  = '/tmp/' . $sNomeArquivo;
-    $lEscreveuArquivo = DBLargeObject::leitura($this->iOid, $sCaminhoArquivo);
 
-    if (!$lEscreveuArquivo) {
-
-      $oStdMensagemErro                  = new StdClass();
-      $oStdMensagemErro->sCaminhoArquivo = $sCaminhoArquivo;
-      throw new BusinessException('Erro ao escrever o arquivo no diretorio.');
+    if (!copy('model/licitacao/PNCP/anexoslicitacao/' . $this->iOid, $sCaminhoArquivo)) {
+        throw new BusinessException("Erro ao copiar arquivo para tmp.");
     }
 
     return $sCaminhoArquivo;
+    
   }
 
   /**

@@ -28,12 +28,13 @@ require_once "libs/db_stdlib.php";
 require_once "libs/db_conecta.php";
 include_once "libs/db_sessoes.php";
 include_once "libs/db_usuariosonline.php";
-include("vendor/mpdf/mpdf/mpdf.php");
 include("libs/db_liborcamento.php");
 include("libs/db_libcontabilidade.php");
 include("libs/db_sql.php");
 require_once("classes/db_consexecucaoorc_classe.php");
 require_once("classes/db_infocomplementaresinstit_classe.php");
+use \Mpdf\Mpdf;
+use \Mpdf\MpdfException;
 
 db_postmemory($HTTP_POST_VARS);
 $oPeriodo = new Periodo($o116_periodo);
@@ -803,10 +804,32 @@ if (temDataImplantacao($dtini)) {
  */
 
 if ($tipoEmissao == 1) {
-    $mPDF = new mpdf('', '', 0, '', 15, 15, 23.5, 15, 5, 11);
+    $mPDF = new Mpdf([
+        'mode' => '',
+        'format' => '',
+        'orientation' => '',
+        'margin_left' => 15,
+        'margin_right' => 15,
+        'margin_top' => 23.5,
+        'margin_bottom' => 15,
+        'margin_header' => 5,
+        'margin_footer' => 11,
+    ]);
+
 } else {
-    $mPDF = new mpdf('', 'A4-L', 0, '', 15, 15, 23.5, 15, 5, 11);
+    $mPDF = new Mpdf([
+        'mode' => '',
+        'format' => 'A4',
+        'orientation' => 'L',
+        'margin_left' => 15,
+        'margin_right' => 15,
+        'margin_top' => 23.5,
+        'margin_bottom' => 15,
+        'margin_header' => 5,
+        'margin_footer' => 11,
+    ]);
 }
+
 if ($tipoEmissao == 1) {
     $valorEsperadoUC = ucfirst($valoresperado);
     $header = <<<HEADER
@@ -2605,6 +2628,7 @@ ob_end_clean();
 
 $mPDF->WriteHTML(utf8_encode($html));
 $mPDF->Output('Dem. Gastos Pessoal - ANEXO IV', 'I');
+
 
 /* ---- */
 

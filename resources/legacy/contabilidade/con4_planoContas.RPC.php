@@ -177,7 +177,7 @@ switch ($oParam->exec) {
 
   case "verificaContasParaAutoComplete":
 
-    $descricao = strtoupper($oParam->iDescricao);
+    $descricao = substr($oParam->iDescricao,0,1) == 0 ?  strtoupper(substr($oParam->iDescricao,1)) : strtoupper($oParam->iDescricao);
     $clsaltes = new cl_saltes;
     $sSqlCampos   = " distinct  saltes.k13_reduz, saltes.k13_conta, 
                       CASE
@@ -209,25 +209,16 @@ switch ($oParam->exec) {
         }
         if($oParam->tipoDebCred == 1){
           if ($oParam->codigoconta){
-            $sSqlWhere .= " and c63_conta = 
-                          ( select 
-                                c63_conta
-                            from
-                                saltes
-                            inner join conplanoreduz on
-                                conplanoreduz.c61_reduz = saltes.k13_reduz
-                                and c61_anousu = $iAnoSessao
-                            inner join conplanoexe on
-                                conplanoexe.c62_reduz = conplanoreduz.c61_reduz
-                                and c61_anousu = c62_anousu
-                            inner join conplano on
-                                conplanoreduz.c61_codcon = conplano.c60_codcon
-                                and c61_anousu = c60_anousu
-                            left join conplanoconta on
-                                conplanoconta.c63_codcon = conplanoreduz.c61_codcon
-                                and conplanoconta.c63_anousu = conplanoreduz.c61_anousu
-                            where  k13_reduz = $oParam->codigoconta and c61_anousu = $iAnoSessao
-                            )";
+
+            $sSqlWhereConta = " k13_reduz = $oParam->codigoconta and c61_anousu = $iAnoSessao ";
+            $sSqlBuscarConta = $clsaltes->sql_query($oParam->codigoconta , 'c63_conta', "k13_conta", $sSqlWhereConta);
+            $rsExecutaQueryBuscarConta= $clsaltes->sql_record($sSqlBuscarConta);
+            
+            if ($clsaltes->numrows > 0) {
+              $NumeroConta = db_utils::fieldsMemory($rsExecutaQueryBuscarConta, 0)->c63_conta;
+            } 
+            $NumeroConta = substr($NumeroConta,0,1) == 0 ? substr($NumeroConta,1) : $NumeroConta;
+            $sSqlWhere .= " and c63_conta like '%$NumeroConta%' ";
             
             if ($oParam->tiposelecione == 02){
               $sSqlWhere .= "  and ( db83_tipoconta = ".$oParam->tipodaconta."  or db83_tipoconta = 3 )"  ;

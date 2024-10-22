@@ -24,7 +24,7 @@
  *  Copia da licenca no diretorio licenca/licenca_en.txt
  *                                licenca/licenca_pt.txt
  */
-
+use Illuminate\Database\Capsule\Manager as DB;
 ini_set("ERROR_REPORTING", "E_ALL & ~ E_NOTICE");
 
 
@@ -362,7 +362,23 @@ switch ($objJson->method) {
             }
 
             $sHistorico = db_stdClass::normalizeStringJsonEscapeString($objJson->historico); //addslashes(stripslashes(utf8_decode()))
-            $oRetorno   = $objEmpenho->liquidarAjax($objJson->iEmpenho, $objJson->notas, $sHistorico, $objJson->e50_compdesp, $objJson->e83_codtipo, $objJson->cattrabalhador, $objJson->numempresa, $objJson->contribuicaoPrev, $objJson->cattrabalhadorremuneracao, $objJson->valorremuneracao, $objJson->valordesconto, $objJson->competencia, $objJson->e50_retencaoir, $objJson->e50_naturezabemservico,$dDataLiquidacao, $dDataVencimento);
+            $oRetorno   = $objEmpenho->liquidarAjax($objJson->iEmpenho,
+                                                    $objJson->notas, $sHistorico,
+                                                    $objJson->e50_compdesp,
+                                                    $objJson->e83_codtipo,
+                                                    $objJson->cattrabalhador,
+                                                    $objJson->numempresa,
+                                                    $objJson->contribuicaoPrev,
+                                                    $objJson->cattrabalhadorremuneracao,
+                                                    $objJson->valorremuneracao,
+                                                    $objJson->valordesconto,
+                                                    $objJson->competencia,
+                                                    $objJson->e50_retencaoir,
+                                                    $objJson->e50_naturezabemservico,
+                                                    $dDataLiquidacao, 
+                                                    $dDataVencimento,
+                                                    $objJson->e50_contafornecedor,
+                                                    $objJson->e50_numcgmordenador);
             $oDadosRetorno = $json->decode(str_replace("\\", "", $oRetorno));
 
             if ($oRetorno !== false) {
@@ -442,37 +458,54 @@ switch ($objJson->method) {
         $objEmpenho->setEmpenho($objJson->iEmpenho);
         $objEmpenho->setCredor($z01_credor);
 
-        /**
-         * Pode ser que o método gerarOrdemCompra retorne false ou um JSON
-         */
-        $oRetorno = $objEmpenho->gerarOrdemCompra(
-            $objJson->e69_nota,
-            $objJson->valorTotal,
-            $objJson->notas,
-            true,
-            $objJson->e69_dtnota,
-            $sHistorico,
-            true,
-            $objJson->oInfoNota,
-            $objJson->e69_notafiscaleletronica,
-            $objJson->e69_chaveacesso,
-            $objJson->e69_nfserie,
-            $objJson->e50_compdesp,
-            $objJson->e83_codtipo,
-            true,
-            $objJson->iCgmEmitente,
-            $objJson->cattrabalhador,
-            $objJson->numempresa,
-            $objJson->contribuicaoPrev,
-            $objJson->cattrabalhadorremuneracao,
-            $objJson->valorremuneracao,
-            $objJson->valordesconto,
-            $objJson->competencia,
-            $objJson->e50_retencaoir,
-            $objJson->e50_naturezabemservico,
-            $dDataLiquidacao,
-            $dDataVencimento
-        );
+
+        if ($objJson->iCgmEmitente != "") {            
+            $oDaoCgm   = db_utils::getDao("cgm");
+            $sSqlCgmEmitente   = $oDaoCgm->sql_query_file($objJson->iCgmEmitente);
+            $sSqlCgm   = $oDaoCgm->sql_query_file($objJson->cgm);
+            $oDadosCgm = db_utils::fieldsMemory($oDaoCgm->sql_record($sSqlCgm), 0);
+            $oDadosCgmEmitente = db_utils::fieldsMemory($oDaoCgm->sql_record($sSqlCgmEmitente), 0);
+            if (substr($oDadosCgm->z01_cgccpf, 0, 8) != substr($oDadosCgmEmitente->z01_cgccpf, 0, 8)) {
+                $chave = false; 
+                $objEmpenho->sMsgErro   = "Verifique o CNPJ do Emitente!";
+            }
+        }
+        
+        if ($chave != false) {
+            /**
+             * Pode ser que o método gerarOrdemCompra retorne false ou um JSON
+             */
+            $oRetorno = $objEmpenho->gerarOrdemCompra(
+                $objJson->e69_nota,
+                $objJson->valorTotal,
+                $objJson->notas,
+                true,
+                $objJson->e69_dtnota,
+                $sHistorico,
+                true,
+                $objJson->oInfoNota,
+                $objJson->e69_notafiscaleletronica,
+                $objJson->e69_chaveacesso,
+                $objJson->e69_nfserie,
+                $objJson->e50_compdesp,
+                $objJson->e83_codtipo,
+                true,
+                $objJson->iCgmEmitente,
+                $objJson->cattrabalhador,
+                $objJson->numempresa,
+                $objJson->contribuicaoPrev,
+                $objJson->cattrabalhadorremuneracao,
+                $objJson->valorremuneracao,
+                $objJson->valordesconto,
+                $objJson->competencia,
+                $objJson->e50_retencaoir,
+                $objJson->e50_naturezabemservico,
+                $dDataLiquidacao,
+                $dDataVencimento,
+                $objJson->e50_contafornecedor,
+                $objJson->e50_numcgmordenador
+            );
+        }
 
         if (isset($objJson->verificaChave) && $objJson->verificaChave == 1 && $objJson->e69_notafiscaleletronica != 2 && $objJson->e69_notafiscaleletronica != 3) {
             $ufs = array(
@@ -1359,7 +1392,131 @@ switch ($objJson->method) {
         echo $json->encode($oDadosRetorno);
         break;
 
+    case 'getContasFornecedor':
+
+        $clpcfornecon = new cl_pcfornecon;
+        $rsContaFornecedor = $clpcfornecon->sql_record($clpcfornecon->sql_query_lefpadrao(null,"pc63_contabanco, pc63_banco||' / '||pc63_agencia||'-'||pc63_agencia_dig||' / '||pc63_conta||'-'||pc63_conta_dig as conta,case when pc63_tipoconta = 1 then 'C/C' else 'C/I' end as tipoconta,case when pc64_contabanco is not null then 1 else 0 end as tipo","tipo DESC"," pc63_numcgm = {$objJson->iFornecedor} "));
+
+        echo $json->encode(db_utils::getCollectionByRecord($rsContaFornecedor));
+        break;
+
+    case "getOrdenador":
+
+        if ((isset($objJson->sNumEmpenho) && !empty($objJson->sNumEmpenho)) && (isset($objJson->sOrdenador) && !empty($objJson->sOrdenador))) {
+                      
+            foreach (listarOrdenadoresCGM($objJson->sNumEmpenho,$objJson->sOrdenador) as $assinante) {
+              $o41_cgmordenador  = $assinante['z01_numcgm'];
+              $o41_cgmordenadordescr = $assinante['nome'];
+              $db243_data_inicio = $assinante['db243_data_inicio'];
+              $db243_data_final  = $assinante['db243_data_final']; 
+            }
+          }
+
+          $oDadosRetorno->status    = 2;
+          $oDadosRetorno->db243_data_final  = $o41_cgmordenador;
+          $oDadosRetorno->o41_cgmordenadordescr  = $o41_cgmordenadordescr ;
+          $oDadosRetorno->db243_data_inicio  = $db243_data_inicio;
+          $oDadosRetorno->db243_data_final    = $db243_data_final;
+          echo $json->encode($oDadosRetorno);
+
+        break;
+
     default:
         echo $objEmpenho->$method($objJson->iEmpenho, $objJson->notas, $objJson->historico, true,$objJson->dDataEstorno);
         break;
+}
+
+function listarOrdenadoresCGM($e60_numemp,$o41_cgmordenador) 
+{
+
+  $o58_anousu  = 0;
+  $o58_instit  = 0;
+  $o58_orgao   = 0;
+  $o58_unidade = 0;
+  $e56_autori  = 0;
+  $clempautidot      = new cl_empautidot;
+  $clorcunidade      = new cl_orcunidade;
+  $oDaoElementos     = db_utils::getDao('orcelemento');
+
+  $sWhereEmpenho     = " e60_numemp =  {$e60_numemp}";
+  $sSqlBuscaElemento = $oDaoElementos->sql_query_estrut_empenho(null, "substr(o56_elemento,1,7) AS o56_elemento,e60_coddot,e60_emiss", null, $sWhereEmpenho);
+  $rsBuscaElemento   = $oDaoElementos->sql_record($sSqlBuscaElemento);
+  $coddotacao = db_utils::fieldsMemory($rsBuscaElemento, 0)->e60_coddot;
+
+  $anoUsu = db_getsession("DB_anousu");
+  $sWhere = "e56_coddot =	" . $coddotacao . " and ( e56_anousu = " . $anoUsu ." or e64_vlrpag > 0 ) and e61_numemp = ".$e60_numemp; 
+  $rsResult = $clempautidot->sql_record($clempautidot->sql_query_dotacao_empenho(null, "*", null, $sWhere));
+  $numrows = $clempautidot->numrows;
+
+  if ($numrows > 0) {
+     
+      $o58_anousu  = db_utils::fieldsMemory($rsResult, 0)->o58_anousu;
+      $o58_instit  = db_utils::fieldsMemory($rsResult, 0)->o58_instit;
+      $o58_orgao   = db_utils::fieldsMemory($rsResult, 0)->o58_orgao;
+      $o58_unidade = db_utils::fieldsMemory($rsResult, 0)->o58_unidade;
+      $e56_autori  = db_utils::fieldsMemory($rsResult, 0)->e56_autori;
+  }
+
+  $anoUsu = db_getsession("DB_anousu");
+  $results = DB::table('empenho.empautidot')
+               ->join('orcdotacao', function($join) {
+               $join->on('orcdotacao.o58_anousu', '=', 'empautidot.e56_anousu')
+                    ->on('orcdotacao.o58_coddot', '=', 'empautidot.e56_coddot');
+               })
+               ->join('empautoriza', 'empautoriza.e54_autori', '=', 'empautidot.e56_autori')
+               ->join('orcelemento', function($join) {
+                   $join->on('orcelemento.o56_codele', '=', 'orcdotacao.o58_codele')
+                        ->on('orcelemento.o56_anousu', '=', 'orcdotacao.o58_anousu');
+               })
+               ->join('empempaut', 'empempaut.e61_autori', '=', 'empautidot.e56_autori')
+               ->join('empelemento', 'empelemento.e64_numemp', '=', 'empempaut.e61_numemp')
+               ->leftJoin('orctiporec', 'orctiporec.o15_codigo', '=', 'empautidot.e56_orctiporec')
+               ->select('*')
+               ->where('empenho.empautidot.e56_autori', '=',$e56_autori)
+               ->where(function ($query) {
+                $query->where('empenho.empautidot.e56_anousu', '=', $anoUsu)
+                      ->orWhere('empelemento.e64_vlrpag', '>', 0);
+               })
+               ->get()->toArray();
+        
+   foreach ($results as $autorizacao) {  
+       $o58_instit  =  $autorizacao->o58_instit; 
+       $o58_orgao   =  $autorizacao->o58_orgao; 
+       $o58_unidade =  $autorizacao->o58_unidade; 
+       $o58_anousu  =  $autorizacao->o58_anousu; 
+   }   
+
+   $aAssinantes = DB::table('configuracoes.assinatura_digital_assinante')
+               ->join('configuracoes.db_usuarios', 'configuracoes.assinatura_digital_assinante.db243_usuario', '=', 'configuracoes.db_usuarios.id_usuario')
+               ->join('configuracoes.db_usuacgm', 'configuracoes.db_usuacgm.id_usuario', '=', 'configuracoes.db_usuarios.id_usuario')
+               ->join('protocolo.cgm', 'protocolo.cgm.z01_numcgm', '=', 'configuracoes.db_usuacgm.cgmlogin')
+               ->where('configuracoes.assinatura_digital_assinante.db243_instit', '=', $o58_instit)
+               ->where('configuracoes.assinatura_digital_assinante.db243_orgao', '=', $o58_orgao)
+               ->where('configuracoes.assinatura_digital_assinante.db243_unidade', '=', $o58_unidade)
+               ->where('configuracoes.assinatura_digital_assinante.db243_anousu', '=', $anoUsu)
+               ->where('protocolo.cgm.z01_numcgm', '=', $o41_cgmordenador)
+               ->where('configuracoes.assinatura_digital_assinante.db243_cargo', '=', 2)
+               ->where('configuracoes.assinatura_digital_assinante.db243_documento', '=', 1)
+               ->select('configuracoes.db_usuarios.login', 'configuracoes.db_usuarios.nome', 'configuracoes.db_usuarios.email', 'protocolo.cgm.z01_cgccpf' , 'configuracoes.assinatura_digital_assinante.db243_cargo','protocolo.cgm.z01_numcgm','configuracoes.assinatura_digital_assinante.db243_data_inicio','configuracoes.assinatura_digital_assinante.db243_data_final')
+               ->distinct('login', 'nome', 'z01_cgccpf', 'db243_cargo')
+               ->get()->toArray();         
+
+   $rowCount = count($aAssinantes);  
+   $ordenadoresArray = array(); 
+   $uniqueKeys = array(); 
+   
+   foreach ($aAssinantes as $assinante) {
+       $uniqueKey = $assinante->nome . '|' . $assinante->z01_numcgm;
+           if (!in_array($uniqueKey, $uniqueKeys)) {
+               $ordenadoresArray[] = [
+                   'nome' => $assinante->nome,
+                   'z01_numcgm' => $assinante->z01_numcgm,
+                   'db243_data_inicio' => $assinante->db243_data_inicio,
+                   'db243_data_final' => $assinante->db243_data_final,
+                   'rowCount'    => $rowCount
+               ];
+               $uniqueKeys[] = $uniqueKey;
+           }
+   }
+   return $ordenadoresArray;
 }

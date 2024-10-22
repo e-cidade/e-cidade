@@ -407,6 +407,23 @@ if ($db_opcao == 1) {
           ?>
         </td>
       </tr>
+
+    <tr>
+        <td nowrap title="<?=@$Tdb21_apirfb?>">
+           <?=@$Ldb21_apirfb?>
+           <b>API CPF/CNPJ RFB:</b>
+        </td>
+        <td> 
+            <?php
+                $aApiRfb = [
+                    "1" => "Ativa", 
+                    "2" => "Apenas Banco da API",
+                    "0" => "Inativa"
+                ];
+          	    db_select('db21_apirfb', $aApiRfb, true, $db_opcao);
+            ?>
+        </td>
+    </tr>
       
      </table>
   </fieldset>

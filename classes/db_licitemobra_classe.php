@@ -32,6 +32,7 @@ class cl_licitemobra {
   public $obr06_dtcadastro = null;
   public $obr06_instit = 0;
   public $obr06_ordem = 0;
+  public $obr06_solicitacao = null;
 
   // cria propriedade com as variaveis do arquivo
   public $campos = "
@@ -45,6 +46,7 @@ class cl_licitemobra {
                  obr06_dtcadastro = date = Data do Cadastro
                  obr06_instit = int4 = Instituição
                  obr06_ordem = int4 = Sequência
+                 obr06_solicitacao = int = Sequencial da solicitação de compra
                  ";
 
   //funcao construtor da classe
@@ -90,6 +92,7 @@ class cl_licitemobra {
         }
       }
       $this->obr06_instit = ($this->obr06_instit == ""?@$GLOBALS["HTTP_POST_VARS"]["obr06_instit"]:$this->obr06_instit);
+      $this->obr06_solicitacao = ($this->obr06_solicitacao == ""?@$GLOBALS["HTTP_POST_VARS"]["obr06_solicitacao"]:$this->obr06_solicitacao);
     } else {
     }
   }
@@ -198,6 +201,7 @@ class cl_licitemobra {
                                       ,obr06_dtcadastro
                                       ,obr06_instit
                                       ,obr06_ordem
+                                      ,obr06_solicitacao
                        )
                 values (
                                 $this->obr06_sequencial
@@ -210,6 +214,7 @@ class cl_licitemobra {
                                ,".($this->obr06_dtcadastro == "null" || $this->obr06_dtcadastro == ""?"null":"'".$this->obr06_dtcadastro."'")."
                                ,$this->obr06_instit
                                ,$this->obr06_ordem
+                               ,$this->obr06_solicitacao
                       )";
     $result = db_query($sql);
     if ($result==false) {
@@ -576,14 +581,14 @@ class cl_licitemobra {
         }
         $sql .= " from liclicitem ";
         $sql .= " INNER JOIN pcprocitem ON liclicitem.l21_codpcprocitem = pcprocitem.pc81_codprocitem ";
-        $sql .= " INNER JOIN pcorcamitemproc ON pc31_pcprocitem = pc81_codprocitem ";
+        $sql .= " LEFT JOIN pcorcamitemproc ON pc31_pcprocitem = pc81_codprocitem ";
         $sql .= " INNER JOIN pcproc ON pcproc.pc80_codproc = pcprocitem.pc81_codproc ";
         $sql .= " LEFT JOIN itemprecoreferencia ON si02_itemproccompra = pcorcamitemproc.pc31_orcamitem ";
         $sql .= " INNER JOIN solicitem ON solicitem.pc11_codigo = pcprocitem.pc81_solicitem ";
         $sql .= " INNER JOIN solicita ON solicita.pc10_numero = solicitem.pc11_numero ";
         $sql .= " INNER JOIN solicitempcmater ON solicitempcmater.pc16_solicitem = solicitem.pc11_codigo ";
         $sql .= " INNER JOIN pcmater ON pcmater.pc01_codmater = solicitempcmater.pc16_codmater ";
-        $sql .= " LEFT JOIN licitemobra ON obr06_pcmater = pc01_codmater AND  obr06_ordem = l21_ordem ";
+        $sql .= " LEFT JOIN licitemobra ON obr06_pcmater = pc01_codmater AND  obr06_ordem = l21_ordem and obr06_solicitacao = solicita.pc10_numero ";
         $sql2 = "";
         if ($dbwhere=="") {
           $sql2 = "where l20_codigo = $l20_codigo";
@@ -618,14 +623,14 @@ class cl_licitemobra {
         }
         $sql .= " from liclicitem ";
         $sql .= " INNER JOIN pcprocitem ON liclicitem.l21_codpcprocitem = pcprocitem.pc81_codprocitem ";
-        $sql .= " INNER JOIN pcorcamitemproc ON pc31_pcprocitem = pc81_codprocitem ";
+        $sql .= " LEFT JOIN pcorcamitemproc ON pc31_pcprocitem = pc81_codprocitem ";
         $sql .= " INNER JOIN pcproc ON pcproc.pc80_codproc = pcprocitem.pc81_codproc ";
         $sql .= " LEFT JOIN itemprecoreferencia ON si02_itemproccompra = pcorcamitemproc.pc31_orcamitem ";
         $sql .= " INNER JOIN solicitem ON solicitem.pc11_codigo = pcprocitem.pc81_solicitem ";
         $sql .= " INNER JOIN solicita ON solicita.pc10_numero = solicitem.pc11_numero ";
         $sql .= " INNER JOIN solicitempcmater ON solicitempcmater.pc16_solicitem = solicitem.pc11_codigo ";
         $sql .= " INNER JOIN pcmater ON pcmater.pc01_codmater = solicitempcmater.pc16_codmater ";
-        $sql .= " LEFT JOIN licitemobra ON obr06_pcmater = pc01_codmater ";
+        $sql .= " LEFT JOIN licitemobra ON obr06_pcmater = pc01_codmater and obr06_solicitacao = solicita.pc10_numero ";
         $sql2 = "";
         if ($dbwhere=="") {
           $sql2 = "where l20_codigo = $l20_codigo";
@@ -664,7 +669,7 @@ class cl_licitemobra {
         $sql .= " INNER JOIN solicita ON solicita.pc10_numero = solicitem.pc11_numero ";
         $sql .= " INNER JOIN solicitempcmater ON solicitempcmater.pc16_solicitem = solicitem.pc11_codigo ";
         $sql .= " INNER JOIN pcmater ON pcmater.pc01_codmater = solicitempcmater.pc16_codmater ";
-        $sql .= " LEFT JOIN licitemobra ON obr06_pcmater = pc01_codmater AND obr06_ordem = pc11_seq ";
+        $sql .= " LEFT JOIN licitemobra ON obr06_pcmater = pc01_codmater AND obr06_ordem = pc11_seq and obr06_solicitacao = pc11_numero ";
         $sql2 = "";
         if ($dbwhere=="") {
             $sql2 = "where pc80_codproc = $pc80_codproc";
@@ -702,7 +707,7 @@ class cl_licitemobra {
       $sql .= " INNER JOIN solicita ON solicita.pc10_numero = solicitem.pc11_numero ";
       $sql .= " INNER JOIN solicitempcmater ON solicitempcmater.pc16_solicitem = solicitem.pc11_codigo ";
       $sql .= " INNER JOIN pcmater ON pcmater.pc01_codmater = solicitempcmater.pc16_codmater ";
-      $sql .= " LEFT JOIN licitemobra ON obr06_pcmater = pc01_codmater ";
+      $sql .= " LEFT JOIN licitemobra ON obr06_pcmater = pc01_codmater and obr06_solicitacao = solicita.pc10_numero ";
       $sql2 = "";
       if ($dbwhere=="") {
           $sql2 = "where pc80_codproc = $pc80_codproc";
@@ -721,5 +726,68 @@ class cl_licitemobra {
       }
       return $sql;
   }
+
+  function getSequencialSolicitacao($licitacao,$processocompra,$codigomaterial,$ordem){
+
+    $sequencialLicitacao;
+
+    if($licitacao != null){
+    
+      $rsSolicitacao = db_query("select pc11_numero from liclicita
+      inner join liclicitem on l21_codliclicita = l20_codigo
+      inner join pcprocitem on l21_codpcprocitem = pc81_codprocitem
+      inner join solicitem on pc11_codigo = pc81_solicitem
+      inner join solicitempcmater on pc16_solicitem = pc11_codigo
+      where l20_codigo = $licitacao and pc16_codmater = $codigomaterial and l21_ordem = $ordem;");
+      $sequencialLicitacao = db_utils::fieldsMemory($rsSolicitacao, 0)->pc11_numero;
+
+    }
+
+    if($processocompra != null){
+
+      $rsSolicitacao = db_query("select pc11_numero from pcproc
+      inner join pcprocitem on pc81_codproc = pc80_codproc
+      inner join solicitem on pc11_codigo = pc81_solicitem
+      inner join solicitempcmater on pc16_solicitem = pc11_codigo
+      where pc80_codproc = $processocompra and pc16_codmater = $codigomaterial and pc11_seq = $ordem;");
+      $sequencialLicitacao = db_utils::fieldsMemory($rsSolicitacao, 0)->pc11_numero;
+    }
+    
+    return $sequencialLicitacao;
+
+  }
+
+  function getLicItemObraSicomContratos($codigoAgordoItem){
+
+
+    $rsItems = db_query("SELECT
+                            *
+                        FROM
+                            acordoitem
+                        INNER JOIN
+                            acordoliclicitem ON ac24_acordoitem = ac20_sequencial
+                        INNER JOIN
+                            liclicitem ON ac24_liclicitem = l21_codigo
+                        INNER JOIN
+                            liclicita ON l20_codigo = l21_codliclicita
+                        INNER JOIN
+                            pcprocitem ON pcprocitem.pc81_codprocitem = liclicitem.l21_codpcprocitem
+                        INNER JOIN
+                            solicitem ON solicitem.pc11_codigo = pcprocitem.pc81_solicitem
+                        LEFT JOIN
+                            licitemobra ON (
+                                obr06_pcmater = ac20_pcmater AND
+                                obr06_solicitacao = pc11_numero AND
+                                (
+                                    (l20_anousu > 2023 AND obr06_ordem = l21_ordem) OR
+                                    (l20_anousu <= 2023)
+                                )
+                            )
+                        where ac20_sequencial = $codigoAgordoItem ");
+    
+    return $rsItems;
+
+  }
+
 }
 ?>

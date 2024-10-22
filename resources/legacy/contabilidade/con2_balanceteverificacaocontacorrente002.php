@@ -22,6 +22,8 @@ $aContasDesc = array(3 => "CREDOR", 100 => "RECEITA", 101 => "DOTAÇÃO", 102 => "
 
 $aTipoValor = array('beginning_balance', 'period_change_deb', 'period_change_cred', 'ending_balance');
 
+$aIndicadores = array(''  => 'Todos', 'N' => 'N - Não se aplica', 'F' => 'F - Financeiro', 'P' => 'P - Patrimonial',);
+
 $aInstit = str_replace("-",",",$aFiltros['selinstit']);
 $iAnoUsu      = date("Y", db_getsession("DB_datausu"));
 $iMes         = (!empty($aFiltros['mes']))     ? $aFiltros['mes'] : '';
@@ -29,8 +31,8 @@ $iMes         = (!empty($aFiltros['mes']))     ? $aFiltros['mes'] : '';
 $sEstrut_inicial = $aFiltros['estrut_inicial'];
 
 $iUltimoDiaMes = date("d", mktime(0,0,0,$iMes+1,0,db_getsession("DB_anousu")));
-$sDataInicial = db_getsession("DB_anousu")."-{$iMes}-01";
-$sDataFinal   = db_getsession("DB_anousu")."-{$iMes}-{$iUltimoDiaMes}";
+$sDataInicial = App\Support\String\DateFormatter::convertDateFormatBRToISO(trim($dataInicial));
+$sDataFinal   = App\Support\String\DateFormatter::convertDateFormatBRToISO(trim($dataFinal));
 
 $sInstituicao = ($aFiltros['matriz'] == 'd')   ? " r.c61_instit = $iInstit and " : '';
 $sTipoInstit  = !empty($sInstituicao)          ? " limit 1 " : '';
@@ -44,11 +46,25 @@ try {
     else
         $where = " c61_instit in ({$aInstit}) " ;
 
+    if ($indicSuperavit !== "") {
+        $where .= " and c60_identificadorfinanceiro = '$indicSuperavit'";
+    }
+
     $iAnoUsu = db_getsession("DB_anousu");
     $rsBalancete = db_planocontassaldo_matriz($iAnoUsu,$sDataInicial,$sDataFinal,false,$where);
     $nCC = 0;
     for ($iCont = 0; $iCont < pg_num_rows($rsBalancete); $iCont++) {
         $oBalancete = db_utils::fieldsMemory($rsBalancete, $iCont);
+
+        if ($oBalancete->c61_reduz == 0 && $recurso != 0) {
+            continue;
+        }
+
+        if ($naturezaSaldo == 1) {
+            $aNaturezaSaldo = array(1 => 'D', 2 => 'C');
+            $sSql = "SELECT c60_naturezasaldo from conplano where c60_estrut = '{$oBalancete->estrutural}' and c60_anousu = {$iAnoUsu}";
+            $iNaturezaSaldo = db_utils::fieldsMemory(db_query($sSql), 0)->c60_naturezasaldo;
+        }
 
         $oNovoResgistro                         = new stdClass;
         $oNovoResgistro->estrutural             = $oBalancete->estrutural;
@@ -66,12 +82,52 @@ try {
             $sSqlCC = "select c18_contacorrente from conplanocontacorrente where c18_anousu={$iAnoUsu} and c18_codcon = {$oBalancete->c61_codcon}";
             $rsCC = db_query($sSqlCC);
             $nCC = db_utils::fieldsMemory($rsCC, 0)->c18_contacorrente;
-            $oNovoResgistro->contacorrente         = getSaldoTotalContaCorrente($iAnoUsu,$oBalancete->c61_reduz,$nCC > 0 ? $nCC : null, $iMes, $oBalancete->c61_instit);
+            $oNovoResgistro->contacorrente         = getSaldoTotalContaCorrente($iAnoUsu,$oBalancete->c61_reduz,$nCC > 0 ? $nCC : null, null, $oBalancete->c61_instit, $sDataInicial, $sDataFinal);
             $oNovoResgistro->cc                    = $nCC;
             $oNovoResgistro->ccdescricao           = isset($aContasDesc[$nCC]) ? $aContasDesc[$nCC] : $nCC;
-            if ($nCC == 103 && $tipoRel == 2){
+
+            if ($nCC != 103 && $recurso != 0) {
+                continue;
+            }
+            
+            if ($nCC == 103){
                 $clContaCorrente = new cl_contacorrentedetalhe;
-                $oNovoResgistro->contacorrentedetalhe = $clContaCorrente->detalhamentoPorFonte($iAnoUsu,$oBalancete->c61_reduz, $aInstit, $iMes);                
+                $aContacorrenteDetalhe = $clContaCorrente->detalhamentoPorFonte($iAnoUsu,$oBalancete->c61_reduz, $aInstit, null, $sDataInicial, $sDataFinal);                                
+                
+                if ($tipoRel == 2) {
+                    $oNovoResgistro->contacorrentedetalhe = $aContacorrenteDetalhe;
+                }
+
+                $incluir = true;
+                if ($recurso != 0) {
+                    $incluir = false;
+                    foreach ($aContacorrenteDetalhe as $oCCdetalhe) {                        
+                        if ($oCCdetalhe['codtri'] == $recurso) {
+                            $incluir = true;
+                            break;
+                        }
+                    }
+                }
+
+                if ($incluir && $naturezaSaldo == 1) {                    
+                    $incluir = false;
+                    foreach ($aContacorrenteDetalhe as $oCCdetalhe) {
+                        if ($aNaturezaSaldo[$iNaturezaSaldo] != $oCCdetalhe['sinal_final']) {
+                            $incluir = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!$incluir || ($naturezaSaldo == 1 && $oBalancete->saldo_final == 0)){
+                    continue;
+                }      
+            }
+        }
+
+        if ($naturezaSaldo == 1) {
+            if (($nCC != 103) && ($oBalancete->sinal_final == $aNaturezaSaldo[$iNaturezaSaldo] || $oBalancete->saldo_final == 0)) {
+                continue;
             }
         }
 
@@ -98,8 +154,11 @@ $pdf->Open();
 $pdf->AliasNbPages();
 $head2 = "BALANCETE C/C";
 $head3 = "EXERCÍCIO: {$iAnoUsu}";
-$head4 = "PERÍODO: ".array_search($iMes, $aMeses);
+$head4 = "PERÍODO: ".$dataInicial." - ".$dataFinal;
 $head5 = "INSTIUIÇÕES: {$aInstit}";
+$head6 = "SUPERÁVIT: {$aIndicadores[$indicSuperavit]}";
+$head7 = "NATUREZA DE SALDO: ".($naturezaSaldo == 0 ? 'Todos' : 'Invertidas');
+$head8 = "RECURSO: ".($recurso == 0 ? 'Todos' : $recurso);
 $alt   = 4;
 $pdf->SetAutoPageBreak('on',0);
 $pdf->line(2,148.5,208,148.5);
@@ -155,11 +214,11 @@ foreach ($aRegistros as $aRegistro) {
                     $pdf->cell(89,$alt,"","0",0,"R",1);
                     $pdf->cell(10, $alt, $ccDetalhe["codtri"], "0", 0, "C", 1);
                     $pdf->cell(24, $alt, db_formatar($ccDetalhe["saldo_anterior"], 'f').
-                    ($ccDetalhe["saldo_anterior"] != 0 ? $ccDetalhe["sinal_anterior"] : ''), "0", 0, "R", 1);
+                    ($ccDetalhe["saldo_anterior"] > 0.001 ? $ccDetalhe["sinal_anterior"] : ''), "0", 0, "R", 1);
                     $pdf->cell(22, $alt, db_formatar($ccDetalhe["valor_debito"], 'f'), "0", 0, "R", 1);
                     $pdf->cell(22, $alt, db_formatar($ccDetalhe["valor_credito"], 'f'), "0", 0, "R", 1);
                     $pdf->cell(24, $alt, db_formatar($ccDetalhe["saldo_final"], 'f').
-                    ($ccDetalhe["saldo_final"] != 0 ? $ccDetalhe["sinal_final"] : ''), "0", 0, "R", 1);
+                    ($ccDetalhe["saldo_final"] > 0.001 ? $ccDetalhe["sinal_final"] : ''), "0", 0, "R", 1);
                     
                     if ($pdf->gety() > ($pdf->h - 20)) {
                         $pdf->addpage();

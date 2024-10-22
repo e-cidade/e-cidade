@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class InserirNaturezaRubricasContribuinteIndividual extends AbstractMigration
+class InserirNaturezaRubricasContribuinteIndividual extends PostgresMigration
 {
 
     public function up()

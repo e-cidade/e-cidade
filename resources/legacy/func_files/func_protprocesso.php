@@ -181,7 +181,7 @@ if (isset($chave_p58_requer)) {
                 if (isset($campos) == false) {
 
                     $campos = "p58_codproc,cast(p58_numero||'/'||p58_ano as varchar) as p58_numero,z01_numcgm as DB_p58_numcgm,";
-                    $campos .= "z01_nome,p58_dtproc,p51_descr,p58_obs,p58_requer as DB_p58_requer";
+                    $campos .= "z01_nome,p58_dtproc,p51_descr,p58_obs,p58_requer as DB_p58_requer,p58_coddepto,descrdepto,p58_codigo";
                 }
                 if (isset($chave_p58_numcgm) && (trim($chave_p58_numcgm) != "")) {
                     $sql = $clprotprocesso->sql_query(null, $campos, "p58_codproc desc", "p58_numcgm = $chave_p58_numcgm  and $where");

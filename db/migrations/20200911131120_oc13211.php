@@ -1,13 +1,13 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc13211 extends AbstractMigration
+class Oc13211 extends PostgresMigration
 {
     public function up()
     {
         $sql = <<<SQL
-        
+
         CREATE OR REPLACE FUNCTION public.fc_verifica_lancamento(integer, date, integer, double precision)
         RETURNS text
         LANGUAGE plpgsql

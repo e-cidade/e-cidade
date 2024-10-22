@@ -102,5 +102,31 @@ class ContaBancariaRepository implements ContaBancariaRepositoryInterface
         return $result;
     }
 
+    public function checkRepeated(int $agencia, string $conta, int $tipoconta, string $fonte, int $nroseqaplicacao): ?Collection
+    {
+
+        $result = $this->model
+            ->join('conplanocontabancaria', 'contabancaria.db83_sequencial', '=', 'conplanocontabancaria.c56_contabancaria')
+            ->join('conplano', 'conplanocontabancaria.c56_codcon', '=', 'conplano.c60_codcon')
+            ->join('conplanoreduz', 'conplanocontabancaria.c56_codcon', '=', 'conplanoreduz.c61_codcon')
+            ->join('saltes', 'saltes.k13_reduz', '=', 'conplanoreduz.c61_reduz')
+            ->join('conplanoconta', 'conplanoconta.c63_codcon', '=', 'conplanocontabancaria.c56_codcon')
+            ->join('empagetipo', 'empagetipo.e83_conta', '=', 'saltes.k13_reduz')
+            ->join('conplanoexe', 'conplanoexe.c62_reduz', '=', 'saltes.k13_reduz')
+            ->join('conplanocontacorrente', 'conplanocontacorrente.c18_codcon', '=', 'conplanocontabancaria.c56_codcon')
+            ->where('contabancaria.db83_bancoagencia', $agencia)
+            ->where('contabancaria.db83_conta', $conta)
+            ->where('contabancaria.db83_tipoconta', $tipoconta)
+            ->where('conplanoreduz.c61_codigo', $fonte)
+            ->when($nroseqaplicacao, function ($query, $nroseqaplicacao) {
+                return $query->where('contabancaria.db83_nroseqaplicacao', $nroseqaplicacao);
+            })
+            ->limit(1)
+            ->get([
+                'conplanoreduz.c61_reduz'
+            ]);
+            
+        return $result;
+    }
 }
  

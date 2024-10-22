@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Createtabelalicobras30202 extends AbstractMigration
+class Createtabelalicobras30202 extends PostgresMigration
 {
 
     public function up()

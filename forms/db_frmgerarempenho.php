@@ -97,8 +97,17 @@ $clrotulo->label('DBtxt25');
 		<td><strong>Tipo de Empenho:</strong></td>
 		<td>
 			<?
-				$aTipos = array("1" => "Dotação", "2" => "Lotação");
-				db_select('tipoEmpenho',$aTipos,true,4, " style='width: 150px;'");
+				$clcfpess = new cl_cfpess;
+				$sSql     = $clcfpess->sql_query(db_getsession("DB_anousu"),date('m', db_getsession("DB_datausu")),db_getsession("DB_instit"),'r11_tipoempenho');
+				$iTipoEmpenho   = db_utils::fieldsMemory($clcfpess->sql_record($sSql),0)->r11_tipoempenho;
+				if ($iTipoEmpenho == 1) {
+					$aTiposEmpenho = array("1" => "Dotação");
+				}else if ($iTipoEmpenho == 2) {
+					$aTiposEmpenho = array("2" => "Lotação");
+				} else {
+					$aTiposEmpenho = array("1" => "Dotação", "2" => "Lotação");
+				}
+				db_select('tipoEmpenho',$aTiposEmpenho,true,4, " style='width: 150px;'");
 			?>
 		</td>
 	</tr>
@@ -199,6 +208,14 @@ var MENSAGEM = 'recursoshumanos/pessoal/db_frmgerarempenho.';
 js_periodoFolha();
 
 js_montaCombo();
+
+if ($F('tipo') == '1' && ($F('ponto') == 'r14' || $F('ponto') == 'r48' || $F('ponto') == 'r35')) {
+	$('trTipoEmpenho').style.display = 'table-row';
+	$('tipoEmpenho').disabled = false;
+} else {
+	$('trTipoEmpenho').style.display = 'none';
+	$('tipoEmpenho').disabled = true;
+}
 
   function js_montaCombo() {
 
@@ -362,15 +379,6 @@ js_montaCombo();
       }
 
     } 
-	
-	if ($F('tipo') == '1' && ($F('ponto') == 'r14' || $F('ponto') == 'r48' || $F('ponto') == 'r35')) {
-	  	$('trTipoEmpenho').style.display = 'table-row';
-		$('tipoEmpenho').disabled = false;
-	} else {
-		$('trTipoEmpenho').style.display = 'none';
-		$('tipoEmpenho').disabled = true;
-	}
-
 	  /**
 	   * Tipo previdência.
 	   */
@@ -380,9 +388,17 @@ js_montaCombo();
 	  	js_periodoFolha();
 	  }
 
-	  if (lCarregaCombo)
+	  if (lCarregaCombo){
 		  js_montaCombo();
+	   }
 
+	if ($F('tipo') == '1' && ($F('ponto') == 'r14' || $F('ponto') == 'r48' || $F('ponto') == 'r35')) {
+	  	$('trTipoEmpenho').style.display = 'table-row';
+		$('tipoEmpenho').disabled = false;
+	} else {
+		$('trTipoEmpenho').style.display = 'none';
+		$('tipoEmpenho').disabled = true;
+	}
   }
 
   function js_periodoFolha() {

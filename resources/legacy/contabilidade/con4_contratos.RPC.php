@@ -592,6 +592,10 @@ switch ($oParam->exec) {
 
     case "salvarContrato":
 
+        if (!empty($oParam->contrato->iValorParcela)) {
+            $oParam->contrato->iValorParcela = floatval($oParam->contrato->iValorParcela);
+        }
+
         try {
             db_inicio_transacao();
             $lAcordoValido            = true;
@@ -660,23 +664,10 @@ switch ($oParam->exec) {
             /**
              * Controle de cadastro de fornecedor
              */
-
-
-            $result_tipoparticipacao3 = $clpcfornereprlegal->sql_record($clpcfornereprlegal->sql_query("", "*", "", "pc81_cgmforn = {$oParam->contrato->iContratado}"));
-            $resulta     = db_utils::fieldsMemory($result_tipoparticipacao3, 0);
-            //$result_tipoparticipacao3 = db_query("select pc81_cgmforn from pcfornereprlegal where pc81_cgmforn = {$oParam->contrato->iContratado}");
-            if ($resulta->pc81_tipopart != 3 && $resulta->pc81_tipopart != 4 && $resulta->pc81_tipopart != 5) {
-                $result_tipoparticipacao1 = db_query("select pc81_cgmforn,pc81_tipopart from pcforne inner join pcfornereprlegal on pc81_cgmforn = pc60_numcgm where pc60_numcgm = {$oParam->contrato->iContratado} and pc81_tipopart = 1");
-
-                if (pg_num_rows($result_tipoparticipacao1) == 0) {
-                    throw new Exception("É necessário cadastrar o representante legal e demais membros para o fornecedor.");
-                }
-
-                $result_tipoparticipacao2 = db_query("select pc81_cgmforn,pc81_tipopart from pcforne inner join pcfornereprlegal on pc81_cgmforn = pc60_numcgm where pc60_numcgm = {$oParam->contrato->iContratado} and pc81_tipopart = 2");
-
-                if (pg_num_rows($result_tipoparticipacao2) == 0) {
-                    throw new Exception('É necessário cadastrar o representante legal e demais membros para o fornecedor.');
-                }
+            $clHabilitacaoForn = new cl_habilitacaoforn;
+            $erroValidacaoRepresentante = $clHabilitacaoForn->validacaoRepresentanteLegal($oParam->contrato->iContratado);
+            if($erroValidacaoRepresentante != ""){
+              throw new Exception($erroValidacaoRepresentante);
             }
 
             $oLicitacao = db_utils::getDao('liclicita');
@@ -1864,8 +1855,7 @@ switch ($oParam->exec) {
                 $rsAnexos = $clacoanexopncp->sql_record($clacoanexopncp->sql_query_file(null, " * ", null, "ac214_acordo = " . $Documentos));
 
                 if (pg_num_rows($rsAnexos) > 0) {
-                    $oRetorno->message = "O documento do codigo " . $Documentos . " ja foi enviado !";
-                    $oRetorno->status  = 2;
+                    throw new Exception("O anexo do código " . $Documentos . " já foi enviado !");
                     break;
                 }
 
@@ -1888,15 +1878,14 @@ switch ($oParam->exec) {
 
                 db_inicio_transacao();
 
-                $sNomeArquivo = "tmp/{$oDocumento->getNomeArquivo()}";
+                $arquivo = "tmp/{$oDocumento->getNomeArquivo()}";
 
-                pg_lo_export($conn, $oDocumento->getArquivo(), $sNomeArquivo);
+                pg_lo_export($conn, $oDocumento->getArquivo(), $arquivo);
                 db_fim_transacao(true);
                 $oRetorno->nomearquivo = $sNomeArquivo;
 
                 $nomearquivo = $oRetorno->nomearquivo;
-                $rsApiPNCP = $clContratoPNCP->enviarArquivoContrato($dadospncp, $sNomeArquivo, $Documentos,$dadosTipoAnexo->l213_sequencial);
-
+                $rsApiPNCP = $clContratoPNCP->enviarArquivoContrato($dadospncp,$arquivo, $oDocumento->getNomeArquivo(),$dadosTipoAnexo->l213_sequencial);
                 if ($rsApiPNCP[1] == "201") {
 
                     $codigocontrato = explode('x-content-type-options', $rsApiPNCP[0]);
@@ -1933,7 +1922,7 @@ switch ($oParam->exec) {
                 $contTipoAnexos++;
             } catch (Exception $oErro) {
 
-                $oRetorno->message = $oErro->getMessage();
+                $oRetorno->message =  utf8_encode($oErro->getMessage());
                 $oRetorno->status  = 2;
             }
         }
@@ -1970,8 +1959,7 @@ switch ($oParam->exec) {
                 $rsAnexos = $clacoanexopncp->sql_record($clacoanexopncp->sql_query_file(null, " * ", null, "ac214_acordo = " . $Documentos));
 
                 if (pg_num_rows($rsAnexos) == 0) {
-                    $oRetorno->message = "O documento do codigo " . $Documentos . " nao foi encontrado !";
-                    $oRetorno->status  = 2;
+                    throw new Exception("O Anexo do código " . $Documentos . " não foi encontrado !");
                     break;
                 }
 
@@ -1979,6 +1967,7 @@ switch ($oParam->exec) {
                     $anexospncp = db_utils::fieldsMemory($rsAnexos, $iCont);
                 }
 
+                $anexospncp->justificativa = $oParam->justificativa;
                 $rsApiPNCP = $clContratoPNCP->excluirArquivoContrato($anexospncp);
 
                 if ($rsApiPNCP->status == null || $rsApiPNCP->status == '' || $rsApiPNCP->status == 201) {
@@ -1988,17 +1977,17 @@ switch ($oParam->exec) {
                     $oRetorno->status  = 1;
                 }
                 if ($rsApiPNCP->status == 404) {
-                    throw new Exception(utf8_decode($rsApiPNCP->message));
+                    throw new Exception(utf8_encode($rsApiPNCP->message));
                 }
                 if ($rsApiPNCP->status == 422) {
-                    throw new Exception(utf8_decode($rsApiPNCP->message));
+                    throw new Exception(utf8_encode($rsApiPNCP->message));
                 }
                 if ($rsApiPNCP->status == 500) {
-                    throw new Exception(utf8_decode($rsApiPNCP->message));
+                    throw new Exception(utf8_encode($rsApiPNCP->message));
                 }
             } catch (Exception $oErro) {
 
-                $oRetorno->message = utf8_decode($oErro->getMessage());
+                $oRetorno->message = utf8_encode($oErro->getMessage());
                 $oRetorno->status  = 2;
             }
         }

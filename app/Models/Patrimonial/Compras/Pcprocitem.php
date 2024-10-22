@@ -17,6 +17,8 @@ class Pcprocitem extends LegacyModel
 
     public $incrementing = false;
 
+    protected string $sequenceName = 'pcprocitem_pc81_codprocitem_seq';
+
     protected $fillable = [
         'pc81_codprocitem',
         'pc81_codproc',

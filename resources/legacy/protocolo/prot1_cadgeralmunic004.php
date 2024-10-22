@@ -84,21 +84,19 @@ function js_findCidadao() {
 </head>
 <body class="body-default" onLoad=" js_findCidadao(<?=@$oPost->ov02_sequencial?>);" >
 <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
-  <tr>
-    <td align="center" valign="top" bgcolor="#CCCCCC">
-    <center>
-      <?
-
-			if ((isset($oPost->cpf) && $oPost->cpf != '') || (isset($oPost->cnpj) && $oPost->cnpj != '')) {
-        require_once("forms/db_frmcadgeralmunic.php");
-      }else {
-
-        include("forms/db_frmcadgeralmunicini.php");
-			}
-			?>
-    </center>
-	</td>
-  </tr>
+    <tr>
+        <td align="center" valign="top" bgcolor="#CCCCCC">
+            <center>
+            <?php
+			    if ((isset($oPost->cpf) && $oPost->cpf != '') || (isset($oPost->cnpj) && $oPost->cnpj != '')) {
+                    require_once("forms/db_frmcadgeralmunic.php");
+                } else {
+                    include("forms/db_frmcadgeralmunicini.php");
+			    }
+		    ?>
+            </center>
+	    </td>
+    </tr>
 </table>
 </body>
 </html>

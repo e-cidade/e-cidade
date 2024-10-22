@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class SicomDcasp2020 extends AbstractMigration
+class SicomDcasp2020 extends PostgresMigration
 {
 
     public function change()

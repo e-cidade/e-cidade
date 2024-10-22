@@ -19,21 +19,45 @@ class LiclicitemLoteService
     }
 
 
-    public function salvarItensLicitacaoLote ($dados):LiclicitemLote
+    public function salvarItensLicitacaoLote ($dados)
     {
-        $aliclicitemlote = [];
-        $l04_descricao = 'LOTE_AUTOITEM_'.$dados->pc81_codprocitem;
-        $aliclicitemlote['l04_liclicitem'] = $dados->l04_liclicitem;
-        $aliclicitemlote['l04_descricao'] = $l04_descricao;
+        $aLotesCompras = $this->getLotesCompras($dados->pc81_codprocitem);
+
+        if($aLotesCompras){
+            $aliclicitemlote = [];
+            $l04_descricao = $aLotesCompras->pc68_nome;
+            $aliclicitemlote['l04_liclicitem'] = $dados->l04_liclicitem;
+            $aliclicitemlote['l04_descricao'] = $l04_descricao;
+            $aliclicitemlote['l04_seq'] = $aLotesCompras->pc69_seq;
+            $aliclicitemlote['l04_numerolote'] = $aLotesCompras->pc68_sequencial;
+
+            $this->licilicitemloteRepository->insert($aliclicitemlote);
+        }
+    }
+
+    public function salvarItensLicitacaoLoteAutomatico ($dados):LiclicitemLote
+    {
+            $aliclicitemlote = [];
+            $l04_descricao = 'LOTE_AUTOITEM_'.$dados->pc81_codprocitem;
+            $aliclicitemlote['l04_liclicitem'] = $dados->l04_liclicitem;
+            $aliclicitemlote['l04_descricao'] = $l04_descricao;
+
         return $this->licilicitemloteRepository->insert($aliclicitemlote);
     }
+
 
     public function excluirItensLote($dados)
     {
         $itens = $this->pcprocitemRepository->getItensProcOnLiclicitem($dados->processo,$dados->l20_codigo);
+
         foreach ($itens as $item) {
-            return $this->licilicitemloteRepository->delete($item->l21_codigo);
+            $this->licilicitemloteRepository->delete($item->l21_codigo);
         }
+    }
+
+    private function getLotesCompras(int $pc81_codprocitem)
+    {
+        return $this->pcprocitemRepository->getLotesCompras($pc81_codprocitem);
     }
 
 }

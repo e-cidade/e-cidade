@@ -226,7 +226,7 @@ for($i = 0;$i < $clpagordem->numrows;$i++){
 
   db_fieldsmemory($resultord,0);
 
-  $sql1         = $clemite_nota_liq->get_sql_assinaturas($e50_codord);
+  $sql1         = $clemite_nota_liq->get_sql_assinaturas_ordenador($e50_codord);
   $resultordass = db_query($sql1);
   db_fieldsmemory($resultordass,0);
 
@@ -252,9 +252,16 @@ for($i = 0;$i < $clpagordem->numrows;$i++){
 
    }
 
-   $sqlDiaria = $clDiaria->sql_query(null,'empdiaria.*,e60_numcgm',null,' e140_codord = '.$e50_codord);
-   $resultDiaria   = db_query($sqlDiaria);
-   if(pg_num_rows($resultDiaria) > 0){
+  $resultContrato = $clpagordem->getContratoDataByEmpenho($e50_numemp);
+
+  if (pg_num_rows($resultContrato) >= 1) {
+    db_fieldsmemory($resultContrato, 0);
+  }
+
+  $sqlDiaria = $clDiaria->sql_query(null,'empdiaria.*,e60_numcgm',null,' e140_codord = '.$e50_codord);
+  $resultDiaria   = db_query($sqlDiaria);
+
+  if(pg_num_rows($resultDiaria) > 0){
     $diaria = db_utils::fieldsMemory($resultDiaria,0);
 
     $diaria->matricula = $diaria->e140_matricula;
@@ -272,6 +279,20 @@ for($i = 0;$i < $clpagordem->numrows;$i++){
   } else {
     $pdf1->diaria = null;
   }
+   
+    if ($e50_contafornecedor != null) {
+      if ($e50_contafornecedor != 0) {
+        $sSqlContaFornecedor = "SELECT * FROM pcfornecon WHERE pc63_contabanco = {$e50_contafornecedor}";
+        db_fieldsmemory(db_query($sSqlContaFornecedor),0);      
+      } else {
+        $pc63_banco       = '';
+        $pc63_agencia     = '';
+        $pc63_agencia_dig = '';
+        $pc63_conta       = '';
+        $pc63_tipoconta   = '';
+        $pc63_conta_dig   = '';
+      }
+    }
 
    $sSqlFuncaoOrdenaPagamento = $clemite_nota_liq->get_sql_funcao_ordena_pagamento($cgmpaga);
    $pdf1->cargoordenapagamento = db_utils::fieldsMemory(db_query($sSqlFuncaoOrdenaPagamento),0)->cargoordenapagamento;
@@ -285,14 +306,14 @@ for($i = 0;$i < $clpagordem->numrows;$i++){
   /*OC4401*/
   $pdf1->usuario = $usuario;
   /*FIM = OC4401*/
-
+  
    //assinaturas
-   $pdf1->ordenadespesa   =  $assindsp;
-   $pdf1->liquida         =  $assinlqd;
-   $pdf1->ordenapagamento =  $assinord;
-   $pdf1->contador        =  $contador;
-   $pdf1->crccontador     =  $crc;
-   $pdf1->controleinterno =  $controleinterno;
+   $pdf1->ordenadespesa    =  $assindsp;
+   $pdf1->liquida          =  $assinlqd;
+   $pdf1->ordenapagamento  =  $assinord;
+   $pdf1->contador         =  $contador;
+   $pdf1->crccontador      =  $crc;
+   $pdf1->controleinterno  =  $controleinterno;
 
    $pdf1->numliquidacao    = $e50_numliquidacao;
    $pdf1->numeronota       = $e69_numero;
@@ -336,7 +357,7 @@ for($i = 0;$i < $clpagordem->numrows;$i++){
    $pdf1->vlrsaldo         = "saldo";
    $pdf1->saldo_final      = "saldo_final";
    $pdf1->aRetencoes       = $aRetencoes;
-   $pdf1->orcado	       = $e60_vlrorc;
+   $pdf1->orcado	         = $e60_vlrorc;
    $pdf1->saldo_ant        = $e60_salant;
    $pdf1->empenhado        = $e60_vlremp;
    $pdf1->empenho_anulado  = $e60_vlranu;
@@ -358,9 +379,12 @@ for($i = 0;$i < $clpagordem->numrows;$i++){
    $pdf1->descr_recurso    = $o15_descr;
    $pdf1->elemento     	   = $o56_elemento;
    $pdf1->descr_elemento   = $o56_descr;
-   $pdf1->obs		       = substr($e50_obs,0,300);
+   $pdf1->obs		           = substr($e50_obs,0,300);
+   $pdf1->contrato         = $ac16_numero;
+   $pdf1->contrato_ano      = $ac16_anousu;
+   $pdf1->cod_contrato     = $ac16_sequencial;
    $pdf1->emissao          = db_formatar($e50_data,'d');
-   $pdf1->texto		       = db_getsession("DB_login").'  -  '.date("d-m-Y",db_getsession("DB_datausu")).'    '.db_hora(db_getsession("DB_datausu"));
+   $pdf1->texto		         = db_getsession("DB_login").'  -  '.date("d-m-Y",db_getsession("DB_datausu")).'    '.db_hora(db_getsession("DB_datausu"));
 
    $pdf1->telef            = $z01_telef;
    $pdf1->fax              = $z01_numero;

@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc17285 extends AbstractMigration
+class Oc17285 extends PostgresMigration
 {
     public function up()
     {
@@ -12,7 +12,7 @@ class Oc17285 extends AbstractMigration
         BEGIN;
 
         SELECT fc_startsession();
-        
+
         --DROP TABLE:
         DROP TABLE IF EXISTS fornemensalemp CASCADE;
 
@@ -79,11 +79,11 @@ class Oc17285 extends AbstractMigration
            AND modulo = 398),
 
         398);
-       
-       
+
+
         COMMIT;
 
 SQL;
         $this->execute($sql);
-    } 
+    }
 }

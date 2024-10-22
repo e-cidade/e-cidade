@@ -361,6 +361,9 @@ class Menu extends Model
   {
 
     $file = trim(addslashes(basename($path)));
+    if (preg_match('/[^?]*\web/', $path)) {
+        $file = $path;
+    }
     $where = null;
 
     if ($request->session()->has("DB_modulo")) {

@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class Oc20817v3 extends AbstractMigration
+class Oc20817v3 extends PostgresMigration
 {
     public function up()
     {
@@ -37,7 +37,7 @@ class Oc20817v3 extends AbstractMigration
         values (
             ( select 	codarq
                 from 	db_sysarqcamp
-                where	codcam = 
+                where	codcam =
                 ( select	codcam
                     from   db_syscampo
                     where 	nomecam in ('o134_percentuallimiteloa'))),
@@ -54,7 +54,7 @@ class Oc20817v3 extends AbstractMigration
                 ( select	codcam
                     from db_syscampo
                     where nomecam in ('o134_percentuallimiteloa'))), 0);
-			
+
         insert
             into
             db_syscampo (codcam,nomecam,conteudo,descricao,valorinicial,rotulo,tamanho,nulo,maiusculo,autocompl,aceitatipo,tipoobj,rotulorel)
@@ -73,7 +73,7 @@ class Oc20817v3 extends AbstractMigration
         values (
                 ( select 	codarq
                     from 	db_sysarqcamp
-                    where	codcam = 
+                    where	codcam =
                     ( select	codcam
                         from   db_syscampo
                         where 	nomecam in ('o134_percentuallimiteloa'))),
@@ -89,11 +89,11 @@ class Oc20817v3 extends AbstractMigration
                         codcam =
                     ( select	codcam
                         from db_syscampo
-                        where nomecam in ('o134_percentuallimiteloa'))), 0);			
+                        where nomecam in ('o134_percentuallimiteloa'))), 0);
 
     COMMIT;
 
 SQL;
         $this->execute($sql);
-    } 
+    }
 }

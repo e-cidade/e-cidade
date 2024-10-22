@@ -8,6 +8,7 @@ use \ECidade\V3\Window\Session;
 use \ECidade\Package\Desktop\Model\Window as ModelWindow;
 use \ECidade\Package\Desktop\Model\Menu as ModelMenu;
 use \Exception;
+use Illuminate\Support\Facades\Auth;
 
 class Window extends Controller {
 
@@ -46,6 +47,11 @@ class Window extends Controller {
 
     if (!$session->has('DB_instit')) {
       throw new \Exception('Instituição não definida.');
+    }
+
+    if ($get->has('redirect')) {
+      $session->set('DB_itemmenu_acessado',  $get->get('DB_itemmenu_acessado'));
+      $session->set('DB_acessado', 1);
     }
 
     $model = new ModelWindow();
@@ -106,11 +112,12 @@ class Window extends Controller {
       return $this->render();
     }
 
-    // Remoção temporária de validação para possibilitar redirecionamento em uma aba diferente.
+    // Remoção de variaveis GET da url, para que a string possua apenas o nome do arquivo, para que assim, seja possivel fazer a verificação no banco do nome do arquivo.
+    $nomeArquivo = $get->has('redirect') ? $get->get('redirectionFileName') : $get->get('action');
+
     // valida se usuario tem permissao para acessar rotina pelo anousu
 
-
-    $idMenu = $menuModel->getMenuArquivo($this->request, $get->get('action'));
+    $idMenu = $menuModel->getMenuArquivo($this->request, $nomeArquivo);
 
     // 404?
     if (empty($idMenu)) {
@@ -269,6 +276,7 @@ class Window extends Controller {
 
     $this->request->session()->destroy();
     Session::destroyAll();
+    Auth::logout();
 
     return array('session' => 'dead');
   }

@@ -115,26 +115,17 @@ $clsaltes->rotulo->label("k13_reduz");
               }
             }
             if ($tipoconta == "Credito"){
-                
-                $dbwhere .= " and c63_conta = 
-                            ( select 
-                                  c63_conta
-                              from
-                                  saltes
-                              inner join conplanoreduz on
-                                  conplanoreduz.c61_reduz = saltes.k13_reduz
-                                  and c61_anousu = $iAnoSessao
-                              inner join conplanoexe on
-                                  conplanoexe.c62_reduz = conplanoreduz.c61_reduz
-                                  and c61_anousu = c62_anousu
-                              inner join conplano on
-                                  conplanoreduz.c61_codcon = conplano.c60_codcon
-                                  and c61_anousu = c60_anousu
-                              left join conplanoconta on
-                                  conplanoconta.c63_codcon = conplanoreduz.c61_codcon
-                                  and conplanoconta.c63_anousu = conplanoreduz.c61_anousu
-                              where  k13_reduz = $codigoconta and c61_anousu = $iAnoSessao
-                              )  " ;
+
+                $sSqlWhereConta = " k13_reduz = $codigoconta and c61_anousu = $iAnoSessao ";
+                $sSqlBuscarConta = $clsaltes->sql_query($codigoconta , 'c63_conta', "k13_conta", $sSqlWhereConta);
+
+                $rsExecutaQueryBuscarConta= $clsaltes->sql_record($sSqlBuscarConta);
+
+                if ($clsaltes->numrows > 0) {
+                  $NumeroConta = db_utils::fieldsMemory($rsExecutaQueryBuscarConta, 0)->c63_conta;
+                } 
+                $NumeroConta = substr($NumeroConta,0,1) == 0 ? substr($NumeroConta,1) : $NumeroConta;
+                $dbwhere .= " and c63_conta like '%$NumeroConta%' " ;
                 
                 if ($tiposelecione == 02){
                     $dbwhere .= "  and ( db83_tipoconta = ".$tipocontacredito."  or db83_tipoconta = 3 )"  ;

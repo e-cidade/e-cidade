@@ -179,7 +179,7 @@ function db_contas($nome, $valor = "", $tipo = 1)
  * @param string  $iMaxLen       MaxLenght       : Maximo de Caractereres
  * @return void
  */
-function db_input($nome, $dbsize, $dbvalidatipo, $dbcadastro, $dbhidden = 'text', $db_opcao = 3, $js_script = "", $nomevar = "", $bgcolor = "", $css="", $iMaxLen=null)
+function db_input($nome, $dbsize, $dbvalidatipo, $dbcadastro, $dbhidden = 'text', $db_opcao = 3, $js_script = "", $nomevar = "", $bgcolor = "", $css="", $iMaxLen=null, $class = '', $dataAttr = [])
 {
     if ($iMaxLen != null && !empty($iMaxLen)) {
         $iMax = $iMaxLen;
@@ -187,9 +187,14 @@ function db_input($nome, $dbsize, $dbvalidatipo, $dbcadastro, $dbhidden = 'text'
         $iMax = @$GLOBALS['M'.$nome];
     } ?>
 
-  <input title="<?=@$GLOBALS['T'.$nome]?>" name="<?=($nomevar==""?$nome:$nomevar)?>"  type="<?=$dbhidden?>" <?=($dbhidden=="checkbox"?(@$GLOBALS[($nomevar==""?$nome:$nomevar)]=="t"?"checked":""):"")?>
-    id="<?=($nomevar==""?$nome:$nomevar)?>"  value="<?=@$GLOBALS[($nomevar==""?$nome:$nomevar)]?>"  size="<?=$dbsize?>"
-        maxlength="<?=@$iMax?>"
+  <input
+    title="<?=@$GLOBALS['T'.$nome]?>"
+    name="<?=($nomevar==""?$nome:$nomevar)?>"
+    type="<?=$dbhidden?>" <?=($dbhidden=="checkbox"?(@$GLOBALS[($nomevar==""?$nome:$nomevar)]=="t"?"checked":""):"")?>
+    id="<?=($nomevar==""?$nome:$nomevar)?>"
+    value="<?=@$GLOBALS[($nomevar==""?$nome:$nomevar)]?>"
+    size="<?=$dbsize?>"
+    maxlength="<?=@$iMax?>"
   <?php
 
         echo $js_script;
@@ -215,19 +220,29 @@ function db_input($nome, $dbsize, $dbvalidatipo, $dbcadastro, $dbhidden = 'text'
         $db_style .= "text-transform:uppercase;";
     }
 
-    if ($db_style != '') {
-        if ($css!="") {
-            echo " style=\"$db_style;$css\" ";
-        } else {
-            echo " style=\"$db_style\" ";
-        }
-    } else {
-        if ($css != "") {
-            echo " style=\"$css\" ";
+	if ($db_style != '') {
+	  if ($css!=""){
+		   echo " style=\"$db_style;$css\" ";
+     }else{
+      echo " style=\"$db_style\" ";
+		}
+	} else {
+	  if ($css != ""){
+		 echo " style=\"$css\" ";
+		}
+	}
+
+    if(!empty($class)){
+        echo " class=\"$class\" ";
+    }
+
+    if(!empty($dataAttr)){
+        foreach($dataAttr as $key => $val){
+            echo " data-{$key}=\"{$val}\" ";
         }
     }
 
-    if (($db_opcao != 3) && ($db_opcao != 5)) {
+    if (($db_opcao != 3) && ($db_opcao != 5) && ($db_opcao != 44)) {
         ?>
     onblur="js_ValidaMaiusculo(this,'<?=@$GLOBALS['G'.$nome]?>',event);"
     onInput="js_ValidaCampos(this,<?=($dbvalidatipo==''?0:$dbvalidatipo)?>,'<?=@$GLOBALS['S'.$nome]?>','<?=($db_opcao==4?"t":@$GLOBALS['U'.$nome])?>','<?=@$GLOBALS['G'.$nome]?>',event);"
@@ -255,7 +270,7 @@ function db_input($nome, $dbsize, $dbvalidatipo, $dbcadastro, $dbhidden = 'text'
  * @param $bgcolor       - Cor Background  : Cor de fundo da tela, no caso de *db_opcao*=3 ser? "#DEB887"
  * @param $maxlength     - Maxlenght       : Tamanho m?ximo permitido para escrita no textarea
  */
-function db_textarea($nome, $dbsizelinha = 1, $dbsizecoluna = 1, $dbvalidatipo, $dbcadastro = true, $dbhidden = 'text', $db_opcao = 3, $js_script = "", $nomevar = "", $bgcolor = "", $maxlength = "")
+function db_textarea($nome, $dbsizelinha = 1, $dbsizecoluna = 1, $dbvalidatipo, $dbcadastro = true, $dbhidden = 'text', $db_opcao = 3, $js_script = "", $nomevar = "", $bgcolor = "", $maxlength = "", $class = "")
 {
     $sOnInput = ""; ?>
   <textarea title="<?=@$GLOBALS['T'.$nome]?>" name="<?=($nomevar==""?$nome:$nomevar)?>"  type="<?=$dbhidden?>"
@@ -302,7 +317,7 @@ function db_textarea($nome, $dbsizelinha = 1, $dbsizecoluna = 1, $dbvalidatipo, 
     onblur  = "<?=$OnBlur?>"
     onKeyUp = "<?=$OnKeyUp?>"
     onInput = "<?php echo $sOnInput; ?>"
-
+    class="<?= $class ?>"
     <?=@$GLOBALS['N'.$nome]?>
 
     autocomplete='<?=@$GLOBALS['A'.$nome]?>'><?php echo $sValue; ?></textarea>
@@ -1001,7 +1016,6 @@ function db_select($nome, $db_matriz, $dbcadastro, $db_opcao = 3, $js_script = "
         echo "<select name='{$nome}' id='{$nome}' {$sReadonly} {$sDisabled} {$js_script}>";
 
         $nomevar = $nomevar == "" ? $nome : $nomevar;
-
         foreach ($db_matriz as $chave => $valor) {
             $sSelected = (@$GLOBALS[$nomevar] == $chave) ? 'selected' : '';
             echo "<option value='{$chave}' {$sSelected}>{$valor}</option>";
@@ -1039,7 +1053,7 @@ function db_select($nome, $db_matriz, $dbcadastro, $db_opcao = 3, $js_script = "
 }
 //////////////////////////////////////
 
-function db_inputdata($nome, $dia = "", $mes = "", $ano = "", $dbcadastro = true, $dbtype = 'text', $db_opcao = 3, $js_script = "", $nomevar = "", $bgcolor = "", $shutdown_function="none", $onclickBT="", $onfocus="", $jsRetornoCal="")
+function db_inputdata($nome, $dia = "", $mes = "", $ano = "", $dbcadastro = true, $dbtype = 'text', $db_opcao = 3, $js_script = "", $nomevar = "", $bgcolor = "", $shutdown_function="none", $onclickBT="", $onfocus="", $jsRetornoCal="", $class="")
 {
     //#00#//db_inputdata
     //#10#//Fun??o para montar um objeto tipo data. Ser?o tr?s objetos input na tela mais um objeto input tipo button para
@@ -1086,10 +1100,25 @@ function db_inputdata($nome, $dia = "", $mes = "", $ano = "", $dbcadastro = true
 
     $sButtonType = "button"; ?>
 
-  <input name="<?=($nomevar==""?$nome:$nomevar).""?>" <?=$bgcolor?>   type="<?=$dbtype?>" id="<?=($nomevar==""?$nome:$nomevar).""?>" <?=($db_opcao==3 || $db_opcao==33 || $db_opcao==22 ?'readonly':($db_opcao==5?'disabled':''))?> value="<?=@$diamesano?>" size="10" maxlength="10" autocomplete="off" onBlur='js_validaDbData(this);' onKeyUp="return js_mascaraData(this,event)"  onFocus="js_validaEntrada(this);" onpaste="return false" ondrop="return false" <?=$js_script?> >
-        <input name="<?=($nomevar==""?$nome:$nomevar)."_dia"?>"   type="hidden" title="" id="<?=($nomevar==""?$nome:$nomevar)."_dia"?>" value="<?=@$dia?>" size="2"  maxlength="2" >
-  <input name="<?=($nomevar==""?$nome:$nomevar)."_mes"?>"   type="hidden" title="" id="<?=($nomevar==""?$nome:$nomevar)."_mes"?>" value="<?=@$mes?>" size="2"  maxlength="2" >
-  <input name="<?=($nomevar==""?$nome:$nomevar)."_ano"?>"   type="hidden" title="" id="<?=($nomevar==""?$nome:$nomevar)."_ano"?>" value="<?=@$ano?>" size="4"  maxlength="4" >
+    <input
+        name="<?=($nomevar==""?$nome:$nomevar).""?>" <?=$bgcolor?>
+        type="<?=$dbtype?>"
+        id="<?=($nomevar==""?$nome:$nomevar).""?>" <?=($db_opcao==3 || $db_opcao==33 || $db_opcao==22 ?'readonly':($db_opcao==5?'disabled':''))?>
+        value="<?=@$diamesano?>"
+        size="10"
+        maxlength="10"
+        autocomplete="off"
+        onBlur='js_validaDbData(this);'
+        onKeyUp="return js_mascaraData(this,event)"
+        onFocus="js_validaEntrada(this);"
+        onpaste="return false"
+        ondrop="return false"
+        <?=$js_script?>
+        class="<?= $class ?>"
+    >
+    <input name="<?=($nomevar==""?$nome:$nomevar)."_dia"?>"   type="hidden" title="" id="<?=($nomevar==""?$nome:$nomevar)."_dia"?>" value="<?=@$dia?>" size="2"  maxlength="2" >
+    <input name="<?=($nomevar==""?$nome:$nomevar)."_mes"?>"   type="hidden" title="" id="<?=($nomevar==""?$nome:$nomevar)."_mes"?>" value="<?=@$mes?>" size="2"  maxlength="2" >
+    <input name="<?=($nomevar==""?$nome:$nomevar)."_ano"?>"   type="hidden" title="" id="<?=($nomevar==""?$nome:$nomevar)."_ano"?>" value="<?=@$ano?>" size="4"  maxlength="4" >
   <?php
         if (($db_opcao < 3) || ($db_opcao == 4)) {
             ?>
@@ -1108,7 +1137,13 @@ function db_inputdata($nome, $dia = "", $mes = "", $ano = "", $dbcadastro = true
        $sButtonType = "hidden";
    } ?>
 
-  <input value="D" type="<?=$sButtonType?>" id="dtjs_<?=($nomevar==""?$nome:$nomevar)?>" name="dtjs_<?=($nomevar==""?$nome:$nomevar)?>" onclick="<?=$onclickBT?>pegaPosMouse(event);show_calendar('<?=($nomevar==""?$nome:$nomevar)?>','<?=$shutdown_function?>')"  >
+  <input
+    value="D"
+    type="<?=$sButtonType?>"
+    id="dtjs_<?=($nomevar==""?$nome:$nomevar)?>"
+    name="dtjs_<?=($nomevar==""?$nome:$nomevar)?>"
+    onclick="<?=$onclickBT?>pegaPosMouse(event);show_calendar('<?=($nomevar==""?$nome:$nomevar)?>','<?=$shutdown_function?>')"
+ >
   <?php
         }
 }

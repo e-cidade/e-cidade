@@ -150,6 +150,10 @@ if( !isset($m38_visualizacaoitens) or !isset($m38_visualizacaomatestoque) ) {
           $sWhereConfig .= " and matestoque.m70_codmatmater is not null and ( m70_quant > 0 or m70_valor > 0 )";
         }
 
+        if (!empty($deptoRequisitado)) {
+          $sWhereConfig .= " and db_depart.coddepto = $deptoRequisitado";
+        }
+
         if (isset($chave_m60_codmater) && (trim($chave_m60_codmater)!="") ) {
 
            $sql = $clmatmater->sql_query_config($chave_m60_codmater,$campos,

@@ -1,8 +1,8 @@
 <?php
 
-use Phinx\Migration\AbstractMigration;
+use ECidade\Suporte\Phinx\PostgresMigration;
 
-class HotFixCtb212023 extends AbstractMigration
+class HotFixCtb212023 extends PostgresMigration
 {
     public function up()
     {
