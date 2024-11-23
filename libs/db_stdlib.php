@@ -112,13 +112,16 @@ function db_query($param1, $param2 = null, $param3 = "SQL")
         }
     }
 
+    $sTraceLogObjectName  = 'TracelogObject_'.db_getsession('DB_id_usuario', false);
+    $traceLogCacheExists = fn (string $name) => cache()->store('apc')->get($name, false);
     /*
-   * Trecho comentado devido a um problema na execuçðo do Duplos CGM executado via crontab.
-   */
-    if (db_getsession("DB_traceLog", false) != null) {
+     * Trecho comentado devido a um problema na execuçðo do Duplos CGM executado via crontab.
+     */
+    if ($traceLogCacheExists($sTraceLogObjectName)) {
 
         $oTraceLog = TraceLog::getInstance();
-        $oTraceLog->makeMessage($dbsql, (!$dbresult ? true : false));
+        if ($oTraceLog->isActive())
+            $oTraceLog->makeMessage($dbsql, (!$dbresult ? true : false));
     }
 
     if (db_getsession("DB_premenus", false) != null) {
