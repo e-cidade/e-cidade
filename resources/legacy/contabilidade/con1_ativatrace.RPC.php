@@ -63,6 +63,7 @@ try {
   $oJson               = new services_json();
   $oParametros         = $oJson->decode(str_replace("\\", "", $_POST["json"]));
   $db_id_usuario       = db_getsession('DB_id_usuario');
+  $db_login            = db_getsession('DB_login');
 
   $oRetorno            = new stdClass();
   $oRetorno->iStatus   = 1;
@@ -78,7 +79,7 @@ try {
       if ($oParametros->lActive) {
         CacheHelper::remove('TracelogObject_'.$db_id_usuario);
 
-        $sMessage = "[INFO | ". date("d/m/Y - H:i:s") ."] Enabled Trace Log - db_id_usuario: $db_id_usuario \n";
+        $sMessage = "[INFO | ". date("d/m/Y - H:i:s") ."] Enabled Trace Log - db_id_usuario: $db_id_usuario. db_login: $db_login \n";
         $oTraceLog->write($sMessage);
       }
 
@@ -95,7 +96,7 @@ try {
       }
 
       if (!$oParametros->lActive) {
-        $sMessage = "[INFO | ". date("d/m/Y - H:i:s") ."] Disabled Trace Log - db_id_usuario: $db_id_usuario \n";
+        $sMessage = "[INFO | ". date("d/m/Y - H:i:s") ."] Disabled Trace Log - db_id_usuario: $db_id_usuario. db_login: $db_login \n";
         $oTraceLog->write($sMessage);
 
         CacheHelper::remove('TracelogObject_'.$db_id_usuario);
