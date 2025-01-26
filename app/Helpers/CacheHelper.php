@@ -17,7 +17,7 @@ class CacheHelper implements CacheHelperInterface
      */
     public static function set(string $key, string $value, ?string $drive = 'apc'): bool
     {
-        return Cache::store($drive)->put($key, $value);;
+        return Cache::store($drive)->put($key, $value);
     }
 
     /**
