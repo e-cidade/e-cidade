@@ -1234,7 +1234,8 @@ switch ($oParam->exec) {
           }
 
           $aNomeArquivo = explode('.', $oAnexo->nomearquivo);
-          if($oAnexo->si09_tipoinstit == "51"){
+          $tiposOrgaos = ["50","51","52","53","54","55","56","57","58"];
+          if(in_array($oAnexo->si09_tipoinstit,$tiposOrgaos)){
               $unidade = $oAnexo->si09_codunidadesubunidade;
           }else{
             $unidade = $oAnexo->unidade != '' ? $oAnexo->unidade : '0';

@@ -807,6 +807,51 @@ function sql_query($si134_sequencial = null, $campos = "*", $ordem = null, $dbwh
     }
     return $sSqlContaPagFont;
   }
+
+  /**
+   * @param $oEmpenho
+   * @return string
+   */
+  public function verificaDocumentoOp($oEmpenho){
+    
+    $sSql = "select
+              case
+                when e96_codigo = 4
+                and c60_codsis = 5 then 5
+                when e96_codigo = 1 then 5
+                when e96_codigo = 2 then 1
+                else 99
+              end as tipodocumentoop,
+              e81_numdoc,
+              case
+                when e96_codigo = 2 then e88_cheque
+                else null
+              end as nrodocumento
+            from
+              empord
+            join empagemovforma on
+              e82_codmov = e97_codmov
+            join empageforma on
+              e97_codforma = e96_codigo
+            join empagemov on
+              e82_codmov = e81_codmov
+            join conlancamord on
+              e82_codord = c80_codord
+            join conlancamval on c69_codlan = c80_codlan
+            join conplanoreduz on
+              c61_reduz = c69_credito
+              and c61_anousu = c69_anousu
+            join conplano on
+              c61_codcon = c60_codcon
+              and c61_anousu = c60_anousu
+            left join empageconfcanc on
+              e82_codmov = e88_codmov
+            where
+              e82_codord = {$oEmpenho->ordem}
+            and c69_codlan = {$oEmpenho->lancamento} and c60_codsis <> 0";
+
+    return $sSql;
+  }
 }
 
 

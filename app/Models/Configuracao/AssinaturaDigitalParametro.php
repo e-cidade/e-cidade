@@ -5,7 +5,7 @@ namespace App\Models\Configuracao;
 use App\Traits\LegacyAccount;
 use App\Traits\LegacyLabel;
 use App\Models\LegacyModel;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class AssinaturaDigitalParametro extends LegacyModel
 {

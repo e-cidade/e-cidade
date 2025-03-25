@@ -5,12 +5,12 @@ namespace App\Repositories\Financeiro\Contabilidade;
 use App\Domain\Financeiro\Contabilidade\ContaPlanoContaCorrente;
 use App\Models\Financeiro\Contabilidade\ConPlanoContaCorrente;
 use App\Repositories\Financeiro\Contabilidade\ContaPlanoContaCorrenteRepositoryInterface;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class ContaPlanoContaCorrenteRepository implements ContaPlanoContaCorrenteRepositoryInterface
 {
     private ConPlanoContaCorrente $model;
-   
+
     public function __construct()
     {
         $this->model = new ConPlanoContaCorrente;
@@ -18,15 +18,15 @@ class ContaPlanoContaCorrenteRepository implements ContaPlanoContaCorrenteReposi
 
 
     public function saveByContaPlanoContaCorrente(ContaPlanoContaCorrente $dadosContaPlano): ?ConPlanoContaCorrente
-    { 
+    {
 
         $dados = [
             "c18_codcon"            => $dadosContaPlano->getC18Codcon(),
             "c18_anousu"            => $dadosContaPlano->getC18Anousu(),
             "c18_contacorrente"     => $dadosContaPlano->getC18Contacorrente()
-          
+
         ];
-        
+
         return $this->model->create($dados);
     }
 
@@ -38,4 +38,3 @@ class ContaPlanoContaCorrenteRepository implements ContaPlanoContaCorrenteReposi
 
 
 }
- 

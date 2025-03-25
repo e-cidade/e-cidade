@@ -3406,32 +3406,37 @@ function financeiroPmMontalvania($sArquivoLog, $iParamLog, $connOrigem, $connDes
 
             $oEmpTransp->dsempenho = trim (preg_replace ("/[^a-zA-Z0-9' ]/", "", str_replace ($what, $by, $oEmpTransp->dsempenho)));
 
-            $sqlInsertEmpTransp = "insert into transparencia.transparenciaempenho_tb values (
-                                            '{$oEmpTransp->cdempenho}',
-                                            '{$oEmpTransp->cdunidadeorcamentaria}',
-                                            '{$oEmpTransp->cdfornecedor}',
-                                            '{$oEmpTransp->cddespesa}',
-                                            '{$oEmpTransp->nrempenho}',
-                                            '{$oEmpTransp->tpempenho}',
-                                            '{$oEmpTransp->stempenho}',
-                                            '{$oEmpTransp->dtempenho}',
-                                            '{$oEmpTransp->vlempenho}',
-                                            " . (empty($oEmpTransp->nulicitacao) ? 'null' : $oEmpTransp->nulicitacao) . ",
-                                            '{$oEmpTransp->tplicitacao}',
-                                            '{$oEmpTransp->dtlicitacao}',
-                                            '{$oEmpTransp->nuprocesso}',
-                                            '{$oEmpTransp->dsempenho}',
-                                            '{$oEmpTransp->idfuncao}',
-                                            '{$oEmpTransp->dsfuncao}',
-                                            '{$oEmpTransp->idsubfuncao}',
-                                            '{$oEmpTransp->dssubfuncao}',
-                                            '{$oEmpTransp->idprograma}',
-                                            '{$oEmpTransp->dsprograma}',
-                                            '{$oEmpTransp->iddestinacao}',
-                                            '{$oEmpTransp->dsdestinacao}',
-                                            '{$oEmpTransp->covid}'
-                                        )";
-            db_query ($connDestino, $sqlInsertEmpTransp);
+            try {
+                $sqlInsertEmpTransp = "insert into transparencia.transparenciaempenho_tb values (
+                                                '{$oEmpTransp->cdempenho}',
+                                                '{$oEmpTransp->cdunidadeorcamentaria}',
+                                                '{$oEmpTransp->cdfornecedor}',
+                                                '{$oEmpTransp->cddespesa}',
+                                                '{$oEmpTransp->nrempenho}',
+                                                '{$oEmpTransp->tpempenho}',
+                                                '{$oEmpTransp->stempenho}',
+                                                '{$oEmpTransp->dtempenho}',
+                                                '{$oEmpTransp->vlempenho}',
+                                                '{$oEmpTransp->vlanulempenho}',
+                                                " . (empty($oEmpTransp->nulicitacao) ? 'null' : $oEmpTransp->nulicitacao) . ",
+                                                '{$oEmpTransp->tplicitacao}',
+                                                '{$oEmpTransp->dtlicitacao}',
+                                                '{$oEmpTransp->nuprocesso}',
+                                                '{$oEmpTransp->dsempenho}',
+                                                '{$oEmpTransp->idfuncao}',
+                                                '{$oEmpTransp->dsfuncao}',
+                                                '{$oEmpTransp->idsubfuncao}',
+                                                '{$oEmpTransp->dssubfuncao}',
+                                                '{$oEmpTransp->idprograma}',
+                                                '{$oEmpTransp->dsprograma}',
+                                                '{$oEmpTransp->iddestinacao}',
+                                                '{$oEmpTransp->dsdestinacao}',
+                                                '{$oEmpTransp->covid}'
+                                            )";
+                db_query($connDestino, $sqlInsertEmpTransp);
+            } catch (Exception $e) {
+                throw new Exception("Erro ao inserir dados na tabela transparenciaempenho_tb: " . $e->getMessage());
+            }
         }
     }
     db_logTitulo (" LIQUIDACAO - PORTAL_FACIL", $sArquivoLog, $iParamLog);
@@ -3443,19 +3448,23 @@ function financeiroPmMontalvania($sArquivoLog, $iParamLog, $connOrigem, $connDes
 
             $oLqdTransp = db_utils::fieldsMemory ($rsLqdTransp, $iVwLqd);
 
-            $sqlInsertLqdTransp = "insert into transparencia.transparencialiquidacao_tb values (
-                                                '{$oLqdTransp->cdliquidacao}',
-                                                '{$oLqdTransp->cdempenho}',
-                                                '{$oLqdTransp->nroliquidacao}',
-                                                '{$oLqdTransp->dtliquidacao}',
-                                                " . (empty($oLqdTransp->nrparcela) ? 'null' : $oLqdTransp->nrparcela) . ",
-                                                '{$oLqdTransp->vlliquidacao}',
-                                                '{$oLqdTransp->dsliquidacao}',
-                                                '{$oLqdTransp->nrdocumento}',
-                                                '{$oLqdTransp->dsserie}',
-                                                '{$oLqdTransp->nrnotafiscaleletronica}'
-            )";
-            db_query ($connDestino, $sqlInsertLqdTransp);
+            try {
+                $sqlInsertLqdTransp = "insert into transparencia.transparencialiquidacao_tb values (
+                                                    '{$oLqdTransp->cdliquidacao}',
+                                                    '{$oLqdTransp->cdempenho}',
+                                                    '{$oLqdTransp->nroliquidacao}',
+                                                    '{$oLqdTransp->dtliquidacao}',
+                                                    " . (empty($oLqdTransp->nrparcela) ? 'null' : $oLqdTransp->nrparcela) . ",
+                                                    '{$oLqdTransp->vlliquidacao}',
+                                                    '{$oLqdTransp->dsliquidacao}',
+                                                    '{$oLqdTransp->nrdocumento}',
+                                                    '{$oLqdTransp->dsserie}',
+                                                    '{$oLqdTransp->nrnotafiscaleletronica}'
+                )";
+                db_query($connDestino, $sqlInsertLqdTransp);
+            } catch (Exception $e) {
+                throw new Exception("Erro ao inserir dados na tabela transparencia.transparencialiquidacao_tb: " . $e->getMessage());
+            }
         }
     }
     db_logTitulo (" PAGAMENTO - PORTAL_FACIL", $sArquivoLog, $iParamLog);
@@ -3467,16 +3476,20 @@ function financeiroPmMontalvania($sArquivoLog, $iParamLog, $connOrigem, $connDes
 
             $oPgTransp = db_utils::fieldsMemory ($rsPgTransp, $VwPg);
 
-            $sqlInsertPgTransp = "insert into transparencia.transparenciaordempagamento_tb values (
-                                            '{$oPgTransp->cdordempagamento}',
-                                            '{$oPgTransp->cdempenho}',
-                                            '{$oPgTransp->nrordempagamento}',
-                                            '{$oPgTransp->dtordempagamento}',
-                                            " . (empty($oPgTransp->nrparcela) ? 'null' : $oPgTransp->nrparcela) . ",
-                                            '{$oPgTransp->vlordempagamento}',
-                                            '{$oPgTransp->especificacaoop}'
-            )";
-            db_query ($connDestino, $sqlInsertPgTransp);
+            try {
+                $sqlInsertPgTransp = "insert into transparencia.transparenciaordempagamento_tb values (
+                                                '{$oPgTransp->cdordempagamento}',
+                                                '{$oPgTransp->cdempenho}',
+                                                '{$oPgTransp->nrordempagamento}',
+                                                '{$oPgTransp->dtordempagamento}',
+                                                " . (empty($oPgTransp->nrparcela) ? 'null' : $oPgTransp->nrparcela) . ",
+                                                '{$oPgTransp->vlordempagamento}',
+                                                '{$oPgTransp->especificacaoop}'
+                )";
+                db_query($connDestino, $sqlInsertPgTransp);
+            } catch (Exception $e) {
+                throw new Exception("Erro ao inserir dados na tabela transparencia.transparenciaordempagamento_tb: " . $e->getMessage());
+            }
         }
     }
     db_logTitulo (" RPs - PORTAL_FACIL", $sArquivoLog, $iParamLog);
@@ -3488,15 +3501,19 @@ function financeiroPmMontalvania($sArquivoLog, $iParamLog, $connOrigem, $connDes
 
             $oRestos = db_utils::fieldsMemory ($rsRestosTransp, $VwRP);
 
-            $sqlInsertRP = "insert into transparencia.transparenciarestosapagar_tb values (
-                                        '{$oRestos->cdrestosapagar}',
-                                        '{$oRestos->cdempenho}',
-                                        '{$oRestos->idexercicio}',
-                                        '{$oRestos->vlinscrito}',
-                                        '{$oRestos->vrpago}',
-                                        '{$oRestos->vlcancelado}'
-            )";
-            db_query ($connDestino, $sqlInsertRP);
+            try {
+                $sqlInsertRP = "insert into transparencia.transparenciarestosapagar_tb values (
+                                            '{$oRestos->cdrestosapagar}',
+                                            '{$oRestos->cdempenho}',
+                                            '{$oRestos->idexercicio}',
+                                            '{$oRestos->vlinscrito}',
+                                            '{$oRestos->vrpago}',
+                                            '{$oRestos->vlcancelado}'
+                )";
+                db_query($connDestino, $sqlInsertRP);
+            } catch (Exception $e) {
+                throw new Exception("Erro ao inserir dados na tabela transparencia.transparenciarestosapagar_tb: " . $e->getMessage());
+            }
         }
     }
     db_logTitulo (" LIQUIDACAO RPs - PORTAL_FACIL", $sArquivoLog, $iParamLog);
@@ -3508,16 +3525,20 @@ function financeiroPmMontalvania($sArquivoLog, $iParamLog, $connOrigem, $connDes
 
             $oLqdRp = db_utils::fieldsMemory ($rsLqdRpTransp, $iVwLqdRp);
 
-            $sqlInsertLqdRp = "insert into transparencia.transparencialiquidacaorp_tb values (
-                                            '{$oLqdRp->cdliquidacao}',
-                                            '{$oLqdRp->cdempenho}',
-                                            '{$oLqdRp->nroliquidacao}',
-                                            '{$oLqdRp->dtliquidacao}',
-                                            " . (empty($oLqdRp->nrparcela) ? 'null' : $oLqdRp->nrparcela) . ",
-                                            '{$oLqdRp->vlliquidacao}',
-                                            '{$oLqdRp->dsliquidacao}'
-            )";
-            db_query ($connDestino, $sqlInsertLqdRp);
+            try {
+                $sqlInsertLqdRp = "insert into transparencia.transparencialiquidacaorp_tb values (
+                                                '{$oLqdRp->cdliquidacao}',
+                                                '{$oLqdRp->cdempenho}',
+                                                '{$oLqdRp->nroliquidacao}',
+                                                '{$oLqdRp->dtliquidacao}',
+                                                " . (empty($oLqdRp->nrparcela) ? 'null' : $oLqdRp->nrparcela) . ",
+                                                '{$oLqdRp->vlliquidacao}',
+                                                '{$oLqdRp->dsliquidacao}'
+                )";
+                db_query($connDestino, $sqlInsertLqdRp);
+            } catch (Exception $e) {
+                throw new Exception("Erro ao inserir dados na tabela transparencia.transparencialiquidacaorp_tb: " . $e->getMessage());
+            }
         }
     }
     db_logTitulo (" PAGAMENTO RPs - PORTAL_FACIL", $sArquivoLog, $iParamLog);
@@ -3529,16 +3550,20 @@ function financeiroPmMontalvania($sArquivoLog, $iParamLog, $connOrigem, $connDes
 
             $oPgRp = db_utils::fieldsMemory ($rsPgRpTransp, $iVwPgRp);
 
-            $sqlInsertPgRp = "insert into transparencia.transparenciaordempagamentorp_tb values (
-                                            '{$oPgRp->cdordempagamento}',
-                                            '{$oPgRp->cdempenho}',
-                                            '{$oPgRp->nrordempagamento}',
-                                            '{$oPgRp->dtordempagamento}',
-                                            " . (empty($oPgRp->nrparcela) ? 'null' : $oPgRp->nrparcela) . ",
-                                            '{$oPgRp->vlordempagamento}',
-                                            '{$oPgRp->especificacaoop}'
-            )";
-            db_query ($connDestino, $sqlInsertPgRp);
+            try {
+                $sqlInsertPgRp = "insert into transparencia.transparenciaordempagamentorp_tb values (
+                                                '{$oPgRp->cdordempagamento}',
+                                                '{$oPgRp->cdempenho}',
+                                                '{$oPgRp->nrordempagamento}',
+                                                '{$oPgRp->dtordempagamento}',
+                                                " . (empty($oPgRp->nrparcela) ? 'null' : $oPgRp->nrparcela) . ",
+                                                '{$oPgRp->vlordempagamento}',
+                                                '{$oPgRp->especificacaoop}'
+                )";
+                db_query($connDestino, $sqlInsertPgRp);
+            } catch (Exception $e) {
+                throw new Exception("Erro ao inserir dados na tabela transparencia.transparenciaordempagamentorp_tb: " . $e->getMessage());
+            }
         }
     }
     db_logTitulo (" EXTRA - PORTAL_FACIL", $sArquivoLog, $iParamLog);
@@ -3550,21 +3575,25 @@ function financeiroPmMontalvania($sArquivoLog, $iParamLog, $connOrigem, $connDes
 
             $oExtraTransp = db_utils::fieldsMemory ($rsExtraTransp, $iVwExtraTransp);
 
-            $sqlInsertExtraTransp = "insert into transparencia.transparenciaextra_tb values (
-                                                '{$oExtraTransp->cdextra}',
-                                                '{$oExtraTransp->dtmovimento}',
-                                                '{$oExtraTransp->nuextra}',
-                                                '{$oExtraTransp->nuordem}',
-                                                '{$oExtraTransp->nmfonte}',
-                                                '{$oExtraTransp->nmaplicacao}',
-                                                " . (empty($oExtraTransp->valorarrecadado) ? 0 : $oExtraTransp->valorarrecadado) . ",
-                                                " . (empty($oExtraTransp->valorpago) ? 0 : $oExtraTransp->valorpago) . ",
-                                                '{$oExtraTransp->cdfornecedor}',
-                                                '{$oExtraTransp->nuconta}',
-                                                '{$oExtraTransp->dsconta}',
-                                                '{$oExtraTransp->tipo}'
-            )";
-            db_query ($connDestino, $sqlInsertExtraTransp);
+            try {
+                $sqlInsertExtraTransp = "insert into transparencia.transparenciaextra_tb values (
+                                                    '{$oExtraTransp->cdextra}',
+                                                    '{$oExtraTransp->dtmovimento}',
+                                                    '{$oExtraTransp->nuextra}',
+                                                    '{$oExtraTransp->nuordem}',
+                                                    '{$oExtraTransp->nmfonte}',
+                                                    '{$oExtraTransp->nmaplicacao}',
+                                                    " . (empty($oExtraTransp->valorarrecadado) ? 0 : $oExtraTransp->valorarrecadado) . ",
+                                                    " . (empty($oExtraTransp->valorpago) ? 0 : $oExtraTransp->valorpago) . ",
+                                                    '{$oExtraTransp->cdfornecedor}',
+                                                    '{$oExtraTransp->nuconta}',
+                                                    '{$oExtraTransp->dsconta}',
+                                                    '{$oExtraTransp->tipo}'
+                )";
+                db_query($connDestino, $sqlInsertExtraTransp);
+            } catch (Exception $e) {
+                throw new Exception("Erro ao inserir dados na tabela transparencia.transparenciaextra_tb: " . $e->getMessage());
+            }
         }
     }
 }
@@ -3600,22 +3629,26 @@ function patrimonialPmMontalvania($sArquivoLog, $iParamLog, $connOrigem, $connDe
 
             $oContratos->dsobjeto = trim (preg_replace ("/[^a-zA-Z0-9' ]/", "", str_replace ($what, $by, $oContratos->dsobjeto)));
 
-            $sqlInsertContratos = "insert into transparencia.transparenciacontrato_tb values (
-                                                        '{$oContratos->cdcontrato}',
-                                                        '{$oContratos->cdfornecedor}',
-                                                        '{$oContratos->nrcontrato}',
-                                                        " . (empty($oContratos->nrprocesso) ? 0 : $oContratos->nrprocesso) . ",
-                                                        '{$oContratos->dsobjeto}',
-                                                        '{$oContratos->vlcontrato}',
-                                                        '{$oContratos->dtinicio}',
-                                                        '{$oContratos->dtfinal}',
-                                                        '{$oContratos->dtassinatura}',
-                                                        '{$oContratos->dtpublicacao}',
-                                                        '{$oContratos->nulicitacao}',
-                                                        '{$oContratos->tplicitacao}',
-                                                        '{$oContratos->nuanolicitacao}',
-                                                        '{$oContratos->dsunidade}')";
-            db_query ($connDestino, $sqlInsertContratos);
+            try {
+                $sqlInsertContratos = "insert into transparencia.transparenciacontrato_tb values (
+                                                            '{$oContratos->cdcontrato}',
+                                                            '{$oContratos->cdfornecedor}',
+                                                            '{$oContratos->nrcontrato}',
+                                                            " . (empty($oContratos->nrprocesso) ? 0 : $oContratos->nrprocesso) . ",
+                                                            '{$oContratos->dsobjeto}',
+                                                            '{$oContratos->vlcontrato}',
+                                                            '{$oContratos->dtinicio}',
+                                                            '{$oContratos->dtfinal}',
+                                                            '{$oContratos->dtassinatura}',
+                                                            '{$oContratos->dtpublicacao}',
+                                                            '{$oContratos->nulicitacao}',
+                                                            '{$oContratos->tplicitacao}',
+                                                            '{$oContratos->nuanolicitacao}',
+                                                            '{$oContratos->dsunidade}')";
+                db_query($connDestino, $sqlInsertContratos);
+            } catch (Exception $e) {
+                throw new Exception("Erro ao inserir dados na tabela transparencia.transparenciacontrato_tb: " . $e->getMessage());
+            }
         }
     }
 
@@ -3630,15 +3663,19 @@ function patrimonialPmMontalvania($sArquivoLog, $iParamLog, $connOrigem, $connDe
 
             $oContratosItens->dsdescricao = trim (preg_replace ("/[^a-zA-Z0-9' ]/", "", str_replace ($what, $by, $oContratosItens->dsdescricao)));
 
-            $sqlInsertContratosItens = "insert into transparencia.transparenciacontratoitem_tb values (
-                                                        '{$oContratosItens->cdcontratoitem}',
-                                                        '{$oContratosItens->cdcontrato}',
-                                                        '{$oContratosItens->dsdescricao}',
-                                                        '{$oContratosItens->qtitem}',
-                                                        '{$oContratosItens->tpitem}',
-                                                        '{$oContratosItens->vlitem}'
-                )";
-            db_query ($connDestino, $sqlInsertContratosItens);
+            try {
+                $sqlInsertContratosItens = "insert into transparencia.transparenciacontratoitem_tb values (
+                                                            '{$oContratosItens->cdcontratoitem}',
+                                                            '{$oContratosItens->cdcontrato}',
+                                                            '{$oContratosItens->dsdescricao}',
+                                                            '{$oContratosItens->qtitem}',
+                                                            '{$oContratosItens->tpitem}',
+                                                            '{$oContratosItens->vlitem}'
+                    )";
+                db_query($connDestino, $sqlInsertContratosItens);
+            } catch (Exception $e) {
+                throw new Exception("Erro ao inserir dados na tabela transparencia.transparenciacontratoitem_tb: " . $e->getMessage());
+            }
         }
     }
     db_logTitulo (" ADIT CONTRATO - PORTAL_FACIL", $sArquivoLog, $iParamLog);
@@ -3650,19 +3687,23 @@ function patrimonialPmMontalvania($sArquivoLog, $iParamLog, $connOrigem, $connDe
 
             $oContratosAdit = db_utils::fieldsMemory ($rsContratosAdit, $iVwContratosAdit);
 
-            $sqlInsertContratosAdit = "insert into transparencia.transparenciacontratoadit_tb values (
-                                                        '{$oContratosAdit->cdcontratoadit}',
-                                                        '{$oContratosAdit->cdcontrato}',
-                                                        '{$oContratosAdit->nrtermoadit}',
-                                                        '{$oContratosAdit->dttermoadit}',
-                                                        '{$oContratosAdit->dtassinaturaadit}',
-                                                        '{$oContratosAdit->vlcontratoadit}',
-                                                        '{$oContratosAdit->dsobservacao}',
-                                                        '{$oContratosAdit->dttermoaditinicio}',
-                                                        '{$oContratosAdit->dttermoaditfinal}',
-                                                        '{$oContratosAdit->dstipoaditivo}'
-                )";
-            db_query ($connDestino, $sqlInsertContratosAdit);
+            try {
+                $sqlInsertContratosAdit = "insert into transparencia.transparenciacontratoadit_tb values (
+                                                            '{$oContratosAdit->cdcontratoadit}',
+                                                            '{$oContratosAdit->cdcontrato}',
+                                                            '{$oContratosAdit->nrtermoadit}',
+                                                            '{$oContratosAdit->dttermoadit}',
+                                                            '{$oContratosAdit->dtassinaturaadit}',
+                                                            '{$oContratosAdit->vlcontratoadit}',
+                                                            '{$oContratosAdit->dsobservacao}',
+                                                            '{$oContratosAdit->dttermoaditinicio}',
+                                                            '{$oContratosAdit->dttermoaditfinal}',
+                                                            '{$oContratosAdit->dstipoaditivo}'
+                    )";
+                db_query($connDestino, $sqlInsertContratosAdit);
+            } catch (Exception $e) {
+                throw new Exception("Erro ao inserir dados na tabela transparencia.transparenciacontratoadit_tb: " . $e->getMessage());
+            }
         }
     }
 
@@ -3692,17 +3733,21 @@ function patrimonialPmMontalvania($sArquivoLog, $iParamLog, $connOrigem, $connDe
 
             $oBensMovTransp->dsmovel = trim (preg_replace ("/[^a-zA-Z0-9' ]/", "", str_replace ($what, $by, $oBensMovTransp->dsmovel)));
 
-            $sqlInsertBensMovTransp = "insert into transparencia.transparenciapatrimoniobensmoveis_tb values (
-                                                        '{$oBensMovTransp->nuidentificacao}',
-                                                        '{$oBensMovTransp->nmmovel}',
-                                                        '{$oBensMovTransp->dsmovel}',
-                                                        '{$oBensMovTransp->dsorgaolocalizacao}',
-                                                        '{$oBensMovTransp->dtaquisicao}',
-                                                        '{$oBensMovTransp->nuvaloraquisicao}',
-                                                        '{$oBensMovTransp->nuvaloravaliacao}',
-                                                        '{$oBensMovTransp->dssituacao}'
-                )";
-            db_query ($connDestino, $sqlInsertBensMovTransp);
+            try {
+                $sqlInsertBensMovTransp = "insert into transparencia.transparenciapatrimoniobensmoveis_tb values (
+                                                            '{$oBensMovTransp->nuidentificacao}',
+                                                            '{$oBensMovTransp->nmmovel}',
+                                                            '{$oBensMovTransp->dsmovel}',
+                                                            '{$oBensMovTransp->dsorgaolocalizacao}',
+                                                            '{$oBensMovTransp->dtaquisicao}',
+                                                            '{$oBensMovTransp->nuvaloraquisicao}',
+                                                            '{$oBensMovTransp->nuvaloravaliacao}',
+                                                            '{$oBensMovTransp->dssituacao}'
+                    )";
+                db_query($connDestino, $sqlInsertBensMovTransp);
+            } catch (Exception $e) {
+                throw new Exception("Erro ao inserir dados na tabela transparencia.transparenciapatrimoniobensmoveis_tb: " . $e->getMessage());
+            }
         }
     }
 
@@ -3717,16 +3762,20 @@ function patrimonialPmMontalvania($sArquivoLog, $iParamLog, $connOrigem, $connDe
 
             $oFrotaTransp = db_utils::fieldsMemory ($rsFrotaTransp, $iVwFrotaTransp);
 
-            $sqlInsertFrotaMovTransp = "insert into transparencia.transparenciapatrimoniofrota_tb values (
-                                                    '{$oFrotaTransp->nuano}',
-                                                    '{$oFrotaTransp->dscor}',
-                                                    '{$oFrotaTransp->dsdestinacaoatual}',
-                                                    '{$oFrotaTransp->dsindicadorpropriedade}',
-                                                    '{$oFrotaTransp->dsmarcamodelo}',
-                                                    '{$oFrotaTransp->nuplaca}',
-                                                    '{$oFrotaTransp->dssituacao}'
-            )";
-            db_query ($connDestino, $sqlInsertFrotaMovTransp);
+            try {
+                $sqlInsertFrotaMovTransp = "insert into transparencia.transparenciapatrimoniofrota_tb values (
+                                                        '{$oFrotaTransp->nuano}',
+                                                        '{$oFrotaTransp->dscor}',
+                                                        '{$oFrotaTransp->dsdestinacaoatual}',
+                                                        '{$oFrotaTransp->dsindicadorpropriedade}',
+                                                        '{$oFrotaTransp->dsmarcamodelo}',
+                                                        '{$oFrotaTransp->nuplaca}',
+                                                        '{$oFrotaTransp->dssituacao}'
+                )";
+                db_query($connDestino, $sqlInsertFrotaMovTransp);
+            } catch (Exception $e) {
+                throw new Exception("Erro ao inserir dados na tabela transparencia.transparenciapatrimoniofrota_tb: " . $e->getMessage());
+            }
         }
     }
 
@@ -3739,13 +3788,17 @@ function patrimonialPmMontalvania($sArquivoLog, $iParamLog, $connOrigem, $connDe
 
             $oFornecedorTransp = db_utils::fieldsMemory($rsFornecedorTransp, $iVwFornecedor);
 
-            $sqlInsertFornecedorTransp = "insert into transparencia.transparenciafornecedor_tb values (
-                                                    '{$oFornecedorTransp->cdfornecedor}',
-                                                    '{$oFornecedorTransp->dmtipo}',
-                                                    '{$oFornecedorTransp->nudocumento}',
-                                                    '{$oFornecedorTransp->nmfornecedor}'
-            )";
-            db_query($connDestino, $sqlInsertFornecedorTransp);
+            try {
+                $sqlInsertFornecedorTransp = "insert into transparencia.transparenciafornecedor_tb values (
+                                                        '{$oFornecedorTransp->cdfornecedor}',
+                                                        '{$oFornecedorTransp->dmtipo}',
+                                                        '{$oFornecedorTransp->nudocumento}',
+                                                        '{$oFornecedorTransp->nmfornecedor}'
+                )";
+                db_query($connDestino, $sqlInsertFornecedorTransp);
+            } catch (Exception $e) {
+                throw new Exception("Erro ao inserir dados na tabela transparencia.transparenciafornecedor_tb: " . $e->getMessage());
+            }
         }
     }
 }
@@ -3762,23 +3815,27 @@ function contrachequePmMontalvania($sArquivoLog, $iParamLog, $connOrigem, $connD
 
             $oChequeTransp = db_utils::fieldsMemory ($rsChequeTransp, $iVwCheque);
 
-            $sqlInsertChequeTransp = "insert into transparencia.transparenciacontracheque_tb values (
-                                                '{$oChequeTransp->cdcontracheque}',
-                                                '{$oChequeTransp->cdcadastroservidor}',
-                                                '{$oChequeTransp->nmservidor}',
-                                                '{$oChequeTransp->dtadmissao}',
-                                                '{$oChequeTransp->nmunidade}',
-                                                '{$oChequeTransp->nmcargo}',
-                                                '{$oChequeTransp->nmfuncao}',
-                                                '{$oChequeTransp->nmlotacao}',
-                                                '{$oChequeTransp->nucpf}',
-                                                '{$oChequeTransp->nmcompetencia}',
-                                                '{$oChequeTransp->nmstcontrato}',
-                                                '{$oChequeTransp->covid}',
-                                                '{$oChequeTransp->nmtpfolha}',
-                                                '{$oChequeTransp->tpfolha}'
-            )";
-            db_query ($connDestino, $sqlInsertChequeTransp);
+            try {
+                $sqlInsertChequeTransp = "insert into transparencia.transparenciacontracheque_tb values (
+                                                    '{$oChequeTransp->cdcontracheque}',
+                                                    '{$oChequeTransp->cdcadastroservidor}',
+                                                    '{$oChequeTransp->nmservidor}',
+                                                    '{$oChequeTransp->dtadmissao}',
+                                                    '{$oChequeTransp->nmunidade}',
+                                                    '{$oChequeTransp->nmcargo}',
+                                                    '{$oChequeTransp->nmfuncao}',
+                                                    '{$oChequeTransp->nmlotacao}',
+                                                    '{$oChequeTransp->nucpf}',
+                                                    '{$oChequeTransp->nmcompetencia}',
+                                                    '{$oChequeTransp->nmstcontrato}',
+                                                    '{$oChequeTransp->covid}',
+                                                    '{$oChequeTransp->nmtpfolha}',
+                                                    '{$oChequeTransp->tpfolha}'
+                )";
+                db_query($connDestino, $sqlInsertChequeTransp);
+            } catch (Exception $e) {
+                throw new Exception("Erro ao inserir dados na tabela transparencia.transparenciacontracheque_tb: " . $e->getMessage());
+            }
         }
     }
 
@@ -3791,16 +3848,20 @@ function contrachequePmMontalvania($sArquivoLog, $iParamLog, $connOrigem, $connD
 
             $oChequeItemTransp = db_utils::fieldsMemory ($rsChequeItemTransp, $iVwChequeItem);
 
-            $sqlInsertChequeItemTransp = "insert into transparencia.transparenciacontrachequeitem_tb values (
-                                                    '{$oChequeItemTransp->cdcontrachequeitem}',
-                                                    '{$oChequeItemTransp->cdcontracheque}',
-                                                    '{$oChequeItemTransp->cdevento}',
-                                                    '{$oChequeItemTransp->dsevento}',
-                                                    '{$oChequeItemTransp->dmtipoevento}',
-                                                    '{$oChequeItemTransp->nureferencia}',
-                                                    '{$oChequeItemTransp->nuvalor}'
-            )";
-            db_query ($connDestino, $sqlInsertChequeItemTransp);
+            try {
+                $sqlInsertChequeItemTransp = "insert into transparencia.transparenciacontrachequeitem_tb values (
+                                                        '{$oChequeItemTransp->cdcontrachequeitem}',
+                                                        '{$oChequeItemTransp->cdcontracheque}',
+                                                        '{$oChequeItemTransp->cdevento}',
+                                                        '{$oChequeItemTransp->dsevento}',
+                                                        '{$oChequeItemTransp->dmtipoevento}',
+                                                        '{$oChequeItemTransp->nureferencia}',
+                                                        '{$oChequeItemTransp->nuvalor}'
+                )";
+                db_query($connDestino, $sqlInsertChequeItemTransp);
+            } catch (Exception $e) {
+                throw new Exception("Erro ao inserir dados na tabela transparencia.transparenciacontrachequeitem_tb: " . $e->getMessage());
+            }
         }
     }
 }

@@ -26,9 +26,8 @@ use App\Services\Tributario\ISSQN\Redesim\Alvara\UpdateOrCreateCgmCompanyService
 use App\Services\Tributario\ISSQN\Redesim\Alvara\UpdateOrCreateCompanyActivityService;
 use App\Services\Tributario\ISSQN\Redesim\Alvara\UpdateOrCreateCompanyAddress;
 use App\Services\Tributario\ISSQN\Redesim\Alvara\UpdateOrCreateCompanyPartnerService;
+use App\Support\String\StringHelper;
 use BusinessException;
-use DBString;
-use Exception;
 use Throwable;
 
 class RedesimApiService
@@ -55,8 +54,7 @@ class RedesimApiService
         CompanySuspensionService             $companySuspensionService,
         CompanyShutdownService               $companyShutdownService,
         AlvaraSimplesNacionalService         $alvaraSimplesNacionalService
-    )
-    {
+    ) {
         $this->cgmCompanyService = $cgmCompanyService;
         $this->createAlvaraService = $createAlvaraService;
         $this->companyPartnerService = $companyPartnerService;
@@ -113,10 +111,11 @@ class RedesimApiService
                 $data->dataDoAcontecimento,
                 IssbaseParalisacao::MOTIVO_PARALIZACAO_REDESIM,
                 self::DEFAULT_LOG_MESSAGE,
-                true);
+                true
+            );
         }
 
-        if($data->mei) {
+        if ($data->mei) {
             $this->updateOrCreateSimplesNacional($data->periodosMEI, $issbase->q02_inscr, true);
         }
 
@@ -189,7 +188,7 @@ class RedesimApiService
                 [
                     'q179_inscricao' => $issbase->q02_inscr,
                     'q179_inscricaoredesim' => $data->inscricaoMunicipal,
-                    'q179_dadosregistro' => json_encode(DBString::utf8_encode_all($data->originalData), JSON_UNESCAPED_UNICODE)
+                    'q179_dadosregistro' => json_encode(StringHelper::utf8_encode_all($data->originalData), JSON_UNESCAPED_UNICODE)
                 ]
             );
     }

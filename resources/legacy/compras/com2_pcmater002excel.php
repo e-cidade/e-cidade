@@ -67,10 +67,10 @@ $aOrderBy= array(
     );
 $sOrderBy = $aOrderBy[$grupo];
 
-$sWhere = "pc01_ativo='f' and pc01_conversao is false and o56_anousu = ".db_getsession("DB_anousu");
+$sWhere = "pc01_ativo='f' and pc01_instit in (0,".db_getsession('DB_instit').") and pc01_conversao is false and o56_anousu = ".db_getsession("DB_anousu");
 $sWhere.= $elemento != "" ? " and o56_elemento = '$elemento'" : "";
 
-$rsPcmater = $clpcmater->sql_record($clpcmater->sql_query_desdobra("","*",$sOrderBy,$sWhere));
+$rsPcmater = $clpcmater->sql_record($clpcmater->sql_query_desdobra("","DISTINCT *",$sOrderBy,$sWhere));
 $quantidadeDeItens = $clpcmater->numrows;
 
 /* Estilização de células */

@@ -1,0 +1,64 @@
+/* Textfield-anchor Container */
+.textfield-anchor-container {
+    margin-bottom: 15px;
+}
+
+/* Estilos gerais de rótulos */
+.textfield-anchor-container .label {
+    display: block;
+    margin-bottom: 0.2rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Estilos gerais de rótulos */
+.textfield-anchor-container .label a {
+    color: #3b82f6;
+    display: flex;
+    align-content: center;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    border-bottom: 1px solid #3b82f6;
+}
+
+.textfield-anchor-container .label a:hover {
+    color: #004cc7;
+    border-bottom: 1px solid #004cc7;
+}
+
+/* Estilos gerais de input */
+.textfield-anchor-container .textfield-anchor-input {
+    display: block;
+    width: 100%;
+    font-size: 0.875rem;
+    color: #111827;
+    background-color: #F9FAFB;
+    border: 1px solid #D1D5DB;
+    border-radius: 0.5rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.textfield-anchor-container .textfield-anchor-input:disabled  {
+    background-color: #dddddd;
+}
+
+.textfield-anchor-container-sm {
+    padding: 0.5rem; /* 8px */
+    font-size: 0.75rem; /* 12px */
+}
+
+.textfield-anchor-container-md {
+    padding: 0.625rem; /* 10px */
+    font-size: 0.875rem; /* 14px */
+}
+
+.textfield-anchor-container-lg {
+    padding: 1rem; /* 16px */
+    font-size: 1.125rem; /* 18px */
+}
+
+.textfield-anchor-container .form-input:focus {
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}

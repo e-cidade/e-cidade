@@ -137,6 +137,8 @@ if (isset($incluir) && !$lErro) {
         $clrhpessoalmov->rh02_funcao         = $rh02_funcao;
         $clrhpessoalmov->rh02_instit         = db_getsession("DB_instit");
         $clrhpessoalmov->rh02_equip          = "false";
+        $clrhpessoalmov->rh02_deficientefisico   = "false";
+        $clrhpessoalmov->rh02_portadormolestia   = "false";
         $clrhpessoalmov->rh02_cgminstituidor = $rh02_cgminstituidor;
         $clrhpessoalmov->rh02_dtobitoinstituidor = $rh02_dtobitoinstituidor;
         $clrhpessoalmov->rh02_tipoparentescoinst = $rh02_tipoparentescoinst;
@@ -818,8 +820,6 @@ if (!isset($rh30_vinculo)) {
 if (isset($rh02_salari)) {
     $rh02_salari = trim(db_formatar($rh02_salari, "p"));
 }
-
-
 
 ?>
 <html>

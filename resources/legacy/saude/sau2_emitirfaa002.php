@@ -25,11 +25,11 @@
  *                                licenca/licenca_pt.txt
  */
 
-require_once("fpdf151/scpdf.php");
-require_once("libs/db_sql.php");
-require_once("libs/db_stdlibwebseller.php");
-require_once('libs/db_utils.php');
-require_once('libs/db_stdlib.php');
+require_once(modification("fpdf151/scpdf.php"));
+require_once(modification("libs/db_sql.php"));
+require_once(modification("libs/db_stdlibwebseller.php"));
+require_once(modification('libs/db_utils.php'));
+require_once(modification('libs/db_stdlib.php'));
 
 parse_str( $_SERVER["QUERY_STRING"] );
 db_postmemory( $_POST );

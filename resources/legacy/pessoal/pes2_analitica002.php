@@ -415,7 +415,7 @@ $sql_dados1 .= " order by $orderBY";
 // exit;
 
 $result_dados = db_query($sql_dados1);
-$numrows_dados = pg_numrows($result_dados);
+$numrows_dados = pg_num_rows($result_dados);
 
 if ($numrows_dados == 0) {
     db_redireciona('db_erros.php?fechar=true&db_erro=Não existem lançamentos no período de ' . $mes . ' / ' . $ano);
@@ -493,7 +493,7 @@ $virgP = "";
 $virgD = "";
 
 // Esse FOR passará os valores para os Arrays
-for ($x = 0; $x < pg_numrows($result_dados); $x++) {
+for ($x = 0; $x < pg_num_rows($result_dados); $x++) {
     db_fieldsmemory($result_dados, $x);
     // Testa se registro já passou pelo for e se não tiver passado, setará os valores em seu respectivos ARRAYS
     if (!isset($arr_indexfuncion[$rh01_regist])) {

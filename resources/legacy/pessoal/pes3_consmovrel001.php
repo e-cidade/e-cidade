@@ -161,7 +161,7 @@ $queryst = "";
         db_input('r54_regist',8,$Ir54_regist,true,'hidden',3);
         $repassa = array("r54_codrel"=>$r54_codrel,"r54_codeve"=>$r54_codeve,"r54_regist"=>$r54_regist);
 
-        $sql = $clmovrel->sql_query_dados(null,"r54_codrel,r54_codeve,r54_regist,z01_nome,r54_quant1,r54_quant2,r54_quant3,r54_lancad,rh05_recis","r54_lancad,z01_nome","r54_anomes = '".$ano.$mes."' $dbwhere",$ano,$mes);
+        $sql = $clmovrel->sql_query_dados(null,"r54_codrel,r54_codeve,r54_regist,z01_nome,r54_quant1,r54_quant4,r54_quant2,r54_quant5,r54_quant3,r54_quant6,r54_lancad,rh05_recis","r54_lancad,z01_nome","r54_anomes = '".$ano.$mes."' $dbwhere",$ano,$mes);
 //	echo $sql;
         db_lovrot($sql,15,"()","","","","NoMe",$repassa);
         ?>

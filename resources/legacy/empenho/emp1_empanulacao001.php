@@ -629,16 +629,6 @@ if (isset($e60_numemp)) {
         $sqlerro = true;
     }
 
-    if (isset($e30_verificarmatordem) && $e30_verificarmatordem == 1) {
-        $result_test_ordem_compra = $clmatordemitem->sql_record($clmatordemitem->sql_query_anulado(null, "*", null, " m53_codordem is null and m52_numemp = $e60_numemp "));
-        if ($clmatordemitem->numrows > 0) {
-
-
-            db_msgbox("Não é possivel anular empenho com ordem de compra!!");
-            db_redireciona("emp1_empanulacao001.php");
-            $sqlerro = true;
-        }
-    }
 
     $result_conand = $clpcparam->sql_record($clpcparam->sql_query_file(db_getsession("DB_instit"), "pc30_contrandsol"));
     if ($clpcparam->numrows == 0) {

@@ -484,7 +484,11 @@ WHERE o58_anousu=" . db_getsession('DB_anousu') . "
         }
     }
     db_fim_transacao($sqlerro);
-   
+    if ($o58_codigo) {
+        echo "<script>
+               parent.document.formaba.receita.disabled=false;
+              </script>";
+    }
 } elseif (isset($opcao) && $opcao == "excluir") {
 
     
@@ -513,6 +517,15 @@ WHERE o58_anousu=" . db_getsession('DB_anousu') . "
         db_msgbox($oDaoDespesaPPA->erro_msg);
     }
     db_fim_transacao($sqlerro);
+}
+if ($o46_codsup) {
+    $instit = db_getsession("DB_instit");
+    $result = $clorcsuplemval->sql_record($clorcsuplemval->sql_query_suplemetacao($instit,$o46_codsup));
+    if ($clorcsuplemval->numrows > 0 ) {
+        echo "<script>
+                parent.document.formaba.receita.disabled=false;
+              </script>";
+    }
 }
 if ($limpa_dados == true) {
 

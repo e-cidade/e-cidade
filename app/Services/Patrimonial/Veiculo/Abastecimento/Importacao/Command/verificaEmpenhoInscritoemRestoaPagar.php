@@ -2,17 +2,17 @@
 
 namespace App\Services\Patrimonial\Veiculo\Abastecimento\Importacao\Command;
 
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class verificaEmpenhoInscritoemRestoaPagar
 {
     public function execute(string $codEmp): bool
     {
         $codEmp = explode('/',$codEmp);
-        $anoAtual = date('Y');
+        $anoSistema = db_getsession('DB_anousu');
         $anoEmp = $codEmp[1];
 
-        if($anoEmp < $anoAtual){
+        if($anoEmp < $anoSistema){
 
             $sql = $this->getEmpenhoAbastecimentoRestoaPagar($codEmp[0],$anoEmp);
 

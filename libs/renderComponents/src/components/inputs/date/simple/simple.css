@@ -1,11 +1,11 @@
 /* Datepicker Container */
-.datepicker-container {
+.datepicker-container-V1R77 {
     position: relative;
     max-width: 320px;
     margin-bottom: 15px
 }
 
-.datepicker-container .label {
+.label-V1R77 {
     display: block;
     margin-bottom: 8px;
     font-size: 12px;
@@ -14,32 +14,38 @@
 }
 
 /* Datepicker Input */
-.datepicker-container .datepicker-input {
+.input-V1R77 {
     background-color: #f9fafb;
     border: 1px solid #d1d5db;
     color: #111827;
     font-size: 14px;
     border-radius: 8px;
     width: 100%;
+    cursor: pointer;
 }
 
-.datepicker-container-sm {
-    padding: 0px 25px 0px 25px;
-    height: 28px;
-}
-
-.datepicker-container-md {
-    padding: 0px 25px 0px 25px;
-    height: 28px;
-}
-
-.datepicker-container-lg {
-    padding: 0px 25px 0px 25px;
-    height: 28px;
+.input-V1R77.disabled {
+    background-color: #d1d5db;
+    cursor: not-allowed;
 }
 
 /* Focus Styles */
-.datepicker-container .datepicker-input:focus {
+.input-V1R77:focus {
     border-color: #3b82f6;
     box-shadow: 0 0 0 2px #3b82f6;
+}
+
+.input-V1R77.sm-V1R77 {
+    padding: 0px 25px 0px 25px;
+    height: 28px;
+}
+
+.input-V1R77.md-V1R77 {
+    padding: 0px 25px 0px 25px;
+    height: 28px;
+}
+
+.input-V1R77.lg-V1R77 {
+    padding: 0px 25px 0px 25px;
+    height: 28px;
 }

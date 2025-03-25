@@ -100,7 +100,19 @@ class Liclicita extends LegacyModel
         'l20_horaaberturaprop',
         'l20_horaencerramentoprop',
         'l20_dispensaporvalor',
-        'l20_lances'
+        'l20_lances',
+        'l20_inversaofases',
+        'l20_descrcriterio',
+        'l20_statusenviosicom'
     ];
 
+    public function liclicitem()
+    {
+        return $this->hasMany(Liclicitem::class, 'l21_codliclicita', 'l20_codigo');
+    }
+
+    public function cflicita()
+    {
+        return $this->belongsTo(Cflicita::class, 'l20_codtipocom', 'l03_codigo');
+    }
 }

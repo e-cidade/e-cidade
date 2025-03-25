@@ -189,6 +189,18 @@ db_app::load("scripts.js,
         <!--  <input type=checkbox name=contasemmov > -->
         </td>
     </tr>
+    <tr>
+         <td nowrap align=left>
+            <b>Tipo de Impressão:</b>
+         </td>
+         <td align=left>
+
+	      	 <select id='tipodeconta' name='tipodeconta' class="ComboRazao">
+	          <option value='pdf'>Pdf</option>
+	          <option value='csv'>Csv</option>
+	        </select>
+        </td>
+    </tr>
      <tr>
         <td nowrap align=left>
             <b>Quebrar Página por Conta:</b>
@@ -294,6 +306,7 @@ function js_imprimir() {
   var contasemmov          = $F('contasemmov');
   var quebrapaginaporconta = $F('quebrapaginaporconta');
   var estrut_inicial       = $F('estrut_inicial');
+  var tipodeconta          = $F('tipodeconta');
   var sDocumentos          = "";
   var sVirgulaDocumentos   = "";
   var sContas              = "";
@@ -340,21 +353,27 @@ function js_imprimir() {
       sQuery += "&contasemmov="          + contasemmov;
       sQuery += "&quebrapaginaporconta=" + quebrapaginaporconta;
       sQuery += "&estrut_inicial="       + estrut_inicial;
-
       
-  if ( retorno == true && $F('relatorio') == 'e') {
+  if (retorno == true) {
+    if (tipodeconta == 'csv') {
+      js_imprimir_csv(sQuery);
+    } else {
 
-    oJanela = window.open('con2_razaoporcontas003.php?'+sQuery,'','width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0 ');
-    oJanela.moveTo(0,0);
+      if ($F('relatorio') == 'e') {
+        oJanela = window.open('con2_razaoporcontas003.php?'+sQuery,'','width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0 ');
+        oJanela.moveTo(0,0);
+      } else {
+        oJanela = window.open('con2_razaocontas002.php?'+sQuery,'','width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0 ');
+        oJanela.moveTo(0,0);
+      }
+    }
   }
+}
 
-  if ( retorno == true && $F('relatorio') != 'e'){
-
-    oJanela = window.open('con2_razaocontas002.php?'+sQuery,'','width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0 ');
-    oJanela.moveTo(0,0);
-  }
-
-
+function js_imprimir_csv(sQuery) {
+  // Criar nova janela para download do CSV
+  oJanela = window.open('con2_razaocontas002_csv.php?'+sQuery,'','width=1,height=1');
+  oJanela.moveTo(0,0);
 }
 
 </script>

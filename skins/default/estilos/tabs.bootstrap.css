@@ -1,0 +1,61 @@
+.tab-container {
+  width: 100%;
+  max-width: 100%;
+  margin: 20px auto;
+}
+
+.tabs {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin-bottom: 0;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.tabs .tab {
+  flex: 1;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-bottom: none; /* Removido para criar a conexão visual com o conteúdo */
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  font-size: 16px;
+  color: #495057;
+  border-radius: 5px 5px 0 0;
+}
+
+.tabs .tab:last-child {
+  margin-right: 0;
+}
+
+.tabs .tab:hover {
+  background-color: #e9ecef;
+}
+
+.tabs .tab.active {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-bottom: none; /* Removido para integrar ao conteúdo */
+  color: #495057;
+  font-weight: bold;
+  z-index: 1; /* Garante que a aba ativa fique sobre o conteúdo */
+}
+
+.tabs .tab[data-locked="true"] {
+  background-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.tab-content {
+  padding: 20px;
+  border: 1px solid #dee2e6;
+  border-top: none; /* Removido para integrar ao estilo da aba ativa */
+  background-color: #fff;
+  /* font-size: 16px; */
+  /* line-height: 1.5; */
+  /* color: #495057; */
+  margin-top: -1px; /* Ajuste fino para remover qualquer gap entre a aba e o conteúdo */
+}

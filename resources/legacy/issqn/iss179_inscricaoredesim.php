@@ -51,7 +51,7 @@ db_menu();
 ?>
 </body>
 <script>
-    const route = 'api/v1/redesim/companiesReport';
+    const route = 'web/redesim/companiesReport';
     const btnGerar = document.getElementById('btnGerar');
     const dataInicio = document.getElementById('data1');
     const dataFim = document.getElementById('data2');

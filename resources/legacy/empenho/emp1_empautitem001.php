@@ -275,6 +275,10 @@ if (isset($autori_importa)) {
     <title>DBSeller Inform&aacute;tica Ltda - P&aacute;gina Inicial</title>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <meta http-equiv="Expires" CONTENT="0">
+	<?
+
+	db_app::load("scripts.js, prototype.js, datagrid.widget.js,windowAux.widget.js,messageboard.widget.js, strings.js, AjaxRequest.js,widgets/dbautocomplete.widget.js");
+	?>
     <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
     <link href="estilos.css" rel="stylesheet" type="text/css">
 </head>
@@ -341,6 +345,3 @@ if (isset($consultando)) {
     echo "<script>document.form1.e55_item.focus();</script>";
 }
 ?>
-<script>
-    document.form1.e55_unid.value = 1;
-</script>

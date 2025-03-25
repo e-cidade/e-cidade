@@ -1,33 +1,14 @@
-.tooltip-default {
-    position: relative;
-    display: none;
-    padding: 5px;
-}
-
-.tooltip-default-text {
-    visibility: hidden;
-    opacity: 0;
-    background-color: #dbdbdb;
+.tooltip-default-K835A {
     color: #333;
     text-align: center;
     border-radius: 5px;
     padding: 5px;
     position: absolute;
     z-index: 10;
-    top: 120%; /* Ajusta a posição do tooltip abaixo do ícone */
-    left: 50%;
-    transform: translateX(-50%); /* Centraliza o tooltip horizontalmente */
-    transition: opacity 0.3s ease-in-out;
     font-size: 12px;
 }
 
-.tooltip-default:hover .tooltip-default-text,
-.tooltip-default:focus .tooltip-default-text {
-    visibility: visible;
-    opacity: 1;
-}
-
-.tooltip-default-text::after {
+.bottom-K835A::after {
     content: '';
     position: absolute;
     bottom: 100%; /* Posição da seta acima do tooltip */
@@ -35,36 +16,64 @@
     transform: translateX(-50%);
     border-width: 5px;
     border-style: solid;
-    border-color: transparent transparent #dbdbdb transparent;
-    /* A seta agora aponta para cima */
+}
+
+.right-K835A::after {
+    content: '';
+    position: absolute;
+    top: 50%; /* Centraliza a seta verticalmente */
+    right: 100%; /* Posiciona a seta à esquerda do tooltip */
+    transform: translateY(-50%);
+    border-width: 5px;
+    border-style: solid;
+}
+
+.left-K835A::after {
+    content: '';
+    position: absolute;
+    top: 50%; /* Centraliza a seta verticalmente */
+    left: 100%; /* Posiciona a seta à direita do tooltip */
+    transform: translateY(-50%);
+    border-width: 5px;
+    border-style: solid;
+}
+
+.top-K835A::after {
+    content: '';
+    position: absolute;
+    top: 100%; /* Posição da seta abaixo do tooltip */
+    left: 50%; /* Centraliza a seta horizontalmente */
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
 }
 
 /* Auto (auto) - auto */
-.tooltip-default-auto {
+.tooltip-default-K835A.auto {
     width: auto;
 }
 
 /* Extra Large (XL) - 900px */
-.tooltip-default-xl {
+.tooltip-default-K835A.xl {
     width: 900px;
 }
 
 /* Large (LG) - 700px */
-.tooltip-default-lg {
+.tooltip-default-K835A.lg {
     width: 700px;
 }
 
 /* Medium (MD) - 500px */
-.tooltip-default-md {
+.tooltip-default-K835A.md {
     width: 500px;
 }
 
 /* Small (SM) - 300px */
-.tooltip-default-sm {
+.tooltip-default-K835A.sm {
     width: 300px;
 }
 
-.tooltip-line {
+.tooltip-default-K835A-line {
     border: none;
     height: 1px;
     background-color: #b5b5b594;

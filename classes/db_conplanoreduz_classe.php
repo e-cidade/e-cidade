@@ -759,5 +759,100 @@ class cl_conplanoreduz {
 
     return $sSqlReduz;
   }
+
+  public function sql_razaocontas($iAnousu, $txt_where)
+  {
+    $sSqlReduz = "SELECT conplanoreduz.c61_codcon,
+                         conplanoreduz.c61_reduz,
+          		           conplano.c60_estrut,
+                         conplano.c60_descr,
+                         conplano.c60_codcon
+                    FROM conplanoreduz ";
+
+    $sSqlReduz .= " inner join conplano     on c60_codcon = conplanoreduz.c61_codcon and c60_anousu=conplanoreduz.c61_anousu ";
+    $sSqlReduz .= " where conplanoreduz.c61_anousu = " . $iAnousu . " and " . $txt_where;
+    $sSqlReduz .= " order by conplano.c60_estrut";
+
+    return $sSqlReduz;
+
+  }
+
+  public function sql_razaocontasregistros($iAnousu, $txt_where)
+  {
+    $sSqlReduz = "select distinct conplanoreduz.c61_codcon,
+                        conplanoreduz.c61_reduz,
+                            conplano.c60_estrut,
+                        conplano.c60_descr as conta_descr,
+                            c69_codlan,
+                        c69_sequen,
+                        c69_data,
+                        c69_codhist,
+                        c53_coddoc,
+                        c53_descr,
+                        c69_debito,
+                                debplano.c60_descr as debito_descr,
+                        c69_credito,
+                                credplano.c60_descr as credito_descr,
+                        c69_valor,
+                        case when c71_coddoc = 980
+                            then c28_tipo
+                            else (case when c69_debito = conplanoreduz.c61_reduz
+                            then 'D'
+                            else 'C'
+                        end) end as tipo,
+                                    c50_codhist,
+                        c50_descr,
+                        c74_codrec,
+                        c79_codsup,
+                        c75_numemp,
+                        e60_codemp,
+                        e60_resumo,
+                        e60_anousu,
+                        c73_coddot,
+                        c76_numcgm,
+                        c78_chave,
+                        c72_complem ,
+                        z01_numcgm,
+                        z01_nome,
+                        ( select k81_codpla
+                            from conlancamcorrente
+                                    inner join corplacaixa on k82_data = c86_data and k82_id = c86_id and k82_autent = c86_autent
+                                    inner join placaixarec on k81_seqpla = k82_seqpla
+                            where c86_conlancam = c69_codlan ) as planilha,
+
+                        ( select distinct c84_slip
+                            from conlancamcorrente
+                                    inner join corlanc on c86_id     = k12_id
+                                                    and c86_data   = k12_data
+                                                    and c86_autent = k12_autent
+                                    inner join conlancamslip on c84_slip = k12_codigo
+                            where c86_conlancam = c69_codlan) as slip
+
+                    from conplanoreduz";
+    $sSqlReduz .= " inner join conlancamval on  c69_anousu=conplanoreduz.c61_anousu and ( c69_debito=conplanoreduz.c61_reduz or c69_credito = conplanoreduz.c61_reduz)";
+    $sSqlReduz .= " inner join conplano     on c60_codcon = conplanoreduz.c61_codcon and c60_anousu=conplanoreduz.c61_anousu";
+    $sSqlReduz .= " inner join conplanoreduz debval on debval.c61_anousu = conlancamval.c69_anousu and debval.c61_reduz  = conlancamval.c69_debito";
+    $sSqlReduz .= " inner join conplano  debplano  on debplano.c60_anousu = debval.c61_anousu and debplano.c60_codcon = debval.c61_codcon";
+    $sSqlReduz .= " inner join conplanoreduz credval on credval.c61_anousu = conlancamval.c69_anousu and credval.c61_reduz  = conlancamval.c69_credito";
+    $sSqlReduz .= " inner join conplano  credplano  on credplano.c60_anousu = credval.c61_anousu and credplano.c60_codcon = credval.c61_codcon";
+    $sSqlReduz .= " left join conhist          on c50_codhist = c69_codhist";
+    $sSqlReduz .= " left join conlancamdoc on c71_codlan  = c69_codlan";
+    $sSqlReduz .= " left join conhistdoc   on c53_coddoc  = conlancamdoc.c71_coddoc";
+    $sSqlReduz .= " left join conlancamrec on c74_codlan = c69_codlan and c74_anousu = c69_anousu";
+    $sSqlReduz .= " left join conlancamsup on c79_codlan = c69_codlan";
+    $sSqlReduz .= " left join conlancamemp on c75_codlan = c69_codlan";
+    $sSqlReduz .= " left join empempenho   on  e60_numemp = conlancamemp.c75_numemp";
+    $sSqlReduz .= " left join conlancamdot on c73_codlan = c69_codlan and c73_anousu = c69_anousu";
+    $sSqlReduz .= " left join conlancamcgm on c76_codlan = c69_codlan";
+    $sSqlReduz .= " left join cgm on z01_numcgm = c76_numcgm";
+    $sSqlReduz .= " left join conlancamdig on c78_codlan = c69_codlan";
+    $sSqlReduz .= " left join conlancamcompl on c72_codlan = c69_codlan";
+    $sSqlReduz .= " left join contacorrentedetalheconlancamval on c28_conlancamval = c69_sequen";
+    $sSqlReduz .= " where conplanoreduz.c61_anousu = {$iAnousu} and {$txt_where}";
+    $sSqlReduz .= " order by conplano.c60_estrut, c69_data,c69_codlan,c69_sequen";
+
+    return $sSqlReduz;
+  }
 }
+
 ?>

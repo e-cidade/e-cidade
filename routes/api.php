@@ -1,13 +1,7 @@
 <?php
 
-use App\Http\Controllers\Api\OrderController;
-use App\Http\Controllers\SoapController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\RedesimController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\WebService\CustomerServices;
-use App\Http\Controllers\WebService\PriceServices;
-use App\Http\Controllers\WebService\StockServices;
-use App\Http\Controllers\WebService\VoucherServices;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +14,10 @@ use App\Http\Controllers\WebService\VoucherServices;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group(['middleware' => ['redesimAuth']], function () {
+    //redesim
+    Route::group(['prefix' => 'redesim'], function () {
+        Route::post('/companies', [RedesimController::class, 'index'])
+            ->name('redesim.companies');
+    });
 });

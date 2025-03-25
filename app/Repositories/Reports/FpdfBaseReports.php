@@ -14,9 +14,9 @@ class FpdfBaseReports extends PDF implements IReports
     private bool $showFile = false;
     private bool $base64Format = false;
 
-    public function __construct($orientation='P',$unit='mm',$format='A4')
+    public function __construct($orientation='P', $unit='mm', $format='A4')
     {
-        parent::FPDF($orientation='P',$unit='mm',$format='A4');
+        parent::FPDF($orientation='P', $unit='mm', $format='A4');
         $this->SetAutoPageBreak(false);
     }
 

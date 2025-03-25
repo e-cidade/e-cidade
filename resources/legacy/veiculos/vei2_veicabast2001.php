@@ -348,6 +348,7 @@ function js_mostraveiccadcomb1(chave1,chave2){
 
 
 <script>
+  document.getElementById('situacao').value = "1";
 function js_mostraveiculos1(chave,chave1,chave2){
   if (chave==false){
     document.form1.ve01_placa.value  = "";

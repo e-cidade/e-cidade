@@ -19,7 +19,7 @@ use App\Repositories\Patrimonial\AcordoVigenciaRepository;
 use App\Services\Contracts\Patrimonial\Aditamento\Command\UpdateAditamentoCommandInterface;
 use App\Services\DTO\Patrimonial\InsertItemDto;
 use Exception;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class UpdateAditamentoCommand implements UpdateAditamentoCommandInterface
 {

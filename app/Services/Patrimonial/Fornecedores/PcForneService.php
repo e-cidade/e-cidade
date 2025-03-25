@@ -3,7 +3,7 @@
 namespace App\Services\Patrimonial\Fornecedores;
 
 use App\Repositories\Patrimonial\Fornecedores\PcForneRepository;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 use Exception;
 
 class PcForneService
@@ -26,7 +26,7 @@ class PcForneService
 
     public function cadastroAutomatico($aDados)
     {
-        
+
         $rsCgm = DB::select("select * from cgm where z01_numcgm = {$aDados["pc60_numcgm"]}")[0];
 
         if($rsCgm->z01_cgccpf == "00000000000"){
@@ -42,14 +42,14 @@ class PcForneService
         if($rsPcForne){
             throw new Exception( "Usuário: Erro ao cadastrar fornecedor. Já existe fornecedor cadastrado para o CPF '{$rsCgm->z01_cgccpf}'. CGM cadastrado: '{$rsCgm->z01_numcgm}'. CPF: '{$rsCgm->z01_cgccpf}'");
         }
-        
+
         $result = $this->PcForneRepository->cadastroAutomatico($aDados);
         return $result;
     }
 
     /**
      *
-     * @param int $cgm 
+     * @param int $cgm
      * @return PcForne
      */
 

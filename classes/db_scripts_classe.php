@@ -880,6 +880,13 @@ class cl_scripts
                                     (SELECT e60_numemp
                                         FROM w_empenhos));
 
+                        DELETE FROM contacorrentedetalheconlancamval
+                        WHERE c28_contacorrentedetalhe IN
+                        (SELECT c19_sequencial FROM contacorrentedetalhe 
+                            WHERE c19_numemp IN
+                                (SELECT e60_numemp
+                                    FROM w_empenhos));
+
                         DELETE FROM contacorrentedetalhe
                             WHERE c19_numemp IN
                                 (SELECT e60_numemp
@@ -1421,6 +1428,93 @@ class cl_scripts
     function ajustaSaldoContasLancamento($aDadosLancamentos, $dtData, $descrLog): bool
     {
         $ano = db_getsession('DB_anousu');
+        $resmanut = db_query("select nextval('db_manut_log_manut_sequencial_seq') as seq");
+        $seq = pg_result($resmanut, 0, 0);
+
+        $sessionDataUsu = db_getsession('DB_datausu');
+        $sessionUserId = db_getsession('DB_id_usuario');
+
+        if (!$aDadosLancamentos){
+            $dataAcerto = $dtData;
+            $mesDataAcerto = intval(date('m', strtotime($dataAcerto)));
+            $sqlAcertaContas = "DO $$
+                                DECLARE
+                                    mes_lancamento INTEGER := $mesDataAcerto;
+                                    ano_lancamento INTEGER := $ano;
+                                BEGIN
+                                
+                                  DELETE FROM conplanoexesaldo
+                                  WHERE c68_anousu = ano_lancamento
+                                    AND c68_mes >= mes_lancamento;
+                                
+                                  CREATE TEMP TABLE landeb ON COMMIT DROP AS
+                                  SELECT c69_anousu,
+                                         c69_debito,
+                                         to_char(c69_data, 'MM')::integer,
+                                         sum(round(c69_valor,2)),
+                                         0::float8
+                                  FROM conlancamval
+                                  WHERE c69_anousu = ano_lancamento
+                                    AND to_char(c69_data, 'MM')::integer >= mes_lancamento
+                                  GROUP BY c69_anousu,
+                                           c69_debito,
+                                           to_char(c69_data, 'MM')::integer;
+                                
+                                  CREATE TEMP TABLE lancre ON COMMIT DROP AS
+                                  SELECT c69_anousu,
+                                         c69_credito,
+                                         to_char(c69_data,'MM')::integer,
+                                         0::float8,
+                                         sum(round(c69_valor,2))
+                                  FROM conlancamval
+                                  WHERE c69_anousu = ano_lancamento
+                                    AND to_char(c69_data, 'MM')::integer >= mes_lancamento
+                                  GROUP BY c69_anousu,
+                                           c69_credito,
+                                           to_char(c69_data,'MM')::integer;
+                                
+                                  INSERT INTO conplanoexesaldo
+                                  SELECT * FROM landeb;
+                                
+                                  UPDATE conplanoexesaldo
+                                  SET c68_credito = lancre.sum
+                                  FROM lancre
+                                  WHERE c68_anousu = lancre.c69_anousu
+                                    AND c68_reduz = lancre.c69_credito
+                                    AND c68_mes = lancre.to_char
+                                    AND c68_anousu = ano_lancamento;
+                                
+                                  DELETE FROM lancre USING conplanoexesaldo
+                                  WHERE lancre.c69_anousu = conplanoexesaldo.c68_anousu
+                                    AND conplanoexesaldo.c68_reduz = lancre.c69_credito
+                                    AND conplanoexesaldo.c68_mes = lancre.to_char
+                                    AND c68_anousu = ano_lancamento;
+                                
+                                  INSERT INTO conplanoexesaldo
+                                  SELECT * FROM lancre
+                                  WHERE c69_anousu = ano_lancamento;
+                                
+                                
+                                END $$";
+
+            $result = db_query($sqlAcertaContas);
+
+            if ($result === false) {
+                $this->erro_msg = @pg_last_error();
+                $this->erro = true;
+                return false;
+            }
+
+            $sqlInsert = "INSERT INTO db_manut_log VALUES ($seq, '$descrLog', $sessionDataUsu, $sessionUserId)";
+            $rsInsert = db_query($sqlInsert);
+            if ($rsInsert === false) {
+                $this->erro_msg = @pg_last_error();
+                $this->erro = true;
+                return false;
+            }
+
+            return true;
+        }
 
         foreach ($aDadosLancamentos as $oDadosLancamentos) {
 
@@ -1491,12 +1585,6 @@ class cl_scripts
             }
         }
 
-
-        $resmanut = db_query("select nextval('db_manut_log_manut_sequencial_seq') as seq");
-        $seq = pg_result($resmanut, 0, 0);
-
-        $sessionDataUsu = db_getsession('DB_datausu');
-        $sessionUserId = db_getsession('DB_id_usuario');
 
         $sqlInsert = "INSERT INTO db_manut_log VALUES ($seq, '$descrLog', $sessionDataUsu, $sessionUserId)";
         $rsInsert = db_query($sqlInsert);

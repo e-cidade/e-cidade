@@ -114,7 +114,7 @@ function db_inputdatasaude( $intEspecmed,
         <?=$jsRetornoCal?>
       }
     </script>
-    <?
+    <?php
     if (isset($dbtype) && strtolower($dbtype) == strtolower('hidden')) {
       $sButtonType = "hidden";
     }
@@ -129,12 +129,11 @@ function db_inputdatasaude( $intEspecmed,
     } else {
 
       if ( !$lTodosDias ) {
-
         ?>
         <input value="D"
                type="<?=$sButtonType?>"
                name="dtjs_<?=($nomevar==""?$nome:$nomevar)?>"
-               onclick="<?=$onclickBT?>pegaPosMouse(event);show_calendarsaude('<?=($nomevar==""?$nome:$nomevar)?>','<?=$shutdown_function?>',<?=$intEspecmed ?>, <?=$iUpsSolicitante?>, <?=$iUpsPrestadora?>)"  >
+               onclick="<?=$onclickBT?>pegaPosMouse(event);show_calendarsaude('<?=($nomevar==""?$nome:$nomevar)?>', '<?=$shutdown_function?>', <?=$intEspecmed ?>, <?=$iUpsSolicitante?>, <?=$iUpsPrestadora?>)"  >
         <?
       } else {
 

@@ -204,7 +204,7 @@ function cabecalhoViagem($oPdf) {
   $oPdf->cell(  15, 4, "HR SAÍDA",    1, 0, "C", 1);
   $oPdf->cell(  60, 4, "LOCAL SAÍDA", 1, 0, "C", 1);
   $oPdf->cell(  20, 4, "TELEFONE",    1, 0, "C", 1);
-  $oPdf->cell(  20, 4, "IDENTIDADE",  1, 0, "C", 1);
+  $oPdf->cell(  20, 4, "CARTÃO SUS",  1, 0, "C", 1);
   $oPdf->cell(  28, 4, "ASSINATURA",  1, 1, "C", 1);
   $oPdf->setFont("arial", "", 7);
 }
@@ -347,7 +347,7 @@ function imprimeModeloViagem( $aPedidos, $oPdf ) {
       $oPdf->cell(  15, 4, $oPaciente->hora_saida,                 1, 0, "C");
       $oPdf->cell(  60, 4, substr($oPaciente->local_saida, 0, 34), 1, 0, "L");
       $oPdf->cell(  20, 4, $oPaciente->telefone,                   1, 0, "L");
-      $oPdf->cell(  20, 4, substr($oPaciente->identidade, 0, 13),  1, 0, "L");
+      $oPdf->cell(  20, 4, substr($oPaciente->cartaosus, 0, 13),  1, 0, "L");
       $oPdf->cell(  28, 4, "",                                     1, 1, "C");
 
       if ( count($oPaciente->aAcompanhante) > 0 ) {

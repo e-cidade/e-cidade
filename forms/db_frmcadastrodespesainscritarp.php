@@ -126,44 +126,42 @@
     }, Atualizar);
   }
 
-  function Atualizar(oRetorno){
-    var valoresSicom = JSON.parse(oRetorno.responseText.urlDecode());
-    if(valoresSicom == 0){
-      alert('Gere o arquivo CTB do mês de dezembro para atualizar a disponibilidade');
-      return false;
+  function Atualizar(oRetorno) {
+    try {
+        var valoresSicom = JSON.parse(oRetorno.responseText.urlDecode());
+
+        if (valoresSicom == 0) {
+            alert('Gere o arquivo CTB do mês de dezembro para atualizar a disponibilidade');
+            return false;
+        }
+
+        valoresSicom.oDados.forEach(function (dadosfonte, b) {
+            try {
+                Object.keys(dadosfonte).forEach(function (fonte) {
+                    try {
+                        if (dadosfonte[fonte].vlrcaixabruta !== undefined) {
+                            document.form1['aFonte[' + fonte + '][vlr_dispCaixaBruta]'].value = dadosfonte[fonte].vlrcaixabruta || 0;
+                        }
+
+                        if (dadosfonte[fonte].VlrroexercicioAnteriores !== undefined) {
+                            document.form1['aFonte[' + fonte + '][vlr_rpExerAnteriores]'].value = dadosfonte[fonte].VlrroexercicioAnteriores || 0;
+                        }
+
+                        if (dadosfonte[fonte].vlrDisponibilidade !== undefined) {
+                            document.form1['aFonte[' + fonte + '][vlr_DispCaixa]'].value = dadosfonte[fonte].vlrDisponibilidade || 0;
+                        }
+                    } catch (error) {
+                        console.error(`Erro ao processar a fonte ${fonte}:`, error);
+                    }
+                });
+            } catch (error) {
+                console.error(`Erro ao processar dadosfonte:`, error);
+            }
+        });
+    } catch (error) {
+        console.error('Erro ao processar o retorno:', error);
     }
-
-    valoresSicom.oDados.forEach(function (dadosfonte, b) {
-      Object.keys(dadosfonte).forEach(function (fonte, key) {
-        if(dadosfonte[fonte].vlrcaixabruta == undefined){
-          document.form1['aFonte[' + fonte + '][vlr_dispCaixaBruta]'].value = 0;
-        }else{
-          document.form1['aFonte[' + fonte + '][vlr_dispCaixaBruta]'].value = dadosfonte[fonte].vlrcaixabruta;
-        }
-
-        if(dadosfonte[fonte].VlrroexercicioAnteriores == undefined){
-          document.form1['aFonte[' + fonte + '][vlr_rpExerAnteriores]'].value = 0;
-        }else{
-          document.form1['aFonte[' + fonte + '][vlr_rpExerAnteriores]'].value = dadosfonte[fonte].VlrroexercicioAnteriores;
-        }
-
-        // if(dadosfonte[fonte].vlrrestorecolher == undefined){
-        //   document.form1['aFonte[' + fonte + '][vlr_restArecolher]'].value = 0;
-        // }else{
-        //   document.form1['aFonte[' + fonte + '][vlr_restArecolher]'].value = dadosfonte[fonte].vlrrestorecolher;
-        // }
-        //
-        // if(dadosfonte[fonte].vlrAtivoFian == undefined){
-        //   document.form1['aFonte[' + fonte + '][vlr_restRegAtivoFinan]'].value = 0;
-        // }else{
-        //   document.form1['aFonte[' + fonte + '][vlr_restRegAtivoFinan]'].value = dadosfonte[fonte].vlrAtivoFian;
-        // }
-
-        document.form1['aFonte[' + fonte + '][vlr_DispCaixa]'].value = dadosfonte[fonte].vlrDisponibilidade;
-
-      });
-    });
-  }
+}
 
   function buscarSicom(params, onComplete) {
     js_divCarregando('Carregando Valores', 'div_aguarde');

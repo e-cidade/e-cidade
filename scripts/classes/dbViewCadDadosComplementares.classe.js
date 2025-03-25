@@ -373,6 +373,14 @@ DBViewCadDadosComplementares = function (sId, sNameInstance, iCodigoEndereco, in
     sContent += "         <textarea  id='txtDescrAtividadeServicoEsp" + sId + "' rows='2' style='width:100%'></textarea>";
     sContent += "         </td>";
     sContent += "       </tr>";
+    sContent += "       <tr id='trAtividadeObra" + sId + "' style='display: none'>";
+    sContent += "         <td id='ctnLabelAtividadeObra" + sId + "'  nowrap>";
+    sContent += "           <b>Descrição Atividade Obra:</b>";
+    sContent += "         </td>";
+    sContent += "         <td id='ctnDescrAtividadeObra" + sId + "' colspan='4'>";
+    sContent += "           <textarea  id='txtDescrAtividadeObra" + sId + "' rows='2' style='width:100%' max-length='150'></textarea>";
+    sContent += "         </td>";
+    sContent += "       </tr>";
     sContent += "     </table >";
     sContent += "  </fieldset>";
     sContent += "  </div>";
@@ -1253,6 +1261,16 @@ DBViewCadDadosComplementares = function (sId, sNameInstance, iCodigoEndereco, in
      */
     this.setAtividadeObra = function (iAtividadeObra) {
         this.iAtividadeObra = iAtividadeObra;
+        switch(iAtividadeObra){
+            case '7':
+                $('trAtividadeObra' + sId).style.display = '';
+                $('txtDescrAtividadeObra' + sId).value = '';
+                break;
+            default:
+                $('trAtividadeObra' + sId).style.display = 'none';
+                $('txtDescrAtividadeObra' + sId).value = '';
+                break;
+        }
     }
 
     /**
@@ -1277,6 +1295,7 @@ DBViewCadDadosComplementares = function (sId, sNameInstance, iCodigoEndereco, in
     me.oCboAtividadeObra.addItem(4, 'Recuperação');
     me.oCboAtividadeObra.addItem(5, 'Reforma');
     me.oCboAtividadeObra.addItem(6, 'Restauração');
+    me.oCboAtividadeObra.addItem(7, 'Outros');
     $('ctnAtividadeObra' + sId).observe('change', me.changeAtividadeObra);
     $('cboAtividadeObra' + sId).disabled = true;
 
@@ -4204,6 +4223,11 @@ DBViewCadDadosComplementares = function (sId, sNameInstance, iCodigoEndereco, in
             return false;
         }
 
+        if(me.getAtividadeObra() == '7' && (!$F('txtDescrAtividadeObra' + sId) || $F('txtDescrAtividadeObra' + sId).trim() == '') ){
+            alert('Descrição Arividade Obra é obrigatório!\n\n');
+            return false;
+        }
+
         oEndereco.codigoPais = me.getPais();
         oEndereco.codigoEstado = me.getEstado();
         oEndereco.codigoMunicipio = me.getMunicipio();
@@ -4238,6 +4262,7 @@ DBViewCadDadosComplementares = function (sId, sNameInstance, iCodigoEndereco, in
         oEndereco.sequencial = me.getSequencial();
         oEndereco.sLote = me.sLote;
         oEndereco.lLote = me.exibeLote;
+        oEndereco.descrAtividadeObra = $F('txtDescrAtividadeObra' + sId);
 
         oDados = new Object();
         oDados.exec = 'salvarDadosComplementares';
@@ -4246,6 +4271,7 @@ DBViewCadDadosComplementares = function (sId, sNameInstance, iCodigoEndereco, in
 
         var msgDiv = "Salvando Dados Complementares, aguarde...";
         js_divCarregando(msgDiv, 'msgBox');
+
         var oAjax = new Ajax.Request(
             me.sUrlRpc,
             {
@@ -4490,6 +4516,9 @@ DBViewCadDadosComplementares = function (sId, sNameInstance, iCodigoEndereco, in
         me.preencheSubGrupo(dados.db150_grupobempublico);
         $('cboSubGrupoBemPub' + sId).value = dados.db150_subgrupobempublico;
         me.setSubGrupoBemPublico(dados.db150_subgrupobempublico);
+
+        $('txtDescrAtividadeObra' + sId).value = dados.db150_descratividadeobra;
+        
         $('txtDescrBairro' + sId).value = decodeURI(dados.db150_bairro).replace(/\+/g, ' ');
         $('txtCep' + sId).value = dados.db150_cep;
         $('txtDescrAtividadeServico' + sId).value = unescape(decodeURI(dados.db150_descratividadeservico).replace(/\+/g, ' '));

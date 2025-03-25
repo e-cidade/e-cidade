@@ -1582,6 +1582,7 @@ if (count($aParametrosEmpenho) > 0) {
             var dtAutoriza           = $F('e42_dtpagamento');
             var nValorRetencao       = js_strToFloat(aMovimentos[iMov].aCells[14].getValue());
             var lRetencaoMesAnterior = $('validarretencao'+iCodMov).innerHTML;
+            var numEmpenho           = aMovimentos[iMov].aCells[2].getValue();
 
             if (iForma != 1 && iForma != 2) {
                 var sNumDoc          = aMovimentos[iMov].aCells[10].getValue().trim();
@@ -1657,6 +1658,7 @@ if (count($aParametrosEmpenho) > 0) {
             oMovimento.iCodNota          = iNota;
             oMovimento.nValorRetencao    = nValorRetencao.valueOf();
             oMovimento.sConCarPeculiar   = sConCarPeculiar;
+            oMovimento.empenho           = numEmpenho;
 
             if (iForma != 1 && iForma != 2) {
                 oMovimento.sNumDoc       = sNumDoc;

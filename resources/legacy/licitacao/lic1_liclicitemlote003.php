@@ -25,6 +25,8 @@
  *                                licenca/licenca_pt.txt
  */
 
+use App\Repositories\Patrimonial\Licitacao\LicLicitaLotesRepository;
+
 require("libs/db_stdlib.php");
 require("libs/db_conecta.php");
 include("libs/db_sessoes.php");
@@ -85,17 +87,22 @@ if (isset($excluir) && trim($excluir) != "") {
     }
 
     if (!$sqlerro) {
+        $liclicitalotesRepository = new LicLicitaLotesRepository();
 
         for ($i = 0; $i < sizeof($vetor_lotes); $i++) {
+            $clliclicitemlote->excluir(null, "l04_descricao = '" . trim($vetor_lotes[$i]) . "' AND l04_liclicitem IN (SELECT l21_codigo FROM liclicitem WHERE l21_codliclicita = {$licitacao})");
 
-            $clliclicitemlote->excluir(null, "l04_descricao = '" . trim($vetor_lotes[$i]) . "'");
+            $oLote = $liclicitalotesRepository->getLoteByName(trim($vetor_lotes[$i]), $licitacao);
+            if(!empty($oLote)){
+                $liclicitalotesRepository->delete($oLote);
+            }
 
             if ($clliclicitemlote->erro_status == 0) {
                 $erro_msg = $clliclicitemlote->erro_msg;
                 $sqlerro = true;
                 break;
             }
-        }
+        }        
     }
 
     if (!$sqlerro) {

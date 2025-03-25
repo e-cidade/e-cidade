@@ -207,6 +207,10 @@ if (isset($oGet->chavepesquisa) && $oGet->chavepesquisa != "") {
     
     $e70_vlranu       =  $oNota->e70_vlranu;
     $e70_vlrliq       =  $oNota->e70_vlrliq;
+    $c75_data     =  explode("-", $oNota->c75_data);
+    $c75_data_dia =  $c75_data[2];
+    $c75_data_mes =  $c75_data[1];
+    $c75_data_ano =  $c75_data[0];
     
     $oDaoEmpnotadados = new cl_empnotadadospit;
     $sSqlDadosPit     = $oDaoEmpnotadados->sql_query_notas(null, 
@@ -222,6 +226,13 @@ if (isset($oGet->chavepesquisa) && $oGet->chavepesquisa != "") {
       }
       db_fieldsmemory($rsDadosPit, 0);
     }
+
+    /**
+     * controle de encerramento peri. contabil
+     */
+    $clcondataconf = new cl_condataconf;
+    $resultControle = $clcondataconf->sql_record($clcondataconf->sql_query_file(db_getsession('DB_anousu'), db_getsession('DB_instit'), 'c99_data'));
+    db_fieldsmemory($resultControle, 0);
   } else {
   	$lMsgError = true;
   }

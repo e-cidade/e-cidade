@@ -102,7 +102,7 @@ switch ($oParam->exec) {
     case 'getMembros':
 
         try {
-
+                 
             $oAcordo = new AcordoComissao($oParam->iAcordo);
 
             $oAcordoStd = new stdClass();
@@ -113,20 +113,19 @@ switch ($oParam->exec) {
             $oAcordoStd->sDataFinal   = $oAcordo->getDataInicial();
             $oAcordoStd->aMembros     = array();
 
-            foreach ($oAcordo->getMembros() as $oM) {
+                foreach ($oAcordo->getMembros() as $oM) {
 
-                $oMemb = new stdClass();
-
-                $oMemb->iCodigo           = $oM->getCodigo();
-                $oMemb->iCodigoCgm        = $oM->getCodigoCgm();
-                $oMemb->sNome             = urlencode($oM->getNome());
-                $oMemb->iCodigoComissao   = $oM->getCodigoComissao();
-                $oMemb->iResponsabilidade = $oM->getResponsabilidade();
-
-                $oAcordoStd->aMembros[] = $oMemb;
-            }
-
-
+                    $oMemb = new stdClass();
+    
+                    $oMemb->iCodigo           = $oM->getCodigo();
+                    $oMemb->iCodigoCgm        = $oM->getCodigoCgm();
+                    $oMemb->sNome             = urlencode($oM->getNome());
+                    $oMemb->iCodigoComissao   = $oM->getCodigoComissao();
+                    $oMemb->iResponsabilidade = $oM->getResponsabilidade();
+    
+                    $oAcordoStd->aMembros[] = $oMemb;
+                }
+            
             $oRetorno->oAcordo = $oAcordoStd;
         } catch (Exception $eErro) {
 
@@ -157,6 +156,42 @@ switch ($oParam->exec) {
             $oRetorno->message = "Erro de busca";
         }
 
+        break;
+    
+    case 'validacaoDispensaInexibilidade':
+
+        try {
+
+            $rsLicitacao = db_query("select l20_dispensaporvalor from liclicita where l20_codigo = {$oParam->licitacao}");
+            $dispensaporvalor  = db_utils::fieldsMemory($rsLicitacao, 0)->l20_dispensaporvalor;
+
+            if($dispensaporvalor == 't'){
+                throw new Exception('Usuário: O processo selecionado é uma Dispensa por valor, sendo assim, o tipo origem correto é 1 - Dispensa por valor');
+            }
+
+        } catch (Exception $eErro) {
+            $oRetorno->status  = 2;
+            $oRetorno->message = urlencode(str_replace("\\n", "\n", $eErro->getMessage()));
+        }
+
+        break;
+
+    case 'validacaoDispensaValor':
+
+            try {
+    
+                $rsLicitacao = db_query("select l20_dispensaporvalor from liclicita where l20_codigo = {$oParam->licitacao}");
+                $dispensaporvalor  = db_utils::fieldsMemory($rsLicitacao, 0)->l20_dispensaporvalor;
+    
+                if($dispensaporvalor != 't'){
+                    throw new Exception('Usuário: O processo selecionado não se trata de Dispensa por valor, sendo assim, o tipo origem correto é 3 - Dispensa ou Inexigibilidade.');
+                }
+    
+            } catch (Exception $eErro) {
+                $oRetorno->status  = 2;
+                $oRetorno->message = urlencode(str_replace("\\n", "\n", $eErro->getMessage()));
+            }
+    
         break;
 
     case 'getAcordo':
@@ -996,38 +1031,38 @@ switch ($oParam->exec) {
             $oPcmater = new MaterialCompras($oParam->material->iMaterial);
             $db150_coditem = $oPcmater->getMaterial().$oParam->material->iUnidade;
 
-            $clhistoricomaterial = new cl_historicomaterial();
-            $rsHistoricoMaterial = $clhistoricomaterial->sql_record($clhistoricomaterial->sql_query(null,"*",null,"db150_coditem = $db150_coditem"));
+            // $clhistoricomaterial = new cl_historicomaterial();
+            // $rsHistoricoMaterial = $clhistoricomaterial->sql_record($clhistoricomaterial->sql_query(null,"*",null,"db150_coditem = $db150_coditem"));
 
             $clpcmater = new cl_pcmater();
-            if(pg_num_rows($rsHistoricoMaterial) == 0 ){
-                $rsMaterial = $clpcmater->sql_record($clpcmater->sql_query(null,"pc01_descrmater,pc01_complmater",null,"pc01_codmater = {$oPcmater->getMaterial()}"));
-                $oMaterial = db_utils::fieldsmemory($rsMaterial, 0);
+            // if(pg_num_rows($rsHistoricoMaterial) == 0 ){
+            //     $rsMaterial = $clpcmater->sql_record($clpcmater->sql_query(null,"pc01_descrmater,pc01_complmater",null,"pc01_codmater = {$oPcmater->getMaterial()}"));
+            //     $oMaterial = db_utils::fieldsmemory($rsMaterial, 0);
 
-                $clmatunid = new cl_matunid();
-                $rsMatunid = $clmatunid->sql_record($clmatunid->sql_query_file($oParam->material->iUnidade));
-                $oMatunid = db_utils::fieldsmemory($rsMatunid, 0);
-                $dataInicioPeriodo = implode('-',array_reverse(explode('/',$oParam->material->aPeriodo[0]->dtDataInicial)));
+            //     $clmatunid = new cl_matunid();
+            //     $rsMatunid = $clmatunid->sql_record($clmatunid->sql_query_file($oParam->material->iUnidade));
+            //     $oMatunid = db_utils::fieldsmemory($rsMatunid, 0);
+            //     $dataInicioPeriodo = implode('-',array_reverse(explode('/',$oParam->material->aPeriodo[0]->dtDataInicial)));
 
-                //inserir na tabela historico material
-                $clhistoricomaterial->db150_tiporegistro              = 10;
-                $clhistoricomaterial->db150_coditem                   = $db150_coditem;
-                $clhistoricomaterial->db150_pcmater                   = $oPcmater->getMaterial();
-                $clhistoricomaterial->db150_dscitem                   = substr($oMaterial->pc01_descrmater.'-'.$oMaterial->pc01_complmater,0,999);
-                $clhistoricomaterial->db150_unidademedida             = $oMatunid->m61_descr;
-                $clhistoricomaterial->db150_tipocadastro              = 1;
-                $clhistoricomaterial->db150_justificativaalteracao    = '';
-                $clhistoricomaterial->db150_mes                       = explode('/',$oParam->material->aPeriodo[0]->dtDataInicial)[1];
-                $clhistoricomaterial->db150_data                      = $dataInicioPeriodo;
-                $clhistoricomaterial->db150_instit                    = db_getsession('DB_instit');
-                $clhistoricomaterial->incluir(null);
+            //     //inserir na tabela historico material
+            //     $clhistoricomaterial->db150_tiporegistro              = 10;
+            //     $clhistoricomaterial->db150_coditem                   = $db150_coditem;
+            //     $clhistoricomaterial->db150_pcmater                   = $oPcmater->getMaterial();
+            //     $clhistoricomaterial->db150_dscitem                   = substr($oMaterial->pc01_descrmater.'-'.$oMaterial->pc01_complmater,0,999);
+            //     $clhistoricomaterial->db150_unidademedida             = $oMatunid->m61_descr;
+            //     $clhistoricomaterial->db150_tipocadastro              = 1;
+            //     $clhistoricomaterial->db150_justificativaalteracao    = '';
+            //     $clhistoricomaterial->db150_mes                       = explode('/',$oParam->material->aPeriodo[0]->dtDataInicial)[1];
+            //     $clhistoricomaterial->db150_data                      = $dataInicioPeriodo;
+            //     $clhistoricomaterial->db150_instit                    = db_getsession('DB_instit');
+            //     $clhistoricomaterial->incluir(null);
 
-                if ($clhistoricomaterial->erro_status == 0) {
-                    $sqlerro = true;
-                    $msg_alert = $clhistoricomaterial->erro_msg;
-                    throw new Exception("Erro na inclusão na historicomaterial código do material:\n\n{$clhistoricomaterial->erro_msg}");
-                }
-            }
+            //     if ($clhistoricomaterial->erro_status == 0) {
+            //         $sqlerro = true;
+            //         $msg_alert = $clhistoricomaterial->erro_msg;
+            //         throw new Exception("Erro na inclusão na historicomaterial código do material:\n\n{$clhistoricomaterial->erro_msg}");
+            //     }
+            // }
 
             $oItemContrato = new AcordoItem();
             $oContrato     = $_SESSION["oContrato"];
@@ -1687,6 +1722,7 @@ switch ($oParam->exec) {
             $oDocumentos      = new stdClass();
             $oDocumentos->iCodigo    = $aAcordoDocumento[$i]->getCodigo();
             $oDocumentos->iAcordo    = $aAcordoDocumento[$i]->getCodigoAcordo();
+            $oDocumentos->sNomeArquivo = $aAcordoDocumento[$i]->getNomeArquivo();
             $oDocumentos->sDescricao = utf8_encode($aAcordoDocumento[$i]->getDescricao());
             $oRetorno->dados[] = $oDocumentos;
         }

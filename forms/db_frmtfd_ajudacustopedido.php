@@ -1,28 +1,28 @@
 <?
 /*
- *     E-cidade Software Publico para Gestao Municipal                
- *  Copyright (C) 2013  DBselller Servicos de Informatica             
- *                            www.dbseller.com.br                     
- *                         e-cidade@dbseller.com.br                   
- *                                                                    
- *  Este programa e software livre; voce pode redistribui-lo e/ou     
- *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme  
- *  publicada pela Free Software Foundation; tanto a versao 2 da      
- *  Licenca como (a seu criterio) qualquer versao mais nova.          
- *                                                                    
- *  Este programa e distribuido na expectativa de ser util, mas SEM   
- *  QUALQUER GARANTIA; sem mesmo a garantia implicita de              
- *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM           
- *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais  
- *  detalhes.                                                         
- *                                                                    
- *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU     
- *  junto com este programa; se nao, escreva para a Free Software     
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA          
- *  02111-1307, USA.                                                  
- *  
- *  Copia da licenca no diretorio licenca/licenca_en.txt 
- *                                licenca/licenca_pt.txt 
+ *     E-cidade Software Publico para Gestao Municipal
+ *  Copyright (C) 2013  DBselller Servicos de Informatica
+ *                            www.dbseller.com.br
+ *                         e-cidade@dbseller.com.br
+ *
+ *  Este programa e software livre; voce pode redistribui-lo e/ou
+ *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme
+ *  publicada pela Free Software Foundation; tanto a versao 2 da
+ *  Licenca como (a seu criterio) qualquer versao mais nova.
+ *
+ *  Este programa e distribuido na expectativa de ser util, mas SEM
+ *  QUALQUER GARANTIA; sem mesmo a garantia implicita de
+ *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM
+ *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais
+ *  detalhes.
+ *
+ *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU
+ *  junto com este programa; se nao, escreva para a Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ *  02111-1307, USA.
+ *
+ *  Copia da licenca no diretorio licenca/licenca_en.txt
+ *                                licenca/licenca_pt.txt
  */
 //MODULO: TFD
 $oDaotfd_ajudacustopedido->rotulo->label();
@@ -136,22 +136,31 @@ $clrotulo->label("tf12_descricao");
               <?=@$Ltf15_observacao?>
             </td>
             <td nowrap>
-              <?
+              <?php
               db_input('tf15_observacao', 62, @$Itf15_observacao, true, 'text', $db_opcao, '');
               ?>
             </td>
           </tr>
           <tr>
             <td nowrap title="<?=@$Ttf14_i_cgsretirou?>">
-              <?=$Ltf15_f_valoremitido?>
+                <strong>Valor Tabela SUS</strong>
             </td>
             <td nowrap>
-              <?
-              db_input('tf15_f_valoremitido', 10, $Itf15_f_valoremitido, true, 'text', 3, '');
-              db_input('tf12_f_valor', 10, '', true, 'hidden', 3, '');
+              <?php
+              db_input('tf12_f_valor', 10, '', true, 'text', 3, '');
               ?>
             </td>
           </tr>
+            <tr>
+                <td nowrap title="<?=@$Ttf14_i_cgsretirou?>">
+                    <strong>Valor Total Emitido</strong>
+                </td>
+                <td nowrap>
+                    <?php
+                    db_input('tf15_f_valoremitido', 10, $Itf15_f_valoremitido, true, 'text', 1, '');
+                    ?>
+                </td>
+            </tr>
           <tr>
             <td colspan="2" align="right">
               <input name="<?=($db_opcao==1?"incluir":($db_opcao==2||$db_opcao==22?"alterar":"excluir"))?>"
@@ -196,7 +205,7 @@ $clrotulo->label("tf12_descricao");
                   tf15_i_ajudacusto,
                   tf15_i_cgsund,
                   tf15_f_valoremitido,
-                  tf15_f_valoremitido as tf12_f_valor,
+                  tf12_f_valor as tf12_f_valor,
                   tf12_descricao,
                   a.z01_v_nome as z01_v_nome2,
                   cgs_und.z01_v_nome,
@@ -316,12 +325,12 @@ function js_validaEnvio() {
 
   }
 
-  if(parseFloat(oF.tf15_f_valoremitido.value) < parseFloat(oF.tf12_f_valor.value)) {
-
-   alert('O valor a ser emitido é menor que o da ajuda de custo.');
-    return true;
-
-  }
+  // if(parseFloat(oF.tf15_f_valoremitido.value) < parseFloat(oF.tf12_f_valor.value)) {
+  //
+  //  alert('O valor a ser emitido é menor que o da ajuda de custo.');
+  //   return true;
+  //
+  // }
 
   return true;
 
@@ -348,7 +357,7 @@ function js_pesquisatf15_i_ajudacusto(mostra) {
   var lAcompanhante = $F('tipo') == 2; // 1 = Paciente,  2 = Acompanhante
 
   var sUrl = "func_tfd_ajudacusto.php?";
-  
+
   if(mostra) {
 
     sUrl += "funcao_js=parent.js_mostraajuda|tf12_i_codigo|tf12_descricao|tf12_f_valor";
@@ -362,7 +371,7 @@ function js_pesquisatf15_i_ajudacusto(mostra) {
       sUrl += "chave_tf12_i_codigo="+$F('tf15_i_ajudacusto');
       sUrl += "&funcao_js=parent.js_mostraajuda|tf12_i_codigo|tf12_descricao|tf12_f_valor";
       sUrl += "&nao_mostra=true&chave_validade=true&lTrazAjudaAutomatico=false&lAcompanhante="+ lPaciente;
-      
+
       js_OpenJanelaIframe('', 'db_iframe_tfd_ajudacusto', sUrl ,'Pesquisa Ajudas de Custo',false);
 
     } else {
@@ -377,7 +386,7 @@ function js_pesquisatf15_i_ajudacusto(mostra) {
 
 }
 function js_mostraajuda(chave1, chave2, chave3) {
-
+console.log(chave1, chave2, chave3);
   if(chave1 == '') {
     chave3 = '';
   }
@@ -462,14 +471,14 @@ function js_pesquisatf15_i_cgsund(mostra) {
 
 /**
  * @param integer chave1 Codigo do paciente
- * @param boolean erro true 
- * @param integer tipo 1 = Paciente, 2 = Acompanhante 
+ * @param boolean erro true
+ * @param integer tipo 1 = Paciente, 2 = Acompanhante
  */
 function js_mostracgsbeneficiados(chave, erro, tipo) {
 
   $('z01_v_nome3').value = chave;
   $('tipo').value        = tipo;
-  
+
   if (erro) {
 
     document.form1.tf15_i_cgsund.focus();
@@ -484,7 +493,7 @@ function js_mostracgsbeneficiados(chave, erro, tipo) {
 /**
  * @param integer chave1 Codigo do paciente
  * @param string  chave2 Nome do paciente
- * @param integer tipo 1 = Paciente, 2 = Acompanhante 
+ * @param integer tipo 1 = Paciente, 2 = Acompanhante
  */
 function js_mostracgsbeneficiados1(chave1,chave2, tipo) {
 

@@ -65,6 +65,7 @@ class cl_obrasdadoscomplementareslote
 	var $db150_lote = null;
 	var $db150_bdi = 0;
 	var $db150_cep = 0;
+	var $db150_descratividadeobra = '';
 	var $db150_seqobrascodigos = 0;
     public $db150_planilhatce = 0;
 
@@ -89,10 +90,11 @@ class cl_obrasdadoscomplementareslote
                     db150_descratividadeservico = varchar(150) = Descrição da Atividade do Serviço
                     db150_atividadeservicoesp = int4 = Atividade do Serviço Especializado
                     db150_descratividadeservicoesp = varchar(150) = Descrição da Atividade do Serviço Especializado
-					db150_lote = real = Número do lote
+										db150_lote = real = Número do lote
                     db150_bdi = numeric = BDI
                     db150_cep = char(8) = CEP
-					db150_seqobrascodigos = int4 = Sequencial da Obra
+										db150_seqobrascodigos = int4 = Sequencial da Obra
+                    db150_descratividadeobra = varchar(150) = Descrição Atividade Obra
                   ";
 
 	//funcao construtor da classe
@@ -136,6 +138,7 @@ class cl_obrasdadoscomplementareslote
 			$this->db150_descratividadeservico = ($this->db150_descratividadeservico == "" ? @$GLOBALS["HTTP_POST_VARS"]["$this->db150_descratividadeservico"] : $this->db150_descratividadeservico);
 			$this->db150_atividadeservicoesp = ($this->db150_atividadeservicoesp == "" ? @$GLOBALS["HTTP_POST_VARS"]["$this->db150_atividadeservicoesp"] : $this->db150_atividadeservicoesp);
 			$this->db150_descratividadeservicoesp = ($this->db150_descratividadeservicoesp == "" ? @$GLOBALS["HTTP_POST_VARS"]["$this->db150_descratividadeservicoesp"] : $this->db150_descratividadeservicoesp);
+			$this->db150_descratividadeobra = ($this->db150_descratividadeobra == "" ? @$GLOBALS["HTTP_POST_VARS"]["$this->db150_descratividadeobra"] : $this->db150_descratividadeobra);
 			$this->db150_grupobempublico = ($this->db150_grupobempublico == "" ? @$GLOBALS["HTTP_POST_VARS"]["$this->db150_grupobempublico"] : $this->db150_grupobempublico);
 			$this->db150_subgrupobempublico = ($this->db150_subgrupobempublico == "" ? @$GLOBALS["HTTP_POST_VARS"]["$this->db150_subgrupobempublico"] : $this->db150_subgrupobempublico);
 			$this->db150_bdi = ($this->db150_bdi == "" ? @$GLOBALS["HTTP_POST_VARS"]["$this->db150_bdi"] : $this->db150_bdi);
@@ -289,6 +292,7 @@ class cl_obrasdadoscomplementareslote
                                         ,db150_cep
 										,db150_lote
 										,db150_seqobrascodigos
+										,db150_descratividadeobra
                         )
                 values (
                                 $this->db150_sequencial
@@ -313,8 +317,9 @@ class cl_obrasdadoscomplementareslote
                                ,$this->db150_subgrupobempublico
                                ,$this->db150_bdi
                                ,'$this->db150_cep'
-							   ,$this->db150_lote
-							   ,$this->db150_seqobrascodigos
+															,$this->db150_lote
+															,$this->db150_seqobrascodigos
+															,'$this->db150_descratividadeobra'
                       )";
 		$result = db_query($sql);
 
@@ -461,6 +466,10 @@ class cl_obrasdadoscomplementareslote
 
 		if (trim($this->db150_subgrupobempublico) != "" || isset($GLOBALS["HTTP_POST_VARS"]["$this->db150_subgrupobempublico"])) {
 			$sql .= $virgula . " db150_subgrupobempublico = $this->db150_subgrupobempublico ";
+			$virgula = ",";
+		}
+		if (trim($this->db150_descratividadeobra) != "" || isset($GLOBALS["HTTP_POST_VARS"]["$this->db150_descratividadeobra"])) {
+			$sql .= $virgula . " db150_descratividadeobra = '$this->db150_descratividadeobra' ";
 			$virgula = ",";
 		}
 		if (trim($this->db150_bdi) != "" || isset($GLOBALS["HTTP_POST_VARS"]["db150_bdi"])) {

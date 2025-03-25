@@ -35,6 +35,7 @@ require_once("libs/db_usuariosonline.php");
 require_once("dbforms/db_funcoes.php");
 require_once("classes/db_coremp_classe.php");
 require_once("classes/db_pagordemnota_classe.php");
+require_once("classes/db_empelemento_classe.php");
 include ("libs/db_liborcamento.php");
 
 $iAnoUsoSessao      = db_getsession("DB_anousu");
@@ -522,8 +523,16 @@ foreach ($aDadosAgrupados as $iIndice => $aDadoEmpenhos) {
     $oPdf->sety($iYlinha + 1);
 
     if($oPost->iPrestacaoConta==2) {
-      $oPdf->multiCell(260, 3, "Histórico: " . $oDadoEmpenho->e60_resumo, 0, "L", 0);
-      $oPdf->sety($iYlinha + 10);
+
+      $clempelemento  = new cl_empelemento;
+      $result     = $clempelemento->sql_record($clempelemento->sql_query($oDadoEmpenho->e60_numemp, null, "e64_codele, o56_elemento,o56_descr","e64_codele"));
+      if ($clempelemento->numrows > 0) {
+          db_fieldsmemory($result,0);
+      }
+
+      $oPdf->multiCell(260, 3, "Desdobramento: " . substr($o56_elemento,1) . ' ' . $o56_descr, 0, "L", 0);
+      trataHistorico($oPdf, $oDadoEmpenho);
+
     }
     $total_nadata += $oDadoEmpenho->k12_valor;
     $count_dados += 1;
@@ -563,4 +572,31 @@ function imprimeCabecalho($oPdf, $iAltura) {
   $oPdf->cell(15, $iAltura, "Tipo",            1, 0, "C", 1);
   $oPdf->cell(17, $iAltura, "Contrato",       1, 1, "C", 1);
   $iYlinha = $oPdf->getY();
+}
+
+/**
+ * @param PDF $oPdf
+ * @param $oDadoEmpenho
+ * @return void
+ */
+function trataHistorico(PDF $oPdf, $oDadoEmpenho): void
+{
+// Guarda a posição inicial
+    $posicaoInicialY = $oPdf->GetY();
+
+    // Define a largura disponível para o texto
+    $larguraDisponivel = $oPdf->w - $oPdf->lMargin - $oPdf->rMargin;
+
+    // Armazena o texto do histórico
+    $textoHistorico = "Histórico: " . $oDadoEmpenho->e60_resumo;
+
+    // Simula a altura necessária para o texto quebrando-o em linhas
+    $linhas = $oPdf->GetStringWidth($textoHistorico) / $larguraDisponivel;
+    $alturaNecessaria = ceil($linhas) * 4; // 4 é a altura da linha
+
+    // Imprime o histórico com a altura correta
+    $oPdf->multiCell($larguraDisponivel, 4, $textoHistorico, 0, "L", 0);
+
+    // Ajusta a posição Y para os próximos elementos, evitando sobreposição
+    $oPdf->SetY($posicaoInicialY + $alturaNecessaria + 2);
 }

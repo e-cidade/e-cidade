@@ -37,8 +37,6 @@ $criteriodeadjudicacao = $criterio[0]->l20_criterioadjudicacao;
 $lote = $itensProposta[0]->l04_descricao;
 
 
-
-
 // Atualizar o cabeçalho da planilha
 $sheet = $objPHPExcel->getActiveSheet();
 

@@ -473,6 +473,7 @@ switch ($oParam->exec) {
       $oEndereco->setLicita($oParam->endereco->licitacao);
       $oEndereco->setSequencial($oParam->endereco->sequencial);
       $oEndereco->setSeqObrasCodigos($oParam->endereco->seqobrascodigo);
+      $oEndereco->setDescricaAtividadeObra($oParam->endereco->descrAtividadeObra);
 
       $oEndereco->salvaDadosComplementares($oParam->acao);
       db_fim_transacao(false);

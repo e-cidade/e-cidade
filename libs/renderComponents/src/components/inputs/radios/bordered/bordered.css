@@ -1,66 +1,67 @@
-  /* Radio Container */
-  .radio-container {
-    display: flex;
-    align-items: center;
-    padding-left: 16px;
-    padding-right: 16px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    background-color: #fff;
-  }
+/* Radio Container */
+.radio-container-075RN {
+  display: flex;
+  align-items: center;
+  padding-left: 16px;
+  padding-right: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  background-color: #fff;
+}
 
-  .radio-container.disabled {
-    background-color: #f5f5f5;
-    border-color: #d1d5db; /* Opcional: altera a cor da borda se necessário */
-  }
+.radio-container-075RN.disabled {
+  background-color: #f5f5f5;
+  border-color: #d1d5db; /* Opcional: altera a cor da borda se necessário */
+}
 
-  /* Radio Input */
-  .radio-input {
-    width: 16px;
-    height: 16px;
-    color: #2563eb;
-    background-color: #f3f4f6;
-    border: 1px solid #d1d5db;
-    border-radius: 50%;
-    appearance: none;
-    outline: none;
-    cursor: pointer;
-    margin: 0;
-  }
+/* Radio Input */
+.radio-input-075RN {
+  width: 16px;
+  height: 16px;
+  color: #2563eb;
+  background-color: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 50%;
+  appearance: none;
+  outline: none;
+  cursor: pointer;
+  margin: 0;
+}
 
-  /* Disabled Radio Input */
-  .radio-input:disabled {
-    background-color: #e5e7eb; /* Cor de fundo para o rádio desativado */
-    cursor: not-allowed;
-  }
+/* Disabled Radio Input */
+.radio-input-075RN:disabled {
+  background-color: #e5e7eb; /* Cor de fundo para o rádio desativado */
+  cursor: not-allowed;
+}
 
-  /* Focus Styles */
-  .radio-input:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px #3b82f6;
-  }
+/* Focus Styles */
+.radio-input-075RN:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px #3b82f6;
+}
 
-  .radio-input:checked {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px #3b82f6;
-  }
+.radio-input-075RN:checked {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px #3b82f6;
+}
 
-  /* Radio Label */
-  .radio-label {
-    display: block;
-    padding: 0px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    margin: 0px 0px 0px 8px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #1f2937;
-  }
+/* Radio Label */
+.radio-label-075RN {
+  display: block;
+  padding: 0px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  margin: 0px 0px 0px 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937;
+  cursor: pointer;
+}
 
-  /* Disabled Radio Label */
-  .radio-label.disabled-label {
-    color: #afafaf !important;
-    cursor: not-allowed !important;
-  }
+/* Disabled Radio Label */
+.radio-label-075RN.disabled {
+  color: #afafaf !important;
+  cursor: not-allowed !important;
+}

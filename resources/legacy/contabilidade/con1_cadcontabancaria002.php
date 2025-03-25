@@ -51,7 +51,8 @@ if (isset($chavepesquisa)) {
 
   $db_opcao = 2;
   $db_opcaonovo = 2;
-  $result   = $clcontabancaria->sql_record($clcontabancaria->sql_query_cadcontanovo($chavepesquisa));
+  $where = "contabancaria.db83_sequencial = {$chavepesquisa} and c61_reduz = {$reduzido} " ;
+  $result   = $clcontabancaria->sql_record($clcontabancaria->sql_query_cadcontanovo(null,'*',null,$where ));
 
   db_fieldsmemory($result, 0);
 

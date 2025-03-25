@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  *     E-cidade Software Publico para Gestao Municipal
  *  Copyright (C) 2014  DBselller Servicos de Informatica
@@ -73,6 +73,7 @@ db_app::load("scripts.js,
     <table valign="top" marginwidth="0" width="600" border="0" cellspacing="0" cellpadding="0">
         <tr>
             <td>&nbsp;</td>
+
         </tr>
         <tr>
             <td valign="top" bgcolor="#CCCCCC">
@@ -81,35 +82,35 @@ db_app::load("scripts.js,
                         <table>
                             <tr>
                                 <td nowrap title="<?= @$Te60_codemp ?>">
-                                    <? db_ancora(@$Le60_codemp, "js_pesquisae60_codemp(true);", 1); ?>
+                                    <?php db_ancora(@$Le60_codemp, "js_pesquisae60_codemp(true);", 1); ?>
                                     <span style="margin-left: 8px;">
-                                     <? db_input('e60_codemp', 13, $Ie60_codemp, true, 'text', $db_opcao, " onchange='js_pesquisae60_codemp(false);'", "e60_codemp_ini") ?>
+                                     <?php db_input('e60_codemp', 13, $Ie60_codemp, true, 'text', $db_opcao, " onchange='js_pesquisae60_codemp(false);'", "e60_codemp_ini") ?>
                                       <strong> / </strong>
-                                     <? db_input('e60_codemp', 13, $Ie60_codemp, true, 'text', $db_opcao, "", "e60_codemp_fim") ?>
+                                     <?php db_input('e60_codemp', 13, $Ie60_codemp, true, 'text', $db_opcao, "", "e60_codemp_fim") ?>
                                     </span>
                                 </td>
                             </tr>
                             <tr>
                                 <td nowrap title="<?= @$Te60_numemp ?>">
-                                    <? db_ancora(@$Le60_numemp, "js_pesquisae60_numemp(true);", 1); ?>
+                                    <?php db_ancora(@$Le60_numemp, "js_pesquisae60_numemp(true);", 1); ?>
                                     <span style="margin-left: 46px;">
-                                           <? db_input('e60_numemp', 13, $Ie60_numemp, true, 'text', $db_opcao, " onchange='js_pesquisae60_numemp(false);'") ?>
+                                           <?php db_input('e60_numemp', 13, $Ie60_numemp, true, 'text', $db_opcao, " onchange='js_pesquisae60_numemp(false);'") ?>
                                       </span>
                                 </td>
                             </tr>
                             <tr>
                                 <td nowrap title="<?= @$Te50_numliquidacao ?>">
                                     <?= @$Le50_numliquidacao ?>
-                                    <? db_input('e50_numliquidacao', 13, $Ie50_numliquidacao, true, 'text', $db_opcao) ?>
+                                    <?php db_input('e50_numliquidacao', 13, $Ie50_numliquidacao, true, 'text', $db_opcao, "", "e50_numliquidacao") ?>
                                 </td>
                             </tr>
                             <tr>
                                 <td nowrap title="<?= @$Te50_codord ?>">
-                                    <b><? db_ancora("Ordem:", "js_pesquisae50_codord(true);", 1); ?></b>
+                                    <b><?php db_ancora("Ordem:", "js_pesquisae50_codord(true);", 1); ?></b>
                                     <span style="margin-left: 91px;">
-                                       <? db_input('e50_codord', 13, $Ie50_codord, true, 'text', $db_opcao, " onchange='js_pesquisae50_codord(false);'", "e50_codord_ini") ?>
+                                       <?php db_input('e50_codord', 13, $Ie50_codord, true, 'text', $db_opcao, " onchange='js_pesquisae50_codord(false);'", "e50_codord_ini") ?>
                                      <strong> / </strong>
-                                     <? db_input('e50_codord', 13, $Ie50_codord, true, 'text', $db_opcao, "", "e50_codord_fim") ?>
+                                     <?php db_input('e50_codord', 13, $Ie50_codord, true, 'text', $db_opcao, "", "e50_codord_fim") ?>
                                     </span>
                                 </td>
                             </tr>
@@ -121,9 +122,9 @@ db_app::load("scripts.js,
                             </tr>
                             <tr>
                                 <td align="left">
-                                    <b> Período: </b>
-                                    <span style="margin-left: 85px;">
-                                    <? db_inputdata('dtini', @$dia, @$mes, @$ano, true, 'text', 1, "");
+                                    <b> Data Pagamento: </b>
+                                    <span style="margin-left: 36px;">
+                                    <?php db_inputdata('dtini', @$dia, @$mes, @$ano, true, 'text', 1, "");
                                     echo " a ";
                                     db_inputdata('dtfim', @$dia, @$mes, @$ano, true, 'text', 1, "");
                                     ?>
@@ -139,9 +140,9 @@ db_app::load("scripts.js,
                             </tr>
 
                             <!-- Oc18018 -->
-                            <tr>
+                            <tr id="fonteRecurso">
                                 <td>
-                                    <?
+                                    <?php
                                     $oFiltroRecursos = new cl_arquivo_auxiliar;
                                     $oFiltroRecursos->cabecalho = "<strong>Recursos</strong>";
                                     $oFiltroRecursos->codigo = "o15_codigo";
@@ -185,7 +186,7 @@ db_app::load("scripts.js,
         </tr>
     </table>
 </center>
-<?
+<?php
 db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsession("DB_anousu"), db_getsession("DB_instit"));
 ?>
 </body>
@@ -385,13 +386,33 @@ db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsessio
             return;
         }
         obj = document.form1;
-        if (obj.e81_codmov.value == '' && obj.dtini.value == ''  && obj.dtfim.value == '') {
-            alert("Selecione um Movimento ou um Período!");
-            return;
-        }
         js_divCarregando('Aguarde, Enviando documentos para assinatura','msgbox');
         var oParametros = new Object();
-        oParametros.codmov = obj.e81_codmov.value;
+        oParametros.codmov            = obj.e81_codmov.value;
+        oParametros.e60_codemp_ini    = obj.e60_codemp_ini.value;
+        oParametros.e60_codemp_fim    = obj.e60_codemp_fim.value;
+        oParametros.e50_codord_ini    = obj.e50_codord_ini.value;
+        oParametros.e50_codord_fim    = obj.e50_codord_fim.value;
+        oParametros.e60_numemp        = obj.e60_numemp.value;
+        oParametros.e50_numliquidacao = obj.e50_numliquidacao.value;
+        oParametros.aFornecedores     = getForncedores();
+        oParametros.aRecursos         = js_campo_recebe_valores_recursos();
+        if(obj.e50_numliquidacao.value !== "" && obj.e60_codemp_ini.value == ""){
+            alert("Informe o Número Empenho!");
+            js_removeObj('msgbox');
+            return;
+        }
+        if (obj.e60_codemp_ini.value == '' && obj.e81_codmov.value == '' && obj.e50_numliquidacao.value == ""
+            && obj.dtini.value == ''
+            && obj.e50_codord_ini.value == ''
+            && obj.e60_numemp.value == ''
+            && oParametros.aFornecedores == ''
+            && oParametros.aRecursos == '') {
+            alert("Selecione pelo menos um filtro!");
+            js_removeObj('msgbox');
+            return;
+        }
+
         var sDtini = obj.dtini.value.split("/");
         var sDtfim = obj.dtfim.value.split("/");
         var dtini_dia = sDtini[0];
@@ -410,8 +431,8 @@ db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsessio
             oParametros.dtfim_mes = dtfim_mes;
             oParametros.dtfim_dia = dtfim_dia;
         }
+
         oParametros.sExecuta = 'enviarOrdemaPagamentoAssinaturaLote';
-        console.log('aqui')
         var oAjax  = new Ajax.Request(
             'con1_assinaturaDigitalDocumentos.RPC.php',
             {
@@ -434,12 +455,34 @@ db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsessio
 
     function js_solicitarImpressaoComAssinatura() {
         obj = document.form1;
-        if (obj.e81_codmov.value == '' && obj.dtini.value == '') {
-            alert("Selecione um movimento ou um perído de datas!");
+        if (!confirm("Esse procedimento pode demorar um pouco. Deseja continuar?")) {
             return;
         }
+
         var oParametros = new Object();
         oParametros.codmov = obj.e81_codmov.value;
+        oParametros.e60_codemp_ini = obj.e60_codemp_ini.value;
+        oParametros.e60_codemp_fim = obj.e60_codemp_fim.value;
+        oParametros.e50_codord_ini = obj.e50_codord_ini.value;
+        oParametros.e50_codord_fim = obj.e50_codord_fim.value;
+        oParametros.e60_numemp     = obj.e60_numemp.value;
+        oParametros.e50_numliquidacao = obj.e50_numliquidacao.value;
+        oParametros.aFornecedores  = getForncedores();
+        oParametros.aRecursos      = js_campo_recebe_valores_recursos();
+        if(obj.e50_numliquidacao.value != "" && obj.e60_codemp_ini.value == ""){
+            alert("Informe o Número Empenho!");
+            js_removeObj('msgbox');
+            return;
+        }
+        if (obj.e60_codemp_ini.value == '' && obj.e81_codmov.value == '' && obj.e50_numliquidacao.value == ""
+            && obj.dtini.value == ''
+            && obj.e50_codord_ini.value == ''
+            && obj.e60_numemp.value == ''
+            && oParametros.aFornecedores == ''
+            && oParametros.aRecursos == '') {
+            alert("Selecione pelo menos um filtro!");
+            return;
+        }
         var sDtini = obj.dtini.value.split("/");
         var sDtfim = obj.dtfim.value.split("/");
         var dtini_dia = sDtini[0];
@@ -483,5 +526,6 @@ db_menu(db_getsession("DB_id_usuario"), db_getsession("DB_modulo"), db_getsessio
         $('e81_codmov').value = chave;
         db_iframe_movs.hide();
     }
+
 
 </script>

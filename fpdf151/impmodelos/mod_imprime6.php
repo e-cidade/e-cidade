@@ -76,7 +76,7 @@ for ($xxx = 0; $xxx < $this->nvias; $xxx++) {
     }
     $this->objpdf->text($xcol + 2, $xlin + 53, 'Tipo de Compra');
     if ($this->prazo_ent != "") {
-        $this->objpdf->text($xcol + 2, $xlin + 47, 'Prazo Entrega');
+        $this->objpdf->text($xcol + 2, $xlin + 49.5, 'Prazo Entrega');
     }
 
     $this->objpdf->Setfont('Arial', '', 8);
@@ -115,7 +115,7 @@ for ($xxx = 0; $xxx < $this->nvias; $xxx++) {
 
     $this->objpdf->text($xcol + 24, $xlin + 53, ':  ' . $this->descr_tipocompra);
     if ($this->prazo_ent != "") {
-        $this->objpdf->text($xcol + 22, $xlin + 47, ':  ' . $this->prazo_ent);
+        $this->objpdf->text($xcol + 22, $xlin + 49.5, ':  ' . $this->prazo_ent);
     }
 
 

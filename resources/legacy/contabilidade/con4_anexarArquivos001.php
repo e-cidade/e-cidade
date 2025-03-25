@@ -208,11 +208,6 @@ $clRotulo->label('ac16_sequencial');
 </style>
 
 <script type="text/javascript">
-  loadComponents([
-    'buttonsSolid',
-    'simpleModal'
-  ]);
-
 var iAcordo = null;
 
 /**
@@ -433,7 +428,7 @@ function js_retornoExcluiDocumento(oAjax) {
   var oRetorno = eval('('+oAjax.responseText+")");
   if (oRetorno.status == 2) {
 
-     alert("Não foi possivel excluir o documento:\n "+ oRetorno.message);
+    alert("Não foi possivel excluir o documento:\n "+ oRetorno.message);
   }
 
   js_getDocumento();
@@ -464,7 +459,7 @@ function js_downloadDocumento(oAjax) {
   js_removeObj("msgbox");
   var oRetorno = eval('('+oAjax.responseText+")");
   if (oRetorno.status == 2) {
-     alert("Não foi possivel carregar o documento:\n "+ oRetorno.message);
+    alert("Não foi possivel carregar o documento:\n "+ oRetorno.message);
   }
   window.open("db_download.php?arquivo="+oRetorno.nomearquivo);
 }

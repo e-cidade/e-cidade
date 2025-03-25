@@ -1837,8 +1837,6 @@ function dbViewAditamentoContrato(iTipoAditamento, sNomeInstance, oNode, Assinat
 
   this.preencheItens = function (aItens) {
 
-
-
       var sizeLabelItens = 0;
       if (aItens.length < 12) {
           sizeLabelItens = (aItens.length / 2) * 50;
@@ -1868,7 +1866,7 @@ function dbViewAditamentoContrato(iTipoAditamento, sNomeInstance, oNode, Assinat
         aLinha[0] = parseInt(new String(iSeq)) + 1;
         aLinha[1] = oItem.codigoitem;
         aLinha[2] = oItem.descricaoitem.urlDecode();
-        aLinha[3] = js_formatar(oItem.qtdeanterior, 'f', casas);
+        aLinha[3] = js_formatar(oItem.qtdeanterior, 'f', 4);
         aLinha[4] = js_formatar(oItem.vlunitanterior, 'f', 4);
 
           if (!oItem.novo) {
@@ -2231,6 +2229,41 @@ function dbViewAditamentoContrato(iTipoAditamento, sNomeInstance, oNode, Assinat
       me.salvarInfoDotacoes(iLinha);
   }
 
+  this.getUnidade = function(){
+    let oParametro = new Object();
+        let oRetorno;
+        oParametro.pc01_codmater = document.getElementById('oTxtMaterial').value;
+        let oAjax = new Ajax.Request('com_getunidpcmater.RPC.php', {
+            method: 'post',
+            parameters: 'json=' + Object.toJSON(oParametro),
+            asynchronous: false,
+            onComplete: function(oAjax) {
+                oRetorno = eval("(" + oAjax.responseText.urlDecode() + ")");
+                let codigoUnidade = oRetorno.pc01_unid;
+                if(codigoUnidade != "" && codigoUnidade != null){
+                  document.getElementById('oCboUnidade').value = codigoUnidade;
+                  document.getElementById('oCboUnidade').style.backgroundColor = '#DEB887';
+                  let oCboUnidade = document.getElementById("oCboUnidade");
+                  oCboUnidade.onmousedown = function(e) {
+                      e.preventDefault(); // Impede a interação com o `select`
+                      this.blur();        // Remove o foco do `select`
+                      return false;
+                  };
+
+
+                }else{
+                  document.getElementById('oCboUnidade').style.backgroundColor = 'white';
+                  document.getElementById('oCboUnidade').removeAttribute('disabled');
+                  let oCboUnidade = document.getElementById("oCboUnidade");
+                  oCboUnidade.onmousedown = null;
+
+                }
+
+
+            }
+        });
+  }
+
   this.pesquisaMaterial = function (mostra) {
 
       if (mostra) {
@@ -2254,6 +2287,11 @@ function dbViewAditamentoContrato(iTipoAditamento, sNomeInstance, oNode, Assinat
                   false);
           } else {
               oTxtDescrMaterial.setValue('');
+              document.getElementById('oCboUnidade').style.backgroundColor = 'white';
+              document.getElementById('oCboUnidade').removeAttribute('disabled');
+              document.getElementById('oCboUnidade').value = "0";
+              let oCboUnidade = document.getElementById("oCboUnidade");
+              oCboUnidade.onmousedown = null;
           }
       }
   }
@@ -2266,6 +2304,7 @@ function dbViewAditamentoContrato(iTipoAditamento, sNomeInstance, oNode, Assinat
       if (erro == true) {
           oTxtMaterial.setValue('');
       } else {
+          me.getUnidade();
           me.getElementosMateriais();
       }
   }
@@ -2273,9 +2312,9 @@ function dbViewAditamentoContrato(iTipoAditamento, sNomeInstance, oNode, Assinat
   this.mostraMaterial = function (chave1, chave2, chave3) {
 
       me.mostraSelectServico(chave3);
-
       oTxtMaterial.setValue(chave1);
       oTxtDescrMaterial.setValue(chave2);
+      me.getUnidade();
       db_iframe_pcmater.hide();
       me.getElementosMateriais();
   }

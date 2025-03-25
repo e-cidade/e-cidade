@@ -17,6 +17,7 @@ require_once("model/CgmFactory.model.php");
 require_once("model/agendaPagamento.model.php");
 require_once "model/contabilidade/planoconta/ContaPlano.model.php";
 require_once 'classes/db_historicocgm_classe.php';
+use Carbon\Carbon;
 
 db_app::import("MaterialCompras");
 db_app::import("caixa.*");
@@ -354,6 +355,13 @@ switch ($oParam->exec) {
 
       $sDataLancamento     = implode("-", array_reverse(explode("/", $oParam->iDataEstorno))); 
       $oTransferencia = TransferenciaFactory::getInstance($oParam->iCodigoTipoOperacao, $oParam->k17_codigo);
+
+      $iAnoAut = Carbon::createFromFormat('Y-m-d', $oTransferencia->getSlip()->getDataAutenticacao())->year;
+      $iAnoUsu = db_getsession("DB_anousu");
+      if ($iAnoAut != $iAnoUsu){
+        throw new Exception("Não é possivel estornar Slip em exercicio diferente da Emissão/Autenticação");
+      }
+
       $oTransferencia->anular($oParam->sMotivo,$sDataLancamento);
 
       /**

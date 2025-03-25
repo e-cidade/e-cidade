@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  *     E-cidade Software Publico para Gestao Municipal
  *  Copyright (C) 2009  DBselller Servicos de Informatica
@@ -111,20 +111,20 @@ if(isset($alterar)){
   parent.document.formaba.a4.disabled = false;
   parent.document.formaba.a5.disabled = false;
   parent.document.formaba.a6.disabled = false;
-  CurrentWindow.corpo.iframe_a2.location.href='lab1_lab_examematerial001.php?la19_i_exame=<?=$la08_i_codigo?>&la08_c_descr=<?=$la08_c_descr?>';
-  CurrentWindow.corpo.iframe_a3.location.href='lab1_lab_exame004.php?la19_i_exame=<?=$la08_i_codigo?>&la08_i_codigo=<?=$la08_i_codigo?>&la08_c_descr=<?=$la08_c_descr?>'
-  CurrentWindow.corpo.iframe_a4.location.href='lab1_lab_examerequisito001.php?la20_i_exame=<?=$la08_i_codigo?>&la08_c_descr=<?=$la08_c_descr?>'
-  CurrentWindow.corpo.iframe_a5.location.href='lab1_lab_exameatributo001.php?la42_i_exame=<?=$la08_i_codigo?>&la08_c_descr=<?=$la08_c_descr?>'
-  CurrentWindow.corpo.iframe_a6.location.href='lab1_lab_exameproced001.php?la53_i_exame=<?=$la08_i_codigo?>&la08_c_descr=<?=$la08_c_descr?>'
+  (window.CurrentWindow || parent.CurrentWindow).corpo.iframe_a2.location.href='lab1_lab_examematerial001.php?la19_i_exame=<?=$la08_i_codigo?>&la08_c_descr=<?=$la08_c_descr?>';
+  (window.CurrentWindow || parent.CurrentWindow).corpo.iframe_a3.location.href='lab1_lab_exame004.php?la19_i_exame=<?=$la08_i_codigo?>&la08_i_codigo=<?=$la08_i_codigo?>&la08_c_descr=<?=$la08_c_descr?>';
+  (window.CurrentWindow || parent.CurrentWindow).corpo.iframe_a4.location.href='lab1_lab_examerequisito001.php?la20_i_exame=<?=$la08_i_codigo?>&la08_c_descr=<?=$la08_c_descr?>';
+  (window.CurrentWindow || parent.CurrentWindow).corpo.iframe_a5.location.href='lab1_lab_exameatributo001.php?la42_i_exame=<?=$la08_i_codigo?>&la08_c_descr=<?=$la08_c_descr?>';
+  (window.CurrentWindow || parent.CurrentWindow).corpo.iframe_a6.location.href='lab1_lab_exameproced001.php?la53_i_exame=<?=$la08_i_codigo?>&la08_c_descr=<?=$la08_c_descr?>';
  </script>
-<?}
+<?php }
 ?>
 <html>
 <head>
 <title>DBSeller Inform&aacute;tica Ltda - P&aacute;gina Inicial</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <meta http-equiv="Expires" CONTENT="0">
-<?
+<?php
 db_app::load("scripts.js");
 db_app::load("prototype.js");
 db_app::load("datagrid.widget.js");
@@ -144,7 +144,7 @@ db_app::load("/widgets/dbautocomplete.widget.js");
     <td height="430" align="left" valign="top" bgcolor="#CCCCCC">
     <center>
     <fieldset style='width: 75%;'> <legend><b>Exames</b></legend>
-	<?
+	<?php
 	include("forms/db_frmlab_exame.php");
 	?>
 	</fieldset>

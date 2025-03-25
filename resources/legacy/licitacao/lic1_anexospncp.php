@@ -249,11 +249,6 @@ $oRotulo->label("l20_objeto");
 
 <script type="text/javascript">
 
-  loadComponents([
-    'buttonsSolid',
-    'simpleModal',
-  ]);
-
   document.getElementById("btnAlterar").style.display = "none";
 
   /**

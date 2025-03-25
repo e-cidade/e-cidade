@@ -6,7 +6,7 @@ use App\Models\PcForne;
 use App\Repositories\Contracts\Patrimonial\Fornecedores\PcForneRepositoryInterface;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class PcForneRepository implements PcForneRepositoryInterface
 {
@@ -92,5 +92,5 @@ class PcForneRepository implements PcForneRepositoryInterface
     {
         return $this->model->find($cgm);
     }
-    
+
 }

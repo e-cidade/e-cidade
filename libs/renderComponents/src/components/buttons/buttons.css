@@ -1,4 +1,4 @@
-.btn {
+.btn-SG136 {
     padding: 10px 20px;
     border-radius: 5px;
     font-size: 16px;
@@ -7,31 +7,31 @@
 }
 
 /* Small (SM) */
-.btn.sm {
+.btn-SG136.sm-SG136 {
     padding: 5px 10px;
     font-size: 14px;
 }
 
 /* Medium (MD) */
-.btn.md {
+.btn-SG136.md-SG136 {
     padding: 10px 20px;
     font-size: 16px;
 }
 
 /* Large (LG) */
-.btn.lg {
+.btn-SG136.lg-SG136 {
     padding: 15px 30px;
     font-size: 18px;
 }
 
 /* Extra Large (XL) */
-.btn.xl {
+.btn-SG136.xl-SG136 {
     padding: 20px 40px;
     font-size: 20px;
 }
 
 /* Full width (full) */
-.btn.full {
+.btn-SG136.full-SG136 {
     padding: 10px 20px;
     width: 100%;
 }

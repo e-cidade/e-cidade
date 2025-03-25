@@ -53,7 +53,7 @@ cache/forms/*
 cache/preferencias/*
 config/apipcp/.env
 node_modules
-.env
+/.env
 phinx.yml
 docker/db-data
 extension/data/extension/Desktop.data
@@ -61,3 +61,5 @@ extension/modification/data/modification/dbportal-v3-desktop.data
 docker/bd/pgsql
 extension/modification/data/group/modifications.data
 DEC_*.pdf
+legacy_config/sicom/
+.php-cs-fixer.cache

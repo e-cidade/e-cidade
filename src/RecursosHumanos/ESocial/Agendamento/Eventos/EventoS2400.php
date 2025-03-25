@@ -60,7 +60,7 @@ class EventoS2400 extends EventoBase
             $oDadosAPI->evtCdBenefIn->endereco->brasil->codMunic = $oDados->codmunic;
             $oDadosAPI->evtCdBenefIn->endereco->brasil->uf = $oDados->uf;
             $oDadosAPI->evtCdBenefIn->endereco->brasil->complemento = empty($oDados->complemento) ? null : $oDados->complemento;
-            $oDadosAPI->evtCdBenefIn->endereco->brasil->tpLograd = empty($oDados->tplograd) ? null : $oDados->tplograd;
+            $oDadosAPI->evtCdBenefIn->endereco->brasil->tpLograd = 'R'; //empty($oDados->tplograd) ? null : $oDados->tplograd;
 
             $oDadosAPI->evtCdBenefIn->endereco->exterior = null;
 

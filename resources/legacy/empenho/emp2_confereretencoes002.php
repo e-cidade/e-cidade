@@ -360,22 +360,34 @@ if ($oParametros->tipo == "p") {
 
     $iTamCell = 0;
     $iTamFonte = 5;
+    $iTamTotalDesc = 31.5;
+    $iTamTotalValor = 62.5;
+    $iTamTotalRet = 53.5;
     if ($oParametros->group == 2) {
 
         $iTamCell = (39 / 5);
         $iTamFonte = 6;
+        $iTamTotalDesc = 23.7;
+        $iTamTotalValor = 54.7;
+        $iTamTotalRet = 53.5;
     } else if ($oParametros->group == 3) {
 
         $iTamCell = (56 / 5);
         $iTamFonte = 6;
+        $iTamTotalDesc = 76.3;
+        $iTamTotalValor = 51.3;
+        $iTamTotalRet = -2.5;
     }
 
     foreach ($aRetencoes as $oQuebra) {
 
         $oPdf->SetFont($sFonte, "b", $iTamFonte + 2);
         $lEscreverHeader = true;
-        foreach ($oQuebra->itens as $oRetencaoAtiva) {
 
+        $iTotalRet = count($oQuebra->itens);
+
+        for ($i = 0; $i < $iTotalRet; $i++ ) {
+            $oRetencaoAtiva = $oQuebra->itens[$i];
             if ($oPdf->Gety() > $oPdf->h - 27 || $lEscreverHeader) {
 
                 if ($oPdf->Gety() > $oPdf->h - 27) {
@@ -443,16 +455,30 @@ if ($oParametros->tipo == "p") {
 
             $oPdf->cell(17, 5, $oRetencaoAtiva->k17_codigo, "TBR", 0, "R");
             $oPdf->cell(25, 5, db_formatar($oRetencaoAtiva->e23_valorretencao, "f"), "TBL", 1, "R");
+
+            $nTotalRetOp += $oRetencaoAtiva->e23_valorretencao;
+
+            if ($oParametros->quebraOp == 2 && ($i == $iTotalRet || $oRetencaoAtiva->e50_codord != $oQuebra->itens[$i + 1]->e50_codord)) {
+                $oPdf->SetFont($sFonte, "b", $iTamFonte);
+                $oPdf->cell(77.5 + $iTamTotalDesc, 5, 'Total da OP:', "TBR", 0, "R");
+                $oPdf->cell(77.5 - $iTamTotalValor, 5, db_formatar($oRetencaoAtiva->e53_valor, "f"), "TBR", 0, "R");
+                $oPdf->cell(77.5 + $iTamTotalRet, 5, 'Total da Retenção:', "TBR", 0, "R");
+                $oPdf->cell(25, 5, db_formatar($nTotalRetOp, "f"), "TBL", 0, "R");
+                $nTotalOrdemPagamento += $oRetencaoAtiva->e53_valor;
+                $nTotalRetencoes += $nTotalRetOp;
+                $nTotalRetOp = 0;
+                $oPdf->ln();
+            }
         }
-
-        $oPdf->SetFont($sFonte, "b", $iTamFonte);
-        $oPdf->cell(109, 5, 'Total da OP:', "TBR", 0, "R");
-        $oPdf->cell(15, 5, db_formatar($oQuebra->total_op, "f"), "TBR", 0, "R");
-        $oPdf->cell(131, 5, "Total da Retenção:", "TBR", 0, "R");
-        $oPdf->cell(25, 5, db_formatar($oQuebra->total, "f"), "TBL", 1, "R");
-        $nTotalRetencoes += $oQuebra->total;
-        $nTotalOrdemPagamento += $oQuebra->total_op;
-
+        if ($oParametros->quebraOp == 1) {
+            $oPdf->SetFont($sFonte, "b", $iTamFonte);
+            $oPdf->cell(109, 5, 'Total da OP:', "TBR", 0, "R");
+            $oPdf->cell(15, 5, db_formatar($oQuebra->total_op, "f"), "TBR", 0, "R");
+            $oPdf->cell(131, 5, "Total da Retenção:", "TBR", 0, "R");
+            $oPdf->cell(25, 5, db_formatar($oQuebra->total, "f"), "TBL", 1, "R");
+            $nTotalRetencoes += $oQuebra->total;
+            $nTotalOrdemPagamento += $oQuebra->total_op;
+        }
     }
     $oPdf->SetFont($sFonte, "b", $iTamFonte);
     $oPdf->cell(109, 5, 'Total Geral OP:', "TBR", 0, "R");

@@ -211,7 +211,7 @@ function js_troca(codele) {
       <td>
         <?php
             $result_unidade = array ();
-            $result_sql_unid = $clmatunid->sql_record($clmatunid->sql_query_file(null, "m61_codmatunid,substr(m61_descr,1,20) as m61_descr,m61_usaquant,m61_usadec", "m61_descr"));
+            $result_sql_unid = $clmatunid->sql_record($clmatunid->sql_query_file(null, "m61_codmatunid,substr(m61_descr,1,20) as m61_descr,m61_usaquant,m61_usadec", "m61_codmatunid","m61_ativo = 't' and m61_ativo = 't'"));
             $numrows_unid = $clmatunid->numrows;
             for ($i = 0; $i < $numrows_unid; $i++){
                                 db_fieldsmemory($result_sql_unid, $i);
@@ -469,6 +469,47 @@ function js_troca(codele) {
   </form>
     <script>
 
+  function getUnidade(){
+    if(document.form1.e55_item.value == ""){
+      document.getElementById('e55_unid').value = "1";
+      return;
+    }
+    let oParametro = new Object();
+        let oRetorno;
+        oParametro.pc01_codmater = document.getElementById('e55_item').value;
+        let oAjax = new Ajax.Request('com_getunidpcmater.RPC.php', {
+            method: 'post',
+            parameters: 'json=' + Object.toJSON(oParametro),
+            asynchronous: false,
+            onComplete: function(oAjax) {
+                oRetorno = eval("(" + oAjax.responseText.urlDecode() + ")");
+                let codigoUnidade = oRetorno.pc01_unid;
+                if(codigoUnidade != "" && codigoUnidade != null){
+                  document.getElementById('e55_unid').value = codigoUnidade;
+                  document.getElementById('e55_unid').style.backgroundColor = '#DEB887';
+                  let e55_unid = document.getElementById("e55_unid");
+                  e55_unid.onmousedown = function(e) {
+                      e.preventDefault(); // Impede a interação com o `select`
+                      this.blur();        // Remove o foco do `select`
+                      return false;
+                  };
+
+
+                }else{
+                  document.getElementById('e55_unid').style.backgroundColor = 'white';
+                  document.getElementById('e55_unid').removeAttribute('disabled');
+                  let e55_unid = document.getElementById("e55_unid");
+                  e55_unid.onmousedown = null;
+
+                }
+
+
+            }
+        });
+  }
+
+  getUnidade();
+
 
   function js_verificar() {
     vltot =  new Number(document.form1.e55_vltot.value);
@@ -564,8 +605,10 @@ function js_pesquisae55_item(mostra){
 }
 function js_mostrapcmater(chave,erro,codele){
   document.form1.pc01_descrmater.value = chave;
+
   if(erro==true){
     document.form1.e55_item.focus();
+    document.form1.e55_unid = '1';
     document.form1.e55_item.value = '';
     document.form1.submit();
   }else{

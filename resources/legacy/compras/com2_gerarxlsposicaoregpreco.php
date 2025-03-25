@@ -197,6 +197,8 @@ for ($iInd = 0; $iInd  < $iRsSql; $iInd++) {
 
     $oSolicita->empenhada          = $oCompilacao->getValorEmpenhadoItem($oSolicita->pc11_codigo);
     $oSolicita->solicitada         = $oCompilacao->getValorSolicitadoItem($oSolicita->pc11_codigo);
+    $oSolicita->anulada            = $oCompilacao->getValorSolAnuladoItem($oSolicita->pc11_codigo);
+    $oSolicita->empAnulada         = $oCompilacao->getValorEmpAnuladoItem($oSolicita->pc11_codigo);
 
     $oDadosEstimativa                 = new stdClass();
     $oDadosEstimativa->iSeq           = $oSolicita->pc11_seq;
@@ -205,12 +207,12 @@ for ($iInd = 0; $iInd  < $iRsSql; $iInd++) {
     $oDadosEstimativa->sCompl         = $oSolicita->pc11_resum;
     $oDadosEstimativa->sUnidade       = $oSolicita->m61_descr;
     $oDadosEstimativa->sFornecedor    = $oSolicita->oDadosFornecedor->vencedor;
-    $oDadosEstimativa->iEmpenhada     = $oSolicita->empenhada;
-    $oDadosEstimativa->iSolicitada    = $oSolicita->solicitada;
+    $oDadosEstimativa->iEmpenhada     = $oSolicita->empenhada - $oSolicita->empAnulada;
+    $oDadosEstimativa->iSolicitada    = $oSolicita->solicitada - $oSolicita->anulada;
     $oDadosEstimativa->lControlaValor = ($oCompilacao->getFormaDeControle() == aberturaRegistroPreco::CONTROLA_VALOR);
 
-    $oDadosEstimativa->nSolicitar    = ($oSolicita->pc11_quant - $oSolicita->solicitada);
-    $oDadosEstimativa->nEmpenhar     = ($oSolicita->solicitada - $oSolicita->empenhada);
+    $oDadosEstimativa->nSolicitar    = ($oSolicita->pc11_quant - $oDadosEstimativa->iSolicitada);
+    $oDadosEstimativa->nEmpenhar     = ($oDadosEstimativa->iSolicitada - $oDadosEstimativa->iEmpenhada);
 
     $nQuantMin                     = (empty($oSolicita->pc57_quantmin)                   ? '0' : $oSolicita->pc57_quantmin);
     $nQuantMax                     = (empty($oSolicita->pc11_quant)                      ? '0' : $oSolicita->pc11_quant);
@@ -223,7 +225,7 @@ for ($iInd = 0; $iInd  < $iRsSql; $iInd++) {
      */
     if ($oDadosEstimativa->lControlaValor) {
 
-        $oDadosEstimativa->nSolicitar = ($oSolicita->pc11_vlrun - $oSolicita->solicitada);
+        $oDadosEstimativa->nSolicitar = ($oSolicita->pc11_vlrun - $oDadosEstimativa->iSolicitada);
         $nVlrUnitario = $oSolicita->pc11_vlrun;
     }
 

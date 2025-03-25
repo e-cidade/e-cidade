@@ -1,5 +1,4 @@
-/* Contêiner do formulário */
-.simple-card-one {
+.simple-card-559YV {
     width: 100%;
     max-width: 432px;
     padding: 16px;
@@ -9,23 +8,38 @@
     border-radius: 8px;
 }
 
-/* Estilo para diferentes tamanhos de tela */
+.simple-card-title-559YV.sm-559YV {
+    margin-top: 0px;
+    font-size: 0.875rem;
+    color: #111827;
+    margin-bottom: 24px;
+    font-weight: bold;
+}
+
+.simple-card-title-559YV.md-559YV {
+    margin-top: 0px;
+    font-size: 1.1rem;
+    color: #111827;
+    margin-bottom: 24px;
+    font-weight: bold;
+}
+
+.simple-card-title-559YV.lg-559YV {
+    margin-top: 0px;
+    font-size: 1.5rem;
+    color: #111827;
+    margin-bottom: 24px;
+    font-weight: bold;
+}
+
 @media (min-width: 640px) {
-    .simple-card-one {
+    .simple-card-559YV {
         padding: 24px;
     }
 }
 
 @media (min-width: 768px) {
-    .simple-card-one {
+    .simple-card-559YV {
         padding: 32px;
     }
-}
-
-/* Título do formulário */
-.simple-card-one h5 {
-    font-size: 15px;
-    font-weight: bold;
-    color: #111827;
-    margin-bottom: 24px;
 }

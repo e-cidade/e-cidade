@@ -163,7 +163,7 @@ db_app::load("estilos.css, grid.style.css");
                                 <td>
                                     <?
                                     $oDaoMatUnid = db_utils::getDao("matunid");
-                                    $sSqlUnidades = $oDaoMatUnid->sql_query_file(null, "m61_codmatunid,substr(m61_descr,1,20) as m61_descr", "m61_descr");
+                                    $sSqlUnidades = $oDaoMatUnid->sql_query_file(null, "m61_codmatunid,substr(m61_descr,1,20) as m61_descr", "m61_descr","m61_ativo = 't'");
                                     $rsUnidades = $oDaoMatUnid->sql_record($sSqlUnidades);
                                     $iNumRowsUnidade = $oDaoMatUnid->numrows;
                                     $aUnidades = array(0 => "Selecione");

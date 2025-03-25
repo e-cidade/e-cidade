@@ -585,6 +585,12 @@ switch ($oParam->exec) {
     case 'VerificaMembrosModalidade':
 
         $verifica = $clliclicita->verificaMembrosModalidade($oParam->modalidade, $oParam->equipepregao);
+        
+        // echo '<pre>';
+        // print_r($oParam->modalidade);
+        // print_r("\n");
+        // print_r($oParam->equipepregao);
+        // exit;
 
         if ($verifica) {
             $oRetorno->validaMod = 1;
@@ -1817,7 +1823,7 @@ switch ($oParam->exec) {
     case 'VerificaMembrosModalidadeParaLei1':
 
         $oRetorno->validacao = $clliclicita->verificaMembrosModalidadeParaLei1($oParam->modalidade, $oParam->comissao);
-    
+
         break;
 }
 echo $oJson->encode($oRetorno);

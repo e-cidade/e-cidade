@@ -1,28 +1,28 @@
 <?php
 /*
- *     E-cidade Software Publico para Gestao Municipal                
- *  Copyright (C) 2014  DBSeller Servicos de Informatica             
- *                            www.dbseller.com.br                     
- *                         e-cidade@dbseller.com.br                   
- *                                                                    
- *  Este programa e software livre; voce pode redistribui-lo e/ou     
- *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme  
- *  publicada pela Free Software Foundation; tanto a versao 2 da      
- *  Licenca como (a seu criterio) qualquer versao mais nova.          
- *                                                                    
- *  Este programa e distribuido na expectativa de ser util, mas SEM   
- *  QUALQUER GARANTIA; sem mesmo a garantia implicita de              
- *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM           
- *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais  
- *  detalhes.                                                         
- *                                                                    
- *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU     
- *  junto com este programa; se nao, escreva para a Free Software     
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA          
- *  02111-1307, USA.                                                  
- *  
- *  Copia da licenca no diretorio licenca/licenca_en.txt 
- *                                licenca/licenca_pt.txt 
+ *     E-cidade Software Publico para Gestao Municipal
+ *  Copyright (C) 2014  DBSeller Servicos de Informatica
+ *                            www.dbseller.com.br
+ *                         e-cidade@dbseller.com.br
+ *
+ *  Este programa e software livre; voce pode redistribui-lo e/ou
+ *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme
+ *  publicada pela Free Software Foundation; tanto a versao 2 da
+ *  Licenca como (a seu criterio) qualquer versao mais nova.
+ *
+ *  Este programa e distribuido na expectativa de ser util, mas SEM
+ *  QUALQUER GARANTIA; sem mesmo a garantia implicita de
+ *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM
+ *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais
+ *  detalhes.
+ *
+ *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU
+ *  junto com este programa; se nao, escreva para a Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ *  02111-1307, USA.
+ *
+ *  Copia da licenca no diretorio licenca/licenca_en.txt
+ *                                licenca/licenca_pt.txt
  */
 
 
@@ -197,6 +197,13 @@ class empenhoFolha {
    */
   protected $sRetencoes = null;
 
+    /**
+   * Define credor do empenho em caso de recisão
+   *
+   * @var integer
+   */
+  protected $sCredor = null;
+
 
   /**
    * @param integer $iNumeroEmpenhoFinanceiro
@@ -213,7 +220,7 @@ class empenhoFolha {
   }
 
 
-  function __construct($iEmpenhoFolha, $iLotacao = null, $lRubrica = false, $sRetencoes = null) {
+  function __construct($iEmpenhoFolha, $iLotacao = null, $lRubrica = false, $sRetencoes = null, $sCredor = null) {
 
     if (empty($iEmpenhoFolha)) {
       throw new ParameterException("Empenho da Folha não informado");
@@ -288,6 +295,7 @@ class empenhoFolha {
     $this->lotacao           = $iLotacao;
     $this->lRubrica          = $lRubrica;
     $this->sRetencoes        = $sRetencoes;
+    $this->sCredor           = $sCredor;
 
 
     switch ($oDadosEmpenho->rh72_siglaarq) {
@@ -541,7 +549,7 @@ class empenhoFolha {
     } else {
       $sWhere = "o120_rhempenhofolha = {$this->empenhofolha}";
     }
-    
+
     $sSqlReservasGeradas = $oDaoOrcReservaRhEmpenhoFolha->sql_query_file(null, "*", null, $sWhere);
     $rsReservasGeradas   = $oDaoOrcReservaRhEmpenhoFolha->sql_record($sSqlReservasGeradas);
     $oReservasGeradas    = db_utils::getCollectionByRecord($rsReservasGeradas);
@@ -631,6 +639,12 @@ class empenhoFolha {
     } else {
       $sFiltroRetencao = " and rh78_retencaotiporec in ({$sRetencoes}) ";
     }
+
+    if ($this->sCredor == null) {
+      $filtroCredor = " rh02_lota = {$this->lotacao} ";
+    } else {
+      $filtroCredor = " rh73_seqpes = {$this->sCredor} ";
+    }
     $sSqlDadosRetencao   = "SELECT  ";
     $sSqlDadosRetencao  .= "       rh72_anousu, ";
     $sSqlDadosRetencao  .= "       rh72_mesusu, ";
@@ -642,7 +656,7 @@ class empenhoFolha {
     $sSqlDadosRetencao  .= "       inner join rhpessoalmov          on rh73_seqpes                         = rh02_seqpes  ";
     $sSqlDadosRetencao  .= "                                                and rh73_instit                = rh02_instit ";
     $sSqlDadosRetencao  .= "       inner join  rhempenhofolharubricaretencao on rh78_rhempenhofolharubrica = rh73_sequencial ";
-    $sSqlDadosRetencao  .= "   where rh02_lota = {$this->lotacao}  ";
+    $sSqlDadosRetencao  .= "   where {$filtroCredor}  ";
     $sSqlDadosRetencao  .= "     {$sFiltroRetencao}";
     $sSqlDadosRetencao  .= "     and rh72_tipoempenho = {$iTipoEmpenho}";
     $sSqlDadosRetencao  .= "     and rh73_tiporubrica = 2";
@@ -953,7 +967,7 @@ class empenhoFolha {
         $sErroMsg  = "Ordenador da liquidação não encontrado para o orgão $this->orgao unidade $this->unidade";
         throw new DBException($sErroMsg);
       }
-     
+
     } elseif ($buscarOrdenadoresliquidacao == 2) {
 
       $aAssinantesLiquidacao  = getAssinantes($this->orgao,$this->unidade,2,1);
@@ -1199,7 +1213,7 @@ class empenhoFolha {
       $lGeraRetencao = db_utils::fieldsMemory($rsParam,0)->r11_geraretencaoempenho;
       if ( $lGeraRetencao == 't') {
 
-        
+
         if ($lPrevidencia) {
             $aRetencoes =  $this->getRetencoes(2, 1);
         } else {
@@ -1208,7 +1222,7 @@ class empenhoFolha {
           } elseif ($this->lRubrica == 'true' || ($this->lRubrica == 'false' && $this->sRetencoes != null)){
             $aRetencoes =  $this->getRetencoesRubricaPrincipal($this->sRetencoes);
           }
-        }   
+        }
 
         require_once("model/retencaoNota.model.php");
         $oRetencaoNota = new retencaoNota($oRetornoLiquidacao->iCodNota);
@@ -1241,13 +1255,13 @@ class empenhoFolha {
 
       if ($sRetencoesTipoRec != "" && $this->lotacao != null) {
         $aRubricas = $this->consultaRubricas($sRetencoesTipoRec);
-        $oDaoEmpenhoRubrica = db_utils::getDao("rhempenhofolharhemprubrica");        
+        $oDaoEmpenhoRubrica = db_utils::getDao("rhempenhofolharhemprubrica");
         if ($aRubricas) {
           foreach ($aRubricas as $oRubrica) {
-            $oDaoEmpenhoRubrica->rh81_lancamento = $this->empenhofolha;   
-            $oDaoEmpenhoRubrica->rh81_lota = $this->lotacao;          
+            $oDaoEmpenhoRubrica->rh81_lancamento = $this->empenhofolha;
+            $oDaoEmpenhoRubrica->rh81_lota = $this->lotacao;
             $oDaoEmpenhoRubrica->alterar($oRubrica->rh81_sequencial);
-      
+
             if ($oDaoEmpenhoRubrica->erro_status == 0) {
               $sErroMsg = "Empenho folha {$this->empenhofolha}:\n";
               $sErroMsg .= "Erro: {$oDaoEmpenhoRubrica->erro_msg}";
@@ -1296,19 +1310,19 @@ class empenhoFolha {
   function consultaRubricas($sRetencoesTipoRec)
   {
     $sql = "select rh81_sequencial
-            from rhempenhofolha 
-            inner join rhempenhofolharhemprubrica on rh81_rhempenhofolha = rh72_sequencial 
+            from rhempenhofolha
+            inner join rhempenhofolharhemprubrica on rh81_rhempenhofolha = rh72_sequencial
             inner join rhempenhofolharubrica on rh73_sequencial = rh81_rhempenhofolharubrica
-            inner join rhpessoalmov on rh73_seqpes  = rh02_seqpes and rh73_instit = rh02_instit 
-            inner join  rhempenhofolharubricaretencao on rh78_rhempenhofolharubrica = rh73_sequencial 
-            where 
+            inner join rhpessoalmov on rh73_seqpes  = rh02_seqpes and rh73_instit = rh02_instit
+            inner join  rhempenhofolharubricaretencao on rh78_rhempenhofolharubrica = rh73_sequencial
+            where
               rh02_lota = {$this->lotacao}
-              and rh78_retencaotiporec in ({$sRetencoesTipoRec}) 
+              and rh78_retencaotiporec in ({$sRetencoesTipoRec})
               and rh72_tipoempenho = 1
               and rh73_tiporubrica = 2
               and rh73_pd          = 2
               and rh72_siglaarq    = '{$this->siglafolha}'
-              and rh72_anousu = {$this->ano} 
+              and rh72_anousu = {$this->ano}
               and rh72_mesusu = {$this->mes} ";
     $aTeste = db_utils::getColectionByRecord(db_query($sql));
     return $aTeste;
@@ -1434,7 +1448,7 @@ class empenhoFolha {
    * Retorna as informações do empenho
    *
    */
-  function getInfoEmpenho () {
+  function getInfoEmpenho ($lRecisao = false, $lPrincipal = null) {
 
     $oDaoRhempenhoRubricas = db_utils::getDao("rhempenhofolharubrica");
     $sCampos               = "z01_nome, ";
@@ -1500,14 +1514,35 @@ class empenhoFolha {
       $sSqlRubricas  .= "                            and rh73_instit = rh27_instit ";
       $sSqlRubricas  .= " where rh81_rhempenhofolha = {$this->empenhofolha} ";
       $sSqlRubricas  .= "   and rh73_seqpes         = {$aDadosEmpenhos[$iEmpenho]->rh73_seqpes}";
-      if ($this->lRubrica == 'false') {
-        $sSqlRubricas  .= " and rh73_pd = 1 ";
+      if ($this->lRubrica == 'false' || $lRecisao == true) {
+        $sSqlRubricas  .= " and rh73_pd = 1 and rh73_tiporubrica = 1";
       }
       $sSqlRubricas  .= " order by rh73_pd,rh27_rubric";
 
       $rsRubricas     = db_query($sSqlRubricas);
       $aRubricas      = db_utils::getCollectionByRecord($rsRubricas, false, false, true);
+      if ($lRecisao == true && $lPrincipal == true) {
 
+        $sSqlRubricasRetencoes  = "SELECT rh27_rubric,";
+        $sSqlRubricasRetencoes .= "       rh27_descr, ";
+        $sSqlRubricasRetencoes .= "       sum(rh73_valor) as rh73_valor, ";
+        $sSqlRubricasRetencoes .= "       rh73_seqpes, ";
+        $sSqlRubricasRetencoes .= "       rh73_pd ";
+        $sSqlRubricasRetencoes .= "  from rhempenhofolharubrica ";
+        $sSqlRubricasRetencoes .= "       inner join rhempenhofolharhemprubrica  on rh73_sequencial = rh81_rhempenhofolharubrica ";
+        $sSqlRubricasRetencoes .= "       inner join rhrubricas on rh27_rubric = rh73_rubric ";
+        $sSqlRubricasRetencoes .= "                            and rh73_instit = rh27_instit ";
+        $sSqlRubricasRetencoes .= "     inner join rhempenhofolha on rh81_rhempenhofolha = rh72_sequencial ";
+        $sSqlRubricasRetencoes .= "     where rh72_anousu = {$this->ano} and rh72_mesusu = {$this->mes}";
+        $sSqlRubricasRetencoes .= "   and rh73_seqpes = {$aDadosEmpenhos[$iEmpenho]->rh73_seqpes}";
+        $sSqlRubricasRetencoes .= " and rh73_pd = 2";
+        $sSqlRubricasRetencoes .= " group by rh27_rubric, rh27_descr, rh73_seqpes, rh73_pd ";
+        $sSqlRubricasRetencoes .= " order by rh73_pd,rh27_rubric";
+
+        $rsRubricasRetencoes = db_query($sSqlRubricasRetencoes);
+        $aRubricasRetencoes  = db_utils::getCollectionByRecord($rsRubricasRetencoes, false, false, true);
+        $aRubricas = array_merge($aRubricas, $aRubricasRetencoes);
+      }
       $aDadosEmpenhos[$iEmpenho]->rubricas = $aRubricas;
 
     }
@@ -1562,7 +1597,7 @@ class empenhoFolha {
     $sWhere .= " and rh72_concarpeculiar = '{$iCaract}'";
 
     /**
-     * Caso esteja gerando os dados da complementar verifica se ja existe outro seqcompl igual para a mesma competencia, 
+     * Caso esteja gerando os dados da complementar verifica se ja existe outro seqcompl igual para a mesma competencia,
      * se não existir irá posteriormente gerar um novo empenho para o seqcompl desta complementar.
      */
     if ($this->siglafolha == 'r48') {
@@ -1840,11 +1875,11 @@ class empenhoFolha {
    * @return string
    */
   function getResumo() {
-    
+
     if ($this->tipoEmpenhoResumo == 2) {
         return "Contribuição Patronal referente ao mês {$this->mes}/{$this->anoFolha}";
-    } 
-    
+    }
+
     if ($this->tipoEmpenhoResumo == 3) {
         return "FGTS referente ao mês {$this->mes}/{$this->anoFolha}";
     }
@@ -1852,7 +1887,7 @@ class empenhoFolha {
     return "Referente ao pagamento de {$this->tipofolha} do mês {$this->mes}/{$this->anoFolha}".($this->lotacao != null ? " da lotação {$this->lotacao}." : ".");
 
   }
-  
+
   /**
    * Atribui tipo do empenho para definição do resumo/histórico do empenho
    * @param $iTipo Tipo informado
@@ -1862,8 +1897,8 @@ class empenhoFolha {
   }
 
 }
-use Illuminate\Database\Capsule\Manager as DB;
-function getAssinantes($orgao, $unidade,$cargo,$documento) 
+use Illuminate\Support\Facades\DB;
+function getAssinantes($orgao, $unidade,$cargo,$documento)
 {
 
   $anousu = db_getsession("DB_anousu");
@@ -1882,7 +1917,7 @@ function getAssinantes($orgao, $unidade,$cargo,$documento)
               ->select('configuracoes.db_usuarios.login', 'configuracoes.db_usuarios.nome', 'configuracoes.db_usuarios.email', 'protocolo.cgm.z01_cgccpf' , 'configuracoes.assinatura_digital_assinante.db243_cargo', 'protocolo.cgm.z01_numcgm', 'configuracoes.assinatura_digital_assinante.db243_data_inicio', 'configuracoes.assinatura_digital_assinante.db243_data_final')
               ->distinct('login', 'nome', 'z01_cgccpf', 'db243_cargo')
               ->get()
-              ->toArray(); 
+              ->toArray();
 
   return $aAssinante;
 }
@@ -1924,15 +1959,15 @@ function getAllOrdenadores($aAssinantes)
 {
 
   foreach($aAssinantes as $assinante) {
-      
+
       $db243_data_inicio = $assinante->db243_data_inicio;
-      $db243_data_final  = $assinante->db243_data_final;  
-      
+      $db243_data_final  = $assinante->db243_data_final;
+
       $e60_emiss = date("Y-m-d", db_getsession("DB_datausu"));
       $dataemissformatada  = $e60_emiss;
       $datainicioformatada = date('Y-m-d\TH:i:s\Z', strtotime($db243_data_inicio));
       $datafimformatada    = date('Y-m-d\TH:i:s\Z', strtotime($db243_data_final));
-      
+
       $datafinal = explode('-', $db243_data_final);
       $datafinal = $datafinal[2] . '/' . $datafinal[1] . '/' . $datafinal[0];
 
@@ -1943,7 +1978,7 @@ function getAllOrdenadores($aAssinantes)
         continue;
       }
       return $assinante;
-  } 
-  
+  }
+
 }
 ?>

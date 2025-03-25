@@ -181,7 +181,7 @@ db_app::load("dbtextFieldData.widget.js");
                                                         $aValores,
                                                         true,
                                                         $db_opcao,
-                                                        " onchange='js_desabilitaselecionar();js_exibeBotaoJulgamento();js_validaCampoValor();' style='width:100%;'"
+                                                        " onchange='js_desabilitaselecionar();js_verificaorigem();js_exibeBotaoJulgamento();js_validaCampoValor();' style='width:100%;'"
                                                     );
 
                                                     ?>
@@ -204,6 +204,8 @@ db_app::load("dbtextFieldData.widget.js");
                                                         7 => '7 - Licitação - Regime Diferenciado de Contratações Públicas - RDC',
                                                         8 => '8 - Licitação realizada por consorcio público',
                                                         9 => '9 - Licitação realizada por outro ente da federação',
+                                                        10 =>'10 - Dispensa ou Inexigibilidade realizada por consórcio público',
+                                                        99 =>'99 - Contrato não decorrente de licitação',
                                                     );
                                                     db_select('ac16_tipoorigem', $aValores, true, $db_opcao, "onchange='js_verificatipoorigem();'", "style='width:100%;'");
 
@@ -375,7 +377,7 @@ db_app::load("dbtextFieldData.widget.js");
                                                     //     "onchange=js_pesquisaac16_acordocomissao(false)");
                                                     // db_input('ac08_descricao', 30, $Iac08_descricao, true, 'text', 3);
                                                     ?>
-                                                    <input type="hidden" id="ac16_acordocomissao" name="ac16_acordocomissao" value='1'>
+                                                    <input type="hidden" id="ac16_acordocomissao" name="ac16_acordocomissao" value=''>
                                                 </td>
                                             </tr>
                                             <tr style="display:none;">
@@ -757,6 +759,7 @@ db_app::load("dbtextFieldData.widget.js");
 </style>
 
 <script>
+
     var sCaminhoMensagens = "patrimonial.contratos.db_frmacordo";
 
     $('trValorAcordo').style.display = 'none';
@@ -1199,6 +1202,24 @@ db_app::load("dbtextFieldData.widget.js");
         }
     }
 
+    function js_verificaorigem() {
+        iOrigem = document.form1.ac16_origem.value;
+
+        if(iOrigem == 2){
+            let select = document.getElementById("ac16_tipoorigem");
+            let option = select.querySelector("option[value='99']");
+            if (option) option.remove();
+        } else {
+                    // Verificar se a opção já existe antes de adicioná-la
+            let select = document.getElementById("ac16_tipoorigem");
+            let existeOpcao = select.querySelector(`option[value='99']`);
+            if (!existeOpcao) {
+                let novaOption = new Option("99 - Contrato não decorrente de licitação", "99");
+                select.appendChild(novaOption); // Adiciona no final
+            }
+        }
+    }
+
 
     function js_validaOrigemTipo(limpar = false) {
         if (limpar) {
@@ -1567,7 +1588,6 @@ db_app::load("dbtextFieldData.widget.js");
     function js_pesquisaac16_acordocomissao(mostra) {
 
         if (mostra == true) {
-
             js_OpenJanelaIframe('CurrentWindow.corpo.iframe_acordo',
                 'db_iframe_comissao',
                 'func_acordocomissao.php?funcao_js=parent.js_mostracomissao1|' +
@@ -1578,7 +1598,6 @@ db_app::load("dbtextFieldData.widget.js");
         } else {
 
             if ($('ac16_acordocomissao').value != '') {
-
                 js_OpenJanelaIframe('CurrentWindow.corpo.iframe_acordo',
                     'db_iframe_comissao',
                     'func_acordocomissao.php?pesquisa_chave=' + $F('ac16_acordocomissao') +

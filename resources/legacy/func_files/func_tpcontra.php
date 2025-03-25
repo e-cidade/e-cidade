@@ -112,7 +112,7 @@ $cltpcontra->rotulo->label("h13_descr");
           $result = $cltpcontra->sql_record($cltpcontra->sql_query(null,"*","h13_codigo","h13_codigo = $pesquisa_chave $dbwhere"));
           if($cltpcontra->numrows!=0){
             db_fieldsmemory($result,0);
-            echo "<script>".$funcao_js."('$h13_descr','$h13_tpcont',false);</script>";
+            echo "<script>".$funcao_js."('$h13_descr','$h13_tpcont','$h13_tipocargo',false);</script>";
           }else{
 	         echo "<script>".$funcao_js."('Chave(".$pesquisa_chave.") não Encontrado',true,true);</script>";
           }

@@ -1,6 +1,12 @@
+@import url("skins/estilos.php?file=espacamento.bootstrap.css");
 @import url("skins/estilos.php?file=grid.bootstrap.css");
 @import url("skins/estilos.php?file=inputs.bootstrap.css");
 @import url("skins/estilos.php?file=buttons.bootstrap.css");
 @import url("skins/estilos.php?file=pagination.bootstrap.css");
 @import url("skins/estilos.php?file=sweetalert/sweetalert2.min.css");
 /* @import url("skins/estilos.php?file=formvalidation/formValidation.min.css"); */
+@import url("skins/estilos.php?file=tabs.bootstrap.css");
+@import url("skins/estilos.php?file=accordion.bootstrap.css");
+@import url("skins/estilos.php?file=fontawesome/all.min.css");
+@import url("skins/estilos.php?file=navs.bootstrap.css");
+@import url("skins/estilos.php?file=tooltips.bootstrap.css");

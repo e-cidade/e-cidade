@@ -34,7 +34,7 @@ class DispensaPorValorPNCP extends ModeloBasePNCP
         $oDadosAPI->anoCompra                       = $oDado->anocompra;
         $oDadosAPI->numeroProcesso                  = $oDado->numeroprocesso;
         $oDadosAPI->objetoCompra                    = utf8_encode($oDado->objetocompra);
-        $oDadosAPI->informacaoComplementar          = $oDado->informacaocomplementar;
+        $oDadosAPI->informacaoComplementar          = utf8_encode($oDado->informacaocomplementar);
         $oDadosAPI->srp                             = $oDado->srp == 'f' ? 'false' : 'true';
         //$oDadosAPI->orcamentoSigiloso               = $oDado->orcamentosigiloso == 'f' ? 'false' : 'true';
         $oDadosAPI->dataAberturaProposta            = $this->formatDate($oDado->dataaberturaproposta);

@@ -79,25 +79,42 @@ $clrotulo->label("o15_codigo");
                             <td style="border: 2px groove white;" valign="top">
                                 <input type="checkbox" value="IdentificacaoRemessa" id="IdenficacaoRemessa" />
                                 <label for="IdenficacaoRemessa">Identificação da Remessa (IDE)</label><br>
-                                <input type="checkbox" value="Pessoa" id="Pessoa" />
-                                <label for="Pessoa">Pessoas Físicas (PESSOA)</label><br>
+
+                                <?php
+                                if (db_getsession("DB_anousu") < 2025) {
+                                ?>
+                                    <input type="checkbox" value="Pessoa" id="Pessoa" />
+                                    <label for="Pessoa">Pessoas Físicas (PESSOA)</label><br>
+                                <?
+                                }
+                                ?>
+
 
                                 <?php
                                 if (db_getsession("DB_anousu") > 2017) {
                                 ?>
-
                                     <input type="checkbox" value="Viap" id="Viap" />
                                     <label for="Viap">Vínculo do Agente Público (Viap)</label><br>
 
                                     <input type="checkbox" value="Afast" id="Afast" />
                                     <label for="Afast">Afastamento (Afast)</label><br>
-
                                 <?
                                 }
                                 ?>
 
                                 <input type="checkbox" value="Terem" id="Terem" />
                                 <label for="Terem">Teto Remuneratório (TEREM)</label><br>
+
+                                <?php
+                                if (db_getsession("DB_anousu") > 2024) {
+                                ?>
+                                    <input type="checkbox" value="Subve" id="Subve" />
+                                    <label for="Subve">Subsidio dos Vereadores (SUBVE)</label><br>
+
+                                <?php
+                                }
+                                ?>
+
                                 <input type="checkbox" value="Flpgo" id="Flpgo" />
                                 <label for="Flpgo">Folha de Pagamento do Órgão (FLPGO)</label><br>
                                 <input type="checkbox" value="Respinf" id="Respinf" />

@@ -499,27 +499,9 @@ function pes4_geracalculo003($calcula_parcial=null,$calcula_pensao=null) {
 		  	
    		    $rubrica1 = ( ($opcao_geral == 1 || $opcao_geral == 8 || $opcao_geral == 4 ) ? "R985": ( $opcao_geral == 5 ? "R986": "R987" ) );
    		    $rubrica  = ( ($opcao_geral == 1 || $opcao_geral == 8 ) ? "R981": ( $opcao_geral == 5 ? "R982": "R983" ) );
-			$aFaixaRegis = explode(",", $faixa_regis);
-			if (count($aFaixaRegis) > 1 && $aFaixaRegis[0] != $aFaixaRegis[1]) {
-				global $pessoal_;
-				if (!empty($pessoal_) && strpos($faixa_regis, $pessoal_[0]['r01_regist']) !== false) {
-					$oDaoRhpessoalmov = db_utils::getDao('rhpessoalmov');
-					$rsMatricOrigem = db_query($oDaoRhpessoalmov->sql_queryDadosServidor($ano, $mes, db_getsession('DB_instit'), $r110_regisi, 'rh02_tbprev,(select rh30_vinculo from rhregime where rh30_codreg = rh02_codreg limit 1) as rh30_vinculo,rh01_numcgm'));
-					$oMatricOrigem = db_utils::fieldsMemory($rsMatricOrigem);
-
-					if ($oMatricOrigem->rh02_tbprev != $pessoal_[0]['r01_tbprev']) {
-						ajusta_previdencia_diferente_tbprev( $chamada_geral_arquivo, $rubrica1, $sigla1);
-					}
-					if ($oMatricOrigem->rh02_tbprev == $pessoal_[0]['r01_tbprev']) {
-						ajusta_previdencia( $chamada_geral_arquivo, $rubrica1, $y1, $sigla1);
-					}
-				}
-			}
-			if (count($aFaixaRegis) == 1) {
-				ajusta_previdencia( $chamada_geral_arquivo, $rubrica1, $y1, $sigla1);
-			}
+			
+			ajusta_previdencia( $chamada_geral_arquivo, $rubrica1, $y1, $sigla1);
 		    ajusta_irrf($chamada_geral_arquivo, $rubrica,$y1 ,$sigla1);
-		    //echo "<BR> saiu do ajusta_previdencia()";
           }
 
 		  if ( ( $icalc == 2 ) && ($opcao_geral == 1 || $opcao_geral == 4) ) {

@@ -24,8 +24,13 @@ class Liclicitemlote extends LegacyModel
         'l04_liclicitem',
         'l04_descricao',
         'l04_seq',
-        'l04_numerolote'
+        'l04_numerolote',
+        'l04_codlilicitalote'
     ];
 
+    public function liclicitem()
+    {
+        return $this->belongsTo(Liclicitem::class, 'l04_liclicitem', 'l21_codigo');
+    }
 }
 

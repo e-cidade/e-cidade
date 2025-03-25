@@ -73,16 +73,16 @@ class Relatorio extends mPDF
         $margin_bottom = 14
     )
     {
-        $orientation = strpos($format, 'P') ? 'P' : 'L';
-        parent::__construct([
-            'mode' => $mode,
-            'format' => $format,
-            'orientation' => $orientation,
-            'margin_top' => $margin_top,
-            'margin_bottom' => $margin_bottom,
-            'margin_left' => $margin_left,
-            'margin_right' => $margin_right
-        ]);
+
+    parent::__construct([
+      'mode' => $mode,
+      'format' => $format,
+      'orientation' => ($format == 'A4-L') ? 'L' : 'P',
+      'margin_top' => $margin_top,
+      'margin_bottom' => $margin_bottom,
+      'margin_left' => $margin_left,
+      'margin_right' => $margin_right
+    ]);
 
     /*----------- Footer -----------*/
     $this->setHTMLFooter(utf8_encode($this->rodape()), 'O');

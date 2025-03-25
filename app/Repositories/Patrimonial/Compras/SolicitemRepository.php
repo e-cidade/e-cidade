@@ -3,7 +3,7 @@
 namespace App\Repositories\Patrimonial\Compras;
 
 use App\Models\Patrimonial\Compras\Solicitem;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 use cl_solicitem;
 class SolicitemRepository
 {
@@ -65,6 +65,25 @@ class SolicitemRepository
                     INNER JOIN solicita ON pc11_numero = pc10_numero
                     WHERE $where";
         return DB::select($sql);
+    }
+
+    public function getDadosItens(int $l21_codliclicita, int $pc82_codproc):?array
+    {
+        return $this->model
+            ->whereIn('pc11_codigo', function ($query) use ($l21_codliclicita, $pc82_codproc) {
+                $query->select('pc11_codigo')
+                    ->from('pcprocitem')
+                    ->join('solicitem', 'pc81_solicitem', '=', 'pc11_codigo')
+                    ->whereIn('pc81_codprocitem', function ($subquery) use ($l21_codliclicita, $pc82_codproc) {
+                        $subquery->select('l21_codpcprocitem')
+                            ->from('liclicitem')
+                            ->where('l21_codliclicita', $l21_codliclicita)
+                            ->where('pc81_codproc', $pc82_codproc);
+                    })
+                    ->orderBy('pc81_codproc');
+            })
+            ->get()
+            ->toArray();
     }
 
 }

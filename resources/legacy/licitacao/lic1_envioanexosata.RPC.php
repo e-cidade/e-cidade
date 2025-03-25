@@ -31,7 +31,7 @@ switch ($oParam->exec) {
     case 'EnviarDocumentoPNCP':
 
         try{
-            $rsAta = $cllicontroleatarppncp->sql_record($cllicontroleatarppncp->sql_query(null,"DISTINCT l213_anousu,l213_numerocompra,l215_ata",null,"l215_numataecidade = $oParam->iCodigoAta"));
+            $rsAta = $cllicontroleatarppncp->sql_record($cllicontroleatarppncp->sql_query(null,"DISTINCT l213_anousu,l213_numerocompra,l215_ata",null,"l215_numataecidade = $oParam->iCodigoAta and l221_licitacao = $oParam->iCodigoLicitacao and l213_instit = ".db_getsession('DB_instit')));
 
             if (!pg_num_rows($rsAta) > 0) {
                 throw new Exception("Ata codigo $oParam->iCodigoAta não localizada no pncp");
@@ -99,7 +99,7 @@ switch ($oParam->exec) {
 
             try {
 
-                $rsAnexos = $clcontroleanexosataspncp->sql_record($clcontroleanexosataspncp->sql_query(null, " l217_anocompra,l213_numerocompra,l217_sequencialata,l217_sequencialpncp ", null, "l217_sequencialarquivo = $iDocumentos"));
+                $rsAnexos = $clcontroleanexosataspncp->sql_record($clcontroleanexosataspncp->sql_query(null, " l217_anocompra,l213_numerocompra,l217_sequencialata,l217_sequencialpncp ", null, "l217_sequencialarquivo = $iDocumentos and l213_instit = " . db_getsession('DB_instit')));
 
                 $oDadosAnexo = db_utils::fieldsMemory($rsAnexos, 0);
 

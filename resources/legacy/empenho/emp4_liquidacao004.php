@@ -24,7 +24,7 @@
  *  Copia da licenca no diretorio licenca/licenca_en.txt
  *                                licenca/licenca_pt.txt
  */
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 ini_set("ERROR_REPORTING", "E_ALL & ~ E_NOTICE");
 
 
@@ -121,6 +121,11 @@ $clempparametro       = new cl_empparametro;
 $clempempenholiberado = new cl_empempenholiberado;
 $lBloquear = false;
 $result    = $clempparametro->sql_record($clempparametro->sql_query(db_getsession("DB_anousu")));
+
+$aLiberadosLiquidarComDataAnterior = ['333903964'];
+
+$sDesdobramentoEmpenho = getDesdobramentoByEmpenho($objJson->iEmpenho);
+
 if ($result != false && $clempparametro->numrows > 0) {
     $oParam = db_utils::fieldsMemory($result, 0);
 }
@@ -167,9 +172,7 @@ if (strlen($z01_cgccpf) == 11) {
 switch ($objJson->method) {
 
     case "getEmpenhos":
-
         $lValidaNotasEmpenho = false;
-
         $oDaoElementos        = db_utils::getDao('orcelemento');
         $sWhereEmpenho        = " e60_numemp =  {$objJson->iEmpenho}";
         $sSqlBuscaElemento    = $oDaoElementos->sql_query_estrut_empenho(null, "substr(o56_elemento,1,7) AS o56_elemento", null, $sWhereEmpenho);
@@ -199,6 +202,10 @@ switch ($objJson->method) {
         $aNotasEmpenho    = array();
         $oGrupoElemento   = new stdClass();
 
+        $clEmpparametro = new cl_empparametro();
+        $rsEmpparametro = $clEmpparametro->sql_record($clEmpparametro->sql_query(db_getsession('DB_anousu'), "e30_verificarmatordem"));
+        $lParamOrdemCompra = db_utils::fieldsMemory($rsEmpparametro, 0)->e30_verificarmatordem == 0 ? false : true;
+
         if (count($aBuscaNotas) > 0 && $lValidaNotasEmpenho) {
 
             foreach ($aBuscaNotas as $oNota) {
@@ -225,11 +232,9 @@ switch ($objJson->method) {
             $item = 1;
         }
         $objEmpenho->setEmpenho($objJson->iEmpenho);
-
+        
         if (count($aNotasEmpenho) > 0 && $lValidaNotasEmpenho) {
-
-            //echo $objEmpenho->empenho2Json('',$item, $aNotasEmpenho);
-            $oEmpenho = json_decode($objEmpenho->empenho2Json('', $item, $aNotasEmpenho));
+            $oEmpenho = json_decode($objEmpenho->empenho2Json('', $item, $aNotasEmpenho, $lParamOrdemCompra));
             $oEmpenho->sDesdobramento = db_utils::fieldsMemory($rsBuscaDesdobramento, 0)->o56_elemento;
             $oGrupoElemento->iGrupo = "";
             $oGrupoElemento->sGrupo = "";
@@ -244,7 +249,7 @@ switch ($objJson->method) {
             echo $json->encode($oEmpenho);
         } else {
 
-            $oEmpenho = json_decode($objEmpenho->empenho2Json('', $item));
+            $oEmpenho = json_decode($objEmpenho->empenho2Json('', $item, array(), $lParamOrdemCompra));
             $oGrupoContaOrcamento = GrupoContaOrcamento::getGrupoConta($oEmpenho->e64_codele, db_getsession("DB_anousu"));
 
             $oEmpenhoFinanceiro = new EmpenhoFinanceiro($oEmpenho->e60_numemp);
@@ -273,11 +278,11 @@ switch ($objJson->method) {
                         $oEmpenho->obrigaDiaria = $oParam->e30_obrigadiarias;
                         $rsEstruturalDotacao = db_query('SELECT fc_estruturaldotacao('.$oEmpenho->e60_anousu.', '.$oEmpenho->e60_coddot.') as estrutural_dotacao');
                         $oEmpenho->estruturalDotacao = db_utils::fieldsMemory($rsEstruturalDotacao, 0)->estrutural_dotacao;
+
                         echo $json->encode($oEmpenho);
                     } else {
 
-                        //echo $objEmpenho->empenho2Json('',$item);
-                        $oEmpenho = json_decode($objEmpenho->empenho2Json('', $item));
+                        $oEmpenho = json_decode($objEmpenho->empenho2Json('', $item, array(), $lParamOrdemCompra));
                         $oEmpenho->sDesdobramento = db_utils::fieldsMemory($rsBuscaDesdobramento, 0)->o56_elemento;
                         $oGrupoElemento->iGrupo = "";
                         $oGrupoElemento->sGrupo = "";
@@ -293,8 +298,7 @@ switch ($objJson->method) {
                     }
                 }
             } else {
-                // echo $objEmpenho->empenho2Json('',$item);
-                $oEmpenho = json_decode($objEmpenho->empenho2Json('', $item));
+                $oEmpenho = json_decode($objEmpenho->empenho2Json('', $item, array(), $lParamOrdemCompra));
                 $oEmpenho->sEstrutural = db_utils::fieldsMemory($rsBuscaElemento, 0)->o56_elemento;
                 $oEmpenho->sDesdobramento = db_utils::fieldsMemory($rsBuscaDesdobramento, 0)->o56_elemento;
 
@@ -308,6 +312,7 @@ switch ($objJson->method) {
                 $oEmpenho->obrigaDiaria = $oParam->e30_obrigadiarias;
                 $rsEstruturalDotacao = db_query('SELECT fc_estruturaldotacao('.$oEmpenho->e60_anousu.', '.$oEmpenho->e60_coddot.') as estrutural_dotacao');
                 $oEmpenho->estruturalDotacao = db_utils::fieldsMemory($rsEstruturalDotacao, 0)->estrutural_dotacao;
+                
                 echo $json->encode($oEmpenho);
             }
         }
@@ -343,7 +348,7 @@ switch ($objJson->method) {
                 db_fieldsmemory($rsLiquidados, 0);
 
                 if ($oParam->e30_liquidacaodataanterior == 'f') {
-                    if (date("Y-m-d", strtotime($dDataLiquidacao)) < date("Y-m-d", strtotime($dtultimaliquidacao))) {
+                    if (date("Y-m-d", strtotime($dDataLiquidacao)) < date("Y-m-d", strtotime($dtultimaliquidacao)) && !in_array($sDesdobramentoEmpenho, $aLiberadosLiquidarComDataAnterior)) {
                         throw new Exception("Não é permitido liquidar com data anterior ao último lançamento de liquidação.");
                     }
                 }
@@ -375,7 +380,7 @@ switch ($objJson->method) {
                                                     $objJson->competencia,
                                                     $objJson->e50_retencaoir,
                                                     $objJson->e50_naturezabemservico,
-                                                    $dDataLiquidacao, 
+                                                    $dDataLiquidacao,
                                                     $dDataVencimento,
                                                     $objJson->e50_contafornecedor,
                                                     $objJson->e50_numcgmordenador);
@@ -444,7 +449,7 @@ switch ($objJson->method) {
             db_fieldsmemory($rsLiquidados, 0);
 
         if ($oParam->e30_liquidacaodataanterior == 'f') {
-            if (date("Y-m-d", strtotime($dDataLiquidacao)) < date("Y-m-d", strtotime($dtultimaliquidacao))) {
+            if (date("Y-m-d", strtotime($dDataLiquidacao)) < date("Y-m-d", strtotime($dtultimaliquidacao)) && !in_array($sDesdobramentoEmpenho, $aLiberadosLiquidarComDataAnterior)) {
                 $chave = false;
                 $objEmpenho->sMsgErro = "Não é permitido liquidar com data anterior ao último lançamento de liquidação.";
                 $retorno = array("erro" => 2, "mensagem" => urlencode($objEmpenho->sMsgErro), "e50_codord" => null);
@@ -459,18 +464,18 @@ switch ($objJson->method) {
         $objEmpenho->setCredor($z01_credor);
 
 
-        if ($objJson->iCgmEmitente != "") {            
+        if ($objJson->iCgmEmitente != "") {
             $oDaoCgm   = db_utils::getDao("cgm");
             $sSqlCgmEmitente   = $oDaoCgm->sql_query_file($objJson->iCgmEmitente);
             $sSqlCgm   = $oDaoCgm->sql_query_file($objJson->cgm);
             $oDadosCgm = db_utils::fieldsMemory($oDaoCgm->sql_record($sSqlCgm), 0);
             $oDadosCgmEmitente = db_utils::fieldsMemory($oDaoCgm->sql_record($sSqlCgmEmitente), 0);
             if (substr($oDadosCgm->z01_cgccpf, 0, 8) != substr($oDadosCgmEmitente->z01_cgccpf, 0, 8)) {
-                $chave = false; 
+                $chave = false;
                 $objEmpenho->sMsgErro   = "Verifique o CNPJ do Emitente!";
             }
         }
-        
+
         if ($chave != false) {
             /**
              * Pode ser que o método gerarOrdemCompra retorne false ou um JSON
@@ -765,8 +770,6 @@ switch ($objJson->method) {
             }
         }
 
-
-
         if ($resulparemetrosaldo->pc01_liberarsaldoposicao == 'f' && pg_num_rows($Sqlparemetrosaldo) > 0 && $iStatus == 1) {
 
             db_inicio_transacao();
@@ -1060,7 +1063,11 @@ switch ($objJson->method) {
 
     case "getDadosRP":
 
-        if ($objEmpenho->getDadosRP($objJson->iTipoRP)) {
+        $clEmpparametro = new cl_empparametro();
+        $rsEmpparametro = $clEmpparametro->sql_record($clEmpparametro->sql_query(db_getsession('DB_anousu'), "e30_verificarmatordem"));
+        $lParamOrdemCompra = db_utils::fieldsMemory($rsEmpparametro, 0)->e30_verificarmatordem == 0 ? false : true;
+
+        if ($objEmpenho->getDadosRP($objJson->iTipoRP,  $lParamOrdemCompra)) {
             echo $json->encode($objEmpenho->dadosEmpenho);
         } else {
             echo $json->encode(array("status" => 2, "sMensagem" => urlencode($objEmpenho->sErroMsg)));
@@ -1403,12 +1410,12 @@ switch ($objJson->method) {
     case "getOrdenador":
 
         if ((isset($objJson->sNumEmpenho) && !empty($objJson->sNumEmpenho)) && (isset($objJson->sOrdenador) && !empty($objJson->sOrdenador))) {
-                      
+
             foreach (listarOrdenadoresCGM($objJson->sNumEmpenho,$objJson->sOrdenador) as $assinante) {
               $o41_cgmordenador  = $assinante['z01_numcgm'];
               $o41_cgmordenadordescr = $assinante['nome'];
               $db243_data_inicio = $assinante['db243_data_inicio'];
-              $db243_data_final  = $assinante['db243_data_final']; 
+              $db243_data_final  = $assinante['db243_data_final'];
             }
           }
 
@@ -1426,7 +1433,7 @@ switch ($objJson->method) {
         break;
 }
 
-function listarOrdenadoresCGM($e60_numemp,$o41_cgmordenador) 
+function listarOrdenadoresCGM($e60_numemp,$o41_cgmordenador)
 {
 
   $o58_anousu  = 0;
@@ -1444,12 +1451,12 @@ function listarOrdenadoresCGM($e60_numemp,$o41_cgmordenador)
   $coddotacao = db_utils::fieldsMemory($rsBuscaElemento, 0)->e60_coddot;
 
   $anoUsu = db_getsession("DB_anousu");
-  $sWhere = "e56_coddot =	" . $coddotacao . " and ( e56_anousu = " . $anoUsu ." or e64_vlrpag > 0 ) and e61_numemp = ".$e60_numemp; 
+  $sWhere = "e56_coddot =	" . $coddotacao . " and ( e56_anousu = " . $anoUsu ." or e64_vlrpag > 0 ) and e61_numemp = ".$e60_numemp;
   $rsResult = $clempautidot->sql_record($clempautidot->sql_query_dotacao_empenho(null, "*", null, $sWhere));
   $numrows = $clempautidot->numrows;
 
   if ($numrows > 0) {
-     
+
       $o58_anousu  = db_utils::fieldsMemory($rsResult, 0)->o58_anousu;
       $o58_instit  = db_utils::fieldsMemory($rsResult, 0)->o58_instit;
       $o58_orgao   = db_utils::fieldsMemory($rsResult, 0)->o58_orgao;
@@ -1478,13 +1485,13 @@ function listarOrdenadoresCGM($e60_numemp,$o41_cgmordenador)
                       ->orWhere('empelemento.e64_vlrpag', '>', 0);
                })
                ->get()->toArray();
-        
-   foreach ($results as $autorizacao) {  
-       $o58_instit  =  $autorizacao->o58_instit; 
-       $o58_orgao   =  $autorizacao->o58_orgao; 
-       $o58_unidade =  $autorizacao->o58_unidade; 
-       $o58_anousu  =  $autorizacao->o58_anousu; 
-   }   
+
+   foreach ($results as $autorizacao) {
+       $o58_instit  =  $autorizacao->o58_instit;
+       $o58_orgao   =  $autorizacao->o58_orgao;
+       $o58_unidade =  $autorizacao->o58_unidade;
+       $o58_anousu  =  $autorizacao->o58_anousu;
+   }
 
    $aAssinantes = DB::table('configuracoes.assinatura_digital_assinante')
                ->join('configuracoes.db_usuarios', 'configuracoes.assinatura_digital_assinante.db243_usuario', '=', 'configuracoes.db_usuarios.id_usuario')
@@ -1499,12 +1506,12 @@ function listarOrdenadoresCGM($e60_numemp,$o41_cgmordenador)
                ->where('configuracoes.assinatura_digital_assinante.db243_documento', '=', 1)
                ->select('configuracoes.db_usuarios.login', 'configuracoes.db_usuarios.nome', 'configuracoes.db_usuarios.email', 'protocolo.cgm.z01_cgccpf' , 'configuracoes.assinatura_digital_assinante.db243_cargo','protocolo.cgm.z01_numcgm','configuracoes.assinatura_digital_assinante.db243_data_inicio','configuracoes.assinatura_digital_assinante.db243_data_final')
                ->distinct('login', 'nome', 'z01_cgccpf', 'db243_cargo')
-               ->get()->toArray();         
+               ->get()->toArray();
 
-   $rowCount = count($aAssinantes);  
-   $ordenadoresArray = array(); 
-   $uniqueKeys = array(); 
-   
+   $rowCount = count($aAssinantes);
+   $ordenadoresArray = array();
+   $uniqueKeys = array();
+
    foreach ($aAssinantes as $assinante) {
        $uniqueKey = $assinante->nome . '|' . $assinante->z01_numcgm;
            if (!in_array($uniqueKey, $uniqueKeys)) {
@@ -1519,4 +1526,30 @@ function listarOrdenadoresCGM($e60_numemp,$o41_cgmordenador)
            }
    }
    return $ordenadoresArray;
+}
+
+function getDesdobramentoByEmpenho($iNumEmp) {
+
+    $sql = "SELECT
+                orcelemento.o56_elemento as desdobramento
+            FROM 
+                empelemento
+            INNER JOIN empempenho on
+                empempenho.e60_numemp = empelemento.e64_numemp
+            INNER JOIN 
+                orcelemento on orcelemento.o56_codele = empelemento.e64_codele  and orcelemento.o56_anousu = empempenho.e60_anousu
+            INNER JOIN 
+                db_config on db_config.codigo = empempenho.e60_instit
+            WHERE 
+                empelemento.e64_numemp = '" . $iNumEmp . "';";
+
+    $result = pg_exec($sql);
+
+    $aResult = pg_fetch_assoc($result);
+
+    if(!empty($aResult['desdobramento'])) {
+        return substr($aResult['desdobramento'], 0, 9);
+    }
+
+    return null;
 }

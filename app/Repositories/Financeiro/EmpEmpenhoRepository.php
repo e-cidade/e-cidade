@@ -2,7 +2,7 @@
 namespace App\Repositories\Financeiro;
 
 use App\Models\EmpEmpenho;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class EmpEmpenhoRepository
 {
@@ -56,5 +56,13 @@ class EmpEmpenhoRepository
     public function atualizarEmpenho(int $e60NumEmp, array $dados ): bool
     {
         return DB::table('empempenho')->where('e60_numemp',$e60NumEmp)->update($dados);
+    }
+
+    
+    public function update(int $e60_numemp, array $data){
+        $oEmpEmpenho = $this->model->findOrFail($e60_numemp);
+        $oEmpEmpenho->update($data);
+
+        return $oEmpEmpenho;
     }
 }

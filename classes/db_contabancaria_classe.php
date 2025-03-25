@@ -836,7 +836,8 @@ class cl_contabancaria
         $sql .= " from contabancaria ";
         $sql .= "      inner join bancoagencia           on  bancoagencia.db89_sequencial = contabancaria.db83_bancoagencia";
         $sql .= "      inner join db_bancos              on  db_bancos.db90_codban = bancoagencia.db89_db_bancos";
-        $sql .= "      left  join conplanocontabancaria  on c56_contabancaria = db83_sequencial";
+        $sql .= "      left  join conplanocontabancaria  on c56_contabancaria = db83_sequencial ";
+        $sql .= "                                        and c56_anousu = {$iAnoSessao}";
         $sql .= "      left  join conplano               on c60_codcon = c56_codcon ";
         $sql .= "                                       and c60_anousu = {$iAnoSessao}";
         $sql .= "      left  join conplanoreduz          on c61_codcon = c60_codcon ";

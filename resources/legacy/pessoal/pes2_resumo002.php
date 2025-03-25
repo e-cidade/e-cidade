@@ -147,7 +147,7 @@ if ($regime != 0) {
 $erroajuda = "";
 if ($sel != 0) {
   $result_sel = db_query("select r44_where , r44_descr from selecao where r44_selec = " . $sel . " and r44_instit = " . $instit);
-  if (pg_numrows($result_sel) > 0) {
+  if (pg_num_rows($result_sel) > 0) {
     db_fieldsmemory($result_sel, 0, 1);
     $wherepes .= " and " . $r44_where;
     $head5 = $r44_descr;
@@ -248,7 +248,11 @@ if ($tipo == "l") {
 									                      and rh26_anousu = $ano
 		               left join  orcorgao   on o40_orgao   = rh26_orgao 
 					                              and o40_anousu  = $ano
-			                                  and o40_instit  = rh02_instit ";
+			                                  and o40_instit  = rh02_instit 
+                        left join orcunidade on o41_orgao = rh26_orgao
+                                                  and o41_anousu = $ano
+                                              and o41_unidade = rh26_unidade
+                                            and o41_instit = rh02_instit";
 } elseif ($tipo == "t") {
   "lci=&lcf=   flc=13004,13006 ";
   $whereestrut = "";
@@ -437,6 +441,13 @@ if ($tipo == "l") {
 											                      and r70_instit  = rh02_instit
 			                left join  rhlotaexe   on rh26_codigo = r70_codigo 
 											                      and rh26_anousu = $ano
+                            left join orcorgao on o40_orgao = rh26_orgao
+                                                                  and o40_anousu = $ano 
+                                                                  and o40_instit = rh02_instit
+                            left join orcunidade on o41_orgao = rh26_orgao
+                                                                  and o41_anousu = $ano 
+                                                                  and o41_instit = rh02_instit
+                                                                  and o41_unidade = rh26_unidade
 		      where " . $folha . "_anousu = $ano 
 		        and " . $folha . "_mesusu = $mes 
 		    		and " . $folha . "_instit = " . db_getsession("DB_instit") . "
@@ -567,12 +578,12 @@ if ($tipo == "l") {
 
 // echo "<BR><BR> 3.1 $tipo";
 // echo "<BR><BR> 3.2 xxordem --> $xxordem com_quebra --> $com_quebra sql --> $sql <br><br>";
-//echo $sql;
+//echo $sql; die;
 
 $result = db_query($sql);
 //db_criatabela($result);
 //exit;
-$xxnum = pg_numrows($result);
+$xxnum = pg_num_rows($result);
 if ($xxnum == 0) {
   db_redireciona('db_erros.php?fechar=true&db_erro=Não existem lançamentos no período de ' . $mes . ' / ' . $ano . $erroajuda . ".");
 }
@@ -615,7 +626,7 @@ if ($tipo == "l" || $tipo == "o" || $tipo == "s" || $tipo == "t") {
     $sqlficha = getSqlFicha($lota, $ano, $mes, $folha);
   }
 }
-for ($x = 0; $x < pg_numrows($result); $x++) {
+for ($x = 0; $x < pg_num_rows($result); $x++) {
   db_fieldsmemory($result, $x);
   if (($tipo == "l" || $tipo == "o" || $tipo == "s" || $tipo == "t") && $quebra != $lota) {
     $pdf->cell(15, $alt, '', "T", 0, "C", 0);
@@ -644,6 +655,8 @@ for ($x = 0; $x < pg_numrows($result); $x++) {
     } elseif ($tipo == "o") {
       $xand = " rh26_orgao ";
       $xinner = " left join rhlotaexe on rh26_codigo = rh02_lota and rh26_anousu = " . $ano;
+      $xinner .= " left join orcorgao on o40_orgao = rh26_orgao and o40_anousu = " . $ano . " and o40_instit = rh02_instit";
+      $xinner .= " left join orcunidade on o41_orgao = rh26_orgao and o41_anousu = " . $ano . " and o41_instit = rh02_instit and o41_unidade = rh26_unidade";
     }
     if ($tipo == "t") {
       $sqllota = "select count(distinct(" . $folha . "_regist))
@@ -896,6 +909,10 @@ if ($tipo == "l" || $tipo == "o" || $tipo == "s" || $tipo == "t") {
   } elseif ($tipo == "o") {
     $xand    = " rh26_orgao ";
     $xinner .= " left join rhlotaexe on rh26_codigo = to_number(" . $folha . "_lotac,'9999') and rh26_anousu = " . $ano;
+    $xinner .= " left join orcorgao on o40_orgao = rh26_orgao and o40_anousu = " . $ano . " and o40_instit = rh02_instit";
+    $xinner .= " left join orcunidade on o41_orgao = rh26_orgao and o41_anousu = " . $ano . " and o41_instit = rh02_instit and o41_unidade = rh26_unidade";
+} elseif ($tipo == "t") {
+  $xand    = " rh55_codigo ";
   } elseif ($tipo == "t") {
     $xand    = " rh55_codigo ";
     $xinner .= " left join rhpeslocaltrab on rh56_seqpes = rh02_seqpes
@@ -1184,7 +1201,7 @@ function imprimirFicha($pdf, $sqlficha)
 {
 
   $resultficha  = db_query($sqlficha);
-  if (pg_numrows($resultficha) == 0) {
+  if (pg_num_rows($resultficha) == 0) {
     return;
   }
   for ($iCont = 0; $iCont < pg_num_rows($resultficha); $iCont++) {

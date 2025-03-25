@@ -36,6 +36,6 @@
 }
 
 /* danger: #dc3545 | rgb(220, 53, 69) */
-.icon.exclamation-circle-danger {
+.icon.exclamation-circle.danger {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='rgb(220, 53, 69)' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='size-6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z' /%3E%3C/svg%3E%0A");
 }

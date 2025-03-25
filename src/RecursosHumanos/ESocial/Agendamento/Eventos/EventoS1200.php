@@ -227,16 +227,16 @@ class EventoS1200 extends EventoBase
             for ($iCont2 = 0; $iCont2 < count($aIdentificador); $iCont2++) {
                 $std->dmdev[$seqdmdev] = new \stdClass();
                 if ($aIdentificador[$iCont2]->idedmdev == 1) {
-                    $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfsal';
+                    $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfsal' . $this->mes();
                 }
                 if ($aIdentificador[$iCont2]->idedmdev == 2) {
-                    $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfres';
+                    $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfres' . $this->mes();
                 }
                 if ($aIdentificador[$iCont2]->idedmdev == 3) {
-                    $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfcom';
+                    $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfcom' . $this->mes();
                 }
                 if ($aIdentificador[$iCont2]->idedmdev == 4) {
-                    $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfs13';
+                    $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfs13' . $this->mes();
                 }
                 $std->dmdev[$seqdmdev]->codcateg = $aDadosPorMatriculas[$iCont]->codcateg;
 

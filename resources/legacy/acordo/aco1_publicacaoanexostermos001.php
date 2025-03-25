@@ -71,7 +71,7 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
                 <?php
                 $aTipoAnexos = array(
                             0 => 'Selecione',
-                            13 => 'Termo de Rescisão',
+                            13 => 'Termo de Rescisï¿½o',
                             14 => 'Termo Aditivo',
                             15 => 'Termo de Apostilamento',
                             17 => 'Nota de Empenho'
@@ -188,11 +188,6 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
 </style>
 
 <script type="text/javascript">
-  loadComponents([
-    'buttonsSolid',
-    'simpleModal'
-  ]);
-
   const oGridDocumentos = new DBGrid('gridDocumentos');
 
   oGridDocumentos.nameInstance = "oGridDocumentos";

@@ -115,6 +115,7 @@ if (isset($o48_arrecadmaior) && $o48_arrecadmaior > 0){
     $clcriaabas->identifica = $identifica;
     $clcriaabas->src        = $src;
     $clcriaabas->sizecampo  = $sizecampo;
+    $clcriaabas->disabled   =  array("receita"=>"true"); 
     $clcriaabas->cria_abas();
    ?>
 

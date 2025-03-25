@@ -503,7 +503,7 @@ db_app::load("widgets/windowAux.widget.js");
                 with (oResponse.aLinhasExtrato[i]) {
                     if (fechar_conciliacao == 1)
                         document.getElementById("fechar_conciliacao").checked = true;
-                    else 
+                    else
                         document.getElementById("fechar_conciliacao").checked = false;
                 }
             }
@@ -521,7 +521,7 @@ db_app::load("widgets/windowAux.widget.js");
                 with (oResponse.aLinhasExtrato[i]) {
                     if (fechar_conciliacao == 1)
                         document.getElementById("fechar_conciliacao").checked = true;
-                    else 
+                    else
                         document.getElementById("fechar_conciliacao").checked = false;
                     var conciliado = parseFloat(saldo_anterior) - parseFloat(total_entradas) + parseFloat(total_saidas);
                     // console.log("Query da Entrada: " + total_entradas);
@@ -745,7 +745,7 @@ db_app::load("widgets/windowAux.widget.js");
                 // if (oRow.aCells[3].getValue().length == 1) {
                     valorCampo = oRow.aCells[9].getValue();
                     // Remove os pontos do número (apenas os pontos, sem remover a vírgula)
-                    var valorSemPontos = valorCampo.replace(/\./g, ''); 
+                    var valorSemPontos = valorCampo.replace(/\./g, '');
                     // Remove a vírgula decimal do número
                     var valorSemVirgula = valorSemPontos.replace(',', '.');
                     if (oRow.aCells[8].getValue() == 'E' || oRow.aCells[8].getValue() == 'EP')
@@ -763,7 +763,7 @@ db_app::load("widgets/windowAux.widget.js");
                     // f (oRow.aCells[3].getValue().length == 1) {
                         valorCampo = oRow.aCells[9].getValue();
                         // Remove os pontos do número (apenas os pontos, sem remover a vírgula)
-                        var valorSemPontos = valorCampo.replace(/\./g, ''); 
+                        var valorSemPontos = valorCampo.replace(/\./g, '');
                         // Remove a vírgula decimal do número
                         var valorSemVirgula = valorSemPontos.replace(',', '.');
                         if (oRow.aCells[8].getValue() == 'S' || oRow.aCells[8].getValue() == 'SP')
@@ -1055,9 +1055,9 @@ db_app::load("widgets/windowAux.widget.js");
         lancamento.codigo           = dados_complementares_oprecslip[movimento[1]];
         lancamento.documento        = dados_complementares_documento[movimento[1]];
         lancamento.movimentacao     = movimento[8];
-        if (movimento[8] == "EP") 
+        if (movimento[8] == "EP")
             lancamento.movimentacao = "E";
-        if (movimento[8] == "SP") 
+        if (movimento[8] == "SP")
             lancamento.movimentacao = "S";
         lancamento.valor            = dados_complementares_valor_individual[movimento[1]];
         console.log(lancamento);

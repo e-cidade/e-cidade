@@ -1,5 +1,4 @@
 <?php
-//ini_set("display_errors", "on");
 
 require_once("libs/db_stdlib.php");
 require_once("libs/db_utils.php");
@@ -96,8 +95,6 @@ try {
         }
       }
 
-      //            echo"<pre>";print_r($vlrdiscaixabruta);exit;
-
       /**
        * aqui irei montar a consulta para chegar ao valor de resto a pagar de exercicios anteriores
        *
@@ -164,7 +161,6 @@ try {
                                 ORDER BY e91_recurso,e60_anousu,e60_codemp::bigint";
 
         $resultMovFonte = db_query($sql);
-        //                db_criatabela($resultMovFonte);
 
         for ($iContMov = 0; $iContMov < pg_num_rows($resultMovFonte); $iContMov++) {
           $rsFontes = db_utils::fieldsMemory($resultMovFonte, $iContMov);
@@ -206,19 +202,7 @@ try {
           }
         }
       }
-      //                  echo "<pre>"; echo "totemp91: ".$oVlrTote91Emp;echo"<br>";
-      //                  echo "totanu91: ".$oVlrTote91Anu;echo"<br>";
-      //                  echo "totliq91: ".$oVlrTote91Liq;echo"<br>";
-      //                  echo "totpag91: ".$oVlrTote91Pag;echo"<br>";
-      //                  echo "totliq: ".$oVlrTotLiq;echo"<br>";
-      //                  echo "totanu: ".$oVlrTotAnu;echo"<br>";
-      //                  echo "totpag: ".$oVlrTotPag;echo"<br>";
-      //                  echo "totpagnproc: ".$vlrTotpagnproc;echo"<br>";
-      //                  echo "totanuliq: ".$vlrTotanuliq;echo"<br>";
-      //                  echo "totanuliqnaoproc: ".$vlrTotanuliqnaoproc;echo"<br>";
-      //                  echo "TotNP: ".$totNP;echo"<br>";
-      //                  echo "TotLiq: ".$totLiq;echo"<br>";
-      //                  exit;
+
       /***
        * busco informações do registro 20 ext com tipo de lançamento 01,02 e 99
        */
@@ -251,7 +235,6 @@ try {
           $vlrrestorecolher->valor += $oExt20->si165_vlsaldoatualfonte;
         }
       }
-      //    echo "<pre>"; print_r($vlrrestorecolherfonte);exit;
       /***
        * busco informações do registro 20 ext com tipo de lançamento 03
        */
@@ -349,7 +332,7 @@ try {
         }
       }
       $oRetorno->oDados[] = $retornoSicom;
-      //            echo "<pre>";print_r($retornoSicom);
+
       break;
 
     case "getSicom":
@@ -396,8 +379,6 @@ try {
           $vlsaldofinalfonte->valor += round($ocaixa11->si166_vlsaldofinalfonte, 2);
         }
       }
-
-      //echo"<pre>";print_r($vlrdiscaixabruta);exit;
 
       /**
        * aqui irei montar a consulta para chegar ao valor de resto a pagar de exercicios anteriores
@@ -463,9 +444,7 @@ try {
                                 AND o15_codtri::int4 IN($fonte)
                                 AND o15_codtri != ''
                                 ORDER BY e91_recurso,e60_anousu,e60_codemp::bigint";
-        //echo $sql;exit;
         $resultMovFonte = db_query($sql);
-        //db_criatabela($resultMovFonte);
 
         for ($iContMov = 0; $iContMov < pg_num_rows($resultMovFonte); $iContMov++) {
           $rsFontes = db_utils::fieldsMemory($resultMovFonte, $iContMov);
@@ -528,16 +507,11 @@ try {
         }
       }
 
-      $ctrOrcamentario = new ControleOrcamentario();
-      $ctrOrcamentario->setDeParaFonte8digitos();
-
-      // $aFontesEncerradas = array('148', '149', '150', '151', '152', '248', '249', '250', '251', '252');
-
+      
       foreach ($vlRspExerciciosAnteriores as $fonte => $oDados) {
 
-        // if (in_array($fonte, $aFontesEncerradas)) {
-        //   $fonte = substr($fonte, 0, 1) . '59';
-        // }
+       $ctrOrcamentario = new ControleOrcamentario();
+       $ctrOrcamentario->setDeParaFonte8digitos();
 
         $ctrOrcamentario->setFonte($fonte);
         $fonteControleOrcamentario = $ctrOrcamentario->getFonte3ParaFonte8();

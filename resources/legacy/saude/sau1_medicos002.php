@@ -76,14 +76,14 @@ if (isset($alterar)) {
       parent.document.formaba.a4.disabled = false;
       parent.document.formaba.a5.disabled = false;
       parent.document.formaba.a6.disabled = false;
-      CurrentWindow.corpo.iframe_a2.location.href   = 'pro1_cgmdoc001.php?z02_i_cgm=<?=$sd03_i_cgm?>&z01_nome=<?=$z01_nome?>';
-      CurrentWindow.corpo.iframe_a3.location.href   = 'sau1_unidademedicos001.php?sd04_i_medico=<?=$sd03_i_codigo?>'+
+      (window.CurrentWindow || parent.CurrentWindow).corpo.iframe_a2.location.href   = 'pro1_cgmdoc001.php?z02_i_cgm=<?=$sd03_i_cgm?>&z01_nome=<?=$z01_nome?>';
+      (window.CurrentWindow || parent.CurrentWindow).corpo.iframe_a3.location.href   = 'sau1_unidademedicos001.php?sd04_i_medico=<?=$sd03_i_codigo?>'+
                                             '&z01_nome=<?=$z01_nome?>';
-      CurrentWindow.corpo.iframe_a4.location.href   = 'sau1_undmedhorario006.php?sd04_i_medico=<?=$sd03_i_codigo?>'+
+      (window.CurrentWindow || parent.CurrentWindow).corpo.iframe_a4.location.href   = 'sau1_undmedhorario006.php?sd04_i_medico=<?=$sd03_i_codigo?>'+
                                             '&z01_nome=<?=$z01_nome?>';
-      CurrentWindow.corpo.iframe_a5.location.href   = 'sau1_undmedhorario007.php?sd04_i_medico=<?=$sd03_i_codigo?>'+
+      (window.CurrentWindow || parent.CurrentWindow).corpo.iframe_a5.location.href   = 'sau1_undmedhorario007.php?sd04_i_medico=<?=$sd03_i_codigo?>'+
                                             '&z01_nome=<?=$z01_nome?>';
-      CurrentWindow.corpo.iframe_a6.location.href   = 'sau1_sau_procedmedagendamento001.php?sd04_i_medico=<?=$sd03_i_codigo?>'+
+      (window.CurrentWindow || parent.CurrentWindow).corpo.iframe_a6.location.href   = 'sau1_sau_procedmedagendamento001.php?sd04_i_medico=<?=$sd03_i_codigo?>'+
                                             '&z01_nome=<?=$z01_nome?>';
     </script>
 <?

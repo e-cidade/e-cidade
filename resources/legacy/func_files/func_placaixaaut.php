@@ -168,6 +168,9 @@ $clplacaixa->rotulo->label("k80_data");
           $repassa = array("chave_k80_codpla" => $chave_k80_codpla);
         }
 
+        if (count($_POST) == 0){
+          $sql = "";
+        }
         db_lovrot($sql, 15,"()","",$funcao_js,"","NoMe",$repassa, false);
 
       } else {

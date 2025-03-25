@@ -3,7 +3,7 @@
 //error_reporting(E_ALL);
 use App\Models\Configuracao\AssinaturaDigitalParametro;
 use App\Models\Configuracao\AssinaturaDigitalAssinante;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 require_once("libs/db_stdlib.php");
 require_once("libs/db_app.utils.php");
@@ -217,6 +217,36 @@ try {
                 ->where('db242_assinador_ativo', '=', TRUE)
                 ->exists() ?? FALSE;
             DB::commit();
+        break;
+        case 'duplicarAssinantes':
+
+            $iAnoAtual = db_getsession("DB_anousu");
+            $iAnoDestino = db_getsession("DB_anousu") + 1;
+
+            $aAssinantes = DB::table('configuracoes.assinatura_digital_assinante')
+            ->where('configuracoes.assinatura_digital_assinante.db243_anousu', '=', db_getsession("DB_anousu"))
+            ->where('configuracoes.assinatura_digital_assinante.db243_data_final', '=', db_getsession("DB_anousu")."-12-31")
+            ->orderBy('configuracoes.assinatura_digital_assinante.db243_codigo')
+            ->get()->toArray();
+
+            $oRetorno->sMensagem =  "Não existe assinantes para duplicar.";
+
+            foreach($aAssinantes as &$oAssinantes){
+                unset($oAssinantes->db243_codigo);
+                $oAssinantes->db243_data_inicio = $iAnoDestino."-01-01";
+                $oAssinantes->db243_data_final = $iAnoDestino."-12-31";
+                $oAssinantes->db243_anousu = $iAnoDestino;
+                $oAssinantes = (array)$oAssinantes;
+
+                $oExiste = DB::table('configuracoes.assinatura_digital_assinante')
+                ->where($oAssinantes) 
+                ->first();
+
+                if (!$oExiste){
+                    AssinaturaDigitalAssinante::create($oAssinantes);
+                    $oRetorno->sMensagem =  "Assinantes do exercicío atual duplicados com sucesso.";
+                }
+            }
         break;
     }
 } catch ( Exception $oErro ) {

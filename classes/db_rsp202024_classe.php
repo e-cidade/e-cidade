@@ -861,7 +861,11 @@ class cl_rsp202024
             JOIN orcelemento ON o58_codele = o56_codele AND o58_anousu = o56_anousu
             JOIN orctiporec ON o58_codigo = o15_codigo
             JOIN db_config ON codigo = e60_instit
-            JOIN empanulado ON e94_numemp = e60_numemp AND c71_data = e94_data AND c70_valor = e94_valor
+          --JOIN empanulado ON e94_numemp = e60_numemp AND c71_data = e94_data AND c70_valor = e94_valor
+            JOIN (SELECT DISTINCT ON (e94_data, e94_valor,e94_numemp) * FROM empanulado) x ON
+              e60_numemp = x.e94_numemp
+              AND c71_data = x.e94_data
+              AND c70_valor = x.e94_valor
             LEFT JOIN infocomplementaresinstit ON codigo = si09_instit
             JOIN orcunidade ON o58_orgao=o41_orgao AND o58_unidade=o41_unidade AND o58_anousu = o41_anousu
             JOIN orcorgao ON o40_orgao = o41_orgao AND o40_anousu = o41_anousu

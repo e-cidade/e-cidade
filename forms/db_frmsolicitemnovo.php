@@ -280,7 +280,7 @@ if ((isset($opcao) && $opcao == "alterar")) {
             $unidade = array();
 
 
-            $result = db_query("select * from matunid order by m61_descr");
+            $result = db_query("select * from matunid where m61_ativo = 't' order by m61_descr");
             if (pg_numrows($result) != 0) {
               $numrows = pg_numrows($result);
               $unidade[0] = "";
@@ -555,7 +555,7 @@ if ((isset($opcao) && $opcao == "alterar")) {
     }
 
     if (document.getElementById('pc11_servicoquantidade').value == 'false' && document.getElementById('pc11_servicoquantidade').style.display != 'none') {
-      document.getElementById('pc17_unid').value = 999999;
+      document.getElementById('pc17_unid').value = 407;
     }
 
 
@@ -576,18 +576,14 @@ if ((isset($opcao) && $opcao == "alterar")) {
 
   function js_alterarLinha(indice) {
 
-
     document.getElementById('novo').style.display = "";
     servicoquantidade = document.getElementsByName("servicoquantidade[]")[indice].value;
     servico = document.getElementsByName("servico[]")[indice].value;
-
 
     document.getElementById('db_opcao').value = "Alterar";
     document.getElementById("db_opcao").setAttribute('name', 'alterar');
     document.getElementById("db_opcao").setAttribute('type', 'submit');
     document.getElementById("db_opcao").setAttribute('onclick', 'return js_alterar(' + indice + ')');
-
-
 
     document.getElementById('pc16_codmater').value = document.getElementsByName("codmaterial[]")[indice].value;
     document.getElementById('pc01_descrmater').value = document.getElementsByName("descmaterial[]")[indice].value;
@@ -651,6 +647,7 @@ if ((isset($opcao) && $opcao == "alterar")) {
     options.forEach(o => o.remove());
     js_buscarEle();
     document.getElementById('eleSub').value = document.getElementsByName("codele[]")[indice].value;
+    getUnidade();
 
 
   }
@@ -943,6 +940,7 @@ if ((isset($opcao) && $opcao == "alterar")) {
 
       }
       js_buscarEle();
+      getUnidade();
 
     }
   }
@@ -995,6 +993,7 @@ if ((isset($opcao) && $opcao == "alterar")) {
     }
 
     js_buscarEle();
+    getUnidade();
 
   }
 
@@ -1066,6 +1065,9 @@ if ((isset($opcao) && $opcao == "alterar")) {
     document.getElementById('pc17_unid').disabled = false;
     document.getElementById('eleSub').disabled = false;
     document.getElementById('pc11_servicoquantidade').disabled = false;
+    document.getElementById('pc17_unid').style.backgroundColor = 'white';
+    document.getElementById('pc17_unid2').style.backgroundColor = 'white';
+    getUnidade();
   }
 
   function js_adicionarItem() {
@@ -1117,7 +1119,7 @@ if ((isset($opcao) && $opcao == "alterar")) {
     }
 
     if (document.getElementById('pc11_servicoquantidade').value == 'false' && document.getElementById('pc11_servicoquantidade').style.display != 'none') {
-      document.getElementById('pc17_unid').value = 999999;
+      document.getElementById('pc17_unid').value = 407;
     }
 
 
@@ -1252,4 +1254,33 @@ if ((isset($opcao) && $opcao == "alterar")) {
     }, 3000);
 
   }
+
+  function getUnidade(){
+    let oParametro = new Object();
+        let oRetorno;
+        oParametro.pc01_codmater = document.getElementById('pc16_codmater').value;
+        let oAjax = new Ajax.Request('com_getunidpcmater.RPC.php', {
+            method: 'post',
+            parameters: 'json=' + Object.toJSON(oParametro),
+            asynchronous: false,
+            onComplete: function(oAjax) {
+                oRetorno = eval("(" + oAjax.responseText.urlDecode() + ")");
+                let codigoUnidade = oRetorno.pc01_unid;
+
+                if(codigoUnidade != "" && codigoUnidade != null){
+                  document.getElementById('pc17_unid').value = codigoUnidade;
+                  document.getElementById('pc17_unid').disabled = true;
+                  document.getElementById('pc17_unid2').value = codigoUnidade;
+                  document.getElementById('pc17_unid').style.backgroundColor = '#DEB887';
+                  document.getElementById('pc17_unid2').style.backgroundColor = '#DEB887';
+                }else{
+                  document.getElementById('pc17_unid').style.backgroundColor = 'white';
+                  document.getElementById('pc17_unid').disabled = false;
+                  document.getElementById('pc17_unid2').style.backgroundColor = 'white';
+                }
+
+            }
+        });
+  }
+
 </script>

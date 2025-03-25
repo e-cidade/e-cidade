@@ -26,7 +26,7 @@
  */
 
 /**
- * Classe utilizada Internamente em Métodos da classe db_utils, como se fosse um stdClass
+ * Classe utilizada Internamente em Mtodos da classe db_utils, como se fosse um stdClass
  * @author $Author: dbrafael.nery $
  * @version $Revision: 1.37 $
  */
@@ -35,7 +35,7 @@ class _db_fields
 }
 
 /**
- * Classe com Utilitários comuns para Uso no Projeto
+ * Classe com Utilitrios comuns para Uso no Projeto
  * @abstract
  */
 class db_utils
@@ -137,13 +137,13 @@ class db_utils
     }
 
     /**
-     * Metodo para carregar o arquivo de definição da classe requerida;
+     * Metodo para carregar o arquivo de definio da classe requerida;
      *
      * @param string  $sClasse   - Nome da Classe na Pasta Classes.
      *                             Ex. db_arrecad_classe.php deve passar como parametro
      *                                 "arrecad"
-     * @param boolean $rInstance - Testa se além de carregar arquivo deve também Instanciá-la
-     * @return OBJECT|boolean - Objeto da Classe Instanciada ou Apenas confirmação do Carregamento
+     * @param boolean $rInstance - Testa se alm de carregar arquivo deve tambm Instanci-la
+     * @return OBJECT|boolean - Objeto da Classe Instanciada ou Apenas confirmao do Carregamento
      */
     static function getDao($sClasse, $lInstanciaClasse = true)
     {
@@ -165,7 +165,7 @@ class db_utils
     }
 
     /**
-     * Retorna Coleção de Objetos de TODAS as Linhas do Result passado
+     * Retorna Coleo de Objetos de TODAS as Linhas do Result passado
      *
      * @see db_utils::fieldsMemory()
      * @return stdClass[]
@@ -249,7 +249,7 @@ class db_utils
     }
 
     /**
-     * Valida se uma String está codificada como UTF-8
+     * Valida se uma String est codificada como UTF-8
      * @param  string $string
      * @return boolean
      */
@@ -263,7 +263,7 @@ class db_utils
     }
 
     /**
-     * Valida se uma String está codificada como LATIN1(ISO-8859-1)
+     * Valida se uma String est codificada como LATIN1(ISO-8859-1)
      * @param  string $string
      * @return boolean
      */
@@ -295,11 +295,11 @@ class db_utils
     }
 
     /**
-     * Cria a representação da Linha de Query no formato especificado na Closure
+     * Cria a representao da Linha de Query no formato especificado na Closure
      *
      * @param RecordSet  $rsRecord - Recordset do Resultado da query
-     * @param Closure    $fRetorno - Função que descreverá o retorno
-     * @param Integer    $iIndice  - Indice da linha do resultado, caso não seja informada pegará a próxima(fetch)
+     * @param Closure    $fRetorno - Funo que descrever o retorno
+     * @param Integer    $iIndice  - Indice da linha do resultado, caso no seja informada pegar a prxima(fetch)
      *
      * @return mixed - Retorno informado na Closure
      */
@@ -310,12 +310,12 @@ class db_utils
 
 
     /**
-     * Cria a representação da Coleção de Resultados de Query no formato especificado na Closure
+     * Cria a representao da Coleo de Resultados de Query no formato especificado na Closure
      *
      * @param RecordSet  $rsRecord - Recordset do Resultado da query
-     * @param Closure    $fRetorno - Função que descreverá o retorno
+     * @param Closure    $fRetorno - Funo que descrever o retorno
      *
-     * @return array - Coleção criada
+     * @return array - Coleo criada
      */
     public static function makeCollectionFromRecord($rsRecord, Closure $fRetorno)
     {
@@ -341,9 +341,9 @@ class db_utils
     }
 
     /**
-     * Verifica os dados postados e verificar se o conteudo enviado não ultrapassou o max_post_size,
-     * onde o PHP não dispara nenhum alerta quando esse valor é ultrapassado,
-     * gerando apenas erros onde a variável POST/GET/REQUEST não for definida
+     * Verifica os dados postados e verificar se o conteudo enviado no ultrapassou o max_post_size,
+     * onde o PHP no dispara nenhum alerta quando esse valor  ultrapassado,
+     * gerando apenas erros onde a varivel POST/GET/REQUEST no for definida
      */
     public static function checkContentSize()
     {
@@ -356,7 +356,7 @@ class db_utils
             $maxPostSize = DBString::formatSizeUnits($maxPostSize);
             $contentSize = DBString::formatSizeUnits($contentSize);
             throw new ParameterException(
-                "Tamanho do conteúdo enviado({$contentSize}), ultrapassa o valor máximo permitido({$maxPostSize})."
+                "Tamanho do contedo enviado({$contentSize}), ultrapassa o valor mximo permitido({$maxPostSize})."
             );
         }
         return true;
@@ -412,10 +412,10 @@ class db_utils
             }
             return $data;
         } elseif (is_string($data)) {
-            // Verificar se a string já está na codificação desejada
+            // Verificar se a string j est na codificao desejada
             $currentEncoding = mb_detect_encoding($data, [$encodingfrom, $encodingto], true);
 
-            // Só converter se a string estiver na codificação de origem esperada
+            // S converter se a string estiver na codificao de origem esperada
             if ($currentEncoding === $encodingfrom) {
                 return mb_convert_encoding($data, $encodingto, $encodingfrom);
             }

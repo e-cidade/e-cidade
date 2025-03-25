@@ -148,6 +148,21 @@ function js_emite(){
 
 }
 
+function js_marcaritenspadrao()
+{
+    caracteristicas.document.getElementById("CHECK_5").checked = true;
+    caracteristicas.document.getElementById("CHECK_6").checked = true;
+    caracteristicas.document.getElementById("CHECK_10").checked = true;
+    caracteristicas.document.getElementById("CHECK_20").checked = true;
+    caracteristicas.document.getElementById("CHECK_21").checked = true;
+    caracteristicas.document.getElementById("CHECK_22").checked = true;
+    caracteristicas.document.getElementById("CHECK_24").checked = true;
+    caracteristicas.document.getElementById("CHECK_25").checked = true;
+    caracteristicas.document.getElementById("CHECK_29").checked = true;
+    caracteristicas.document.getElementById("CHECK_30").checked = true;
+    caracteristicas.document.getElementById("CHECK_31").checked = true;
+    caracteristicas.document.getElementById("CHECK_33").checked = true;
+}
 
 </script>
 <link href="estilos.css" rel="stylesheet" type="text/css">
@@ -193,6 +208,7 @@ function js_emite(){
       <tr>
         <td colspan="2" align = "center">
           <input  name="emite2" id="emite2" type="button" value="Processar" onclick="js_emite();" >
+          <input  name="marcar-item-padrao" id="marcar-item-padrao" type="button" value="Marcar Itens Padrão" onclick="js_marcaritenspadrao();" >
         </td>
       </tr>
     </form>

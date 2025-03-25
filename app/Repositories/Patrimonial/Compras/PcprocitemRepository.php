@@ -3,7 +3,7 @@
 namespace App\Repositories\Patrimonial\Compras;
 use App\Models\Patrimonial\Compras\Pcprocitem;
 use cl_pcprocitem;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class PcprocitemRepository
 {
@@ -37,9 +37,182 @@ class PcprocitemRepository
     public function getItensLicitacao($pc81_codproc)
     {
         $pcprocitem = new cl_pcprocitem();
-        $campos = "pc11_seq,pc01_codmater,pc01_descrmater,pc11_quant,pc81_codprocitem,si02_vlprecoreferencia,si02_vltotalprecoreferencia,m61_descr,pc11_reservado";
+        $campos = "
+            pc11_seq,
+            pc01_codmater,
+            pc01_descrmater,
+            pc11_quant,
+            pc81_codprocitem,
+            si02_vlprecoreferencia,
+            si02_vltotalprecoreferencia,
+            m61_codmatunid,
+            m61_descr,
+            pc11_reservado
+        ";
         $sql = $pcprocitem->queryGetItens($pc81_codproc,$campos,"","pc11_seq");
         return DB::select($sql);
+    }
+
+    public function getItensLicLicitemAndLicitacao(?int $pc81_codproc, int $l20_codigo, int $limit = 15, int $offset = 0, bool $isPaginate = true){
+        $query = $this->model->query();
+
+        $query->select(
+            'pc01_codmater',
+            'pc11_seq',
+            'pc01_descrmater',
+            'pc01_complmater',
+            'pc11_quant',
+            'm61_codmatunid',
+            'm61_descr',
+            'pc11_reservado',
+            DB::raw('
+                CASE
+                    WHEN pc11_reservado = \'t\' THEN \'SIM\'
+                    ELSE \'NÃO\'
+                END as reservado
+            '),
+            'pc81_codprocitem',
+            'l21_codigo',
+            'l04_codigo',
+            'l04_descricao',
+            'l21_sigilo',
+            'pc81_codproc',
+            'pc68_nome'
+        );
+
+        $query->leftJoin(
+            'processocompraloteitem',
+            'pc69_pcprocitem',
+            '=',
+            'pc81_codprocitem'
+        );
+        $query->leftJoin(
+            'processocompralote',
+            'pc68_sequencial',
+            '=',
+            'pc69_processocompralote'
+        );
+        $query->join(
+            'solicitem',
+            'pc11_codigo',
+            '=',
+            'pc81_solicitem'
+        );
+        $query->join(
+            'solicitempcmater',
+            'pc16_solicitem',
+            '=',
+            'pc11_codigo'
+        );
+        $query->join(
+            'solicitemunid',
+            'pc17_codigo',
+            '=',
+            'pc11_codigo'
+        );
+        $query->join(
+            'matunid',
+            'm61_codmatunid',
+            '=',
+            'pc17_unid'
+        );
+        $query->join(
+            'pcmater',
+            'pc01_codmater',
+            '=',
+            'pc16_codmater'
+        );
+        $query->join(
+            'pcorcamitemproc',
+            'pc31_pcprocitem',
+            '=',
+            'pc81_codprocitem'
+        );
+        $query->join(
+            'pcorcamitem',
+            'pc22_orcamitem',
+            '=',
+            'pc31_orcamitem'
+        );
+        $query->join(
+            'itemprecoreferencia',
+            'si02_itemproccompra',
+            '=',
+            'pc22_orcamitem'
+        );
+
+        if(!empty($pc81_codproc)){
+            $query->leftJoin(
+                'liclicitem',
+                function($join) use ($l20_codigo) {
+                    $join->on(
+                        'l21_codpcprocitem',
+                        '=',
+                        'pc81_codprocitem'
+                    )
+                    ->on(
+                        'l21_codliclicita',
+                        '=',
+                        DB::raw($l20_codigo)
+                    );
+                }
+            );
+        } else {
+            $query->join(
+                'liclicitem',
+                function($join) use ($l20_codigo) {
+                    $join->on(
+                        'l21_codpcprocitem',
+                        '=',
+                        'pc81_codprocitem'
+                    )
+                    ->on(
+                        'l21_codliclicita',
+                        '=',
+                        DB::raw($l20_codigo)
+                    );
+                }
+            );
+        }
+
+        $query->leftJoin(
+            'liclicitemlote',
+            'l04_liclicitem',
+            '=',
+            'l21_codigo'
+        );
+
+        if(!empty($pc81_codproc)){
+            $query->where('pc81_codproc', '=', $pc81_codproc);
+        }
+
+        $query->orderBy('l21_ordem', 'asc');
+
+        $total = $query->count();
+
+        if($isPaginate){
+            $query->limit($limit);
+            $query->offset(($offset * $limit));
+        }
+
+        $data = $query->get()->toArray();
+
+        return ['total' => $total, 'data' => $data];
+    }
+
+    public function getItensProcesso($l20_codigo){
+        return $this->model
+            ->distinct()
+            ->select('pc81_codproc')
+            ->join('solicitem', 'pc81_solicitem', '=', 'pc11_codigo')
+            ->whereIn('pc81_codprocitem', function ($query) use ($l20_codigo) {
+                $query->select('l21_codpcprocitem')
+                    ->from('liclicitem')
+                    ->where('l21_codliclicita', $l20_codigo);
+            })
+            ->orderBy('pc81_codproc')
+            ->get()
+            ->toArray();
     }
 
     public function getItensCota($pc81_codproc)

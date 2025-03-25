@@ -238,3 +238,14 @@ table.table-body tr.warning {
 .elipse {
   text-overflow: ellipsis;
 }
+
+.header-busca{
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  padding: 10px 5px 10px;
+}
+.header-busca input{
+  max-width: 100%;
+  width: 300px;
+}

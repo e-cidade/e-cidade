@@ -329,10 +329,24 @@ if ($k03_tipo != 16) {
             $mostrabotao      = db_permissaomenu(db_getsession("DB_anousu"),81,2537);
             $mostrabotaoBySim = db_permissaomenu(db_getsession("DB_anousu"),81,8393);
             
+            $consulta = "SELECT * FROM cartorio.titulos where termo = $v07_parcel and (status = 'PAGO' or status = 'ENVIO_PENDENTE' or status = 'ENVIADO' )";
+            $exec = db_query($consulta);
+            $count = pg_num_rows($exec);
+
+            if($count > 0){
+              $flagbotao = true;
+            }else{
+              $flagbotao = false;
+            }
+
             if ($mostrabotao == "true" || $mostrabotaoBySim == "true") {
             	if (@$mostra != "nao") {
           ?>
-                <input type="button" name="anula" value="Simular Anulação de Parcelamento" onclick="js_anula();" > 
+                 <input 
+                type="button" name="anula" 
+                value="Simular Anulação de Parcelamento" onclick="js_anula();" 
+                <?php echo $flagbotao ? 'disabled' : ''; ?>
+                >
           <?php        	
              }
             }

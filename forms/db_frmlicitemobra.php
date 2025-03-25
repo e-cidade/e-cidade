@@ -125,7 +125,6 @@ $cllicitemobra->rotulo->label();
         } else {
             $sSqlItemLicitacao = $cllicitemobra->sql_query_itens_obras_licitacao(null, $sCampos, $sOrdem, $sWhere);
         }
-        
         $sResultitens = $cllicitemobra->sql_record($sSqlItemLicitacao);
         $aItensObras = db_utils::getCollectionByRecord($sResultitens);
         $numrows = $cllicitemobra->numrows;

@@ -5,7 +5,7 @@ namespace App\Repositories\Patrimonial;
 
 use App\Models\AcordoVigencia;
 use App\Repositories\Contracts\Patrimonial\AcordoVigenciaRepositoryInterface;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class AcordoVigenciaRepository implements AcordoVigenciaRepositoryInterface
 {

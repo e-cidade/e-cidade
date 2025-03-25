@@ -604,7 +604,9 @@ function query_lancamentos($conta, $data_inicial, $data_final, $condicao_lancame
         $sql .= " UNION ALL ";
         $sql .= query_transferencias_credito($conta, $data_inicial, $data_final, $condicao_lancamento, data($dataImplantacao));
     }
-    $sql .= ") as w " . where_retencoes() . " ORDER BY w.data";
+    $groupby = " group by w.data,w.tipo_lancamento,w.data_conciliacao,w.cod_doc,w.valor_debito,w.valor_credito,w.codigo,w.tipo,w.cheque,
+                       w.ordem,w.credor,w.numcgm,w.historico,w.retencao";
+    $sql .= ") as w " . where_retencoes() . "$groupby ORDER BY w.data";
     return $sql;
 }
 
@@ -754,7 +756,9 @@ function movimentacao_extrato($conta, $dataInicial, $dataFinal, $movimentacao)
     $sql .= query_transferencias_debito_total($conta, $dataInicial, $dataFinal, $implantacao);
     $sql .= " union all ";
     $sql .= query_transferencias_credito_total($conta, $dataInicial, $dataFinal, $implantacao);
-    $sql .= ") as w " . where_retencoes() . " ORDER BY w.data";
+    $groupby = " group by w.data,w.tipo_lancamento,w.data_conciliacao,w.cod_doc,w.valor_debito,w.valor_credito,w.codigo,w.tipo,w.cheque,
+    w.ordem,w.credor,w.numcgm,w.historico,w.retencao";
+    $sql .= ") as w " . where_retencoes() . " $groupby ORDER BY w.data";
 
     $query = pg_query($sql);
 

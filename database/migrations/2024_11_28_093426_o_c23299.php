@@ -1,0 +1,148 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class OC23299 extends Migration
+{
+
+    public function up()
+    {
+        $sql = "
+            begin;
+
+                alter table material.matunid add column m61_codsicom varchar(50);
+                alter table material.matunid add column m61_ativo bool;
+                update material.matunid set m61_ativo='f';
+
+                insert into material.matunid values (301,'UNIDADE','t','UN','t','121','t');
+                insert into material.matunid values (302,'AMPOLA','t','AMP','t','002','t');
+                insert into material.matunid values (303,'ANO','f','ANO','t','003','t');
+                insert into material.matunid values (304,'BANDEJA','t','BDJ','f','004','t');
+                insert into material.matunid values (305,'BASTÃO','f','BAST','t','005','t');
+                insert into material.matunid values (306,'BISNAGA','t','BISNG','t','006','t');
+                insert into material.matunid values (307,'BLOCO','f','BLOCO','t','007','t');
+                insert into material.matunid values (308,'BALDE','t','BALDE','f','008','t');
+                insert into material.matunid values (309,'BLISTER','f','BLIST','t','009','t');
+                insert into material.matunid values (310,'BOLSA','f','BOLSA','t','010','t');
+                insert into material.matunid values (311,'BOBINA','f','BOBNA','t','011','t');
+                insert into material.matunid values (312,'BOMBONA','f','BOMBN','t','012','t');
+                insert into material.matunid values (313,'BOTIJÃO','f','BTJ','t','013','t');
+                insert into material.matunid values (314,'BARRA','f','BARRA','t','014','t');
+                insert into material.matunid values (315,'CÁPSULA','f','CAPSL','t','015','t');
+                insert into material.matunid values (316,'CARRETEL','f','CARRT','t','016','t');
+                insert into material.matunid values (317,'CARTELA','t','CARTL','f','017','t');
+                insert into material.matunid values (318,'CENTO','t','CENTO','t','018','t');
+                insert into material.matunid values (319,'CHAPA','f','CHAPA','t','019','t');
+                insert into material.matunid values (320,'CUSTO HORA IMPRODUTIVA','f','HIMPR','t','020','t');
+                insert into material.matunid values (321,'CUSTO HORA PRODUTIVA','f','HPROD','t','021','t');
+                insert into material.matunid values (322,'CILINDRO','f','CILIN','t','022','t');
+                insert into material.matunid values (323,'CONJUNTO','f','CJ','t','023','t');
+                insert into material.matunid values (324,'CENTIMETRO','f','CM','t','024','t');
+                insert into material.matunid values (325,'CENTIMETRO/COLUNA','f','CMCOL','t','025','t');
+                insert into material.matunid values (326,'CONE','f','CONE','t','026','t');
+                insert into material.matunid values (327,'COLEÇÃO','f','COLEC','t','027','t');
+                insert into material.matunid values (328,'COMPRIMIDO','f','COMP','f','028','t');
+                insert into material.matunid values (329,'CARTUCHO','f','CARTC','t','029','t');
+                insert into material.matunid values (330,'CARGA','f','CARG','t','030','t');
+                insert into material.matunid values (331,'CAIXA','t','CX','t','031','t');
+                insert into material.matunid values (332,'DIA','f','DIA','t','032','t');
+                insert into material.matunid values (333,'DOSE','f','DOSE','t','033','t');
+                insert into material.matunid values (334,'DRÁGEA','f','DRAGE','t','034','t');
+                insert into material.matunid values (335,'DÚZIA','t','DZ','t','035','t');
+                insert into material.matunid values (336,'POR EIXO','f','POREX','t','036','t');
+                insert into material.matunid values (337,'EMBALAGEM','t','EMBLG','t','037','t');
+                insert into material.matunid values (338,'ENVELOPE','t','ENVEL','f','038','t');
+                insert into material.matunid values (339,'ESTOJO','t','ESTOJ','t','039','t');
+                insert into material.matunid values (340,'FRASCO-AMPOLA','t','FRAMP','f','040','t');
+                insert into material.matunid values (341,'FARDO','f','FARDO','t','041','t');
+                insert into material.matunid values (342,'FITA','f','FITA','t','042','t');
+                insert into material.matunid values (343,'FOLHA','f','FL','t','043','t');
+                insert into material.matunid values (344,'FLACONETE','t','FLACN','t','044','t');
+                insert into material.matunid values (345,'FRASCO','f','FR','f','045','t');
+                insert into material.matunid values (346,'FEIXE','t','FEIXE','t','046','t');
+                insert into material.matunid values (347,'FAIXA.MÊS','f','FXMES','t','047','t');
+                insert into material.matunid values (348,'GRAMA','f','G','t','048','t');
+                insert into material.matunid values (349,'GALÃO','t','GALAO','t','049','t');
+                insert into material.matunid values (350,'GIGABYTE','f','GB','t','050','t');
+                insert into material.matunid values (351,'GARRAFA','t','GRRF','t','051','t');
+                insert into material.matunid values (352,'HORA','f','H','t','052','t');
+                insert into material.matunid values (353,'HECTARE','f','HA','t','053','t');
+                insert into material.matunid values (354,'JOGO','f','JOGO','t','054','t');
+                insert into material.matunid values (355,'QUILOCALORIA','f','KCAL','t','055','t');
+                insert into material.matunid values (356,'QUILOGRAMA','f','KG','t','056','t');
+                insert into material.matunid values (357,'QUILO.QUILOMETRO','t','KGXKM','t','057','t');
+                insert into material.matunid values (358,'KIT','t','KIT','t','058','t');
+                insert into material.matunid values (359,'QUILÔMETRO','f','KM','t','059','t');
+                insert into material.matunid values (360,'QUILÔMETRO QUADRADO','f','KM2','t','060','t');
+                insert into material.matunid values (361,'QUILOMETRO RODADO','f','KMRDD','t','061','t');
+                insert into material.matunid values (362,'QUILOWATT-HORA','f','KWH','t','062','t');
+                insert into material.matunid values (363,'QUILOWATT-PICO','f','KWPC','t','063','t');
+                insert into material.matunid values (364,'LITRO','f','LT','t','064','t');
+                insert into material.matunid values (365,'LIBRA','f','LIBRA','t','065','t');
+                insert into material.matunid values (366,'LITRO DILUIDO','f','LTDLD','t','066','t');
+                insert into material.matunid values (367,'LATA','t','LATA','t','067','t');
+                insert into material.matunid values (368,'LITRO.QUILOMETRO','f','LTXKM','t','068','t');
+                insert into material.matunid values (369,'METRO','f','M','t','069','t');
+                insert into material.matunid values (370,'METRO QUADRADO','f','M2','t','070','t');
+                insert into material.matunid values (371,'METRO QUADRADO.MES','f','M2MES','t','071','t');
+                insert into material.matunid values (372,'QUADRADO.QUILOMETRO','f','2KM','t','072','t');
+                insert into material.matunid values (373,'METRO CÚBICO','f','M3','t','073','t');
+                insert into material.matunid values (374,'CUBICO.QUILOMETRO','f','3KM','t','074','t');
+                insert into material.matunid values (375,'MEGABYTE','f','MB','t','075','t');
+                insert into material.matunid values (376,'MICROGRAMA','f','MCG','t','076','t');
+                insert into material.matunid values (377,'MEADA','f','MEADA','t','077','t');
+                insert into material.matunid values (378,'MÊS','f','MES','t','078','t');
+                insert into material.matunid values (379,'MILIGRAMA','f','MG','t','079','t');
+                insert into material.matunid values (380,'MILHEIRO','t','MLH','f','080','t');
+                insert into material.matunid values (381,'MINUTO','f','MIN','t','081','t');
+                insert into material.matunid values (382,'MILILITRO','f','ML','t','082','t');
+                insert into material.matunid values (383,'MOLHO','t','MOLHO','f','083','t');
+                insert into material.matunid values (384,'METRO.MÊS','f','MXMES','t','084','t');
+                insert into material.matunid values (385,'MEGAWATT-HORA','f','MWH','t','085','t');
+                insert into material.matunid values (386,'NOVELO','t','NOVEL','t','086','t');
+                insert into material.matunid values (387,'PACOTE','t','PCT','t','087','t');
+                insert into material.matunid values (388,'PAR','t','PAR','t','088','t');
+                insert into material.matunid values (389,'PASSAGEIRO','f','PASSG','t','089','t');
+                insert into material.matunid values (390,'PEÇA','f','PC','f','090','t');
+                insert into material.matunid values (391,'PONTO DE FUNÇÃO','f','PF','t','091','t');
+                insert into material.matunid values (392,'PÁGINA','f','PG','t','092','t');
+                insert into material.matunid values (393,'POSTO','f','POSTO','t','093','t');
+                insert into material.matunid values (394,'POTE','t','POTE','t','094','t');
+                insert into material.matunid values (395,'PONTO','f','PONTO','t','095','t');
+                insert into material.matunid values (396,'RODADA','f','RODAD','t','096','t');
+                insert into material.matunid values (397,'REFIL','t','REFIL','f','097','t');
+                insert into material.matunid values (398,'ROLO','t','ROLO','t','098','t');
+                insert into material.matunid values (399,'ROLETE','f','ROLET','t','099','t');
+                insert into material.matunid values (400,'RESMA','t','RESMA','t','100','t');
+                insert into material.matunid values (401,'SACO','t','SACO','f','101','t');
+                insert into material.matunid values (402,'SACHÊ','t','SACHE','t','102','t');
+                insert into material.matunid values (403,'SEÇÃO','f','SECAO','f','103','t');
+                insert into material.matunid values (404,'SEMESTRE','f','SEMES','t','104','t');
+                insert into material.matunid values (405,'SEMANA','f','SEMAN','t','105','t');
+                insert into material.matunid values (406,'SERINGA','t','SERIN','t','106','t');
+                insert into material.matunid values (407,'SERVIÇO','f','SERV','t','107','t');
+                insert into material.matunid values (408,'SUPOSITORIO','f','SUPOS','t','108','t');
+                insert into material.matunid values (409,'TONELADA','f','T','t','109','t');
+                insert into material.matunid values (410,'TUBO','f','TUBO','t','110','t');
+                insert into material.matunid values (411,'TUBETE','f','TUBET','t','111','t');
+                insert into material.matunid values (412,'TERABYTE','f','TB','t','112','t');
+                insert into material.matunid values (413,'TIRA','t','TIRA','t','113','t');
+                insert into material.matunid values (414,'TALÃO','f','TALAO','t','114','t');
+                insert into material.matunid values (415,'TAMBOR','t','TAMB','t','115','t');
+                insert into material.matunid values (416,'TONEL','t','TONEL','t','116','t');
+                insert into material.matunid values (417,'TURNO','f','TURNO','t','117','t');
+                insert into material.matunid values (418,'TESTE','f','TESTE','t','118','t');
+                insert into material.matunid values (419,'TAXA','f','TX','f','119','t');
+                insert into material.matunid values (420,'TONELADA.QUILOMETRO','f','TXKM','t','120','t');
+                insert into material.matunid values (421,'ADESIVO','f','ADS','f','001','t');
+                insert into material.matunid values (422,'UNIDADE.MÊS','f','UNMES','t','122','t');
+                insert into material.matunid values (423,'UNIDADE.QUILOMETRO','f','UNXKM','t','123','t');
+                insert into material.matunid values (424,'VIDRO','t','VIDRO','t','124','t');
+                insert into material.matunid values (425,'VIAGEM','f','VIAG','t','125','t');
+            commit;
+        ";
+        DB::unprepared($sql);
+    }
+}

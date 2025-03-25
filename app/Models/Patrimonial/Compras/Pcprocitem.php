@@ -24,4 +24,9 @@ class Pcprocitem extends LegacyModel
         'pc81_codproc',
         'pc81_solicitem'
     ];
+
+    public function solicitem()
+    {
+        return $this->belongsTo(Solicitem::class, 'pc81_solicitem', 'pc11_codigo');
+    }
 }

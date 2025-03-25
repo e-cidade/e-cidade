@@ -81,6 +81,8 @@ class cl_empparametro
     var $e30_obrigadivida = 't';
     var $e30_buscarordenadores = 0;
     var $e30_buscarordenadoresliqui = 0;
+    var $e30_empsolicitadesdobramento = 't';
+    var $e30_anularpprocessado = 'f';
     // cria propriedade com as variaveis do arquivo
     var $campos = "
                  e39_anousu = int4 = Exercício
@@ -118,6 +120,8 @@ class cl_empparametro
                  e30_obrigadivida = bool = Controla Dívida Consolidada
                  e30_buscarordenadores = int8 =  Buscar Ordenadores Despesas
                  e30_buscarordenadoresliqui = int8 =  Buscar Ordenadores Liquidação
+                 e30_empsolicitadesdobramento = bool = Altera Desdobramento Emp. Proc. Compras
+                e30_anularpprocessado = bool = Anular RP Processado com movimentação de estoque
                  ";
 
     //funcao construtor da classe
@@ -182,8 +186,8 @@ class cl_empparametro
             $this->e30_modeloop = ($this->e30_modeloop == "t"?@$GLOBALS["HTTP_POST_VARS"]["e30_modeloop"]:$this->e30_modeloop);
             $this->e30_buscarordenadores = ($this->e30_buscarordenadores == "f"?@$GLOBALS["HTTP_POST_VARS"]["e30_buscarordenadores"]:$this->e30_buscarordenadores);
             $this->e30_buscarordenadoresliqui = ($this->e30_buscarordenadoresliqui == "f"?@$GLOBALS["HTTP_POST_VARS"]["e30_buscarordenadoresliqui"]:$this->e30_buscarordenadoresliqui);
-
-        } else {
+            $this->e30_empsolicitadesdobramento = ($this->e30_empsolicitadesdobramento == "f"?@$GLOBALS["HTTP_POST_VARS"]["e30_empsolicitadesdobramento"]:$this->e30_empsolicitadesdobramento);
+            $this->e30_anularpprocessado = ($this->e30_anularpprocessado == "f"?@$GLOBALS["HTTP_POST_VARS"]["e30_anularpprocessado"]:$this->e30_anularpprocessado);
         }
     }
     // funcao para inclusao
@@ -477,6 +481,16 @@ class cl_empparametro
             return false;
         }
 
+        if($this->e30_empsolicitadesdobramento == null ){
+            $this->erro_sql = " Campo Altera Desdobramento Emp. Proc. Compras.";
+            $this->erro_campo = "e30_empsolicitadesdobramento";
+            $this->erro_banco = "";
+            $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+            $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+            $this->erro_status = "0";
+            return false;
+        }
+
         $sql = "insert into empparametro(
                                        e39_anousu
                                       ,e30_nroviaaut
@@ -511,6 +525,8 @@ class cl_empparametro
                                       ,e30_obrigadivida
                                       ,e30_buscarordenadores
                                       ,e30_buscarordenadoresliqui
+                                      ,e30_empsolicitadesdobramento
+                                      ,e30_anularpprocessado
                        )
                 values (
                                 $this->e39_anousu
@@ -547,6 +563,8 @@ class cl_empparametro
                                ,$this->e30_obrigadivida
                                ,$this->e30_buscarordenadores
                                ,$this->e30_buscarordenadoresliqui
+                               ,$this->e30_empsolicitadesdobramento
+                               ,$this->e30_anularpprocessado
                       )";
 
         $result = db_query($sql);
@@ -606,6 +624,9 @@ class cl_empparametro
             $resac = db_query("insert into db_acount values($acount,893,2012515,'','" . AddSlashes(pg_result($resaco, 0, 'e30_obrigactapagliq')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
             $resac = db_query("insert into db_acount values($acount,893,2012515,'','" . AddSlashes(pg_result($resaco, 0, 'e30_obrigadiarias')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
             $resac = db_query("insert into db_acount values($acount,893,2012515,'','" . AddSlashes(pg_result($resaco, 0, 'e30_obrigadivida')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
+            $resac = db_query("insert into db_acount values($acount,893,2012515,'','" . AddSlashes(pg_result($resaco, 0, 'e30_empsolicitadesdobramento')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
+            $codcam = DB::table('db_syscampo')->where('nomecam', 'e30_anularpprocessado')->value('codcam');
+            $resac = db_query("insert into db_acount values($acount,893,{$codcam},'','" . AddSlashes(pg_result($resaco, 0, 'e30_anularpprocessado')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
         }
         return true;
     }
@@ -1060,6 +1081,33 @@ class cl_empparametro
                 return false;
             }
         }
+
+        if(trim($this->e30_empsolicitadesdobramento)!="" || isset($GLOBALS["HTTP_POST_VARS"]["e30_empsolicitadesdobramento"])){
+            $sql  .= $virgula." e30_empsolicitadesdobramento = '$this->e30_empsolicitadesdobramento' ";
+            $virgula = ",";
+            if(trim($this->e30_empsolicitadesdobramento) == null ){
+                $this->erro_sql = " Campo Altera Desdobramento Emp. Proc. Compras nao Informado.";
+                $this->erro_campo = "e30_empsolicitadesdobramento";
+                $this->erro_banco = "";
+                $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+                $this->erro_status = "0";
+                return false;
+            }
+        }
+        if(trim($this->e30_anularpprocessado)!="" || isset($GLOBALS["HTTP_POST_VARS"]["e30_anularpprocessado"])){
+            $sql  .= $virgula." e30_anularpprocessado = '$this->e30_anularpprocessado' ";
+            $virgula = ",";
+            if(trim($this->e30_anularpprocessado) == null ){
+                $this->erro_sql = " Campo Anular RP Processado com movimentação de estoque nao Informado.";
+                $this->erro_campo = "e30_anularpprocessado";
+                $this->erro_banco = "";
+                $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+                $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+                $this->erro_status = "0";
+                return false;
+            }
+        }
         $sql .= " where ";
         if ($e39_anousu != null) {
             $sql .= " e39_anousu = $this->e39_anousu";
@@ -1127,6 +1175,9 @@ class cl_empparametro
                     $resac = db_query("insert into db_acount values($acount,893,2012515,'" . AddSlashes(pg_result($resaco, $conresaco, 'e30_obrigadiarias')) . "','$this->e30_obrigadiarias'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");            
                 if (isset($GLOBALS["HTTP_POST_VARS"]["e30_obrigadivida"]) || $this->e30_obrigadivida != "")
                     $resac = db_query("insert into db_acount values($acount,893,2012515,'" . AddSlashes(pg_result($resaco, $conresaco, 'e30_obrigadivida')) . "','$this->e30_obrigadivida'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
+                if (isset($GLOBALS["HTTP_POST_VARS"]["e30_anularpprocessado"]) || $this->e30_anularpprocessado != "")
+                    $codcam = DB::table('db_syscampo')->where('nomecam', 'e30_anularpprocessado')->value('codcam');
+                    $resac  = db_query("insert into db_acount values($acount,893,$codcam,'" . AddSlashes(pg_result($resaco, $conresaco, 'e30_anularpprocessado')) . "','$this->e30_anularpprocessado'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
             }
         }
         $result = db_query($sql);
@@ -1199,6 +1250,8 @@ class cl_empparametro
                 $resac = db_query("insert into db_acount values($acount,893,2012400,'','" . AddSlashes(pg_result($resaco, $iresaco, 'e30_prazoentordcompra')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
                 $resac = db_query("insert into db_acount values($acount,893,2012515,'','" . AddSlashes(pg_result($resaco, $iresaco, 'e30_obrigactapagliq')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
                 $resac = db_query("insert into db_acount values($acount,893,2012515,'','" . AddSlashes(pg_result($resaco, $iresaco, 'e30_obrigadivida')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
+                $codcam = DB::table('db_syscampo')->where('nomecam', 'e30_anularpprocessado')->value('codcam');
+                $resac = db_query("insert into db_acount values($acount,893,{$codcam},'','" . AddSlashes(pg_result($resaco, $iresaco, 'e30_anularpprocessado')) . "'," . db_getsession('DB_datausu') . "," . db_getsession('DB_id_usuario') . ")");
             }
         }
         $sql = " delete from empparametro

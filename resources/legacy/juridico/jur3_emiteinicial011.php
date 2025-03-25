@@ -97,6 +97,12 @@ if ( !isset($lConsulta) ) {
     db_app::load("estilos.css, grid.style.css, tab.style.css, scripts.js, strings.js, prototype.js, datagrid.widget.js, DBToogle.widget.js");
   ?>
 </head>
+<style>
+  /* Estiliza o checkbox com cor */
+  .colored-checkbox {
+      accent-color: red;
+  }
+</style>
 <body class="abas">
 <?php
 

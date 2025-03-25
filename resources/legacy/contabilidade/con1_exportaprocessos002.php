@@ -209,7 +209,7 @@ if ($leiaute == 1) {
     $resultRegistro1 = db_query("select
     1 as tiporegistro,
     l20_nroedital as edital,
-    l20_exercicioedital as exercicioedital,
+    l20_anousu as exercicioedital,
     l20_edital as numprocesso,
     l20_numero,
     l20_tipojulg,
@@ -232,7 +232,7 @@ if ($leiaute == 1) {
         $resultRegistro2 = db_query("select distinct on (l04_numerolote)
         2 as tiporegistro,
         l20_nroedital as edital,
-        l20_exercicioedital as exercicioedital,
+        l20_anousu as exercicioedital,
         l04_descricao as  descricaolote,
         l20_liclocal as localentrega,
         l20_localentrega as localdeentrega,
@@ -256,7 +256,7 @@ if ($leiaute == 1) {
         $resultRegistro2 = db_query("  SELECT 
         2 AS tiporegistro,
         l20_nroedital AS edital,
-        l20_exercicioedital AS exercicioedital,
+        l20_anousu AS exercicioedital,
         l20_liclocal AS localentrega,
         l20_localentrega AS localdeentrega,
         l20_prazoentrega AS datadeentrega,
@@ -286,7 +286,7 @@ if ($leiaute == 1) {
     pc16_codmater,
     l20_nroedital as edital,
     l20_numero,
-    l20_exercicioedital as exercicioedital,
+    l20_anousu as exercicioedital,
     l04_descricao as  descricaolote,
     l04_codigo as numerodolote,
     l21_ordem as numerodoitem,

@@ -72,7 +72,8 @@ $tipos = array(0 => '0 - Selecione',
                6 => '6 - Dispensa ou Inexigibilidade realizada por outro órgão ou entidade',
                7 => '7 - Licitação - Regime Diferenciado de Contratações',
                8 => '8 - Licitação realizada por consorcio público',
-               9 => '9 - Licitação realizada por outro ente da federação'
+               9 => '9 - Licitação realizada por outro ente da federação',
+               10 =>'10 - Dispensa ou Inexigibilidade realizada por consórcio público'
               );
 db_select('lic211_tipo',$tipos,true,$db_opcao,"onchange='js_verificartipo()'");
 ?>

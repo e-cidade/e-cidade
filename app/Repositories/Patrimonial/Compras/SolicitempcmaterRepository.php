@@ -3,7 +3,7 @@
 namespace App\Repositories\Patrimonial\Compras;
 
 use App\Models\Patrimonial\Compras\Solicitempcmater;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class SolicitempcmaterRepository
 {
@@ -26,5 +26,18 @@ class SolicitempcmaterRepository
     {
         $sql = "DELETE FROM solicitempcmater WHERE pc16_solicitem IN ($pc16_solicitem)";
         return DB::statement($sql);
+    }
+
+    public function getDadosByCodigoItem(int $pc16_solicitem):?object
+    {
+        return $this->model
+            ->join(
+                'pcmater',
+                'pc16_codmater',
+                '=',
+                'pc01_codmater'
+            )
+            ->where('pc16_solicitem', $pc16_solicitem)
+            ->first();
     }
 }

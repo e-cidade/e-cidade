@@ -1,5 +1,7 @@
 <?
 
+require_once 'libs/renderComponents/index.php';
+
 //MODULO: compras
 $clpcmater->rotulo->label();
 $clrotulo = new rotulocampo;
@@ -46,300 +48,383 @@ $l12_pncp = $oParamLicicita[0]->l12_pncp;
     }
 </script>
 <style>
-    #pc01_regimobiliario {
-        background-color: #e6e4f1;
-    }
+    #pc01_regimobiliario{background-color:#e6e4f1}#pc01_codgrupo,#pc01_codsubgrupo{width:60px}#pc01_codgrupodescr,#pc01_codsubgrupodescr{width:280px}
 </style>
+
 <form name="form1" method="post" action="" onsubmit="return js_check()">
-    <input type="hidden" name="codeles" value=<?= @$coluna ?>>
-    <center>
-        <fieldset>
-            <table border="0">
-                <tr>
-                    <td nowrap title="<?= @$Tpc01_codmater ?>"> <?= @$Lpc01_codmater ?> </td>
-                    <td> <? //db_input('pc01_codmater',6,$Ipc01_codmater,true,'text',$db_opcao,"readonly")
-                            // carlos
-                            db_input('pc01_codmater', 6, $Ipc01_codmater, true, 'text', 3, "");
+        <input type="hidden" name="codeles" value=<?= @$coluna ?>>
+
+    <fieldset style="width:100%;">
+            <legend>Materiais/Serviços</legend>
+            <div class="row">
+                <div class="col-sm-2 form-group">
+                        <label><b>Código do Item: </b></label>
+                        <?php
+                            db_input(
+                                'pc01_codmater',
+                                10,
+                                1,
+                                true,
+                                'text',
+                                3,
+                                "",
+                                "",
+                                "",
+                                "",
+                                null,
+                                "form-control"
+                            );
                             $pc01_id_usuario = db_getsession("DB_id_usuario");
                             db_input('pc01_id_usuario', 6, $Ipc01_id_usuario, true, 'hidden', 3, "");
-                            ?>
-                    </td>
-                </tr>
-                <tr>
-                    <td nowrap title="<?= @$Tpc01_descrmater ?>"> <?= @$Lpc01_descrmater ?> </td>
-                    <td> <? db_textarea('pc01_descrmater', 0, 75, $Ipc01_descrmater, true, 'text', $db_opcao, "onkeyup = 'return js_validaCaracteres(this.value, pc01_descrmater.id)';", '', '', '80') ?>
-                    </td>
-                </tr>
-                <tr>
-                    <td nowrap title="<?= @$Tpc01_complmater ?>"> <?= @$Lpc01_complmater ?> </td>
-                    <td> <? db_textarea('pc01_complmater', 0, 75, $Ipc01_complmater, true, 'text', $db_opcao, "onkeyup = 'return js_validaCaracteres(this.value, pc01_complmater.id)';") ?>
-                    </td>
-                </tr>
-                <tr>
-                    <!--<td nowrap title="<? //=@$Tpc01_libaut
-                                            ?>">       <? //=@$Lpc01_libaut
-                                                        ?>    </td>
-    <td nowrap>--> <?
-                    $arrlibaut_truefalse = array('t' => 'Sim', 'f' => 'Não');
-                    db_select("pc01_libaut", $arrlibaut_truefalse, true, $db_opcao, "Hidden");
-                    ?>
-                    <td nowrap title="<? //=@$Tpc01_libaut
-                                        ?>"> <?= $Lpc01_ativo ?> </td>
-                    <td nowrap> <?
-                                $arr_truefalse = array('f' => 'Não', 't' => 'Sim');
-                                db_select("pc01_ativo", $arr_truefalse, true, $db_opcao);
-                                ?>
-                        <b>Tipo:</b>
-                        <?
-                        if ($db_opcao == 1) {
-                            $x = array("selecione" => "Selecione", "f" => "Material", "t" => "Serviço/Material Permanente");
-                        } else {
-                            $x = array("f" => "Material", "t" => "Serviço/Material Permanente");
-                        }
-                        if (isset($pc01_codmater)) {
-                            if (verPermissaoAlteraServico($pc01_codmater)) {
-                                db_select("pc01_servico", $x, true, 3);
-                            } else {
-                                db_select("pc01_servico", $x, true, $db_opcao);
-                            }
-                        } else {
-                            db_select("pc01_servico", $x, true, $db_opcao);
-                        }
                         ?>
-                        <? //=$Lpc01_veiculo
-                        ?>
-                        <?
-                        $aVeic = array("f" => "Não", "t" => "Sim");
-                        db_select("pc01_veiculo", $aVeic, true, $db_opcao, "hidden");
-                        ?>
-                        <?
-                        echo $Lpc01_fraciona;
-                        ?>
-                        <?
-                        $aFrac = array("f" => "Não", "t" => "Sim");
-                        db_select("pc01_fraciona", $aFrac, true, $db_opcao);
-                        ?>
-                    </td>
 
-                <tr>
-                    <td nowrap>
-                        <?
-                        //echo $Lpc01_validademinima;
-                        ?>
-                    </td>
-                    <td nowrap>
-                        <?
+                    <?
+                        $arrlibaut_truefalse = array('t' => 'Sim', 'f' => 'Não');
+                        db_select("pc01_libaut", $arrlibaut_truefalse, true, 1, "hidden");
                         $aValMin = array("f" => "Não", "t" => "Sim");
-                        db_select("pc01_validademinima", $aValMin, true, $db_opcao, "hidden");
-                        ?>
-
-
-                        <?
-                        //echo $Lpc01_obrigatorio;
-
+                        db_select("pc01_validademinima", $aValMin, true, 1, "hidden");
                         $aPObrigatorio = array("f" => "Não", "t" => "Sim");
-                        db_select("pc01_obrigatorio", $aPObrigatorio, true, $db_opcao, "hidden");
-                        ?>
-
-                        <?
-                        //echo $Lpc01_liberaresumo;
-
-                        $aLiberarResumo = array(
-                            "t" => "Sim",
-                            "f" => "Não"
-                        );
-                        db_select("pc01_liberaresumo", $aLiberarResumo, true, $db_opcao, "hidden");
-                        ?>
-                    </td>
-
-                </tr>
-                <tr>
-                    <td><?= $Lpc03_codgrupo ?> </td>
-                    <td align='left'>
-                        <?
-            if (!isset($pc01_codgrupo)) {
-              if (!isset($pc03_codgrupo)) {
-                if (isset($pc01_codsubgrupo) &&  ($db_opcao == 2 || $db_opcao == 3)) {
-                  global $pc01_codgrupo;
-                  $result = $clpcsubgrupo->sql_record($clpcsubgrupo->sql_query($pc01_codsubgrupo, "pc04_codgrupo as pc01_codgrupo", null, "pc04_codsubgrupo=$pc01_codsubgrupo and pc04_ativo is true and pc04_instit in (". db_getsession('DB_instit').",0)"));
-                  if ($clpcsubgrupo->numrows > 0) {
-                    db_fieldsmemory($result, 0);
-                  }
-                }
-              }
-            }
-            $result = $clpcgrupo->sql_record($clpcgrupo->sql_query(null, "pc03_codgrupo,pc03_descrgrupo", "pc03_descrgrupo", "pc03_ativo is true and pc03_instit in (". db_getsession('DB_instit').",0)"));
-            @db_selectrecord("pc01_codgrupo", $result, true, $db_opcao, "", "", "", "0", "js_troca(this.value);");
-            ?>
-
-            <?
-            /*$arr_truefalse = array('f'=>'Não','t'=>'Sim');
-          db_select("pc01_ativo",$arr_truefalse,true,$db_opcao);*/
-                        ?>
-
-                    </td>
-                </tr>
-                <? if (isset($pc01_codgrupo) || $db_opcao != 1) : ?>
-                    <tr>
-                        <td> <?= $Lpc04_codsubgrupo ?> </td>
-                        <td align='left'>
-                            <?
-                            $sWhere = "pc04_codgrupo = " . @$pc01_codgrupo . " and pc04_ativo is true and (pc04_tipoutil=1 or pc04_tipoutil=3)";
-                            if (!isset($pc01_codgrupo)) {
-                                $sWhere = "pc04_ativo is true and (pc04_tipoutil=1 or pc04_tipoutil=3)";
-                            }
-                            $result = $clpcsubgrupo->sql_record(
-                                $clpcsubgrupo->sql_query(
-                                    null,
-                                    "pc04_codsubgrupo as subgrupo,pc04_descrsubgrupo",
-                                    "pc04_descrsubgrupo",
-                                    $sWhere
-                                )
-                            );
-                            if ($clpcsubgrupo->numrows > 0) {
-
-                                db_fieldsmemory($result, 0);
-                                $pc04_codsubgrupo = $subgrupo;
-                                if (isset($impmater)) {
-                                    $result_coluna = $clpcmaterele->sql_record($clpcmaterele->sql_query_file($impmater, null, "pc07_codele"));
-                                    $numrows_coluna = $clpcmaterele->numrows;
-                                    $separa = "";
-                                    $coluna = "";
-                                    for ($i = 0; $i < $numrows_coluna; $i++) {
-                                        db_fieldsmemory($result_coluna, $i);
-                                        $coluna .= $separa . $pc07_codele;
-                                        $separa  = "XX";
-                                    }
-                                    //db_msgbox($subgrupo);
-                                    $vaiIframe = "?db_opcao=$db_opcao&codigomater=" . $impmater . "&impmater=impmater&codsubgrupo=" . $subgrupo . "&codele=" . $coluna;
-                                } else {
-                                    //db_msgbox($subgrupo);
-                                    //db_msgbox($pc01_codmater);
-                                    if (!isset($pc01_codmater)) {
-                                        $pc01_codmater = '';
-                                    }
-                                    $vaiIframe = "?db_opcao=$db_opcao&codigomater=" . $pc01_codmater . "&codsubgrupo=" . @$subgrupo . "&codele=" . @$coluna;
-                                }
-                            }
-                            @db_selectrecord("pc01_codsubgrupo", $result, true, $db_opcao, "", "", "", "", "js_executaIframe(this.value)");
-
-                            if (empty($pc01_data) || $pc01_data == "") {
-                                $pc01_data = date('Y-m-d', db_getsession("DB_datausu"));
-                            }
-                            db_input('pc01_data', 6, $Ipc01_data, true, 'hidden', 3, "");
-                            ?>
-                        </td>
-                    </tr>
-                <? endif;    ?>
-
-                <!--OC3770-->
-                <!--<tr>
-      <td>
-        <strong>
-           Tabela
-        <strong>
-      </td>
-      <td>
-        <?
-        $aTabela = array("f" => "Não", "t" => "Sim");
-        db_select("pc01_tabela", $aTabela, true, $db_opcao);
-        ?>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <strong>
-           Taxa
-        <strong>
-      </td>
-      <td>
-        <?
-        $aTaxa = array("f" => "Não", "t" => "Sim");
-        db_select("pc01_taxa", $aTaxa, true, $db_opcao);
-        ?>
-      </td>
-    </tr>
-  <tr> -->
-                <td>
-                    <strong>Material Utilizado em Obras/serviços?</strong>
-                </td>
-                <td>
-                    <?php
-                    $aObra = array("0" => "Selecione", "f" => "Não", "t" => "Sim");
-                    db_select("pc01_obras", $aObra, true, $db_opcao, "");
+                        db_select("pc01_obrigatorio", $aPObrigatorio, true, 1, "hidden");
+                        $aLiberarResumo = array("t" => "Sim","f" => "Não");
+                        db_select("pc01_liberaresumo", $aLiberarResumo, true, 1, "hidden");
+                        $aVeic = array("f" => "Não", "t" => "Sim");
+                        db_select("pc01_veiculo", $aVeic, true, 1, "hidden");
                     ?>
-                    <strong>
-                        Tabela
-                        <strong>
-                            <?
-                            $aTabela = array("f" => "Não", "t" => "Sim");
-                            db_select("pc01_tabela", $aTabela, true, $db_opcao, "style=width:90px;");
-                            ?>
 
-                            <strong>
-                                Taxa
-                                <strong>
-                                    <?
-                                    $aTaxa = array("f" => "Não", "t" => "Sim");
-                                    db_select("pc01_taxa", $aTaxa, true, $db_opcao, "style=width:90px;");
-                                    ?>
-                </td>
-                </tr>
-                <?php if ($l12_pncp == 't') : ?>
-                <tr>
-                    <td>
-                        <strong>Reg. Imobiliário</strong>
-                    </td>
-                    <td>
-                        <?
-                        db_textarea('pc01_regimobiliario', 0, 75, '', true, 'text', $db_opcao, "onkeyup = 'return js_validaCaracteres(this.value, pc01_justificativa.id)';", '', '', '255');
+
+                </div>
+
+                <div class="col-sm-6 form-group">
+                </div>
+
+
+                <div class="col-sm-2 form-group">
+                        <label><b>Data: </b></label>
+                        <?php
+                            if ($db_opcao == 1) {
+                                $pc01_data = date("d/m/Y", db_getsession("DB_datausu"));
+                            } else{
+                                $pc01_data = implode('/', array_reverse(explode('-', $pc01_data)));
+                            }
+                            db_input(
+                                'pc01_data',
+                                10,
+                                $pc01_data,
+                                true,
+                                'text',
+                                3,
+                                "",
+                                "",
+                                "",
+                                "",
+                                null,
+                                "form-control"
+                            );
                         ?>
-                    </td>
-                </tr>
-                <?php endif ?>
-                
-                <? if ($db_opcao == 22 || $db_opcao == 2) : ?>
-                    <tr>
-                        <td><b>Justificativa da Alteração:</b></td>
-                        <td>
-                            <?= db_textarea('pc01_justificativa', 0, 75, '', true, 'text', $db_opcao, "onkeyup = 'return js_validaCaracteres(this.value, pc01_justificativa.id)';", '', '', '100'); ?>
-                        </td>
-                    </tr>
-                <? endif; ?>
-                <!--FIM OC3770 -->
+                </div>
 
-                <tr>
-                    <td>&nbsp;
-                    <td>
-                </tr>
-                <tr>
-                    <td colspan="2" align="center">
-                        <div align="left"><b>Lista de desdobramentos<b></div>
-                        <iframe width="630" height="200" name="pcmater0011" src="com1_pcmater0011.php<?= $vaiIframe ?>"></iframe>
-                    </td>
-                </tr>
+                <div class="col-sm-2 form-group">
+                <label><b>Inativo: </b></label>
+                    <?db_select("pc01_ativo", array('f' => 'Não', 't' => 'Sim'), true, $db_opcao,"class='custom-select'");?>
+                </div>
+
+            </div>
+
+            <div class="row" style="margin-top:20px;">
+
+                <div class="col-sm-12 form-group">
+                   <b> Descrição do Item: </b>
+                    <? db_textarea('pc01_descrmater', 3, 140, $Ipc01_descrmater, true, 'text', $db_opcao, "onkeyup = 'return js_validaCaracteres(this.value, pc01_descrmater.id)';", '', '', '80') ?>
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-sm-12 form-group">
+                   <b> Complemento da Descrição: </b>
+                    <? db_textarea('pc01_complmater', 3, 140, $Ipc01_complmater, true, 'text', $db_opcao, "onkeyup = 'return js_validaCaracteres(this.value, pc01_complmater.id)';", '', '', '') ?>
+                </div>
+
+            </div>
+
+            <div class="row" style="margin-top:20px;">
+
+                <div class=" col-sm-3 form-group">
+                    <label><b>Tipo: </b></label>
+                    <?
+
+                    if ($db_opcao == 1) {
+                        $x = array("selecione" => "Selecione", "f" => "Material", "t" => "Serviço/Material Permanente");
+                    } else {
+                        $x = array("f" => "Material", "t" => "Serviço/Material Permanente");
+                    }
+                    if (isset($pc01_codmater)) {
+                        if (verPermissaoAlteraServico($pc01_codmater)) {
+                            db_select("pc01_servico", $x, true,3,"class='custom-select'");
+                        } else {
+                            db_select("pc01_servico", $x, true, $db_opcao,"class='custom-select'");
+                        }
+                    } else {
+                        db_select("pc01_servico", $x, true, $db_opcao,"class='custom-select'");
+                    }
+
+                    ?>
+                </div>
+
+                <div class=" col-sm-4 form-group">
+                <label><b>Unidade de Medida: </b></label>
+                    <?
+                        $aUnidades = array();
+
+                            $rsMatunid = db_query("SELECT m61_codmatunid, m61_descr
+                            FROM (
+                                SELECT 0 AS m61_codmatunid, 'Selecione' AS m61_descr
+                                UNION ALL
+                                SELECT m61_codmatunid, m61_descr
+                                FROM matunid
+                            where m61_ativo='t') AS result
+                            ORDER BY
+                                CASE WHEN m61_descr = 'Selecione' THEN 0 ELSE 1 END,
+                                m61_descr;");
+
+                            for ($i = 0; $i < pg_numrows($rsMatunid); $i++) {
+                                if(($db_opcao == 2 || $db_opcao == 3) && $pc01_unid != null){
+                                    if($i==0)continue;
+                                }
+                                $matunid = db_utils::fieldsMemory($rsMatunid, $i);
+                                $aUnidades[$matunid->m61_codmatunid] = $matunid->m61_descr;
+                            }
+
+                        if(($db_opcao == 2 || $db_opcao == 3) && $pc01_unid == null){
+                            db_select("pc01_unid", $aUnidades, true, 3,"class='custom-select'");
+                        }else{
+
+                            if (isset($pc01_codmater)) {
+                                if (verPermissaoAlteraServico($pc01_codmater)) {
+                                    db_select("pc01_unid", $aUnidades, true, 3,"class='custom-select'");
+                                } else {
+                                    db_select("pc01_unid", $aUnidades, true, 1,"class='custom-select'");
+                                }
+                            } else {
+                                db_select("pc01_unid", $aUnidades, true, 1,"class='custom-select'");
+                            }
+
+                        }
+
+                    ?>
+                </div>
+
+                <div class=" col-sm-2 form-group">
+                    <label><b>Item p/Obra/Serviço: </b></label>
+                    <?db_select("pc01_obras", array('f' => 'Não', 't' => 'Sim'), true, $db_opcao,"class='custom-select'");?>
+                </div>
+
+                <div class=" col-sm-1 form-group">
+                    <label><b>Tabela: </b></label>
+                    <?db_select("pc01_tabela", array('f' => 'Não', 't' => 'Sim'), true, $db_opcao,"class='custom-select'");?>
+                </div>
+
+                <div class=" col-sm-1 form-group">
+                    <b> Taxa: </b>
+                    <?db_select("pc01_taxa", array('f' => 'Não', 't' => 'Sim'), true, $db_opcao,"class='custom-select'");?>
+                </div>
+
+                <div class=" col-sm-1 form-group">
+                    <b> Fraciona: </b>
+                    <?db_select("pc01_fraciona", array('f' => 'Não', 't' => 'Sim'), true, $db_opcao,"class='custom-select'");?>
+                </div>
+
+
+            </div>
+            <div class="row" style="margin-top:20px;">
+              <b style="margin-right: 10px;">Código do Grupo: </b>
+
+
                 <?
-                if ($db_opcao != 1) { ?>
-                    <tr>
-                        <td colspan=2 bgcolor="#CCFF99" align="center"><strong>*** Elementos que não podem ser <?= $db_opcao == 2 ? " alterados " : " excluídos " ?> por estar na autorização de empenho.</strong></td>
-                    </tr>
-                <? } ?>
-            </table>
-        </fieldset>
-    </center>
+                    if (!isset($pc01_codgrupo)) {
+                    if (!isset($pc03_codgrupo)) {
+                        if (isset($pc01_codsubgrupo) &&  ($db_opcao == 2 || $db_opcao == 3)) {
+                        global $pc01_codgrupo;
+                        $result = $clpcsubgrupo->sql_record($clpcsubgrupo->sql_query($pc01_codsubgrupo, "pc04_codgrupo as pc01_codgrupo", null, "pc04_codsubgrupo=$pc01_codsubgrupo and pc04_ativo is true and pc04_instit in (". db_getsession('DB_instit').",0)"));
+                        if ($clpcsubgrupo->numrows > 0) {
+                            db_fieldsmemory($result, 0);
+                        }
+                        }
+                    }
+                    }
+                    $result = $clpcgrupo->sql_record($clpcgrupo->sql_query(null, "pc03_codgrupo,pc03_descrgrupo", "pc03_descrgrupo", "pc03_ativo is true and pc03_instit in (". db_getsession('DB_instit').",0)"));
+                    @db_selectrecord("pc01_codgrupo", $result, true, $db_opcao, "", "", "", "0", "js_troca(this.value);");
+                ?>
 
-    <input name="db_opcao" type="submit" id="db_opcao" value="<?= ($db_opcao == 1 ? "Incluir" : ($db_opcao == 2 || $db_opcao == 22 ? "Alterar" : "Excluir")) ?>" disabled="disabled" <?= ($db_opcao == 2 || $db_opcao == 1 ? "onclick='return js_coloca();'" : "") ?>>
-    <input name="pesquisar" type="button" id="pesquisar" value="Pesquisar" onclick="js_pesquisa();">
-    <?
 
-    if ($db_opcao == 1) {
-        $result_pcmater = $clpcmater->sql_record($clpcmater->sql_query_file());
-        if ($clpcmater->numrows > 0) {
-            echo "<input name='importar' type='button' id='importar' value='Importar material' onclick='js_janelaimporta();' >";
-        }
-    }
-    ?>
+
+                <?
+                     if (isset($pc01_codgrupo) || $db_opcao != 1) {
+                        echo " <b style='margin-right: 10px; margin-left:10px;'>Código do SubGrupo: </b> ";
+                    $sWhere = "pc04_codgrupo = " . @$pc01_codgrupo . " and pc04_ativo is true and (pc04_tipoutil=1 or pc04_tipoutil=3)";
+                    if (!isset($pc01_codgrupo)) {
+                        $sWhere = "pc04_ativo is true and (pc04_tipoutil=1 or pc04_tipoutil=3)";
+                    }
+                    $result = $clpcsubgrupo->sql_record(
+                        $clpcsubgrupo->sql_query(
+                            null,
+                            "pc04_codsubgrupo as subgrupo,pc04_descrsubgrupo",
+                            "pc04_descrsubgrupo",
+                            $sWhere
+                        )
+                    );
+                    if ($clpcsubgrupo->numrows > 0) {
+
+                        db_fieldsmemory($result, 0);
+                        $pc04_codsubgrupo = $subgrupo;
+                        if (isset($impmater)) {
+                            $result_coluna = $clpcmaterele->sql_record($clpcmaterele->sql_query_file($impmater, null, "pc07_codele"));
+                            $numrows_coluna = $clpcmaterele->numrows;
+                            $separa = "";
+                            $coluna = "";
+                            for ($i = 0; $i < $numrows_coluna; $i++) {
+                                db_fieldsmemory($result_coluna, $i);
+                                $coluna .= $separa . $pc07_codele;
+                                $separa  = "XX";
+                            }
+                            //db_msgbox($subgrupo);
+                            $vaiIframe = "?db_opcao=$db_opcao&codigomater=" . $impmater . "&impmater=impmater&codsubgrupo=" . $subgrupo . "&codele=" . $coluna;
+                        } else {
+                            //db_msgbox($subgrupo);
+                            //db_msgbox($pc01_codmater);
+                            if (!isset($pc01_codmater)) {
+                                $pc01_codmater = '';
+                            }
+                            $vaiIframe = "?db_opcao=$db_opcao&codigomater=" . $pc01_codmater . "&codsubgrupo=" . @$subgrupo . "&codele=" . @$coluna;
+                        }
+                    }
+                    @db_selectrecord("pc01_codsubgrupo", $result, true, $db_opcao, "", "", "", "", "js_executaIframe(this.value)");
+
+                }
+                ?>
+
+            </div>
+
+
+            <?php if ($l12_pncp == 't') : ?>
+
+            <div class="row" style="margin-top:20px;">
+
+                <div class="col-sm-12 form-group">
+                <b> Reg. Imobiliário: </b>
+                <? db_textarea('pc01_regimobiliario', 3, 140, '', true, 'text', $db_opcao, "onkeyup = 'return js_validaCaracteres(this.value, pc01_justificativa.id)';", '', '', '255');?>
+                </div>
+
+            </div>
+
+            <?php endif ?>
+
+            <? if ($db_opcao == 22 || $db_opcao == 2) : ?>
+                <div class="row" style="margin-top:20px;">
+                    <div class="col-sm-12 form-group">
+                    <b>Justificativa da Alteração:</b>
+                        <? db_textarea('pc01_justificativa', 0, 140, '', true, 'text', $db_opcao, "onkeyup = 'return js_validaCaracteres(this.value, pc01_justificativa.id)';", '', '', '100'); ?>
+                    </div>
+                </div>
+           <? endif; ?>
+
+
+            <div  style="margin-top:20px;">
+                <fieldset>
+                    <legend>Lista de Desdobramentos:</legend>
+                    <iframe style="width:100%;" height="200" name="pcmater0011" src="com1_pcmater0011.php<?= $vaiIframe ?>"></iframe>
+                    <?
+                     if ($db_opcao != 1) { ?>
+                    <div class="row" style="background-color: #CCFF99;">
+                        <strong>*** Elementos que não podem ser <?= $db_opcao == 2 ? " alterados " : " excluídos " ?> por estar na autorização de empenho.</strong>
+                     </div>
+                    <? } ?>
+                </fieldset>
+            </div>
+
+
+
+    </fieldset>
+
+    <div style="margin-top:15px;">
+
+
+         <?php
+
+         $nomeOpcao =  $db_opcao == 1 ? "Incluir" : ($db_opcao == 2 || $db_opcao == 22 ? "Alterar" : "Excluir");
+
+        $component->render('buttons/solid', [
+          'type' => 'submit',
+          'designButton' => 'success',
+          'size' => 'sm',
+          'onclick' => ($db_opcao == 2 || $db_opcao == 1 ? "return js_coloca();" : ""),
+          'message' => $nomeOpcao,
+          'value' => $nomeOpcao,
+          'name' => "db_opcao",
+          'id' => "db_opcao",
+        ]);
+
+        $component->render('buttons/solid', [
+            'type' => 'button',
+            'designButton' => 'primary',
+            'size' => 'sm',
+            'onclick' => "js_pesquisa();",
+            'message' => "Pesquisar",
+            'name' => "pesquisar",
+            'id' => "pesquisar",
+          ]);
+
+          if($db_opcao == 1){
+            $result_pcmater = $clpcmater->sql_record($clpcmater->sql_query_file());
+            if ($clpcmater->numrows > 0) {
+            $component->render('buttons/solid', [
+                'type' => 'button',
+                'designButton' => 'primary',
+                'size' => 'sm',
+                'onclick' => "js_janelaimporta();",
+                'message' => "Importar material",
+                'name' => "importar",
+                'id' => "importar",
+              ]);
+
+            }
+
+          }
+
+        ?>
+
+    <div>
+
 </form>
+
+<script>
+var elementIds = [
+    'pc01_unid_select_descr',
+    'pc01_obras_select_descr',
+    'pc01_tabela_select_descr',
+    'pc01_taxa_select_descr',
+    'pc01_fraciona_select_descr',
+    'pc04_descrsubgrupo',
+    'pc01_ativo_select_descr',
+    'pc01_servico_select_descr',
+    'pc01_codgrupo',
+    'pc01_codsubgrupo',
+    'pc01_codgrupodescr',
+    'pc01_codsubgrupodescr'
+];
+
+elementIds.forEach(function(id) {
+    var element = document.getElementById(id);
+    if (element) {
+        element.classList.add('form-control');
+    }
+});
+
+
+
+</script>
+
 <script>
     function js_check() {
         if (document.form1.pc01_obras.value == 0) {
@@ -379,6 +464,11 @@ $l12_pncp = $oParamLicicita[0]->l12_pncp;
                 coluna += sep + obj[i].value;
                 sep = "XX";
             }
+        }
+
+        if((document.getElementById('db_opcao').value == "Alterar" || document.getElementById('db_opcao').value == "Incluir") && coluna == ""){
+            alert('Usuário: Selecione pelo menos um desdobramento.');
+            return false;
         }
         document.form1.codeles.value = coluna;
         return true;

@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Patrimonial\Licitacao;
 use App\Models\Patrimonial\Licitacao\Licpropostavinc;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class LicpropostavincRepository
 {
@@ -15,7 +15,7 @@ class LicpropostavincRepository
 
     public function insert(array $dados): ?Licpropostavinc
     {
-        
+
         $l223_codigo = $this->model->getNextval();
         $dados['l223_codigo'] = $l223_codigo;
         return $this->model->create($dados);

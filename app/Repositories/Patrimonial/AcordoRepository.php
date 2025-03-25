@@ -28,4 +28,10 @@ class AcordoRepository implements AcordoRepositoryInterface
     {
        return $this->model->where('ac16_sequencial', $codigoAcordo)->first($fields);
     }
+
+    public function getAcordosByAdesao(int $ac16_adesaoregpreco){
+        return $this->model
+            ->where('ac16_adesaoregpreco', $ac16_adesaoregpreco)
+            ->get();
+    }
 }

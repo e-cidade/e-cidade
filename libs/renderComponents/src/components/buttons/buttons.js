@@ -22,7 +22,6 @@ function addSpinnerToButton(id, message = "") {
         messageSpinnerRDC.style.display = 'none';
     }
 }
-// addSpinnerToButton()
 
 function removeSpinnerAndShowMessage() {
     // Seleciona o botão onde o spinner foi adicionado
@@ -38,5 +37,28 @@ function removeSpinnerAndShowMessage() {
     }
 }
 
-// Chame esta função quando quiser remover o spinner e mostrar a mensagem
-// removeSpinnerAndShowMessage();
+function removeSpinnerAndShowMessage2(id) {
+    const spinner = document.getElementById('rdc-spinner-div');
+    if (spinner) {
+        spinner.remove();
+    }
+
+    const message = document.getElementById(id+'-message');
+    if (message) {
+        message.style.display = 'block'; // Exibe a mensagem
+    }
+}
+
+function disableTheButtonAndAddTheChargingSymbol(id, message = "") {
+    const button = document.getElementById(id);
+    button.disabled = true;
+    button.classList.add('disabled');
+    addSpinnerToButton(id, message);
+}
+
+function reactivateTheButtonAndRemoveTheChargingSymbol(id) {
+    const button = document.getElementById(id);
+    button.disabled = false;
+    button.classList.remove('disabled');
+    removeSpinnerAndShowMessage2(id);
+}

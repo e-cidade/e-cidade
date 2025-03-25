@@ -13,7 +13,7 @@ class Solicitempcmater extends LegacyModel
 
     protected $table = 'compras.solicitempcmater';
 
-    protected $primaryKey = 'pc16_codmater,pc16_solicitem';
+    protected $primaryKey = 'pc16_codmater';
 
     public $incrementing = false;
 
@@ -21,4 +21,9 @@ class Solicitempcmater extends LegacyModel
         'pc16_codmater',
         'pc16_solicitem'
     ];
+        
+    public function pcmater()
+    {
+        return $this->belongsTo(Pcmater::class, 'pc01_codmater', 'pc16_codmater');
+    }
 }

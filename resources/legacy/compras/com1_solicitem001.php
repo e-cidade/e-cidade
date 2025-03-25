@@ -90,7 +90,7 @@ require_once("classes/db_itemprecoreferencia_classe.php");
 $clsolicitem         = new cl_solicitem;
 $clsolicitemunid     = new cl_solicitemunid;
 $clsolicitempcmater  = new cl_solicitempcmater;
-$clhistoricomaterial = new cl_historicomaterial;
+// $clhistoricomaterial = new cl_historicomaterial;
 $clsolicitemele      = new cl_solicitemele;
 $clsolicita          = new cl_solicita;
 $clsolicitatipo      = new cl_solicitatipo;
@@ -477,26 +477,27 @@ if (isset($incluir) && $sqlerro == false) {
       db_fieldsmemory($rsMatunid, 0);
       $db150_coditem = $pc16_codmater.$pc17_unid;
 
-      $rsHistoricoMaterial = $clhistoricomaterial->sql_record($clhistoricomaterial->sql_query(null,"*",null,"db150_coditem =$db150_coditem"));
-      if(pg_num_rows($rsHistoricoMaterial) == 0 ){
-          //inserir na tabela historico material
-          $clhistoricomaterial->db150_tiporegistro              = 10;
-          $clhistoricomaterial->db150_coditem                   = $db150_coditem;
-          $clhistoricomaterial->db150_pcmater                   = $pc16_codmater;
-          $clhistoricomaterial->db150_dscitem                   = substr($pc01_descrmater.'-'.$pc01_complmater,0,999);
-          $clhistoricomaterial->db150_unidademedida             = $m61_descr;
-          $clhistoricomaterial->db150_tipocadastro              = 1;
-          $clhistoricomaterial->db150_justificativaalteracao    = '';
-          $clhistoricomaterial->db150_mes                       = date("m", db_getsession("DB_datausu"));
-          $clhistoricomaterial->db150_data                      = date("Y-m-d", db_getsession("DB_datausu"));
-          $clhistoricomaterial->db150_instit                    = db_getsession('DB_instit');
-          $clhistoricomaterial->incluir(null);
+      // $rsHistoricoMaterial = $clhistoricomaterial->sql_record($clhistoricomaterial->sql_query(null,"*",null,"db150_coditem =$db150_coditem"));
+      // if(pg_num_rows($rsHistoricoMaterial) == 0 ){
+      //     //inserir na tabela historico material
+      //     $clhistoricomaterial->db150_tiporegistro              = 10;
+      //     $clhistoricomaterial->db150_coditem                   = $db150_coditem;
+      //     $clhistoricomaterial->db150_pcmater                   = $pc16_codmater;
+      //     $clhistoricomaterial->db150_dscitem                   = substr($pc01_descrmater.'-'.$pc01_complmater,0,999);
+      //     $clhistoricomaterial->db150_unidademedida             = $m61_descr;
+      //     $clhistoricomaterial->db150_tipocadastro              = 1;
+      //     $clhistoricomaterial->db150_justificativaalteracao    = '';
+      //     $clhistoricomaterial->db150_mes                       = date("m", db_getsession("DB_datausu"));
+      //     $clhistoricomaterial->db150_data                      = date("Y-m-d", db_getsession("DB_datausu"));
+      //     $clhistoricomaterial->db150_instit                    = db_getsession('DB_instit');
+      //     $clhistoricomaterial->incluir(null);
 
-          if ($clhistoricomaterial->erro_status == 0) {
-              $sqlerro = true;
-              $erro_msg = $clhistoricomaterial->erro_msg;
-          }
-      }
+      //     if ($clhistoricomaterial->erro_status == 0) {
+      //         $sqlerro = true;
+      //         $erro_msg = $clhistoricomaterial->erro_msg;
+      //     }
+      // }
+
       if (isset($o103_pactovalor) && $o103_pactovalor != "") {
 
         try {

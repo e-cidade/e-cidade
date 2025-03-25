@@ -582,6 +582,67 @@ switch ($oParam->exec) {
         $oOrdemPagamento->desconto($oNota, $oParam->nValorEstornar, $oParam->sHistorico);
       }
 
+      $clempempenho = new cl_empempenho;
+      $controlaDivida = $clempempenho->getControlaDividaParam(db_getsession("DB_anousu"));
+      if ($controlaDivida == true) {
+          
+        $clempelemento = new cl_empelemento;
+        $where = "empempenho.e60_numemp = '{$oParam->empenho}' ";
+        $result = $clempelemento->sql_record($clempelemento->sql_query(null, null, "substr(o56_elemento,2,2) as elemento ,e60_codemp||'/'||e60_anousu as numempenho ", "e64_codele",$where));  
+                
+        if($clempelemento->numrows > 0){
+          $oResult = db_utils::fieldsMemory($result,0);
+        }
+
+        if ($oResult->elemento == 32 || $oResult->elemento == 46) {
+          $sDataMovimento = App\Support\String\DateFormatter::convertDateFormatBRToISO($oParam->dataLancamento);
+          $sSqlConsultaFimPeriodoContabil = "SELECT * FROM condataconf WHERE c99_anousu = ".db_getsession('DB_anousu')." and c99_instit = ".db_getsession('DB_instit');
+          $rsConsultaFimPeriodoContabil   = db_query($sSqlConsultaFimPeriodoContabil);
+          if (pg_num_rows($rsConsultaFimPeriodoContabil) > 0) {
+            $oFimPeriodoContabil = db_utils::fieldsMemory($rsConsultaFimPeriodoContabil, 0);
+                
+            if ($oFimPeriodoContabil->c99_data != '' && db_strtotime($sDataMovimento) <= db_strtotime($oFimPeriodoContabil->c99_data)) {                
+              $erro = true;
+            }
+          }
+           
+          if (!$erro) {
+            $dtPagamento    = App\Support\String\DateFormatter::convertDateFormatBRToISO($oParam->dataLancamento);
+              
+            $clsaltes = new cl_saltes;
+            $where    = " saltes.k13_conta = {$oParam->iConta }";
+            $sqlsaltes = $clsaltes->sql_query_anousu(null,"db83_codigoopcredito",null,$where);
+            $rsSaltes  = $clsaltes->sql_record($sqlsaltes);
+            if ($clsaltes->numrows > 0) {
+              $oDadosSaltes = db_utils::fieldsMemory($rsSaltes, 0);
+            } 
+
+            $justificativa = "Estorno do Pagamento da OP ($oParam->iNota) do Empenho ($oResult->numempenho)";
+                    
+            $clMovimentacao = new cl_movimentacaodedivida();
+            $clMovimentacao->op02_operacaodecredito = $oDadosSaltes->db83_codigoopcredito;
+            $clMovimentacao->op02_movimentacao      = 5;
+            $clMovimentacao->op02_tipo              = $oResult->elemento == 46? 1 : 2;
+            $clMovimentacao->op02_data              = $dtPagamento;
+            $clMovimentacao->op02_justificativa     = $justificativa;
+            $clMovimentacao->op02_valor             = $oParam->nValorEstornar;
+            $clMovimentacao->op02_movautomatica     = 't';
+            $clMovimentacao->op02_codigoplanilha    = $oParam->iCodMov;
+            $clMovimentacao->incluir();
+  
+            if ($clMovimentacao->erro_status == "0"){
+              $oRetorno->status = 2;
+              $oRetorno->message = "Erro ao incluir movimentação automática na Dívida Consolidada.";
+              throw new Exception($oRetorno->message);
+            } 
+          } else {
+  
+            $oRetorno->status = 2;
+            $oRetorno->message = "Não foi possível alterar a movimentação automática na Dívida Consolidada.<br> A data é inferior à data de encerramento do período contábil.";
+            throw new Exception($oRetorno->message);
+          }
+        } 
+      }
 
       //$oOrdemPagamento->estornarOrdem();
       //$oRetorno->aAutenticacoes[] = $oAutentica;

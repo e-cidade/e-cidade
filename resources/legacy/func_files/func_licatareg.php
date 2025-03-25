@@ -99,18 +99,18 @@ $cllicatareg->rotulo->label("l221_fornecedor");
            $campos = "licatareg.oid,licatareg.*";
            }
         }
-        $campos = "l221_sequencial,l221_licitacao,l221_numata,l221_exercicio,z01_nome,l221_dataini,l221_datafinal,l221_datapublica,l221_veiculopublica,l20_objeto";
+        $campos = "l221_sequencial,l221_licitacao,l221_numata,l221_exercicio,z01_nome,l221_dataini,l221_datafinal,l221_datapublica,l221_veiculopublica,l20_codigo,l20_objeto";
 
         if(isset($chave_l221_sequencial) && (trim($chave_l221_sequencial)!="") ){
-            $sql = $cllicatareg->sql_query_for(null,$campos,"l221_sequencial DESC","l221_sequencial = $chave_l221_sequencial");
+            $sql = $cllicatareg->sql_query_for(null,$campos,"l221_sequencial DESC","l221_sequencial = $chave_l221_sequencial and l20_instit = ".db_getsession('DB_instit'));
         }else if(isset($chave_l221_licitacao) && (trim($chave_l221_licitacao)!="") ){
-            $sql = $cllicatareg->sql_query_for(null,$campos,"l221_licitacao DESC","l221_licitacao=$chave_l221_licitacao");
+            $sql = $cllicatareg->sql_query_for(null,$campos,"l221_licitacao DESC","l221_licitacao=$chave_l221_licitacao and l20_instit = ".db_getsession('DB_instit'));
         }else if(isset($chave_l221_numata) && (trim($chave_l221_numata)!="") ){
-            $sql = $cllicatareg->sql_query_for(null,$campos,"l221_sequencial DESC","l221_numata like '$chave_l221_numata%'");
+            $sql = $cllicatareg->sql_query_for(null,$campos,"l221_sequencial DESC","l221_numata like '$chave_l221_numata%'and l20_instit = ".db_getsession('DB_instit'));
         }else if(isset($chave_l221_fornecedor) && (trim($chave_l221_fornecedor)!="") ){
-            $sql = $cllicatareg->sql_query_for(null,$campos,"l221_sequencial DESC","l221_fornecedor=$chave_l221_fornecedor");
+            $sql = $cllicatareg->sql_query_for(null,$campos,"l221_sequencial DESC","l221_fornecedor=$chave_l221_fornecedor and l20_instit = ".db_getsession('DB_instit'));
         }else{
-            $sql = $cllicatareg->sql_query_for(null,$campos,"l221_sequencial DESC");
+            $sql = $cllicatareg->sql_query_for(null,$campos,"l221_sequencial DESC","l20_instit = ".db_getsession('DB_instit'));
         }
         $repassa = array();
         echo '<div class="container">';

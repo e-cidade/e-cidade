@@ -26,7 +26,7 @@
  */
 
 //MODULO: empenho
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 $clrotulo = new rotulocampo;
 $clrotulo->label("z01_nome");
 $clrotulo->label("o56_elemento");
@@ -116,20 +116,20 @@ $db_opcao_inf=1;
 
                 $paramentosOrdenadores = buscarParamentosOrdenadores();
                 db_input('paramentosOrdenadores',10,$IparamentosOrdenadores,true,'hidden',3);
-                
+
                 if ($paramentosOrdenadores == 1) {
 
                   $dado = listarOrdenadores($numemp);
                   foreach($dado as $dados) {
                     $o41_cgmordenador = $dados['z01_numcgm'];
                   }
-                  
+
                   $where = $o41_cgmordenador ? " z01_numcgm in ($o41_cgmordenador) " :  "z01_numcgm is null";
                   $result_cgm = $clcgm->sql_record($clcgm->sql_buscar_ordenador(null," o41_nomeordenador desc ",$where));
                   if ($clcgm->numrows == 0 ) {
                     $result_cgm = $clcgm->sql_record($clcgm->sql_query_ordenador(null," o41_nomeordenador asc ",$where));
-                  } 
-                 
+                  }
+
                  if ($dados['erro'] == false) { ?>
 
                     <tr>
@@ -137,13 +137,13 @@ $db_opcao_inf=1;
                           <?db_ancora('<b>Ordenador da Liquidação</b>',"js_pesquisa_cgm(true);",$fimperiodocontabil);?>
                       </td>
                       <td colspan="4">
-                          <?  
+                          <?
                               db_input("o41_cgmordenador",10,$Io41_cgmordenador,true,"text",$fimperiodocontabil,"onChange='js_pesquisa_cgm(false);'");
                               db_input("o41_cgmordenadordescr",40,$Io41_cgmordenadordescr,true,"text",3);
                           ?>
                       </td>
                     </tr>
-                    <?php    
+                    <?php
                       } else {
                     ?>
                     <td nowrap title="<?= @$Te54_numcgm ?>">
@@ -153,30 +153,30 @@ $db_opcao_inf=1;
                         <?=
                           db_selectrecord("o41_cgmordenador", $result_cgm, true, $db_opcao, "", "", "", "","");
                         ?>
-                    </td>  
-                <?php 
+                    </td>
+                <?php
                   }
-                } elseif ($paramentosOrdenadores == 2) { 
+                } elseif ($paramentosOrdenadores == 2) {
                   if ($numemp) {
                     $ordenadoresArray = listarOrdenadores($numemp);
-                    $arrayCount = count($ordenadoresArray); 
+                    $arrayCount = count($ordenadoresArray);
                     $cont       = 0;
                     $numCgm     = '';
 
                     if ($arrayCount > 1) {
                       foreach($ordenadoresArray as $ordenadores) {
-                          $cont++; 
+                          $cont++;
                           $numCgm .= "'";
-                          $numCgm .= $ordenadores['z01_numcgm']; 
+                          $numCgm .= $ordenadores['z01_numcgm'];
                           if ($arrayCount == $cont) {
-                            $numCgm .= "'";   
+                            $numCgm .= "'";
                           } else {
-                            $numCgm .= "',";  
-                          }        
+                            $numCgm .= "',";
+                          }
                       }
                       $where = " z01_numcgm in ($numCgm) ";
                       $result_cgm = $clcgm->sql_record($clcgm->sql_query_ordenador(null," sort_order asc, o41_nomeordenador asc ",$where));
-                      
+
                       if ($ordenadores['erro'] == false) { ?>
 
                         <tr>
@@ -184,7 +184,7 @@ $db_opcao_inf=1;
                               <?db_ancora('<b>Ordenador da Liquidação</b>',"js_pesquisa_cgm(true);",$fimperiodocontabil);?>
                           </td>
                           <td colspan="4">
-                              <?  
+                              <?
                                   db_input("o41_cgmordenador",10,$Io41_cgmordenador,true,"text",$fimperiodocontabil,"onChange='js_pesquisa_cgm(false);'");
                                   db_input("o41_cgmordenadordescr",40,$Io41_cgmordenadordescr,true,"text",3);
                                   db_input('db243_data_inicio',10,$Idb243_data_inicio,true,'hidden',3);
@@ -192,7 +192,7 @@ $db_opcao_inf=1;
                               ?>
                           </td>
                         </tr>
-                      <?php    
+                      <?php
                       } else {
                       ?>
                           <td nowrap title="<?= @$Te54_numcgm ?>">
@@ -200,11 +200,11 @@ $db_opcao_inf=1;
                           </td>
                           <td colspan="5"><?=
                           db_selectrecord("o41_cgmordenador", $result_cgm, true, $db_opcao, "", "", "", "","js_dadosordenador(this.value,$numemp)");
-                          ?></td>    
+                          ?></td>
                           <td ><?=
                           db_input('o41_nomeordenador', 55, $Iz01_nome, true, 'hidden', 3);
-                          
-                        ?></td>  
+
+                        ?></td>
                         <?php
                          db_input('db243_data_inicio',10,$Idb243_data_inicio,true,'hidden',3);
                          db_input('db243_data_final',10,$Idb243_data_final,true,'hidden',3);
@@ -215,13 +215,13 @@ $db_opcao_inf=1;
                         foreach($dado as $dados) {
                           $o41_cgmordenador = $dados['z01_numcgm'];
                         }
-                        
+
                         $where = $o41_cgmordenador ? " z01_numcgm in ($o41_cgmordenador) " :  "z01_numcgm is null";
                         $result_cgm = $clcgm->sql_record($clcgm->sql_buscar_ordenador(null," o41_nomeordenador asc ",$where));
                         if ($clcgm->numrows == 0 ) {
                           $result_cgm = $clcgm->sql_record($clcgm->sql_query_ordenador(null," o41_nomeordenador asc ",$where));
-                        } 
-                          
+                        }
+
                         if ($dados['erro'] == 0) { ?>
 
                           <tr>
@@ -229,16 +229,16 @@ $db_opcao_inf=1;
                               <?db_ancora('<b>Ordenador da Liquidação</b>',"js_pesquisa_cgm(true);",$fimperiodocontabil);?>
                           </td>
                           <td colspan="4">
-                              <?  
+                              <?
                                   db_input("o41_cgmordenador",8,$Io41_cgmordenador,true,"text",$fimperiodocontabil,"onChange='js_pesquisa_cgm(false);'");
                                   db_input("o41_cgmordenadordescr",40,$Io41_cgmordenadordescr,true,"text",3);
                                   db_input('db243_data_inicio',10,$Idb243_data_inicio,true,'hidden',3);
                                   db_input('db243_data_final',10,$Idb243_data_final,true,'hidden',3);
-                              
+
                               ?>
                           </td>
                           </tr>
-                          <?php    
+                          <?php
                         } else {
 
                         ?>
@@ -251,11 +251,11 @@ $db_opcao_inf=1;
                                db_input('db243_data_inicio',10,$Idb243_data_inicio,true,'hidden',3);
                                db_input('db243_data_final',10,$Idb243_data_final,true,'hidden',3);
                             ?>
-                        </td>  
+                        </td>
                         <?php
                       }
                    }
-                }   
+                }
               } else {
           ?>
 
@@ -264,21 +264,21 @@ $db_opcao_inf=1;
                 <?db_ancora('<b>Ordenador da Liquidação</b>',"js_pesquisa_cgm(true);",$fimperiodocontabil);?>
               </td>
               <td colspan="4">
-                <?  
+                <?
                   db_input("o41_cgmordenador",8,$Io41_cgmordenador,true,"text",$fimperiodocontabil,"onChange='js_pesquisa_cgm(false);'");
                   db_input("o41_cgmordenadordescr",40,$Io41_cgmordenadordescr,true,"text",3);
                   db_input('db243_data_inicio',10,$Idb243_data_inicio,true,'hidden',3);
                   db_input('db243_data_final',10,$Idb243_data_final,true,'hidden',3);
-                         
+
                 ?>
               </td>
               </tr>
-           
+
               <?php
             }
           }
-          ?>       
-              </tr> 
+          ?>
+              </tr>
           <?
            if($operacao == 1){
               ?>
@@ -787,7 +787,7 @@ function js_saida(oAjax){
     $('naturezaDesc').value  = '';
     $('reinfRetencaoEstabelecimento').value = 0;
     js_validarEstabelecimentos();
-    
+
     if (iOperacao == 1) {
       $("e50_contafornecedor").innerHTML = ''
       opcaoPadrao = document.createElement('option');
@@ -795,7 +795,7 @@ function js_saida(oAjax){
       opcaoPadrao.textContent = "Sem conta definida.";
       $("e50_contafornecedor").appendChild(opcaoPadrao);
 
-      if (obj.contas.length > 0) {      
+      if (obj.contas.length > 0) {
         obj.contas.forEach(function(conta) {
           const novaConta = document.createElement('option');
           novaConta.value = conta.pc63_contabanco;
@@ -1048,7 +1048,7 @@ function js_liquidar(metodo){
           alert('É obrigatório informar o ordenador da liquidação!');
           return false;
     }
-   } 
+   }
 
    if(document.form1.aIncide.value == 1){
     if(opcao != '3' && !document.form1.ct01_codcategoria.value &&  obj.Tipofornec =='cpf' && tipodesdobramento == '1' ){
@@ -1193,8 +1193,8 @@ function js_liquidar(metodo){
           }
           $('o41_cgmordenador').focus();
           return false;
-      } 
-    }  
+      }
+    }
   }
 
   if(iOperacao === 2){
@@ -1468,7 +1468,7 @@ function  js_dadosordenador(dadosOrdenador,numempenho)
             }
         );
 }
-function js_retornogetOrdenador(oAjax) 
+function js_retornogetOrdenador(oAjax)
   {
 
         js_removeObj('msgBox');
@@ -1476,7 +1476,7 @@ function js_retornogetOrdenador(oAjax)
         document.getElementById('db243_data_inicio').value = oResposta.db243_data_inicio;
         document.getElementById('db243_data_final').value = oResposta.db243_data_final;
 
-}    
+}
 function js_mostraCatTrabalhador(erro,chave){
   document.form1.ct01_descricaocategoria.value = chave;
   if(erro==true){
@@ -1539,7 +1539,7 @@ function js_pesquisa_cgm(mostra)
 }
 
 function js_mostracgm(erro, chave,chave2)
-{ 
+{
         if (chave2 == 'JURIDICA') {
             alert("É obrigatório que o ordenador seja uma pessoa física.")
             document.form1.o41_cgmordenador.value = '';
@@ -1554,9 +1554,9 @@ function js_mostracgm(erro, chave,chave2)
         }
 }
 
-function js_mostracgm1(chave, chave1,chave2) 
+function js_mostracgm1(chave, chave1,chave2)
 {
-       
+
   if (chave2 == 'JURIDICA') {
     alert("É obrigatório que o ordenador seja uma pessoa física.")
     document.form1.o41_cgmordenador.value = '';
@@ -1567,7 +1567,7 @@ function js_mostracgm1(chave, chave1,chave2)
     document.form1.o41_cgmordenadordescr.value = chave1;
     db_iframe_cgm.hide();
   }
-      
+
 }
 
 function removerObj(id) {
@@ -1725,7 +1725,7 @@ function buscarParamentosOrdenadores()
   $clempparametro    = new cl_empparametro;
   return db_utils::fieldsMemory($clempparametro->sql_record($clempparametro->sql_query(db_getsession("DB_anousu"), "e30_buscarordenadoresliqui", null, "")), 0)->e30_buscarordenadoresliqui;
 }
-function listarOrdenadores($e60_numemp) 
+function listarOrdenadores($e60_numemp)
 {
   $o58_anousu  = 0;
   $o58_instit  = 0;
@@ -1742,43 +1742,40 @@ function listarOrdenadores($e60_numemp)
   $coddotacao = db_utils::fieldsMemory($rsBuscaElemento, 0)->e60_coddot;
 
   $anoUsu = db_getsession("DB_anousu");
-  $sWhere = "e56_coddot =	" . $coddotacao . " and ( e56_anousu = " . $anoUsu ."or e64_vlrpag > 0 ) and e61_numemp = ".$e60_numemp; 
+  $sWhere = "e56_coddot =	" . $coddotacao . " and ( e56_anousu = " . $anoUsu ."or e64_vlrpag > 0 ) and e61_numemp = ".$e60_numemp;
   $rsResult = $clempautidot->sql_record($clempautidot->sql_query_dotacao_empenho(null, "*", null, $sWhere));
   $numrows = $clempautidot->numrows;
 
   if ($numrows > 0) {
-     
-      $o58_anousu  = db_utils::fieldsMemory($rsResult, 0)->o58_anousu;
-      $o58_instit  = db_utils::fieldsMemory($rsResult, 0)->o58_instit;
-      $o58_orgao   = db_utils::fieldsMemory($rsResult, 0)->o58_orgao;
-      $o58_unidade = db_utils::fieldsMemory($rsResult, 0)->o58_unidade;
-      $e56_autori  = db_utils::fieldsMemory($rsResult, 0)->e56_autori;
+    $o58_anousu  = db_utils::fieldsMemory($rsResult, 0)->o58_anousu;
+    $o58_instit  = db_utils::fieldsMemory($rsResult, 0)->o58_instit;
+    $o58_orgao   = db_utils::fieldsMemory($rsResult, 0)->o58_orgao;
+    $o58_unidade = db_utils::fieldsMemory($rsResult, 0)->o58_unidade;
+    $e56_autori  = db_utils::fieldsMemory($rsResult, 0)->e56_autori;
   }
 
   $buscarOrdenadores = buscarParamentosOrdenadores();
   if ($buscarOrdenadores == 1 ) {
 
-     $whereUnidades = " o41_anousu = {$anoUsu} and o41_instit = {$o58_instit} and o41_orgao = {$o58_orgao} and o41_unidade = {$o58_unidade} ";
-     $o41_cgmordenador =  db_utils::fieldsMemory($clorcunidade->sql_record($clorcunidade->sql_query($anoUsu,null,null, " o41_ordliquidacao ",null,$whereUnidades)), 0)->o41_ordliquidacao;
-     $result_cgmorliquidaca = db_query("SELECT z01_nome as nomeordenador FROM cgm WHERE z01_numcgm = {$o41_cgmordenador}");
-     $o41_nomeordenador = db_utils::fieldsMemory($result_cgmorliquidaca, 0)->nomeordenador;
+    $whereUnidades = " o41_anousu = {$anoUsu} and o41_instit = {$o58_instit} and o41_orgao = {$o58_orgao} and o41_unidade = {$o58_unidade} ";
+    $o41_cgmordenador =  db_utils::fieldsMemory($clorcunidade->sql_record($clorcunidade->sql_query($anoUsu,null,null, " o41_ordliquidacao ",null,$whereUnidades)), 0)->o41_ordliquidacao;
+    $result_cgmorliquidaca = db_query("SELECT z01_nome as nomeordenador FROM cgm WHERE z01_numcgm = {$o41_cgmordenador}");
+    $o41_nomeordenador = db_utils::fieldsMemory($result_cgmorliquidaca, 0)->nomeordenador;
 
-     if ($numrows > 0) {
-       $ordenadoresArray[] = [
-
+    if ($numrows > 0) {
+      $ordenadoresArray[] = [
         'z01_numcgm' => $o41_cgmordenador,
         'o41_nomeordenador' => $o41_nomeordenador,
         'erro'        =>  true,
-      ];
-      return $ordenadoresArray; 
-     }
+        ];
+      return $ordenadoresArray;
+    }
+    return ['erro' => false];
 
-     return ['erro' => false];
-    
   } else {
-
-   $anoUsu = db_getsession("DB_anousu");
- $results = DB::table('empenho.empautidot')
+    $anoUsu = db_getsession("DB_anousu");
+    if ($e56_autori) {
+      $results = DB::table('empenho.empautidot')
                ->join('orcdotacao', function($join) {
                $join->on('orcdotacao.o58_anousu', '=', 'empautidot.e56_anousu')
                     ->on('orcdotacao.o58_coddot', '=', 'empautidot.e56_coddot');
@@ -1798,15 +1795,31 @@ function listarOrdenadores($e60_numemp)
                       ->orWhere('empelemento.e64_vlrpag', '>', 0);
                })
                ->get()->toArray();
-        
-   foreach ($results as $autorizacao) {  
-       $o58_instit  =  $autorizacao->o58_instit; 
-       $o58_orgao   =  $autorizacao->o58_orgao; 
-       $o58_unidade =  $autorizacao->o58_unidade; 
-       $o58_anousu  =  $autorizacao->o58_anousu; 
-   }   
 
-   $aAssinantes = DB::table('configuracoes.assinatura_digital_assinante')
+      foreach ($results as $autorizacao) {
+        $o58_instit  =  $autorizacao->o58_instit;
+        $o58_orgao   =  $autorizacao->o58_orgao;
+        $o58_unidade =  $autorizacao->o58_unidade;
+        $o58_anousu  =  $autorizacao->o58_anousu;
+      }
+
+    } else {
+      $rsResult = DB::table('empenho.empempenho')
+      ->join('orcamento.orcdotacao', 'o58_coddot', 'e60_coddot')
+      ->where("e60_numemp", $e60_numemp)
+      ->select('o58_instit',
+                'o58_orgao',
+                'o58_unidade')
+      ->first();
+
+      if ($rsResult) {
+        $o58_instit  =  $rsResult->o58_instit;
+        $o58_orgao   =  $rsResult->o58_orgao;
+        $o58_unidade =  $rsResult->o58_unidade;
+        $numrows     = 1;
+      }
+    }
+    $aAssinantes = DB::table('configuracoes.assinatura_digital_assinante')
                ->join('configuracoes.db_usuarios', 'configuracoes.assinatura_digital_assinante.db243_usuario', '=', 'configuracoes.db_usuarios.id_usuario')
                ->join('configuracoes.db_usuacgm', 'configuracoes.db_usuacgm.id_usuario', '=', 'configuracoes.db_usuarios.id_usuario')
                ->join('protocolo.cgm', 'protocolo.cgm.z01_numcgm', '=', 'configuracoes.db_usuacgm.cgmlogin')
@@ -1818,33 +1831,32 @@ function listarOrdenadores($e60_numemp)
                ->where('configuracoes.assinatura_digital_assinante.db243_documento', '=', 1)
                ->select('configuracoes.db_usuarios.login', 'configuracoes.db_usuarios.nome', 'configuracoes.db_usuarios.email', 'protocolo.cgm.z01_cgccpf' , 'configuracoes.assinatura_digital_assinante.db243_cargo','protocolo.cgm.z01_numcgm','configuracoes.assinatura_digital_assinante.db243_data_inicio','configuracoes.assinatura_digital_assinante.db243_data_final')
                ->distinct('login', 'nome', 'z01_cgccpf', 'db243_cargo')
-               ->get()->toArray();         
+               ->get()->toArray();
 
-   $rowCount = count($aAssinantes);  
-   $ordenadoresArray = array(); 
-   $uniqueKeys = array(); 
-   
-   foreach ($aAssinantes as $assinante) {
-    $uniqueKey = $assinante->nome . '|' . $assinante->z01_numcgm;
+    $rowCount = count($aAssinantes);
+    $ordenadoresArray = array();
+    $uniqueKeys = array();
 
-        if (!in_array($uniqueKey, $uniqueKeys)) {
-            $ordenadoresArray[] = [
-                'nome' => $assinante->nome,
-                'z01_numcgm' => $assinante->z01_numcgm,
-                'db243_data_inicio' => $assinante->db243_data_inicio,
-                'db243_data_final' => $assinante->db243_data_final,
-                'rowCount'    => $rowCount,
-                'erro'        =>  $numrows,
-            ];
-            $uniqueKeys[] = $uniqueKey;
-        }
-}
-if ($rowCount > 0) {
-   return $ordenadoresArray;
-}
+    foreach ($aAssinantes as $assinante) {
+      $uniqueKey = $assinante->nome . '|' . $assinante->z01_numcgm;
 
-return ['erro' => false];
-}
+      if (!in_array($uniqueKey, $uniqueKeys)) {
+        $ordenadoresArray[] = [
+            'nome' => $assinante->nome,
+            'z01_numcgm' => $assinante->z01_numcgm,
+            'db243_data_inicio' => $assinante->db243_data_inicio,
+            'db243_data_final' => $assinante->db243_data_final,
+            'rowCount'    => $rowCount,
+            'erro'        =>  $numrows,
+        ];
+        $uniqueKeys[] = $uniqueKey;
+      }
+    }
+    if ($rowCount > 0) {
+      return $ordenadoresArray;
+    }
+    return ['erro' => false];
+  }
 }
 ?>
 

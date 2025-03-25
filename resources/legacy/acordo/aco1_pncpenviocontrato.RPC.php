@@ -16,7 +16,7 @@ require_once("model/contrato/PNCP/ContratoPNCP.model.php");
 require_once("model/Acordo.model.php");
 
 db_app::import("configuracao.DBDepartamento");
-$envs = parse_ini_file('config/PNCP/.env', true);
+$envs = parse_ini_file('legacy_config/PNCP/.env', true);
 $oJson             = new services_json();
 $oParam            = $oJson->decode(str_replace("\\", "", $_POST["json"]));
 $oErro             = new stdClass();
@@ -80,11 +80,11 @@ switch ($oParam->exec) {
                     //monta o json com os dados da Contrato
                     $oDados = $clContratoPNCP->montarDados();
                     $arraybensjson = json_encode(DBString::utf8_encode_all($oDados));
-    
+
                     $rsApiPNCP = $clContratoPNCP->enviarContrato($arraybensjson);
-    
-                    //$rsApiPNCP = array(201,'//treina.pncp.gov.br/pncp-api/v1/orgaos/23539463000121/contratos/2024/6 x-content-type-options');
-    
+
+                    //$rsApiPNCP = array(201,'//treina.pncp.gov.br/pncp-api/v1/orgaos/23539463000121/contratos/2024/12 x-content-type-options');
+
                     if ($rsApiPNCP[0] == 201) {
                         //producao
                         $anocontrato = substr($rsApiPNCP[1], 58, 4);
@@ -96,7 +96,7 @@ switch ($oParam->exec) {
                             $ac213_sequencialpncp = trim(substr(str_replace('x-content-type-options', '', $rsApiPNCP[1]), 70));
                             $ac213_numerocontrolepncp = db_utils::getCnpj() . '-2-' . str_pad($ac213_sequencialpncp, 6, '0', STR_PAD_LEFT) . '/' . $anocontrato;
                         }
-    
+
                         //monto o codigo do contrato no pncp
                         $clacocontrolepncp->ac213_contrato = $aContrato->codigo;
                         $clacocontrolepncp->ac213_usuario = db_getsession('DB_id_usuario');
@@ -107,12 +107,12 @@ switch ($oParam->exec) {
                         $clacocontrolepncp->ac213_ano = $anocontrato;
                         $clacocontrolepncp->ac213_sequencialpncp = $ac213_sequencialpncp;
                         $clacocontrolepncp->incluir();
-    
+
                         if($clacocontrolepncp->erro_status == 0){
                             $erro = $clacocontrolepncp->erro_msg;
                             $sqlerro = true;
                         }
-    
+
                         $oRetorno->status  = 1;
                     } else {
                         throw new Exception(utf8_decode($rsApiPNCP[1]));

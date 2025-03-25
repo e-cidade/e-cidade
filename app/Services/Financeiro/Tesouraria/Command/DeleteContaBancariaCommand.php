@@ -25,7 +25,7 @@ use App\Repositories\Financeiro\Tesouraria\SaltesRepositoryInterface;
 use App\Services\Financeiro\Tesouraria\Command\DeleteContaBancariaCommandInterface;
 
 use Exception;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 use stdClass;
 
 class DeleteContaBancariaCommand implements DeleteContaBancariaCommandInterface
@@ -90,7 +90,7 @@ class DeleteContaBancariaCommand implements DeleteContaBancariaCommandInterface
      * @var int $instituicao
      */
     private int $instituicao;
-    
+
     public function __construct()
     {
         $this->contabancariaRepository           = new ContaBancariaRepository();
@@ -108,7 +108,7 @@ class DeleteContaBancariaCommand implements DeleteContaBancariaCommandInterface
 
     public function execute(stdClass $chavestabelas): bool
     {
-        
+
         $sequencialcontaBancaria           = $chavestabelas->db83_sequencial;
         $sequencialcontaPlano              = $chavestabelas->c60_codcon;
         $sequencialcontaplanoreduz         = $chavestabelas->c61_codcon;
@@ -117,12 +117,12 @@ class DeleteContaBancariaCommand implements DeleteContaBancariaCommandInterface
         $sequencialcontaplanocontacorrente = $chavestabelas->c18_codcon;
         $sequencialsaltes                  = $chavestabelas->k13_conta;
         $sequencialempagetipo              = $chavestabelas->e83_codtipo;
-        
+
         $dataSessao = $this->contaplanocontaRepository->dataSessao($this->ano,$this->instituicao);
-        
+
         try {
-           
-            
+
+
             DB::beginTransaction();
 
             $resultContaPlanoReduz = $this->contaplanoreduzRepository->delete($sequencialcontaplanoreduz);
@@ -134,8 +134,8 @@ class DeleteContaBancariaCommand implements DeleteContaBancariaCommandInterface
             if (!$resultContaPlanoContaCorrente) {
                 throw new Exception("Não foi possível excluir a conta {$sequencialcontaBancaria}. Erro!");
             }
-           
-            $resultContaPlanoExe = $this->contaplanoexeRepository->delete($sequencialcontaplanoexe);  
+
+            $resultContaPlanoExe = $this->contaplanoexeRepository->delete($sequencialcontaplanoexe);
             if (!$resultContaPlanoExe) {
                 throw new Exception("Não foi possível excluir a conta {$sequencialcontaBancaria}. Erro!");
             }
@@ -144,27 +144,27 @@ class DeleteContaBancariaCommand implements DeleteContaBancariaCommandInterface
             if (!$resultEmpagetipo) {
                 throw new Exception("Não foi possível excluirb a conta {$sequencialcontaBancaria}. Erro!");
             }
-            
+
             $resultSaltes = $this->saltesRepository->delete($sequencialsaltes);
             if (!$resultSaltes) {
                 throw new Exception("Não foi possível excluirs a conta {$sequencialcontaBancaria}. Erro!");
             }
-           
+
             $resultContaPlanoContaBancaria =  $this->contaplanocontabancariaRepository->delete($sequencialcontaplanocontabancaria);
             if (!$resultContaPlanoContaBancaria) {
                 throw new Exception("Não foi possível excluir a conta {$sequencialcontaBancaria}. Erro!");
             }
-            
+
             $resultContaBancaria = $this->contabancariaRepository->delete($sequencialcontaBancaria);
             if (!$resultContaBancaria) {
                 throw new Exception("Não foi possível excluir a conta {$sequencialcontaBancaria}. Erro!");
             }
-            
+
             $resultContaPlano = $this->contaplanoRepository->delete($sequencialcontaPlano);
             if (!$resultContaPlano) {
                 throw new Exception("Não foi possível excluir a conta {$sequencialcontaBancaria}. Erro!");
             }
-           
+
             DB::commit();
             return true;
         } catch (Exception $e) {

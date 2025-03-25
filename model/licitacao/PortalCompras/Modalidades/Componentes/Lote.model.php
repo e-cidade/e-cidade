@@ -81,7 +81,7 @@ class Lote implements \JsonSerializable
     /**
      * Set the value of exclusivoMPE
      */
-    public function setExclusivoMPE(?int $exclusivoMPE): self
+    public function setExclusivoMPE(int $exclusivoMPE): bool
     {
         $this->exclusivoMPE = false;
 
@@ -89,7 +89,7 @@ class Lote implements \JsonSerializable
             $this->exclusivoMPE = true;
         }
 
-        return $this;
+        return $this->exclusivoMPE;
     }
 
     /**

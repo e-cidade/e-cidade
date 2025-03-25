@@ -96,14 +96,6 @@ $codigoModalidade = (db_utils::fieldsMemory($resource, 0))->codigomodalidade;
     <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
     <script language="JavaScript" type="text/javascript" src="scripts/prototype.js"></script>
     <link href="estilos.css" rel="stylesheet" type="text/css">
-
-    <script type="text/javascript">
-        loadComponents([
-            'buttonsSolid',
-            'tooltipDefault',
-            'todosIcones'
-        ]);
-    </script>
 </head>
 
 <body>
@@ -115,8 +107,8 @@ $codigoModalidade = (db_utils::fieldsMemory($resource, 0))->codigomodalidade;
                                                     echo "none";
                                                 } ?>;">
                 <fieldset style="width: 550;">
-                    <legend><strong>Publicações</strong></legend>
-                    <table>
+                <legend><strong>Publicações</strong></legend>
+                <table>
                         <tr style="margin-left:-50px;" id="dtpubedital">
                             <td nowrap title="Data Publicação Edital" id="dtpublic">
                                 <b>Data Publicação Edital: </b>
@@ -284,7 +276,7 @@ $codigoModalidade = (db_utils::fieldsMemory($resource, 0))->codigomodalidade;
                         <tr id="respPublic">
                             <td nowrap title="respPubliccodigo">
                                 <?
-                                db_ancora("Texto Padrão:", "js_pesquisa(true);", $db_opcao)
+                                db_ancora("Texto Padrï¿½o:", "js_pesquisa(true);", $db_opcao)
 
                                 ?>
                             </td>
@@ -330,7 +322,7 @@ $codigoModalidade = (db_utils::fieldsMemory($resource, 0))->codigomodalidade;
             ?>
                 <form name="form2">
                     <fieldset style="width: 550;">
-                        <legend><strong>Enviar Publicações para Plataforma: </strong></legend>
+                        <legend><strong>Enviar Publicaï¿½ï¿½es para Plataforma: </strong></legend>
                         <table>
                             <tr id="PortalCompras">
                                 <td nowrap title="enviarPortalCompras">
@@ -347,14 +339,14 @@ $codigoModalidade = (db_utils::fieldsMemory($resource, 0))->codigomodalidade;
                                         'message' => 'Enviar'
                                     ]); ?>
 
-                                    <?php $component->render('tooltip/default', [
+                                    <?php $component->render('tooltip/defaultLegacy', [
                                         'id' => 'tooltip-default-triangle-pcp',
                                         'body' => '<i class="icon exclamation-triangle warning"></i>',
                                         'color' => '',
                                         'size' => 'lg'
                                     ]) ?>
 
-                                    <?php $component->render('tooltip/default', [
+                                    <?php $component->render('tooltip/defaultLegacy', [
                                         'id' => 'tooltip-default-circle-pcp',
                                         'body' => '<i class="icon exclamation-circle info"></i>',
                                         'color' => '',

@@ -80,12 +80,12 @@ charset=iso-8859-1">
             $where .= " and t98_manutencaoprocessada = 'f'";
           }
 
-          $sql = "select t98_sequencial, t98_bem, t98_data, t98_vlrmanut, t98_descricao, CASE WHEN t98_tipo = 1 THEN 'Acréscimo de Valor' 
+          $sql = "SELECT t98_sequencial, t98_bem, t98_data, t98_vlrmanut, SUBSTRING(t98_descricao, 1, 500) AS t98_descricao, CASE WHEN t98_tipo = 1 THEN 'Acréscimo de Valor' 
           WHEN t98_tipo = 2 THEN 'Decréscimo de Valor' 
           WHEN t98_tipo = 3 THEN 'Adição de Componente' 
           WHEN t98_tipo = 4 THEN 'Remoção de Componente' 
   WHEN t98_tipo = 5 THEN 'Manutenção de Imóvel' 
-      END as TipoManutencao,t52_ident,t52_descr,t98_manutencaoprocessada,t52_valaqu,t44_valoratual,t52_depart,descrdepto,t98_tipo
+      END as t98_tipo,t52_ident,t52_descr,t98_manutencaoprocessada,t52_valaqu,t44_valoratual,t52_depart,descrdepto,t98_tipo
           from bemmanutencao
           inner join bens on t52_bem = t98_bem
           inner join bensdepreciacao on t44_bens = t98_bem

@@ -520,7 +520,7 @@ if(isset($mostra)){
 			$cllayout_BBBS->CEFheaderL_004_007 = db_formatar(substr($seq_header,0,4),'s','0',4,'e',0);
 			$cllayout_BBBS->CEFheaderL_008_008 = "1";
 			$cllayout_BBBS->CEFheaderL_009_009 = "C";
-			$cllayout_BBBS->CEFheaderL_010_011 = $tiposerv;
+			$cllayout_BBBS->CEFheaderL_010_011 = '20';
 			$cllayout_BBBS->CEFheaderL_012_013 = $tipopag;
 			$cllayout_BBBS->CEFheaderL_014_016 = '041';
 			$cllayout_BBBS->CEFheaderL_017_017 = ' ';
@@ -614,6 +614,14 @@ if(isset($mostra)){
 	    if($banco == '001' && $pc63_banco == '001'){
 	      $dvagconta_fav = '0';
 	    }
+
+		if ($banco == "104") {
+			$iConta   = db_formatar(str_replace('.', '', str_replace('-', '', trim($pc63_conta))), 's', '0', 8, 'e', 0);
+			$conta_fav = $pc63_codigooperacao.$iConta;
+			if ($pc63_codigooperacao == '000' && $pc63_banco == '104') {
+				$conta_fav = substr($pc63_codigooperacao,1,3).$iConta;
+			} 
+		}
 
 	    // REGISTROS
 	    if($banco=="041"){
@@ -729,7 +737,7 @@ if(isset($mostra)){
 				 $cllayout_BBBS->CEFregistA_021_023 = $pc63_banco;
 				 $cllayout_BBBS->CEFregistA_024_028 = db_formatar(str_replace('.','',str_replace('-','',$agencia_fav)),'s','0',5,'e',0);
 				 $cllayout_BBBS->CEFregistA_029_029 = $dvagencia_fav;
-				 $cllayout_BBBS->CEFregistA_030_041 = $conta_fav;
+				 $cllayout_BBBS->CEFregistA_030_041 = db_formatar($conta_fav,'s','0',12,'e',0);
 				 $cllayout_BBBS->CEFregistA_042_042 = $dvconta_fav;
 				 $cllayout_BBBS->CEFregistA_043_043 = str_repeat(' ',1);
 				 $cllayout_BBBS->CEFregistA_044_073 = db_translate(db_formatar(str_replace('-','',substr(removeAccents($z01_nome),0,30)),'s',' ',30,'d',0));
@@ -930,6 +938,7 @@ if(isset($sqlerro)){
 
           jan = window.open('tmp/$nomearquivo','','width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0 ');
           jan.moveTo(0,0);
+		  alert('Arquivo gerado com sucesso!');
         }
 
       }

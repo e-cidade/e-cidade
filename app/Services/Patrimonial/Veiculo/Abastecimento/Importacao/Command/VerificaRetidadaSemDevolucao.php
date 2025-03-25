@@ -2,7 +2,7 @@
 
 namespace App\Services\Patrimonial\Veiculo\Abastecimento\Importacao\Command;
 
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class VerificaRetidadaSemDevolucao
 {

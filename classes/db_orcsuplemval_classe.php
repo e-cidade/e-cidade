@@ -730,5 +730,14 @@ class cl_orcsuplemval {
             $sql .= " GROUP BY fonte ";
         return $sql;
     }
+
+    function sql_query_suplemetacao($instit,$suplementacao)
+    {
+      $sql = " select o58_codigo";
+      $sql .= " from orcsuplemval ";
+      $sql .= " join orcdotacao on  (o47_coddot,o47_anousu) = (o58_coddot,o58_anousu)";
+      $sql .= " where o47_codsup = {$suplementacao} and o58_instit = {$instit} ";
+      return $sql;     
+    }
 }
 ?>

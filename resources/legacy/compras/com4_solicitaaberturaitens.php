@@ -1,32 +1,32 @@
 <?php
 /*
- *     E-cidade Software Publico para Gestao Municipal                
- *  Copyright (C) 2013  DBselller Servicos de Informatica             
- *                            www.dbseller.com.br                     
- *                         e-cidade@dbseller.com.br                   
- *                                                                    
- *  Este programa e software livre; voce pode redistribui-lo e/ou     
- *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme  
- *  publicada pela Free Software Foundation; tanto a versao 2 da      
- *  Licenca como (a seu criterio) qualquer versao mais nova.          
- *                                                                    
- *  Este programa e distribuido na expectativa de ser util, mas SEM   
- *  QUALQUER GARANTIA; sem mesmo a garantia implicita de              
- *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM           
- *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais  
- *  detalhes.                                                         
- *                                                                    
- *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU     
- *  junto com este programa; se nao, escreva para a Free Software     
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA          
- *  02111-1307, USA.                                                  
- *  
- *  Copia da licenca no diretorio licenca/licenca_en.txt 
- *                                licenca/licenca_pt.txt 
+ *     E-cidade Software Publico para Gestao Municipal
+ *  Copyright (C) 2013  DBselller Servicos de Informatica
+ *                            www.dbseller.com.br
+ *                         e-cidade@dbseller.com.br
+ *
+ *  Este programa e software livre; voce pode redistribui-lo e/ou
+ *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme
+ *  publicada pela Free Software Foundation; tanto a versao 2 da
+ *  Licenca como (a seu criterio) qualquer versao mais nova.
+ *
+ *  Este programa e distribuido na expectativa de ser util, mas SEM
+ *  QUALQUER GARANTIA; sem mesmo a garantia implicita de
+ *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM
+ *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais
+ *  detalhes.
+ *
+ *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU
+ *  junto com este programa; se nao, escreva para a Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ *  02111-1307, USA.
+ *
+ *  Copia da licenca no diretorio licenca/licenca_en.txt
+ *                                licenca/licenca_pt.txt
  */
 
 /**
- * 
+ *
  * @author I
  * @revision $Author: dbbruno.silva $
  * @version $Revision: 1.7 $
@@ -52,7 +52,7 @@ $clrotulo->label("pc11_prazo");
 $clrotulo->label("pc01_descrmater");
 $oDaoUnidades = db_utils::getDao("matunid");
 $sSqlUnid     = $oDaoUnidades->sql_query_file(null, "m61_codmatunid,substr(m61_descr,1,20) as m61_descr,
-                                                     m61_usaquant,m61_usadec", "m61_descr");
+                                                     m61_usaquant,m61_usadec", "m61_descr","m61_ativo = 't'");
 $rsUnid             = $oDaoUnidades->sql_record($sSqlUnid);
 $aUnidades          = db_utils::getColectionByRecord($rsUnid);
 $aParametrosCompras = db_stdClass::getParametro("pcparam", array(db_getsession("DB_anousu")));
@@ -363,6 +363,7 @@ $db_opcao           = 1;
 
   function js_mostrapcmater(sDescricaoMaterial, Erro) {
     $('pc01_descrmater').value = sDescricaoMaterial;
+    getUnidade();
     if (Erro == true) {
       $('pc16_codmater').value = "";
     }
@@ -372,6 +373,7 @@ $db_opcao           = 1;
 
     $('pc16_codmater').value = iCodigoMaterial;
     $('pc01_descrmater').value = sDescricaoMaterial;
+    getUnidade();
     db_iframe_pcmater.hide();
   }
 
@@ -486,7 +488,7 @@ $db_opcao           = 1;
     if (oRetorno.status == 1) {
       document.getElementById("btnLancarEstimativa").style.display = '';
       return alert('Itens Salvos Com sucesso.');
-    } 
+    }
 
     return alert(oRetorno.message.urlDecode());
   }
@@ -505,6 +507,7 @@ $db_opcao           = 1;
     $('btnFecharWindowAux').onclick = function() {
       windowAuxiliar.hide();
     }
+    getUnidade();
 
   }
 
@@ -518,6 +521,7 @@ $db_opcao           = 1;
     document.getElementById('pc16_codmater').disabled = true
     document.getElementById('pc01_descrmater').disabled = true;
     document.getElementById('pc17_unid').value = oRow.aCells[3].content;
+    getUnidade();
   }
 
   function js_alterarItem() {
@@ -702,4 +706,40 @@ $db_opcao           = 1;
     var codigoAbertura = parent.iframe_registro.document.getElementById('pc10_numero').value;
     CurrentWindow.corpo.document.location.href='com4_estimativaregistro001.php?codigoAbertura='+codigoAbertura;
   }
+
+  function getUnidade(){
+    let oParametro = new Object();
+        let oRetorno;
+        oParametro.pc01_codmater = document.getElementById('pc16_codmater').value;
+        let oAjax = new Ajax.Request('com_getunidpcmater.RPC.php', {
+            method: 'post',
+            parameters: 'json=' + Object.toJSON(oParametro),
+            asynchronous: false,
+            onComplete: function(oAjax) {
+                oRetorno = eval("(" + oAjax.responseText.urlDecode() + ")");
+                let codigoUnidade = oRetorno.pc01_unid;
+                if(codigoUnidade != "" && codigoUnidade != null){
+                  document.getElementById('pc17_unid').value = codigoUnidade;
+                  document.getElementById('pc17_unid').style.backgroundColor = '#DEB887';
+                  let pc17_unid = document.getElementById("pc17_unid");
+                  pc17_unid.onmousedown = function(e) {
+                      e.preventDefault(); // Impede a interação com o `select`
+                      this.blur();        // Remove o foco do `select`
+                      return false;
+                  };
+
+
+                }else{
+                  document.getElementById('pc17_unid').style.backgroundColor = 'white';
+                  document.getElementById('pc17_unid').removeAttribute('disabled');
+                  let pc17_unid = document.getElementById("pc17_unid");
+                  pc17_unid.onmousedown = null;
+
+                }
+
+
+            }
+        });
+  }
+
 </script>

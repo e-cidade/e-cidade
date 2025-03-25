@@ -54,6 +54,7 @@ function DBGrid(sName) {
      */
     this.aWidths         = new Array();
 
+    this.aHeaderOrder    = new Array();
     /**
      * Array com o alinhamento de cada Celula
      * @type array
@@ -196,6 +197,14 @@ function DBGrid(sName) {
 
     this.currentPage = 1;
 
+    this.total = 0;
+
+    this.tableHeader = null;
+
+    this.orderableColumns = null;
+
+    this.showV2 = false;
+
     var me = this;
 
 
@@ -300,11 +309,11 @@ function DBGrid(sName) {
         // Itera sobre todas as colunas criadas
         for (var iCont = 0; iCont < me.aHeaders.length; iCont++) {
 
-            // Garante que só será trabalhado sobre as colunas visiveis
+            // Garante que s? ser? trabalhado sobre as colunas visiveis
             if (oBody.rows[iFirstLineValid].cells[iCont].style.display != "none" &&
                 oHeader.rows[me.iHeaderLineModel].cells[iCont].style.display != "none" ) {
 
-                //Se oa coluna x do Header e a Conluna x do Body for do mesmo tamanho, passa para o próxima volta do laço
+                //Se oa coluna x do Header e a Conluna x do Body for do mesmo tamanho, passa para o pr?xima volta do la?o
                 if (oBody.rows[iFirstLineValid].cells[iCont].scrollWidth == oHeader.rows[me.iHeaderLineModel].cells[iCont].scrollWidth) {
                     continue;
                 }
@@ -324,9 +333,9 @@ function DBGrid(sName) {
         me.iHeaderLineModel = iHeaderLineModel;
     }
     /**
-     * Instancia os objétos das tabelas (Header, Body e Footer) e seta o tamnho do Container em cada uma delas,
+     * Instancia os obj?tos das tabelas (Header, Body e Footer) e seta o tamnho do Container em cada uma delas,
      * garantindo assim que todas tenham o mesmo tamanho.
-     * Garante que as tabelas não iram mudar de tamanho e realiza chamada para método alinhar as colunas.
+     * Garante que as tabelas n?o iram mudar de tamanho e realiza chamada para m?todo alinhar as colunas.
      *
      * @return void
      *
@@ -334,7 +343,7 @@ function DBGrid(sName) {
     this.resizeCols = function() {
 
         /**
-         * Caso a grid não seja renderizada antes do carregamento, o valor de "me.gridContainerWidth" será 0.
+         * Caso a grid n?o seja renderizada antes do carregamento, o valor de "me.gridContainerWidth" ser? 0.
          * Esse teste verifica este caso e atribui seu width inicial.
          */
         if (me.gridContainerWidth <= 0) {
@@ -355,7 +364,7 @@ function DBGrid(sName) {
      * adiciona uma linha ao corpo da grid
      * @param {Array} aRow array com as colunas da linha
      * @param {boolean} lRender renderiza apos adicionar a coluna
-     * @param {boolean} Se o checkbox está desabilitado
+     * @param {boolean} Se o checkbox est? desabilitado
      * @return void
      * @see tableRow
      */
@@ -448,10 +457,10 @@ function DBGrid(sName) {
         if (!this.aRows) {
             this.aRows = [];
         }
-    
+
         // Cria uma nova instância de tableRow
         let oRow = new tableRow(this.sName + 'row' + this.aRows.length);
-    
+
         // Se houver checkbox
         if (this.hasCheckbox) {
             let sDisabled = lDisabled ? " disabled " : "";
@@ -460,43 +469,43 @@ function DBGrid(sName) {
                 oRow.classChecked = "marcado";
                 oRow.isSelected = true;
             }
-    
+
             // Cria o HTML para o checkbox
             let sCheckbox = `<input type='checkbox' id='chk${this.sName}${aRow[this.checkBoxValue]}' ${sDisabled} ${sChecked}
                 onclick="${this.nameInstance}.selectSingle(this,'${this.sName}row${this.aRows.length}',${this.nameInstance}.aRows[${this.aRows.length}])"
                 value='${aRow[this.checkBoxValue]}' class='checkbox${this.sName}' style='height:12px;'>`;
-    
+
             oRow.addCell(new tableCell(sCheckbox, this.sName + 'row' + this.aRows.length + 'checkbox', 21, 'checkbox'));
         }
-    
+
         // Adiciona as células ao row
         aRow.forEach((cellContent, i) => {
             let sId = `${this.sName}row${this.aRows.length}cell${i}`;
             let sCellWidth = this.aWidths[i] || '';
             let oCell = new tableCell(cellContent, sId, sCellWidth, 'cell');
-    
+
             // Ajusta o alinhamento se necessário
             if (this.aAligns[i]) {
                 oCell.setAlign(this.aAligns[i]);
             }
-    
+
             // Se o cabeçalho da coluna não estiver exibido, a célula também não será exibida
             if (!this.aHeaders[i].lDisplayed) {
                 oCell.lDisplayed = false;
             }
-    
+
             oRow.addCell(oCell);
         });
-    
+
         // Adiciona a nova linha no array de linhas
         this.aRows.push(oRow);
-    
+
         // Renderiza as linhas se necessário
         if (lRender) {
             this.renderRows();
         }
     }
-    
+
 
     /**
      * define as colunas do Header da grid, criando para cada no da array um objeto do tipo tableHeader
@@ -545,7 +554,18 @@ function DBGrid(sName) {
             if (this.aWidths[iLength]) {
                 sCellWidth = this.aWidths[iLength];
             }
-            var oHeader = new tableHeader(aHeader[iLength], sCellWidth, iNumCells, 'cell', iLength);
+
+            var oHeader = new tableHeader(
+              aHeader[iLength],
+              sCellWidth,
+              iNumCells,
+              'cell',
+              iLength,
+              (this.aHeaderOrder[iLength] ? this.aHeaderOrder[iLength].orderable : false),
+              (this.aHeaderOrder[iLength] ? this.aHeaderOrder[iLength].slug : ''),
+              (this.aHeaderOrder[iLength] ? this.aHeaderOrder[iLength].default : false),
+              (this.aHeaderOrder[iLength] ? this.aHeaderOrder[iLength].order : '')
+            );
             this.aHeaders.push(oHeader);
         }
 
@@ -553,20 +573,25 @@ function DBGrid(sName) {
 
     }
 
+    this.setHeaderOrderable = function(aHeaderOrder){
+      this.aHeaderOrder = aHeaderOrder;
+    }
+
     /**
-     * Renderiza a grid no nó especificado no parametro
+     * Renderiza a grid no não especificado no parametro
      * @param  {HTMLNode} oNode onde a grid sera incluida.
      * @return void
      * @type   void
      */
     this.show = function (oNode) {
-
+        this.showV2 = false;
         var sGrid = "<div class='gridcontainer' id='grid"+this.sName+"'>";
         sGrid    += "<div class='header-container' >";
         sGrid    += "<div class='grid-resize'>";
         sGrid    += "<img src='"+this._IMGPATH+"/"+sImgSelection+"' border='0' onclick='"+sCallBackCols+"'>";
         sGrid    += "<div style='clear: both;'></div>" // LIMPA O FLOAT DA IMAGEM
         sGrid    += "</div>"  //FECHA DIV "grid-resize"
+        sGrid    += "<div id='header-busca-"+this.sName+"' class='header-busca'></div>"
         sGrid    += "<table class='table-header' rel='ignore-css'  id='table"+this.sName+"header'>";
         sGrid    += this.renderHeader();
         sGrid    += "</table>"; // FECHA TABELA DO HEADER table-header
@@ -633,13 +658,158 @@ function DBGrid(sName) {
         }
 
     }
+    this.showV2 = function(oNode){
+      this.showV2 = true;
+      let sGrid = `
+        <div class='gridcontainer' id='grid${this.sName}'>
+          <div class="header-container">
+            <div class='grid-resize'>
+              <img src='${this._IMGPATH}/${sImgSelection}' border='0' onclick='${sCallBackCols}'>
+              <div style='clear: both;'></div>
+            </div>
+            <div id='header-busca-${this.sName}' class='header-busca'></div>
+          </div>
+          <div class="table-container" style='height: ${me.iHeight}px; min-height: ${me.iHeight}px;'>
+            <table class='table tablegrid'>
+              <thead id='table${this.sName}header'>${this.renderHeader()}</thead>
+              <tbody id='${this.sName}body' class='body-container' style='position: relative;'>
+                ${this.renderRows(true, false)}
+              </tbody>
+            </table>
+            <div id='loader-${this.sName}' class='loader-overlay' style='display: none; position: absolute; z-index: 5;'>
+              <div class='spinner'></div>
+              Carregando...
+            </div>
+          </div>
+          <div class='footer-container'>
+            <table class='table-footer' id='table${this.sName}footer'>
+              ${this.hasTotalizador ? this.renderFooter() : ''}
+              <tr style='text-align:left;'>
+                <td colspan='${ this.aHeaders.length + 2 }'>
+                  <div style='border:1px inset white;height:100%;padding:2px'>
+                    <span>Total de Registros:</span>
+                    <span style='color:blue;padding:3px' id='${this.sName}numrows'>0</span>
+                    <span style='border-left:1px inset #eeeee2' id='${this.sName}status'>&nbsp;</span>&nbsp;
+                    ${this.hasTotalValue ? `<span style='padding-left: 58%'>Valor Total:</span><span style='color:#000;padding:3px' id='${this.sName}totalValue'>0.00</span>` : ''}
+                    ${
+                      this.hasPesquisaConteudo
+                      ? `
+                          <span style='margin-right: 5px'>
+                            <input type='button' id='${this.sName}recomecar' onclick='$("filtro").value = "";$("${this.sName}pesquisaConteudo").value = ""; btnPesquisarDados.click();' value='Recome?ar'>
+                          </span>
+                          <span style='margin-right: 5px'> Indique o Conte?do:</span>
+                          <span>
+                            <input type='text' id='${this.sName}pesquisaConteudo' style='width: 160px'>
+                          <span>
+                        `
+                      : ''
+                    }
+                  </div>
+                </td>
+              </tr>
+            </table>
+            <div class='text-right pagination${this.sName}' style='padding: 5px 10px'></div>
+          </div>
+        </div>
+        <div id='tooltip${this.sName}' class='tooltip'></div>
+      `;
 
-    this.showLoading = function(){
-      document.getElementById(`loader-${this.sName}`).style.display = 'flex'
+      me.gridContainer      =  oNode;
+      me.gridContainerWidth =  oNode.scrollWidth - 25;
+      if (this.lAllowSelectCol) {
+          sGrid += this.drawSelectCol();
+      }
+      oNode.innerHTML = sGrid;
+
+      $(`table${this.sName}header`).style.width = me.gridContainerWidth;
+      $(`${this.sName}body`).style.width        = me.gridContainerWidth;
+      $(`table${this.sName}footer`).style.width = me.gridContainerWidth;
+
+      // Subtrai o tamanho do scroll
+      if (this.hasTotalizador) {
+          if (me.bAlinhaFooter){
+              this.alinhaFooter();
+              me.bAlinhaFooter = false;
+          }
+      }
     }
 
+    this.fixedColumns = function(fixedLeft = 0, fixedRight = 0) {
+      const tableContainer = document.getElementById(`grid${this.sName}`).querySelector('.table-container');
+      const table = tableContainer.querySelector('table');
+      const rowHeader = table.querySelectorAll(`#table${this.sName}header tr`);
+      const rowBody = table.querySelectorAll(`#${this.sName}body tr`);
+
+      let leftOffset = 0;
+      let rightOffset = 0;
+      let aWidths = this.aWidths;
+
+      if (rowHeader && rowHeader.length > 0) {
+          rowHeader.forEach((item) => {
+              const tds = item.querySelectorAll('td');
+              leftOffset = 0;
+              rightOffset = 0;
+
+              if (tds && tds.length > 0) {
+                  tds.forEach((td, index) => {
+                      // Adicionar classe e posicionamento para colunas fixadas ná esquerda
+                      if (index < fixedLeft) {
+                          td.classList.add('fixed-left');
+                          td.style.left = `${leftOffset}px`; // Definir a posição relativa
+                          leftOffset += td.offsetWidth || parseInt(aWidths[index]) || 100; // Acumular a largura da coluna
+                      }
+                      // Adicionar classe e posicionamento para colunas fixadas ná direita
+                      else if (index >= tds.length - fixedRight) {
+                          td.classList.add('fixed-right');
+                          td.style.right = `${rightOffset}px`; // Definir a posição relativa
+                          rightOffset += td.offsetWidth || parseInt(aWidths[index]) || 100; // Acumular a largura da coluna
+                      }
+                  });
+              }
+          });
+      }
+
+      if (rowBody && rowBody.length > 0) {
+          rowBody.forEach((item) => {
+              const tds = item.querySelectorAll('td');
+              leftOffset = 0;
+              rightOffset = 0;
+
+              if (tds && tds.length > 0) {
+                  tds.forEach((td, index) => {
+                      // Adicionar classe e posicionamento para colunas fixadas ná esquerda
+                      if (index < fixedLeft) {
+                          td.classList.add('fixed-left');
+                          td.style.left = `${leftOffset}px`; // Definir a posição relativa
+                          leftOffset += td.offsetWidth || parseInt(aWidths[index]) || 100; // Acumular a largura da coluna
+                      }
+                      // Adicionar classe e posicionamento para colunas fixadas ná direita
+                      else if (index >= tds.length - fixedRight) {
+                          td.classList.add('fixed-right');
+                          td.style.right = `${rightOffset}px`; // Definir a posição relativa
+                          rightOffset += td.offsetWidth || parseInt(aWidths[index]) || 100; // Acumular a largura da coluna
+                      }
+                  });
+              }
+          });
+      }
+    }
+
+    this.showLoading = function(){
+      this.clearAll();
+      document.getElementById(`loader-${this.sName}`).style.display = 'flex'
+      const gridElement = document.getElementById(`grid${this.sName}`);
+      const containerElement = gridElement ? gridElement.querySelector('.table-container') : null;
+      const tableGridElement = containerElement ? containerElement.querySelector('.tablegrid') : null;
+
+      if (tableGridElement) {
+          containerElement.scrollBy({ top: -containerElement.scrollTop, left: -containerElement.scrollLeft, behavior: 'smooth' })
+      }
+      this.isLoading = true;
+    }
     this.hideLoading = function(){
       document.getElementById(`loader-${this.sName}`).style.display = 'none'
+      this.isLoading = false;
     }
 
     this.updatePagination = function() {
@@ -653,10 +823,10 @@ function DBGrid(sName) {
         return false;
       }
 
-      // Adiciona o botï¿½o "Anterior"
-      buttonsHTML += '<li class="disabled"><button id="prevBtn">Anterior</button></li>';
+      // Adiciona o botão "Anterior"
+      buttonsHTML += `<li class="${this.currentPage <= 1 ? 'disabled' : ''}"><button id="prevBtn">Anterior</button></li>`;
 
-      // Adiciona o botï¿½o "Primeira" e "Mais ï¿½ esquerda" se necessï¿½rio
+      // Adiciona o botão "Primeira" e "Mais á esquerda" se necessário
       if (showMoreLeft) {
         buttonsHTML += '<li><button id="page1" class="page-btn">1</button></li>';
         if (startPage > 3) {
@@ -664,28 +834,28 @@ function DBGrid(sName) {
         }
       }
 
-      // Adiciona os botï¿½es de pï¿½gina
+      // Adiciona os botões de página
       for (var i = startPage; i <= endPage; i++) {
         buttonsHTML += `<li class="page-item${i === this.currentPage ? ' active' : ''}"><button id="page${i}" class="page-btn">${i}</button></li>`;
       }
 
-      // Adiciona o botão "última" e "Mais á direita" se necessário
+      // Adiciona o botão "Última" e "Mais ná direita" se necessário
       if (showMoreRight) {
         if (endPage < this.totalPages - 1) {
           buttonsHTML += '<li><button id="moreRightBtn" class="more-btn">...</button></li>';
         }
-        buttonsHTML += `<li><button id="page${this.totalPages}" class="page-btn">${this.totalPages}</button></li>`;
+        buttonsHTML += `<li><button id="page${Math.ceil(this.totalPages)}" class="page-btn">${Math.ceil(this.totalPages)}</button></li>`;
       }
 
       // Adiciona o botão "Próximo"
-      buttonsHTML += '<li><button id="nextBtn">Próximo</button></li>';
+      buttonsHTML += `<li class="${this.currentPage >= Math.ceil(this.totalPages) ? 'disabled' : ''}"><button id="nextBtn">Próximo</button></li>`;
 
       this.container.innerHTML = `<div id="pagination-container"><ul class="pagination">${buttonsHTML}</ul></div>`;
     }
 
 
     this.getPaginationRange = function() {
-      var maxButtons = 10; // Limite máximo de botï¿½es a serem exibidos
+      var maxButtons = 10; // Limite máximo de botões a serem exibidos
       var startPage, endPage;
 
       if (this.totalPages <= maxButtons) {
@@ -716,6 +886,8 @@ function DBGrid(sName) {
       }
       this.container = document.querySelector(`.pagination${this.sName}`);
       this.container.addEventListener('click', (function(e) {
+        if(this.isLoading) return;
+
         if (e.target.id === 'prevBtn') {
           if (this.currentPage > 1) {
             this.currentPage--;
@@ -752,41 +924,232 @@ function DBGrid(sName) {
       this.updatePagination();
     }
     this.renderPagination = function(totalPages, pageActive = 0) {
-      this.totalPages = totalPages;
+      this.totalPages = Math.ceil(totalPages);
       this.currentPage = pageActive;
       this.updatePagination();
     }
 
+    this.orderableInitialize = function(onSortClick) {
+      if (typeof onSortClick !== 'function') {
+        console.error('onSortClick must be a function');
+        return;
+      }
 
-    this.inicializaTooltip = function(){
-      this.tooltip = document.querySelector(`#tooltip${this.sName}`);
+      this.tableHeader = document.querySelector(`#table${this.sName}header`);
+      this.orderableColumns = this.tableHeader.querySelectorAll('td[data-orderable="true"]');
+      const getActiveSortColumns = this.getActiveSortColumns.bind(this);
+
+      this.orderableColumns.forEach(column => {
+        column.addEventListener('click', (e) => {
+          const td = e.target.closest('td');
+          let order = td.getAttribute('data-order');
+
+          if (!order) {
+            order = 'asc';
+            td.querySelector('.arrow.arrow-up').classList.add('strong');
+            td.querySelector('.arrow.arrow-down').classList.remove('strong');
+          } else if (order === 'asc') {
+            order = 'desc';
+            td.querySelector('.arrow.arrow-up').classList.remove('strong');
+            td.querySelector('.arrow.arrow-down').classList.add('strong');
+          } else {
+            order = '';
+            td.querySelector('.arrow.arrow-up').classList.remove('strong');
+            td.querySelector('.arrow.arrow-down').classList.remove('strong');
+          }
+
+          if (order) {
+            td.setAttribute('data-order', order);
+          } else {
+            td.removeAttribute('data-order');
+          }
+
+          const activeSortColumns = getActiveSortColumns();
+
+          onSortClick(activeSortColumns);
+        });
+      });
+    };
+
+    this.resetOrderableColumns = function (onSortClick) {
+      if (typeof onSortClick !== 'function') {
+        console.error('onSortClick must be a function');
+        return;
+      }
+
+      const getActiveSortColumns = this.getActiveSortColumns.bind(this);
+      let activeSortColumns = []
+      const processColumns = async () => {
+        const updatePromises = Array.from(this.orderableColumns).map(async (column) => {
+          const slug = column.getAttribute('data-slug');
+          let order = null;
+
+          if (slug) {
+            const filter = this.aHeaderOrder.find(item => item.slug === slug);
+            if (filter && filter.default !== undefined && filter.order !== undefined) {
+              order = filter.order;
+
+              activeSortColumns.push({
+                slug: filter.slug,
+                order: filter.order
+              })
+            }
+          }
+
+          // Atualiza as classes e atributos de acordo com a ordem
+          if (order === 'desc') {
+            column.querySelector('.arrow.arrow-up').classList.remove('strong');
+            column.querySelector('.arrow.arrow-down').classList.add('strong');
+            column.setAttribute('order', 'desc');
+          } else if (order === 'asc') {
+            column.querySelector('.arrow.arrow-up').classList.add('strong');
+            column.querySelector('.arrow.arrow-down').classList.remove('strong');
+            column.setAttribute('order', 'asc');
+          } else {
+            column.querySelector('.arrow.arrow-up').classList.remove('strong');
+            column.querySelector('.arrow.arrow-down').classList.remove('strong');
+            column.setAttribute('order', '');
+          }
+
+        });
+
+        // Aguarda todas as promessas terminarem antes de continuar
+        await Promise.all(updatePromises);
+
+        onSortClick(activeSortColumns);
+      };
+
+      // Inicia o processamento das colunas
+      processColumns();
+    };
+
+
+    this.getActiveSortColumns = function() {
+      const activeSorts = [];
+      this.orderableColumns.forEach(column => {
+        const slug = column.getAttribute('data-slug');
+        const order = column.getAttribute('data-order');
+
+        // Apenas adiciona ao objeto se houver uma ordem ativa (asc ou desc)
+        if (order) {
+          activeSorts.push({ slug, order });
+        }
+      });
+
+      return activeSorts;
+    }
+
+    this.initializeInpuSearch = function(onChangeBusca) {
+        if (typeof onChangeBusca !== 'function') {
+          console.error('onChangeBusca must be a function');
+          return;
+        }
+  
+        document.getElementById(`header-busca-${this.sName}`).innerHTML = `
+          <input type="search" class="form-control" name="inputSearch${this.sName}" id="inputSearch${this.sName}" placeholder="Pesquisar">
+        `;
+  
+        let debounceTimeout;
+        const debounceDelay = 300; // Tempo de espera antes de executar a função, em milissegundos
+  
+        const sanitizeInput = (input) => {
+          // Remove caracteres especiais que possam quebrar a consulta SQL
+          return input.replace(/[^\w\sçãõáéíóúâêîôûàèìòùäëïöüñÇÃÕÁÉÍÓÚÂÊÎÔÛÀÈÌÒÙÄËÏÖÜÑ]/gi, ''); // Permite letras, números, espaços e caracteres acentuados
+        };
+  
+        document.getElementById(`inputSearch${this.sName}`).addEventListener('keypress', (e) => {
+          const char = String.fromCharCode(e.which);
+          // Verifica se o caractere digitado é permitido
+          if (!/[\w\sçãõáéíóúâêîôûàèìòùäëïöüñÇÃÕÁÉÍÓÚÂÊÎÔÛÀÈÌÒÙÄËÏÖÜÑ]/.test(char)) {
+            e.preventDefault(); // Bloqueia a entrada do caractere
+          }
+        });
+  
+        document.getElementById(`inputSearch${this.sName}`).addEventListener('input', (e) => {
+          clearTimeout(debounceTimeout); // Limpa o timeout anterior
+          debounceTimeout = setTimeout(() => {
+            const sanitizedValue = sanitizeInput(e.target.value); // Sanitiza o valor do input
+            onChangeBusca(sanitizedValue); // Chama a função após o tempo de espera
+          }, debounceDelay);
+        });
+    };
+
+
+    this.getInputSearch = function() {
+      return document.getElementById(`inputSearch${this.sName}`).value;
+    }
+
+    this.inicializaTooltip = function() {
+      // Usar o mï¿½todo querySelector para garantir que o tooltip seja sempre selecionado corretamente
+      const getTooltip = () => document.querySelector(`#tooltip${this.sName}`);
+
       const ancestor = document.body; // Ou qualquer outro elemento pai apropriado
+
       const showTooltip = (function(e) {
         const target = e.target;
+        const tooltip = getTooltip(); // Buscar o tooltip a cada evento, caso ele seja criado dinamicamente
 
-        if(target.classList.contains('tooltip')){
-          this.tooltip.style.display = 'block';
-        }else if (target.classList.contains('tooltip-target')) {
+        if (!tooltip) return; // Se o tooltip nï¿½o existir ainda, nï¿½o faz nada
+
+        if (target.classList.contains('tooltip-target')) {
           const rect = target.getBoundingClientRect();
-          const tooltipRect = this.tooltip.getBoundingClientRect();
+          const tooltipRect = tooltip.getBoundingClientRect();
 
-          this.tooltip.textContent = target.textContent;
-          this.tooltip.style.display = 'block';
+          tooltip.textContent = target.textContent;
+          tooltip.style.display = 'block';
 
-          // Calcular a posiï¿½ï¿½o
+          // Calcular a posiï¿½ï¿½o do tooltip
           const top = rect.top - tooltipRect.height - 10; // 10px acima do mouse
           const left = rect.left + (rect.width / 2) - (tooltipRect.width / 2); // Centralizado
 
-          this.tooltip.style.top = top + 'px';
-          this.tooltip.style.left = left + 'px';
+          tooltip.style.top = `${top}px`;
+          tooltip.style.left = `${left}px`;
         } else {
-          this.tooltip.style.display = 'none';
+          tooltip.style.display = 'none';
         }
       }).bind(this);
 
-      ancestor.addEventListener('mouseenter', showTooltip);
+      // Adiciona o evento 'mouseover' ao elemento pai
       ancestor.addEventListener('mouseover', showTooltip);
     }
+
+    this.reinicializaTooltip = function() {
+      // Usar o mï¿½todo querySelector para garantir que o tooltip seja sempre selecionado corretamente
+      const getTooltip = () => document.querySelector(`#tooltip${this.sName}`);
+
+      const ancestor = document.body; // Ou qualquer outro elemento pai apropriado
+
+      const showTooltip = (function(e) {
+        const target = e.target;
+        const tooltip = getTooltip(); // Buscar o tooltip a cada evento, caso ele seja criado dinamicamente
+
+        if (!tooltip) return; // Se o tooltip nï¿½o existir ainda, nï¿½o faz nada
+
+        if (target.classList.contains('tooltip-target')) {
+          const rect = target.getBoundingClientRect();
+          const tooltipRect = tooltip.getBoundingClientRect();
+
+          tooltip.textContent = target.textContent;
+          tooltip.style.display = 'block';
+
+          // Calcular a posiï¿½ï¿½o do tooltip
+          const top = rect.top - tooltipRect.height - 10; // 10px acima do mouse
+          const left = rect.left + (rect.width / 2) - (tooltipRect.width / 2); // Centralizado
+
+          tooltip.style.top = `${top}px`;
+          tooltip.style.left = `${left}px`;
+        } else {
+          tooltip.style.display = 'none';
+        }
+      }).bind(this);
+
+      // Remove todos os listeners de 'mouseover' previamente adicionados (se houver)
+      ancestor.removeEventListener('mouseover', showTooltip);
+
+      // Adiciona o evento 'mouseover' novamente para garantir que o tooltip seja exibido
+      ancestor.addEventListener('mouseover', showTooltip);
+    };
+
 
     this.renderFooter = function() {
 
@@ -841,7 +1204,7 @@ function DBGrid(sName) {
 
     /**
      * Seta se a grid mostrara um checkbox, no inicio de cada linha
-     * @param integer iCell Posição da array que contem o valor da checkbox (sera usado com indice.)
+     * @param integer iCell Posiï¿½ï¿½o da array que contem o valor da checkbox (sera usado com indice.)
      */
     this.setCheckbox = function(iCell) {
 
@@ -906,7 +1269,7 @@ function DBGrid(sName) {
      *
      * Busca elementos pela className
      * @param {string} searchClass nome da classe que deve ser pesquisada
-     * @param {string} domNode nó que deve iniciar a busca default é document.
+     * @param {string} domNode nï¿½ que deve iniciar a busca default ï¿½ document.
      * @param {string} tagName tag que deve ser verificada default "*"
      *
      * @return array com todos os objetos encontrados
@@ -1069,7 +1432,7 @@ function DBGrid(sName) {
     };
 
     /**
-     * reseta as informações da grid,
+     * reseta as informaï¿½ï¿½es da grid,
      * @param {bool} lDeleteRows se exclui as linhas cadastradas. caso false apenas limpa o corpo da grid
      * @return void
      */
@@ -1093,6 +1456,14 @@ function DBGrid(sName) {
         }
 
         return true;
+    }
+
+    this.setTotalItens = function(total){
+      this.total = total
+    }
+
+    this.getTotalItens = function(){
+      return this.total;
     }
 
     /**
@@ -1123,7 +1494,7 @@ function DBGrid(sName) {
 
             this.clearAll(false);
             $(this.sName+"body").innerHTML    = sRows;
-            $(this.sName+"numrows").innerHTML = this.aRows.length;
+            $(this.sName+"numrows").innerHTML = this.total > 0 ? this.total : this.aRows.length;
             if (lResizeColumns) {
                 me.resizeCols();
             }
@@ -1132,7 +1503,7 @@ function DBGrid(sName) {
     /**
      * Mostra a opcao para marcar todos os checkboxes
      *
-     * @param {bool} lSelectAll true para mostrar a opção
+     * @param {bool} lSelectAll true para mostrar a opï¿½ï¿½o
      * @see #getSelectAll
      * @return void;
      */
@@ -1143,7 +1514,7 @@ function DBGrid(sName) {
 
     }
     /**
-     * retorna se deve  mostrar opção para selecionar todos os checkbox
+     * retorna se deve  mostrar opï¿½ï¿½o para selecionar todos os checkbox
      * @see #setSelectAll
      * @type bool
      * @return boolean
@@ -1155,7 +1526,7 @@ function DBGrid(sName) {
     /**
      * Realiza a soma de valores de toda uma coluna;
      * @param  {int} iCol Indice da coluna.
-     * @param  {bool} lInSelection se leva em consideração apenas o que está selecionado
+     * @param  {bool} lInSelection se leva em consideraï¿½ï¿½o apenas o que estï¿½ selecionado
      * @type   Number
      * @return total da soma das colunas;
      */
@@ -1235,7 +1606,7 @@ function DBGrid(sName) {
     this.drawSelectCol = function() {
 
         var sDropDown  = "<div id='columns"+this.sName+"' class='draw-select-col' ";
-        sDropDown     += "      style='position:absolute; visibility:hidden; top:0px; left:0px; text-align:left; padding:2px'>";
+        sDropDown     += "      style='position:absolute; visibility:hidden; top:0px; left:0px; text-align:left; padding:2px; z-index: 40;'>";
         for (var i = 0; i < this.aHeaders.length; i++) {
 
             iNumCol = i;
@@ -1271,8 +1642,8 @@ function DBGrid(sName) {
         var y = el.offsetHeight;
 
         /*
-         * calculamos a distancia do dropdown em relação a página,
-         * para podemos renderiza-lo na posição correta.
+         * calculamos a distancia do dropdown em relaï¿½ï¿½o a pï¿½gina,
+         * para podemos renderiza-lo na posiï¿½ï¿½o correta.
          */
         while (el.offsetParent && el.id.toUpperCase() != 'wndAuxiliar') {
 
@@ -1288,13 +1659,13 @@ function DBGrid(sName) {
         x += new Number(el.offsetLeft);
         y += new Number(el.offsetTop)+4;
         /*
-         * Pegamos a largura do dropdown, e diminuimos da posiçao do cursors
+         * Pegamos a largura do dropdown, e diminuimos da posiï¿½ao do cursors
          */
         var iTamObj = $('columns'+this.sName).scrollWidth-1;
         $('columns'+this.sName).style.left = x - iTamObj;
         $('columns'+this.sName).style.top  = y;
         /*
-         * decidimos se mostramos ou não o dropdown, conforme o seu estado.
+         * decidimos se mostramos ou nï¿½o o dropdown, conforme o seu estado.
          */
         if ($('columns'+this.sName).style.visibility == 'visible') {
             $('columns'+this.sName).style.visibility = 'hidden';
@@ -1484,7 +1855,7 @@ function tableCell(sContent, sId, sWidth, sClasse) {
     this.content = sContent;
 
     /**
-     * Adiciona uma class na TD através do Id passado.
+     * Adiciona uma class na TD atravï¿½s do Id passado.
      */
     this.addClassName = function(sClass){
 
@@ -1496,7 +1867,7 @@ function tableCell(sContent, sId, sWidth, sClasse) {
     }
 
     /**
-     * Remove a class na TD através do ID passado
+     * Remove a class na TD atravï¿½s do ID passado
      */
     this.removeClassName = function( sClass){
         if ($(me.sId)) {
@@ -1526,17 +1897,6 @@ function tableCell(sContent, sId, sWidth, sClasse) {
             sClasse += " "+sClass;
         });
 
-
-        var sCol  = "<td class='linhagrid "+sClasse+"' title='' nowrap style='"+this.sStyleWidth+"text-align:"+this.sAlign+";"+sStyleDisplay+";"+this.sStyle+"'";
-        sCol += " id='"+this.sId+"' ";
-
-        if ( this.iColspan != 1 ) {
-            sCol += " colspan='" + this.iColspan + "' ";
-        }
-        if (this.sEvents != '') {
-            sCol += "  "+this.sEvents;
-        }
-
         var sEventosAdicionais = "";
         if (this.aEventos.length > 0) {
 
@@ -1546,10 +1906,8 @@ function tableCell(sContent, sId, sWidth, sClasse) {
                 }
             );
         }
-        sCol += sEventosAdicionais;
-        sCol += ">";
-        sCol += this.getContent();
-        sCol += "</td>\n";
+
+        let sCol = `<td class='linhagrid ${sClasse}' title='' nowrap style='${this.sStyleWidth} text-align: ${this.sAlign};${sStyleDisplay}; ${this.sStyle}' id='${this.sId}' ${this.iColspan != 1 ? ` colspan='${this.iColspan}' ` : ''} ${this.sEvents != '' ? ` ${this.sEvents} ` : ''} ${sEventosAdicionais}>${this.getContent()}</td>`;
 
         return sCol;
     }
@@ -1576,7 +1934,7 @@ function tableCell(sContent, sId, sWidth, sClasse) {
     }
 
     /**
-     * Seta o conteúdo da célula e altera em tela
+     * Seta o conteï¿½do da cï¿½lula e altera em tela
      * @param string sContent
      */
     this.setContent = function(sContent) {
@@ -1599,7 +1957,7 @@ function tableCell(sContent, sId, sWidth, sClasse) {
 
     /**
      * Retorna o valor da celula.
-     * analisa o no filho da celula, para decidir qual informação deve pegar.
+     * analisa o no filho da celula, para decidir qual informaï¿½ï¿½o deve pegar.
      * @return string
      */
     this.getValue = function() {
@@ -1619,7 +1977,7 @@ function tableCell(sContent, sId, sWidth, sClasse) {
                 sValue = $F(oCelulaAtiva.childNodes[0].id);
                 break;
 
-            case "#text" : //nó padrao, a TD possui apenas texto, sem nenhuma tag html.
+            case "#text" : //nï¿½ padrao, a TD possui apenas texto, sem nenhuma tag html.
 
                 sValue = oCelulaAtiva.childNodes[0].nodeValue;
                 break;
@@ -1668,9 +2026,9 @@ function tableCell(sContent, sId, sWidth, sClasse) {
     }
 
     /**
-     * Define a Utilização de Colspan pela Célula
+     * Define a Utilizaï¿½ï¿½o de Colspan pela Cï¿½lula
      * @param lUtilizaColspan      bool
-     * @param iQuantidadeMesclagem integer - Quantidade de Colunas que vão ser mescladas
+     * @param iQuantidadeMesclagem integer - Quantidade de Colunas que vï¿½o ser mescladas
      */
     this.setUseColspan     = function( lUtilizaColspan, iQuantidadeMesclagem ) {
 
@@ -1679,9 +2037,9 @@ function tableCell(sContent, sId, sWidth, sClasse) {
     }
 
     /**
-     * Adiciona um evento à ser chamado
+     * Adiciona um evento ï¿½ ser chamado
      * @param sEvento - Evento desejado - EX: onclick, onmousein
-     * @param sFuncao - Função à ser executada
+     * @param sFuncao - Funï¿½ï¿½o ï¿½ ser executada
      */
     this.adicionarEvento = function(sEvento, sFuncao) {
 
@@ -1697,94 +2055,78 @@ function tableCell(sContent, sId, sWidth, sClasse) {
  * @type tableHeader
  * @return string
  */
-function tableHeader(sContent, sWidth, iCol, classe, sGridCollNumber) {
+function tableHeader(sContent, sWidth, iCol, classe, sGridCollNumber, isSortable = false, slug = '', isDefault = false, order = '') {
+  var me = this;
+  this.content = sContent;
+  this.lDisplayed = true;
+  this.sWidth = sWidth || '';
+  this.isSortable = isSortable || false;
+  this.slug = slug || '';
+  this.sId = 'col' + iCol;
 
-    /**
-     * contem o caption da celula
-     * @type string
-     */
-    var me       = this;
-    this.content = sContent;
+  this.create = function () {
+      var sCol;
+      if (classe == "checkbox") {
+          sCol = "<td class='table_header " + classe + "' id='col" + iCol + "' nowrap ";
+      } else {
+          sCol = "<td class='table_header " + classe + "' id='col" + iCol + "' nowrap title='" + this.getContent() + "'";
+      }
 
-    /**
-     * Define se a coluna está visível ou não
-     * @type bool
-     */
-    this.lDisplayed = true;
+      sCol += "gridColNumber='" + sGridCollNumber + "'";
+      var sStyle = "style ='";
+      if (!this.lDisplayed) {
+          sStyle += " display:none;";
+      }
+      if (this.sWidth != '') {
+          sStyle += "width:" + this.sWidth + ";";
+      }
+      if (this.isSortable) {
+        sStyle += "padding: 0 15px;";
+      }
+      sStyle += "'";
+      sCol += sStyle;
+      sCol += " data-slug='"+this.slug+"' ";
+      sCol += " data-orderable='"+this.isSortable+"' ";
+      sCol += " data-order='"+ order.toLowerCase() +"' ";
+      sCol += ">";
 
+      // Adiciona o ï¿½cone de ordenaï¿½ï¿½o, se a coluna for ordenï¿½vel
+      if (this.isSortable) {
+          sCol += `
+              <div class="arrow-container">
+                  <span class="arrow arrow-up ${isDefault && order.toLowerCase() == 'asc' ? 'strong' : ''}">&#x25B2;</span>
+                  <span class="arrow arrow-down ${isDefault && order.toLowerCase() == 'desc' ? 'strong' : ''}">&#x25BC;</span>
+              </div>`;
+      }
 
-    this.sWidth = '';
-    if (sWidth != null || sWidth != "") {
-        this.sWidth = sWidth;
-    }
-    /**
-     * Renderiza a TD em forma de string
-     * @return string
-     */
+      sCol += me.getContent();
+      sCol += "</td>\n";
+      return sCol;
+  }
 
-    this.create = function () {
+  this.getContent = function () {
+      var sRetorno = '';
+      if (this.content == "") {
+          me.content = "&nbsp;";
+      }
+      sRetorno = this.content;
+      if (me.content instanceof Object) {
+          if (me.content.toInnerHtml) {
+              sRetorno = this.content.toInnerHtml();
+          }
+      }
+      return sRetorno;
+  }
 
-        if (classe == "checkbox") {
-            var sCol  = "<td class='table_header "+classe+"' id='col"+iCol+"' nowrap  ";
-        } else {
-            var sCol  = "<td class='table_header "+classe+"' id='col"+iCol+"' nowrap title='"+this.getContent()+"'";
-        }
-        sCol += "gridColNumber='"+sGridCollNumber+"'";
-        sStyle    = "style ='";
-        if (!this.lDisplayed) {
-            sStyle += " display:none;";
-        }
-        if (this.sWidth != '') {
-            sStyle += "width:"+this.sWidth;
-        }
-        sStyle   += "'";
-        sCol     += sStyle;
-        sCol     += ">";
-        sCol     += me.getContent();
-        sCol     += "</td>\n";
-        return sCol;
+  this.getId = function() {
+      return this.sId;
+  }
 
-    }
-
-    /**
-     * metodo getter para o innerHTML da Celula
-     * @return string
-     */
-    this.getContent = function () {
-
-        var sRetorno = '';
-        if (this.content == "") {
-            me.content = "&nbsp;";
-        }
-        sRetorno = this.content;
-        if (me.content instanceof Object) {
-
-            if (me.content.toInnerHtml) {
-                sRetorno = this.content.toInnerHtml();
-            }
-        }
-        return sRetorno;
-    }
-
-    /**
-     * metodo getter para o Id da Celula
-     * @return string
-     */
-    this.getId = function() {
-        return this.sId;
-    }
-
-    /**
-     * Define o tamanho da coluna
-     * @param {string} sWidthColumn Tamanho da Coluna
-     * @return void
-     */
-    this.setWidth = function(sWidthColumn) {
-
-        if (sWidthColumn != null || sWidthColumn != "") {
-            me.sWidth = sWidthColumn;
-        }
-    }
+  this.setWidth = function(sWidthColumn) {
+      if (sWidthColumn != null || sWidthColumn != "") {
+          me.sWidth = sWidthColumn;
+      }
+  }
 }
 
 /**
@@ -1811,7 +2153,7 @@ function tableRow (sId) {
     var me          = this;
 
     /**
-     * Adiciona uma class na TD através do Id passado.
+     * Adiciona uma class na TD atravï¿½s do Id passado.
      */
     this.addClassName = function(sClass){
 
@@ -1822,7 +2164,7 @@ function tableRow (sId) {
     }
 
     /**
-     * Remove a class na TD através do ID passado
+     * Remove a class na TD atravï¿½s do ID passado
      */
     this.removeClassName = function( sClass){
 

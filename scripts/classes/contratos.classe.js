@@ -242,6 +242,64 @@ contrato = function () {
 
         }
 
+
+
+        if(document.getElementById('ac16_origem').value == "2" && document.getElementById('ac16_tipoorigem').value == "3"){
+
+            var oParametros = new Object();
+            oParametros.exec = 'validacaoDispensaInexibilidade';
+            var validacaoDispensaValor;
+
+            aItensSelecionados.each(function(oLinha, id) {
+                oParametros.licitacao = oLinha.aCells[1].getContent();
+            });
+
+            var oAjax = new Ajax.Request("con4_contratos.RPC.php", {
+                method: "post",
+                asynchronous: false,
+                parameters: 'json=' + Object.toJSON(oParametros),
+                onComplete: function(oAjax) {
+                    var oRetorno = eval("(" + oAjax.responseText + ")");
+                    if (oRetorno.status == 2) {
+                        validacaoDispensaValor = false;
+                        alert(oRetorno.message.urlDecode());
+                    }
+
+                }
+            });
+
+            if (validacaoDispensaValor == false) return false;
+
+        }
+
+        if(document.getElementById('ac16_origem').value == "2" && document.getElementById('ac16_tipoorigem').value == "1"){
+
+            var oParametros = new Object();
+            oParametros.exec = 'validacaoDispensaValor';
+            var validacaoDispensaValor;
+
+            aItensSelecionados.each(function(oLinha, id) {
+                oParametros.licitacao = oLinha.aCells[1].getContent();
+            });
+
+            var oAjax = new Ajax.Request("con4_contratos.RPC.php", {
+                method: "post",
+                asynchronous: false,
+                parameters: 'json=' + Object.toJSON(oParametros),
+                onComplete: function(oAjax) {
+                    var oRetorno = eval("(" + oAjax.responseText + ")");
+                    if (oRetorno.status == 2) {
+                        validacaoDispensaValor = false;
+                        alert(oRetorno.message.urlDecode());
+                    }
+
+                }
+            });
+
+            if (validacaoDispensaValor == false) return false;
+
+        }
+
         this.verificacredenciamentotermo = function() {
             var oParam     = new Object();
             oParam.exec    = "verificaCredenciamentoTermo";
@@ -290,7 +348,7 @@ contrato = function () {
 
             oJanela.destroy();
 
-            let origensValidas = ["2","3"];
+            let origensValidas = ["1","2","3"];
             let tipoOrigem = $('ac16_tipoorigem').value;
 
             if($('ac16_origem').value == "2" && origensValidas.includes(tipoOrigem)){

@@ -56,6 +56,32 @@ $clrotulo->label("l20_numero");
     <link href="estilos.css" rel="stylesheet" type="text/css">
 
     <script>
+        const url = 'con1_dadosedital.RPC.php';
+
+        function js_getDadosItensEditalLote() {
+
+            let oParam = {};
+            let l20_codigo = document.getElementById('l20_codigo').value;
+            oParam.exec = "getDadosItenseEditalLote";
+            oParam.l20_codigo = l20_codigo;
+            new Ajax.Request(url, {
+                method: 'post',
+                parameters: 'json=' + Object.toJSON(oParam),
+                onComplete: js_retornoItensEditalLote
+            });
+        }
+
+        function js_retornoItensEditalLote(oAjax) {
+            let oRetorno = JSON.parse(oAjax.responseText);
+            let edital = oRetorno.edital;
+            if (!edital || edital.length === 0) {
+                alert("Processo selecionado não possui itens vinculados!");
+                return;
+            } else {
+                js_emite();
+            }
+        }
+
         function js_emite() {
 
             var codigo = document.form1.l20_codigo.value;
@@ -83,7 +109,7 @@ $clrotulo->label("l20_numero");
             //location.href = 'con1_exportaprocessos002.php?' + sQuery;
             jan = window.open('con1_exportaprocessos002.php?' + sQuery);
             jan.moveTo(0, 0);
-            document.form1.l20_codigo.value = '';
+            //document.form1.l20_codigo.value = '';
 
         }
 
@@ -193,7 +219,7 @@ $clrotulo->label("l20_numero");
                         </tr>
                         <tr>
                             <td colspan="2" align="center">
-                                <input name="emite2" id="emite2" type="button" value="Processar" onclick="js_emite();">
+                                <input name="emite2" id="emite2" type="button" value="Processar" onclick="js_getDadosItensEditalLote();">
                             </td>
                         </tr>
                     </table>

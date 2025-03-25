@@ -58,6 +58,8 @@ class cl_rhpessoalmov
     var $rh02_ocorre = null;
     var $rh02_equip = 'f';
     var $rh02_tpcont = 0;
+    var $rh02_outrovincefetivo = 'f';
+    var $rh02_remcargoefetivo = 'f';
     var $rh02_vincrais = 0;
     var $rh02_salari = 0;
     var $rh02_lota = 0;
@@ -133,6 +135,8 @@ class cl_rhpessoalmov
                  rh02_ocorre = varchar(2) = Agentes Nocivos
                  rh02_equip = bool = Equiparacao
                  rh02_tpcont = int4 = Tipo de Contrato
+                 rh02_outrovincefetivo = bool = Possui Outro Vínculo Efetivo
+                 rh02_remcargoefetivo = bool = Optou Pela Rem. Cargo Efetivo
                  rh02_vincrais = int4 = Vinculo
                  rh02_salari = float8 = Salario
                  rh02_lota = int4 = Codigo da Lotacao
@@ -203,6 +207,8 @@ class cl_rhpessoalmov
             $this->rh02_ocorre = ($this->rh02_ocorre == "" ? @$GLOBALS["HTTP_POST_VARS"]["rh02_ocorre"] : $this->rh02_ocorre);
             $this->rh02_equip = ($this->rh02_equip == "f" ? @$GLOBALS["HTTP_POST_VARS"]["rh02_equip"] : $this->rh02_equip);
             $this->rh02_tpcont = ($this->rh02_tpcont == "" ? @$GLOBALS["HTTP_POST_VARS"]["rh02_tpcont"] : $this->rh02_tpcont);
+            $this->rh02_outrovincefetivo = ($this->rh02_outrovincefetivo == "f" ? @$GLOBALS["HTTP_POST_VARS"]["rh02_outrovincefetivo"] : $this->rh02_outrovincefetivo);
+            $this->rh02_remcargoefetivo = ($this->rh02_remcargoefetivo == "f" ? @$GLOBALS["HTTP_POST_VARS"]["rh02_remcargoefetivo"] : $this->rh02_remcargoefetivo);
             $this->rh02_vincrais = ($this->rh02_vincrais == "" ? @$GLOBALS["HTTP_POST_VARS"]["rh02_vincrais"] : $this->rh02_vincrais);
             $this->rh02_salari = ($this->rh02_salari == "" ? @$GLOBALS["HTTP_POST_VARS"]["rh02_salari"] : $this->rh02_salari);
             $this->rh02_lota = ($this->rh02_lota == "" ? @$GLOBALS["HTTP_POST_VARS"]["rh02_lota"] : $this->rh02_lota);
@@ -398,6 +404,24 @@ class cl_rhpessoalmov
             $this->erro_status = "0";
             return false;
         }
+        if ($this->rh02_outrovincefetivo == null) {
+            $this->erro_sql = " Campo Possui Outro Vínculo Efetivo não informado.";
+            $this->erro_campo = "rh02_outrovincefetivo";
+            $this->erro_banco = "";
+            $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+            $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+            $this->erro_status = "0";
+            return false;
+        }
+        if ($this->rh02_remcargoefetivo == null) {
+            $this->erro_sql = " Campo Optou Pela Rem. Cargo Efetivo não informado.";
+            $this->erro_campo = "rh02_remcargoefetivo";
+            $this->erro_banco = "";
+            $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+            $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+            $this->erro_status = "0";
+            return false;
+        }
         if ($this->rh02_salari == null) {
             $this->rh02_salari = "0";
         }
@@ -506,7 +530,6 @@ class cl_rhpessoalmov
         if ($this->rh02_art1leioutros == null) {
             $this->rh02_art1leioutros = "f";
         }
-
         if ($this->rh02_reabreadap == null) {
             $this->rh02_reabreadap = "f";
         }
@@ -516,11 +539,9 @@ class cl_rhpessoalmov
         if ($this->rh02_plansegreg == null) {
             $this->rh02_plansegreg = "null";
         }
-
         if ($this->rh02_datainicio == null) {
             $this->rh02_datainicio = "null";
         }
-
         if ($this->rh02_tipojornada == null) {
             $this->rh02_tipojornada = "null";
         }
@@ -536,19 +557,15 @@ class cl_rhpessoalmov
             }
             $this->rh02_tipojornada = "null";
         }
-
         if ($this->rh02_horarionoturno == null) {
             $this->rh02_horarionoturno = "f";
         }
-
         if ($this->rh02_tipobeneficio == null) {
             $this->rh02_tipobeneficio = "null";
         }
-
         if ($this->rh02_descratobeneficio == null) {
             $this->rh02_descratobeneficio = "null";
         }
-
         if ($this->rh02_cnpjcedente == null) {
             if (in_array($GLOBALS["HTTP_POST_VARS"]["tipadm"], array(3, 4))) {
                 $this->erro_sql = " Campo CNPJ Cedente não informado.";
@@ -561,7 +578,6 @@ class cl_rhpessoalmov
             }
             $this->rh02_cnpjcedente = "null";
         }
-
         if ($this->rh02_mattraborgcedente == null) {
             if (in_array($GLOBALS["HTTP_POST_VARS"]["tipadm"], array(3, 4))) {
                 $this->erro_sql = " Campo Matrícula do Trabalhador no Órgão Cedente não informado.";
@@ -574,7 +590,6 @@ class cl_rhpessoalmov
             }
             $this->rh02_mattraborgcedente = "null";
         }
-
         if ($this->rh02_dataadmisorgcedente == null) {
             if (in_array($GLOBALS["HTTP_POST_VARS"]["tipadm"], array(3, 4))) {
                 $this->erro_sql = " Campo Data de Admissão no Órgão Cedente não informado.";
@@ -587,7 +602,6 @@ class cl_rhpessoalmov
             }
             $this->rh02_dataadmisorgcedente = "null";
         }
-
         if ($this->rh02_jornadadetrabalho == null) {
             if (in_array($GLOBALS["HTTP_POST_VARS"]["tipadm"], array(3, 4))) {
                 $this->erro_sql = " Campo Jornada de Trabalho não informado.";
@@ -600,7 +614,6 @@ class cl_rhpessoalmov
             }
             $this->rh02_jornadadetrabalho = "null";
         }
-
         if ($rh02_seqpes == "" || $rh02_seqpes == null) {
             $result = db_query("select nextval('rhpessoalmov_rh02_seqpes_seq')");
             if ($result == false) {
@@ -668,6 +681,8 @@ class cl_rhpessoalmov
                                       ,rh02_ocorre
                                       ,rh02_equip
                                       ,rh02_tpcont
+                                      ,rh02_outrovincefetivo
+                                      ,rh02_remcargoefetivo
                                       ,rh02_vincrais
                                       ,rh02_salari
                                       ,rh02_lota
@@ -726,6 +741,8 @@ class cl_rhpessoalmov
                                ,'$this->rh02_ocorre'
                                ,'$this->rh02_equip'
                                ,$this->rh02_tpcont
+                               ,'$this->rh02_outrovincefetivo'
+                               ,'$this->rh02_remcargoefetivo'
                                ,$this->rh02_vincrais
                                ,$this->rh02_salari
                                ,$this->rh02_lota
@@ -1027,6 +1044,33 @@ class cl_rhpessoalmov
                 return false;
             }
         }
+        if (trim($this->rh02_outrovincefetivo) != "" || isset($GLOBALS["HTTP_POST_VARS"]["rh02_outrovincefetivo"])) {
+            $sql  .= $virgula . " rh02_outrovincefetivo = '$this->rh02_outrovincefetivo' ";
+            $virgula = ",";
+            if (trim($this->rh02_outrovincefetivo) == null) {
+                $this->erro_sql = " Campo Possui Outro Vínculo Efetivo não informado.";
+                $this->erro_campo = "rh02_outrovincefetivo";
+                $this->erro_banco = "";
+                $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+                $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+                $this->erro_status = "0";
+                return false;
+            }
+        }
+        if (trim($this->rh02_remcargoefetivo) != "" || isset($GLOBALS["HTTP_POST_VARS"]["rh02_remcargoefetivo"])) {
+            $sql  .= $virgula . " rh02_remcargoefetivo = '$this->rh02_remcargoefetivo' ";
+            $virgula = ",";
+            if (trim($this->rh02_remcargoefetivo) == null) {
+                $this->erro_sql = " Campo Optou Pela Rem. Cargo Efetivo não informado.";
+                $this->erro_campo = "rh02_remcargoefetivo";
+                $this->erro_banco = "";
+                $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+                $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+                $this->erro_status = "0";
+                return false;
+            }
+        }
+
         if (trim($this->rh02_vincrais) != "" || isset($GLOBALS["HTTP_POST_VARS"]["rh02_vincrais"])) {
             $sql  .= $virgula . " rh02_vincrais = $this->rh02_vincrais ";
             $virgula = ",";
@@ -1790,7 +1834,7 @@ class cl_rhpessoalmov
         $sql .= "      inner join rhregime  on  rhregime.rh30_codreg = rhpessoalmov.rh02_codreg       ";
         $sql .= "          and  rhregime.rh30_instit = rhpessoalmov.rh02_instit                       ";
         $sql .= "      left join rhlotavinc on rh25_codigo = r70_codigo                               ";
-        $sql .= "           and rh25_anousu = ".db_getsession('DB_anousu')                             ;
+        $sql .= "           and rh25_anousu = " . db_getsession('DB_anousu');
         $sql .= "      left join  rhlotavincrec on rh43_codlotavinc = rh25_codlotavinc                ";
         $sql .= "      inner join cgm  on  cgm.z01_numcgm = db_config.numcgm                          ";
         $sql .= "      inner join db_estrutura  on  db_estrutura.db77_codestrut = rhlota.r70_codestrut";
@@ -2424,6 +2468,10 @@ class cl_rhpessoalmov
         $sSql .= "       left  join orcorgao             on o40_orgao                     = rh26_orgao                  \n";
         $sSql .= "                                      and o40_anousu                    = rhpessoalmov.rh02_anousu    \n";
         $sSql .= "                                      and o40_instit                    = rhpessoalmov.rh02_instit    \n";
+        $sSql .= "       left  join orcunidade           on o41_orgao                     = rh26_orgao                  \n";
+        $sSql .= "                                      and o41_unidade                   = rh26_unidade                \n";
+        $sSql .= "                                      and o41_anousu                    = rhpessoalmov.rh02_anousu    \n";
+        $sSql .= "                                      and o41_instit                    = rhpessoalmov.rh02_instit    \n";
         $sSql .= "       left  join rhlotavinc           on rh25_codigo                   = r70_codigo                  \n";
         $sSql .= "                                      and rh25_anousu                   = rhpessoalmov.rh02_anousu    \n";
         $sSql .= "       left  join orctiporec           on o15_codigo                    = rh25_recurso                \n";
@@ -2441,7 +2489,7 @@ class cl_rhpessoalmov
         $sSql .= "       left  join rhpeslocaltrab       on rhpeslocaltrab.rh56_seqpes    = rhpessoalmov.rh02_seqpes    \n";
         $sSql .= "                                      and rhpeslocaltrab.rh56_princ     = 't'                         \n";
         $sSql .= "       left  join rhlocaltrab          on rhpeslocaltrab.rh56_localtrab = rhlocaltrab.rh55_codigo     \n";
-        $sSql .= "       AND rhlocaltrab.rh55_instit =  rhpessoal.rh01_instit                                               \n";
+        $sSql .= "       AND rhlocaltrab.rh55_instit =  rhpessoal.rh01_instit                                           \n";
         $sSql .= "       left  join rhpesdoc             on rhpesdoc.rh16_regist          = rhpessoal.rh01_regist       \n";
         $sSql .= "       left  join rhpesbanco           on rhpesbanco.rh44_seqpes        = rhpessoalmov.rh02_seqpes    \n";
         $sSql .= "       left  join (select distinct rhipe.*,                                                           \n";

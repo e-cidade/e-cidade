@@ -1,28 +1,28 @@
 <?
 /*
- *     E-cidade Software Publico para Gestao Municipal                
- *  Copyright (C) 2009  DBselller Servicos de Informatica             
- *                            www.dbseller.com.br                     
- *                         e-cidade@dbseller.com.br                   
- *                                                                    
- *  Este programa e software livre; voce pode redistribui-lo e/ou     
- *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme  
- *  publicada pela Free Software Foundation; tanto a versao 2 da      
- *  Licenca como (a seu criterio) qualquer versao mais nova.          
- *                                                                    
- *  Este programa e distribuido na expectativa de ser util, mas SEM   
- *  QUALQUER GARANTIA; sem mesmo a garantia implicita de              
- *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM           
- *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais  
- *  detalhes.                                                         
- *                                                                    
- *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU     
- *  junto com este programa; se nao, escreva para a Free Software     
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA          
- *  02111-1307, USA.                                                  
- *  
- *  Copia da licenca no diretorio licenca/licenca_en.txt 
- *                                licenca/licenca_pt.txt 
+ *     E-cidade Software Publico para Gestao Municipal
+ *  Copyright (C) 2009  DBselller Servicos de Informatica
+ *                            www.dbseller.com.br
+ *                         e-cidade@dbseller.com.br
+ *
+ *  Este programa e software livre; voce pode redistribui-lo e/ou
+ *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme
+ *  publicada pela Free Software Foundation; tanto a versao 2 da
+ *  Licenca como (a seu criterio) qualquer versao mais nova.
+ *
+ *  Este programa e distribuido na expectativa de ser util, mas SEM
+ *  QUALQUER GARANTIA; sem mesmo a garantia implicita de
+ *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM
+ *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais
+ *  detalhes.
+ *
+ *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU
+ *  junto com este programa; se nao, escreva para a Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ *  02111-1307, USA.
+ *
+ *  Copia da licenca no diretorio licenca/licenca_en.txt
+ *                                licenca/licenca_pt.txt
  */
 
 include("fpdf151/pdf.php");
@@ -74,8 +74,8 @@ $desc_grupo = "Por Sub-Grupo";
   }else {
 	  $desc_ordem = "Numérica";
 	  $order_by = "o56_codele,pc01_codmater";
-  } 
-$desc_grupo = "Por Elemento";  
+  }
+$desc_grupo = "Por Elemento";
 }
 //echo $grupo;echo "<br>";echo $desc_grupo;echo "<br>";echo $desc_ordem;exit;
 
@@ -83,13 +83,13 @@ $head1 = "RELATÓRIO DE MATERIAIS/SERVIÇOS";
 $head3 = "CLASSIFICAÇÃO $desc_grupo";
 $head5 = "ORDEM $desc_ordem";
 
-$ativo="pc01_ativo='f' and pc01_conversao is false and o56_anousu = ".db_getsession("DB_anousu");
+$ativo="pc01_ativo='f' and pc01_instit in (0,".db_getsession('DB_instit').") and pc01_conversao is false and o56_anousu = ".db_getsession("DB_anousu");
 
 if (isset($elemento) && $elemento != ""){
      $ativo .= " and o56_elemento = '$elemento' ";
 }
 
-$result = $clpcmater->sql_record($clpcmater->sql_query_grupo("","*",$order_by,$ativo));
+$result = $clpcmater->sql_record($clpcmater->sql_query_grupo("","DISTINCT *",$order_by,$ativo));
 //die($clpcmater->sql_query_grupo("","*",$order_by,$ativo));
 //db_criatabela($result);exit;
 
@@ -100,9 +100,9 @@ if ($clpcmater->numrows == 0){
 
 //db_criatabela($result); exit;
 
-$pdf = new PDF(); 
-$pdf->Open(); 
-$pdf->AliasNbPages(); 
+$pdf = new PDF();
+$pdf->Open();
+$pdf->AliasNbPages();
 $total = 0;
 $pdf->setfillcolor(235);
 $pdf->setfont('arial','b',8);
@@ -137,7 +137,7 @@ for($x = 0; $x < $clpcmater->numrows;$x++){
    if($cldb_usuarios->numrows > 0){
      db_fieldsmemory($result_usuario,0);
    }
-   
+
    $pdf->setfont('arial','',7);
    if($codmater != $pc01_codmater){
 	   if($codmater != "" && $complmat != ""){
@@ -243,5 +243,5 @@ $pdf->cell(164,$alt,'TOTAL GERAL  :  '.$total,"T",0,"L",0);
 }
 
 $pdf->Output();
-   
+
 ?>

@@ -44,10 +44,12 @@ class cl_veiccadcomb {
    // cria variaveis do arquivo 
    var $ve26_codigo = 0; 
    var $ve26_descr = null; 
+   var $ve26_combustivelsicom = 0;
    // cria propriedade com as variaveis do arquivo 
    var $campos = "
                  ve26_codigo = int4 = Código do Combustível 
                  ve26_descr = varchar(40) = Descrição do Combustível 
+                 ve26_combustivelsicom = int = Combustivel Padrão Sicom
                  ";
    //funcao construtor da classe 
    function cl_veiccadcomb() { 
@@ -69,6 +71,7 @@ class cl_veiccadcomb {
      if($exclusao==false){
        $this->ve26_codigo = ($this->ve26_codigo == ""?@$GLOBALS["HTTP_POST_VARS"]["ve26_codigo"]:$this->ve26_codigo);
        $this->ve26_descr = ($this->ve26_descr == ""?@$GLOBALS["HTTP_POST_VARS"]["ve26_descr"]:$this->ve26_descr);
+       $this->ve26_combustivelsicom = ($this->ve26_combustivelsicom == ""?@$GLOBALS["HTTP_POST_VARS"]["ve26_combustivelsicom"]:$this->ve26_combustivelsicom);
      }else{
        $this->ve26_codigo = ($this->ve26_codigo == ""?@$GLOBALS["HTTP_POST_VARS"]["ve26_codigo"]:$this->ve26_codigo);
      }
@@ -85,6 +88,15 @@ class cl_veiccadcomb {
        $this->erro_status = "0";
        return false;
      }
+     if($this->ve26_combustivelsicom == "0" ){ 
+      $this->erro_sql = " Campo Combustivel Padrão Sicom nao Informado.";
+      $this->erro_campo = "ve26_combustivelsicom";
+      $this->erro_banco = "";
+      $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+      $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+      $this->erro_status = "0";
+      return false;
+    }
      if($ve26_codigo == "" || $ve26_codigo == null ){
        $result = db_query("select nextval('veiccadcomb_ve26_codigo_seq')"); 
        if($result==false){
@@ -119,11 +131,13 @@ class cl_veiccadcomb {
      }
      $sql = "insert into veiccadcomb(
                                        ve26_codigo 
-                                      ,ve26_descr 
+                                      ,ve26_descr
+                                      ,ve26_combustivelsicom 
                        )
                 values (
                                 $this->ve26_codigo 
-                               ,'$this->ve26_descr' 
+                               ,'$this->ve26_descr'
+                               ,'$this->ve26_combustivelsicom'
                       )";
      $result = db_query($sql); 
      if($result==false){ 
@@ -191,6 +205,22 @@ class cl_veiccadcomb {
          return false;
        }
      }
+     if(trim($this->ve26_combustivelsicom)!="" || isset($GLOBALS["HTTP_POST_VARS"]["ve26_combustivelsicom"]))
+     { 
+        $sql  .= $virgula." ve26_combustivelsicom = '$this->ve26_combustivelsicom' ";
+        $virgula = ",";
+        if(trim($this->ve26_combustivelsicom) == "0" )
+        { 
+          $this->erro_sql = " Campo Combustivel Padrão Sicom nao Informado.";
+          $this->erro_campo = "ve26_combustivelsicom";
+          $this->erro_banco = "";
+          $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+          $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+          $this->erro_status = "0";
+          return false;
+        }
+      }
+
      $sql .= " where ";
      if($ve26_codigo!=null){
        $sql .= " ve26_codigo = $this->ve26_codigo";

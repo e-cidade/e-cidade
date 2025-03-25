@@ -44,6 +44,9 @@ if(isset($incluir)){
   $clconvenio->r56_posq01 = $r56_posq011.$r56_posq012;
   $clconvenio->r56_posq02 = $r56_posq021.$r56_posq022;
   $clconvenio->r56_posq03 = $r56_posq031.$r56_posq032;
+  $clconvenio->r56_posq04 = $r56_posq041.$r56_posq042;
+  $clconvenio->r56_posq05 = $r56_posq051.$r56_posq052;
+  $clconvenio->r56_posq06 = $r56_posq061.$r56_posq062;
   $clconvenio->incluir($r56_codrel, db_getsession('DB_instit'));
   db_fim_transacao();
 }

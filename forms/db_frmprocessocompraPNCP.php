@@ -372,6 +372,46 @@ $clrotulo->label("descrdepto");
         }
     }
 
+    function js_consultaamparolegal(param) {
+
+        let modalidade = 0;
+
+        if (param === '8') {
+            $('pc80_criteriojulgamento').value = 0;
+            modalidade = 101;
+        } else {
+            $('pc80_criteriojulgamento').value = 7;
+            modalidade = 100;
+        }
+
+        const oParam = {};
+        oParam.exec = 'buscarAparolegal';
+        oParam.modalidade = modalidade;
+
+        const oAjax = new Ajax.Request(
+            'com1_processocomprasutils.RPC.php', {
+                parameters: 'json=' + Object.toJSON(oParam),
+                asynchronous: false,
+                method: 'post',
+                onComplete: js_retornoAmparolegal
+            });
+    }
+
+    function js_retornoAmparolegal(oAjax) {
+        const oRetorno = eval('(' + oAjax.responseText + ")");
+
+        let listaamparolegal = document.getElementById('pc80_amparolegal').options;
+
+        for (let x = listaamparolegal.length; x > 0; x--) {
+
+            listaamparolegal.remove(x);
+        }
+
+        oRetorno.amparolegal.forEach(function(amparo, iseq) {
+            listaamparolegal.add(new Option(amparo.l212_lei.urlDecode(), amparo.l212_codigo));
+        });
+    }
+
     (function(exports) {
 
         const MENSAGENS = 'patrimonial.compras.com4_processocompra.';
@@ -986,49 +1026,6 @@ $clrotulo->label("descrdepto");
             var input = document.querySelector('#txt_lotedescricao');
             input.addEventListener('keypress', log);
         });
-
-
-        function js_consultaamparolegal(param){
-
-            let modalidade = 0;
-
-            if(param === '8'){
-                $('pc80_criteriojulgamento').value = 0;
-                modalidade = 101;
-            }else{
-                $('pc80_criteriojulgamento').value = 7;
-                modalidade = 100;
-            }
-
-            const oParam = {};
-            oParam.exec       = 'buscarAparolegal';
-            oParam.modalidade = modalidade;
-
-            const oAjax = new Ajax.Request(
-                'com1_processocomprasutils.RPC.php',
-                {
-                    parameters: 'json=' + Object.toJSON(oParam),
-                    asynchronous: false,
-                    method: 'post',
-                    onComplete: js_retornoAmparolegal
-                });
-        }
-
-        function js_retornoAmparolegal(oAjax){
-            const oRetorno = eval('(' + oAjax.responseText + ")");
-
-            let listaamparolegal = document.getElementById('pc80_amparolegal').options;
-
-            for (let x = listaamparolegal.length; x > 0; x --) {
-
-                listaamparolegal.remove(x);
-            }
-
-            oRetorno.amparolegal.forEach(function (amparo, iseq){
-                listaamparolegal.add(new Option(amparo.l212_lei.urlDecode(), amparo.l212_codigo));
-            });
-        }
-
 
         function log(e) {
             var regex = /[*|\":<>[\]{}`\\()';#@&$]/;

@@ -1,8 +1,7 @@
 .simple-modal {
     display: none;
     position: fixed;
-    z-index: 1;
-    padding-top: 100px;
+    z-index: 99999;
     left: 0;
     top: 0;
     width: 100%;
@@ -21,6 +20,9 @@
     border-radius: 10px;
     animation: slideIn 0.5s;
     max-width: 90%;
+    height: auto;
+    margin-bottom: 100px;
+    margin-top: 100px;
 }
 
 @media only screen and (min-width: 1400px) {
@@ -37,7 +39,8 @@
 }
 
 .simple-modal-content-title h2 {
-    margin: 0px;
+    margin-top: 0px;
+    margin-bottom: 10px;
     width: 95%;
 }
 
@@ -45,6 +48,7 @@
 .simple-modal-content.xs {
     width: 10%;
     min-width: 150px;
+    height: auto;
 }
 
 /* Small (SM) */
@@ -52,29 +56,34 @@
     width: 20%;
     min-width: 200px;
     max-width: 500px;
+    height: auto;
 }
 
 /* Medium (MD) */
 .simple-modal-content.md {
     width: 40%;
     min-width: 300px;
+    height: auto;
 }
 
 /* Large (LG) */
 .simple-modal-content.lg {
     width: 60%;
     min-width: 400px;
+    height: auto;
 }
 
 /* Extra Large (XL) */
 .simple-modal-content.xl {
     width: 80%;
     min-width: 500px;
+    height: auto;
 }
 
 /* Full (FULL) */
 .simple-modal-content.full {
     width: 97%;
+    height: auto;
 }
 
 

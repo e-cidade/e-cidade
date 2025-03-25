@@ -108,6 +108,10 @@ switch ($ordem) {
     break;
 }
 
+if(!empty($instit)){
+  $sWhere .= " AND ac16_instit = $instit ";
+}
+
 $sSql = "SELECT
 ac16_sequencial as acordo,
 ac26_sequencial as posicao_acordo,

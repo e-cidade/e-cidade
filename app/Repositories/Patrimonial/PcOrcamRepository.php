@@ -3,11 +3,11 @@
 namespace App\Repositories\Patrimonial;
 
 use App\Models\PcOrcam;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 use cl_pcorcam;
 use db_stdClass;
 
-class PcOrcamRepository 
+class PcOrcamRepository
 {
 
     /**
@@ -35,7 +35,7 @@ class PcOrcamRepository
        $pcOrcam->pc20_validadeorcamento = $orcamento->pc20_validadeorcamento;
        $pcOrcam->pc20_cotacaoprevia = $orcamento->pc20_cotacaoprevia;
        $pcOrcam->pc20_obs = utf8_decode(db_stdClass::db_stripTagsJsonSemEscape($orcamento->pc20_obs));
-       
+
        return $pcOrcam->save();
     }
 

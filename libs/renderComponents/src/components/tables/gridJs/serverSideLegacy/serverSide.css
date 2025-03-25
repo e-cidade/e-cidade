@@ -1,0 +1,493 @@
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+/* Conteiner de ações para o grid */
+.content-box-gridjs-component {
+    margin-bottom: 10px;
+}
+
+/* Row */
+.row-gridjs-component {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+@media (min-width: 768px) {
+    .row-gridjs-component {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+/* Div da barra de pesquisa */
+.search-input-container-gridjs-component {
+    position: relative;
+    width: 100%;
+}
+
+/* Icone de lupa da barra de pesquisa */
+.search-icon-gridjs-component {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+}
+
+/* Barra de pesquisa */
+.search-input-gridjs-component {
+    width: 50%;
+    max-width: 450px;
+    padding: 10px 10px 8px 32px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+/* Botão dropdown de configurações da tabela grid js */
+.dropdown-settings-button-gridjs-component {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+}
+
+.dropdown-settings-button-gridjs-component:hover {
+    background-color: #2563eb;
+}
+
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+/* Menu do botão de filtros da tabela grid js */
+.dropdown-settings-menu-gridjs-component {
+    position: absolute;
+    margin: 5px;
+    width: 600px;
+    transform: translateX(-500px);
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 14px 0px rgb(165 165 165);
+    z-index: 10;
+    padding: 1.5rem;
+}
+
+/* Estilos para o botão */
+.clear-filter-gridjs-component {
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.clear-filter-gridjs-component:active {
+    transform: scale(0.99);
+}
+
+/* Estilos para o tooltip */
+.tooltip-gridjs-component {
+    position: absolute;
+    top: 50%;
+    left: 480px;
+    transform: translateY(-50%);
+    padding: 0.5rem;
+    background-color: #1f2937;
+    color: white;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s;
+}
+
+/* Exibir tooltip ao passar o mouse no botão */
+.clear-filter-gridjs-component:hover .tooltip-gridjs-component {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Classe por responsavel por esconder o menu */
+.hidden-gridjs-component {
+    display: none !important;
+}
+
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+/* Content com busca por coluna */
+.content-search-column-gridjs-component {
+    display: flex; 
+    flex-direction: column
+}
+
+/* Label da busca por coluna */
+.label-search-column-gridjs-component {
+    font-weight: bold;
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Label da busca por coluna */
+.span-label-search-column-gridjs-component {
+    margin-bottom: 5px;
+}
+
+.warning-label-search-column-gridjs-component {
+    display: flex; 
+    justify-items: center; 
+    align-items: center;
+    font-weight: 300;
+    color: red;
+    font-size: 13px;
+}
+
+.warning-label-search-input-gridjs-component {
+    display: flex; 
+    justify-items: center; 
+    align-items: center;
+    font-weight: 300;
+    color: red;
+    font-size: 13px;
+}
+
+/* Sub content da busca por coluna */
+.sub-content-search-column-gridjs-component {
+    display: flex; 
+}
+
+/* Select de colunas para busca */
+.select-column-search-gridjs-component {
+    width: 100px;
+    
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
+
+    margin-bottom: 0.5rem;
+
+    border-right: none;
+    border-left: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+
+    border-top-left-radius: 0.5rem;
+    border-bottom-left-radius: 0.5rem;
+
+    outline: none;
+}
+
+/* Container do icone com campo de busca */
+.search-column-input-container-gridjs-component {
+    position: relative;
+    width: 100%;
+}
+
+/* Icone de lupa da barra de pesquisa */
+.search-column-icon-gridjs-component {
+    position: absolute;
+    left: 8px;
+    top: 40%;
+    transform: translateY(-50%);
+    color: #6b7280;
+}
+
+/* Campo de budca por colunas */
+.input-column-search-gridjs-component {
+    width: 100%;
+
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+    padding-left: 2rem;
+    padding-right: 0.1rem;
+
+    margin-bottom: 0.5rem;
+
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+
+    border-top-right-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+
+    outline: none;
+}
+
+.border-color-red-gridjs-component {
+    border: 1px solid red !important;
+}
+
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+/* Acordion dentro do menu do botão de filtros da tabela grid js */
+.accordion-settings-menu-gridjs-component {
+    margin: 0.5rem 0;
+}
+
+.accordion-header-gridjs-component {
+    cursor: pointer;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.25rem;
+    display: flex;
+    justify-content: space-between;
+    border-radius: 10px;
+    box-shadow: rgb(229 229 229) 0px 4px 11px 0px;
+    z-index: 9;
+}
+
+.accordion-header-gridjs-component:hover {
+    border-bottom: 1px solid rgb(180, 180, 180);
+}
+
+.accordion-content-gridjs-component {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.dropdown-list-gridjs-component {
+    max-height: 12rem;
+    padding: 0px;
+    overflow-y: auto;
+    font-size: 0.875rem;
+    color: #374151;
+    background-color: white;
+    list-style-type: none;
+    margin: 0;
+}
+
+.dropdown-item-gridjs-component {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    transition: background-color 0.2s;
+}
+
+.dropdown-item-gridjs-component:hover {
+    background-color: #f3f4f6;
+}
+
+.checkbox-settings-menu-gridjs-component {
+    cursor: pointer;
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+}
+
+.label-settings-menu-gridjs-component {
+    margin-left: 0.5rem;
+    font-weight: 500;
+    color: #1f2937;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+/* Select de colunas para busca */
+.select-column-condition-search-gridjs-component {
+    width: 100px;
+    
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
+
+    margin-bottom: 0.5rem;
+
+    border-right: none;
+    border-left: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+
+    border-top-left-radius: 0.5rem;
+    border-bottom-left-radius: 0.5rem;
+
+    outline: none;
+}
+
+/* Select de colunas para busca */
+.select-condition-search-gridjs-component {
+    width: 100px;
+    
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
+
+    margin-bottom: 0.5rem;
+
+    border-right: none;
+    border-left: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+
+    outline: none;
+}
+
+/* Container do icone com campo de busca */
+.search-condition-column-input-container-gridjs-component {
+    position: relative;
+    width: 100%;
+}
+
+/* Icone de lupa da barra de pesquisa */
+.search-condition-column-icon-gridjs-component {
+    position: absolute;
+    left: 8px;
+    top: 40%;
+    transform: translateY(-50%);
+    color: #6b7280;
+}
+
+/* Campo de budca por colunas */
+.input-condition-search-gridjs-component {
+    width: 100%;
+
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+    padding-left: 2rem;
+    padding-right: 0.1rem;
+
+    margin-bottom: 0.5rem;
+
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+
+    border-top-right-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+
+    outline: none;
+}
+
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+.grid-container-3b7d7b0517f09 tr:hover {
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+
+.grid-container-3b7d7b0517f09 tr.selected {
+    background-color: #d0e0f0;
+}
+
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+.empty-table-gridjs-component {
+    width: 100%;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    background-color: whitesmoke;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+
+}
+
+.icon-container-empty-table-gridjs-component {
+    background-color: #ededed;
+    padding: 16px;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.search-icon-empty-table-gridjs-component {
+    width: 30px;
+    height: 30px;
+    fill: #4a5568;
+}
+
+.title-empty-table-gridjs-component {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 8px;
+}
+
+.message-empty-table-gridjs-component {
+    font-size: 1rem;
+    color: #718096;
+}
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+
+/* Tooltip grid clicks */
+.tooltip-8653X {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip-8653X .tooltip-text-8653X {
+    visibility: hidden;
+    width: 120px;
+    background-color: rgb(216, 216, 216);
+    color: black;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    margin-bottom: 5px;
+    font-size: x-small;
+    
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -65px;
+}
+
+.tooltip-8653X .tooltip-text-8653X .visible-8653X {
+    visibility: visible;
+}
+
+.tooltip-8653X:hover .tooltip-text-8653X {
+    visibility: visible;
+}
+
+.icon.circle-8653X {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    vertical-align: middle;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /></svg>');
+}
+
+.icon.check-8653X {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    vertical-align: middle;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 12l2 2l4 -4" /></svg>');
+}
+
+.icon.m-8653X {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    vertical-align: middle;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 16v-8l3 5l3 -5v8" /><path d="M7.5 4.21v.01" /><path d="M4.21 7.5v.01" /><path d="M3 12v.01" /><path d="M4.21 16.5v.01" /><path d="M7.5 19.79v.01" /><path d="M12 21v.01" /><path d="M16.5 19.79v.01" /><path d="M19.79 16.5v.01" /><path d="M21 12v.01" /><path d="M19.79 7.5v.01" /><path d="M16.5 4.21v.01" /><path d="M12 3v.01" /></svg>');
+}
+
+.gridjs-td {
+    font-size: 12px;
+}

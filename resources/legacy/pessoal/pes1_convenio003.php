@@ -60,6 +60,12 @@ if(isset($excluir)){
   $r56_posq022 = substr($r56_posq02,3,3);
   $r56_posq031 = substr($r56_posq03,0,3);
   $r56_posq032 = substr($r56_posq03,3,3);
+  $r56_posq041 = substr($r56_posq04,0,3);
+  $r56_posq042 = substr($r56_posq04,3,3);
+  $r56_posq051 = substr($r56_posq05,0,3);
+  $r56_posq052 = substr($r56_posq05,3,3);
+  $r56_posq061 = substr($r56_posq06,0,3);
+  $r56_posq062 = substr($r56_posq06,3,3);
 }
 ?>
 <html>

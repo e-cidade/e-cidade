@@ -111,6 +111,10 @@ if (isset($testanome) && !isset($pesquisa_chave)) {
     }
   }
 
+  function js_hide(){
+    parent.db_iframe_cgm.hide();
+  }
+
   <?php if(isset($testanome) && !isset($pesquisa_chave)): ?>
 
     function js_testanome(z01_numcgm, ender, cgccpf, <?= $camp; ?>) {
@@ -184,7 +188,7 @@ if (isset($testanome) && !isset($pesquisa_chave)) {
         <td>
           <input name="pesquisar" type="submit" id="pesquisar2" value="Pesquisar">
           <input name="limpar" type="button" id="naoencontrado2" value="Limpar" onClick="js_limpa()">
-          <input name="Fechar" type="button" id="limpar" value="Fechar" onClick="parent.func_nome.hide();">
+          <input name="Fechar" type="button" id="limpar" value="Fechar" onClick="js_hide()">
           <?php if (isset($testanome)) { ?>
             <input name="Incluir" type="button" value="Incluir Novo CGM" onClick="location.href = 'prot1_cadcgm001.php?testanome=<?=$func_antes?>&valores=<?=$valores?>&funcao_js=<?=$func_antes.$valores?>'">
             <script>

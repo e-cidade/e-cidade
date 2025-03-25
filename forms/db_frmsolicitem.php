@@ -342,7 +342,7 @@ if (isset($pc11_codigo) && $pc11_codigo != '') {
           $result_unidade = array();
           $desabilita_qtd = array();
           if (isset($verificado)) {
-            $result_sql_unid = $clmatunid->sql_record($clmatunid->sql_query_file(null, "m61_codmatunid,substr(m61_descr,1,20) as m61_descr,m61_usaquant,m61_usadec", "m61_descr"));
+            $result_sql_unid = $clmatunid->sql_record($clmatunid->sql_query_file(null, "m61_codmatunid,substr(m61_descr,1,20) as m61_descr,m61_usaquant,m61_usadec,m61_ativo", "m61_descr","m61_ativo='t'"));
             $numrows_unid = $clmatunid->numrows;
             echo "<script>
                     			          arr_desabilitaqtd = new Array();\n;
@@ -852,6 +852,9 @@ if (isset($pc11_codigo) && $pc11_codigo != '') {
   ?>
 </form>
 <script>
+
+  getUnidade();
+
   /**
    * Codigo do material informado, pesquisa quantidade restante do item da estimativa
    */
@@ -1020,6 +1023,8 @@ if (isset($pc11_codigo) && $pc11_codigo != '') {
     document.form1.o56_codelefunc.value = codele;
 
     db_iframe_pcmater.hide();
+    getUnidade();
+
     obj = document.createElement('input');
     obj.setAttribute('name', 'codigomaterial');
     obj.setAttribute('type', 'hidden');
@@ -1452,6 +1457,41 @@ if (isset($pc11_codigo) && $pc11_codigo != '') {
       document.getElementById('hoverBox').classList.add('hoverBoxDisabled');
     }, 3000);
 
+  }
+
+  function getUnidade(){
+    let oParametro = new Object();
+        let oRetorno;
+        oParametro.pc01_codmater = document.getElementById('pc16_codmater').value;
+        let oAjax = new Ajax.Request('com_getunidpcmater.RPC.php', {
+            method: 'post',
+            parameters: 'json=' + Object.toJSON(oParametro),
+            asynchronous: false,
+            onComplete: function(oAjax) {
+                oRetorno = eval("(" + oAjax.responseText.urlDecode() + ")");
+                let codigoUnidade = oRetorno.pc01_unid;
+                if(codigoUnidade != "" && codigoUnidade != null){
+                  document.getElementById('pc17_unid').value = codigoUnidade;
+                  document.getElementById('pc17_unid').style.backgroundColor = '#DEB887';
+                  let pc17_unid = document.getElementById("pc17_unid");
+                  pc17_unid.onmousedown = function(e) {
+                      e.preventDefault(); // Impede a interação com o `select`
+                      this.blur();        // Remove o foco do `select`
+                      return false;
+                  };
+
+
+                }else{
+                  document.getElementById('pc17_unid').style.backgroundColor = 'white';
+                  document.getElementById('pc17_unid').removeAttribute('disabled');
+                  let pc17_unid = document.getElementById("pc17_unid");
+                  pc17_unid.onmousedown = null;
+
+                }
+
+
+            }
+        });
   }
 
   js_verificaServico();

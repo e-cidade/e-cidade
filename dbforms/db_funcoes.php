@@ -179,7 +179,7 @@ function db_contas($nome, $valor = "", $tipo = 1)
  * @param string  $iMaxLen       MaxLenght       : Maximo de Caractereres
  * @return void
  */
-function db_input($nome, $dbsize, $dbvalidatipo, $dbcadastro, $dbhidden = 'text', $db_opcao = 3, $js_script = "", $nomevar = "", $bgcolor = "", $css="", $iMaxLen=null, $class = '', $dataAttr = [])
+function db_input($nome, $dbsize, $dbvalidatipo, $dbcadastro, $dbhidden = 'text', $db_opcao = 3, $js_script = "", $nomevar = "", $bgcolor = "", $css="", $iMaxLen=null, $class = '', $dataAttr = [], $valueDefault = '')
 {
     if ($iMaxLen != null && !empty($iMaxLen)) {
         $iMax = $iMaxLen;
@@ -192,7 +192,7 @@ function db_input($nome, $dbsize, $dbvalidatipo, $dbcadastro, $dbhidden = 'text'
     name="<?=($nomevar==""?$nome:$nomevar)?>"
     type="<?=$dbhidden?>" <?=($dbhidden=="checkbox"?(@$GLOBALS[($nomevar==""?$nome:$nomevar)]=="t"?"checked":""):"")?>
     id="<?=($nomevar==""?$nome:$nomevar)?>"
-    value="<?=@$GLOBALS[($nomevar==""?$nome:$nomevar)]?>"
+    value="<?=@$GLOBALS[($nomevar==""?$nome:$nomevar)] ?? @$valueDefault?>"
     size="<?=$dbsize?>"
     maxlength="<?=@$iMax?>"
   <?php
@@ -270,7 +270,7 @@ function db_input($nome, $dbsize, $dbvalidatipo, $dbcadastro, $dbhidden = 'text'
  * @param $bgcolor       - Cor Background  : Cor de fundo da tela, no caso de *db_opcao*=3 ser? "#DEB887"
  * @param $maxlength     - Maxlenght       : Tamanho m?ximo permitido para escrita no textarea
  */
-function db_textarea($nome, $dbsizelinha = 1, $dbsizecoluna = 1, $dbvalidatipo, $dbcadastro = true, $dbhidden = 'text', $db_opcao = 3, $js_script = "", $nomevar = "", $bgcolor = "", $maxlength = "", $class = "")
+function db_textarea($nome, $dbsizelinha = 1, $dbsizecoluna = 1, $dbvalidatipo, $dbcadastro = true, $dbhidden = 'text', $db_opcao = 3, $js_script = "", $nomevar = "", $bgcolor = "", $maxlength = "", $class = "", $dataAttr = [], $css = '')
 {
     $sOnInput = ""; ?>
   <textarea title="<?=@$GLOBALS['T'.$nome]?>" name="<?=($nomevar==""?$nome:$nomevar)?>"  type="<?=$dbhidden?>"
@@ -303,7 +303,9 @@ function db_textarea($nome, $dbsizelinha = 1, $dbsizecoluna = 1, $dbvalidatipo, 
     }
 
     if ($db_style != '') {
-        echo " style=\"$db_style\" ";
+        echo " style=\"$db_style". (!empty($css) ? ';'.$css : '') ."\"";
+    } else {
+        echo " style=\"". (!empty($css) ? $css : '') ."\"";
     }
     $OnBlur  = " js_ValidaMaiusculo(this,'".@$GLOBALS['G'.$nome]."',event); ";
     $OnKeyUp = " js_ValidaCampos(this,".($dbvalidatipo==''?0:$dbvalidatipo).",'".@$GLOBALS['S'.$nome]."','".@$GLOBALS['U'.$nome]."','".@$GLOBALS['G'.$nome]."',event); ";
@@ -311,6 +313,12 @@ function db_textarea($nome, $dbsizelinha = 1, $dbsizecoluna = 1, $dbvalidatipo, 
     if ($maxlength != "") {
         $sOnInput = " js_maxlenghttextarea(this,event,".$maxlength."); ";
         $OnKeyUp   .= $sOnInput;
+    }
+
+    if(!empty($dataAttr)){
+        foreach($dataAttr as $key => $val){
+            echo " data-{$key}=\"{$val}\" ";
+        }
     }
 
     $sValue = (!isset($GLOBALS[$nome]) ? "" : stripslashes($GLOBALS[($nomevar==""?$nome:$nomevar)])); ?>
@@ -324,7 +332,7 @@ function db_textarea($nome, $dbsizelinha = 1, $dbsizecoluna = 1, $dbvalidatipo, 
 <?php
   if ($maxlength != "") {
       echo "<br>";
-      echo "<div align='right'>";
+      echo "<div align='right' style='display: flex;justify-content: end; gap: 5px'>";
       echo "<span style='float:left;color:red;font-weight:bold' id='{$nome}errobar'></span>";
       echo " <b> Caracteres Digitados : </b> ";
       echo "  <input type='text' name='{$nome}obsdig' id='{$nome}obsdig' size='3' value='" . strlen($sValue) . "' style='color: #000;' disabled> ";
@@ -1686,5 +1694,27 @@ function db_retorna_periodo($mes = 1, $tipo = "B")
     return $periodo;
 }
 
+function convertToUtf8($data, $encodingfrom = 'ISO-8859-1', $encodingto = 'UTF-8') {
+    if (is_array($data)) {
+        return array_map(function($item) use ($encodingfrom, $encodingto) {
+            return convertToUtf8($item, $encodingfrom, $encodingto);
+        }, $data);
+    } elseif (is_object($data)) {
+        foreach ($data as $key => $value) {
+            $data->$key = convertToUtf8($value, $encodingfrom, $encodingto);
+        }
+        return $data;
+    } elseif (is_string($data)) {
+        // Verificar se a string j est na codificao desejada
+        $currentEncoding = mb_detect_encoding($data, [$encodingfrom, $encodingto], true);
+
+        // S converter se a string estiver na codificao de origem esperada
+        if ($currentEncoding === $encodingfrom) {
+            return mb_convert_encoding($data, $encodingto, $encodingfrom);
+        }
+    }
+
+    return $data;
+}
 
 ?>

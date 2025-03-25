@@ -269,10 +269,18 @@ if (isset($db_opcaoal)) {
         <div style="margin-top:20px; margin-bottom:20px;">
             <input name="<?= ($db_opcao == 1 ? "incluir" : ($db_opcao == 2 || $db_opcao == 22 ? "alterar" : "excluir")) ?>" type="submit" id="db_opcao" value="<?= ($db_opcao == 1 ? "Incluir" : ($db_opcao == 2 || $db_opcao == 22 ? "Alterar" : "Excluir")) ?>" <?= ($db_botao == false ? "disabled" : "") ?>>
                 <?php 
+
+                    $resultLiclicita = $clliclicita->sql_record($clliclicita->sql_query_pco($l20_codigo));
+                    db_fieldsmemory($resultLiclicita, 0)->l20_lances;
+
                     if ($clpcorcamforne->numrows > 0) {
                     $tiposcompra = array(102, 103);
                     if (!in_array($l03_pctipocompratribunal, $tiposcompra)) {
-                        echo "<input name='lancval' type='button' id='lancval' value='Lançar valores'  onclick='CurrentWindow.corpo.document.location.href=\"lic1_orcamlancval001.php?l20_codigo=$l20_codigo&pc20_codorc=$pc20_codorc\"' " . ($db_botao == false ? "disabled" : "") . ">&nbsp";
+                        if (!empty($l20_lances) && $l20_lances == 't') {
+                            echo "<input name='lancval' type='button' id='lancval' onclick='CurrentWindow.corpo.document.location.href=`lic_propostas.php?l20_codigo=$l20_codigo`' value='Lançar valores'" . ($db_botao == false ? "disabled" : "") . ">&nbsp";
+                        } else {
+                            echo "<input name='lancval' type='button' id='lancval' value='Lançar valores'  onclick='CurrentWindow.corpo.document.location.href=\"lic1_orcamlancval001.php?l20_codigo=$l20_codigo&pc20_codorc=$pc20_codorc\"' " . ($db_botao == false ? "disabled" : "") . ">&nbsp";
+                        }
                     }
                     echo "<input name='gera'    type='submit' id='gera'    value='Gerar relatório' onclick='js_gerarel();' " . ($db_botao == false ? "disabled" : "") . ">&nbsp;";
                     echo "<input name='gerarxlsbranco' type='button' id='gerarxlsbranco' value='xls em Branco' onclick='js_gerarxlsbranco()'>&nbsp";

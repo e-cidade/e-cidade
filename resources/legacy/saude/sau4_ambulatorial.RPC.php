@@ -458,7 +458,7 @@ if ($oParam->exec == 'duplicarCotas') {
 
             $oDaoSauCotas->erro_status = "0";
             $oDaoSauCotas->erro_msg    = $oDaoUndmedhorario->erro_msg;
-            break;
+
 
           }
 
@@ -470,7 +470,6 @@ if ($oParam->exec == 'duplicarCotas') {
 
       $oDaoSauCotas->erro_status = "0";
       $oDaoSauCotas->erro_msg    = "Nenhuma grade de horario para a prestadora ".$oParam->aUps."!";
-      break;
 
     }
   }
@@ -508,7 +507,7 @@ if ($oParam->exec == 'duplicarCotas') {
 
       }
       if ($oDaoSauCotas->erro_status == "0") {
-        break;
+
       } else {
 
         $iTamCotasProf = count($oParam->aCotas[$iInd]->aProf);
@@ -641,7 +640,8 @@ if ($oParam->exec == 'saveCotas') {
 
         $oDaoSauCotas->erro_status = "0";
         $oDaoSauCotas->erro_msg    = $oDaoUndmedhorario->erro_msg;
-        break;
+
+
 
       }
 
@@ -755,7 +755,7 @@ if ($oParam->exec == 'saveCotas') {
 
       }
       if ($oDaoSauCotas->erro_status == "0") {
-        break;
+
       }
 
       }
@@ -1373,7 +1373,7 @@ if ($oParam->exec == 'getUnidadesMedicos') {
                                       'possui agendamento no período de '.$aHorariosIni[$iCont].
                                       ' a '.$aHorariosFim[$iCont]
                                      );
-      break;
+
 
     }
 
@@ -1572,7 +1572,7 @@ if ($oParam->exec == 'getUnidadesMedicos') {
 
        $oRetorno->iStatus  = 0;
        $oRetorno->sMessage = urlencode($oDaoSauMedicamentosReceita->erro_msg);
-       break;
+
 
       }
       $aCodMed[$iCont] = $oDaoSauMedicamentosReceita->s159_i_codigo;
@@ -1659,7 +1659,7 @@ if ($oParam->exec == 'getUnidadesMedicos') {
 
        $oRetorno->iStatus  = 0;
        $oRetorno->sMessage = urlencode($oDaoSauMedicamentosReceita->erro_msg);
-       break;
+
 
       }
       $aCodMed[$iCont] = $oDaoSauMedicamentosReceita->s159_i_codigo;

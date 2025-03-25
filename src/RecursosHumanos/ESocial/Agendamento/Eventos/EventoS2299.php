@@ -50,7 +50,9 @@ class EventoS2299 extends EventoBase
                 $oDadosAPI->evtDeslig->dtavprv = $oDados->dtavprv;
             }
             $oDadosAPI->evtDeslig->indpagtoapi  = $oDados->indpagtoapi;
-            $oDadosAPI->evtDeslig->dtprojfimapi = $this->getDtProjetadaAviso($oDados->dtdeslig, $oDados->dtadmiss);
+            if ($oDados->rh30_regime == "2") {
+                $oDadosAPI->evtDeslig->dtprojfimapi = $this->getDtProjetadaAviso($oDados->dtdeslig, $oDados->dtadmiss);
+            }
             if ($oDados->rh30_regime == "2") {
                 $oDadosAPI->evtDeslig->pensalim = (string) $oDados->pensalim;
             }

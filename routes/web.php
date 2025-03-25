@@ -2,8 +2,9 @@
 
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\IptuFotosController;
+use App\Http\Controllers\RedesimController;
+use App\Http\Controllers\Modules\Patrimonial\Licitacoes\Procedimentos\JulgamentoPorLance\FaseDeLances\FaseDeLancesController;
 use Illuminate\Support\Facades\Route;
-
 
 Route::group(['middleware' => ['legacySession', 'authEcidadeUser', 'auth.basic'], 'prefix' => 'web'], function () {
     Route::get('/welcome', function () {
@@ -17,8 +18,23 @@ Route::group(['middleware' => ['legacySession', 'authEcidadeUser', 'auth.basic']
 
     //audit
     Route::get('/audits', [AuditController::class, 'index'])->name('audits.index');
-    
+
+    //redesim
+    Route::group(['prefix' => 'redesim'], function () {
+        Route::post('/companiesReport', [RedesimController::class, 'companiesReport'])
+            ->name('redesim.companies.report');
+        Route::get('/alvara', [RedesimController::class, 'alvara'])
+            ->name('redesim.alvara');
+        Route::post('/alvara/create', [RedesimController::class, 'create'])
+            ->name('redesim.alvara.create');
+    });
     require base_path('routes/modules/patrimonial/patrimonial.php');
+    require base_path('routes/modules/configuracao/configuracao.php');
+
+    Route::prefix('datagrid')->group(function () {
+        Route::get('/get-liclicita', [FaseDeLancesController::class, 'getLiclicita'])->name('datagrid.getLiclicita');
+        Route::get('/get-liclicita-item', [FaseDeLancesController::class, 'getLiclicitaItens'])->name('datagrid.getLiclicitaItens');
+    });
 });
 
 Route::fallback(function () {

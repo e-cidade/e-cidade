@@ -1551,7 +1551,7 @@ function db_getsession($var = "0", $alertarExistencia = true)
             return $_SESSION[$var];
         } else {
             if ($alertarExistencia == true) {
-                db_msgbox('Variavel de sessðo nao encontrada: ' . $var);
+                db_msgbox('Variavel de sessão nao encontrada: ' . $var);
             }
             return null;
         }
@@ -1676,35 +1676,77 @@ function db_lovrot($query, $numlinhas, $arquivo = "", $filtro = "%", $aonde = "_
     $offset        = "offset" . $NomeForm;
     //recebe os valores do campo hidden
 
-    function extrairMatriculas($data) {
-        $matriculas = array();
-    
-        // Função recursiva para percorrer a estrutura JSON
-        $buscarMatriculas = function ($obj) use (&$buscarMatriculas, &$matriculas) {
-            // Verifica se é um objeto ou array
-            if (is_object($obj) || is_array($obj)) {
-                foreach ($obj as $key => $value) {
-                    // Se o valor for um objeto ou array, continua a busca recursiva
-                    if (is_object($value) || is_array($value)) {
-                        $buscarMatriculas($value);
-                    } elseif ($key === 'matricula' && isset($value)) {
-                        // Se a chave for "matricula", adiciona ao array de matrículas
-                        $matriculas[] = $value;
+    if (!function_exists('extrairMatriculas')) {
+        function extrairMatriculas($data) {
+            $matriculas = array();
+
+            // Função recursiva para percorrer a estrutura JSON
+            $buscarMatriculas = function ($obj) use (&$buscarMatriculas, &$matriculas) {
+                // Verifica se é um objeto ou array
+                if (is_object($obj) || is_array($obj)) {
+                    foreach ($obj as $key => $value) {
+                        // Se o valor for um objeto ou array, continua a busca recursiva
+                        if (is_object($value) || is_array($value)) {
+                            $buscarMatriculas($value);
+                        } elseif ($key === 'matricula' && isset($value)) {
+                            // Se a chave for "matricula", adiciona ao array de matrículas
+                            $matriculas[] = $value;
+                        }
                     }
                 }
-            }
-        };
-    
-        // Inicia a busca recursiva a partir dos dados fornecidos
-        $buscarMatriculas($data);
-    
-        return $matriculas;
+            };
+
+            // Inicia a busca recursiva a partir dos dados fornecidos
+            $buscarMatriculas($data);
+
+            return $matriculas;
+        }
     }
 
     if (isset($_POST["totreg" . $NomeForm])) {
         ${$tot_registros} = $_POST["totreg" . $NomeForm];
     } else {
         ${$tot_registros} = 0;
+    }
+
+    if(isset($_POST['retirar'])){
+        if (isset($_POST['cdas'])) {
+            $itensMarcados = $_POST['cdas'];
+            foreach ($itensMarcados as $id) {
+                $count_titulo = "select * from cartorio.titulos where cda_id = $id";
+                $result_titulo = db_query($count_titulo);
+                $titulo_count = pg_num_rows($result_titulo);
+
+                if($titulo_count == 0){
+                    $delete_query = "delete from cartorio.cdas where cda_id = $id and remessa = 0";
+                    $delete = db_query($delete_query);
+                    if($delete){
+                        echo "<li>CDA com ID $id foi removida do sistema de protesto</li>";
+                    }
+                }
+            }
+        }
+    }
+
+    if(isset($_POST['disponibilizar'])){
+        if (isset($_POST['cdas'])) {
+            $itensMarcados = $_POST['cdas'];
+            foreach ($itensMarcados as $id) {
+               $cda_sql = "select * from cartorio.cdas where cda_id = $id";
+               $cda_result = db_query($cda_sql);
+               $count_cda = pg_num_rows($cda_result);
+
+               if($count_cda == 0){
+                $sql = "insert into cartorio.cdas (cda_id, remessa) VALUES ($id, 0)";
+                $executar = db_query($sql);
+                echo "<li>CDA com ID $id foi disponibilizada no sistema de protesto</li>";
+               }else{
+                echo "<li>CDA com ID $id já foi disponibilizada para o sistema de protesto</li>";
+               }
+            }
+        } else {
+            echo "<p>Nenhum checkbox foi selecionado.</p>";
+        }
     }
 
     if (isset($_POST["offset" . $NomeForm])) {
@@ -1894,7 +1936,7 @@ function db_lovrot($query, $numlinhas, $arquivo = "", $filtro = "%", $aonde = "_
     $query  .= " limit $numlinhas offset " . ${$offset};
     $result  = db_query($query);
     $NumRows = pg_numrows($result);
-    
+
     if ($NumRows == 0) {
 
         if (isset($query_anterior)) {
@@ -2050,6 +2092,11 @@ function db_lovrot($query, $numlinhas, $arquivo = "", $filtro = "%", $aonde = "_
     $sHtml .= "        <input type=\"hidden\" name=\"distinct_pesquisa\"   value=\"\">                      ";
     $sHtml .= "        <input type=\"hidden\" name=\"filtro\"              value=\"$filtro\">               ";
     $sHtml .= "        <input type=\"hidden\" name=\"campo_filtrado\"      value=\"\">                      ";
+
+    if(str_contains($_SERVER['SCRIPT_FILENAME'], 'jur3_emiteinicial011.php')){
+        $sHtml .= "        <input type=\"submit\" name=\"disponibilizar" . "\"   value=\"Disponibilizar CDA\" " . @$Dd2 . ">    ";
+        $sHtml .= "        <input type=\"submit\" name=\"retirar" . "\"   value=\"Retirar CDA\" " . @$Dd2 . ">    ";    
+    }
 
     reset($variaveis_repassa);
 
@@ -2217,7 +2264,7 @@ function db_lovrot($query, $numlinhas, $arquivo = "", $filtro = "%", $aonde = "_
                     //var_dump(pg_result($result, $i, $j));
                     $matriculas = array();
                     if (!empty($query)) {
-                                
+
                         $json_data = json_decode(pg_result($result, $i, $j));
                         if ($json_data !== null) {
 
@@ -2226,8 +2273,8 @@ function db_lovrot($query, $numlinhas, $arquivo = "", $filtro = "%", $aonde = "_
                             } else {
                                 $corMatriculas = $cor1;
                             }
-                    
-                            
+
+
                             $matriculas = extrairMatriculas($json_data);
                             $matriculas = implode(',', $matriculas);
 
@@ -2238,7 +2285,7 @@ function db_lovrot($query, $numlinhas, $arquivo = "", $filtro = "%", $aonde = "_
                 }
             }
         }
-        
+
         if ($arquivo == "()") {
 
             $loop     = "";
@@ -2267,6 +2314,18 @@ function db_lovrot($query, $numlinhas, $arquivo = "", $filtro = "%", $aonde = "_
                 }
 
                 $resultadoRetorno = $arrayFuncao[0] . "(" . $loop . ")";
+                $id_cda = str_replace("'","",$loop);
+                if($marcar === true) {
+                    $query = "select * from cartorio.cdas where cda_id = $id_cda";
+                    $result_query = db_query($query);
+                    $count_result = pg_num_rows($result_query);
+                    //Caso a CDA tenha sido disponibilizada aparece um * ao lado do checkbox para identificar
+                    if($count_result > 0){
+                        $sHtml .= "<td><input type='checkbox' class='checkbox colored-checkbox' value='$id_cda' name='cdas[]'>*</td>";
+                    }else{
+                        $sHtml .= "<td><input type='checkbox' class='checkbox' value='$id_cda' name='cdas[]'></td>";
+                    }
+                }
             } else {
                 $resultadoRetorno = $arrayFuncao[0] . "()";
             }
@@ -2407,7 +2466,7 @@ function db_lovrot($query, $numlinhas, $arquivo = "", $filtro = "%", $aonde = "_
                     }
 
                     if ($lEncontrouResultado) {
-                        $sHtmlCampos = "<td id=\"I" . $i . $j . "\" class='DBLovrotRegistrosRetornados' bgcolor=\"$cor\"><a title='" . $sTitulo . "' onclick=\"js_JanelaAutomatica('" . $sLabel . "','" . (trim(pg_result($result, $i, $j))) . "');return false;\">&nbsp;Inf->&nbsp;</a>" . ($arquivo != "" ? "<a title=\"$mensagem\" class='DBLovrotRegistrosRetornados' href=\"\" " . ($arquivo == "()" ? "OnClick=\"" . $resultadoRetorno . ";return false\">" : "onclick=\"JanBrowse = window.open('" . $arquivo . "?" . base64_encode("retorno=" . ($BrowSe == 1 ? $i : trim(pg_result($result, $i, 0)))) . "','$aonde','width=800,height=600');return false\">") . trim(pg_result($result, $i, $j)) . "</a>" : (trim(pg_result($result, $i, $j)))) . "&nbsp;</td>\n";
+                        $sHtmlCampos = "<td id=\"I" . $i . $j . "\" class='DBLovrotRegistrosRetornados' bgcolor=\"$cor\"><a title='" . $sTitulo . "' onclick=\"js_JanelaAutomatica('" . $sLabel . "','" . (trim(pg_result($result, $i, $j))) . "');return false;\">&nbsp;Inf->&nbsp;</a>" . ($arquivo != "" ? "<a title=\"$mensagem\" class='DBLovrotRegistrosRetornados' href=\"\" " . ($arquivo == "()" ? "OnClick=\"" . $resultadoRetorno . ";return false\">" : "onclick=\"JanBrowse = window.open('" . $arquivo . "?" . base64_encode("retorno=" . ($BrowSe == 1 ? $i : trim(pg_result($result, $i, 0)))) . "','$aonde','width=800,height=600');return false\">") . trim(pg_result($result, $i, $j)) . "</a>" : (trim(pg_result($result, $i, $j)))) . "&nbsp;</td> \n";
                     } else {
                         $sHtmlCampos = "<td id=\"I" . $i . $j . "\" class='DBLovrotRegistrosRetornados' bgcolor=\"$cor\">" . ($arquivo != "" ? "<a title=\"$mensagem\" class='DBLovrotRegistrosRetornados' href=\"\" " . ($arquivo == "()" ? "OnClick=\"" . $resultadoRetorno . ";return false\">" : "onclick=\"JanBrowse = window.open('" . $arquivo . "?" . base64_encode("retorno=" . ($BrowSe == 1 ? $i : trim(pg_result($result, $i, 0)))) . "','$aonde','width=800,height=600');return false\">") . trim(pg_result($result, $i, $j)) . "</a>" : (trim(pg_result($result, $i, $j)))) . "&nbsp;</td>\n";
                     }

@@ -121,7 +121,15 @@ if((isset($HTTP_POST_VARS["db_opcao"]) && $HTTP_POST_VARS["db_opcao"])=="Alterar
         $clempparametro->e30_modeloop = 1;
     }
 
+    if ($e30_anularpprocessado != "" && $e30_anularpprocessado == 't'){
+        $clempparametro->e30_anularpprocessado = "true";
+    } else {
+        $clempparametro->e30_anularpprocessado = "false";
+    }
+    
     $clempparametro->e30_tipoanulacaopadrao = !is_null($e30_tipoanulacaopadrao) ? (int) $e30_tipoanulacaopadrao : 2;
+
+    $clempparametro->e30_empsolicitadesdobramento = $e30_empsolicitadesdobramento == 't' ? 'true' : 'false';
 
     if (!$lSqlErro) {
 

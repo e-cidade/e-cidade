@@ -247,6 +247,8 @@ $oRotulo->label('z01_bairro');
 <input name="<?=($db_opcao==1?"incluir":($db_opcao==2||$db_opcao==22?"alterar":"excluir"))?>"
   type="submit" id="db_opcao" value="<?=($db_opcao==1?"Incluir":($db_opcao==2||$db_opcao==22?"Alterar":"Excluir"))?>"
   <?=($db_botao==false?"disabled":"")?> onclick="return js_validaEnvio();">
+<input type="button" name="atendimento" id="atendimento" value="Relatório de Atendimento" onclick="js_atendimento();"
+        <?=(isset($tf16_i_pedidotfd) && !empty($tf16_i_pedidotfd) ? '' : ' disabled')?>>
 <input name="fechar" type="button" id="fechar" value="Fechar" onclick="parent.db_iframe_prestadora.hide();">
 </form>
 <script>
@@ -499,6 +501,20 @@ function js_mostratfd_centralagendamento1(chave1,chave2) {
 
 String.prototype.trim = function() {
     return this.replace(/^\s+|\s+$/g,"");
+}
+
+function js_atendimento() {
+
+    sChave = 'tf01_i_pedidotfd='+$F('tf16_i_pedidotfd');
+    if ($F('tf16_i_pedidotfd') != '') {
+
+        jan = window.open('tfd2_relatorioatendimentotfd002.php?'+sChave, '',
+            'width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0 '
+        );
+        jan.moveTo(0, 0);
+
+    }
+
 }
 /*
 function js_pesquisatf16_i_prestcentralagend(mostra){

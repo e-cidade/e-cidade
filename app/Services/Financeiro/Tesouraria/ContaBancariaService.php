@@ -106,12 +106,12 @@ class ContaBancariaService implements ContaBancariaServiceInterface
         }
     }
 
-    public function checkGeneral(int $sequencial)
+    public function checkGeneral(int $sequencial,int $reduzido,int $instituicao)
     {
         try {
            
             $contabancaria = new InsertContaBancariaCommand();
-            $contabancarianovo = $contabancaria->checkAllTables($sequencial);
+            $contabancarianovo = $contabancaria->checkAllTables($sequencial,$reduzido, $instituicao);
         
             return $contabancarianovo;
         } catch (\Exception $e) {

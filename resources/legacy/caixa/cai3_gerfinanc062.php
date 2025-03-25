@@ -51,7 +51,103 @@ $cltermo        = new cl_termo;
 $clprotprocesso = new cl_protprocesso;
 $clrotulo       = new rotulocampo;
 $iCodProc       = 'null';
+//Codigo para validar itens selecionados conforme regra para integraçao
+//com a aplicação do cartorio.
+
+// Contar quantos elementos _CHECK existem
+$valores_count = 0;
+$posting = $_POST;
+$arrayNumPre = [];
+
+foreach ($posting as $key => $value) {
+    if (strpos($key, 'CHECK') === 0) { // Verifica se a chave começa com "_CHECK"
+        $valores_count++;
+    }
+}
+
+
+foreach ($posting as $key => $value) {
+    if (strpos($key, 'CHECK') === 0) { // Verifica se a chave começa com "CHECK"
+        // Usar expressão regular para extrair os números entre "N" e "P1R0N"
+        preg_match_all('/N(\d+)P1R0/', $value, $matches);
+        
+        if (!empty($matches[1])) {
+            foreach ($matches[1] as $match) {
+                if(!in_array($match, $arrayNumPre)){
+					$arrayNumPre[] = $match;
+				}
+            }
+        }
+    }
+}
+
+$flag = false;
+if(!empty($arrayNumPre)){
+	$controle = 0;
+	$flag_select = false;
+	for($i = 0; $i < sizeof($arrayNumPre); $i++){
+		$sql = "SELECT * from cartorio.debitos where codigo_divida = '$arrayNumPre[$i]'";
+		$exec = db_query($sql);
+		$count = pg_num_rows($exec);
+
+		if($count > 0){
+			$controle++;
+			$flag_select = true;
+		}
+	}
+
+	if($controle == 0){
+		$flag = true;
+	}
+
+	if($controle == sizeof($arrayNumPre)){
+		$flag = true;
+	}
+
+	$_SESSION['controle'] = $controle;
+}
+
+
+$cda_list = [];
+//Recupero as CDAs selecionadas
+for($i = 0; $i < sizeof($arrayNumPre); $i++){
+	$q = "SELECT * from cartorio.debitos where codigo_divida = '$arrayNumPre[$i]'";
+	$q_exec = db_query($q);
+	$q_object = pg_fetch_object($q_exec);
+
+	if(!in_array($q_object->cda_id, $cda_list)){
+		$cda_list[] = $q_object->cda_id;
+	}
+}
+
+$debitos_count = 0;
+for($i = 0; $i < sizeof($cda_list); $i++){
+	$debitos = "SELECT DISTINCT codigo_divida from cartorio.debitos where cda_id = '$cda_list[$i]'";
+	$debitos_exec = db_query($debitos);
+	$debitos_contador = pg_num_rows($debitos_exec);
+	$debitos_count += $debitos_contador;
+}
+
+$interna = false;
+if(isset($_POST['tiposparc'])){
+	$interna = true;
+}
+
+if(!empty($cda_list)){
+	if(sizeof($arrayNumPre) < $debitos_count && $debitos_count > 0){
+		echo "<p style='text-align:center;'><strong> PARA REALIZAR O PARCELAMENTO VOCÊ DEVE SELECIONAR TODOS OS DEBITOS DA CDA</strong></p>";
+		die;
+	}
+
+	if(!$flag && $interna == false){
+		echo "<p style='text-align:center;'><strong> NÃO É POSSIVEL SELECIONAR JUNTOS NO MESMO PARCELAMENTO DEBITOS QUE NUNCA FORAM PARCELADOS </strong></p>";
+		die;
+	}
+}
+
 //db_msgbox(db_getsession("conteudoparc"));
+
+
 if (isset($envia) or @$mostra == 1) {
   $entra=true;
 } else {
@@ -259,6 +355,20 @@ for($r=0; $r<pg_numrows($resultcadtipoparc); $r++){
   $arr[$k40_codigo] = $k40_descr;
 }
 flush();
+
+// Definir o ID que quer preservar - nesse caso o ID da Regra de Parcelamento da CDA
+// Após solicitação de Filipi desabilitei a lógica que desabilita as regras de parcelamento da CDA
+// afim de evitar re-trabalho apenas comentei o código para que caso tenha a necessidade de voltar fique mais facil.
+/*
+$idPreservado = 30;
+
+if($flag_select){
+	// Manter apenas o elemento com o ID especificado
+	$arr = isset($arr[$idPreservado]) ? [$idPreservado => $arr[$idPreservado]] : [];
+}else{
+	unset($arr[$idPreservado]);
+}
+*/
 
 db_select("k40_cadtipoparc",$arr,true,1,"onchange='js_reload(this.value)'");
 
@@ -1162,11 +1272,15 @@ db_select('arredondamento',$matarredonda,true,2,"onchange='parcelas.location.hre
 </tr>
 </table>
 </td>
+<?php
+	if(isset($_POST['k40_cadtipoparc'])){
+?>
 <td valign="top">
 <iframe name='parcelas' src='cai3_gerfinanc063.php?valoresportipo=<?=$valoresportipo?>&valor=<?=$totaltotal?>&valorcorr=<?=$totalvlrcor?>&juros=<?=$totalvlrjuros?>&multa=<?=$totalvlrmulta?>&valorcomdesconto=<?=$totaltotal?>&arredondamento=D&temdesconto=<?=$iTemDesconto?>&tiposparc=<?=$tiposparc?>&k40_aplicacao=<?=$k40_aplicacao?>' frameborder='0' align='center' width='350' height='180'>
 </iframe>
 </td>
 </tr>
+<?php } ?>
 </table>
 <?
 	if ($lValidaReparcelamento) {

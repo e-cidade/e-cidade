@@ -783,7 +783,7 @@ class cl_pcorcamforne {
 
   public function queryfornecedores($l20_codigo)
   {
-    return "select z01_numcgm,z01_nome,z01_cgccpf  from pcorcamforne 
+    return "select z01_numcgm,z01_nome,z01_cgccpf,pc31_orcamforne  from pcorcamforne 
             inner join pcorcamfornelic on pc31_orcamforne = pc21_orcamforne
             inner join cgm on z01_numcgm = pc21_numcgm
             where pc31_liclicita = $l20_codigo";

@@ -112,11 +112,6 @@ $anoUsu = db_getsession("DB_anousu");
                             <input type="checkbox" value="IdentificacaoRemessa" id="IdenficacaoRemessa" />
                             <label for="IdenficacaoRemessa">IDE - Identificação da Remessa</label><br>
 
-                            <? if (db_getsession("DB_anousu") >= 2014) {?>
-                                <input type="checkbox" value="Pessoa" id="Pessoa" />
-                                <label for="Pessoa">PESSOA - Pessoas Físicas e Jurídicas</label><br>
-                            <? } ?>
-
                             <input type="checkbox" value="AmOrgao" id="AmOrgao" />
                             <label for="AmOrgao">ORGAO - Orgãos</label><br>
 
@@ -137,50 +132,8 @@ $anoUsu = db_getsession("DB_anousu");
                             <input type="checkbox" value="LeiAlteracaoOrcamentaria" id="LeiAlteracaoOrcamentaria" />
                             <label for="LeiAlteracaoOrcamentaria">LAO - Lei de Alteração Orçamentária</label><br>
 
-                            <? if (db_getsession("DB_anousu") < 2014) {?>
-
-                                <input type="checkbox" value="DecretoMunicipal" id="DecretoMunicipal" />
-                                <label for="DecretoMunicipal">Decreto Municipal Regulamentador do Pregão</label><br>
-
-                            <? } ?>
-
                             <input type="checkbox" value="AlteracoesOrcamentarias" id="AlteracoesOrcamentarias" />
                             <label for="AlteracoesOrcamentarias">AOC - Alterações Orçamentárias</label><br>
-
-                            <? if (db_getsession("DB_anousu") >= 2014) {?>
-                                <input type="checkbox" value="Item" id="Item" />
-                                <label for="Item">ITEM - Item das Lic. etc.</label><br>
-                            <? } ?>
-                            <? if (db_getsession("DB_anousu") >= 2014) {?>
-                                <input type="checkbox" value="LegislacaoMunicipalLicitacao" id="LegislacaoMunicipalLicitacao" />
-                                <label for="LegislacaoMunicipalLicitacao">REGLIC - Legislação Municipal para Licitação</label><br>
-                            <? } ?>
-                            <input type="checkbox" value="AberturaLicitacao" id="AberturaLicitacao" />
-                            <label for="AberturaLicitacao">ABERLIC - Abertura da Licitação</label><br>
-
-                            <input type="checkbox" value="ResponsaveisLicitacao" id="ResponsaveisLicitacao" />
-                            <label for="ResponsaveisLicitacao">RESPLIC - Responsáveis pela Licitação</label><br>
-
-                            <input type="checkbox" value="ParticipantesLicitacao" id="ParticipantesLicitacao" />
-                            <label for="ParticipantesLicitacao">PARTLIC - Participantes da Licitação</label><br>
-
-                            <input type="checkbox" value="HabilitacaoLicitacao" id="HabilitacaoLicitacao" />
-                            <label for="HabilitacaoLicitacao">HABLIC - Habilitação da Licitação</label><br>
-
-                            <input type="checkbox" value="JulgamentoLicitacao" id="JulgamentoLicitacao" />
-                            <label for="JulgamentoLicitacao">JULGLIC - Julgamento da Licitação</label><br>
-
-                            <input type="checkbox" value="HomologacaoLicitacao" id="HomologacaoLicitacao" />
-                            <label for="HomologacaoLicitacao">HOMOLIC - Homologação da Licitação</label><br>
-
-                            <input type="checkbox" value="ParecerLicitacao" id="ParecerLicitacao" />
-                            <label for="ParecerLicitacao">PARELIC - Parecer da Licitação</label><br>
-
-                            <input type="checkbox" value="AdesaoRegistroPrecos" id="AdesaoRegistroPrecos" />
-                            <label for="AdesaoRegistroPrecos">REGADESAO - Adesão a Registro de Preços</label><br>
-
-                            <input type="checkbox" value="DispensaInexigibilidade" id="DispensaInexigibilidade" />
-                            <label for="DispensaInexigibilidade">DISPENSA - Dispensa ou Inexigibilidade</label><br>
 
                             <input type="checkbox" value="Contratos" id="Contratos" />
                             <label for="Contratos">CONTRATOS - Contratos</label><br>
@@ -192,17 +145,21 @@ $anoUsu = db_getsession("DB_anousu");
 
                             <input type="checkbox" value="ContasBancarias" id="ContasBancarias" />
                             <label for="ContasBancarias">CTB - Contas Bancárias</label><br>
-                            <input type="checkbox" value="Caixa" id="Caixa" />
-                            <label for="Caixa">CAIXA - Caixa</label><br>
-
+                            
                             <? if (db_getsession("DB_anousu") >= 2022) {?>
 
                                 <input type="checkbox" value="ConciliacaoBancaria" id="ConciliacaoBancaria" />
                                 <label for="ConciliacaoBancaria">CONCIBANC - Conciliação Bancária</label><br>
-                            <? } ?>
+                            <? } ?>         
 
-                        </td>
-                        <td style="border: 2px groove white; padding-right:10px;" valign="top">
+                            <input type="checkbox" value="Caixa" id="Caixa" />
+                            <label for="Caixa">CAIXA - Caixa</label><br>
+
+                            <? if (db_getsession("DB_anousu") >= 2019) {?>
+
+                                <input type="checkbox" value="ContaUnicadoTesouroMunicipal" id="ContaUnicadoTesouroMunicipal" />
+                                <label for="ContaUnicadoTesouroMunicipal">CUTE - Conta Única do Tesouro Municipal</label><br>
+                            <? } ?>
 
                             <input type="checkbox" value="DetalhamentoEmpenhosMes" id="DetalhamentoEmpenhosMes" />
                             <label for="DetalhamentoEmpenhosMes">EMP - Detalhamento dos Empenhos do Mês</label><br>
@@ -219,6 +176,62 @@ $anoUsu = db_getsession("DB_anousu");
                             <input type="checkbox" value="DetalhamentoAnulacao" id="DetalhamentoAnulacao" />
                             <label for="DetalhamentoAnulacao">ALQ - Detalha. da Anulação da liq. da despesa</label><br>
 
+                            <? if (db_getsession("DB_anousu") < 2014) {?>
+
+                                <input type="checkbox" value="DecretoMunicipal" id="DecretoMunicipal" />
+                                <label for="DecretoMunicipal">Decreto Municipal Regulamentador do Pregão</label><br>
+
+                            <? } ?>
+
+                            <? if (db_getsession("DB_anousu") < 2025) {?>
+                                <input type="checkbox" value="LegislacaoMunicipalLicitacao" id="LegislacaoMunicipalLicitacao" />
+                                <label for="LegislacaoMunicipalLicitacao">REGLIC - Legislação Municipal para Licitação</label><br>
+
+                                <input type="checkbox" value="AberturaLicitacao" id="AberturaLicitacao" />
+                                <label for="AberturaLicitacao">ABERLIC - Abertura da Licitação</label><br>
+
+                                <input type="checkbox" value="ResponsaveisLicitacao" id="ResponsaveisLicitacao" />
+                                <label for="ResponsaveisLicitacao">RESPLIC - Responsáveis pela Licitação</label><br>
+
+                                <input type="checkbox" value="ParticipantesLicitacao" id="ParticipantesLicitacao" />
+                                <label for="ParticipantesLicitacao">PARTLIC - Participantes da Licitação</label><br>
+
+                                <input type="checkbox" value="HabilitacaoLicitacao" id="HabilitacaoLicitacao" />
+                                <label for="HabilitacaoLicitacao">HABLIC - Habilitação da Licitação</label><br>
+
+                                <input type="checkbox" value="JulgamentoLicitacao" id="JulgamentoLicitacao" />
+                                <label for="JulgamentoLicitacao">JULGLIC - Julgamento da Licitação</label><br>
+
+                            <? } ?>
+                          
+                        </td>
+                        <td style="border: 2px groove white; padding-right:10px;" valign="top">
+
+                            <? if (db_getsession("DB_anousu") < 2025) {?>
+                                <input type="checkbox" value="Pessoa" id="Pessoa" />
+                                <label for="Pessoa">PESSOA - Pessoas Físicas e Jurídicas</label><br>
+                            <? } ?>
+
+                            <? if (db_getsession("DB_anousu") < 2025) {?>
+                                <input type="checkbox" value="DividaConsolidada" id="DividaConsolidada" />
+                                <label for="DividaConsolidada">DDC - Dívida Consolidada</label><br>
+                                
+                                <input type="checkbox" value="HomologacaoLicitacao" id="HomologacaoLicitacao" />
+                                <label for="HomologacaoLicitacao">HOMOLIC - Homologação da Licitação</label><br>
+
+                                <input type="checkbox" value="ParecerLicitacao" id="ParecerLicitacao" />
+                                <label for="ParecerLicitacao">PARELIC - Parecer da Licitação</label><br>
+
+                                <input type="checkbox" value="AdesaoRegistroPrecos" id="AdesaoRegistroPrecos" />
+                                <label for="AdesaoRegistroPrecos">REGADESAO - Adesão a Registro de Preços</label><br>
+
+                                <input type="checkbox" value="DispensaInexigibilidade" id="DispensaInexigibilidade" />
+                                <label for="DispensaInexigibilidade">DISPENSA - Dispensa ou Inexigibilidade</label><br>
+
+                                <input type="checkbox" value="Item" id="Item" />
+                                <label for="Item">ITEM - Item das Lic. etc.</label><br>
+                            <? } ?>
+
                             <input type="checkbox" value="DetalhamentoExtraOrcamentarias" id="DetalhamentoExtraOrcamentarias" />
                             <label for="DetalhamentoExtraOrcamentarias">EXT - Detalhamento das Extra-Orçamentárias</label><br>
 
@@ -227,7 +240,6 @@ $anoUsu = db_getsession("DB_anousu");
 
                             <input type="checkbox" value="PagamentosDespesas" id="PagamentosDespesas" />
                             <label for="PagamentosDespesas">OPS - Pagamentos das Despesas</label><br>
-
                             <input type="checkbox" value="AnulacoesOrdensPagamento" id="AnulacoesOrdensPagamento" />
                             <label for="AnulacoesOrdensPagamento">AOP - Anulações das Ordens de Pagamento</label><br>
 
@@ -242,9 +254,6 @@ $anoUsu = db_getsession("DB_anousu");
 
                             <input type="checkbox" value="CadastroVeiculos" id="CadastroVeiculos" />
                             <label for="CadastroVeiculos">CVC - Cadastro de Veículos ou Equipamentos</label><br>
-
-                            <input type="checkbox" value="DividaConsolidada" id="DividaConsolidada" />
-                            <label for="DividaConsolidada">DDC - Dívida Consolidada</label><br>
 
                             <input type="checkbox" value="ProjecaoAtuarial" id="ProjecaoAtuarial" />
                             <label for="ProjecaoAtuarial">PARPPS - Projeção Atuarial do RPPS</label><br>
@@ -288,10 +297,12 @@ $anoUsu = db_getsession("DB_anousu");
                                 <input type="checkbox" value="SuperavitFinanceiro" id="SuperavitFinanceiro" />
                                 <label for="SuperavitFinanceiro">Superavit Financeiro</label><br>
                             <? } ?>
-                            <? if (db_getsession("DB_anousu") >= 2019) {?>
+                            
 
-                                <input type="checkbox" value="ContaUnicadoTesouroMunicipal" id="ContaUnicadoTesouroMunicipal" />
-                                <label for="ContaUnicadoTesouroMunicipal">CUTE - Conta Única do Tesouro Municipal</label><br>
+                            <? if (db_getsession("DB_anousu") > 2024) {?>
+
+                                <input type="checkbox" value="PrevisaoReceitasOperacoesCredito" id="PrevisaoReceitasOperacoesCredito" />
+                                <label for="PrevisaoReceitasOperacoesCredito">PROC - Previsão das Receitas de Operações de Crédito</label><br>
                             <? } ?>
 
                         </td>

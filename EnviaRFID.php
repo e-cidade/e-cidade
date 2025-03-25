@@ -121,7 +121,7 @@ function enviaDadosRFid($oParam)
         $bens = array('data' => $arraybensjson, 'PlacaAnterior' => $oParam->t41_placa, 'Descricao' => $oParam->t52_descr);
         $curl = curl_init();
         curl_setopt_array($curl, array(
-          CURLOPT_URL => 'https://teste.aplicartecnologia.com.br/webservice/add/bem?a=a',
+          CURLOPT_URL => 'https://cmbh.aplicartecnologia.com.br/ws/add/bem?a=a',
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => '',
           CURLOPT_MAXREDIRS => 10,
@@ -199,7 +199,7 @@ function enviaDadosRFid($oParam)
 
         $curl = curl_init();
         curl_setopt_array($curl, array(
-          CURLOPT_URL => 'https://teste.aplicartecnologia.com.br/ws/add/baixa',
+          CURLOPT_URL => 'https://cmbh.aplicartecnologia.com.br/ws/add/baixa',
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => '',
           CURLOPT_MAXREDIRS => 10,
@@ -303,7 +303,7 @@ function enviaDadosRFid($oParam)
           $bens = array('data' => $arraybensjson, 'PlacaAnterior' => $oBens->t214_placabem, 'Descricao' => $oBens->t214_descbem);
           $curl = curl_init();
           curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://teste.aplicartecnologia.com.br/webservice/add/bem?a=a',
+            CURLOPT_URL => 'https://cmbh.aplicartecnologia.com.br/ws/add/bem?a=a',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -379,7 +379,7 @@ function enviaDadosRFid($oParam)
 
           $curl = curl_init();
           curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://teste.aplicartecnologia.com.br/ws/add/baixa',
+            CURLOPT_URL => 'https://cmbh.aplicartecnologia.com.br/ws/add/baixa',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,

@@ -28,38 +28,81 @@
 //MODULO: veiculos
 $clveiccadcomb->rotulo->label();
 ?>
-<form name="form1" method="post" action="">
+
 <center>
-<table border="0">
-  <tr>
-    <td nowrap title="<?=@$Tve26_codigo?>">
-       <?=@$Lve26_codigo?>
-    </td>
-    <td>
-<?
-db_input('ve26_codigo',10,$Ive26_codigo,true,'text',3,"")
-?>
-    </td>
-  </tr>
-  <tr>
-    <td nowrap title="<?=@$Tve26_descr?>">
-       <?=@$Lve26_descr?>
-    </td>
-    <td>
-<?
-db_input('ve26_descr',40,$Ive26_descr,true,'text',$db_opcao,"")
-?>
-    </td>
-  </tr>
-  </table>
-  </center>
-<input name="<?=($db_opcao==1?"incluir":($db_opcao==2||$db_opcao==22?"alterar":"excluir"))?>" type="submit" id="db_opcao" value="<?=($db_opcao==1?"Incluir":($db_opcao==2||$db_opcao==22?"Alterar":"Excluir"))?>" <?=($db_botao==false?"disabled":"")?> >
-<input name="pesquisar" type="button" id="pesquisar" value="Pesquisar" onclick="js_pesquisa();" >
+<form id="form1" name="form1" method="post" action="">
+<fieldset style="width: 700px; margin-top: 30px">
+  <legend>Combustiveis</legend>           
+  <div class="row">
+    <div class="col-4 form-group">
+    <b>Código do Combustível:</b> 
+    <?
+      db_input('ve26_codigo',10,$Ive26_codigo,true,'text',3,"",'','','',null,'form-control')
+    ?>
+    </div>    
+    
+    <div class="col-8 form-group">
+    <b> Descrição do Combustível: </b> 
+    <?
+      db_input('ve26_descr',40,$Ive26_descr,true,'text',$db_opcao,"",'','','',null,'form-control')
+    ?>
+    </div>  
+
+  </div>     
+
+  <div style="margin-top: 10px;" class="row">
+  <div class="col-4 form-group">
+
+  <b> Combustível Padrão SICOM: </b> 
+   <?php 
+    $opcoesCombustivel = array("0" => "Selecione", "01" => "ALCOOL", "02" => "GASOLINA", "03" => "GAS","04" => "DIESEL");
+   db_select("ve26_combustivelsicom", $opcoesCombustivel, true, $db_opcao,"class='custom-select'");
+   ?>
+     </div>  
+
+  </div>  
+
+  </fieldset>
+  <div>
+  <?php
+
+          $messageButton = ($db_opcao==1?"Incluir":($db_opcao==2||$db_opcao==22?"Alterar":"Excluir"));
+          $nameButton = ($db_opcao==1?"incluir":($db_opcao==2||$db_opcao==22?"alterar":"excluir"));
+
+                $component->render('buttons/solid', [
+                'type' => 'submit',
+                'designButton' => 'success',
+                'size' => 'sm',
+                'message' => $messageButton,
+                'name' => $nameButton,
+                'id' => 'acao',
+                ]);
+
+              $component->render('buttons/solid', [
+                'type' => 'button',
+                'designButton' => 'primary',
+                'size' => 'sm',
+                'onclick' => 'js_pesquisa();',
+                'message' => "Pesquisar",
+                'value' => 'Pesquisar',
+                'name' => $nameButton,
+                ]);
+                
+                ?>
+
+
+  </div>
+
+</center>
+
 </form>
+
 <script>
+
 function js_pesquisa(){
   js_OpenJanelaIframe('CurrentWindow.corpo','db_iframe_veiccadcomb','func_veiccadcomb.php?funcao_js=parent.js_preenchepesquisa|ve26_codigo','Pesquisa',true);
 }
+
 function js_preenchepesquisa(chave){
   db_iframe_veiccadcomb.hide();
   <?
@@ -68,4 +111,9 @@ function js_preenchepesquisa(chave){
   }
   ?>
 }
+
+if(document.getElementById('acao').name != "incluir" && document.getElementById('ve26_codigo').value == ""){
+  js_pesquisa();
+}
+
 </script>

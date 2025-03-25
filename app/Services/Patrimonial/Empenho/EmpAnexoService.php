@@ -3,7 +3,7 @@
 namespace App\Services\Patrimonial\Empenho;
 
 use App\Repositories\Patrimonial\EmpAnexoRepository;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 use Exception;
 
 class EmpAnexoService
@@ -35,7 +35,7 @@ class EmpAnexoService
      * Atualiza informações do Anexo
      *
      * @param int $iSequencialEmpAnexo - Sequencial do Anexo
-     * @param array $aDadosEmpAnexo - Dados do Anexo 
+     * @param array $aDadosEmpAnexo - Dados do Anexo
      * @return bool
      */
 

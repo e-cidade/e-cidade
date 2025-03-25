@@ -294,7 +294,7 @@ if(isset($alterar)){
     for ($i = 0; $i < $count; $i++) {
 
             $item = array(
-              "ve63_descr" => $itemDescricoes[$i],
+              "ve63_descr" => substr($itemDescricoes[$i], 0, 50),
               "ve63_quant" => $itemQuantidades[$i],
               "ve63_vlruni" => $itemValores[$i]
             );

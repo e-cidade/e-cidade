@@ -864,5 +864,53 @@ class cl_placaixarec {
     }
     return $sql;
  }
+
+ function sql_query_placaixarec_lancamento($k81_seqpla=null,$campos="*",$ordem=null,$dbwhere="") {
+  $sql = "select ";
+    if($campos != "*" ){
+      $campos_sql = explode("#",$campos);
+      $virgula = "";
+      for($i=0;$i<sizeof($campos_sql);$i++){
+        $sql .= $virgula.$campos_sql[$i];
+        $virgula = ",";
+      }
+    }else{
+      $sql .= $campos;
+    }
+    $sql .= " from placaixarec ";
+    $sql .= "      inner join tabrec on tabrec.k02_codigo = placaixarec.k81_receita";
+    $sql .= "      inner join taborc on taborc.k02_codigo     = tabrec.k02_codigo";
+    $sql2 = "";
+    if($dbwhere==""){
+      if($k81_seqpla!=null ){
+        $sql2 .= " where placaixarec.k81_seqpla = $k81_seqpla ";
+      }
+    }else if($dbwhere != ""){
+      $sql2 = " where $dbwhere";
+    }
+    $sql .= $sql2;
+    if($ordem != null ){
+      $sql .= " order by ";
+      $campos_sql = explode("#",$ordem);
+      $virgula = "";
+      for($i=0;$i<sizeof($campos_sql);$i++){
+        $sql .= $virgula.$campos_sql[$i];
+        $virgula = ",";
+      }
+    }
+    return $sql;
+ }
+
+  function validateArrecadacoesByConvenio($k81_convenio) {
+
+    $sqlArrecadacoes = 'SELECT * FROM placaixarec WHERE k81_convenio = ' . $k81_convenio;
+    $aArrecadacoes = pg_fetch_all(db_query($sqlArrecadacoes));
+
+    if(!empty($aArrecadacoes)) {
+      return $aArrecadacoes;
+    }
+    
+    return null;
+  }
 }
 ?>

@@ -96,7 +96,7 @@ if(isset($nao_lancados)){
   $dbwhere .= " and r54_instit = ".db_getsession('DB_instit')." and r54_lancad = 'f' ";
 }
 
-$sCamposMovRelDados = "r54_codrel,r54_codeve,r54_regist,z01_nome,r54_quant1,r54_quant2,r54_quant3,r54_lancad,rh05_recis";
+$sCamposMovRelDados = "r54_codrel,r54_codeve,r54_regist,z01_nome,r54_quant1,r54_quant4,r54_quant2,r54_quant5,r54_quant3,r54_quant6,r54_lancad,rh05_recis";
 $sOrdemMovRelDados  = "r54_lancad,z01_nome";
 $sWhereMovRelDados  = "r54_anomes = '".$ano.$mes."' $dbwhere";
 $sSqlMovRelDados    = $clmovrel->sql_query_dados(null, $sCamposMovRelDados, $sOrdemMovRelDados, $sWhereMovRelDados, $ano, $mes);
@@ -107,7 +107,7 @@ if($numrows_dados == 0){
   db_redireciona('db_erros.php?fechar=true&db_erro=Não existem dados importados no período de '.$mes.' / '.$ano);
 }
 
-$pdf = new PDF(); 
+$pdf = new PDF("L"); 
 $pdf->Open(); 
 $pdf->AliasNbPages(); 
 $pdf->setfillcolor(235);
@@ -117,21 +117,27 @@ $alt = 4;
 
 $total_reg = 0;
 $total_qt1 = 0;
+$total_qt4 = 0;
 $total_qt2 = 0;
+$total_qt5 = 0;
 $total_qt3 = 0;
+$total_qt6 = 0;
 
 for($i = 0; $i < $numrows_dados;$i++){
   db_fieldsmemory($result_dados,$i);
   if($pdf->gety() > $pdf->h - 30 || $troca != 0 ){
     $pdf->addpage();
     $pdf->setfont('arial','b',8);
-    $pdf->cell(15,$alt,$RLr54_codrel,1,0,"C",1);
-    $pdf->cell(15,$alt,$RLr54_codeve,1,0,"C",1);
-    $pdf->cell(18,$alt,$RLr54_regist,1,0,"C",1);
-    $pdf->cell(60,$alt,$RLz01_nome  ,1,0,"C",1);
-    $pdf->cell(15,$alt,$RLr54_quant1,1,0,"C",1);
-    $pdf->cell(15,$alt,$RLr54_quant2,1,0,"C",1);
-    $pdf->cell(15,$alt,$RLr54_quant3,1,0,"C",1);
+    $pdf->cell(20,$alt,$RLr54_codrel,1,0,"C",1);
+    $pdf->cell(20,$alt,$RLr54_codeve,1,0,"C",1);
+    $pdf->cell(20,$alt,$RLr54_regist,1,0,"C",1);
+    $pdf->cell(75,$alt,$RLz01_nome  ,1,0,"C",1);
+    $pdf->cell(17,$alt,"Vlr. Rub 1",1,0,"C",1);
+    $pdf->cell(17,$alt,"Qtd. Rub 1",1,0,"C",1);
+    $pdf->cell(17,$alt,"Vlr. Rub 2",1,0,"C",1);
+    $pdf->cell(17,$alt,"Qtd. Rub 2",1,0,"C",1);
+    $pdf->cell(17,$alt,"Vlr. Rub 3",1,0,"C",1);
+    $pdf->cell(17,$alt,"Qtd. Rub 3",1,0,"C",1);
     $pdf->cell(15,$alt,$RLr54_lancad,1,0,"C",1);
     $pdf->cell(25,$alt,$RLrh05_recis,1,1,"C",1);
     $troca = 0;
@@ -144,26 +150,35 @@ for($i = 0; $i < $numrows_dados;$i++){
   }
 
   $pdf->setfont('arial','',7);
-  $pdf->cell(15,$alt,$r54_codrel,1,0,"C",0);
-  $pdf->cell(15,$alt,$r54_codeve,1,0,"C",0);
-  $pdf->cell(18,$alt,$r54_regist,1,0,"C",0);
-  $pdf->cell(60,$alt,$z01_nome  ,1,0,"L",0);
-  $pdf->cell(15,$alt,db_formatar($r54_quant1,"f"),1,0,"R",0);
-  $pdf->cell(15,$alt,db_formatar($r54_quant2,"f"),1,0,"R",0);
-  $pdf->cell(15,$alt,db_formatar($r54_quant3,"f"),1,0,"R",0);
+  $pdf->cell(20,$alt,$r54_codrel,1,0,"C",0);
+  $pdf->cell(20,$alt,$r54_codeve,1,0,"C",0);
+  $pdf->cell(20,$alt,$r54_regist,1,0,"C",0);
+  $pdf->cell(75,$alt,$z01_nome  ,1,0,"L",0);
+  $pdf->cell(17,$alt,db_formatar($r54_quant1,"f"),1,0,"R",0);
+  $pdf->cell(17,$alt,db_formatar($r54_quant4,"f"),1,0,"R",0);
+  $pdf->cell(17,$alt,db_formatar($r54_quant2,"f"),1,0,"R",0);
+  $pdf->cell(17,$alt,db_formatar($r54_quant5,"f"),1,0,"R",0);
+  $pdf->cell(17,$alt,db_formatar($r54_quant3,"f"),1,0,"R",0);
+  $pdf->cell(17,$alt,db_formatar($r54_quant6,"f"),1,0,"R",0);
   $pdf->cell(15,$alt,$r54_lancad,1,0,"C",0);
   $pdf->cell(25,$alt,db_formatar($rh05_recis,"d"),1,1,"C",0);
 
   $total_reg ++;
   $total_qt1 += $r54_quant1;
+  $total_qt4 += $r54_quant4;
   $total_qt2 += $r54_quant2;
+  $total_qt5 += $r54_quant5;
   $total_qt3 += $r54_quant3;
+  $total_qt6 += $r54_quant6;
 }
 $pdf->ln(1);
-$pdf->cell(108,$alt,'Quantidade total  :  ',"TB",0,"L",1);
-$pdf->cell(15,$alt,db_formatar($total_qt1,"f"),"TB",0,"R",1);
-$pdf->cell(15,$alt,db_formatar($total_qt2,"f"),"TB",0,"R",1);
-$pdf->cell(15,$alt,db_formatar($total_qt3,"f"),"TB",0,"R",1);
+$pdf->cell(135,$alt,'Quantidade total  :  ',"TB",0,"L",1);
+$pdf->cell(17,$alt,db_formatar($total_qt1,"f"),"TB",0,"R",1);
+$pdf->cell(17,$alt,db_formatar($total_qt4,"f"),"TB",0,"R",1);
+$pdf->cell(17,$alt,db_formatar($total_qt2,"f"),"TB",0,"R",1);
+$pdf->cell(17,$alt,db_formatar($total_qt5,"f"),"TB",0,"R",1);
+$pdf->cell(17,$alt,db_formatar($total_qt3,"f"),"TB",0,"R",1);
+$pdf->cell(17,$alt,db_formatar($total_qt6,"f"),"TB",0,"R",1);
 $pdf->cell(40,$alt,"","TB",1,"C",1);
 $pdf->ln(1);
 $pdf->cell(193,$alt,'Total de registros  :  '.$total_reg,"T",1,"L",0);

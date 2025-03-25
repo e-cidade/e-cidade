@@ -141,6 +141,7 @@ class cl_cgs_und {
    var $z01_codigoibgenasc = null;
    var $z01_i_codocupacao = null;
    var $z01_b_inativo = false;
+    var $z01_i_numtfd = null;
    // cria propriedade com as variaveis do arquivo
    var $campos = "
                  z01_i_cgsund = int4 = CGS
@@ -221,6 +222,7 @@ class cl_cgs_und {
                  z01_d_datapais = date = Data Entrada
                  z01_d_dtemissaocnh = date = Data de Emissão
                  z01_codigoibge = varchar(50) = Código IBGE
+                 z01_i_numtfd = int8 = Número TDF
                  ";
    //funcao construtor da classe
    function cl_cgs_und() {
@@ -410,6 +412,7 @@ class cl_cgs_und {
        $this->z01_codigoibgenasc = ($this->z01_codigoibgenasc == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_codigoibgenasc"]:$this->z01_codigoibgenasc);
        $this->z01_i_codocupacao = ($this->z01_i_codocupacao == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_i_codocupacao"]:$this->z01_i_codocupacao);
        $this->z01_b_inativo = ($this->z01_b_inativo == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_b_inativo"]:$this->z01_b_inativo);
+       $this->z01_i_numtfd = ($this->z01_i_numtfd == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_i_numtfd"]:$this->z01_i_numtfd);
      }else{
        $this->z01_i_cgsund = ($this->z01_i_cgsund == ""?@$GLOBALS["HTTP_POST_VARS"]["z01_i_cgsund"]:$this->z01_i_cgsund);
      }
@@ -552,7 +555,7 @@ class cl_cgs_und {
      if($this->z01_d_dtemissaocnh == null ){
        $this->z01_d_dtemissaocnh = "null";
      }
-if($this->z01_i_cgm == null ){
+     if($this->z01_i_cgm == null ){
        $this->z01_i_cgm = "null";
      }
      if($this->z01_i_cge == null ){
@@ -614,6 +617,9 @@ if($this->z01_i_cgm == null ){
      if($this->z01_b_inativo == null ){
        $this->z01_b_inativo = "null";
      }
+       if($this->z01_i_numtfd == null ){
+           $this->z01_i_numtfd = "null";
+       }
        $this->z01_i_cgsund = $z01_i_cgsund;
      if(($this->z01_i_cgsund == null) || ($this->z01_i_cgsund == "") ){
        $this->erro_sql = " Campo z01_i_cgsund não declarado.";
@@ -702,6 +708,7 @@ if($this->z01_i_cgm == null ){
                                       ,z01_d_datapais
                                       ,z01_d_dtemissaocnh
                                       ,z01_codigoibge
+                                      ,z01_i_numtfd
                        )
                 values (
                                 $this->z01_i_cgsund
@@ -782,6 +789,7 @@ if($this->z01_i_cgm == null ){
                                ,".($this->z01_d_datapais == "null" || $this->z01_d_datapais == ""?"null":"'".$this->z01_d_datapais."'")."
                                ,".($this->z01_d_dtemissaocnh == "null" || $this->z01_d_dtemissaocnh == ""?"null":"'".$this->z01_d_dtemissaocnh."'")."
                                ,'$this->z01_codigoibge'
+                               ,$this->z01_i_numtfd
                       )";
      $result = db_query($sql);
      if($result==false){
@@ -1457,6 +1465,12 @@ if($this->z01_i_cgm == null ){
        $sql  .= $virgula." z01_codigoibge = '$this->z01_codigoibge' ";
        $virgula = ",";
      }
+     if(!empty($this->z01_i_numtfd)){
+         $sql  .= $virgula." z01_i_numtfd = '$this->z01_i_numtfd' ";
+     }
+       if($this->z01_i_numtfd == null ){
+           $this->z01_i_numtfd = "null";
+       }
      $sql .= " where ";
      if($z01_i_cgsund!=null){
        $sql .= " z01_i_cgsund = $this->z01_i_cgsund";
@@ -1683,7 +1697,8 @@ if($this->z01_i_cgm == null ){
                                       z01_i_cgm,
                                       z01_i_cge,
                                       z01_i_cidadao,
-                                      z01_b_inativo)
+                                      z01_b_inativo,
+                                      z01_i_numtfd)
                           VALUES(
                                       $this->z01_i_cgsund,
                                       ".($this->z01_b_faleceu == "" ? "FALSE":"TRUE").",
@@ -1698,7 +1713,8 @@ if($this->z01_i_cgm == null ){
                                       ".(empty($this->z01_i_cgm) ? 'null' : "'".$this->z01_i_cgm."'").",
                                       ".(empty($this->z01_i_cge) ? 'null' : "'".$this->z01_i_cge."'").",
                                       ".(empty($this->z01_i_cidadao) ? 'null' : "'".$this->z01_i_cidadao."'").",
-                                      ".($this->z01_b_inativo == "" ? "FALSE":"TRUE")."
+                                      ".($this->z01_b_inativo == "" ? "FALSE":"TRUE").",
+                                      $this->z01_i_numtfd
                           )";
 
     $result2 = db_query($sql2);

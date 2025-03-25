@@ -6,12 +6,12 @@ use App\Domain\Financeiro\Contabilidade\ContaPlanoReduz;
 use App\Models\Financeiro\Contabilidade\ConPlanoReduz;
 use App\Repositories\Financeiro\Contabilidade\ContaPlanoReduzRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class ContaPlanoReduzRepository implements ContaPlanoReduzRepositoryInterface
 {
     private ConPlanoReduz $model;
-   
+
     public function __construct()
     {
         $this->model = new ConPlanoReduz;
@@ -19,8 +19,8 @@ class ContaPlanoReduzRepository implements ContaPlanoReduzRepositoryInterface
 
 
     public function saveByContaPlanoReduz(ContaPlanoReduz $dadosContaPlanoReduz): ?ConPlanoReduz
-    { 
-        
+    {
+
         $dados = [
             "c61_codcon"                  => $dadosContaPlanoReduz->getC61Codcon(),
             "c61_anousu"                  => $dadosContaPlanoReduz->getC61Anousu(),
@@ -29,9 +29,9 @@ class ContaPlanoReduzRepository implements ContaPlanoReduzRepositoryInterface
             "c61_codigo"                  => $dadosContaPlanoReduz->getC61Codigo(),
             "c61_contrapartida"           => $dadosContaPlanoReduz->getC61Contrapartida(),
             "c61_codtce"                  => $dadosContaPlanoReduz->getC61Codtce(),
-        
+
         ];
-        
+
         return $this->model->create($dados);
     }
 
@@ -66,10 +66,9 @@ class ContaPlanoReduzRepository implements ContaPlanoReduzRepositoryInterface
         if (!empty($result) && isset($result[0]->new_value)) {
             return true;
         }
-    
-        return false;   
+
+        return false;
     }
 
 
 }
- 

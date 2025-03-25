@@ -4,7 +4,7 @@ namespace App\Services\Patrimonial\Orcamento;
 
 use App\Services\Patrimonial\Orcamento\PcOrcamService;
 use App\Services\Patrimonial\Orcamento\PcOrcamValService;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 use Exception;
 use DBString;
 

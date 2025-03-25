@@ -1160,7 +1160,7 @@ ob_start();
                     if ($receita[1] == 'title') {
                         echo "";
                     } else {
-                        $totalIBI=$nTotalReceita;
+                        $totalITBI=$nTotalReceita;
                         echo db_formatar(abs($nTotalReceita), "f");
                     }
                     echo "    </td>";

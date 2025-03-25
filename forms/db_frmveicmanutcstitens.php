@@ -960,10 +960,8 @@ db_app::load("estilos.css, grid.style.css");
                     oItem.descr = aCells[3].getValue();
                     oItem.quant = aCells[5].getValue();
                     oItem.quantUti = aCells[6].getValue();
-                    oItem.valor = aCells[7].getValue();
-                    retorno = oItem.valor.split(",");
-                    oItem.valor = retorno[0] + "." + retorno[1];
-                    oItem.precoTo = aCells[8].getValue();
+                    oItem.valor = aCells[7].getValue().replace('.', '').replace(',', '.');
+                    oItem.precoTo = aCells[8].getValue().replace('.', '').replace(',', '.');
 
                     if (oItem.quantUti == "") {
                         op = 1;
@@ -982,32 +980,8 @@ db_app::load("estilos.css, grid.style.css");
                         oItem.descr = aCells[3].getValue();
                         oItem.quant = aCells[5].getValue();
                         oItem.quantUti = aCells[6].getValue();
-                        oItem.valor = aCells[7].getValue();
-                        oItem.precoTo = aCells[8].getValue();
-
-                        retorno = oItem.valor.split(",");
-                        if (retorno[1] == 00) {
-                            oItem.valor = retorno[0];
-                            retorno = oItem.valor.split(".");
-                            if (retorno[1] == undefined) {
-                                oItem.valor = retorno[0];
-                            } else {
-                                oItem.valor = retorno[0] + "" + retorno[1];
-                            }
-                        } else {
-                            valor = retorno[0];
-                            retorno1 = valor.split(".");
-                            if (retorno1[1] == undefined) {
-                                oItem.valor = valor + "." + retorno[1];
-                            } else {
-                                valor = retorno1[0] + "" + retorno1[1];
-                                oItem.valor = valor + "." + retorno[1];
-                            }
-
-
-
-
-                        }
+                        oItem.valor = aCells[7].getValue().replace('.', '').replace(',', '.');
+                        oItem.precoTo = aCells[8].getValue().replace('.', '').replace(',', '.');
 
                         itens.push({ descr: oItem.descr, quantUti: oItem.quantUti, valor: oItem.valor, precoTo: oItem.precoTo, item: oItem.item })
                     }
@@ -1467,7 +1441,7 @@ db_app::load("estilos.css, grid.style.css");
 
             js_divCarregando('Carregando itens lançados...', 'msgBox');
 
-            let oAjax = new Ajax.Request('ve1_veicmanut.RPC.php', {
+            let oAjax = new Ajax.Request('vei1_veicmanut.RPC.php', {
                 method: 'post',
                 asynchronous: false,
                 parameters: 'json=' + Object.toJSON(oParametros),
@@ -1607,8 +1581,8 @@ db_app::load("estilos.css, grid.style.css");
         let valorTotal = 0;
 
         for(i = 0; i < itens.length; i++){
-            valorItem = parseFloat(itens[i].value.replace('.', '').replace(',', '.'));
-            valorTotal = valorItem + valorTotal;
+            valorItem = Number(itens[i].value);
+            valorTotal = valorItem + valorTotal;            
         }
 
         document.form1.ve62_valor.value = valorTotal.toFixed(2);

@@ -1,83 +1,134 @@
-.solid {
+.solid-SG136 {
     border: none;
     transition: background-color 0.3s, transform 0.2s;
 }
 
-.solid:focus {
+.solid-SG136:focus {
     outline: 2px solid #333;
     outline-offset: 2px;
 }
 
-.solid:active {
+.solid-SG136:active {
     transform: scale(0.95);
 }
 
-.solid.primary {
+.solid-SG136.disabled:active {
+    transform: scale(0);
+}
+
+.solid-SG136.primary-SG136 {
     background-color: #007bff;
     color: white;
 }
 
-.solid.primary:hover {
+.solid-SG136.primary-SG136:hover {
     background-color: #0056b3;
 }
 
-.solid.secondary {
+.solid-SG136.disabled.primary-SG136 {
+    background-color: #007bff48;
+}
+
+.solid-SG136.disabled.primary-SG136:hover {
+    background-color: #007bff48;
+}
+
+.solid-SG136.secondary-SG136 {
     background-color: #6c757d;
     color: white;
 }
 
-.solid.secondary:hover {
+.solid-SG136.secondary-SG136:hover {
     background-color: #5a6268;
 }
 
-.solid.success {
+.solid-SG136.disabled.secondary-SG136 {
+    background-color: #6c757d4b;
+}
+
+.solid-SG136.disabled.secondary-SG136:hover {
+    background-color: #6c757d4b;
+}
+
+.solid-SG136.success-SG136 {
     background-color: #28a745;
     color: white;
 }
 
-.solid.success:hover {
+.solid-SG136.success-SG136:hover {
     background-color: #218838;
 }
 
-.solid.danger {
+.solid-SG136.disabled.success-SG136 {
+    background-color: #28a7456e;
+}
+
+.solid-SG136.disabled.success-SG136:hover {
+    background-color: #28a7456e;
+}
+
+.solid-SG136.danger-SG136 {
     background-color: #dc3545;
     color: white;
 }
 
-.solid.danger:hover {
+.solid-SG136.danger-SG136:hover {
     background-color: #c82333;
 }
 
-.solid.warning {
+.solid-SG136.disabled.danger-SG136 {
+    background-color: #dc35464f;
+}
+
+.solid-SG136.disabled.danger-SG136:hover {
+    background-color: #dc35464f;
+}
+
+.solid-SG136.warning-SG136 {
     background-color: #ffc107;
     color: black;
 }
 
-.solid.warning:hover {
+.solid-SG136.warning-SG136:hover {
     background-color: #e0a800;
 }
 
-.solid.info {
+.solid-SG136.disabled.warning-SG136 {
+    background-color: #e0a80041;
+}
+
+.solid-SG136.disabled.warning-SG136:hover {
+    background-color: #e0a80041;
+}
+
+.solid-SG136.info-SG136 {
     background-color: #17a2b8;
     color: white;
 }
 
-.solid.info:hover {
+.solid-SG136.info-SG136:hover {
     background-color: #138496;
 }
 
-.solid.disabled {
-    background-color: #6c757d;
+.solid-SG136.disabled.info-SG136 {
+    background-color: #17a3b84b;
+}
+
+.solid-SG136.disabled.info-SG136:hover {
+    background-color: #17a3b84b;
+}
+
+.solid-SG136.disabled {
     color: white;
     cursor: not-allowed;
     transition: none !important;
 }
 
-.solid.disabled:focus {
+.solid-SG136.disabled:focus {
     outline: none !important;
     outline-offset: none !important;
 }
 
-.solid.disabled:active {
+.solid-SG136.disabled:active {
     transform: none !important;
 }

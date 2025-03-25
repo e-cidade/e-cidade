@@ -62,7 +62,7 @@ require_once(modification("classes/db_conlancamcompl_classe.php"));
 require_once(modification("classes/db_conlancamord_classe.php"));
 
 require_once(modification("classes/empenho.php"));
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 $clempnota         = new cl_empnota;
 $clempnotaele      = new cl_empnotaele;
 $clpagordem        = new cl_pagordem;
@@ -103,7 +103,7 @@ $tela_estorno = false;
 if ($e60_numemp){
   $db_opcao = 1;
   $db_botao = true;
-}  
+}
 
 ?>
 <html>

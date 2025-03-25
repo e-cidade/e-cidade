@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Traits\LegacyAccount;
 use DateTime;
 use Illuminate\Support\Collection;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class Notidebitos extends LegacyModel
 {

@@ -90,7 +90,7 @@ e-cidade            5432    pmgraomogol
 
 e-cidade            5432    pmburitizeiro
 
-e-cidade            5432    pmmonteazul
+pmmonteazul         5432    e-cidadev3-prod
 
 e-cidade            5432    pmmontalvania
 
@@ -123,7 +123,6 @@ cismesf                5432 e-cidadev3
 cias                   5432 e-cidadev3
 treinamento_consorcio  5432 e-cidadev3
 pmverdelandia          5432 e-cidadev3
-demoecidade            5432 e-cidadev3
 
 e-cidade            5432 pmmonteazulv3
 

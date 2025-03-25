@@ -28,7 +28,8 @@
 use App\Models\Acordo;
 use App\Models\AcordoItemDotacao;
 use App\Models\OrcDotacao;
-use Illuminate\Database\Capsule\Manager as DB;
+use App\Repositories\Contabilidade\OrcdotacaoRepository;
+use Illuminate\Support\Facades\DB;
 
 require_once("libs/db_stdlib.php");
 require_once("fpdf151/pdf.php");
@@ -63,6 +64,7 @@ $acordos = new Acordo();
 $orcamentosDotacoes = new OrcDotacao();
 
 $acordoItemDotacao = new AcordoItemDotacao();
+$orcadotacaoRepository = new OrcDotacaoRepository();
 
 if (!isset($oParam->somenteConsulta) && !$oParam->somenteConsulta) {
     $acordosDotacoesAnoOrigem = $acordos
@@ -113,14 +115,15 @@ if (!isset($oParam->somenteConsulta) && !$oParam->somenteConsulta) {
 
             // Inibir a inserção de dados duplicados no banco.
             if ($duplicados->isEmpty()) {
-                $dadosParaInserir[] = [
-                    'ac22_sequencial' => $acordoItemDotacao->getNextval(),
-                    'ac22_coddot' => $dadocru['dotacao'],
-                    'ac22_anousu' => (int) $oParam->anoDestino,
-                    'ac22_acordoitem' => $dadocru['acordoitem'],
-                    'ac22_valor' => $dadocru['valor'],
-                    'ac22_quantidade' => $dadocru['quantidade'],
-                ];
+                $oDotacaoAnoOrigem = $orcadotacaoRepository->getDotacaoAno($anoOrigem,$dadocru['dotacao']);
+                    $dadosParaInserir[] = [
+                        'ac22_sequencial' => $acordoItemDotacao->getNextval(),
+                        'ac22_coddot' => $orcadotacaoRepository->getDotacaoAnoDestino($oParam->anoDestino,$oDotacaoAnoOrigem->o58_codele,$oDotacaoAnoOrigem->o58_unidade,$oDotacaoAnoOrigem->o58_orgao,$oDotacaoAnoOrigem->o58_projativ,$oDotacaoAnoOrigem->o58_codigo,$oDotacaoAnoOrigem->o58_funcao,$oDotacaoAnoOrigem->o58_subfuncao,$oDotacaoAnoOrigem->o58_programa),
+                        'ac22_anousu' => (int) $oParam->anoDestino,
+                        'ac22_acordoitem' => $dadocru['acordoitem'],
+                        'ac22_valor' => $dadocru['valor'],
+                        'ac22_quantidade' => $dadocru['quantidade'],
+                    ];
             }
 
         }

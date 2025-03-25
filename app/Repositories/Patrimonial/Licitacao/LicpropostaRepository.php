@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Patrimonial\Licitacao;
 use App\Models\Patrimonial\Licitacao\Licproposta;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class LicpropostaRepository
 {
@@ -42,21 +42,21 @@ class LicpropostaRepository
                 FROM licproposta
                 INNER JOIN licpropostavinc ON licproposta.l224_codigo = licpropostavinc.l223_codigo
                 WHERE l223_fornecedor = $l223_fornecedor AND l223_liclicita = $l223_codigo ";
-                
-                
+
+
         return DB::select($sql);
     }
 
     public function getSequencial($l224_codigo,$l224_propitem)
     {
 
-       $sql = " SELECT 
+       $sql = " SELECT
                 l224_sequencial
                 FROM licproposta
-                WHERE l224_codigo = $l224_codigo 
+                WHERE l224_codigo = $l224_codigo
                 AND l224_propitem = $l224_propitem";
                 return DB::select($sql);
-               
+
     }
     public function getCriterio($l20_codigo)
     {
@@ -66,7 +66,7 @@ class LicpropostaRepository
                 FROM liclicita
                 WHERE l20_codigo = $l20_codigo";
                 return DB::select($sql);
-        
+
     }
 
     public function getLote($l20_codigo)

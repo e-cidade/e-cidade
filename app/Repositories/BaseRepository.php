@@ -5,7 +5,7 @@ namespace App\Repositories;
 use App\Repositories\Interfaces\EloquentRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 abstract class BaseRepository implements EloquentRepositoryInterface
 {

@@ -8,35 +8,87 @@
 /* Container */
 .container {
   width: 100%;
-  padding-right: 15px;
-  padding-left: 15px;
   margin-right: auto;
   margin-left: auto;
+  margin-top: 25px !important;
+  margin-bottom: 50px !important;
+  background-color: #FFFFFF;
+  padding: 20px;
+  max-width: 100%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+body {
+  background-color: #CCCCCC;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.tdleft {
+  text-align: left;
+}
+.tdright {
+  text-align: right;
+}
+form {
+  margin-top: 10px;
+}
+select{
+  width: 100%;
+}
+.DBJanelaIframeTitulo{
+  text-align: left;
+}
+.inner-container {
+  margin: 0 auto;
 }
 
 @media (min-width: 576px) {
+  .inner-container,
   .container {
-    max-width: 540px;
+    width: 100%;
+    max-width: 540px !important;
   }
 }
 
 @media (min-width: 768px) {
+  .inner-container,
   .container {
-    max-width: 720px;
+    width: 100%;
+    max-width: 720px !important;
   }
 }
 
 @media (min-width: 992px) {
+  .inner-container,
   .container {
-    max-width: 960px;
+    width: 100%;
+    max-width: 960px !important;
   }
 }
 
 @media (min-width: 1200px) {
+  .inner-container,
   .container {
-    max-width: 1140px;
+    width: 100%;
+    max-width: 1170px !important;
   }
 }
+
+@media (min-width: 1400px) {
+  .inner-container,
+  .container {
+    width: 100%;
+    max-width: 1366px !important;
+  }
+}
+
 
 /* Row */
 .row {
@@ -286,6 +338,14 @@ div.body-container table.table-body tr td{
     padding: 4px 5px;
 }
 
+tbody.body-container tr:nth-child(even){
+  background: #D3D3D3;
+}
+
+tbody.body-container tr:nth-child(odd){
+
+}
+
 .tooltip {
   position: fixed;
   z-index: 9999999999;
@@ -376,4 +436,116 @@ div.body-container table.table-body tr td{
   left: 50%;
   top: 0;
   transform: translateX(-50%);
+}
+
+.arrow-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 10px;
+  margin: 0 5px;
+  float: left; /* Aplica o float */
+  position: absolute;
+  top: 50%;
+  left: 3%; /* Opcional: se quiser centralizar horizontalmente também */
+  transform: translate(-50%, -50%); /* Move o elemento para o centro */
+}
+
+.arrow {
+  font-size: 1.2em; /* Tamanho padrão */
+  line-height: 9px;
+  transition: font-weight 0.2s; /* Transição suave para o peso da fonte */
+  opacity: 0.3;
+}
+
+.arrow.strong {
+  font-weight: bold; /* Setas mais fortes */
+  color: #000; /* Cor das setas ativas */
+  opacity: 1;
+}
+
+.content-header {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.table_header {
+  vertical-align: middle;
+  cursor: pointer;
+  position: relative;
+  padding: 0 15px;
+}
+
+.table-container {
+  min-height: 400px;
+  max-height: 400px;
+  overflow: auto;
+  position: relative;
+  background: #fff;
+}
+
+.table-container table {
+  width: 100%;
+  border-spacing: 0;
+  border-collapse: inherit;
+  table-layout: fixed;
+}
+
+.table-container table th,
+.table-container table td {
+  padding: 5px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-right: 1px outset #D3D3D3;
+  border-bottom: 1px outset #D3D3D3;
+  margin: 0 !important;
+}
+
+.table-container table th:last-child,
+.table-container table td:last-child {
+  border-right: none;
+}
+
+.table-container thead {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.table-container tbody tr:nth-child(2n) td {
+  background: #D3D3D3;
+}
+.table-container tbody tr:nth-child(2n+1) td {
+  background: #fff;
+}
+
+.table-container tbody td i{
+  font-size: 16px;
+}
+
+.table-container .fixed-left,
+.table-container .fixed-right {
+  position: sticky;
+  z-index: 1;
+}
+
+.table-container .fixed-left {
+  z-index: 2;
+  box-shadow: 2px 0 5px -2px rgba(0, 0, 0, 0.1);
+}
+
+.table-container .fixed-right {
+  z-index: 3;
+  border-left: 1px outset #D3D3D3;
+  box-shadow: -2px 0 5px -2px rgba(0, 0, 0, 0.1);
+}
+
+.table-container thead th.fixed-left,
+.table-container thead th.fixed-right {
+  z-index: 4;
 }

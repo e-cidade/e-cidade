@@ -31,7 +31,6 @@ if($_POST['json']){
 
 
 if (isset($incluir)) {
-
     /**
      * Verifica data de julgamento e homologação da licitação do tipo julgamento
      */

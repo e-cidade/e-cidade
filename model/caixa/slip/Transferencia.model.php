@@ -469,6 +469,14 @@ abstract class Transferencia {
     return $this->oSlip->getArrecacoes();
   }
 
+ /**
+   * Retorna objeto Slip
+   * @return Slip
+   */
+  public function getSlip() {
+    return $this->oSlip;
+  }
+
   /**
    * @param integer $iArrecacoes
    */

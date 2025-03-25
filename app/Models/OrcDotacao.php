@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\LegacyAccount;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Facades\DB;
 
 class OrcDotacao extends LegacyModel
 {
@@ -37,25 +38,6 @@ class OrcDotacao extends LegacyModel
 
     public function getOrcamentosDotacoesAnoDestino (int $anoDestino, int $codigoInstituicao) {
         return $this->newQuery()
-            ->whereIn('o58_coddot', function ($query) {
-                global $codigoInstituicao;
-                $query->select('ac22_coddot')
-                    ->from('acordo')
-                    ->join('acordoposicao', 'acordoposicao.ac26_acordo', '=', 'acordo.ac16_sequencial')
-                    ->join('acordoitem', 'acordoitem.ac20_acordoposicao', '=', 'acordoposicao.ac26_sequencial')
-                    ->join('acordoitemdotacao', 'acordoitemdotacao.ac22_acordoitem', '=', 'acordoitem.ac20_sequencial')
-                    ->join('orcdotacao', function ($join) {
-                        $join->on('orcdotacao.o58_coddot', '=', 'acordoitemdotacao.ac22_coddot')
-                            ->whereColumn('orcdotacao.o58_anousu', '=', 'acordoitemdotacao.ac22_anousu');
-                    })
-                    ->where('acordo.ac16_instit', $codigoInstituicao)
-                    ->where('acordo.ac16_acordosituacao', 4)
-                    ->whereIn('ac26_sequencial', function ($subquery) {
-                        $subquery->selectRaw('max(ac26_sequencial)')
-                            ->from('acordoposicao')
-                            ->whereColumn('ac26_acordo', 'acordo.ac16_sequencial');
-                    });
-            })
             ->join('orcelemento', function ($join) {
                 $join->on('orcdotacao.o58_codele', '=', 'orcelemento.o56_codele')
                     ->whereColumn('orcdotacao.o58_anousu', '=', 'orcelemento.o56_anousu');

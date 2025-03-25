@@ -815,6 +815,19 @@ class Recibo
 
     }
 
+    if($_SESSION['flag'] == 1){
+      $ano = $_SESSION['DB_anousu'];
+      $instituicao = $_SESSION['DB_instit'];
+      $query = "select * from caixa.numpref where k03_anousu = $ano and k03_instit = $instituicao limit 1";
+      $result = db_query($query);
+      $settings = db_utils::fieldsMemory($result, 0);
+    }else{
+      $settings = Numpref::query()
+        ->where('k03_anousu', db_getsession("DB_anousu"))
+        ->where('k03_instit', db_getsession("DB_instit"))
+        ->first();
+    }
+
       /**
        * @var Numpref $settings
        */

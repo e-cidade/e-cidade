@@ -44,14 +44,6 @@ $clrotulo->label("l20_codigo");
 <meta http-equiv="Expires" CONTENT="0">
 <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
 
-<script>
-function js_emite(){
-    jan = window.open('lic2_homologproc002.php?l20_codigo='+document.form1.l20_codigo.value,'','width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0 ');
-    jan.moveTo(0,0);
-    document.form1.l20_codigo.value='';
-
-}
-</script>
 <link href="estilos.css" rel="stylesheet" type="text/css">
 </head>
 <body bgcolor=#CCCCCC leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="a=1" bgcolor="#cccccc">
@@ -123,6 +115,16 @@ function js_mostraliclicita1(chave1){
    document.form1.l20_codigo.value = chave1;
    db_iframe_liclicita.hide();
    js_emite();
+}
+
+function js_emite(){
+
+  jan = window.open('lic1_homologacaoadjudica004.php?codigoLicitacao=' + document.form1.l20_codigo.value + '&tipoRelatorio=Homologacao' ,
+                'width=' + (screen.availWidth - 5) + ',height=' + (screen.availHeight - 40) + ',scrollbars=1,location=0 ');
+  jan.moveTo(0, 0);
+
+  document.form1.l20_codigo.value='';
+
 }
 
 js_pesquisa_liclicita(true);

@@ -393,6 +393,41 @@ class cl_solicitemanul {
      }
      return $sql;
   }
+  function sql_query_vinculo ( $pc28_sequencial=null,$campos="*",$ordem=null,$dbwhere=""){ 
+    $sql = "select ";
+    if($campos != "*" ){
+      $campos_sql = split("#",$campos);
+      $virgula = "";
+      for($i=0;$i<sizeof($campos_sql);$i++){
+        $sql .= $virgula.$campos_sql[$i];
+        $virgula = ",";
+      }
+    }else{
+      $sql .= $campos;
+    }
+    $sql .= " from solicitemanul ";
+    $sql .= "      inner join solicitem on solicitem.pc11_codigo = solicitemanul.pc28_solicitem";
+    $sql .= "      inner join solicitemvinculo on solicitemvinculo.pc55_solicitemfilho = solicitem.pc11_codigo";
+    $sql2 = "";
+    if($dbwhere==""){
+      if($pc28_sequencial!=null ){
+        $sql2 .= " where solicitemanul.pc28_sequencial = $pc28_sequencial "; 
+      } 
+    }else if($dbwhere != ""){
+      $sql2 = " where $dbwhere";
+    }
+    $sql .= $sql2;
+    if($ordem != null ){
+      $sql .= " order by ";
+      $campos_sql = split("#",$ordem);
+      $virgula = "";
+      for($i=0;$i<sizeof($campos_sql);$i++){
+        $sql .= $virgula.$campos_sql[$i];
+        $virgula = ",";
+      }
+    }
+    return $sql;
+ }
    function sql_query_file ( $pc28_sequencial=null,$campos="*",$ordem=null,$dbwhere=""){ 
      $sql = "select ";
      if($campos != "*" ){

@@ -355,7 +355,7 @@ for ($xxx = 0; $xxx < $this->nvias; $xxx++) {
   // descrição da observação
   $this->objpdf->setxy($xcol, $xlin + 85);
   $this->objpdf->Setfont('Arial', '', 7);
-  $this->objpdf->multicell(190, 4, substr($this->obs, 0, 456));
+  $this->objpdf->multicell(190, 4, substr($this->obs, 0, 1130));
   if (isset($this->diaria) && $this->diaria != null) {
     $contador = 105;
 

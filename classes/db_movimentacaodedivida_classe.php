@@ -49,6 +49,8 @@ class cl_movimentacaodedivida
   var $op02_data_ano = null;
   var $op02_justificativa = null;
   var $op02_valor = null;
+  var $op02_movautomatica = "f";
+  var $op02_codigoplanilha = 0;
 
   // cria propriedade com as variaveis do arquivo 
   var $campos = "
@@ -59,6 +61,8 @@ class cl_movimentacaodedivida
                 op02_data = int8 = Data
                 op02_justificativa = int8 = Justificativa
                 op02_valor = int8 = Valor
+                op02_movautomatica = bool = Movimentacao automatica
+                op02_codigoplanilha  = int8 = Codigo planilha
                 ";
   //funcao construtor da classe 
   function cl_movimentacaodedivida()
@@ -94,6 +98,8 @@ class cl_movimentacaodedivida
       }
       $this->op02_justificativa = (!empty($GLOBALS["HTTP_POST_VARS"]["op02_justificativa"]) ? $GLOBALS["HTTP_POST_VARS"]["op02_justificativa"] : $this->op02_justificativa);
       $this->op02_valor = (!empty($GLOBALS["HTTP_POST_VARS"]["op02_valor"]) ? $GLOBALS["HTTP_POST_VARS"]["op02_valor"] : $this->op02_valor);
+      $this->op02_movautomatica = (!empty($GLOBALS["HTTP_POST_VARS"]["op02_movautomatica"]) ? $GLOBALS["HTTP_POST_VARS"]["op02_movautomatica"] : $this->op02_movautomatica);
+      $this->op02_codigoplanilha = (!empty($GLOBALS["HTTP_POST_VARS"]["op02_codigoplanilha"]) ? $GLOBALS["HTTP_POST_VARS"]["op02_codigoplanilha"] : $this->op02_codigoplanilha);
     }
   }
   // funcao para inclusao
@@ -133,15 +139,19 @@ class cl_movimentacaodedivida
               op02_tipo,
               op02_data, 
               op02_justificativa,
-              op02_valor
+              op02_valor,
+              op02_movautomatica,
+              op02_codigoplanilha
           ) VALUES (
               {$this->op02_operacaodecredito},
               {$this->op02_movimentacao},
               {$this->op02_tipo},
               '{$this->op02_data}',
               '{$this->op02_justificativa}',
-              {$this->op02_valor} )";
-
+              {$this->op02_valor},
+              '{$this->op02_movautomatica}',
+              {$this->op02_codigoplanilha}
+               )";
     $result = db_query($sqlString);
       
     if ($result == false) {

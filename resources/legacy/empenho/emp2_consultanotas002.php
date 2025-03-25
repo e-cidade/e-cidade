@@ -118,8 +118,8 @@ if (isset($oGet->e69_codnota)) {
     $e50_codord  = $oNotas->e50_codord;
     $e69_dtnota  = date('d/m/Y', strtotime($oNotas->e69_dtnota));
     $e69_nfserie = $oNotas->e69_nfserie;
-    $e50_data    = date('d/m/Y', strtotime($oNotas->e50_data));
-    $e50_dtvencimento  = $oNotas->e50_dtvencimento == '' ? '' : date('d/m/Y', strtotime($oNotas->e50_dtvencimento));
+    $e50_data    = ($oNotas->e50_data == '' || empty($oNotas->e50_data)) ? '' : date('d/m/Y', strtotime($oNotas->e50_data));
+    $e50_dtvencimento  = ($oNotas->e50_dtvencimento == '' || empty($oNotas->e50_dtvencimento)) ? '' : date('d/m/Y', strtotime($oNotas->e50_dtvencimento));
     $e69_chaveacesso  = $oNotas->e69_chaveacesso == 'null' ? '' : $oNotas->e69_chaveacesso;
     $e50_cattrabalhador = $oNotas->e50_cattrabalhador;
     $ct01_descricaocategoria = $oNotas->ct01_descricaocategoria;

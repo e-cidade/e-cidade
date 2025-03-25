@@ -324,6 +324,8 @@ if(isset($incluir)) {
             $clsubsql->inner_fun = false;
             $clsubsql->inner_ban = false;
             $clsubsql->inner_res = false;
+            $clsubsql->inner_org = false;
+            $clsubsql->usar_org  = true;
             $clsubsql->usar_atv  = true;
             $clsubsql->usar_pad  = true;
             $clsubsql->usar_lot  = true;

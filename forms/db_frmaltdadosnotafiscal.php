@@ -34,10 +34,6 @@ $oGet = db_utils::postMemory($_GET);
             $opcaoA    = 1;
             $opcaoB    = 1;
             $lDesabled = false;
-         if (isset($e70_vlrliq) && $e70_vlrliq > 0){
-            $opcaoA = 3;
-            $sMsg      = "** Não será permitida alteração de data quando a nota já foi liquidada e/ou paga a NF **";
-         }
        }
        if ($lDisabled2){
          $opcaoA = 3;
@@ -95,6 +91,8 @@ $oGet = db_utils::postMemory($_GET);
             $e69_dtnota_ano = null;
           }
            db_inputdata('e69_dtnota',$e69_dtnota_dia,$e69_dtnota_mes,$e69_dtnota_ano,true,'text',$opcaoA);
+           db_inputdata('c75_data',$c75_data_dia,$c75_data_mes,$c75_data_ano,true,'hidden',$opcaoA);
+           db_inputdata('c99_data',$c99_data_dia,$c99_data_mes,$c99_data_ano,true,'hidden',$opcaoA);
           ?>
           </td>
          </tr>
@@ -346,7 +344,33 @@ function js_alterar_ordemcompra(){
   location.href = "mat1_altDadosNotaFiscal001.php";
 }
 
+function convertToDate(dateString) 
+{
+    const parts = dateString.split('/');
+    return new Date(parts[2], parts[1] - 1, parts[0]);
+}
+
 function validar_campos() {
+
+ let dateRecebe = convertToDate(document.getElementById('e69_dtrecebe').value);
+ let dateNota = convertToDate(document.getElementById('e69_dtnota').value);
+ let dateLiquidacao = convertToDate(document.getElementById('c75_data').value);
+ let peridoContabil = convertToDate(document.getElementById('c99_data').value);
+ 
+ if (dateRecebe < dateNota) {
+    alert('A Data da Nota não pode ser maior que a Data do Recebimento!');
+    return false;
+ } 
+
+ if (dateLiquidacao < dateNota) {
+    alert('A Data da Nota não pode ser maior que a Data da Liquidação!');
+    return false;
+ } 
+
+ if (peridoContabil > dateNota) {
+    alert('A Data da Nota deverá ser maior que a data de encerramento do período contábil!');
+    return false;
+ } 
 
  if ($F('e69_tipodocumentosfiscal') == "") {
 
@@ -367,7 +391,7 @@ function validar_campos() {
  } else if ($('e69_dtnota').value == ""){
    alert('Campo data nota não informado!');
    return false;
- } else if ($('e69_dtnota').value == ""){
+ } else if ($('e69_dtrecebe').value == ""){
    alert('Campo data do recebimento não informado!');
    return false;
  } else {

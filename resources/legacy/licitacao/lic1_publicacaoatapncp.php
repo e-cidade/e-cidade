@@ -19,13 +19,6 @@ db_app::load("time.js");
     <meta http-equiv="Expires" CONTENT="0">
     <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
     <link href="estilos.css" rel="stylesheet" type="text/css">
-
-    <script type="text/javascript">
-        loadComponents([
-            'buttonsSolid',
-            'simpleModal'
-        ]);
-    </script>
 </head>
 <style>
 </style>

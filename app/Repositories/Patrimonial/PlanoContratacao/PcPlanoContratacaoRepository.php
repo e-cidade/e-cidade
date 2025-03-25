@@ -3,7 +3,7 @@ namespace App\Repositories\Patrimonial\PlanoContratacao;
 
 use App\Models\Patrimonial\Compras\PcPlanoContratacao;
 use App\Repositories\Contracts\Patrimonial\PlanoDeContratacao\PcPlanoContracaoRepositoryInterface;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class PcPlanoContratacaoRepository implements PcPlanoContracaoRepositoryInterface{
     private PcPlanoContratacao $model;

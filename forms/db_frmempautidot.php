@@ -47,6 +47,21 @@ if($clempautitem->numrows==0){
   $db_opcao_item = 1;
 }
 
+function formataNumero($numero) {
+
+  $numero = str_replace('.', '', $numero);
+  
+  $pos = strrpos($numero, ',');
+
+  if ($pos !== false) {
+      $numero = substr_replace($numero, '.', $pos, 1);
+  }
+
+  return $numero;
+}
+
+$bDotacaoCalculada = 0;
+
 ?>
   <form name="form1" method="post" action="">
     <center>
@@ -103,8 +118,27 @@ if($clempautitem->numrows==0){
           }else{
             $nops=" Dotação $o47_coddot  não encontrada ";
           }
-
         }
+
+        if($db_botao_c != false && !$bDotacaoCalculada) {
+
+          $bDotacaoCalculada = 1;
+
+          if (strpos($atual, ',') !== false) {
+            $atual = formataNumero($atual);
+          }
+
+          if (strpos($atual, ',') === false) {
+            $atual = number_format(floatval($atual),2,",",".");
+          }
+
+          $atudo = number_format(floatval( (formataNumero($atudo) - formataNumero($e54_valor)) ),2,",",".");
+
+          if(empty($reservado)) {
+            $reservado = number_format(floatval( (formataNumero($reservado) + formataNumero($e54_valor)) ),2,",",".");
+          }
+        }
+
         ?>
         <tr>
           <td nowrap title="<?=@$To58_orgao ?>"><?=@$Lo58_orgao ?> </td>
@@ -281,6 +315,7 @@ if(isset($tot) && $tot<0 && empty($cancelar) && isset($pesquisa_dot)){
       document.form1.appendChild(opcao);
       document.form1.submit();
     }
+    
     function js_verifica(){
       if(document.form1.o47_coddot.value==''){
         alert('Código da dotação inválida!');
@@ -306,7 +341,15 @@ if(isset($tot) && $tot<0 && empty($cancelar) && isset($pesquisa_dot)){
         alert('Primeiro clique em pesquisar para calcular os valores!');
         return false;
       }
+
+      var dotacao_calculada = <?php echo $bDotacaoCalculada; ?> ?? 0;
+
+      if(dotacao_calculada){
+        document.form1.confirmar.type = 'button';
+        return false;
+      }
     }
+
     function js_pesquisao47_coddot(mostra){
       elemento=CurrentWindow.corpo.iframe_empautitem.document.form1.elemento01.value;
       query='';

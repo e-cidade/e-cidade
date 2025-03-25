@@ -37,11 +37,10 @@ $tipo_mesfim = 1;
 include("fpdf151/pdf.php");
 include("libs/db_sql.php");
 
-//parse_str($HTTP_SERVER_VARS['QUERY_STRING']);
 db_postmemory($HTTP_POST_VARS);
 
 $instit     = str_replace('-',', ',$db_selinstit);
-$xinstit    = explode("-",$db_selinstit);
+
 $resultinst = db_query("select codigo,nomeinstabrev from db_config where codigo in ($instit)");
 $descr_inst = '';
 $xvirg = '';
@@ -55,54 +54,72 @@ $head3 = "POR RECURSO";
 $head4 = "EXERCICIO: ".db_getsession("DB_anousu");
 $head5 = "INSTITUIÇÕES : ".$descr_inst;
 
+$filtroReceita = ' o70_instit in (' . str_replace('-',', ',$instit) . ')';
+$sqlReceita = db_receitasaldo(11,1,2,true,$filtroReceita,db_getsession("DB_anousu"),null,null,true);
+
+$filtroDespesa = ' 1=1 and w.o58_instit in (' . str_replace('-',', ',$instit) . ')';
+$sqlDespesa = db_dotacaosaldo(8,2,2,true,$filtroDespesa,db_getsession("DB_anousu"),null,null,8,0,true);
+
 $sql = "
-SELECT o70_codigo,
-       (select o15_descr from orctiporec where o70_codigo = o15_codigo limit 1) as o15_descr,
-       sum(receita) receita,
-       sum(despesa) despesa,
-       sum(difer) AS difer
-FROM
-(select *,receita-despesa as difer from (
-SELECT RIGHT (o70_codigo::varchar, 8)::integer AS o70_codigo,
-       o15_descr,
-       sum(case when tipo = 0 then sum else 0 end ) as receita,
-       sum(case when tipo = 1 then sum else 0 end ) as despesa
-from (
-   select 0::int as tipo,o70_codigo,
-        sum(substr(fc_receitasaldo(".db_getsession("DB_anousu").",
-	                           o70_codrec,
-				   1,
-				   '".db_getsession("DB_anousu")."-01-01',
-  				   '".db_getsession("DB_anousu")."-01-01'),
-		   2,15)::float8
-		   )
-   from orcreceita
-   where o70_anousu = ".db_getsession("DB_anousu")." and o70_instit in ($instit)
-   group by o70_codigo,tipo
- union
-   select 1::int as tipo,
-          o58_codigo,
-	  sum(substr(fc_dotacaosaldo(".db_getsession("DB_anousu").",
-	                             o58_coddot,
-				     1,
-				     '".db_getsession("DB_anousu")."-01-01',
-				     '".db_getsession("DB_anousu")."-01-01')
-	             ,2,15)::float8)
-   from orcdotacao
-   where o58_anousu = ".db_getsession("DB_anousu")."
-   group by o58_codigo, tipo
-) as x
-   inner join orctiporec on o70_codigo = o15_codigo
-group by o70_codigo,o15_descr
-) as x
-order by o70_codigo) y
+WITH sub_receita AS (
+    SELECT 
+        0::int AS tipo,
+        o70_codigo::integer,
+        o70_codrec,
+        o15_descr,
+        SUM(saldo_inicial) AS valor
+    FROM 
+        ( $sqlReceita ) AS sub
+    WHERE o70_codigo > 0
+    GROUP BY o70_codigo, o15_descr, o70_codrec
+),
+
+sub_despesa AS (
+    SELECT 
+        1::int AS tipo,
+        o58_codigo::integer AS o70_codigo,
+        NULL::integer AS o70_codrec,
+        o15_descr,
+        SUM(dot_ini) AS valor
+    FROM 
+        ( $sqlDespesa ) AS sub2
+    WHERE o58_codigo > 0
+    GROUP BY o58_codigo, o15_descr, o70_codrec
+)
+
+SELECT 
+    o70_codigo,
+    (SELECT o15_descr  FROM orctiporec  WHERE o70_codigo = o15_codigo LIMIT 1 ) AS o15_descr,
+    SUM(receita) AS receita,
+    SUM(despesa) AS despesa,
+    SUM(difer) AS difer
+FROM (
+   SELECT 
+    *,
+    receita - despesa AS difer
+    FROM (
+        SELECT 
+            RIGHT(o70_codigo::varchar, 8)::integer AS o70_codigo,
+            o15_descr,
+            SUM(CASE WHEN tipo = 0 THEN valor ELSE 0 END) AS receita,
+            SUM(CASE WHEN tipo = 1 THEN valor ELSE 0 END) AS despesa
+        FROM (
+
+            SELECT * FROM sub_receita  
+
+                UNION  
+                
+            SELECT * FROM sub_despesa
+        
+        ) AS x
+        GROUP BY o70_codigo, o15_descr
+    ) AS x
+    ORDER BY o70_codigo
+) y
 GROUP BY 1, 2
 ORDER BY 1";
+
 $result = db_query($sql);
-
-
-//db_criatabela($result);
-//exit;
 
 $pdf = new PDF();
 $pdf->Open();

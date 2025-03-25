@@ -41,7 +41,7 @@ require_once('model/cda.model.php');
 parse_str($HTTP_SERVER_VARS['QUERY_STRING']);
 
 if ( !isset($certid) || $certid == '' ) {
-    db_redireciona('db_erros.php?fechar=true&db_erro=Certidão Não Encontrada.');
+    db_redireciona('db_erros.php?fechar=true&db_erro=Certido No Encontrada.');
     exit;
 }
 
@@ -50,10 +50,10 @@ $sSqlPardiv   = $oDaoParDiv->sql_query_file(db_getsession("DB_instit"));
 $rsPardiv     = $oDaoParDiv->sql_record($sSqlPardiv);
 $lImpFolha    = false;
 $oInstit = new Instituicao(db_getsession('DB_instit'));
-$lbProcedencia=  $oInstit->getCodigoCliente() !== Instituicao::COD_CLI_PMPIRAPORA ? 'PROCEDÊNCIA' : 'PROCEDÊNCIA-HISTÓRICO';
+$lbProcedencia=  $oInstit->getCodigoCliente() !== Instituicao::COD_CLI_PMPIRAPORA ? 'PROCEDNCIA' : 'PROCEDNCIA-HISTRICO';
 
 /*
- * Variavel tipo é retornada pelo $_GET
+ * Variavel tipo  retornada pelo $_GET
  *
  * $tipo
  *
@@ -192,7 +192,7 @@ class pdfcertidao extends pdf3 {
 
         $this->SetY(35);
         $this->setfont('arial','b',11);
-        $this->multicell(0,4,"CERTIDÃO DE DÍVIDA ATIVA N".CHR(176)." ".$GLOBALS["head5"],0,"C",0,0);
+        $this->multicell(0,4,"CERTIDO DE DVIDA ATIVA N".CHR(176)." ".$GLOBALS["head5"],0,"C",0,0);
         $this->setfont('arial','',11);
         $this->ln(3);
     }
@@ -256,7 +256,7 @@ for ($numcertid = 0; $numcertid < $numero; $numcertid++) {
 
     if (pg_numrows($resparag) == 0) {
 
-        $head1 = 'SECRETARIA DE FINANÇAS';
+        $head1 = 'SECRETARIA DE FINANAS';
     } else {
 
         db_fieldsmemory( $resparag, 0 );
@@ -486,7 +486,7 @@ function drawOrigens ($pdf, cda $oCertidao, $lTipoOrdem, $dadosCertidao) {
         $pdf->setfont('','',10);
         $pdf->Ln(3);
         $pdf->setfont('arial','B',10);
-        $pdf->cell(190,5,'DADOS DO IMÓVEL'  ,0,1,"C",0);
+        $pdf->cell(190,5,'DADOS DO IMVEL'  ,0,1,"C",0);
         $pdf->cell(190,0.7,''            ,"TB",1,"L",0);
 
     }
@@ -505,7 +505,7 @@ function drawOrigens ($pdf, cda $oCertidao, $lTipoOrdem, $dadosCertidao) {
 
           $pdf->addPage();
           $pdf->SetFont('ARIAL','B',11);
-          $pdf->multicell(0,5,"CERTIDÃO DE DÍVIDA ATIVA N".CHR(176)." ".$oCertidao->getCodigo()."/{$oCertidao->getAno()}",0,"C",0,0);
+          $pdf->multicell(0,5,"CERTIDO DE DVIDA ATIVA N".CHR(176)." ".$oCertidao->getCodigo()."/{$oCertidao->getAno()}",0,"C",0,0);
           $pdf->ln(8);
           $pdf->setfont('','B',9);
         }*/
@@ -513,12 +513,12 @@ function drawOrigens ($pdf, cda $oCertidao, $lTipoOrdem, $dadosCertidao) {
         if ($tipo ==1) {
 
             $pdf->setfont('arial', '', 8);
-            $pdf->cell(120, 3, 'ENDEREÇO: '.$oOrigem->endereco,    0, 0, "l", 0);
+            $pdf->cell(120, 3, 'ENDEREO: '.$oOrigem->endereco,    0, 0, "l", 0);
             $pdf->cell(40,  3, 'BAIRRO : '.$oOrigem->bairro,       0, 1, "l", 0);
             $pdf->cell(40,  3, 'SETOR  : '.$oOrigem->setor,        0, 0, "l", 0);
             $pdf->cell(40,  3, 'QUADRA : '.$oOrigem->quadra,       0, 0, "l", 0);
             $pdf->cell(40,  3, 'LOTE : '.$oOrigem->lote,           0, 0, "l", 0);
-            $pdf->cell(40,  3, 'MATRÍCULA : '.$oOrigem->matricula, 0, 1, "l", 0);
+            $pdf->cell(40,  3, 'MATRCULA : '.$oOrigem->matricula, 0, 1, "l", 0);
 
             if ( $oCfiptu->j18_utilizaloc == 't' ) {
                 $pdf->cell(60,5,'DADOS DE LOCALIZACAO: SETOR  : ' . $oOrigem->setorloc . '-' . $oOrigem->descrsetorloc . ' QUADRA : '.$oOrigem->quadraloc . ' - LOTE : '.$oOrigem->loteloc,0,0,"l",0);
@@ -533,14 +533,14 @@ function drawOrigens ($pdf, cda $oCertidao, $lTipoOrdem, $dadosCertidao) {
         } else if ($tipo == 2) {
 
             $pdf->setfont('arial', '', 8);
-            $pdf->cell(120,3,'ENDEREÇO: '.$oOrigem->endereco,0,0,"l",0);
+            $pdf->cell(120,3,'ENDEREO: '.$oOrigem->endereco,0,0,"l",0);
             $pdf->cell(40,3,'BAIRRO : '.$oOrigem->bairro,0,1,"l",0);
             $pdf->cell(110,3,'CIDADE : '.$oOrigem->cidade,0,0,"l",0);
             $pdf->cell(40,3,'CEP : '.$oOrigem->cep,0,1,"l",0);
             $pdf->cell(40,3,'SETOR  : '.$oOrigem->setor,0,0,"l",0);
             $pdf->cell(40,3,'QUADRA : '.$oOrigem->quadra,0,0,"l",0);
             $pdf->cell(40,3,'LOTE : '.$oOrigem->lote,0,0,"l",0);
-            $pdf->cell(40,3,'MATRÍCULA : '.$oOrigem->matricula,0,1,"l",0);
+            $pdf->cell(40,3,'MATRCULA : '.$oOrigem->matricula,0,1,"l",0);
 
             if ( $oCfiptu->j18_utilizaloc == 't' ) {
                 $pdf->cell(60,5,'DADOS DE LOCALIZACAO: SETOR  : ' . $oOrigem->setorloc . '-' . $oOrigem->descrsetorloc . ' QUADRA : '.$oOrigem->quadraloc . ' - LOTE : '.$oOrigem->loteloc,0,0,"l",0);
@@ -559,7 +559,7 @@ function drawOrigens ($pdf, cda $oCertidao, $lTipoOrdem, $dadosCertidao) {
 
         $pdf->Ln(3);
         $pdf->setfont('arial','B',10);
-        $pdf->cell(190,7,'DADOS DA INSCRIÇÃO',0,1,"C",0);
+        $pdf->cell(190,7,'DADOS DA INSCRIO',0,1,"C",0);
         $pdf->setfont('arial','',10);
         $pdf->cell(190,0.7,'',"TB",1,"L",0);
         $pdf->Ln(3);
@@ -569,12 +569,12 @@ function drawOrigens ($pdf, cda $oCertidao, $lTipoOrdem, $dadosCertidao) {
 
                 $pdf->addPage();
                 $pdf->SetFont('ARIAL','B',11);
-                $pdf->multicell(0,5,"CERTIDÃO DE DÍVIDA ATIVA N".CHR(176)." ".$oCertidao->getCodigo()."/{$oCertidao->getAno()}",0,"C",0,0);
+                $pdf->multicell(0,5,"CERTIDO DE DVIDA ATIVA N".CHR(176)." ".$oCertidao->getCodigo()."/{$oCertidao->getAno()}",0,"C",0,0);
                 $pdf->setfont('','B',9);
                 $pdf->ln(8);
 
             }
-            $pdf->cell(35,5,'INSCRIÇÃO: ',0,0,"L",0);
+            $pdf->cell(35,5,'INSCRIO: ',0,0,"L",0);
             $pdf->cell(100,5,$oOrigem->inscricao,0,0,"L",0);
             if ($tipo ==1) {
 
@@ -583,7 +583,7 @@ function drawOrigens ($pdf, cda $oCertidao, $lTipoOrdem, $dadosCertidao) {
 
             }
             $pdf->ln();
-            $pdf->cell(35,5,'REF. AO ALVARÁ : ',0,0,"L",0);
+            $pdf->cell(35,5,'REF. AO ALVAR : ',0,0,"L",0);
             $pdf->cell(100,5,$oOrigem->endereco,0,1,"L",0);
             $pdf->cell(35,5,'BAIRRO : ',0,0,"l",0);
             $pdf->cell(100,5,$oOrigem->bairro,0,1,"l",0);
@@ -712,7 +712,7 @@ function drawDebitos(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=false, $lRe
 
                   $pdf->addPage();
                   $pdf->SetFont('ARIAL','B',11);
-                  $pdf->multicell(0,5,"CERTIDÃO DE DÍVIDA ATIVA N".CHR(176)." ".$oCertidao->getCodigo()."/{$oCertidao->getAno()}",0,"C",0,0);
+                  $pdf->multicell(0,5,"CERTIDO DE DVIDA ATIVA N".CHR(176)." ".$oCertidao->getCodigo()."/{$oCertidao->getAno()}",0,"C",0,0);
                   $pdf->ln(8);
                   $pdf->setfont('','B',9);
                   $lEscreveHeader = true;
@@ -722,18 +722,18 @@ function drawDebitos(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=false, $lRe
 
                     $pdf->SetFont('','',7);
                     $pdf->Ln(3);
-                    $pdf->MultiCell(0,5,'P R O C E D Ê N C I A ',0,"C",0);
+                    $pdf->MultiCell(0,5,'P R O C E D  N C I A ',0,"C",0);
                     $pdf->Ln(3);
                     $pdf->SetFont('','B',7);
-                    $pdf->Cell(15,5,"DÍVIDA",1,0,"C",1);
+                    $pdf->Cell(15,5,"DVIDA",1,0,"C",1);
                     $pdf->Cell(15,5,"T.PROCED",1,0,"C",1);
-                    $pdf->Cell(18,5,"CÓD. PROCED",1,0,"C",1);
+                    $pdf->Cell(18,5,"CD. PROCED",1,0,"C",1);
                     $pdf->Cell(50,5,$lbProcedencia,1,0,"C",1);
-                    $pdf->Cell(30,5,"DATA DE INSCRIÇÃO",1,0,"C",1);
+                    $pdf->Cell(30,5,"DATA DE INSCRIO",1,0,"C",1);
                     $pdf->Cell(15,5,"ORIGEM",1,0,"C",1);
                     $pdf->Cell(15,5,"LIVRO",1,0,"C",1);
                     $pdf->Cell(15,5,"FOLHA",1,0,"C",1);
-                    $pdf->Cell(15,5,"EXERCÍCIO",1,1,"C",1);
+                    $pdf->Cell(15,5,"EXERCCIO",1,1,"C",1);
                     $lEscreveHeader = false;
                 }
 
@@ -759,7 +759,7 @@ function drawDebitos(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=false, $lRe
 
                     $pdf->SetFont('','I',5);
                     $pdf->setX(10);
-                    $pdf->Cell(188,4,"Observação: $oProcedencias->observacao",1,1,"L",0);
+                    $pdf->Cell(188,4,"Observao: $oProcedencias->observacao",1,1,"L",0);
                     $pdf->SetFont('','',7);
 
                 }
@@ -833,7 +833,7 @@ function drawDebitos(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=false, $lRe
 
               $pdf->addPage();
               $pdf->SetFont('ARIAL','B',11);
-              $pdf->multicell(0,5,"CERTIDÃO DE DÍVIDA ATIVA N".CHR(176)." ".$oCertidao->getCodigo()."/{$oCertidao->getAno()}",0,"C",0,0);
+              $pdf->multicell(0,5,"CERTIDO DE DVIDA ATIVA N".CHR(176)." ".$oCertidao->getCodigo()."/{$oCertidao->getAno()}",0,"C",0,0);
               $pdf->ln(8);
               $pdf->setfont('','B',9);
 
@@ -841,11 +841,11 @@ function drawDebitos(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=false, $lRe
             $pdf->ln(3);
             if ($iTipo == 1) {
 
-                $pdf->MultiCell(0,5,'C R É D I T O    T R I B U T Á R I O ',0,"C",0);
+                $pdf->MultiCell(0,5,'C R  D I T O    T R I B U T  R I O ',0,"C",0);
             } else {
 
                 $pdf->setfont('','B',9);
-                $pdf->MultiCell(0,5,'C R É D I T O  N Ã O  T R I B U T Á R I O ',0,"C",0);
+                $pdf->MultiCell(0,5,'C R  D I T O  N  O  T R I B U T  R I O ',0,"C",0);
             }
             $pdf->SetFont('','B',6);
             $pdf->Cell(10,5,"1 EXERC.",1,0,"C",1);
@@ -853,7 +853,7 @@ function drawDebitos(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=false, $lRe
             $pdf->Cell(10,5,"LIV/FOL",1,0,"C",1);
             $pdf->Cell(15,5,"ORIG.",1,0,"C",1);
             $pdf->Cell(30,5,$lbProcedencia,1,0,"C",1);
-            $pdf->Cell(18,5,"ORIGEM DÉBITO",1,0,"C",1);
+            $pdf->Cell(18,5,"ORIGEM DBITO",1,0,"C",1);
             $pdf->Cell(18,5,"DATA INSCR.",1,0,"C",1);
             $pdf->Cell(18,5,"DATA VENC.",1,0,"C",1);
             $pdf->Cell(15,5,"VLR HIST.",1,0,"C",1);
@@ -885,7 +885,7 @@ function drawDebitos(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=false, $lRe
 
                     $pdf->AddPage();
                     /*$pdf->SetFont('ARIAL','B',11);
-                    $pdf->multicell(0,5,"CERTIDÃO DE DÍVIDA ATIVA N".CHR(176)." ".$oCertidao->getCodigo()."/{$oCertidao->getAno()}",0,"C",0,0);
+                    $pdf->multicell(0,5,"CERTIDO DE DVIDA ATIVA N".CHR(176)." ".$oCertidao->getCodigo()."/{$oCertidao->getAno()}",0,"C",0,0);
                     $pdf->ln(8);*/
                     $pdf->SetFont('','B',6);
                     $pdf->Cell(10,5,"2 EXERC.",1,0,"C",1);
@@ -893,7 +893,7 @@ function drawDebitos(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=false, $lRe
                     $pdf->Cell(10,5,"LIV/FOL",1,0,"C",1);
                     $pdf->Cell(15,5,"ORIG.",1,0,"C",1);
                     $pdf->Cell(30,5,$lbProcedencia,1,0,"C",1);
-                    $pdf->Cell(18,5,"ORIGEM DÉBITO",1,0,"C",1);
+                    $pdf->Cell(18,5,"ORIGEM DBITO",1,0,"C",1);
                     $pdf->Cell(18,5,"DATA INSCR.",1,0,"C",1);
                     $pdf->Cell(18,5,"DATA VENC.",1,0,"C",1);
                     $pdf->Cell(15,5,"VLR HIST.",1,0,"C",1);
@@ -940,7 +940,7 @@ function drawDebitos(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=false, $lRe
 
                     $pdf->SetAligns(array('J'));
                     $pdf->SetWidths(array(194));
-                    $pdf->Row_multicell(array("Observação: {$oDebito->observacao}"),4,true,4,0,true,true,3,3);
+                    $pdf->Row_multicell(array("Observao: {$oDebito->observacao}"),4,true,4,0,true,true,3,3);
 
                     $pdf->SetFont('','',6);
 
@@ -981,7 +981,7 @@ function drawDebitos(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=false, $lRe
 }
 
 /**
- * Escreve o quadro de Divida com a coluna de honorários
+ * Escreve o quadro de Divida com a coluna de honorrios
  *
  * @param pdf3 $pdf
  * @param cda $oCertidao
@@ -1006,7 +1006,7 @@ function drawDebitosHonorarios(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=f
 
                   $pdf->addPage();
                   $pdf->SetFont('ARIAL','B',11);
-                  $pdf->multicell(0,5,"CERTIDÃO DE DÍVIDA ATIVA N".CHR(176)." ".$oCertidao->getCodigo()."/{$oCertidao->getAno()}",0,"C",0,0);
+                  $pdf->multicell(0,5,"CERTIDO DE DVIDA ATIVA N".CHR(176)." ".$oCertidao->getCodigo()."/{$oCertidao->getAno()}",0,"C",0,0);
                   $pdf->ln(8);
                   $pdf->setfont('','B',9);
                   $lEscreveHeader = true;
@@ -1016,18 +1016,18 @@ function drawDebitosHonorarios(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=f
 
                     $pdf->SetFont('','',7);
                     $pdf->Ln(3);
-                    $pdf->MultiCell(0,5,'P R O C E D Ê N C I A ',0,"C",0);
+                    $pdf->MultiCell(0,5,'P R O C E D  N C I A ',0,"C",0);
                     $pdf->Ln(3);
                     $pdf->SetFont('','B',7);
-                    $pdf->Cell(15,5,"DÍVIDA",1,0,"C",1);
+                    $pdf->Cell(15,5,"DVIDA",1,0,"C",1);
                     $pdf->Cell(15,5,"T.PROCED",1,0,"C",1);
-                    $pdf->Cell(18,5,"CÓD. PROCED",1,0,"C",1);
+                    $pdf->Cell(18,5,"CD. PROCED",1,0,"C",1);
                     $pdf->Cell(50,5,$lbProcedencia,1,0,"C",1);
-                    $pdf->Cell(30,5,"DATA DE INSCRIÇÃO",1,0,"C",1);
+                    $pdf->Cell(30,5,"DATA DE INSCRIO",1,0,"C",1);
                     $pdf->Cell(15,5,"ORIGEM",1,0,"C",1);
                     $pdf->Cell(15,5,"LIVRO",1,0,"C",1);
                     $pdf->Cell(15,5,"FOLHA",1,0,"C",1);
-                    $pdf->Cell(15,5,"EXERCÍCIO",1,1,"C",1);
+                    $pdf->Cell(15,5,"EXERCCIO",1,1,"C",1);
                     $lEscreveHeader = false;
                 }
 
@@ -1053,7 +1053,7 @@ function drawDebitosHonorarios(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=f
 
                     $pdf->SetFont('','I',5);
                     $pdf->setX(10);
-                    $pdf->Cell(188,4,"Observação: $oProcedencias->observacao",1,1,"L",0);
+                    $pdf->Cell(188,4,"Observao: $oProcedencias->observacao",1,1,"L",0);
                     $pdf->SetFont('','',7);
 
                 }
@@ -1130,7 +1130,7 @@ function drawDebitosHonorarios(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=f
          */
         foreach ($aDebitosOrdenado as $iTipo => $aTipo) {
 
-            //Data inicial para costumização da coluna Data Inscr. para Data Oper.
+            //Data inicial para costumizao da coluna Data Inscr. para Data Oper.
             $dtInicialModelo  = strtotime('2022-04-11');
             $dtEmissao        = strtotime($oCertidao->getDataEmissao());
             //die($dtInicialModelo.' - '.$dtEmissao);
@@ -1146,7 +1146,7 @@ function drawDebitosHonorarios(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=f
 
               $pdf->addPage();
               $pdf->SetFont('ARIAL','B',11);
-              $pdf->multicell(0,5,"CERTIDÃO DE DÍVIDA ATIVA N".CHR(176)." ".$oCertidao->getCodigo()."/{$oCertidao->getAno()}",0,"C",0,0);
+              $pdf->multicell(0,5,"CERTIDO DE DVIDA ATIVA N".CHR(176)." ".$oCertidao->getCodigo()."/{$oCertidao->getAno()}",0,"C",0,0);
               $pdf->ln(8);
               $pdf->setfont('','B',9);
 
@@ -1154,11 +1154,11 @@ function drawDebitosHonorarios(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=f
             $pdf->ln(3);
             if ($iTipo == 1) {
 
-                $pdf->MultiCell(0,5,'C R É D I T O    T R I B U T Á R I O ',0,"C",0);
+                $pdf->MultiCell(0,5,'C R  D I T O    T R I B U T  R I O ',0,"C",0);
             } else {
 
                 $pdf->setfont('','B',9);
-                $pdf->MultiCell(0,5,'C R É D I T O  N Ã O  T R I B U T Á R I O ',0,"C",0);
+                $pdf->MultiCell(0,5,'C R  D I T O  N  O  T R I B U T  R I O ',0,"C",0);
             }
             $pdf->SetFont('','B',6);
             $pdf->Cell(10,5,"1 EXERC.",1,0,"C",1);
@@ -1170,7 +1170,7 @@ function drawDebitosHonorarios(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=f
             $pdf->Cell(20,5,"CORRIGIDO",1,0,"C",1);
             $pdf->Cell(18,5,"MULTA",1,0,"C",1);
             $pdf->Cell(18,5,"JUROS",1,0,"C",1);
-            $pdf->Cell(17,5,"HONORÁRIOS",1,0,"C",1);
+            $pdf->Cell(17,5,"HONORRIOS",1,0,"C",1);
             $pdf->Cell(20,5,"TOTAL",1,1,"C",1);
             $lEscreveTotal      = false;
             $iExercicioAnterior = null;
@@ -1197,7 +1197,7 @@ function drawDebitosHonorarios(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=f
 
                     $pdf->AddPage();
                     /*$pdf->SetFont('ARIAL','B',11);
-                    $pdf->multicell(0,5,"CERTIDÃO DE DÍVIDA ATIVA N".CHR(176)." ".$oCertidao->getCodigo()."/{$oCertidao->getAno()}",0,"C",0,0);
+                    $pdf->multicell(0,5,"CERTIDO DE DVIDA ATIVA N".CHR(176)." ".$oCertidao->getCodigo()."/{$oCertidao->getAno()}",0,"C",0,0);
                     $pdf->ln(8);*/
                     $pdf->SetFont('','B',6);
                     $pdf->Cell(10,5,"2 EXERC.",1,0,"C",1);
@@ -1209,7 +1209,7 @@ function drawDebitosHonorarios(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=f
                     $pdf->Cell(20,5,"CORRIGIDO",1,0,"C",1);
                     $pdf->Cell(18,5,"MULTA",1,0,"C",1);
                     $pdf->Cell(18,5,"JUROS",1,0,"C",1);
-                    $pdf->Cell(17,5,"HONORÁRIOS",1,0,"C",1);
+                    $pdf->Cell(17,5,"HONORRIOS",1,0,"C",1);
                     $pdf->Cell(20,5,"TOTAL",1,1,"C",1);
                     $pagina = $pdf->PageNo();
 
@@ -1251,7 +1251,7 @@ function drawDebitosHonorarios(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=f
 
                     $pdf->SetAligns(array('J'));
                     $pdf->SetWidths(array(194));
-                    $pdf->Row_multicell(array("Observação: {$oDebito->observacao}"),4,true,4,0,true,true,3,3);
+                    $pdf->Row_multicell(array("Observao: {$oDebito->observacao}"),4,true,4,0,true,true,3,3);
 
                     $pdf->SetFont('','',6);
 
@@ -1319,9 +1319,9 @@ function drawTotalizacaoDebitos(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=
     foreach ($aDebitos as $oDebito) {
 
         if ($oDebito->procedenciatributaria == 1) {
-            $lTributario    = true;  // Tributário
+            $lTributario    = true;  // Tributrio
         } else {
-            $lNaoTributario = true;  // Não Tributário
+            $lNaoTributario = true;  // No Tributrio
         }
 
         if ($lCorrigido) {
@@ -1453,11 +1453,11 @@ function drawDebitosOrigemCorrigido(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotal
 
         if ($iTipo == 1) {
 
-            $pdf->MultiCell(0,5,'C R É D I T O    T R I B U T Á R I O ',0,"C",0);
+            $pdf->MultiCell(0,5,'C R  D I T O    T R I B U T  R I O ',0,"C",0);
         } else {
 
             $pdf->setfont('','B',9);
-            $pdf->MultiCell(0,5,'C R É D I T O  N Ã O  T R I B U T Á R I O ',0,"C",0);
+            $pdf->MultiCell(0,5,'C R  D I T O  N  O  T R I B U T  R I O ',0,"C",0);
         }
 
         $lImprimeCab        = true;
@@ -1490,7 +1490,7 @@ function drawDebitosOrigemCorrigido(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotal
                 }
 
                 $pdf->SetFont('','B',5);
-                $pdf->Cell(13,5,"DÍVIDA"       ,1,0,"C",1);
+                $pdf->Cell(13,5,"DVIDA"       ,1,0,"C",1);
                 $pdf->Cell(10,5,"NUMPRE"       ,1,0,"C",1);
                 $pdf->Cell(13,5,"DT LANC"      ,1,0,"C",1);
                 $pdf->Cell( 9,5,"EXERC"        ,1,0,"C",1);
@@ -1498,7 +1498,7 @@ function drawDebitosOrigemCorrigido(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotal
                 $pdf->Cell(10,5,"LIV/FOL"      ,1,0,"C",1);
                 $pdf->Cell(12,5,"ORIG"         ,1,0,"C",1);
                 $pdf->Cell(27,5,$lbProcedencia ,1,0,"C",1);
-                $pdf->Cell(17,5,"ORIGEM DÉBITO",1,0,"C",1);
+                $pdf->Cell(17,5,"ORIGEM DBITO",1,0,"C",1);
                 $pdf->Cell(12,5,"DT INSCR"     ,1,0,"C",1);
                 $pdf->Cell(12,5,"DT VENC"      ,1,0,"C",1);
                 $pdf->Cell(10,5,"VLR HIST"     ,1,0,"C",1);
@@ -1506,7 +1506,7 @@ function drawDebitosOrigemCorrigido(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotal
                 if ( $lCorrigido ) {
                     $pdf->Cell(11,5,"CORRIGIDO"  ,1,0,"C",1);
                 } else {
-                    $pdf->Cell(11,5,"CORREÇÃO"   ,1,0,"C",1);
+                    $pdf->Cell(11,5,"CORREO"   ,1,0,"C",1);
                 }
 
                 $pdf->Cell(10,5,"MULTA"        ,1,0,"C",1);
@@ -1561,7 +1561,7 @@ function drawDebitosOrigemCorrigido(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotal
 
                 $pdf->SetAligns(array('J'));
                 $pdf->SetWidths(array(194));
-                $pdf->Row_multicell(array("Observação: {$oDebito->observacao}"),4,true,4,0,true,true,3,3);
+                $pdf->Row_multicell(array("Observao: {$oDebito->observacao}"),4,true,4,0,true,true,3,3);
 
                 $pdf->SetFont('','',6);
             }
@@ -1693,11 +1693,11 @@ function drawDebitosOrigemCorrigidoData(pdf3 $pdf, cda $oCertidao, $oPardiv, $lT
 
         if ($iTipo == 1) {
 
-            $pdf->MultiCell(0,5,'C R É D I T O    T R I B U T Á R I O ',0,"C",0);
+            $pdf->MultiCell(0,5,'C R  D I T O    T R I B U T  R I O ',0,"C",0);
         } else {
 
             $pdf->setfont('','B',9);
-            $pdf->MultiCell(0,5,'C R É D I T O  N Ã O  T R I B U T Á R I O ',0,"C",0);
+            $pdf->MultiCell(0,5,'C R  D I T O  N  O  T R I B U T  R I O ',0,"C",0);
         }
 
         $lImprimeCab        = true;
@@ -1730,14 +1730,14 @@ function drawDebitosOrigemCorrigidoData(pdf3 $pdf, cda $oCertidao, $oPardiv, $lT
                 }
 
                 /*
-                 * DIVIDA, NUMPRE, PARCELA, DATA DE LANÇAMENTO, DATA DE INSCRIÇÃO, DATA DE OPERAÇÃO,
-                 * DATA DE VENCIMENTO, EXERCÍCIO, LIVRO/FOLHA, ORIGEM*, ORIGEM DO DÉBITO, PROCEDÊNCIA,
-                 * VALOR HISTÓRICO, VALOR CORRIGIDO, JUROS, MULTA E TOTAL
+                 * DIVIDA, NUMPRE, PARCELA, DATA DE LANAMENTO, DATA DE INSCRIO, DATA DE OPERAO,
+                 * DATA DE VENCIMENTO, EXERCCIO, LIVRO/FOLHA, ORIGEM*, ORIGEM DO DBITO, PROCEDNCIA,
+                 * VALOR HISTRICO, VALOR CORRIGIDO, JUROS, MULTA E TOTAL
                  *
                  * */
 
                 $pdf->SetFont('','B',5);
-                $pdf->Cell(13,5,"DÍVIDA"       ,1,0,"C",1);
+                $pdf->Cell(13,5,"DVIDA"       ,1,0,"C",1);
                 $pdf->Cell(10,5,"NUMPRE"       ,1,0,"C",1);
                 $pdf->Cell( 6,5,"PARC"         ,1,0,"C",1);
                 $pdf->Cell(13,5,"DT LANC"      ,1,0,"C",1);
@@ -1746,14 +1746,14 @@ function drawDebitosOrigemCorrigidoData(pdf3 $pdf, cda $oCertidao, $oPardiv, $lT
                 $pdf->Cell(12,5,"DT VENC"      ,1,0,"C",1);
                 $pdf->Cell( 7,5,"EXERC"        ,1,0,"C",1);
                 $pdf->Cell(10,5,"LIV/FOL"      ,1,0,"C",1);
-                $pdf->Cell(17,5,"ORIGEM DÉBITO",1,0,"C",1);
+                $pdf->Cell(17,5,"ORIGEM DBITO",1,0,"C",1);
                 $pdf->Cell(27,5,$lbProcedencia ,1,0,"C",1);
                 $pdf->Cell(10,5,"VLR HIST"     ,1,0,"C",1);
 
                 if ( $lCorrigido ) {
                     $pdf->Cell(11,5,"CORRIGIDO"  ,1,0,"C",1);
                 } else {
-                    $pdf->Cell(11,5,"CORREÇÃO"   ,1,0,"C",1);
+                    $pdf->Cell(11,5,"CORREO"   ,1,0,"C",1);
                 }
 
                 $pdf->Cell(10,5,"JUROS"        ,1,0,"C",1);
@@ -1808,7 +1808,7 @@ function drawDebitosOrigemCorrigidoData(pdf3 $pdf, cda $oCertidao, $oPardiv, $lT
 
                 $pdf->SetAligns(array('J'));
                 $pdf->SetWidths(array(194));
-                $pdf->Row_multicell(array("Observação: {$oDebito->observacao}"),4,true,4,0,true,true,3,3);
+                $pdf->Row_multicell(array("Observao: {$oDebito->observacao}"),4,true,4,0,true,true,3,3);
 
                 $pdf->SetFont('','',6);
             }
@@ -1847,7 +1847,7 @@ function drawDebitosOrigemCorrigidoData(pdf3 $pdf, cda $oCertidao, $oPardiv, $lT
 }
 
 /**
- * Escreve o quadro de Composição da Divida
+ * Escreve o quadro de Composio da Divida
  *
  * @param pdf3 $pdf
  * @param cda $oCertidao
@@ -1941,11 +1941,11 @@ function drawDebitosComposicao(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=f
 
         if ($iTipo == 1) {
 
-            $pdf->MultiCell(0,5,'C R É D I T O    T R I B U T Á R I O ',0,"C",0);
+            $pdf->MultiCell(0,5,'C R  D I T O    T R I B U T  R I O ',0,"C",0);
         } else {
 
             $pdf->setfont('','B',9);
-            $pdf->MultiCell(0,5,'C R É D I T O  N Ã O  T R I B U T Á R I O ',0,"C",0);
+            $pdf->MultiCell(0,5,'C R  D I T O  N  O  T R I B U T  R I O ',0,"C",0);
         }
 
         $lImprimeCab        = true;
@@ -1978,7 +1978,7 @@ function drawDebitosComposicao(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=f
                 }
 
                 $pdf->SetFont('','B',5);
-                $pdf->Cell(13,5,"DÍVIDA"       ,1,0,"C",1);
+                $pdf->Cell(13,5,"DVIDA"       ,1,0,"C",1);
                 $pdf->Cell(10,5,"NUMPRE"       ,1,0,"C",1);
                 $pdf->Cell(13,5,"DT LANC"      ,1,0,"C",1);
                 $pdf->Cell( 9,5,"EXERC"        ,1,0,"C",1);
@@ -1986,7 +1986,7 @@ function drawDebitosComposicao(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=f
                 $pdf->Cell(10,5,"LIV/FOL"      ,1,0,"C",1);
                 $pdf->Cell(12,5,"ORIG"         ,1,0,"C",1);
                 $pdf->Cell(27,5,$lbProcedencia ,1,0,"C",1);
-                $pdf->Cell(17,5,"ORIGEM DÉBITO",1,0,"C",1);
+                $pdf->Cell(17,5,"ORIGEM DBITO",1,0,"C",1);
                 $pdf->Cell(12,5,"DT INSCR"     ,1,0,"C",1);
                 $pdf->Cell(12,5,"DT VENC"      ,1,0,"C",1);
                 $pdf->Cell(10,5,"VLR HIST"     ,1,0,"C",1);
@@ -1994,7 +1994,7 @@ function drawDebitosComposicao(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=f
                 if ( $lCorrigido ) {
                     $pdf->Cell(11,5,"CORRIGIDO"  ,1,0,"C",1);
                 } else {
-                    $pdf->Cell(11,5,"CORREÇÃO"   ,1,0,"C",1);
+                    $pdf->Cell(11,5,"CORREO"   ,1,0,"C",1);
                 }
 
                 $pdf->Cell(10,5,"MULTA"        ,1,0,"C",1);
@@ -2049,7 +2049,7 @@ function drawDebitosComposicao(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTotaliza=f
 
                 $pdf->SetAligns(array('J'));
                 $pdf->SetWidths(array(194));
-                $pdf->Row_multicell(array("Observação: {$oDebito->observacao}"),4,true,4,0,true,true,3,3);
+                $pdf->Row_multicell(array("Observao: {$oDebito->observacao}"),4,true,4,0,true,true,3,3);
 
                 $pdf->SetFont('','',6);
             }
@@ -2170,7 +2170,7 @@ function drawTotalizacaoDemonstrativos(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTo
                     }else{
 
                         $iTotalDebitos = 0;
-                        db_redireciona("db_erros.php?fechar=true&db_erro=Os debitos da origem CDA {$oCertidao->getCodigo()} não foram encontrados, provavelmente pagos ou cancelados!!<br>Contate Suporte!!");
+                        db_redireciona("db_erros.php?fechar=true&db_erro=Os debitos da origem CDA {$oCertidao->getCodigo()} no foram encontrados, provavelmente pagos ou cancelados!!<br>Contate Suporte!!");
                         exit;
                     }
                 }
@@ -2243,7 +2243,7 @@ function drawTotalizacaoDemonstrativos(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTo
     }
 
     $pdf->setfont('','B',9);
-    $sMsg = "DEMONSTRATIVO DA DÍVIDA - em moeda corrente, atualizado até $xdia/$xmes/$xano.";
+    $sMsg = "DEMONSTRATIVO DA DVIDA - em moeda corrente, atualizado at $xdia/$xmes/$xano.";
     $pdf->MultiCell(0,5,$sMsg,0,"C",0);
 
     $pdf->Ln(3);
@@ -2262,7 +2262,7 @@ function drawTotalizacaoDemonstrativos(pdf3 $pdf, cda $oCertidao, $oPardiv, $lTo
         if ($lCorrigido) {
             $pdf->Cell(40,5,"Corrigido"                                 ,1,0,"L",0);
         } else {
-            $pdf->Cell(40,5,"Correção"                                  ,1,0,"L",0);
+            $pdf->Cell(40,5,"Correo"                                  ,1,0,"L",0);
         }
 
         $pdf->Cell(25,5,db_formatar($oTotalGeral['nVlrCorrecao'],'f') ,1,1,"R",0);
@@ -2380,7 +2380,7 @@ function drawParcelamentos(pdf3 $pdf, cda $oCertidao, $oPardiv, $oDadosCertidao,
                 }else{
 
                     $iTotalDebitos = 0;
-                    db_redireciona("db_erros.php?fechar=true&db_erro=Os debitos da origem CDA {$oCertidao->getCodigo()} não foram encontrados, provavelmente pagos ou cancelados!!<br>Contate Suporte!!");
+                    db_redireciona("db_erros.php?fechar=true&db_erro=Os debitos da origem CDA {$oCertidao->getCodigo()} no foram encontrados, provavelmente pagos ou cancelados!!<br>Contate Suporte!!");
                     exit;
                 }
             }
@@ -2421,7 +2421,7 @@ function drawParcelamentos(pdf3 $pdf, cda $oCertidao, $oPardiv, $oDadosCertidao,
                 $pdf->Cell(20,5,"ORIGINAL" ,1,0,"C",1);
 
                 if ( $lComposicao ) {
-                    $pdf->Cell(20,5,"CORREÇÃO" ,1,0,"C",1);
+                    $pdf->Cell(20,5,"CORREO" ,1,0,"C",1);
                 } else {
                     $pdf->Cell(20,5,"CORRIGIDO",1,0,"C",1);
                 }
@@ -2565,10 +2565,10 @@ function drawDebitosOrigemComposicaoAnteriorPrimeiroNivel(pdf3 $pdf, cda $oCerti
 
                 $pdf->Cell(15,5,'Parcela'      ,1,0,'C',1);
                 $pdf->Cell(50,5,'Receita'      ,1,0,'C',1);
-                $pdf->Cell(20,5,'Dt Lançamento',1,0,'C',1);
+                $pdf->Cell(20,5,'Dt Lanamento',1,0,'C',1);
                 $pdf->Cell(20,5,'Dt Vencimento',1,0,'C',1);
                 $pdf->Cell(19,5,'Vlr Original' ,1,0,'C',1);
-                $pdf->Cell(17,5,'Correção'     ,1,0,'C',1);
+                $pdf->Cell(17,5,'Correo'     ,1,0,'C',1);
                 $pdf->Cell(17,5,'Juros'        ,1,0,'C',1);
                 $pdf->Cell(17,5,'Multa'        ,1,0,'C',1);
                 $pdf->Cell(19,5,'Total'        ,1,1,'C',1);
@@ -2602,10 +2602,10 @@ function drawDebitosOrigemComposicaoAnteriorPrimeiroNivel(pdf3 $pdf, cda $oCerti
 
                         $pdf->Cell(15,5,'Parcela'      ,1,0,'C',1);
                         $pdf->Cell(50,5,'Receita'      ,1,0,'C',1);
-                        $pdf->Cell(20,5,'Dt Lançamento',1,0,'C',1);
+                        $pdf->Cell(20,5,'Dt Lanamento',1,0,'C',1);
                         $pdf->Cell(20,5,'Dt Vencimento',1,0,'C',1);
                         $pdf->Cell(19,5,'Vlr Original' ,1,0,'C',1);
-                        $pdf->Cell(17,5,'Correção'     ,1,0,'C',1);
+                        $pdf->Cell(17,5,'Correo'     ,1,0,'C',1);
                         $pdf->Cell(17,5,'Juros'        ,1,0,'C',1);
                         $pdf->Cell(17,5,'Multa'        ,1,0,'C',1);
                         $pdf->Cell(19,5,'Total'        ,1,1,'C',1);
@@ -2901,7 +2901,7 @@ function drawParcelamentosPago(pdf3 $pdf, cda $oCertidao, $oPardiv, $oDadosCerti
                 } else {
 
                     $iTotalDebitos = 0;
-                    db_redireciona("db_erros.php?fechar=true&db_erro=Os debitos da origem CDA {$oCertidao->getCodigo()} não foram encontrados, provavelmente pagos ou cancelados!!<br>Contate Suporte!!");
+                    db_redireciona("db_erros.php?fechar=true&db_erro=Os debitos da origem CDA {$oCertidao->getCodigo()} no foram encontrados, provavelmente pagos ou cancelados!!<br>Contate Suporte!!");
                     exit;
                 }
             }
@@ -3007,7 +3007,7 @@ function drawParcelamentosPago(pdf3 $pdf, cda $oCertidao, $oPardiv, $oDadosCerti
                         $pdf->Cell(20,5,"ORIGINAL" ,1,0,"C",1);
 
                         if ( $lComposicao ) {
-                            $pdf->Cell(20,5,"CORREÇÃO" ,1,0,"C",1);
+                            $pdf->Cell(20,5,"CORREO" ,1,0,"C",1);
                         } else {
                             $pdf->Cell(20,5,"CORRIGIDO",1,0,"C",1);
                         }
@@ -3015,7 +3015,7 @@ function drawParcelamentosPago(pdf3 $pdf, cda $oCertidao, $oPardiv, $oDadosCerti
                         $pdf->Cell(20,5,"MULTA"         ,1,0,"C",1);
                         $pdf->Cell(20,5,"JUROS"         ,1,0,"C",1);
                         $pdf->Cell(20,5,"Valor Pago"    ,1,0,"C",1);
-                        $pdf->Cell(20,5,"Valor à Pagar" ,1,1,"C",1);
+                        $pdf->Cell(20,5,"Valor  Pagar" ,1,1,"C",1);
 
                         $pagina      = $pdf->PageNo();
                         $lImprimeCab = false;
@@ -3189,7 +3189,7 @@ function drawDebitosInflator($pdf, cda $oCertidao, $oPardiv, $sInflator, $lTotal
 
                     $pdf->SetFont('','I',5);
                     $pdf->setX(10);
-                    $pdf->Cell(188,4,"Observação: $oProcedencias->observacao",1,1,"L",0);
+                    $pdf->Cell(188,4,"Observao: $oProcedencias->observacao",1,1,"L",0);
                     $pdf->SetFont('','',7);
 
                 }
@@ -3264,16 +3264,16 @@ function drawDebitosInflator($pdf, cda $oCertidao, $oPardiv, $sInflator, $lTotal
             $pdf->ln(8);
             if ($iTipo == 1) {
 
-                $pdf->MultiCell(0,5,'C R É D I T O    T R I B U T Á R I O ',0,"C",0);
+                $pdf->MultiCell(0,5,'C R  D I T O    T R I B U T  R I O ',0,"C",0);
             } else {
 
                 $pdf->setfont('','B',9);
-                $pdf->MultiCell(0,5,'C R É D I T O  N Ã O  T R I B U T Á R I O ',0,"C",0);
+                $pdf->MultiCell(0,5,'C R  D I T O  N  O  T R I B U T  R I O ',0,"C",0);
             }
 
             $pdf->SetFont('','B',6);
             $pdf->Cell(20,5,"EXERC.",1,0,"C",1);
-            $pdf->Cell(20,5,"CÓD. DIVIDA",1,0,"C",1);
+            $pdf->Cell(20,5,"CD. DIVIDA",1,0,"C",1);
             $pdf->Cell(20,5,"VLR HIST ({$sInflator})",1,0,"C",1);
             $pdf->Cell(20,5,"CORRIGIDO ({$sInflator})",1,0,"C",1);
             $pdf->Cell(20,5,"MULTA ({$sInflator})",1,0,"C",1);
@@ -3307,7 +3307,7 @@ function drawDebitosInflator($pdf, cda $oCertidao, $oPardiv, $sInflator, $lTotal
                     $pdf->AddPage();
                     $pdf->SetFont('','B',6);
                     $pdf->Cell(20, 5,"EXERC.",1,0,"C",1);
-                    $pdf->Cell(20, 5,"CÓD. DIVIDA",1,0,"C",1);
+                    $pdf->Cell(20, 5,"CD. DIVIDA",1,0,"C",1);
                     $pdf->Cell(20, 5,"VLR HIST ({$sInflator}).",1,0,"C",1);
                     $pdf->Cell(20, 5,"CORRIGIDO ({$sInflator})",1,0,"C",1);
                     $pdf->Cell(20, 5,"MULTA ({$sInflator})",1,0,"C",1);
@@ -3372,7 +3372,7 @@ function drawDebitosInflator($pdf, cda $oCertidao, $oPardiv, $sInflator, $lTotal
 }
 
 /**
- * Calcula o valor dos honorários
+ * Calcula o valor dos honorrios
  * @param float $nValorTotal
  * @todo criar parametro (pardiv ou parjuridico) indicando o percentual de honorarios
  * @return float

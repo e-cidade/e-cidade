@@ -50,7 +50,7 @@ if(isset($alterar)){
      <script>
 
        parent.document.formaba.a2.disabled = false;
-       CurrentWindow.corpo.iframe_a2.location.href='tfd1_tfd_prestadoracentralagend001.php?tf10_i_centralagend=<?=$chavepesquisa?>&z01_nome2=<?=@$z01_nome?>';
+       (window.CurrentWindow || parent.CurrentWindow).corpo.iframe_a2.location.href='tfd1_tfd_prestadoracentralagend001.php?tf10_i_centralagend=<?=$chavepesquisa?>&z01_nome2=<?=@$z01_nome?>';
 
      </script>
 <?

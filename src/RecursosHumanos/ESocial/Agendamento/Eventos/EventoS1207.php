@@ -67,16 +67,16 @@ class EventoS1207 extends EventoBase
                     $std->dmdev[$seqdmdev] = new \stdClass();
 
                     if ($aIdentificador[$iCont2]->idedmdev == 1) {
-                        $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfsal';
+                        $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfsal' . $this->mes();
                     }
                     if ($aIdentificador[$iCont2]->idedmdev == 2) {
-                        $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfres';
+                        $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfres' . $this->mes();
                     }
                     if ($aIdentificador[$iCont2]->idedmdev == 3) {
-                        $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfcom';
+                        $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfcom' . $this->mes();
                     }
                     if ($aIdentificador[$iCont2]->idedmdev == 4) {
-                        $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfs13';
+                        $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfs13' . $this->mes();
                     }
 
                     $std->dmdev[$seqdmdev]->nrbeneficio = $aDadosPorMatriculas[$iCont]->matricula_esocial;
@@ -216,42 +216,53 @@ class EventoS1207 extends EventoBase
 		)
 		or
 		rh05_recis is null
-	)
-    and (exists (SELECT
-	1
-from
-	gerfsal
-where
-	r14_anousu = {$ano}
-	and r14_mesusu = {$mes}
-	and r14_instit = " . db_getsession("DB_instit") . "
-	and r14_regist = rhpessoal.rh01_regist)
-    or
-    exists (SELECT
-	1
-from
-	gerfcom
-where
-	r48_anousu = {$ano}
-	and r48_mesusu = {$mes}
-	and r48_instit = " . db_getsession("DB_instit") . "
-	and r48_regist = rhpessoal.rh01_regist)
-    or
-    exists (SELECT
-	1
-from
-	gerfres
-where
-	r20_anousu = {$ano}
-	and r20_mesusu = {$mes}
-	and r20_instit = " . db_getsession("DB_instit") . "
-	and r20_regist = rhpessoal.rh01_regist))";
+	)";
 
+        $where = " and (exists (SELECT
+            1
+        from
+            gerfsal
+        where
+            r14_anousu = {$ano}
+            and r14_mesusu = {$mes}
+            and r14_instit = " . db_getsession("DB_instit") . "
+            and r14_regist = rhpessoal.rh01_regist)
+            or
+            exists (SELECT
+            1
+        from
+            gerfcom
+        where
+            r48_anousu = {$ano}
+            and r48_mesusu = {$mes}
+            and r48_instit = " . db_getsession("DB_instit") . "
+            and r48_regist = rhpessoal.rh01_regist)
+            or
+            exists (SELECT
+            1
+        from
+            gerfres
+        where
+            r20_anousu = {$ano}
+            and r20_mesusu = {$mes}
+            and r20_instit = " . db_getsession("DB_instit") . "
+            and r20_regist = rhpessoal.rh01_regist))";
 
-        $rsDados = db_query($sql);
-        // echo $sql;
-        // db_criatabela($rsDados);
-        // exit;
+        if ($this->indapuracao === "2") {
+            $where = " and (exists (SELECT
+            1
+        from
+            gerfs13
+        where
+            r35_anousu = {$ano}
+            and r35_mesusu = {$mes}
+            and r35_instit = " . db_getsession("DB_instit") . "
+            and r35_regist = rhpessoal.rh01_regist)
+            )";
+        }
+
+        $rsDados = db_query($sql . $where);
+
         if (pg_num_rows($rsDados) > 0) {
             for ($iCont = 0; $iCont < pg_num_rows($rsDados); $iCont++) {
                 $oResult = \db_utils::fieldsMemory($rsDados, $iCont);
@@ -272,7 +283,7 @@ where
     {
         require_once 'libs/db_libpessoal.php';
         $clrubricasesocial = new cl_rubricasesocial;
-        $rsValores = $this->getValoresPorPonto($ponto, $matricula,$this->ano(),$this->mes());
+        $rsValores = $this->getValoresPorPonto($ponto, $matricula, $this->ano(), $this->mes());
         for ($iCont = 0; $iCont < pg_num_rows($rsValores); $iCont++) {
             $oResult = \db_utils::fieldsMemory($rsValores, $iCont);
             $rubrica = $oResult->rubrica;

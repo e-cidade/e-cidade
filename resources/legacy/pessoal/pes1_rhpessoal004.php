@@ -296,6 +296,8 @@ if (isset($incluir)) {
                     $oDaoPesMov->rh02_tbprev   = $oMovimento->rh02_tbprev;
                     $oDaoPesMov->rh02_tipsal   = $oMovimento->rh02_tipsal;
                     $oDaoPesMov->rh02_tpcont   = $oMovimento->rh02_tpcont;
+                    $oDaoPesMov->rh02_outrovincefetivo  = str_replace("f", "false", $oMovimento->rh02_outrovincefetivo);
+                    $oDaoPesMov->rh02_remcargoefetivo   = str_replace("f", "false", $oMovimento->rh02_remcargoefetivo);
                     $oDaoPesMov->rh02_vincrais = $oMovimento->rh02_vincrais;
                     $oDaoPesMov->rh02_funcao   = $oMovimento->rh02_funcao;
                     $oDaoPesMov->rh02_deficientefisico = str_replace("f", "false", $oMovimento->rh02_deficientefisico);

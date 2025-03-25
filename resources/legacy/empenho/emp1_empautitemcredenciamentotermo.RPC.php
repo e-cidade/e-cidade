@@ -34,7 +34,7 @@ switch ($_POST["action"]) {
         $iAnoSessao = db_getsession('DB_anousu');
 
         $result_unidade = array();
-        $result_sql_unid = $clmatunid->sql_record($clmatunid->sql_query_file(null, "m61_codmatunid,substr(m61_descr,1,20) as m61_descr,m61_usaquant,m61_usadec", "m61_codmatunid"));
+        $result_sql_unid = $clmatunid->sql_record($clmatunid->sql_query_file(null, "m61_codmatunid,substr(m61_descr,1,20) as m61_descr,m61_usaquant,m61_usadec", "m61_codmatunid","m61_ativo = 't'"));
         $numrows_unid = $clmatunid->numrows;
         for ($i = 0; $i < $numrows_unid; $i++) {
             db_fieldsmemory($result_sql_unid, $i);
@@ -46,6 +46,7 @@ switch ($_POST["action"]) {
                        pc01_descrmater,
                        m61_codmatunid,
                        m61_descr,
+                       pc01_unid,
 
                     (SELECT si02_vlprecoreferencia
                      FROM itemprecoreferencia
@@ -108,14 +109,26 @@ switch ($_POST["action"]) {
                 $resultEmpAutItem = $clempautitem->sql_record($clempautitem->sql_query_file($autori, null, "*", "e55_sequen", " e55_autori = $autori and e55_item = $oDados->pc01_codmater"));
                 $oDadosEmpAutItem = db_utils::fieldsMemory($resultEmpAutItem, 0);
 
+                $rsUnidade = db_query("select pc01_unid from pcmater WHERE pc01_codmater = {$oDados->pc01_codmater}");
+                $pc01_unid = db_utils::fieldsMemory($rsUnidade, 0)->pc01_unid;
+                $desabilitarUnidade = false;
+
+
+                if($pc01_unid != ""){
+                    $desabilitarUnidade = "disabled style='background-color: #DEB887;'";
+                }
+
                 $selectunid = "";
-                $selectunid = "<select id='unidade_{$oDados->pc01_codmater}'>";
+                $selectunid = "<select id='unidade_{$oDados->pc01_codmater}' $desabilitarUnidade >";
                 $selectunid .= "<option selected='selected'></option>";
                 foreach ($result_unidade as $key => $item) {
-                    if ($key == $oDados->m61_codmatunid)
+                    if ($key == $oDados->pc01_unid){
+                    $unidadeCadastrada = true;
                         $selectunid .= "<option value='$key' selected='selected'>$item</option>";
-                    else
+                    }
+                    else{
                         $selectunid .= "<option value='$key'>$item</option>";
+                    }
                 }
                 $selectunid .= "</select>";
                 $qtd_disponivel = $oDados->pc23_quant - $oDados->l213_qtdcontratada;

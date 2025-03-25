@@ -98,6 +98,7 @@ try {
         $clpcmater->pc01_validademinima = 'f';
         $clpcmater->pc01_obrigatorio = 'f';
         $clpcmater->pc01_liberaresumo = 'f';
+        $clpcmater->pc01_unid = 'null';
 
         $clpcmater->incluir(null);
 

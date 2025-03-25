@@ -108,7 +108,7 @@ $sContass = explode(".", db_getsession("DB_login"));
                     <p>
                         <center>
                             <br>
-                            <h2>Essa rotina apenas pode ser usada por usurios da contass</h2>
+                            <h2>Essa rotina apenas pode ser usada por usuários da contass</h2>
                         </center>
                     </p>
                 </body>
@@ -118,7 +118,7 @@ $sContass = explode(".", db_getsession("DB_login"));
         <form name='form1' method="post" id="frmAtualizarProtocolo" action="">
             <input type="hidden" name="exec" value="atualizarProtocolo">
             <fieldset>
-                <legend>Manuteno Protocolo</legend>
+                <legend>Manutenção Protocolo</legend>
                 <div class="row">
                     <div class="col-12 col-sm-6 form-group mb-2">
                         <label for="p58_codproc">
@@ -141,7 +141,7 @@ $sContass = explode(".", db_getsession("DB_login"));
                                 [
                                     'validate-required'                 => "true",
                                     'validate-integer'                  => 'true',
-                                    'validate-required-message'         => "O campo protocolo no foi informado",
+                                    'validate-required-message'         => "O campo protocolo não foi informado",
                                     'validate-integer-message'          => 'O campo protocolo deve conter apenas numeros'
                                 ]
                             );
@@ -185,7 +185,7 @@ $sContass = explode(".", db_getsession("DB_login"));
                                 [
                                     'validate-required' => 'true',
                                     'validate-date' => 'true',
-                                    'validate-date-message' => 'Informe uma data vlida'
+                                    'validate-date-message' => 'Informe uma data válida'
                                 ]
                             );
                         ?>
@@ -219,11 +219,11 @@ $sContass = explode(".", db_getsession("DB_login"));
                                             'validate-maxlength'                => '10',
                                             'validate-no-special-chars'         => 'true',
                                             'validate-integer'                  => 'true',
-                                            'validate-required-message'         => "O campo departamento no foi informado",
-                                            'validate-minlength-message'        => "O cdigo deve ter pelo menos 1 caracteres",
-                                            'validate-maxlength-message'        => 'O Cd. Sequencial deve ter no mximo 10 caracteres',
-                                            'validate-no-special-chars-message' => 'O Cd. Sequencial no deve conter aspas simples, ponto e vrgula ou porcentagem',
-                                            'validate-integer-message'          => 'O campo Cd. Sequencial deve conter apenas numeros'
+                                            'validate-required-message'         => "O campo departamento não foi informado",
+                                            'validate-minlength-message'        => "O código deve ter pelo menos 1 caracteres",
+                                            'validate-maxlength-message'        => 'O Cód. Sequencial deve ter no máximo 10 caracteres',
+                                            'validate-no-special-chars-message' => 'O Cód. Sequencial no deve conter aspas simples, ponto e vírgula ou porcentagem',
+                                            'validate-integer-message'          => 'O campo Cód. Sequencial deve conter apenas numeros'
                                         ]
                                     );
                                 ?>
@@ -246,7 +246,7 @@ $sContass = explode(".", db_getsession("DB_login"));
                                         [
                                             'validate-required'          => "true",
                                             'validate-minlength'         => "1",
-                                            'validate-required-message'  => "O campo departamento no foi informado",
+                                            'validate-required-message'  => "O campo departamento não foi informado",
                                             'validate-minlength-message' => "O nome deve ter pelo menos 1 caracteres",
                                         ]
                                     );
@@ -280,10 +280,10 @@ $sContass = explode(".", db_getsession("DB_login"));
                                             'validate-maxlength'                => '10',
                                             'validate-no-special-chars'         => 'true',
                                             'validate-integer'                  => 'true',
-                                            'validate-required-message'         => "O campo tipo no foi informado",
+                                            'validate-required-message'         => "O campo tipo não foi informado",
                                             'validate-minlength-message'        => "O tipo deve ter pelo menos 1 caracteres",
-                                            'validate-maxlength-message'        => 'O tipo deve ter no mximo 10 caracteres',
-                                            'validate-no-special-chars-message' => 'O tipo no deve conter aspas simples, ponto e vrgula ou porcentagem',
+                                            'validate-maxlength-message'        => 'O tipo deve ter no máximo 10 caracteres',
+                                            'validate-no-special-chars-message' => 'O tipo no deve conter aspas simples, ponto e vírgula ou porcentagem',
                                             'validate-integer-message'          => 'O campo tipo deve conter apenas numeros'
                                         ]
                                     );
@@ -307,7 +307,7 @@ $sContass = explode(".", db_getsession("DB_login"));
                                         [
                                             'validate-required'          => "true",
                                             'validate-minlength'         => "1",
-                                            'validate-required-message'  => "O campo tipo no foi informado",
+                                            'validate-required-message'  => "O campo tipo não foi informado",
                                             'validate-minlength-message' => "O nome deve ter pelo menos 1 caracteres",
                                         ]
                                     );
@@ -343,10 +343,10 @@ $sContass = explode(".", db_getsession("DB_login"));
                                             'validate-maxlength'                => '10',
                                             'validate-no-special-chars'         => 'true',
                                             'validate-integer'                  => 'true',
-                                            'validate-required-message'         => "O campo titular no foi informado",
+                                            'validate-required-message'         => "O campo titular não foi informado",
                                             'validate-minlength-message'        => "O titular deve ter pelo menos 1 caracteres",
-                                            'validate-maxlength-message'        => 'O titular deve ter no mximo 10 caracteres',
-                                            'validate-no-special-chars-message' => 'O titular no deve conter aspas simples, ponto e vrgula ou porcentagem',
+                                            'validate-maxlength-message'        => 'O titular deve ter no máximo 10 caracteres',
+                                            'validate-no-special-chars-message' => 'O titular no deve conter aspas simples, ponto e vírgula ou porcentagem',
                                             'validate-integer-message'          => 'O campo titular deve conter apenas numeros'
                                         ]
                                     );
@@ -370,7 +370,7 @@ $sContass = explode(".", db_getsession("DB_login"));
                                         [
                                             'validate-required'          => "true",
                                             'validate-minlength'         => "1",
-                                            'validate-required-message'  => "O campo tipo no foi informado",
+                                            'validate-required-message'  => "O campo tipo não foi informado",
                                             'validate-minlength-message' => "O nome deve ter pelo menos 1 caracteres",
                                         ]
                                     );
@@ -400,7 +400,7 @@ $sContass = explode(".", db_getsession("DB_login"));
                 </div>
                 <div class="row">
                     <div class="col-12 col-sm-12 form-group mb-2">
-                        <label for="p58_obs">Observao</label>
+                        <label for="p58_obs">Observação</label>
                         <?php
                             db_textarea(
                                 'p58_obs',
@@ -419,9 +419,9 @@ $sContass = explode(".", db_getsession("DB_login"));
                                     'validate-required' => 'true',
                                     'validate-minlength' => '10',
                                     'validate-no-special-chars' => 'true',
-                                    'validate-required-message' => 'O campo observao no foi informado',
-                                    'validate-minlength-message' => 'O observao deve ter pelo menos 10 caracteres',
-                                    'validate-no-special-chars-message' => 'O observao no deve conter aspas simples, ponto e vrgula ou porcentagem'
+                                    'validate-required-message' => 'O campo observação no foi informado',
+                                    'validate-minlength-message' => 'O observação deve ter pelo menos 10 caracteres',
+                                    'validate-no-special-chars-message' => 'O observação no deve conter aspas simples, ponto e vírgula ou porcentagem'
                                 ]
                             );
                         ?>
@@ -541,7 +541,7 @@ $sContass = explode(".", db_getsession("DB_login"));
                         '',
                         'db_iframe_departamento',
                         'func_db_depart.php?pesquisa_chave=' + document.getElementById('p58_coddepto').value + '&funcao_js=parent.carregaDepartamento',
-                        'Pesquisar licitao Outro rgo',
+                        'Pesquisar licitação Outro órgão',
                         false,
                         '0'
                     );
@@ -561,7 +561,7 @@ $sContass = explode(".", db_getsession("DB_login"));
             if(error){
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Ateno!',
+                    title: 'Atenção!',
                     text: 'Nenhum departamento foi encontrado.',
                 });
                 validateChangeInteger('p58_coddepto');
@@ -705,23 +705,23 @@ $sContass = explode(".", db_getsession("DB_login"));
                  if(!isValid){
                      Swal.fire({
                          icon: 'warning',
-                         title: 'Ateno!',
+                         title: 'Atenção!',
                          text: 'Preencha todos os campos corretamente.',
                      });
                      return false;
                  }
                 Swal.fire({
-                     title: 'Os dados do Protocolo sero atualizados, deseja continuar?',
-                     text: "Essa ao no pode ser desfeita!",
+                     title: 'Os dados do Protocolo serão atualizados, deseja continuar?',
+                     text: "Essa ação não pode ser desfeita!",
                      icon: 'warning',
                      showCancelButton: true,
-                     confirmButtonText: 'Sim, atualizars!',
+                     confirmButtonText: 'Sim, atualizar!',
                      cancelButtonText: 'Cancelar',
                  }).then((result) => {
                      if (result.isConfirmed) {
                          Swal.fire({
                              title: 'Aguarde...',
-                             text: 'Estamos processando sua solicitao.',
+                             text: 'Estamos processando sua solicitação.',
                              allowOutsideClick: false,
                              didOpen: () => {
                                  Swal.showLoading();

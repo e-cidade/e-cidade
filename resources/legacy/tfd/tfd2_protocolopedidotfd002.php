@@ -248,22 +248,26 @@ for ($iCont = 0; $iCont < $oDaoTfdPedidoTfd->numrows; $iCont++) {
     // Retângulo do solicitante
     $oPdf->Roundedrect(4, $iY + 44, 202, 10, 2, 'DF', '1234');
     $oPdf->Setfont('arial', 'B', 8);
-    $oPdf->text(6, $iY + 48, 'SOLICITANTE ');
+    $oPdf->text(6, $iY + 48, 'SOLICITANTE: ');
     $oPdf->Setfont('arial', 'B', 8);
-    $oPdf->text(14, $iY + 52, 'Médico ');
+    $oPdf->text(27, $iY + 48, 'Médico: ');
     $oPdf->Setfont('arial', '', 8);
-    $oPdf->text(26, $iY + 52, ': '.$oDados->nomemedico);
+    $oPdf->text(37, $iY + 48, ': '.$oDados->nomemedico);
     $oPdf->Setfont('arial', 'B', 8);
-    $oPdf->text(101, $iY + 52, 'CRM ');
+    $oPdf->text(101, $iY + 48, 'CRM ');
     $oPdf->Setfont('arial', '', 8);
-    $oPdf->text(109, $iY + 52, ': '.$oDados->sd03_i_crm);
+    $oPdf->text(109, $iY + 48, ': '.$oDados->sd03_i_crm);
     $oPdf->Setfont('arial', 'B', 8);
-    $oPdf->text(154, $iY + 52, 'CNS ');
+    $oPdf->text(154, $iY + 48, 'CNS ');
     $oPdf->Setfont('arial', '', 8);
-    $oPdf->text(162, $iY + 52, ': '.$oDados->cnsmedico);
+    $oPdf->text(162, $iY + 48, ': '.$oDados->cnsmedico);
+    $oPdf->Setfont('arial', 'B', 8);
+    $oPdf->text(6, $iY + 52, 'OBSERVAÇÃO: ');
+    $oPdf->Setfont('arial', '', 8);
+    $oPdf->text(30, $iY + 52, ''.$oDados->tf01_t_obs);
 
      // Retângulo do prestadora
-    $oPdf->Roundedrect(4, $iY + 55, 202, 19, 2, 'DF', '1234');
+    $oPdf->Roundedrect(4, $iY + 55, 202, 18, 2, 'DF', '1234');
     $oPdf->Setfont('arial', 'B', 8);
     $oPdf->text(6, $iY + 59, 'PRESTADORA ');
     $oPdf->Setfont('arial', 'B', 8);

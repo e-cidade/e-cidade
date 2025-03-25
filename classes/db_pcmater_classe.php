@@ -67,6 +67,7 @@ class cl_pcmater
   var $pc01_instit = null;
   var $pc01_codmaterant = null;
   var $pc01_regimobiliario = null;
+  var $pc01_unid = null;
   // cria propriedade com as variaveis do arquivo
   var $campos = "
                  pc01_codmater = int4 = Código do Material
@@ -93,6 +94,7 @@ class cl_pcmater
                  pc01_instit = int = instituicao do item
                  pc01_codmaterant = int4 = codigo material anterior
                  pc01_regimobiliario = text = registro imobiliario para pncp
+                 pc01_unid = int = Unidade
                  ";
   //funcao construtor da classe
   function cl_pcmater()
@@ -135,6 +137,7 @@ class cl_pcmater
       $this->pc01_instit = ($this->pc01_instit == "f" ? @$GLOBALS["HTTP_POST_VARS"]["pc01_instit"] : $this->pc01_instit);
       $this->pc01_codmaterant = ($this->pc01_codmaterant == "f" ? @$GLOBALS["HTTP_POST_VARS"]["pc01_codmaterant"] : $this->pc01_codmaterant);
       $this->pc01_regimobiliario = ($this->pc01_regimobiliario == "f" ? @$GLOBALS["HTTP_POST_VARS"]["pc01_regimobiliario"] : $this->pc01_regimobiliario);
+      $this->pc01_unid = ($this->pc01_unid == "" ? @$GLOBALS["HTTP_POST_VARS"]["pc01_unid"] : $this->pc01_unid);
     } else {
       $this->pc01_codmater = ($this->pc01_codmater == "" ? @$GLOBALS["HTTP_POST_VARS"]["pc01_codmater"] : $this->pc01_codmater);
     }
@@ -251,6 +254,15 @@ class cl_pcmater
       $this->erro_status = "0";
       return false;
     }
+    if ($this->pc01_unid == "0") {
+      $this->erro_sql = " Campo Unidade de Medida nao Informado.";
+      $this->erro_campo = "pc01_unid";
+      $this->erro_banco = "";
+      $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+      $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+      $this->erro_status = "0";
+      return false;
+    }
     if ($this->pc01_instit == null) {
       $this->pc01_instit = db_getsession('DB_instit');
     }
@@ -314,6 +326,7 @@ class cl_pcmater
                                       ,pc01_instit
                                       ,pc01_codmaterant
                                       ,pc01_regimobiliario
+                                      ,pc01_unid
                        )
                 values (
                                 $this->pc01_codmater
@@ -337,6 +350,7 @@ class cl_pcmater
                                ,$this->pc01_instit
                                ,$this->pc01_codmaterant
                                ,'$this->pc01_regimobiliario'
+                               ,$this->pc01_unid
                       )";
     $result = db_query($sql);
     if ($result == false) {
@@ -592,6 +606,14 @@ class cl_pcmater
     }
     if (trim($this->pc01_obras) != "" || isset($GLOBALS["HTTP_POST_VARS"]["$this->pc01_obras"])) {
       $sql  .= $virgula . " pc01_obras = '$this->pc01_obras' ";
+      $virgula = ",";
+    }
+
+    $rsPcmater = db_query("select pc01_unid from pcmater where pc01_codmater = $this->pc01_unid");
+    $unidadeCadastrada = db_utils::fieldsMemory($rsPcmater, 0)->pc01_unid;
+
+    if($this->pc01_unid != "0"){
+      $sql  .= $virgula . " pc01_unid = $this->pc01_unid ";
       $virgula = ",";
     }
 

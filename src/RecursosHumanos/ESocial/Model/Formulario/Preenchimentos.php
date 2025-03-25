@@ -385,7 +385,7 @@ class Preenchimentos
                  when rh01_nacion = 64 then 728
                  end as paisNascto,
             105 as paisnac,
-            (SELECT j88_sigla from cgm intcgm
+            (SELECT case when j88_sigla = 'PRC' then 'PC' else j88_sigla end as j88_sigla from cgm intcgm
             inner join patrimonio.cgmendereco as cgmendereco on (intcgm.z01_numcgm=cgmendereco.z07_numcgm)
             inner join configuracoes.endereco as endereco on (cgmendereco.z07_endereco = endereco.db76_sequencial)
             inner join cadenderlocal on cadenderlocal.db75_sequencial = db76_sequencial
@@ -509,18 +509,24 @@ class Preenchimentos
                 else 'N'
                 end as cadIni,
                 case when (h13_categoria = 101 or h13_categoria = 106 or h13_categoria = 111) then rh01_admiss
+                when h13_categoria = 302 and rh30_regime = 2 then rh01_admiss 
                 end as dtAdm,
                 case when (h13_categoria = 101 or h13_categoria = 106 or h13_categoria = 111) and (rh01_tipadm = 1 or rh01_tipadm = 2) then 1
                 when (h13_categoria = 101 or h13_categoria = 106 or h13_categoria = 111) and (rh01_tipadm = 3 or rh01_tipadm = 4) then 3
+                when h13_categoria = 302 and rh30_regime = 2 then 1
                 end as tpAdmissao,
                 case when (h13_categoria = 101 or h13_categoria = 106 or h13_categoria = 111) then 1
+                when h13_categoria = 302 and rh30_regime = 2 then 1
                 end as indAdmissao,
                 '' as nrProcTrab,
                 case when (h13_categoria = 101 or h13_categoria = 106 or h13_categoria = 111) then 1
+                when h13_categoria = 302 and rh30_regime = 2 then 1
                 end as tpRegJor,
                 case when (h13_categoria = 101 or h13_categoria = 106 or h13_categoria = 111) then 1
+                when h13_categoria = 302 and rh30_regime = 2 then 1
                 end as natAtividade,
                 case when (h13_categoria = 101 or h13_categoria = 106 or h13_categoria = 111) then rh116_cnpj
+                when h13_categoria = 302 and rh30_regime = 2 then rh116_cnpj
                 end as cnpjSindCategProf,
 
                 rh15_data as dtOpcFGTS,
@@ -565,15 +571,18 @@ class Preenchimentos
                 end as codCateg,
 
                 case when h13_categoria = 101 then rh02_salari
+                when h13_categoria = 302 and rh30_regime = 2 then rh02_salari
                 end as vrSalFx,
                 case when h13_categoria = 101 and rh02_tipsal = 'M' then 5
                 when h13_categoria = 101 and rh02_tipsal = 'Q' then 4
                 when h13_categoria = 101 and rh02_tipsal = 'D' then 2
                 when h13_categoria = 101 and rh02_tipsal = 'H' then 1
+                when h13_categoria = 302 and rh30_regime = 2 then 5
                 end as undSalFixo,
 
                 case when h13_categoria = 101 and h13_tipocargo = 7 or rh164_datafim is not null then 2
                 when h13_categoria = 101 then 1
+                when h13_categoria = 302 and rh30_regime = 2 then 1
                 end as tpContr,
                 rh164_datafim as dtTerm,
                 case when h13_categoria = 101 and h13_tipocargo = 7 or rh164_datafim is not null then 'S'

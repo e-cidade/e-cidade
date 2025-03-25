@@ -28,12 +28,6 @@ db_postmemory($HTTP_POST_VARS);
     db_app::load("time.js");
     db_app::load("estilos.css, grid.style.css");
     ?>
-
-    <script type="text/javascript">
-        loadComponents([
-            'buttonsSolid',
-        ]);
-    </script>
 </head>
 
 <body bgcolor=#CCCCCC leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="a=1">

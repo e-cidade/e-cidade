@@ -796,7 +796,7 @@ DBViewGeracaoAutorizacao = function (sInstancia, oNode, iTipoOrigemDados) {
                 }
                 aRow[10].addStyle("height", '100%');
                 aRow[11] = parseFloat( oItem.valorunitariofornecedor );
-                aRow[12] = eval(sNomeValor+" = new DBTextField('"+sNomeValor+"', '"+sNomeValor+"', '"+nValorTotal+"', 5);");
+                aRow[12] = eval(sNomeValor+" = new DBTextField('"+sNomeValor+"', '"+sNomeValor+"', '"+nValorTotal.toFixed(2)+"', 5);");
                 aRow[12].addEvent('onKeyPress', ';return '+me.sInstancia+'.validaValor(event);');
                 aRow[12].addStyle('text-align', 'right');
 

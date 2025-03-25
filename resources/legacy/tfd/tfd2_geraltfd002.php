@@ -1,28 +1,28 @@
 <?
 /*
- *     E-cidade Software Publico para Gestao Municipal                
- *  Copyright (C) 2009  DBselller Servicos de Informatica             
- *                            www.dbseller.com.br                     
- *                         e-cidade@dbseller.com.br                   
- *                                                                    
- *  Este programa e software livre; voce pode redistribui-lo e/ou     
- *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme  
- *  publicada pela Free Software Foundation; tanto a versao 2 da      
- *  Licenca como (a seu criterio) qualquer versao mais nova.          
- *                                                                    
- *  Este programa e distribuido na expectativa de ser util, mas SEM   
- *  QUALQUER GARANTIA; sem mesmo a garantia implicita de              
- *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM           
- *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais  
- *  detalhes.                                                         
- *                                                                    
- *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU     
- *  junto com este programa; se nao, escreva para a Free Software     
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA          
- *  02111-1307, USA.                                                  
- *  
- *  Copia da licenca no diretorio licenca/licenca_en.txt 
- *                                licenca/licenca_pt.txt 
+ *     E-cidade Software Publico para Gestao Municipal
+ *  Copyright (C) 2009  DBselller Servicos de Informatica
+ *                            www.dbseller.com.br
+ *                         e-cidade@dbseller.com.br
+ *
+ *  Este programa e software livre; voce pode redistribui-lo e/ou
+ *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme
+ *  publicada pela Free Software Foundation; tanto a versao 2 da
+ *  Licenca como (a seu criterio) qualquer versao mais nova.
+ *
+ *  Este programa e distribuido na expectativa de ser util, mas SEM
+ *  QUALQUER GARANTIA; sem mesmo a garantia implicita de
+ *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM
+ *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais
+ *  detalhes.
+ *
+ *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU
+ *  junto com este programa; se nao, escreva para a Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ *  02111-1307, USA.
+ *
+ *  Copia da licenca no diretorio licenca/licenca_en.txt
+ *                                licenca/licenca_pt.txt
  */
 
 require_once('fpdf151/pdf.php');
@@ -33,55 +33,54 @@ function novoCabecalho($oPdf, $sPaciente,$sTelefone,$sEndereco,$iNumero,$sBairro
   $lCor = true;
   $iTam = 5;
   $oPdf->setfont('arial', 'B', 9);
-  
+
   $oPdf->cell(130, $iTam, "Paciente: ".substr($sPaciente, 0, 35) , 1, 0, 'L', $lCor);
   $oPdf->cell(150, $iTam, "Prestadora: ".$sPrestadora , 1, 1, 'L', $lCor);
-  
+
   $oPdf->cell(250, $iTam, "Endereço: ".
-  substr($sEndereco.' '.$iNumero.' '.$sBairro.' '.$sMunicipio.' - '.$sUf,0 ,80) 
+  substr($sEndereco.' '.$iNumero.' '.$sBairro.' '.$sMunicipio.' - '.$sUf,0 ,80)
   , 1, 0, 'L', $lCor);
   $oPdf->cell(30, $iTam, "Fone: ".$sTelefone , 1, 1, 'L', $lCor);
-  
+
   $oPdf->cell(40, $iTam, 'Tipo Tratamento', 1, 0, 'C', $lCor);
   $oPdf->cell(100, $iTam, 'Procedimento', 1, 0, 'C', $lCor);
   $oPdf->cell(80, $iTam, 'Especialidade', 1, 0, 'C', $lCor);
-  $oPdf->cell(30, $iTam, 'Data e Hora', 1, 0, 'C', $lCor);
-  $oPdf->cell(30, $iTam, 'Valor', 1, 1, 'C', $lCor);
+  $oPdf->cell(30, $iTam, 'Valor', 1, 0, 'C', $lCor);
+  $oPdf->cell(30, $iTam, 'Data e Hora', 1, 1, 'C', $lCor);
 
 }
 
-function novaLinha($oPdf, $sTipo, $sEspecialidade,$dData, $tHora,$nNalor,$sProcedimento) {
+function novaLinha($oPdf, $sTipo, $sEspecialidade, $dData, $tHora, $nNalor, $sProcedimento, $sObservacao) {
 
   $lCor = false;
   $iTamFixo = 5;
-  $oPdf->setfont('arial', '', 9);
+  $oPdf->setfont('arial', '', 8);
 
   $aProcedimento = quebrar_texto($sProcedimento,48);
   $aEspecialidade = quebrar_texto($sEspecialidade, 40);
-  if (count($aProcedimento) > count($aEspecialidade)) {
-    $iTam = $iTamFixo*(count($aProcedimento));
-  } else {
-  	$iTam = $iTamFixo*(count($aEspecialidade));
-  }
-  
+  $aTipo = quebrar_texto($sTipo, 15);
   $nNalor != '' ? $nNalor = "R$".db_formatar($nNalor, "f") : '';
+  $aObservacao = quebrar_texto($nNalor." ".$sObservacao, 20);
+
+  $tamanhoFinal = count($aTipo);
+  if($tamanhoFinal < count($aProcedimento)) {
+      $tamanhoFinal = count($aProcedimento);
+  }
+  if ($tamanhoFinal < count($aEspecialidade)) {
+      $tamanhoFinal = count($aEspecialidade);
+  }
+    if ($tamanhoFinal < count($aObservacao)) {
+        $tamanhoFinal = count($aObservacao);
+    }
+  $iTam = $iTamFixo*$tamanhoFinal;
+
   $dData = implode("/", array_reverse(explode("-", $dData)));
-  $oPdf->cell(40, $iTam, substr($sTipo,0,25), 1, 0, 'L', $lCor);
-  
-  if (strlen($sProcedimento) > 48) {
-		multiCell($oPdf, $aProcedimento, $iTamFixo, $iTam, 100);
-  } else {
-	  $oPdf->cell(100, $iTam, $sProcedimento, 1, 0, 'L', $lCor);
-	}
-  
-  if (strlen($sEspecialidade) > 40) {
-		multiCell($oPdf, $aEspecialidade, $iTamFixo, $iTam, 80);
-  } else {
-	  $oPdf->cell(80, $iTam, $sEspecialidade, 1, 0, 'L', $lCor);
-	}
-  
-  $oPdf->cell(30, $iTam, "{$dData} / {$tHora}", 1, 0, 'L', $lCor);
-  $oPdf->cell(30, $iTam, $nNalor, 1, 1, 'L', $lCor);
+
+  multiCell($oPdf, $aTipo, $iTamFixo, $iTam, 40);
+  multiCell($oPdf, $aProcedimento, $iTamFixo, $iTam, 100);
+  multiCell($oPdf, $aEspecialidade, $iTamFixo, $iTam, 80);
+  multiCell($oPdf, $aObservacao, $iTamFixo, $iTam, 30);
+  $oPdf->cell(30, $iTam, "{$dData} / {$tHora}", 1, 1, 'L', $lCor);
 
 }
 
@@ -122,8 +121,8 @@ function novoRodape($oPdf, $nTotalValor,$iTotal) {
 
   $lCor = true;
   $iTam = 5;
-  $oPdf->setfont('arial', 'B', 9);
-  
+  $oPdf->setfont('arial', 'B', 8);
+
   $oPdf->cell(130, $iTam, "Total de Registros: {$iTotal}" , 1, 0, 'L', $lCor);
   $oPdf->cell(150, $iTam, "Total de Valores: R$ ".db_formatar($nTotalValor, "f") , 1, 1, 'L', $lCor);
 
@@ -169,14 +168,11 @@ z01_i_numero,
 z01_v_bairro,
 z01_v_munic,
 z01_v_uf,
-(select round(tf15_f_valoremitido, 2) AS tf15_f_valoremitido 
-from tfd_beneficiadosajudacusto 
-join tfd_ajudacusto ON tfd_ajudacusto.tf12_i_codigo = tfd_beneficiadosajudacusto.tf15_i_ajudacusto
-where tfd_beneficiadosajudacusto.tf15_i_ajudacustopedido = tfd_ajudacustopedido.tf14_i_codigo
-AND tfd_ajudacusto.tf12_i_procedimento = sau_procedimento.sd63_i_codigo limit 1) AS tf15_f_valoremitido,
+tf15_f_valoremitido,
 sd63_c_nome,
-z01_nome
-from sau_procedimento 
+z01_nome,
+tf15_observacao
+from sau_procedimento
 join tfd_procpedidotfd on tfd_procpedidotfd.tf23_i_procedimento = sau_procedimento.sd63_i_codigo
 join tfd_pedidotfd on tfd_pedidotfd.tf01_i_codigo = tfd_procpedidotfd.tf23_i_pedidotfd
 join tfd_tipotratamento on tfd_pedidotfd.tf01_i_tipotratamento = tfd_tipotratamento.tf04_i_codigo
@@ -186,7 +182,8 @@ join tfd_agendamentoprestadora on tfd_agendamentoprestadora.tf16_i_pedidotfd = t
 join tfd_prestadoracentralagend on tfd_prestadoracentralagend.tf10_i_codigo = tfd_agendamentoprestadora.tf16_i_prestcentralagend
 join tfd_prestadora on tfd_prestadora.tf25_i_codigo = tfd_prestadoracentralagend.tf10_i_prestadora
 join cgm on cgm.z01_numcgm = tfd_prestadora.tf25_i_cgm
-LEFT JOIN tfd_ajudacustopedido ON tfd_pedidotfd.tf01_i_codigo = tfd_ajudacustopedido.tf14_i_pedidotfd
+left join tfd_ajudacustopedido ON tfd_pedidotfd.tf01_i_codigo = tfd_ajudacustopedido.tf14_i_pedidotfd
+left join tfd_beneficiadosajudacusto on tf15_i_ajudacustopedido = tf14_i_codigo
  where {$where}
 order by z01_v_nome";
 
@@ -196,8 +193,9 @@ if ($iZerados == 'f') {
 	$sql = "select * FROM ( $sql ) as x where tf15_f_valoremitido = 0 OR tf15_f_valoremitido IS NULL ";
 }
 
-$result = db_query($sql);//echo $sql;exit;
-//db_criatabela($result);
+$result = db_query($sql);
+//echo $sql;exit;
+//db_criatabela($result);exit;
 
 if (pg_num_rows($result) == 0) {
 ?>
@@ -228,14 +226,14 @@ $oPdf->AliasNbPages();
 //$oPdf->Addpage('L');
 
 $oPdf->setfillcolor(223);
-$oPdf->setfont('arial','',11);
+$oPdf->setfont('arial','',10);
 $iTotal = 0;
 $nTotalValor = 0;
 $sNome = '';
 for ($iCont = 0; $iCont < pg_num_rows($result); $iCont++) {
 
   $oDados = db_utils::fieldsmemory($result, $iCont);
-  
+
   if ($oPdf->getY() >$oPdf->h - 35 || $iTotal == 0) {
 
     $oPdf->Addpage('L');
@@ -249,12 +247,12 @@ for ($iCont = 0; $iCont < pg_num_rows($result); $iCont++) {
     novoCabecalho($oPdf,$oDados->z01_v_nome,$oDados->z01_v_telef,$oDados->z01_v_ender,
     $oDados->z01_i_numero,$oDados->z01_v_bairro,$oDados->z01_v_munic,$oDados->z01_v_uf,$oDados->z01_nome);
   }
-    
-  novaLinha($oPdf, $oDados->tf04_c_descr, $oDados->rh70_descr,$oDados->tf16_d_dataagendamento, $oDados->tf16_c_horaagendamento, 
-  $oDados->tf15_f_valoremitido,$oDados->sd63_c_nome);
-  
+
+  novaLinha($oPdf, $oDados->tf04_c_descr, $oDados->rh70_descr,$oDados->tf16_d_dataagendamento, $oDados->tf16_c_horaagendamento,
+  $oDados->tf15_f_valoremitido,$oDados->sd63_c_nome, $oDados->tf15_observacao);
+
   $iTotal += 1;
-  $nTotalValor += $oDados->tf15_f_valoremitido; 
+  $nTotalValor += $oDados->tf15_f_valoremitido;
   $sNome   = $oDados->z01_v_nome;
 
 }

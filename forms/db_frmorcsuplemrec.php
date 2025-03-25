@@ -177,7 +177,8 @@ function valida_dados(){
 // Oc16754
 function js_pesquisao85_codrec() {
     conferirSuplementacao(<?=$o46_codsup?>);
-    js_OpenJanelaIframe('','db_iframe_orcreceita','func_orcreceita.php?funcao_js=parent.js_mostracodrec|o70_codrec','Pesquisa',true,0);
+    var codSuplementacao = <?=$o46_codsup?>;
+    js_OpenJanelaIframe('','db_iframe_orcreceita','func_orcreceita.php?funcao_js=parent.js_mostracodrec|o70_codrec&manutecaosuple=1&codsuplementacao='+codSuplementacao+'','Pesquisa',true,0);
 }
 
 document.form1.o85_codrec.addEventListener("change", function() {

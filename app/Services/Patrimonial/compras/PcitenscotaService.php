@@ -12,7 +12,7 @@ use App\Models\Patrimonial\Compras\Solicitemregistropreco;
 use App\Models\Patrimonial\Compras\Solicitemunid;
 use App\Models\Patrimonial\Compras\Solicitemvinculo;
 use App\Repositories\Patrimonial\Compras\ItemprecoreferenciaRepository;
-use App\Repositories\Patrimonial\Compras\PcdotacRepository;
+use App\Repositories\Patrimonial\Compras\PcDotacRepository;
 use App\Repositories\Patrimonial\Compras\PcorcamitemprocRepository;
 use App\Repositories\Patrimonial\Compras\PcorcamitemRepository;
 use App\Repositories\Patrimonial\Compras\PcorcamvalRepository;
@@ -26,7 +26,7 @@ use App\Repositories\Patrimonial\Compras\SolicitemRepository;
 use App\Repositories\Patrimonial\Compras\SolicitemunidRepository;
 use App\Repositories\Patrimonial\Compras\SolicitemvinculoRepository;
 use App\Repositories\Patrimonial\Compras\ProcessocompraloteitemRepository;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class PcitenscotaService
 {
@@ -61,7 +61,7 @@ class PcitenscotaService
         $this->itemprecoreferenciaRepository = new ItemprecoreferenciaRepository();
         $this->precoreferenciaRepository = new PrecoreferenciaRepository();
         $this->processocompraloteitemRepository = new ProcessocompraloteitemRepository();
-        $this->pcdotacRepository = new PcdotacRepository();
+        $this->pcdotacRepository = new PcDotacRepository();
     }
 
     /**

@@ -31,14 +31,15 @@
  * @revision $Author: dbtales.baz $
  * @version $Revision: 1.13 $
  */
-require("libs/db_stdlib.php");
-require("libs/db_utils.php");
-require("libs/db_app.utils.php");
-require("libs/db_conecta.php");
-include("libs/db_sessoes.php");
-include("libs/db_usuariosonline.php");
-include("dbforms/db_funcoes.php");
-include("libs/JSON.php");
+require_once("model/protocolo/AssinaturaDigital.model.php");
+require_once(modification("libs/db_stdlib.php"));
+require_once("libs/db_utils.php");
+require_once("libs/db_app.utils.php");
+require_once("libs/db_conecta.php");
+require_once("libs/db_sessoes.php");
+require_once("libs/db_usuariosonline.php");
+require_once("dbforms/db_funcoes.php");
+require_once("libs/JSON.php");
 
 $oPost = db_utils::postMemory($_POST);
 $oGet  = db_utils::postMemory($_GET);
@@ -60,6 +61,7 @@ $oRotulo->label("o54_descr");
 $oRotulo->label("o56_codele");
 
 $oJson = new Services_JSON();
+$oAssinaturaDigital =  new AssinaturaDigital();
 $oParam  = $oJson->decode(str_replace("\\","",$_GET["json"]));
 /**
  * Verificamos se a rotina foi liberada pela folha
@@ -267,9 +269,18 @@ db_app::load("estilos.css");
        </tr>
        <tr>
         <td colspan="7" style="text-align: center;">
-          <span id='buttonReservas'>
+        <span id='buttonDotacoes'></span>  
+        <span id='buttonReservas'>
           </span>
           <input type='button' onclick="js_gerarEmpenhos()"     id='empenhar'     value='Gerar Empenhos' disabled>
+          <input type='button' onclick="js_gerarTotalizacoes()" id='totalizacoes' value='Totalizações' >
+            <input type='button' onclick="js_emiteRelatorioOrdemEmpenho()" id='relatorio' value='Imprimir' disabled>
+            <?php
+                if($oAssinaturaDigital->verificaAssituraAtiva()){
+                    echo "<input type='button' onclick='js_enviarOrdemEmpenhoAssinatura()' id='assinatura' value='Solicitar Nova Assinatura Digital' disabled>";
+                }
+            ?>
+          <input type='hidden' name='empenhos_financeiros_gerados' id='empenhos_financeiros_gerados' value=''>
         </td>
        </tr>
    </table>
@@ -488,6 +499,7 @@ switch (oParametros.sSigla) {
 }
 ?>
 sUrl = "pes4_gerarEmpenhoFolhaRPC.php";
+sUrlAssinatura = "con1_assinaturaDigitalDocumentos.RPC.php";
 
 function js_init() {
   /**
@@ -534,40 +546,40 @@ function js_retornoConsultaEmpenhos(oResponse) {
 
       with (oRetorno.itens[i]) {
 
-
+        iMarcador = i
         var oRow              = document.createElement("TR");
         oRow.style.height     = "1em";
         oRow.style.fontWeight = "bold";
         oRow.style.cursor     = "default";
         oRow.className        = "empenho";
-        oRow.id               = 'no'+rh02_seqpes;
+        oRow.id               = 'no'+iMarcador;
         oRow.setAttribute('estado', 1);
         oRow.setAttribute('rh02_seqpes', rh02_seqpes);
         var sImagemTree = "plusbottom.gif";
         var iProximoId  = '';
         if (oRetorno.itens[i+1]) {
-         var iProximoId = oRetorno.itens[i+1].rh02_seqpes;
+          iProximoId = i+1;
         }
         if (i+1 == oRetorno.itens.length) {
           sImagemTree   = "plus.gif";
 
         }
         var oCellTree = document.createElement("TD");
-        oCellTree.innerHTML  = "<img id='open"+rh02_seqpes+"'  src='imagens/treeplus.gif' border='0'>";
+        oCellTree.innerHTML  = "<img id='open"+iMarcador+"' onclick='getEmpenhosFilhos("+rh02_seqpes+", \""+iProximoId+"\", "+i+")' src='imagens/treeplus.gif' border='0'>";
         oCellTree.align      = "center";
 
          var oCellMatricula  = document.createElement("TD");
-         oCellMatricula.innerHTML         = "<span id='matric"+rh02_seqpes+"'>M-"+rh01_regist+"</span>";
+         oCellMatricula.innerHTML         = "<span id='matric"+iMarcador+"'>M-"+rh01_regist+"</span>";
          oCellMatricula.align      = "right";
          oCellMatricula.style.padding     = "1px";
          oCellMatricula.style.borderRight = "1px solid #999999";
          var oCellNome  = document.createElement("TD");
-         oCellNome.innerHTML         = "<span id='nome"+rh02_seqpes+"'>"+z01_nome.urlDecode()+"</span>";
+         oCellNome.innerHTML         = "<span id='nome"+iMarcador+"'>"+z01_nome.urlDecode()+"</span>";
          oCellNome.colSpan          = 6;
          oCellNome.style.padding     = "1px";
 
          var oCellValor  = document.createElement("TD");
-         oCellValor.innerHTML        = "<span id='valor"+rh02_seqpes+"'>"+js_formatar(rh73_valor, "f")+"</span>";
+         oCellValor.innerHTML        = "<span id='valor"+iMarcador+"'>"+js_formatar(rh73_valor, "f")+"</span>";
          oCellValor.colSpan          = 1;
          oCellValor.align            = "right";
 
@@ -588,9 +600,6 @@ function js_retornoConsultaEmpenhos(oResponse) {
          if (totalempenhos == totalempenhosreserva) {
            iToTalEmpEmpenhosReservados++;
          }
-
-         getEmpenhosFilhos(rh02_seqpes,iProximoId);
-
        }
      }
      if (iToTalEmpEmpenhosReservados == oRetorno.itens.length) {
@@ -606,14 +615,17 @@ function js_retornoConsultaEmpenhos(oResponse) {
      if (lReservadoSaldo && lBotoes) {
 
        $('empenhar').disabled     = false;
+       $('buttonDotacoes').innerHTML = "<input type='button' onclick='js_imprimirDotacoes()'  id='imprimiriDotacoes'    value='Imprimir Dotações' disabled>";
        $('buttonReservas').innerHTML = "<input type='button' onclick='js_cancelarReservas()' id='cancelarreserva'    value='Cancelar reservas de Saldos' >";
 
      } else if (!lReservadoSaldo && lBotoes) {
 
        $('empenhar').disabled     = true;
        if (oRetorno.itens.length > 0) {
+         $('buttonDotacoes').innerHTML = "<input type='button' onclick='js_imprimirDotacoes()'  id='imprimiriDotacoes'    value='Imprimir Dotações' >";
          $('buttonReservas').innerHTML = "<input type='button' onclick='js_reservarSaldos()'  id='reservasaldo'    value='Reservar Saldos' >";
        } else {
+         $('buttonDotacoes').innerHTML = "<input type='button' onclick='js_imprimirDotacoes()'  id='imprimiriDotacoes'    value='Imprimir Dotações' disabled>";
          $('buttonReservas').innerHTML = "<input type='button' onclick='js_reservarSaldos()'  id='reservasaldo'    value='Reservar Saldos' disabled>";
        }
 
@@ -646,32 +658,37 @@ function js_retornoConsultaEmpenhos(oResponse) {
    $('valorbruto').innerHTML     = "&nbsp;&nbsp;"+js_formatar(nValorBruto, "f");
    $('valordescontos').innerHTML = "&nbsp;&nbsp;"+js_formatar(nValorDesconto, "f");
    $('valorliquido').innerHTML   = "&nbsp;&nbsp;"+js_formatar(nValorBruto - nValorDesconto, "f");
-
+   js_buscaEmpenhosFinanceiros();
 }
 
-function getEmpenhosFilhos(iSequencial, iProximoEmpenho) {
+function getEmpenhosFilhos(iSequencial, iProximoEmpenho, iIndex) {
 
-  var lConsulta = true;
-  /*if ($('no'+iSequencial).getAttribute("estado") == 1) {
-   $('no'+iSequencial).setAttribute("estado",2);
-   $('open'+iSequencial).src='imagens/treeminus.gif';
+  iMarcador = iIndex
+
+  var lConsulta = false;
+  if ($('no'+iMarcador).getAttribute("estado") == 1) {
+   $('no'+iMarcador).setAttribute("estado",2);
+   $('open'+iMarcador).src='imagens/treeminus.gif';
    lConsulta = true;
 
   } else {
 
-    $('no'+iSequencial).setAttribute("estado",1);
-    $('open'+iSequencial).src='imagens/treeplus.gif';
+    $('no'+iMarcador).setAttribute("estado",1);
+    $('open'+iMarcador).src='imagens/treeplus.gif';
     lConsulta = false;
 
-  }*/
+  }
   /**
    * Buscamos a informacao dos dados por funcionario
    */
+
   if (lConsulta) {
 
    oParametros.exec            = "getDadosEmpenho";
    oParametros.iSeqPes         = iSequencial;
    oParametros.iProximoEmpenho = iProximoEmpenho;
+   oParametros.iIndex          = iMarcador;
+   oParametros.lRecisao        = true;
    var oAjax  = new Ajax.Request(
                                  sUrl,
                                  {
@@ -682,10 +699,10 @@ function getEmpenhosFilhos(iSequencial, iProximoEmpenho) {
                                );
    } else {
 
-     var aListaNos = getElementsByClass("empenhos"+iSequencial);
+     var aListaNos = getElementsByClass("empenhos"+iMarcador+iSequencial);
      for (var i = 0; i < aListaNos.length; i++) {
 
-       var aListaRubricas = getElementsByClass("rubricas"+iSequencial+"empenho"+aListaNos[i].getAttribute('sequencial'));
+      var aListaRubricas = getElementsByClass("rubricas"+iSequencial+"empenho"+iMarcador+aListaNos[i].getAttribute("sequencial"));
        for (j = 0; j < aListaRubricas.length; j++) {
         $('listaEmpenhos').removeChild(aListaRubricas[j]);
        }
@@ -710,7 +727,7 @@ function js_retornoGetDadosEmpenhoFilho(oResponse) {
 
       with (oRetorno.itens[j]) {
 
-        var sId = new String(rh72_sequencial);
+        var sId = new String(oRetorno.iIndex)+new String(rh72_sequencial);
 
         var oRow    = document.createElement("TR");
         oRow.style.height  = "1em";
@@ -719,7 +736,7 @@ function js_retornoGetDadosEmpenhoFilho(oResponse) {
         oRow.setAttribute("sequencial", rh72_sequencial);
         oRow.setAttribute("estado", 1);
         oRow.id            = "noempenho"+sId;
-        oRow.className     ='empenhos'+rh73_seqpes;
+        oRow.className     ='empenhos'+oRetorno.iIndex+rh73_seqpes;
         oRow.ondblclick    = function () {
            js_alterarDotacao(rh72_sequencial, 1, rh73_seqpes);
         }
@@ -728,15 +745,15 @@ function js_retornoGetDadosEmpenhoFilho(oResponse) {
         oCellTree.innerHTML      = "<img src='imagens/identacao.gif' border='0'>";
         oCellTree.align          = "right";
         oCellTree.style.padding  = "0px";
-        oCellTree.innerHTML     += "<img id='openempenho"+sId+"' onclick='js_showRubricas("+rh72_sequencial+","+rh73_seqpes+")' src='imagens/treeplus.gif' border='0'>";
+        oCellTree.innerHTML     += "<img id='openempenho"+sId+"' onclick='js_showRubricas("+rh72_sequencial+","+rh73_seqpes+","+oRetorno.iIndex+")' src='imagens/treeplus.gif' border='0'>";
 
          var oCellOrgao  = document.createElement("TD");
-         oCellOrgao.innerHTML         = "<span id='orgao"+rh72_sequencial+"'>"+rh72_orgao+"</span>";
+         oCellOrgao.innerHTML         = "<span id='orgao"+sId+"'>"+rh72_orgao+"</span>";
          oCellOrgao.style.textAlign   = "center";
          oCellOrgao.className         = "border";
 
          var oCellUnidade             = document.createElement("TD");
-         oCellUnidade.innerHTML       = "<span style='display:none' id='unidade"+rh72_sequencial+"'>"+rh72_unidade+"</span>&nbsp;"+rh72_unidade.urlDecode()+' - '+o41_descr.urlDecode().substr(0,38);
+         oCellUnidade.innerHTML       = "<span style='display:none' id='unidade"+sId+"'>"+rh72_unidade+"</span>&nbsp;"+rh72_unidade.urlDecode()+' - '+o41_descr.urlDecode().substr(0,38);
          oCellUnidade.style.textAlign = 'left';
          oCellUnidade.className       = "border";
 //         oCellUnidade.id              = "unidade"+rh72_sequencial;
@@ -744,16 +761,16 @@ function js_retornoGetDadosEmpenhoFilho(oResponse) {
          var oCellAtividade           = document.createElement("TD");
          oCellAtividade.innerHTML     = rh72_projativ.urlDecode();
          oCellAtividade.className     = "border";
-         oCellAtividade.id            = 'projativ'+rh72_sequencial;
+         oCellAtividade.id            = 'projativ'+sId;
 
          var oCellRecurso             = document.createElement("TD");
          oCellRecurso.style.textAlign = 'right';
          oCellRecurso.innerHTML       = rh72_recurso;
          oCellRecurso.className       = "border";
-         oCellRecurso.id              = 'recurso'+rh72_sequencial;
+         oCellRecurso.id              = 'recurso'+sId;
 
          var oCellElemento             = document.createElement("TD");
-         oCellElemento.innerHTML       = "<span style='display:none' id='elemento"+rh72_sequencial+"'>"+rh72_codele+"</span>&nbsp;"+o56_elemento.urlDecode()+' - '+o56_descr.urlDecode().substr(0,37);
+         oCellElemento.innerHTML       = "<span style='display:none' id='elemento"+sId+"'>"+rh72_codele+"</span>&nbsp;"+o56_elemento.urlDecode()+' - '+o56_descr.urlDecode().substr(0,37);
          oCellElemento.style.textAlign = 'left';
          oCellElemento.className       = "border";
 //         oCellElemento.id              = 'elemento'+rh72_sequencial;
@@ -762,10 +779,10 @@ function js_retornoGetDadosEmpenhoFilho(oResponse) {
          oCellCaracteristica.innerHTML       = rh72_concarpeculiar.urlDecode();
          oCellCaracteristica.style.textAlign = 'right';
          oCellCaracteristica.className       = "border";
-         oCellCaracteristica.id              = 'caracteristica'+rh72_sequencial;
+         oCellCaracteristica.id              = 'caracteristica'+sId;
 
         var oCellDotacao               = document.createElement("TD");
-         oCellDotacao.innerHTML        = "<span style='display:none' id='dotacao"+rh72_sequencial+"'>"+rh72_coddot+"</span>";
+         oCellDotacao.innerHTML        = "<span style='display:none' id='dotacao"+sId+"'>"+rh72_coddot+"</span>";
 
          if(rh72_coddot != 0){
           oCellDotacao.innerHTML      += "<a href='#' onclick='js_mostraDotacao("+rh72_coddot+");return false'>"+rh72_coddot.urlDecode()+"</a>";
@@ -780,7 +797,7 @@ function js_retornoGetDadosEmpenhoFilho(oResponse) {
          oCellValor.innerHTML       = js_formatar(rh73_valor, 'f');
          oCellValor.style.textAlign = 'right';
          oCellValor.className       = "border";
-         oCellValor.id              = "valor"+rh72_sequencial;
+         oCellValor.id              = "valor"+sId;
          if (o120_orcreserva == "") {
 
            oCellValor.style.color = "red";
@@ -809,17 +826,17 @@ function js_retornoGetDadosEmpenhoFilho(oResponse) {
          }
 
          var oCellPrograma  = document.createElement("TD");
-         oCellPrograma.innerHTML         = "<span id='programa"+rh72_sequencial+"'>"+rh72_programa+"</span>";
+         oCellPrograma.innerHTML         = "<span id='programa"+sId+"'>"+rh72_programa+"</span>";
          oCellPrograma.style.textAlign   = "center";
          oCellPrograma.className         = "border";
 
          var oCellFuncao  = document.createElement("TD");
-         oCellFuncao.innerHTML         = "<span id='funcao"+rh72_sequencial+"'>"+rh72_funcao+"</span>";
+         oCellFuncao.innerHTML         = "<span id='funcao"+sId+"'>"+rh72_funcao+"</span>";
          oCellFuncao.style.textAlign   = "center";
          oCellFuncao.className         = "border";
 
          var oCellSubFuncao  = document.createElement("TD");
-         oCellSubFuncao.innerHTML         = "<span id='subfuncao"+rh72_sequencial+"'>"+rh72_subfuncao+"</span>";
+         oCellSubFuncao.innerHTML         = "<span id='subfuncao"+sId+"'>"+rh72_subfuncao+"</span>";
          oCellSubFuncao.style.textAlign   = "center";
          oCellSubFuncao.className         = "border";
 
@@ -868,7 +885,7 @@ function js_retornoGetDadosEmpenhoFilho(oResponse) {
             var oRowRubricas    = document.createElement("TR");
             oRowRubricas.style.height  = "1em";
             oRowRubricas.style.display = "none";
-            oRowRubricas.className     ='rubricas'+rh73_seqpes+'empenho'+rh72_sequencial;
+            oRowRubricas.className     ='rubricas'+rh73_seqpes+'empenho'+sId;
 
             var oCellTree        = document.createElement("TD");
             oCellTree.innerHTML  = "<img src='imagens/espaco.gif' border='0'>";
@@ -928,25 +945,27 @@ function js_retornoGetDadosEmpenhoFilho(oResponse) {
 }
 
 
-function js_showRubricas(iSequencial, iEmpenho) {
+function js_showRubricas(iSequencial, iEmpenho, iIndex) {
+
+  let iMarcador = new String(iIndex)+new String(iSequencial);
 
   var lConsulta = false;
-  if ($('noempenho'+iSequencial).getAttribute("estado") == 1) {
+  if ($('noempenho'+iMarcador).getAttribute("estado") == 1) {
 
-   $('noempenho'+iSequencial).setAttribute("estado",2);
-  // $('openempenho'+iSequencial).src='imagens/setabrancabaixo.png';
-   $('openempenho'+iSequencial).src='imagens/treeminus.gif';
+   $('noempenho'+iMarcador).setAttribute("estado",2);
+
+   $('openempenho'+iMarcador).src='imagens/treeminus.gif';
    lConsulta = true;
 
   } else {
 
-    $('noempenho'+iSequencial).setAttribute("estado",1);
-//    $('openempenho'+iSequencial).src ='imagens/setabranca.png';
-    $('openempenho'+iSequencial).src ='imagens/treeplus.gif';
+    $('noempenho'+iMarcador).setAttribute("estado",1);
+
+    $('openempenho'+iMarcador).src ='imagens/treeplus.gif';
     lConsulta = false;
 
   }
- var aListaRubricas = getElementsByClass("rubricas"+iEmpenho+"empenho"+iSequencial)
+ var aListaRubricas = getElementsByClass("rubricas"+iEmpenho+"empenho"+iMarcador)
  aListaRubricas.each(function(oRubrica, id) {
 
    if (lConsulta) {
@@ -1780,7 +1799,7 @@ function js_gerarEmpenhos() {
   aItens = getElementsByClass("empenho");
 
   //var oParam       = new Object();
-  oParametros.exec      = "gerarEmpenhos";
+  oParametros.exec      = "gerarEmpenhosRecisao";
   oParametros.lOPporRecurso = false;
   oParametros.rescisao   = true;
   oParametros.aEmpenhos = new Array();
@@ -1819,7 +1838,14 @@ function js_retornoGerarEmpenhos(oRequest) {
   if (oRetorno.status == 1) {
 
     alert('Empenhos Gerados com sucesso\nOrdem Auxiliar Nº'+oRetorno.e42_sequencial);
+    $('empenhos_financeiros_gerados').value = oRetorno.empenhos_financeiros_gerados;
+    $('relatorio').disabled = false;
+    $('assinatura').disabled = false;
     js_init();
+
+    if(confirm("Deseja imprimir as ordens de pagamento e os empenhos?")) {
+      js_emiteRelatorioOrdemEmpenho(oRetorno.empenhos_financeiros_gerados);
+    }
 
   } else {
     alert(oRetorno.message.urlDecode().replace(sExpReg,'\n'));
@@ -1837,6 +1863,98 @@ function js_mostraDotacao(chave){
                        (document.body.clientWidth)-40,
                        document.body.scrollHeight-180);
 }
+
+function js_imprimirDotacoes() {
+  console.log(oParametros);
+  let query = "iTipoEmpenho="+oParametros.iTipoEmpenho;
+  query     += "&iAnoFolha="+oParametros.iAnoFolha;
+  query     += "&iMesFolha="+oParametros.iMesFolha;
+  query     += "&iTipo="+oParametros.iTipo;
+  query     += "&sSemestre="+oParametros.sSemestre;
+  query     += "&sSigla="+oParametros.sSigla;
+
+  jan = window.open('pes4_saldodotacoes.php?'+query, "", 'width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0');
+  jan.moveTo(0,0);
+}
+
+function js_buscaEmpenhosFinanceiros() {
+
+  oParametros.exec = 'getEmpenhosFinanceiros';
+
+  js_divCarregando('Aguarde!', 'msgbox');
+
+  var oAjax  = new Ajax.Request(
+    sUrl,
+    {
+      method: 'post',
+      parameters: 'json='+Object.toJSON(oParametros),
+      onComplete: js_retornoBuscaEmpenhosFinanceiros
+    }
+  );
+}
+
+function js_retornoBuscaEmpenhosFinanceiros(oResponse) {
+  js_removeObj('msgbox');
+
+  oRetorno = eval("("+oResponse.responseText+")");
+
+  if (oRetorno.status == 1) {
+    if (oRetorno.empenhos_financeiros != '') {
+      $('empenhos_financeiros_gerados').value = oRetorno.empenhos_financeiros;
+      $('relatorio').disabled = false;
+      $('assinatura').disabled = false;
+    }
+  }
+
+}
+
+function js_enviarOrdemEmpenhoAssinatura(sEmpenhosGerados = '') {
+  if(!confirm('Esse procedimento invalidará as assinaturas já realizadas. Deseja continuar?')){
+    return false;
+  }
+
+  if (sEmpenhosGerados == '') {
+    sEmpenhosGerados = $('empenhos_financeiros_gerados').value;
+  }
+console.log();
+  if (sEmpenhosGerados != '') {
+    js_divCarregando('Aguarde, Enviando documentos para assinatura','msgbox');
+    var oParam = new Object();
+    oParam.sExecuta = "assinarDocumentosFolha";
+    oParam.sEmpenhosGerados = sEmpenhosGerados;
+    var oAjax  = new Ajax.Request(
+      sUrlAssinatura,
+      {
+        method: 'post',
+        parameters: 'json='+Object.toJSON(oParam),
+        onComplete: js_retornoOrdemEmpenhoAssinatura
+      }
+    );
+  }
+}
+function js_retornoOrdemEmpenhoAssinatura(oRequest){
+  js_removeObj('msgbox');
+  var oRetorno = eval("("+oRequest.responseText+")");
+  if (oRetorno.erro) {
+    alert(oRetorno.sMensagem.urlDecode());
+  }else {
+    alert('Empenhos enviados para assinatura com sucesso!');
+  }
+}
+
+function js_emiteRelatorioOrdemEmpenho(sEmpenhosGerados = '') {
+  if (sEmpenhosGerados == '') {
+    sEmpenhosGerados = $('empenhos_financeiros_gerados').value;
+  }
+
+  if (sEmpenhosGerados != '') {
+    jan = window.open('pes2_rhempenhoordemcomprafolha002.php?sEmpenhosGerados='+sEmpenhosGerados,
+                        '',
+                        'width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0 ');
+    jan.moveTo(0,0);
+  }
+}
+
 $('rh72_orgao').style.width="95px";
 $('rh72_orgaodescr').style.width="300px";
 $('rh72_unidade').style.width="395px";

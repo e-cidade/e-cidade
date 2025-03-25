@@ -1,5 +1,9 @@
 <?php
 
+use App\Repositories\Contabilidade\OperacaoCreditoRepository;
+use App\Repositories\Contabilidade\PrevisaoOperacaoCreditoRepository;
+
+
 require_once("std/db_stdClass.php");
 require_once("libs/db_stdlib.php");
 require_once("libs/db_conecta.php");
@@ -158,6 +162,98 @@ try {
             $oRetorno->c229_vlprevisto     = 0;
             $oRetorno->valor_arrecadado    = 0;
 
+        break;
+
+        case "salvaOperacaoCredito":
+            db_inicio_transacao();
+
+            // Verifica se existe operacao de credito
+            $previsaoOperacaoCreditoRepository = new PrevisaoOperacaoCreditoRepository();
+            if ($previsaoOperacaoCreditoRepository->existePrevisao($oParam->iReceita, $oParam->iOperacaoCredito, $iAnoUsu)) {
+                throw new Exception("Operação de Crédito já associado a esta receita! ");
+            }
+            
+            // Salvar Operacao de Credito
+            $operacaoCredito = $previsaoOperacaoCreditoRepository->insert($oParam->iReceita, $oParam->iOperacaoCredito, $iAnoUsu, 0);
+
+            // Retorna Operacao de Credito Vinculada
+            $operacaoCreditoRepository = (new OperacaoCreditoRepository())->pegarPorSequencial($oParam->iOperacaoCredito);
+            $oRetorno->iReceita = $oParam->iReceita;
+            $oRetorno->iCodigoDivida = $operacaoCreditoRepository->op01_sequencial;
+            $oRetorno->iNumeroContrato = $operacaoCreditoRepository->op01_numerocontratoopc;
+            $oRetorno->sObjeto = $operacaoCreditoRepository->op01_objetocontrato;
+            $oRetorno->dDataAssinatura = $operacaoCreditoRepository->op01_dataassinaturacop;
+            $oRetorno->fVlPrevisto = 0;
+            $oRetorno->fVlArrecadado = 0;
+        break;
+
+        case "buscaOperacoesDeCredito":
+            db_inicio_transacao();
+            $oRetorno->vlPrevistoTotal = 0;
+
+            try {
+                $previsoesOperacaoCredito = (new PrevisaoOperacaoCreditoRepository())->pegarOperacoesDeCredito($oParam->iCodRec, $iInstit, $iAnoUsu);
+                foreach ($previsoesOperacaoCredito as $oPrevisao) {
+                    $oPrevisao->iReceita = $oParam->iCodRec;
+                    $oPrevisao->iCodigoDivida = $oPrevisao->op01_sequencial;
+                    $oPrevisao->iNumeroContrato = $oPrevisao->op01_numerocontratoopc;
+                    $oPrevisao->sObjeto = urlencode($oPrevisao->op01_objetocontrato);
+                    $oPrevisao->dDataAssinatura = $oPrevisao->op01_dataassinaturacop;
+                    $oPrevisao->fVlPrevisto = $oPrevisao->c242_vlprevisto;
+                    $oPrevisao->fVlArrecadado = $oPrevisao->valor_arrecadado;
+                    $oRetorno->aItens[] = $oPrevisao;
+                    $oRetorno->fVlPrevisto += $oPrevisao->c242_vlprevisto;
+                }
+            } catch (Exception $e) {
+                throw new Exception($e->getMessage());
+            }
+        break;
+
+        case "excluiOperacaoCredito": 
+            db_inicio_transacao();
+            $previsaoOperacaoCreditoRepository = new PrevisaoOperacaoCreditoRepository();
+
+            foreach ($oParam->aItens as $oItem) {
+                try {
+                    $previsaoOperacaoCreditoRepository->delete($oItem->c242_operacaocredito, $oItem->c242_fonte, $iAnoUsu);
+                    $oRetorno->sMensagem = "Registros excluídos com sucesso.";      
+                } catch (Exception $e) {
+                    throw new Exception("Erro ao excluir associação de uma operação de crédito à previsão de receita . " . $e->getMessage());
+                }
+            }
+        break;
+
+        case "salvaOperacoesCredito":
+            db_inicio_transacao();
+            $fValorPrevTotal = 0;
+
+            try {
+                foreach ($oParam->aItens as $aItem) {
+                    //Verifica se os valores previstos ultrapassam o valor previsto
+                    $fValorPrevTotal += $aItem->c242_vlprevisto;
+
+                    if ($fValorPrevTotal > $oParam->fValorPrevAno) {
+                        throw new Exception("Valor previsto para as operações de crédito superior ao valor previsto no ano");
+                    }
+
+                    // Verifica se existe operacao de credito
+                    $previsaoOperacaoCreditoRepository = new PrevisaoOperacaoCreditoRepository();
+                    if ($previsaoOperacaoCreditoRepository->existePrevisao($aItem->c242_fonte, $aItem->c242_operacaocredito, $iAnoUsu)) {
+                        if (!$previsaoOperacaoCreditoRepository->update($aItem->c242_fonte, $aItem->c242_operacaocredito, $iAnoUsu, $aItem->c242_vlprevisto)) {
+                            throw new Exception("[1] Erro ao criar associação de operação de crédito à previsão de receita. ");
+                        }
+                    } else {
+                        if (!$previsaoOperacaoCreditoRepository->insert($aItem->c242_fonte, $aItem->c242_operacaocredito, $iAnoUsu, $aItem->c242_vlprevisto)) {
+                            throw new Exception("[2] Erro ao criar associação de convênio à previsão de receita . ");
+                        }
+                    }
+                }
+                
+                $oRetorno->fValorPrevTotal = $fValorPrevTotal;
+                $oRetorno->sMensagem = "Registros criados com sucesso.";
+            } catch (Exception $e) {
+                throw new Exception($e->getMessage());
+            }
         break;
 
         case "salvaGeral":

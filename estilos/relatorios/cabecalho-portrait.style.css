@@ -1,13 +1,14 @@
 .cabecalho {
   height: 110px;
 }
+
 .cabecalho .logo {
   width: 110px;
   height: 110px;
 }
 
 .cabecalho .cliente {
-  width: 380px;
+  width: 320px;
   height: 110px;
   font-size: 10px;
 }

@@ -48,6 +48,11 @@ class ItemFabrica
         $listaItens = [];
 
         foreach($itens as $item) {
+
+            if($item['Propostas'] == null){
+                continue;
+            }
+
             $listaItens[] = $this->criar($item);
         }
 

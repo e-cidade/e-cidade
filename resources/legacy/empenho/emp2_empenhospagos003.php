@@ -35,6 +35,7 @@ require_once("libs/db_usuariosonline.php");
 require_once("dbforms/db_funcoes.php");
 require_once("classes/db_coremp_classe.php");
 require_once("classes/db_pagordemnota_classe.php");
+require_once("classes/db_empelemento_classe.php");
 include ("libs/db_liborcamento.php");
 
 $iAnoUsoSessao      = db_getsession("DB_anousu");
@@ -550,7 +551,15 @@ fputs($fp, "DATA AUTENT;COD.CON;DESCRIÇÃO CONTA;FONTE;DOT.;EMP/SLIP;ORDEM;NOTAS 
         fputs($fp, ";");
       fputs($fp, "\n");  
 
+      $clempelemento  = new cl_empelemento;
+      $result     = $clempelemento->sql_record($clempelemento->sql_query($oDadoEmpenho->e60_numemp, null, "e64_codele, o56_elemento,o56_descr","e64_codele"));
+      if ($clempelemento->numrows > 0) {
+          db_fieldsmemory($result,0);
+      }
+
       if($oPost->iPrestacaoConta==2) {
+        fputs($fp, "Desdobramento: ; " . substr($o56_elemento,1) . " " . $o56_descr);
+        fputs($fp, "\n");
         fputs($fp, "Histórico: ; $oDadoEmpenho->e60_resumo");
         fputs($fp, "\n");
         }

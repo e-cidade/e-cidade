@@ -205,7 +205,7 @@ include("libs/db_utils.php");
  		  with (aObjCampos[iInd]) {
 		  	sLinha += "<tr id='linhaCampo"+sNome+"' class='linhagrid' >";		  	
 		  	sLinha += "  <td class='linhagrid'  onClick='js_marcaLinha(\"linhaCampo"+sNome+"\",\"listaCampos\");'  style='text-align:left; width:242px;'>"+sAlias.urlDecode();
-		  	sLinha += "    <input type='hidden' name='"+sAlias.urlDecode()+"' id='"+sNome+"' value='"+aObjCampos[iInd].toSource()+"'>";
+		  	sLinha += "     <input type='hidden' name='" + sNome + "' id='" + iId + "' value='" + JSON.stringify() + "'>";
 		  	sLinha += "  </td>";
 		  	sLinha += "</tr>";		  		
    	  }

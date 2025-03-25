@@ -17,13 +17,13 @@ $cllicpregao = new cl_licpregao;
 </head>
 <body bgcolor=#CCCCCC leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 <table height="100%" border="0"  align="center" cellspacing="0" bgcolor="#CCCCCC">
-  <tr> 
+  <tr>
     <td height="63" align="center" valign="top">
         <table width="35%" border="0" align="center" cellspacing="0">
 	     <form name="form2" method="post" action="" >
-          <tr> 
-            <td colspan="2" align="center"> 
-              <input name="pesquisar" type="submit" id="pesquisar2" value="Pesquisar"> 
+          <tr>
+            <td colspan="2" align="center">
+              <input name="pesquisar" type="submit" id="pesquisar2" value="Pesquisar">
               <input name="limpar" type="reset" id="limpar" value="Limpar" >
               <input name="Fechar" type="button" id="fechar" value="Fechar" onClick="parent.db_iframe_licpregao.hide();">
              </td>
@@ -32,8 +32,8 @@ $cllicpregao = new cl_licpregao;
         </table>
       </td>
   </tr>
-  <tr> 
-    <td align="center" valign="top"> 
+  <tr>
+    <td align="center" valign="top">
       <?
       if(!isset($pesquisa_chave)){
         if(isset($campos)==false){
@@ -51,7 +51,8 @@ $cllicpregao = new cl_licpregao;
           $result = $cllicpregao->sql_record($cllicpregao->sql_query($pesquisa_chave));
           if($cllicpregao->numrows!=0){
             db_fieldsmemory($result,0);
-            echo "<script>".$funcao_js."('$l45_sequencial',false);</script>";
+            $l45_tipo_desc = ($l45_tipo == 1) ? 'Permanente' : 'Especial';
+            echo "<script>".$funcao_js."('$l45_sequencial',false, '$l45_tipo_desc');</script>";
           }else{
 	         echo "<script>".$funcao_js."('',true);</script>";
           }

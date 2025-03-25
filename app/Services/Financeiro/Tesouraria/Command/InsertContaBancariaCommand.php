@@ -55,9 +55,9 @@ class InsertContaBancariaCommand
         }
     }
 
-    public function checkAllTables($sequencial)
+    public function checkAllTables($sequencial,$reduzido, $instituicao)
     {
-        $resultContaBancaria = $this->contaBancariaRepository->checkAllTables($sequencial);
+        $resultContaBancaria = $this->contaBancariaRepository->checkAllTables($sequencial,$reduzido, $instituicao);
         $contaBancaria = $resultContaBancaria->first();
         
         if ($contaBancaria) {

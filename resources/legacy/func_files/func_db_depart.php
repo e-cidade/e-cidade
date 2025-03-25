@@ -1,28 +1,28 @@
 <?
 /*
- *     E-cidade Software Publico para Gestao Municipal                
- *  Copyright (C) 2014  DBSeller Servicos de Informatica             
- *                            www.dbseller.com.br                     
- *                         e-cidade@dbseller.com.br                   
- *                                                                    
- *  Este programa e software livre; voce pode redistribui-lo e/ou     
- *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme  
- *  publicada pela Free Software Foundation; tanto a versao 2 da      
- *  Licenca como (a seu criterio) qualquer versao mais nova.          
- *                                                                    
- *  Este programa e distribuido na expectativa de ser util, mas SEM   
- *  QUALQUER GARANTIA; sem mesmo a garantia implicita de              
- *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM           
- *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais  
- *  detalhes.                                                         
- *                                                                    
- *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU     
- *  junto com este programa; se nao, escreva para a Free Software     
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA          
- *  02111-1307, USA.                                                  
- *  
- *  Copia da licenca no diretorio licenca/licenca_en.txt 
- *                                licenca/licenca_pt.txt 
+ *     E-cidade Software Publico para Gestao Municipal
+ *  Copyright (C) 2014  DBSeller Servicos de Informatica
+ *                            www.dbseller.com.br
+ *                         e-cidade@dbseller.com.br
+ *
+ *  Este programa e software livre; voce pode redistribui-lo e/ou
+ *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme
+ *  publicada pela Free Software Foundation; tanto a versao 2 da
+ *  Licenca como (a seu criterio) qualquer versao mais nova.
+ *
+ *  Este programa e distribuido na expectativa de ser util, mas SEM
+ *  QUALQUER GARANTIA; sem mesmo a garantia implicita de
+ *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM
+ *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais
+ *  detalhes.
+ *
+ *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU
+ *  junto com este programa; se nao, escreva para a Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ *  02111-1307, USA.
+ *
+ *  Copia da licenca no diretorio licenca/licenca_en.txt
+ *                                licenca/licenca_pt.txt
  */
 
 require_once("libs/db_stdlib.php");
@@ -54,7 +54,7 @@ $clorcorgao->rotulo->label("o40_descr");
 </head>
 <body bgcolor=#CCCCCC leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
 <table height="100%" border="0"  align="center" cellspacing="0" bgcolor="#CCCCCC">
-<tr> 
+<tr>
 <td height="63" align="center" valign="top">
 <table width="35%" border="0" align="center" cellspacing="0">
 <form name="form1" method="post" action="" >
@@ -62,11 +62,11 @@ $clorcorgao->rotulo->label("o40_descr");
 <?
 if (isset($todasinstit) and $todasinstit == 1) {
 ?>
-<tr> 
+<tr>
 <td width="4%" align="right" nowrap title="<?=$Tcodigo?>">
 <?=$Lcodigo?>
 </td>
-<td width="96%" align="left" nowrap> 
+<td width="96%" align="left" nowrap>
 <?
 	if (!isset($instituicao)) {
 		$instituicao = db_getsession("DB_instit");
@@ -89,7 +89,7 @@ if (isset($todasinstit) and $todasinstit == 1) {
 $instit=db_getsession("DB_instit");
 $anousu=db_getsession("DB_anousu");
 if (isset($instituicao) && $instituicao != 0) {
-  
+
    $instit = $instituicao;
 }
 $resultorgao = $clorcorgao->sql_record($clorcorgao->sql_query_orgao(null,null,"distinct o40_orgao,o40_descr","o40_descr","o40_instit=$instit and  o40_anousu=$anousu"));
@@ -110,12 +110,12 @@ if ($resultorgao) {
 $instit=db_getsession("DB_instit");
 $anousu=db_getsession("DB_anousu");
 if (isset($instituicao) && $instituicao != 0) {
-  
+
    $instit = $instituicao;
 }
 //sql_query ( $o41_anousu=null,$o41_orgao=null,$o41_unidade=null,$campos="*",$ordem=null,$dbwhere="")
 if (isset($orgao) && $orgao != 0 ){
-	
+
 	$resultunidade = $clorcunidade->sql_record($clorcunidade->sql_query(null,null,null,"distinct o41_unidade,o41_descr",null,"o41_instit=$instit and o41_anousu=$anousu and o41_orgao in ($orgao) "));
 }else {
 	//$unidade = 0;
@@ -133,17 +133,17 @@ if ($resultunidade) {
 <td width="4%" align="right" nowrap title="<?=$Tcoddepto?>">
 <?=$Lcoddepto?>
 </td>
-<td width="96%" align="left" nowrap> 
+<td width="96%" align="left" nowrap>
 <?
 db_input("coddepto",5,$Icoddepto,true,"text",4,"","chave_coddepto");
 ?>
 </td>
 </tr>
-<tr> 
+<tr>
 <td width="4%" align="right" nowrap title="<?=$Tdescrdepto?>">
 <?=$Ldescrdepto?>
 </td>
-<td width="96%" align="left" nowrap> 
+<td width="96%" align="left" nowrap>
 <?
 db_input("descrdepto",40,$Idescrdepto,true,"text",4,"","chave_descrdepto");
 ?>
@@ -152,8 +152,8 @@ db_input("descrdepto",40,$Idescrdepto,true,"text",4,"","chave_descrdepto");
 
 <tr>
 
-<td colspan="2" align="center"> 
-<input name="pesquisar" type="submit" id="pesquisar2" value="Pesquisar"> 
+<td colspan="2" align="center">
+<input name="pesquisar" type="submit" id="pesquisar2" value="Pesquisar">
 <input name="limpar" type="button" id="limpar" value="Limpar" onClick="js_limpar();">
 <input name="Fechar" type="button" id="fechar" value="Fechar" onClick="parent.db_iframe_db_depart.hide();">
 </td>
@@ -162,8 +162,8 @@ db_input("descrdepto",40,$Idescrdepto,true,"text",4,"","chave_descrdepto");
 </table>
 </td>
 </tr>
-<tr> 
-<td align="center" valign="top"> 
+<tr>
+<td align="center" valign="top">
 <?
 
 if (isset($todasinstit) and $todasinstit == 1) {
@@ -187,7 +187,7 @@ if (isset($todasinstit) and $todasinstit == 1) {
 if ( isset($depusu) && trim($depusu) != '' ) {
 	$whereGeral .= " and exists( select db_depusu.coddepto
                                  from db_depusu
-                                where db_depusu.coddepto   = db_depart.coddepto 
+                                where db_depusu.coddepto   = db_depart.coddepto
                                   and db_depusu.id_usuario = {$depusu} limit 1 )";
 
 }
@@ -203,16 +203,16 @@ if ( isset($lFiltrarUnidadeSaude) ) {
 if (!isset($pesquisa_chave)) {
 
   if (isset($campos)==false) {
-    
+
     if(file_exists("funcoes/db_func_db_depart.php") == true) {
       include("funcoes/db_func_db_depart.php");
     }else{
       $campos = "db_depart.*";
     }
   }
-  
+
   $campos = "distinct ".$campos;
-  
+
   if (isset($chave_coddepto) && (trim($chave_coddepto) != "") ) {
 
     $sWhere = " coddepto = $chave_coddepto and (limite is null or limite >= '" . date("Y-m-d",db_getsession("DB_datausu"))."') ";
@@ -224,7 +224,7 @@ if (!isset($pesquisa_chave)) {
     $sql     = $cldb_depart->sql_query_div("", $campos, "descrdepto", $sWhere.$whereGeral);
   } else if (isset($orgao) && $orgao != 0) {
 
- 		if (isset($unidade) && $unidade != 0) { 	
+ 		if (isset($unidade) && $unidade != 0) {
   		$where="o40_orgao in ($orgao) and db01_unidade = $unidade and";
  		} else {
  			$where="o40_orgao in ($orgao) and";
@@ -232,7 +232,7 @@ if (!isset($pesquisa_chave)) {
  		if (isset($unidades) && $unidades != "") {
   		$where = "db01_unidade in $unidades and ";
   	}
-  	
+
   	$sWhere = "{$where} (limite is null or limite >= '" . date("Y-m-d",db_getsession("DB_datausu"))."') ";
   	$sql = $cldb_depart->sql_query_div("", $campos, "coddepto", $sWhere.$whereGeral);
 
@@ -242,20 +242,20 @@ if (!isset($pesquisa_chave)) {
   	if (isset($unidades) && $unidades != "") {
   		$where = "db01_unidade in $unidades and ";
   	}
-  	
+
   	$sWhere = "$where (limite is null or limite >= '" . date("Y-m-d",db_getsession("DB_datausu"))."') ";
   	$sql = $cldb_depart->sql_query_div("", $campos, "coddepto", $sWhere.$whereGeral);
-  
+
   } else {
-  	
+
     $where = "";
-  	if (isset($unidades) && $unidades != "") {
+  	if (!empty($unidades)) {
   		$where = "db01_unidade in $unidades and ";
   	}
-	  if (isset($orgao) && $orgao != "") {
+	  if (!empty($orgao)) {
   		$where = "db01_orgao in ($orgao) and ";
   	}
-  	
+
   	$sWhere = $where."(limite is null or limite >= '" . date("Y-m-d",db_getsession("DB_datausu"))."') ";
     $sql = $cldb_depart->sql_query("", $campos, "coddepto", $sWhere.$whereGeral);
   }
@@ -269,7 +269,7 @@ if (!isset($pesquisa_chave)) {
     if (isset($unidades) && $unidades != "") {
   		$whereGeral .= " and db01_unidade in $unidades ";
   	}
-  	
+
   	$sWhere = "coddepto = $pesquisa_chave $whereGeral and (limite is null or limite >= '".date("Y-m-d",db_getsession("DB_datausu"))."')";
     $result = $cldb_depart->sql_record($cldb_depart->sql_query_div(null, "*", null, $sWhere));
     if ($cldb_depart->numrows != 0) {
@@ -296,7 +296,7 @@ function js_orgao(){
     //document.form1.submit();
   }
 	document.form1.submit();
-  
+
 }
 
 function js_unidade(){
@@ -309,7 +309,7 @@ function js_limpar(){
 //document.form1.instituicao.value="";
 document.form1.chave_coddepto.value="";
 document.form1.chave_descrdepto.value="";
-//document.form1.orgao.value="";	
-	
+//document.form1.orgao.value="";
+
 }
 </script>

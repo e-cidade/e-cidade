@@ -34,6 +34,8 @@ include("classes/db_pcsubgrupo_classe.php");
 include("classes/db_pcmater_classe.php");
 include("classes/db_pcmaterele_classe.php");
 include("dbforms/db_funcoes.php");
+require_once("classes/db_historicomaterial_classe.php");
+require_once 'libs/renderComponents/index.php';
 parse_str($HTTP_SERVER_VARS["QUERY_STRING"]);
 db_postmemory($HTTP_POST_VARS);
 $clpcmater = new cl_pcmater;
@@ -61,6 +63,18 @@ if ((isset($HTTP_POST_VARS["db_opcao"]) && $HTTP_POST_VARS["db_opcao"]) == "Excl
     $sqlerro = true;
   }
 
+  if($sqlerro == false){
+    $clhistoricomaterial = new cl_historicomaterial;
+    $clhistoricomaterial->excluir(
+      null,
+      "db150_coditem = $pc01_codmater"
+    );
+    
+    if ($clhistoricomaterial->erro_status == 0) {
+      $sqlerro = true;
+    }
+  }
+
   db_fim_transacao($sqlerro);
 } else if (isset($chavepesquisa)) {
   $db_opcao = 3;
@@ -79,6 +93,11 @@ if ((isset($HTTP_POST_VARS["db_opcao"]) && $HTTP_POST_VARS["db_opcao"]) == "Excl
   }
 }
 ?>
+
+<script type="text/javascript" defer>
+  loadComponents(['buttonsSolid']);
+</script>
+
 <html>
 
 <head>
@@ -87,6 +106,7 @@ if ((isset($HTTP_POST_VARS["db_opcao"]) && $HTTP_POST_VARS["db_opcao"]) == "Excl
   <meta http-equiv="Expires" CONTENT="0">
   <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
   <link href="estilos.css" rel="stylesheet" type="text/css">
+  <?php db_app::load("estilos.bootstrap.css");?>
 </head>
 
 <body bgcolor=#CCCCCC leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="a=1">
