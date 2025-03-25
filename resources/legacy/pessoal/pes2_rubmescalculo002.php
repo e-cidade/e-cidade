@@ -709,11 +709,13 @@ if ($sTipo == 'r') {
     for ($x = 0; $x < pg_num_rows($rsFinanceiro); $x++) {
         db_fieldsmemory($rsFinanceiro, $x);
 
+        $valor = number_format($valor, 2, ',', '');
+
         $str_dados = str_pad($regist, 10, " ") . " " .
             str_pad($z01_nome, 40, " ") . " " .
             str_pad($z01_cgccpf, 13, " ") . " " .
             str_pad($rubric, 10, " ") . " " .
-            str_pad(trim(db_formatar($valor, 'f')), 11, " ");
+            str_pad($valor, 11, " ", STR_PAD_LEFT);
         fputs($fl_arquivo, $str_dados . "\n");
     }
 

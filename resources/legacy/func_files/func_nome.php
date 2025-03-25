@@ -353,8 +353,10 @@ if (isset($testanome) && $testanome == 'true' && !isset($pesquisa_chave)) {
                     return /^[0-9|.]+$/.test(event.clipboardData.getData('text/plain'));
                 }
 
-                $('cnpj').onpaste = function(event) {
-                    return /^[0-9|.]+$/.test(event.clipboardData.getData('text/plain'));
+                if($('cnpj')){
+                    $('cnpj').onpaste = function(event) {
+                        return /^[0-9|.]+$/.test(event.clipboardData.getData('text/plain'));
+                    }
                 }
 
                 $('cpf').maxLength = 11;

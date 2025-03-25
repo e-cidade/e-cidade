@@ -1,0 +1,52 @@
+/* Textarea Container */
+.textarea-container {
+    margin-bottom: 15px;
+}
+
+/* Estilos gerais de rótulos */
+.textarea-container .label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #111827; /* Texto cinza-claro para temas claros */
+}
+
+/* Estilos gerais de textarea */
+.textarea-container .textarea-input {
+    display: block;
+    width: 100%;
+    font-size: 0.875rem;
+    color: #111827;
+    background-color: #F9FAFB;
+    border: 1px solid #D1D5DB;
+    border-radius: 0.5rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    padding: 0.625rem; /* Padding padrão (pode ser ajustado conforme necessário) */
+}
+
+.textarea-container .textarea-input:disabled {
+    background-color: #dddddd;
+}
+
+/* Tamanhos do textarea */
+.textarea-container-sm {
+    padding: 0.5rem; /* 8px */
+    font-size: 0.75rem; /* 12px */
+}
+
+.textarea-container-md {
+    padding: 0.625rem; /* 10px */
+    font-size: 0.875rem; /* 14px */
+}
+
+.textarea-container-lg {
+    padding: 1rem; /* 16px */
+    font-size: 1.125rem; /* 18px */
+}
+
+/* Estilos de foco do textarea */
+.textarea-container .textarea-input:focus {
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}

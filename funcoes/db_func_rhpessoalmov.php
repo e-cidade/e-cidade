@@ -25,5 +25,5 @@
  *                                licenca/licenca_pt.txt 
  */
 
-$campos = "rhpessoalmov.rh02_seqpes,rhpessoalmov.rh02_mesusu,rhpessoalmov.rh02_regist,rhpessoalmov.rh02_codreg,rhpessoalmov.rh02_tipsal,rhpessoalmov.rh02_folha,rhpessoalmov.rh02_fpagto,rhpessoalmov.rh02_tbprev,rhpessoalmov.rh02_hrsmen,rhpessoalmov.rh02_hrssem,rhpessoalmov.rh02_ocorre,rhpessoalmov.rh02_equip,rhpessoalmov.rh02_tpcont,rhpessoalmov.rh02_vincrais,rhpessoalmov.rh02_salari,rhpessoalmov.rh02_lota,rhpessoalmov.rh02_anousu as db_rh02_anousu";
+$campos = "rhpessoalmov.rh02_seqpes,rhpessoalmov.rh02_mesusu,rhpessoalmov.rh02_regist,rhpessoalmov.rh02_codreg,rhpessoalmov.rh02_tipsal,rhpessoalmov.rh02_folha,rhpessoalmov.rh02_fpagto,rhpessoalmov.rh02_tbprev,rhpessoalmov.rh02_hrsmen,rhpessoalmov.rh02_hrssem,rhpessoalmov.rh02_ocorre,rhpessoalmov.rh02_equip,rhpessoalmov.rh02_tpcont,rhpessoalmov.rh02_outrovincefetivo,rhpessoalmov.rh02_remcargoefetivo,rhpessoalmov.rh02_vincrais,rhpessoalmov.rh02_salari,rhpessoalmov.rh02_lota,rhpessoalmov.rh02_anousu as db_rh02_anousu";
 ?>

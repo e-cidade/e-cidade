@@ -3,7 +3,7 @@
 namespace App\Repositories\Patrimonial;
 
 use App\Models\EmpAnexo;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class EmpAnexoRepository
 {
@@ -31,7 +31,7 @@ class EmpAnexoRepository
      * Atualiza informações do Anexo
      *
      * @param int $iSequencialEmpAnexo - Sequencial do Anexo
-     * @param array $aDadosEmpAnexo - Dados do Anexo 
+     * @param array $aDadosEmpAnexo - Dados do Anexo
      * @return bool
      */
 

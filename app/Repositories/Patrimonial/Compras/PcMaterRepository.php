@@ -3,7 +3,7 @@ namespace App\Repositories\Patrimonial\Compras;
 
 use App\Models\PcMater;
 use App\Repositories\Contracts\Patrimonial\Compras\PcMaterRepositoryInterface;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class PcMaterRepository implements PcMaterRepositoryInterface{
     private PcMater $model;

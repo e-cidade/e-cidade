@@ -3,7 +3,7 @@
 namespace App\Repositories\Patrimonial\Compras;
 
 use App\Models\Patrimonial\Compras\Processocompraloteitem;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 class ProcessocompraloteitemRepository
 {
     private Processocompraloteitem $model;

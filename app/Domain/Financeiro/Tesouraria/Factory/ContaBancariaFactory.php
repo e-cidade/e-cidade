@@ -35,7 +35,7 @@ class ContaBancariaFactory
             ->setDb83CodigoTce((int)$contaBancariaRaw->db83_codigotce)
             ->setDb83FontePrincipal ($contaBancariaRaw->iCodigoRecurso)
             ->setDb83Reduzido ($contaBancariaRaw->db83_reduzido)
-            ->setDb83CodBanco((int) $contaBancariaRaw->db83_codbanco)
+            ->setDb83CodBanco((string) $contaBancariaRaw->db83_codbanco)
             ->setDb83DvAgencia($contaBancariaRaw->db83_dvagencia)
             ->setDb83DataImplantaoConta($oDataImplantacao)
             ->setDb83DataLimite($oDataLimite)

@@ -38,9 +38,10 @@ class RecibopagaQrcodePix extends LegacyModel
     {
         if ($numpar === null) {
             $query->where('k176_numnov', $numpre);
+        } else {
+            $query->where('k176_numpre', $numpre)->where('k176_numpar', $numpar);
         }
-
-        $query->where('k176_numpre', $numpre)->where('k176_numpar', $numpar);
+        $query->orderByDesc('k176_sequencial')->limit(1);
     }
 
     public function scopeOfCodigoConciliacaoRecebedor(Builder $query, string $code): void

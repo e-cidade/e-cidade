@@ -71,25 +71,25 @@ class EventoS1202 extends EventoBase
                     $std->dmdev[$seqdmdev] = new \stdClass(); //Obritat�rio
                     //Identifica??o de cada um dos demonstrativos de valores devidos ao trabalhador.
                     if ($aIdentificador[$iCont2]->idedmdev == 1) {
-                        $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfsal'; //uniqid(); //$aIdentificador[$iCont2]->idedmdev; //Obrigat?rio
+                        $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfsal' . $this->mes(); //uniqid(); //$aIdentificador[$iCont2]->idedmdev; //Obrigat?rio
                     }
                     if ($aIdentificador[$iCont2]->idedmdev == 2) {
-                        $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfres'; //uniqid(); //$aIdentificador[$iCont2]->idedmdev; //Obrigat?rio
+                        $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfres' . $this->mes(); //uniqid(); //$aIdentificador[$iCont2]->idedmdev; //Obrigat?rio
                     }
                     if ($aIdentificador[$iCont2]->idedmdev == 3) {
-                        $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfcom'; //uniqid(); //$aIdentificador[$iCont2]->idedmdev; //Obrigat?rio
+                        $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfcom' . $this->mes(); //uniqid(); //$aIdentificador[$iCont2]->idedmdev; //Obrigat?rio
                     }
                     if ($aIdentificador[$iCont2]->idedmdev == 4) {
-                        $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfs13'; //uniqid(); //$aIdentificador[$iCont2]->idedmdev; //Obrigat?rio
+                        $std->dmdev[$seqdmdev]->idedmdev = $aDadosPorMatriculas[$iCont]->matricula . 'gerfs13' . $this->mes(); //uniqid(); //$aIdentificador[$iCont2]->idedmdev; //Obrigat?rio
                     }
                     $std->dmdev[$seqdmdev]->codcateg = $aDadosPorMatriculas[$iCont]->codcateg;
 
-                    
-                    $std->dmdev[$seqdmdev]->infoperapur->ideestab[0] = new \stdClass(); 
-                    $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->tpinsc = 1; 
-                    $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->nrinsc = $aDadosPorMatriculas[$iCont]->nrinsc; 
 
-                    $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0] = new \stdClass(); 
+                    $std->dmdev[$seqdmdev]->infoperapur->ideestab[0] = new \stdClass();
+                    $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->tpinsc = 1;
+                    $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->nrinsc = $aDadosPorMatriculas[$iCont]->nrinsc;
+
+                    $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0] = new \stdClass();
                     $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->matricula = $aDadosPorMatriculas[$iCont]->matricula_esocial; //Opcional
 
                     $aDadosValoreRubrica = $this->buscarValorRubrica($aDadosPorMatriculas[$iCont]->matricula, $aIdentificador[$iCont2]->idedmdev);
@@ -98,14 +98,14 @@ class EventoS1202 extends EventoBase
 
                     for ($iCont4 = 0; $iCont4 < count($aDadosValoreRubrica); $iCont4++) {
                         //Rubricas que comp?em a remunera??o do trabalhador.
-                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4] = new \stdClass(); 
-                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4]->codrubr = $aDadosValoreRubrica[$iCont4]->codrubr; 
-                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4]->idetabrubr = $aDadosValoreRubrica[$iCont4]->idetabrubr; 
-                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4]->vrunit = $aDadosValoreRubrica[$iCont4]->vrrubr; 
-                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4]->vrrubr = $aDadosValoreRubrica[$iCont4]->vrrubr; 
+                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4] = new \stdClass();
+                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4]->codrubr = $aDadosValoreRubrica[$iCont4]->codrubr;
+                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4]->idetabrubr = $aDadosValoreRubrica[$iCont4]->idetabrubr;
+                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4]->vrunit = $aDadosValoreRubrica[$iCont4]->vrrubr;
+                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4]->vrrubr = $aDadosValoreRubrica[$iCont4]->vrrubr;
                         $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->itensremun[$iCont4]->indapurir = $aDadosValoreRubrica[$iCont4]->indapurir; //Opcional
 
-                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->infoagnocivo->grauexp = $aDadosPorMatriculas[$iCont]->grauexp; 
+                        $std->dmdev[$seqdmdev]->infoperapur->ideestab[0]->remunperapur[0]->infoagnocivo->grauexp = $aDadosPorMatriculas[$iCont]->grauexp;
                     }
                     $seqdmdev++;
                 }

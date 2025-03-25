@@ -914,6 +914,7 @@ if ($oDaoPagOrdemConta->numrows > 0) {
     oRequisicao.sHistorico     = encodeURIComponent($F('c72_complem').replace(/\"/g, "<aspa>"));
     oRequisicao.aRetencoes     = new Array();
     oRequisicao.lDevolucao     = lOrigemDevolucao;
+    oRequisicao.empenho        = <?=@$e60_numemp?>;
 
     if (!oRequisicao.lEstornaCheque) {
 

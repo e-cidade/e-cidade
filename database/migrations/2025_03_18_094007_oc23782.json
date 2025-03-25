@@ -1,0 +1,283 @@
+{
+    "Incluir": [
+        {
+            "Estrutural": "333909204",
+            "Descricao": "Contratacao por Tempo Determinado",
+            "VinculoPCASP": "3324100",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Contratacao por Tempo Determinado",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909206",
+            "Descricao": "Beneficio Mensal ao Deficiente e ao Idoso",
+            "VinculoPCASP": "3239100",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Beneficio Mensal ao Deficiente e ao Idoso",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909208",
+            "Descricao": "Outros Benef. Assist. do Servidor e do Militar",
+            "VinculoPCASP": "3239100",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Outros Benef. Assist. do Servidor e do Militar",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909210",
+            "Descricao": "Seguro Desemprego e Abono Salarial",
+            "VinculoPCASP": "3239100",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Seguro Desemprego e Abono Salarial",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909214",
+            "Descricao": "Diarias - Civil",
+            "VinculoPCASP": "3321101",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Diarias - Civil",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909218",
+            "Descricao": "Auxilio Financeiro a Estudantes",
+            "VinculoPCASP": "3941103",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Auxilio Financeiro a Estudantes",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909220",
+            "Descricao": "Auxilio Financeiro a Pesquisadores",
+            "VinculoPCASP": "3941103",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Auxilio Financeiro a Pesquisadores",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909230",
+            "Descricao": "Material de Consumo",
+            "VinculoPCASP": "3311199",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Material de Consumo",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909231",
+            "Descricao": "Premiacoes Cult, Cient, Art, Desp e Outras",
+            "VinculoPCASP": "3911100",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Premiacoes Cult, Cient, Art, Desp e Outras",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909232",
+            "Descricao": "Material de Distribuicao Gratuita",
+            "VinculoPCASP": "3312199",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Material de Distribuicao Gratuita",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909233",
+            "Descricao": "Passagens e Despesas com Locomocao",
+            "VinculoPCASP": "3322138",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Passagens e Despesas com Locomocao",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909234",
+            "Descricao": "Outras Despesas de Pessoal - Terceirizacao (art.18, LC 101)",
+            "VinculoPCASP": "3324100",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Outras Despesas de Pessoal - Terceirizacao",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909235",
+            "Descricao": "Servicos de Consultoria",
+            "VinculoPCASP": "3323101",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Servicos de Consultoria",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909236",
+            "Descricao": "Outros Servicos de Terceiros - Pessoa Fisica",
+            "VinculoPCASP": "3322199",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Outros Servicos de Terceiros - Pessoa Fisica",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909237",
+            "Descricao": "Locacao de Mao-de-Obra",
+            "VinculoPCASP": "3323154",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Locacao de Mao-de-Obra",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909238",
+            "Descricao": "Arrendamento Mercantil",
+            "VinculoPCASP": "3323155",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Arrendamento Mercantil",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909239",
+            "Descricao": "Outros Servicos de Terceiros - PJ",
+            "VinculoPCASP": "3323199",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Outros Servicos de Terceiros - PJ",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909240",
+            "Descricao": "Servicos de Tecnologia da Informacao e Comunicacao - PJ",
+            "VinculoPCASP": "3323111",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Servicos de Tecnologia da Informacao e Comunicacao - PJ",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909245",
+            "Descricao": "Subvencoes Economicas",
+            "VinculoPCASP": "3523100",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Subvencoes Economicas",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909246",
+            "Descricao": "Auxilio-Alimentacao",
+            "VinculoPCASP": "3322199",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Auxilio-Alimentacao",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909247",
+            "Descricao": "Obrigacoes Tributarias e Contributivas",
+            "VinculoPCASP": "3711199",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Obrigacoes Tributarias e Contributivas",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909248",
+            "Descricao": "Outros Auxilios Financeiros a Pessoa Fisica",
+            "VinculoPCASP": "3322199",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Outros Auxilios Financeiros a Pessoa Fisica",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909249",
+            "Descricao": "Auxilio-Transporte",
+            "VinculoPCASP": "3322199",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Auxilio-Transporte",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909250",
+            "Descricao": "Multas e Juros",
+            "VinculoPCASP": "3999100",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Multas e Juros",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909259",
+            "Descricao": "Pensoes Especiais",
+            "VinculoPCASP": "3229100",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Pensoes Especiais",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909267",
+            "Descricao": "Depositos Compulsorios",
+            "VinculoPCASP": "3999100",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Depositos Compulsorios",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909291",
+            "Descricao": "Sentencas Judiciais",
+            "VinculoPCASP": "3311198",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Sentencas Judiciais",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909293",
+            "Descricao": "Indenizacoes e Restituicoes",
+            "VinculoPCASP": "3996100",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Indenizacoes e Restituicoes",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909296",
+            "Descricao": "Ressarcimento de Despesas com Pessoal Requisitado",
+            "VinculoPCASP": "3999100",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Analitica",
+            "Finalidade": "Ressarcimento de Despesas com Pessoal Requisitado",
+            "Fonte": 15000000
+          },
+          {
+            "Estrutural": "333909200",
+            "Descricao": "Despesas de Exercicios Anteriores",
+            "VinculoPCASP": "",
+            "NaturezaSaldo": "Devedor",
+            "Tipo": "Sintetica",
+            "Finalidade": "Despesas de Exercicios Anteriores",
+            "Fonte": ""
+          }
+    ],
+     "Alterar":[
+        {
+            "Estrutural": "333909200",
+            "Estruturalnovo": "333909299000000",
+            "Descricao": "Outras Despesas de Exercicios Anteriores"
+        }
+    ]
+
+  }
+  

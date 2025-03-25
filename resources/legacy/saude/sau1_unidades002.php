@@ -58,10 +58,10 @@ if(isset($alterar)){
   parent.document.formaba.a3.disabled = false;
   parent.document.formaba.a4.disabled = false;
   parent.document.formaba.a5.disabled = false;
-  CurrentWindow.corpo.iframe_a2.location.href='sau1_unidadescaracter001.php?chavepesquisa=<?=$sd02_i_codigo?>';
-  CurrentWindow.corpo.iframe_a3.location.href='sau1_unidadesconvvig001.php?chavepesquisa=<?=$sd02_i_codigo?>';
-  CurrentWindow.corpo.iframe_a4.location.href='sau1_unidadeservicos001.php?chavepesquisa=<?=$sd02_i_codigo?>';
-  CurrentWindow.corpo.iframe_a5.location.href='sau1_upsparalisada001.php?chavepesquisa=<?=$sd02_i_codigo?>';
+  (window.CurrentWindow || parent.CurrentWindow || top).corpo.iframe_a2.location.href='sau1_unidadescaracter001.php?chavepesquisa=<?=$sd02_i_codigo?>';
+  (window.CurrentWindow || parent.CurrentWindow || top).corpo.iframe_a3.location.href='sau1_unidadesconvvig001.php?chavepesquisa=<?=$sd02_i_codigo?>';
+  (window.CurrentWindow || parent.CurrentWindow || top).corpo.iframe_a4.location.href='sau1_unidadeservicos001.php?chavepesquisa=<?=$sd02_i_codigo?>';
+  (window.CurrentWindow || parent.CurrentWindow || top).corpo.iframe_a5.location.href='sau1_upsparalisada001.php?chavepesquisa=<?=$sd02_i_codigo?>';
  </script>
  <?
 }

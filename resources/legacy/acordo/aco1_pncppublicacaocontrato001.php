@@ -19,19 +19,12 @@
         <meta http-equiv="Expires" CONTENT="0">
         <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
         <link href="estilos.css" rel="stylesheet" type="text/css">
-
-        <script type="text/javascript">
-            loadComponents([
-                'buttonsSolid',
-                'simpleModal'
-            ]);
-        </script>
     </head>
 
     <body bgcolor=#CCCCCC>
         <form action="">
             <fieldset style="margin-top:50px;">
-                <legend>Publição Contratos PNCP</legend>
+                <legend>Publiï¿½ï¿½o Contratos PNCP</legend>
                 <table style="width:100%">
                     <tr>
                         <td colspan="2">
@@ -298,7 +291,7 @@
         oParam.exec = "AdicionarJustificativaPncp";
 
         if (justificativa == '') {
-            alert('A justificativa não pode estar vazia');
+            alert('A justificativa nï¿½o pode estar vazia');
             return false;
         }
 

@@ -108,11 +108,6 @@ db_app::load("time.js");
 </style>
 
 <script type="text/javascript">
-    loadComponents([
-        'buttonsSolid',
-        'simpleModal'
-    ]);
-
     var anoCompetenciaInput = document.getElementById("anocompetencia");
     var anoAtual = new Date().getFullYear();
     anoCompetenciaInput.value = anoAtual;

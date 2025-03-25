@@ -62,8 +62,11 @@ try {
   if (empty($sTipoImpressao)) {
    throw new Exception("Tipo de impressão não informado.");
   }
-
-  $oBalancoFinanceiro = new BalancoFinanceiroDCASP2015($iAnoUsu, $iCodigoRelatorio, $iCodigoPeriodo);
+  if ($iAnoUsu >= 2024) {
+    $oBalancoFinanceiro = new BalancoFinanceiroDCASP2024($iAnoUsu, $iCodigoRelatorio, $iCodigoPeriodo);
+  } else {
+    $oBalancoFinanceiro = new BalancoFinanceiroDCASP2015($iAnoUsu, $iCodigoRelatorio, $iCodigoPeriodo);
+  }
   $oBalancoFinanceiro->setInstituicoes($sListaInstituicoes);
   $oBalancoFinanceiro->setExibirExercicioAnterior($sExercicioAnterior == 'true');
   $oBalancoFinanceiro->setTipo($sTipoImpressao);

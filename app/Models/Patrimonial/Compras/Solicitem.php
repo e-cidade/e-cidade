@@ -35,4 +35,9 @@ class Solicitem extends LegacyModel
         'pc11_exclusivo',
         'pc11_usuario'
     ];
+    
+    public function solicitempcmater()
+    {
+        return $this->belongsTo(Solicitempcmater::class, 'pc11_codigo', 'pc16_solicitem');
+    }
 }

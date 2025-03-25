@@ -129,7 +129,7 @@ if (trim($oGet->itens) != "") {
     $sAnd         = " and ";
 }
 
-$sWhere .= "{$sAnd} solicita.pc10_solicitacaotipo = 6 ";
+$sWhere .= "{$sAnd} solicita.pc10_solicitacaotipo = 6";
 
 /**
  * Cabeçalho do RELATÓRIO POSIÇÃO DO REGISTRO DE PREÇO
@@ -208,9 +208,18 @@ for ($iInd = 0; $iInd  < $iRsSql; $iInd++) {
         continue;
     }
 
-    $oSolicita->empenhada          = $oCompilacao->getValorEmpenhadoItem($oSolicita->pc11_codigo);
+    /*verifica anulações*/
+    $oSolicita->solanulada         = $oCompilacao->getValorSolAnuladoItem($oSolicita->pc11_codigo);
+    $oSolicita->empanulada         = $oCompilacao->getValorEmpAnuladoItem($oSolicita->pc11_codigo);
+
+    $oSolicita->empenhada          = $oCompilacao->getValorEmpenhadoItem($oSolicita->pc11_codigo) - $oSolicita->empanulada;
     $oSolicita->solicitada         = $oCompilacao->getValorSolicitadoItem($oSolicita->pc11_codigo);
 
+    if (!empty($oSolicita->solicitada) && $oSolicita->solicitada != 0) {
+        $oSolicita->solicitada -= $oSolicita->solanulada;
+    }
+    
+    
     $oDadosEstimativa                 = new stdClass();
     $oDadosEstimativa->iSeq           = $oSolicita->pc11_seq;
     $oDadosEstimativa->iCodItem       = $oSolicita->pc01_codmater;
@@ -218,7 +227,7 @@ for ($iInd = 0; $iInd  < $iRsSql; $iInd++) {
     $oDadosEstimativa->sCompl         = $oSolicita->pc11_resum;
     $oDadosEstimativa->sUnidade       = $oSolicita->m61_descr;
     $oDadosEstimativa->sFornecedor    = $oSolicita->oDadosFornecedor->vencedor;
-    $oDadosEstimativa->iCgm        = $oSolicita->oDadosFornecedor->codigocgm;
+    $oDadosEstimativa->iCgm           = $oSolicita->oDadosFornecedor->codigocgm;
 
     if (!in_array($oSolicita->oDadosFornecedor->codigocgm, explode(',', $oGet->fornecedores)) && strlen($oGet->fornecedores)) {
         continue;
@@ -229,8 +238,8 @@ for ($iInd = 0; $iInd  < $iRsSql; $iInd++) {
     $oDadosEstimativa->lControlaValor = ($oCompilacao->getFormaDeControle() == aberturaRegistroPreco::CONTROLA_VALOR);
 
     $oDadosEstimativa->nSolicitar    = ($oSolicita->pc11_quant - $oSolicita->solicitada);
-    $oDadosEstimativa->nEmpenhar     = ($oSolicita->solicitada - $oSolicita->empenhada);
-
+    $oDadosEstimativa->nEmpenhar     = ($oSolicita->solicitada - $oSolicita->empenhada - $oSolicita->anulada);
+    
     $nQuantMin                     = (empty($oSolicita->pc57_quantmin)                   ? '0' : $oSolicita->pc57_quantmin);
     $nQuantMax                     = (empty($oSolicita->pc11_quant)                      ? '0' : $oSolicita->pc11_quant);
     $nVlrUnitario                  = (empty($oSolicita->oDadosFornecedor->valorunitario) ? '0' : $oSolicita->oDadosFornecedor->valorunitario);

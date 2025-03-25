@@ -363,6 +363,9 @@ $oRotulo->label('z01_i_cgsund');
         <?=(isset($tf01_i_codigo) && !empty($tf01_i_codigo) ? '' : ' disabled')?>>
       <input type="button" name="prestadora" id="prestadora" value="Prestadora" onclick="js_prestadora();"
         <?=(isset($tf01_i_codigo) && !empty($tf01_i_codigo) ? '' : ' disabled')?>>
+
+        <input type="button" name="compromisso" id="compromisso" value="Compromisso" onclick="js_compromisso();"
+            <?=(isset($tf01_i_codigo) && !empty($tf01_i_codigo) ? '' : ' disabled')?>>
       <input type="button" name="ajuda" id="ajuda" value="Ajuda de Custo" onclick="js_ajuda();"
       <?=(isset($tf01_i_codigo) && !empty($tf01_i_codigo) ? '' : ' disabled')?>>
       <input type="button" name="regulador" id="regulador" value="Regulador" onclick="js_regulador();"
@@ -783,6 +786,20 @@ function js_protocolo() {
 
 }
 /* Bloco de funções botão Saída (fim) ****/
+
+function js_compromisso() {
+
+    sChave = 'tf01_i_pedidotfd='+$F('tf01_i_codigo');
+    if ($F('tf01_i_codigo') != '') {
+
+        jan = window.open('tfd2_compromissotfd002.php?'+sChave, '',
+            'width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0 '
+        );
+        jan.moveTo(0, 0);
+
+    }
+
+}
 
 /**** Bloco de funções botão Fecha (início) */
 function js_fecha(lAlerta) {

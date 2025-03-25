@@ -306,7 +306,7 @@ if (isset($testanome) && !isset($pesquisa_chave)) {
 								</script>";
 
 					if(isset($campos)==false){
-						$campos = "cgm.z01_numcgm, z01_nome,trim(z01_cgccpf) as z01_cgccpf, case when length(trim(z01_cgccpf)) = 14 then 'JURIDICA' else 'FÍSICA' end as tipo, trim(z01_ender) as z01_ender, z01_munic, z01_uf, z01_cep, z01_email";
+						$campos = "distinct cgm.z01_numcgm, z01_nome,trim(z01_cgccpf) as z01_cgccpf, case when length(trim(z01_cgccpf)) = 14 then 'JURIDICA' else 'FÍSICA' end as tipo, trim(z01_ender) as z01_ender, z01_munic, z01_uf, z01_cep, z01_email, to_ascii(z01_nome)";
 					}
 
           if ($filtro==1){

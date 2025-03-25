@@ -163,7 +163,7 @@ $db_opcao = 1;
           <td>
             <?php
             db_input('anofolha', 4, 1, true, 'text', 2, "class='field-size1' onkeyup='moveFocusToMesfolha(event)'", "", "", "", 4);
-            db_input('mesfolha', 2, 1, true, 'text', 2, "class='field-size1'", "", "", "", 2);
+            db_input('mesfolha', 2, 1, true, 'text', 2, "class='field-size1' onblur='padZero(this)'", "", "", "", 2);
             ?>
           </td>
         </tr>
@@ -212,12 +212,12 @@ $db_opcao = 1;
             <input name="dt_alteracao_mes" type="hidden" title="" id="dt_alteracao_mes" value="" size="2" maxlength="2">
             <input name="dt_alteracao_ano" type="hidden" title="" id="dt_alteracao_ano" value="" size="4" maxlength="4">
             <script>
-              var PosMouseY, PosMoudeX;
+            var PosMouseY, PosMoudeX;
 
-              function js_comparaDatasdt_alteracao(dia, mes, ano) {
-                var objData = document.getElementById('dt_alteracao');
-                objData.value = dia + "/" + mes + '/' + ano;
-              }
+            function js_comparaDatasdt_alteracao(dia, mes, ano) {
+              var objData = document.getElementById('dt_alteracao');
+              objData.value = dia + "/" + mes + '/' + ano;
+            }
             </script>
 
             <input value="D" type="button" id="dtjs_dt_alteracao" name="dtjs_dt_alteracao"
@@ -279,344 +279,352 @@ $db_opcao = 1;
 </html>
 
 <script>
-  var arrEvts = ['EvtIniciaisTabelas', 'EvtNaoPeriodicos', 'EvtPeriodicos'];
-  var empregador = Object();
-  (function() {
+var arrEvts = ['EvtIniciaisTabelas', 'EvtNaoPeriodicos', 'EvtPeriodicos'];
+var empregador = Object();
+(function() {
 
-    new AjaxRequest('eso4_esocialapi.RPC.php', {
-      exec: 'getEmpregadores'
-    }, function(retorno, lErro) {
+  new AjaxRequest('eso4_esocialapi.RPC.php', {
+    exec: 'getEmpregadores'
+  }, function(retorno, lErro) {
 
-      if (lErro) {
-        alert(retorno.sMessage);
-        return false;
-      }
-      empregador = retorno.empregador;
+    if (lErro) {
+      alert(retorno.sMessage);
+      return false;
+    }
+    empregador = retorno.empregador;
 
-      $('cboEmpregador').length = 0;
-      $('cboEmpregador').add(new Option(empregador.nome, empregador.cgm));
-    }).setMessage('Buscando servidores.').execute();
-  })();
+    $('cboEmpregador').length = 0;
+    $('cboEmpregador').add(new Option(empregador.nome, empregador.cgm));
+  }).setMessage('Buscando servidores.').execute();
+})();
 
 
-  (function() {
+(function() {
 
-    $('pesquisar').observe("click", function pesquisar() {
+  $('pesquisar').observe("click", function pesquisar() {
 
-      var iMatricula = $F('rh01_regist');
+    var iMatricula = $F('rh01_regist');
 
-      if (iMatricula.trim() == '' || iMatricula.trim().match(/[^\d]+/g)) {
+    if (iMatricula.trim() == '' || iMatricula.trim().match(/[^\d]+/g)) {
 
-        alert('Informe um número de Matrícula válido para pesquisar.');
-        return;
-      }
+      alert('Informe um número de Matrícula válido para pesquisar.');
+      return;
+    }
 
-      this.form.submit();
-    });
+    this.form.submit();
+  });
 
-    var oLookUpCgm = new DBLookUp($('lbl_z01_numcgm'), $('z01_numcgm'), $('z01_nomecgm'), {
-      'sArquivo': 'func_cgmesocial.php',
-      'oObjetoLookUp': 'func_nome'
-    });
+  var oLookUpCgm = new DBLookUp($('lbl_z01_numcgm'), $('z01_numcgm'), $('z01_nomecgm'), {
+    'sArquivo': 'func_cgmesocial.php',
+    'oObjetoLookUp': 'func_nome'
+  });
 
-    var oLookUpMatricula = new DBLookUp($('lbl_rh01_regist'), $('rh01_regist'), $('z01_nome'), {
-      'sArquivo': 'func_rhpessoal.php',
-      'oObjetoLookUp': 'func_nome'
-    });
+  var oLookUpMatricula = new DBLookUp($('lbl_rh01_regist'), $('rh01_regist'), $('z01_nome'), {
+    'sArquivo': 'func_rhpessoal.php',
+    'oObjetoLookUp': 'func_nome'
+  });
 
-    $('envioESocial').addEventListener('click', async function() {
+  $('envioESocial').addEventListener('click', async function() {
 
-      if ($F('anofolha').length < 4 || parseInt($("mesfolha").value) < 1 || parseInt($("mesfolha").value) > 12) {
-        alert("Campo 'Competência' deve ser preenchido.");
-        return false;
-      }
+    if ($F('anofolha').length < 4 || parseInt($("mesfolha").value) < 1 || parseInt($("mesfolha").value) > 12) {
+      alert("Campo 'Competência' deve ser preenchido.");
+      return false;
+    }
 
-      if ($F('tpAmb') == '') {
-        alert('Selecione o ambiente de envio.');
-        return;
-      }
+    if ($F('tpAmb') == '') {
+      alert('Selecione o ambiente de envio.');
+      return;
+    }
 
-      if ($F('modo') == '') {
-        alert('Selecione o tipo de envio.');
-        return;
-      }
+    if ($F('modo') == '') {
+      alert('Selecione o tipo de envio.');
+      return;
+    }
 
-      if ($F('evento') == '') {
-        alert('Selecione um evento.');
-        return;
-      }
+    if ($F('evento') == '') {
+      alert('Selecione um evento.');
+      return;
+    }
 
-      const eventoValue = document.getElementById('evento').value;
+    const eventoValue = document.getElementById('evento').value;
 
-      if (eventoValue === 'S1210') {
-        const tpeventoValue = document.getElementById('tpevento').value;
-        if (tpeventoValue === '1') {
-          if ($F('data_pgto').length <= 0) {
-            alert("Campo 'Data de Pagamento' deve ser preenchido.");
-            return false;
-          }
-        }
-      }
-
-      const mes = document.getElementById("mesfolha").value;
-      const ano = document.getElementById("anofolha").value;
-
-      const message = '<span style="color: red; font-weight: bold; font-size: 16px;">ATENÇÃO!</span><br><br>' +
-        '<span style="font-size: 14px;">Deseja confirmar o envio do mês <span style="font-weight: bold;">' +
-        mes + '/' + ano +
-        '</span></span>?';
-
-      const result = await showCustomConfirm(message);
-      if (!result) {
-        return false;
-      }
-
-      let aArquivosSelecionados = new Array();
-      aArquivosSelecionados.push($F('evento'));
-
-      var tpid = document.getElementById("tpid");
-      var aMatriculas = [];
-      var aCgms = [];
-
-      if (tpid.value == 2) {
-        var selectobject = document.getElementById("matriculas");
-        for (var iCont = 0; iCont < selectobject.length; iCont++) {
-          aMatriculas.push(selectobject.options[iCont].value);
-        }
-
-        if (aMatriculas.length == 0) {
-          alert('Selecione pelo menos uma matrícula.');
-          return;
-        }
-      }
-
-      if (tpid.value == 1) {
-        var selectobject = document.getElementById("cgms");
-        for (var iCont = 0; iCont < selectobject.length; iCont++) {
-          aCgms.push('' + selectobject.options[iCont].value + '');
-        }
-
-        if (aCgms.length == 0) {
-          alert('Selecione pelo menos um cgm.');
-          return;
-        }
-      }
-
-      var parametros = {
-        'exec': 'transmitir',
-        'arquivos': aArquivosSelecionados,
-        'empregador': $F('cboEmpregador'),
-        'modo': $F('modo'),
-        'tpAmb': $F('tpAmb'),
-        'iAnoValidade': $F('anofolha'),
-        'iMesValidade': $F('mesfolha'),
-        'indapuracao': $F('indapuracao'),
-        'tppgto': $F('tppgto'),
-        'tpevento': $F("tpevento"),
-        'matricula': aMatriculas.join(','),
-        'cgm': aCgms.map(aCgms => `'${aCgms}'`).join(','), // aCgms.join(',').join(),
-        'tipoid': tpid.value,
-        'dtpgto': $("data_pgto").value,
-      }; //Codigo Tipo::CADASTRAMENTO_INICIAL
-      new AjaxRequest('eso4_esocialapi.RPC.php', parametros, function(retorno) {
-
-        alert(retorno.sMessage);
-        if (retorno.erro) {
+    if (eventoValue === 'S1210') {
+      const tpeventoValue = document.getElementById('tpevento').value;
+      if (tpeventoValue === '1') {
+        if ($F('data_pgto').length <= 0) {
+          alert("Campo 'Data de Pagamento' deve ser preenchido.");
           return false;
         }
-      }).setMessage('Agendando envio para o eSocial').execute();
-    });
-  })();
+      }
+    }
 
-  function js_consultar() {
+    const mes = document.getElementById("mesfolha").value;
+    const ano = document.getElementById("anofolha").value;
 
-    js_OpenJanelaIframe('top.corpo', 'iframe_consulta_envio', 'func_consultaenvioesocial.php', 'Pesquisa', true);
-  }
+    const message = '<span style="color: red; font-weight: bold; font-size: 16px;">ATENÇÃO!</span><br><br>' +
+      '<span style="font-size: 14px;">Deseja confirmar o envio do mês <span style="font-weight: bold;">' +
+      mes + '/' + ano +
+      '</span></span>?';
 
-  function js_adicionar_matric() {
-    var selectobject = document.getElementById("matriculas");
-    for (var iCont = 0; iCont < selectobject.length; iCont++) {
-      if (selectobject.options[iCont].value == $F('rh01_regist')) {
-        js_limpar_matric();
+    const result = await showCustomConfirm(message);
+    if (!result) {
+      return false;
+    }
+
+    let aArquivosSelecionados = new Array();
+    aArquivosSelecionados.push($F('evento'));
+
+    var tpid = document.getElementById("tpid");
+    var aMatriculas = [];
+    var aCgms = [];
+
+    if (tpid.value == 2) {
+      var selectobject = document.getElementById("matriculas");
+      for (var iCont = 0; iCont < selectobject.length; iCont++) {
+        aMatriculas.push(selectobject.options[iCont].value);
+      }
+
+      if (aMatriculas.length == 0) {
+        alert('Selecione pelo menos uma matrícula.');
         return;
       }
     }
-    if (!$F('z01_nome') || $F('z01_nome').toLowerCase().indexOf("não encontrado") > 0) {
-      return;
-    }
-    var opt = document.createElement('option');
-    opt.value = $F('rh01_regist');
-    opt.innerHTML = $F('rh01_regist') + ' - ' + $F('z01_nome');
-    selectobject.appendChild(opt);
-    js_limpar_matric();
-  }
 
-  function js_remover_matric(select) {
-    var selectobject = document.getElementById("matriculas");
-    for (var iCont = 0; iCont < selectobject.length; iCont++) {
-      if (selectobject.options[iCont].value == select.value) {
-        selectobject.remove(iCont);
+    if (tpid.value == 1) {
+      var selectobject = document.getElementById("cgms");
+      for (var iCont = 0; iCont < selectobject.length; iCont++) {
+        aCgms.push('' + selectobject.options[iCont].value + '');
       }
-    }
-  }
 
-  function js_adicionar_cgm() {
-    var selectobject = document.getElementById("cgms");
-    for (var iCont = 0; iCont < selectobject.length; iCont++) {
-      if (selectobject.options[iCont].value == $F('z01_numcgm')) {
-        js_limpar_cgm();
+      if (aCgms.length == 0) {
+        alert('Selecione pelo menos um cgm.');
         return;
       }
     }
-    if (!$F('z01_nomecgm') || $F('z01_nomecgm').toLowerCase().indexOf("não encontrado") > 0) {
+
+    var parametros = {
+      'exec': 'transmitir',
+      'arquivos': aArquivosSelecionados,
+      'empregador': $F('cboEmpregador'),
+      'modo': $F('modo'),
+      'tpAmb': $F('tpAmb'),
+      'iAnoValidade': $F('anofolha'),
+      'iMesValidade': $F('mesfolha'),
+      'indapuracao': $F('indapuracao'),
+      'tppgto': $F('tppgto'),
+      'tpevento': $F("tpevento"),
+      'matricula': aMatriculas.join(','),
+      'cgm': aCgms.map(aCgms => `'${aCgms}'`).join(','), // aCgms.join(',').join(),
+      'tipoid': tpid.value,
+      'dtpgto': $("data_pgto").value,
+    }; //Codigo Tipo::CADASTRAMENTO_INICIAL
+    new AjaxRequest('eso4_esocialapi.RPC.php', parametros, function(retorno) {
+
+      alert(retorno.sMessage);
+      if (retorno.erro) {
+        return false;
+      }
+    }).setMessage('Agendando envio para o eSocial').execute();
+  });
+})();
+
+function js_consultar() {
+
+  js_OpenJanelaIframe('top.corpo', 'iframe_consulta_envio', 'func_consultaenvioesocial.php', 'Pesquisa', true);
+}
+
+function js_adicionar_matric() {
+  var selectobject = document.getElementById("matriculas");
+  for (var iCont = 0; iCont < selectobject.length; iCont++) {
+    if (selectobject.options[iCont].value == $F('rh01_regist')) {
+      js_limpar_matric();
       return;
     }
-    var opt = document.createElement('option');
-    opt.value = $F('z01_numcgm');
-    opt.innerHTML = $F('z01_numcgm') + ' - ' + $F('z01_nomecgm');
-    selectobject.appendChild(opt);
-    js_limpar_cgm();
   }
+  if (!$F('z01_nome') || $F('z01_nome').toLowerCase().indexOf("não encontrado") > 0) {
+    return;
+  }
+  var opt = document.createElement('option');
+  opt.value = $F('rh01_regist');
+  opt.innerHTML = $F('rh01_regist') + ' - ' + $F('z01_nome');
+  selectobject.appendChild(opt);
+  js_limpar_matric();
+}
 
-  function js_remover_cgm(select) {
-    var selectobject = document.getElementById("cgms");
-    for (var iCont = 0; iCont < selectobject.length; iCont++) {
-      if (selectobject.options[iCont].value == select.value) {
-        selectobject.remove(iCont);
-      }
+function js_remover_matric(select) {
+  var selectobject = document.getElementById("matriculas");
+  for (var iCont = 0; iCont < selectobject.length; iCont++) {
+    if (selectobject.options[iCont].value == select.value) {
+      selectobject.remove(iCont);
     }
   }
+}
 
-  function js_limpar_matric() {
-    $('rh01_regist').value = '';
-    $('z01_nome').value = '';
-  }
-
-  function js_limpar_cgm() {
-    $('z01_numcgm').value = '';
-    $('z01_nomecgm').value = '';
-  }
-
-  function js_alt_evento() {
-    const eventoValue = document.getElementById('evento').value;
-    const indapuracaoCol = document.getElementById('indapuracao_col');
-    const tppgtoCol = document.getElementById('tppgto_col');
-    const tipoCol = document.getElementById('tipo_col');
-    const dtpgto = document.getElementById('dtpgto');
-
-    if (eventoValue === 'S1200' || eventoValue === 'S1202' || eventoValue === 'S1207' || eventoValue === 'S1299') {
-      if (indapuracaoCol.style.display === 'none') {
-        indapuracaoCol.style.display = 'inline';
-      }
-      if (tipoCol.style.display === 'none') {
-        tipoCol.style.display = 'inline';
-      }
-      dtpgto.style.display = 'none';
-    } else if (eventoValue === 'S1210') {
-      if (tppgtoCol.style.display === 'none') {
-        tppgtoCol.style.display = 'inline';
-      }
-      if (tipoCol.style.display === 'none') {
-        tipoCol.style.display = 'inline';
-      }
-      dtpgto.style.display = 'inline';
-    } else {
-      indapuracaoCol.style.display = 'none';
-      tppgtoCol.style.display = 'none';
-      tipoCol.style.display = 'none';
-      dtpgto.style.display = 'none';
+function js_adicionar_cgm() {
+  var selectobject = document.getElementById("cgms");
+  for (var iCont = 0; iCont < selectobject.length; iCont++) {
+    if (selectobject.options[iCont].value == $F('z01_numcgm')) {
+      js_limpar_cgm();
+      return;
     }
   }
-
-  function js_dataalt() {
-    if (document.getElementById('dtalteracao').style.display == 'none') {
-      document.getElementById('dtalteracao').style.display = 'inline';
-      return true;
-    }
-    document.getElementById('dtalteracao').style.display = 'none';
+  if (!$F('z01_nomecgm') || $F('z01_nomecgm').toLowerCase().indexOf("não encontrado") > 0) {
+    return;
   }
+  var opt = document.createElement('option');
+  opt.value = $F('z01_numcgm');
+  opt.innerHTML = $F('z01_numcgm') + ' - ' + $F('z01_nomecgm');
+  selectobject.appendChild(opt);
+  js_limpar_cgm();
+}
 
-  function js_alt_identificador(e) {
-    if (e.value == 1) {
-      document.getElementsByClassName('linha_cgm')[0].style.display = 'inline';
-      document.getElementsByClassName('linha_cgm')[1].style.display = 'inline';
-      document.getElementsByClassName('linha_matricula')[0].style.display = 'none';
-      document.getElementsByClassName('linha_matricula')[1].style.display = 'none';
-      document.getElementById('cgms').style.width = '78%';
-    }
-
-    if (e.value == 2) {
-      document.getElementsByClassName('linha_cgm')[0].style.display = 'none';
-      document.getElementsByClassName('linha_cgm')[1].style.display = 'none';
-      document.getElementsByClassName('linha_matricula')[0].style.display = 'inline';
-      document.getElementsByClassName('linha_matricula')[1].style.display = 'inline';
-      document.getElementById('matriculas').style.width = '78%';
-
+function js_remover_cgm(select) {
+  var selectobject = document.getElementById("cgms");
+  for (var iCont = 0; iCont < selectobject.length; iCont++) {
+    if (selectobject.options[iCont].value == select.value) {
+      selectobject.remove(iCont);
     }
   }
+}
 
-  function js_tpevento() {
-    const tpeventoValue = document.getElementById('tpevento').value;
-    if (tpeventoValue === '1') {
-      document.getElementById('dtpgto').style.display = 'inline';
-    } else {
-      document.getElementById('dtpgto').style.display = 'none';
+function js_limpar_matric() {
+  $('rh01_regist').value = '';
+  $('z01_nome').value = '';
+}
+
+function js_limpar_cgm() {
+  $('z01_numcgm').value = '';
+  $('z01_nomecgm').value = '';
+}
+
+function js_alt_evento() {
+  const eventoValue = document.getElementById('evento').value;
+  const indapuracaoCol = document.getElementById('indapuracao_col');
+  const tppgtoCol = document.getElementById('tppgto_col');
+  const tipoCol = document.getElementById('tipo_col');
+  const dtpgto = document.getElementById('dtpgto');
+
+  if (eventoValue === 'S1200' || eventoValue === 'S1202' || eventoValue === 'S1207' || eventoValue === 'S1299') {
+    if (indapuracaoCol.style.display === 'none') {
+      indapuracaoCol.style.display = 'inline';
     }
-  }
-
-  function moveFocusToMesfolha(event) {
-    const anofolha = event.target;
-    if (anofolha.value.length === 4) {
-      document.getElementById('mesfolha').focus();
+    if (tipoCol.style.display === 'none') {
+      tipoCol.style.display = 'inline';
     }
+    dtpgto.style.display = 'none';
+  } else if (eventoValue === 'S1210') {
+    if (tppgtoCol.style.display === 'none') {
+      tppgtoCol.style.display = 'inline';
+    }
+    if (tipoCol.style.display === 'none') {
+      tipoCol.style.display = 'inline';
+    }
+    dtpgto.style.display = 'inline';
+  } else {
+    indapuracaoCol.style.display = 'none';
+    tppgtoCol.style.display = 'none';
+    tipoCol.style.display = 'none';
+    dtpgto.style.display = 'none';
+  }
+}
+
+function js_dataalt() {
+  if (document.getElementById('dtalteracao').style.display == 'none') {
+    document.getElementById('dtalteracao').style.display = 'inline';
+    return true;
+  }
+  document.getElementById('dtalteracao').style.display = 'none';
+}
+
+function js_alt_identificador(e) {
+  if (e.value == 1) {
+    document.getElementsByClassName('linha_cgm')[0].style.display = 'inline';
+    document.getElementsByClassName('linha_cgm')[1].style.display = 'inline';
+    document.getElementsByClassName('linha_matricula')[0].style.display = 'none';
+    document.getElementsByClassName('linha_matricula')[1].style.display = 'none';
+    document.getElementById('cgms').style.width = '78%';
   }
 
-  function showCustomConfirm(message) {
-    return new Promise((resolve) => {
-      // Create the confirm dialog elements
-      const confirmOverlay = document.createElement('div');
-      confirmOverlay.style.position = 'fixed';
-      confirmOverlay.style.top = '0';
-      confirmOverlay.style.left = '0';
-      confirmOverlay.style.width = '100%';
-      confirmOverlay.style.height = '100%';
-      confirmOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-      confirmOverlay.style.display = 'flex';
-      confirmOverlay.style.justifyContent = 'center';
-      confirmOverlay.style.alignItems = 'center';
-      confirmOverlay.style.zIndex = '1000';
+  if (e.value == 2) {
+    document.getElementsByClassName('linha_cgm')[0].style.display = 'none';
+    document.getElementsByClassName('linha_cgm')[1].style.display = 'none';
+    document.getElementsByClassName('linha_matricula')[0].style.display = 'inline';
+    document.getElementsByClassName('linha_matricula')[1].style.display = 'inline';
+    document.getElementById('matriculas').style.width = '78%';
 
-      const confirmBox = document.createElement('div');
-      confirmBox.style.backgroundColor = 'white';
-      confirmBox.style.padding = '20px';
-      confirmBox.style.borderRadius = '5px';
-      confirmBox.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.5)';
-      confirmBox.style.textAlign = 'center';
-
-      const confirmMessage = document.createElement('p');
-      confirmMessage.innerHTML = message;
-
-      const confirmYesButton = document.createElement('button');
-      confirmYesButton.textContent = 'Sim';
-      confirmYesButton.style.margin = '5px';
-      confirmYesButton.onclick = () => {
-        document.body.removeChild(confirmOverlay);
-        resolve(true);
-      };
-
-      const confirmNoButton = document.createElement('button');
-      confirmNoButton.textContent = 'Não';
-      confirmNoButton.style.margin = '5px';
-      confirmNoButton.onclick = () => {
-        document.body.removeChild(confirmOverlay);
-        resolve(false);
-      };
-
-      confirmBox.appendChild(confirmMessage);
-      confirmBox.appendChild(confirmYesButton);
-      confirmBox.appendChild(confirmNoButton);
-      confirmOverlay.appendChild(confirmBox);
-      document.body.appendChild(confirmOverlay);
-    });
   }
+}
+
+function js_tpevento() {
+  const tpeventoValue = document.getElementById('tpevento').value;
+  if (tpeventoValue === '1') {
+    document.getElementById('dtpgto').style.display = 'inline';
+  } else {
+    document.getElementById('dtpgto').style.display = 'none';
+  }
+}
+
+function moveFocusToMesfolha(event) {
+  const anofolha = event.target;
+  if (anofolha.value.length === 4) {
+    document.getElementById('mesfolha').focus();
+  }
+}
+
+function padZero(input) {
+  let value = input.value.trim();
+
+  if (value.length === 1 && value !== '0') {
+    input.value = '0' + value;
+  }
+}
+
+function showCustomConfirm(message) {
+  return new Promise((resolve) => {
+    // Create the confirm dialog elements
+    const confirmOverlay = document.createElement('div');
+    confirmOverlay.style.position = 'fixed';
+    confirmOverlay.style.top = '0';
+    confirmOverlay.style.left = '0';
+    confirmOverlay.style.width = '100%';
+    confirmOverlay.style.height = '100%';
+    confirmOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    confirmOverlay.style.display = 'flex';
+    confirmOverlay.style.justifyContent = 'center';
+    confirmOverlay.style.alignItems = 'center';
+    confirmOverlay.style.zIndex = '1000';
+
+    const confirmBox = document.createElement('div');
+    confirmBox.style.backgroundColor = 'white';
+    confirmBox.style.padding = '20px';
+    confirmBox.style.borderRadius = '5px';
+    confirmBox.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.5)';
+    confirmBox.style.textAlign = 'center';
+
+    const confirmMessage = document.createElement('p');
+    confirmMessage.innerHTML = message;
+
+    const confirmYesButton = document.createElement('button');
+    confirmYesButton.textContent = 'Sim';
+    confirmYesButton.style.margin = '5px';
+    confirmYesButton.onclick = () => {
+      document.body.removeChild(confirmOverlay);
+      resolve(true);
+    };
+
+    const confirmNoButton = document.createElement('button');
+    confirmNoButton.textContent = 'Não';
+    confirmNoButton.style.margin = '5px';
+    confirmNoButton.onclick = () => {
+      document.body.removeChild(confirmOverlay);
+      resolve(false);
+    };
+
+    confirmBox.appendChild(confirmMessage);
+    confirmBox.appendChild(confirmYesButton);
+    confirmBox.appendChild(confirmNoButton);
+    confirmOverlay.appendChild(confirmBox);
+    document.body.appendChild(confirmOverlay);
+  });
+}
 </script>

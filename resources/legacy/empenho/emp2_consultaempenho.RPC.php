@@ -25,12 +25,15 @@
  *                                licenca/licenca_pt.txt
  */
 
+ header("Access-Control-Allow-Origin: *");
+ header("Access-Control-Allow-Methods: GET, POST");
 require_once ("libs/db_stdlib.php");
 require_once ("libs/db_utils.php");
 require_once ("libs/db_app.utils.php");
 require_once ("libs/db_conecta.php");
 require_once ("libs/db_sessoes.php");
 require_once ("dbforms/db_funcoes.php");
+require_once(modification("classes/empenho.php"));
 require_once ("libs/JSON.php");
 
 $oJson                  = new services_json();
@@ -57,6 +60,12 @@ try {
           rnsaldoitem AS saldo ,
           round(rnsaldovalor,2) AS saldo_valor ,
           o56_descr ,
+          pc01_servico AS tipo,
+          ac16_numeroacordo as contrato,
+          ac16_anousu as contrato_ano,
+          e55_autori as e55_autori,
+          e55_sequen as e55_sequen,
+          e55_servicoquantidade as forma_controle,
           CASE
               WHEN pcorcamval.pc23_obs IS NOT NULL THEN pcorcamval.pc23_obs
               WHEN pcorcamvalpai.pc23_orcamitem IS NOT NULL THEN pcorcamvalpai.pc23_obs
@@ -89,8 +98,18 @@ try {
       $oRetorno->aItensAnuladoEmpenho = db_utils::getCollectionByRecord($rsBuscaItemAnulado);
 
       break;
-  }
+        case 'alterarFormaControle':
+            try {
+                $oEmpenho = new empenho();
+                $oEmpenho->alterarFormaControle($oParam->bFormaControle, $oParam->iAutoriza, $oParam->iSequencia);
+            } catch (Exception $eErro) {
+                $oRetorno->status  = 2;
+                $oRetorno->message = urlencode($eErro->getMessage());
+            }
+        break;
+    }
 
+    
   db_fim_transacao(false);
 
 

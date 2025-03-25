@@ -59,7 +59,14 @@ $lObrigarCns        = $oSaudeConfiguracao->obrigarCns();
             <?php db_input('z01_i_cgsund',15,$Iz01_i_cgsund,true,'text',3);?>
             <input type="checkbox" name="z01_i_inativo" id="z01_i_inativo" value="t"<?php echo $GLOBALS['z01_i_inativo'] == 't' ? ' checked="checked"' : ''?>> Cadastro inativo
           </td>'
-
+            <td title='Número TDF'>
+                Núm. TDF
+            </td>
+            <td>
+                <?php
+                db_input('z01_i_numtfd',15,@$Iz01_i_numtfd,true,'text',$db_opcao);
+                ?>
+            </td>
           <td title="<?=$Lz01_i_cgsund?>" class='bold'>
             CGS do Município:
           </td>
@@ -69,6 +76,7 @@ $lObrigarCns        = $oSaudeConfiguracao->obrigarCns();
               db_select('municipio',$x,true,$db_opcao,'onChange="js_zerac(this.value);"');
             ?>
           </td>
+
         </tr>
         <tr>
           <td title="">

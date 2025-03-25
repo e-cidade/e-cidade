@@ -6,6 +6,8 @@ $clissnotaavulsaservico->rotulo->label();
 $clrotulo = new rotulocampo;
 $clrotulo->label("q51_sequencial");
 
+$contribuicaoMaximaInss = 897.31;
+
 #recupera a inscrição municipal utilizada no registro da nota
 $id_nota = $get->q51_sequencial;
 $arrayNotas = array();
@@ -98,8 +100,8 @@ for($i = 0; $i < sizeof($arrayNotas['valores']); $i++){
         $soma_inss += $arrayNotas['inss'][$z];
     }
 
-    if($soma_inss > 856.46){
-        $soma_inss = 856.46;
+    if($soma_inss > $contribuicaoMaximaInss){
+        $soma_inss = $contribuicaoMaximaInss;
     }
 
     $calculo = $soma_valores - $soma_inss;
@@ -136,8 +138,8 @@ $baseIRRFPassageiro = $arrayNotas['irrf_outros'];
 $inss_carga_passageiro = $arrayNotas['inss_carga_passageiro'];
 $soma_retido = $arrayNotas['soma_retido'];
 
-if($somaInss > 856.46){
-    $somaInss = 856.46;
+if($somaInss > $contribuicaoMaximaInss){
+    $somaInss = $contribuicaoMaximaInss;
 }
 
 if(empty($retencaoIRRF)){
@@ -824,7 +826,7 @@ $aTiposRetencoesINSS = array(
         var select = document.getElementById('q62_tiporetinss');
 
         var info = {
-            limiteINSS: 856.46,
+            limiteINSS: <?= $contribuicaoMaximaInss ?>,
             baseCalculo: parseFloat(document.getElementById('q62_vlrtotal').value),
             retencoesAntigas: document.getElementById('q62_deducaoinss'),
             retencaoExistente: <?= $retencao ?>,

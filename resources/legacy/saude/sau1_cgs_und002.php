@@ -34,7 +34,7 @@ require_once("dbforms/db_funcoes.php");
 parse_str( $_SERVER["QUERY_STRING"]);
 db_postmemory( $_POST );
 
-$clcgs              = new cl_cgs;
+$clcgs             = new cl_cgs;
 $clcgs_und          = new cl_cgs_und_ext;
 $clcgs_cartaosus    = new cl_cgs_cartaosus;
 
@@ -169,7 +169,7 @@ if ( isset($alterar) ) {
 </script>
 </head>
 <body class="body-default">
-  <?include("forms/db_frmcgs_und.php");?>
+  <?php include("forms/db_frmcgs_und.php");?>
 </body>
 </html>
 
@@ -214,7 +214,7 @@ if ( isset($alterar) ) {
       CurrentWindow.corpo.iframe_a2.location.href      = 'sau1_cgs_undoutros002.php?chavepesquisa=<?=$z01_i_cgsund?>&db_value=Alterar';
       parent.mo_camada('a2');
     </script>
-    <?
+    <?php
   }
 }
 

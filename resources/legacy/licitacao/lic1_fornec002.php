@@ -483,13 +483,7 @@ if (isset($incluir)) {
   $resultValores = $clpcorcamval->sql_record($clpcorcamval->sql_query_file($pc21_orcamforne, null, "sum(pc23_vlrun) as valor", null, ""));
   db_fieldsmemory($resultValores, 0)->valor;
   
-  $sql = "SELECT * FROM licpropostavinc where l223_fornecedor = ". $pc21_numcgm;
-  $rsResult = db_query($sql);
 
-  if(pg_num_rows($rsResult) > 0 ){
-    $sqlerro = true;
-    $erro_msg = "Fornecedor possuí proposta lançada, para remove-lo é necessário remover primeiro sua proposta";
-  }
 
   
   if ($valor > 0) {

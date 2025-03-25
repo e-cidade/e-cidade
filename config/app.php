@@ -238,4 +238,18 @@ return [
 
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Application Custom Keys
+    |--------------------------------------------------------------------------
+    |
+    | List of keys that are used for the e-cidade business logic
+    |
+    |
+    */
+    'redesim' => [
+        'auth' => [
+            'key' => env('API_REDESIM_TOKEN', '')
+        ]
+    ],
 ];

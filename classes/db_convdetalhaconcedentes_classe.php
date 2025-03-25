@@ -49,147 +49,164 @@ class cl_convdetalhaconcedentes {
      }
    }
    // funcao para atualizar campos
-   function atualizacampos($exclusao=false) {
+   function atualizacampos($exclusao=false, $aData=null) {
      if($exclusao==false){
-       $this->c207_sequencial = ($this->c207_sequencial == ""?@$GLOBALS["HTTP_POST_VARS"]["c207_sequencial"]:$this->c207_sequencial);
-       $this->c207_nrodocumento = ($this->c207_nrodocumento == ""?@$GLOBALS["HTTP_POST_VARS"]["c207_nrodocumento"]:$this->c207_nrodocumento);
-       $this->c207_esferaconcedente = ($this->c207_esferaconcedente == ""?@$GLOBALS["HTTP_POST_VARS"]["c207_esferaconcedente"]:$this->c207_esferaconcedente);
-       $this->c207_valorconcedido = ($this->c207_valorconcedido == ""?@$GLOBALS["HTTP_POST_VARS"]["c207_valorconcedido"]:$this->c207_valorconcedido);
-       $this->c207_codconvenio = ($this->c207_codconvenio == ""?@$GLOBALS["HTTP_POST_VARS"]["c207_codconvenio"]:$this->c207_codconvenio);
-       $this->c207_descrconcedente = ($this->c207_descrconcedente == ""?@$GLOBALS["HTTP_POST_VARS"]["c207_descrconcedente"]:$this->c207_descrconcedente);
+
+      $this->c207_sequencial = ($this->c207_sequencial == ""?@$GLOBALS["HTTP_POST_VARS"]["c207_sequencial"]:$this->c207_sequencial);
+      $this->c207_nrodocumento = ($this->c207_nrodocumento == ""?@$GLOBALS["HTTP_POST_VARS"]["c207_nrodocumento"]:$this->c207_nrodocumento);
+      $this->c207_esferaconcedente = ($this->c207_esferaconcedente == ""?@$GLOBALS["HTTP_POST_VARS"]["c207_esferaconcedente"]:$this->c207_esferaconcedente);
+      $this->c207_valorconcedido = ($this->c207_valorconcedido == ""?@$GLOBALS["HTTP_POST_VARS"]["c207_valorconcedido"]:$this->c207_valorconcedido);
+      $this->c207_codconvenio = ($this->c207_codconvenio == ""?@$GLOBALS["HTTP_POST_VARS"]["c207_codconvenio"]:$this->c207_codconvenio);
+      $this->c207_descrconcedente = ($this->c207_descrconcedente == ""?@$GLOBALS["HTTP_POST_VARS"]["c207_descrconcedente"]:$this->c207_descrconcedente);
+
+      if(!empty($aData)) {
+        $this->c207_sequencial       = isset($aData['c207_sequencial'])       ? $aData['c207_sequencial']                   : NULL;
+        $this->c207_nrodocumento     = isset($aData['c207_nrodocumento'])     ? $aData['c207_nrodocumento']                 : NULL;
+        $this->c207_esferaconcedente = isset($aData['c207_esferaconcedente']) ? $aData['c207_esferaconcedente']             : NULL;
+        $this->c207_valorconcedido   = isset($aData['c207_valorconcedido'])   ? $aData['c207_valorconcedido']               : NULL;
+        $this->c207_codconvenio      = isset($aData['c207_codconvenio'])      ? $aData['c207_codconvenio']                  : NULL;
+        $this->c207_descrconcedente  = isset($aData['c207_descrconcedente'])  ? "'" . $aData['c207_descrconcedente'] . "'"  : NULL;
+      }
+
      }else{
-       $this->c207_sequencial = ($this->c207_sequencial == ""?@$GLOBALS["HTTP_POST_VARS"]["c207_sequencial"]:$this->c207_sequencial);
+      
+        $this->c207_sequencial = ($this->c207_sequencial == ""?@$GLOBALS["HTTP_POST_VARS"]["c207_sequencial"]:$this->c207_sequencial);
+
+        if(!empty($aData)) {
+            $this->c207_sequencial = isset($aData['c207_sequencial']) ? $aData['c207_sequencial'] : null;
+        }
      }
    }
    // funcao para inclusao
-   function incluir ($c207_sequencial){
-      $this->atualizacampos();
-     /*if($this->c207_nrodocumento == null ){
-       $this->erro_sql = " Campo Número do  Documento nao Informado.";
-       $this->erro_campo = "c207_nrodocumento";
-       $this->erro_banco = "";
-       $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-       $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
-       $this->erro_status = "0";
-       return false;
-     }*/
-     if($this->c207_esferaconcedente == null ){
-       $this->erro_sql = " Campo Esfera do  Concedente nao Informado.";
-       $this->erro_campo = "c207_esferaconcedente";
-       $this->erro_banco = "";
-       $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-       $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
-       $this->erro_status = "0";
-       return false;
-     }
-     if($this->c207_valorconcedido == null ){
-       $this->erro_sql = " Campo Valor a ser  concedido nao Informado.";
-       $this->erro_campo = "c207_valorconcedido";
-       $this->erro_banco = "";
-       $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-       $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
-       $this->erro_status = "0";
-       return false;
-     }
-     if($this->c207_codconvenio == null ){
-       $this->erro_sql = " Campo Cod convenio nao Informado.";
-       $this->erro_campo = "c207_codconvenio";
-       $this->erro_banco = "";
-       $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-       $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
-       $this->erro_status = "0";
-       return false;
-     }
-     if($c207_sequencial == "" || $c207_sequencial == null ){
-       $result = db_query("select nextval('convdetalhaconcedentes_c207_sequencial_seq')");
-       if($result==false){
-         $this->erro_banco = str_replace("\n","",@pg_last_error());
-         $this->erro_sql   = "Verifique o cadastro da sequencia: convdetalhaconcedentes_c207_sequencial_seq do campo: c207_sequencial";
-         $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-         $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
-         $this->erro_status = "0";
-         return false;
-       }
-       $this->c207_sequencial = pg_result($result,0,0);
-     }else{
-       $result = db_query("select last_value from convdetalhaconcedentes_c207_sequencial_seq");
-       if(($result != false) && (pg_result($result,0,0) < $c207_sequencial)){
-         $this->erro_sql = " Campo c207_sequencial maior que último número da sequencia.";
-         $this->erro_banco = "Sequencia menor que este número.";
-         $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-         $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
-         $this->erro_status = "0";
-         return false;
-       }else{
-         $this->c207_sequencial = $c207_sequencial;
-       }
-     }
-     if(($this->c207_sequencial == null) || ($this->c207_sequencial == "") ){
-       $this->erro_sql = " Campo c207_sequencial nao declarado.";
-       $this->erro_banco = "Chave Primaria zerada.";
-       $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-       $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
-       $this->erro_status = "0";
-       return false;
-     }
-     $sql = "insert into convdetalhaconcedentes(
-                                       c207_sequencial
-                                      ,c207_nrodocumento
-                                      ,c207_esferaconcedente
-                                      ,c207_valorconcedido
-                                      ,c207_codconvenio
-                                      ,c207_descrconcedente
-                       )
-                values (
-                                $this->c207_sequencial
-                               ,'$this->c207_nrodocumento'
-                               ,$this->c207_esferaconcedente
-                               ,$this->c207_valorconcedido
-                               ,$this->c207_codconvenio
-                               ,".($this->c207_descrconcedente == "null" || $this->c207_descrconcedente == ""?"null":"'".$this->c207_descrconcedente."'")."
+   function incluir ($c207_sequencial, $aData = null){
+      $this->atualizacampos(false, $aData);
+      /*if($this->c207_nrodocumento == null ){
+        $this->erro_sql = " Campo Número do  Documento nao Informado.";
+        $this->erro_campo = "c207_nrodocumento";
+        $this->erro_banco = "";
+        $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+        $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+        $this->erro_status = "0";
+        return false;
+      }*/
+      if($this->c207_esferaconcedente == null ){
+        $this->erro_sql = " Campo Esfera do  Concedente nao Informado.";
+        $this->erro_campo = "c207_esferaconcedente";
+        $this->erro_banco = "";
+        $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+        $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+        $this->erro_status = "0";
+        return false;
+      }
+      if($this->c207_valorconcedido == null ){
+        $this->erro_sql = " Campo Valor a ser  concedido nao Informado.";
+        $this->erro_campo = "c207_valorconcedido";
+        $this->erro_banco = "";
+        $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+        $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+        $this->erro_status = "0";
+        return false;
+      }
+      if($this->c207_codconvenio == null ){
+        $this->erro_sql = " Campo Cod convenio nao Informado.";
+        $this->erro_campo = "c207_codconvenio";
+        $this->erro_banco = "";
+        $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+        $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+        $this->erro_status = "0";
+        return false;
+      }
+      if($c207_sequencial == "" || $c207_sequencial == null ){
+        $result = db_query("select nextval('convdetalhaconcedentes_c207_sequencial_seq')");
+        if($result==false){
+          $this->erro_banco = str_replace("\n","",@pg_last_error());
+          $this->erro_sql   = "Verifique o cadastro da sequencia: convdetalhaconcedentes_c207_sequencial_seq do campo: c207_sequencial";
+          $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+          $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+          $this->erro_status = "0";
+          return false;
+        }
+        $this->c207_sequencial = pg_result($result,0,0);
+      }else{
+        $result = db_query("select last_value from convdetalhaconcedentes_c207_sequencial_seq");
+        if(($result != false) && (pg_result($result,0,0) < $c207_sequencial)){
+          $this->erro_sql = " Campo c207_sequencial maior que último número da sequencia.";
+          $this->erro_banco = "Sequencia menor que este número.";
+          $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+          $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+          $this->erro_status = "0";
+          return false;
+        }else{
+          $this->c207_sequencial = $c207_sequencial;
+        }
+      }
+      if(($this->c207_sequencial == null) || ($this->c207_sequencial == "") ){
+        $this->erro_sql = " Campo c207_sequencial nao declarado.";
+        $this->erro_banco = "Chave Primaria zerada.";
+        $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+        $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+        $this->erro_status = "0";
+        return false;
+      }
+      $sql = "insert into convdetalhaconcedentes(
+                c207_sequencial
+                ,c207_nrodocumento
+                ,c207_esferaconcedente
+                ,c207_valorconcedido
+                ,c207_codconvenio
+                ,c207_descrconcedente
+              )
+              values (
+                  $this->c207_sequencial
+                  ,'$this->c207_nrodocumento'
+                  ,$this->c207_esferaconcedente
+                  ,$this->c207_valorconcedido
+                  ,$this->c207_codconvenio
+                  ,".($this->c207_descrconcedente == "null" || $this->c207_descrconcedente == ""?"null":"'".$this->c207_descrconcedente."'")."
+              )";
 
-                      )";
-     $result = db_query($sql);
-     if($result==false){
-       $this->erro_banco = str_replace("\n","",@pg_last_error());
-       if( strpos(strtolower($this->erro_banco),"duplicate key") != 0 ){
-         $this->erro_sql   = "convdetalhaconcedentes ($this->c207_sequencial) nao Incluído. Inclusao Abortada.";
-         $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-         $this->erro_banco = "convdetalhaconcedentes já Cadastrado";
-         $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
-       }else{
-         $this->erro_sql   = "convdetalhaconcedentes ($this->c207_sequencial) nao Incluído. Inclusao Abortada.";
-         $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-         $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
-       }
-       $this->erro_status = "0";
-       $this->numrows_incluir= 0;
-       return false;
-     }
-     $this->erro_banco = "";
-     $this->erro_sql = "Inclusao efetuada com Sucesso\\n";
-         $this->erro_sql .= "Valores : ".$this->c207_sequencial;
-     $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-     $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
-     $this->erro_status = "1";
-     $this->numrows_incluir= pg_affected_rows($result);
-     $resaco = $this->sql_record($this->sql_query_file($this->c207_sequencial));
-     if(($resaco!=false)||($this->numrows!=0)){
-       $resac = db_query("select nextval('db_acount_id_acount_seq') as acount");
-       $acount = pg_result($resac,0,0);
-       $resac = db_query("insert into db_acountacesso values($acount,".db_getsession("DB_acessado").")");
-       $resac = db_query("insert into db_acountkey values($acount,2011391,'$this->c207_sequencial','I')");
-       $resac = db_query("insert into db_acount values($acount,2010398,2011391,'','".AddSlashes(pg_result($resaco,0,'c207_sequencial'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-       $resac = db_query("insert into db_acount values($acount,2010398,2011393,'','".AddSlashes(pg_result($resaco,0,'c207_nrodocumento'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-       $resac = db_query("insert into db_acount values($acount,2010398,2011394,'','".AddSlashes(pg_result($resaco,0,'c207_esferaconcedente'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-       $resac = db_query("insert into db_acount values($acount,2010398,2011395,'','".AddSlashes(pg_result($resaco,0,'c207_valorconcedido'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-       $resac = db_query("insert into db_acount values($acount,2010398,2011396,'','".AddSlashes(pg_result($resaco,0,'c207_codconvenio'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
-     }
-     return true;
+      $result = db_query($sql);
+
+      if($result==false){
+        $this->erro_banco = str_replace("\n","",@pg_last_error());
+        if( strpos(strtolower($this->erro_banco),"duplicate key") != 0 ){
+          $this->erro_sql   = "convdetalhaconcedentes ($this->c207_sequencial) nao Incluído. Inclusao Abortada.";
+          $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+          $this->erro_banco = "convdetalhaconcedentes já Cadastrado";
+          $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+        }else{
+          $this->erro_sql   = "convdetalhaconcedentes ($this->c207_sequencial) nao Incluído. Inclusao Abortada.";
+          $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+          $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+        }
+        $this->erro_status = "0";
+        $this->numrows_incluir= 0;
+        return false;
+      }
+      $this->erro_banco = "";
+      $this->erro_sql = "Inclusao efetuada com Sucesso\\n";
+      $this->erro_sql .= "Valores : ".$this->c207_sequencial;
+      $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+      $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+      $this->erro_status = "1";
+      $this->numrows_incluir= pg_affected_rows($result);
+      $resaco = $this->sql_record($this->sql_query_file($this->c207_sequencial));
+      if(($resaco!=false)||($this->numrows!=0)){
+        $resac = db_query("select nextval('db_acount_id_acount_seq') as acount");
+        $acount = pg_result($resac,0,0);
+        $resac = db_query("insert into db_acountacesso values($acount,".db_getsession("DB_acessado").")");
+        $resac = db_query("insert into db_acountkey values($acount,2011391,'$this->c207_sequencial','I')");
+        $resac = db_query("insert into db_acount values($acount,2010398,2011391,'','".AddSlashes(pg_result($resaco,0,'c207_sequencial'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+        $resac = db_query("insert into db_acount values($acount,2010398,2011393,'','".AddSlashes(pg_result($resaco,0,'c207_nrodocumento'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+        $resac = db_query("insert into db_acount values($acount,2010398,2011394,'','".AddSlashes(pg_result($resaco,0,'c207_esferaconcedente'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+        $resac = db_query("insert into db_acount values($acount,2010398,2011395,'','".AddSlashes(pg_result($resaco,0,'c207_valorconcedido'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+        $resac = db_query("insert into db_acount values($acount,2010398,2011396,'','".AddSlashes(pg_result($resaco,0,'c207_codconvenio'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
+      }
+      return true;
    }
    // funcao para alteracao
-   function alterar ($c207_sequencial=null) {
-      $this->atualizacampos();
+   function alterar ($c207_sequencial=null, $aData = null) {
+      $this->atualizacampos(false, $aData);
      $sql = " update convdetalhaconcedentes set ";
      $virgula = "";
      if(trim($this->c207_sequencial)!="" || isset($GLOBALS["HTTP_POST_VARS"]["c207_sequencial"])){
@@ -478,5 +495,35 @@ class cl_convdetalhaconcedentes {
      }
      return $sql;
   }
+
+  function getDetalhesByConvenio($c207_codconvenio) {
+
+    $sqlDetalhamento = 'SELECT * FROM convdetalhaconcedentes WHERE c207_codconvenio = ' . $c207_codconvenio;
+    $detalhamentosConvenio = pg_fetch_all(db_query($sqlDetalhamento));
+
+    if(!empty($detalhamentosConvenio)) {
+      return $detalhamentosConvenio;
+    }
+    
+    return null;
+  }
+
+  function getNotDelete($pacote_detalhamentos) {
+
+    $sNoteDeleted = '';
+
+    foreach ($pacote_detalhamentos as $key => $item_detalhe) {
+      if(!empty($item_detalhe['c207_sequencial'])) {
+        $sNoteDeleted = $sNoteDeleted . $item_detalhe['c207_sequencial'] . ',';
+      }
+    }
+
+    if(substr($sNoteDeleted, -1) === ',') {
+      $sNoteDeleted = substr($sNoteDeleted, 0, strlen($sNoteDeleted) - 1);
+    }
+    
+    return $sNoteDeleted;
+  }
+
 }
 ?>

@@ -4,7 +4,7 @@ namespace App\Repositories\Patrimonial;
 
 use App\Models\AcordoItemPeriodo;
 use App\Repositories\Contracts\Patrimonial\AcordoItemPeriodoRepositoryInterface;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class AcordoItemPeriodoRepository implements AcordoItemPeriodoRepositoryInterface
 {

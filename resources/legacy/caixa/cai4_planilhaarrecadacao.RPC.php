@@ -100,9 +100,19 @@ switch ($oParam->exec) {
 
     db_inicio_transacao();
     try {
+      $dtArrecadacao = App\Support\String\DateFormatter::convertDateFormatBRToISO($oParam->novaDtRecebimento);
+      $sSqlConsultaFimPeriodoContabil = "SELECT * FROM condataconf WHERE c99_anousu = " . db_getsession('DB_anousu') . " and c99_instit = " . db_getsession('DB_instit');
+      $rsConsultaFimPeriodoContabil   = db_query($sSqlConsultaFimPeriodoContabil);
+    
+      if (pg_num_rows($rsConsultaFimPeriodoContabil) > 0) {
+        $oFimPeriodoContabil = db_utils::fieldsMemory($rsConsultaFimPeriodoContabil, 0);
+    
+        if ($oFimPeriodoContabil->c99_data != '' && db_strtotime($dtArrecadacao) <= db_strtotime($oFimPeriodoContabil->c99_data)) {
+          throw new Exception("Data inferior à data do fim do período contábil.");          
+        }
+      }
 
       $oPlanilhaArrecadacao = new PlanilhaArrecadacao();
-      $dtArrecadacao = formateDateReverse($oParam->novaDtRecebimento);
       $oPlanilhaArrecadacao->setDataCriacao($dtArrecadacao);
       $oPlanilhaArrecadacao->setInstituicao(InstituicaoRepository::getInstituicaoByCodigo(db_getsession('DB_instit')));
       $oPlanilhaArrecadacao->setProcessoAdministrativo(db_stdClass::normalizeStringJsonEscapeString($oParam->k144_numeroprocesso));
@@ -134,6 +144,55 @@ switch ($oParam->exec) {
         $oReceitaPlanilha->setValor($oReceitas->nValor);
         $oReceitaPlanilha->setConvenio($iConvenio);
         $oPlanilhaArrecadacao->adicionarReceitaPlanilha($oReceitaPlanilha);
+        
+        if ($oReceitas->iOperacaodecredito && substr($oReceitas->iEstrutural,1,2) == 21 ) {
+
+          $sDataMovimento = App\Support\String\DateFormatter::convertDateFormatBRToISO($oParam->novaDtRecebimento);
+          $sSqlConsultaFimPeriodoContabil = "SELECT * FROM condataconf WHERE c99_anousu = ".db_getsession('DB_anousu')." and c99_instit = ".db_getsession('DB_instit');
+          $rsConsultaFimPeriodoContabil   = db_query($sSqlConsultaFimPeriodoContabil);
+      
+          if (pg_num_rows($rsConsultaFimPeriodoContabil) > 0) {
+              $oFimPeriodoContabil = db_utils::fieldsMemory($rsConsultaFimPeriodoContabil, 0);
+              
+              if ($oFimPeriodoContabil->c99_data != '' && db_strtotime($sDataMovimento) <= db_strtotime($oFimPeriodoContabil->c99_data)) {                
+                  $erro = true;
+              }
+          }
+          
+          if (!$erro) {
+
+              $clplacaixa = new cl_placaixa;
+              $rsCodplanilha = $clplacaixa->sql_record("select last_value + 1 as cod_planilha from placaixa_k80_codpla_seq");
+              if ($clplacaixa->numrows > 0 ) {
+                $codplanilha = db_utils::fieldsMemory($rsCodplanilha, 0)->cod_planilha;
+              }
+
+              $justificativa = "Arrecadação da Planilha (" .$codplanilha .")";
+              
+              $clMovimentacao = new cl_movimentacaodedivida();
+              $clMovimentacao->op02_operacaodecredito = $oReceitas->iOperacaodecredito;
+              $clMovimentacao->op02_movimentacao      = 1;
+              $clMovimentacao->op02_tipo              = 0;
+              $clMovimentacao->op02_data              = $dtArrecadacao;
+              $clMovimentacao->op02_justificativa     = $justificativa;
+              $clMovimentacao->op02_valor             = $oReceitas->nValor;
+              $clMovimentacao->op02_movautomatica     = 't';
+              $clMovimentacao->op02_codigoplanilha     = $codplanilha;
+              $clMovimentacao->incluir();
+              
+              if ($clMovimentacao->erro_status == "0"){
+                  $oRetorno->status = 2;
+                  $oRetorno->message = "Erro ao incluir movimentação automática na Dívida Consolidada.";
+                  throw new Exception($oRetorno->message);
+              } 
+          } else {
+
+              $oRetorno->status = 2;
+              $oRetorno->message = "Não foi possível incluir a movimentação automática na Dívida Consolidada.<br> A data é inferior à data de encerramento do período contábil.";
+              throw new Exception($oRetorno->message);
+          }
+      }
+
       }
 
       $oPlanilhaArrecadacao->salvar();
@@ -143,6 +202,7 @@ switch ($oParam->exec) {
       $sMensagemRetorno .= "Deseja imprimir o documento gerado?";
       $oRetorno->message         = urlencode($sMensagemRetorno);
       $oRetorno->iCodigoPlanilha = $oPlanilhaArrecadacao->getCodigo();
+      $oRetorno->sDtRecebimento  = $sDtRecebimento;
 
 
     } catch (Exception $oExceptionErro) {
@@ -161,6 +221,72 @@ switch ($oParam->exec) {
       $oPlanilhaArrecadacao = new PlanilhaArrecadacao($oParam->iPlanilha);
       $oPlanilhaArrecadacao->setDataAutenticacao(formateDateReverse($oParam->dataestorno));
       $oPlanilhaArrecadacao->estornar();
+
+      $clplacaixarec = new cl_placaixarec;
+      $sSqlCampos   = " k81_conta,k02_estorc ";
+      $sSqlWhere    = " k81_codpla = $oParam->iPlanilha and k02_anousu = ".db_getsession('DB_anousu');
+      $sSqlMonta    = $clplacaixarec->sql_query_placaixarec_lancamento(null, $sSqlCampos,null,$sSqlWhere);
+      $rsMonta      = $clplacaixarec->sql_record($sSqlMonta);
+      if ($clplacaixarec->numrows > 0) {
+
+        for ( $i=0; $i<$clplacaixarec->numrows; $i++) {
+          $dadoContas = db_utils::fieldsMemory($rsMonta, $i);
+
+          $clsaltes = new cl_saltes;
+          $campos = "distinct  saltes.k13_reduz, saltes.k13_conta, saltes.k13_descr,saltes.k13_saldo,c63_banco,c63_agencia,c63_dvagencia,c63_conta,c63_dvconta,saltes.k13_vlratu,saltes.k13_datvlr,c61_codigo, db83_conta, c60_tipolancamento, c60_subtipolancamento, db83_codigoopcredito, db83_tipoconta  ";
+          $sqlSaltes = $clsaltes->sql_query(null,$campos,null," saltes.k13_reduz = $dadoContas->k81_conta and db83_codigoopcredito is not null ");
+          $rsSaltes  = $clsaltes->sql_record($sqlSaltes);
+
+          if ($clsaltes->numrows > 0) {
+            $oDadosSaltes = db_utils::fieldsMemory($rsSaltes, 0);
+          }  
+
+          if ($oDadosSaltes->db83_codigoopcredito && substr($dadoContas->k02_estorc,1,2) == 21 ) {
+
+            $sDataMovimento = App\Support\String\DateFormatter::convertDateFormatBRToISO($oParam->dataestorno);
+            $sSqlConsultaFimPeriodoContabil = "SELECT * FROM condataconf WHERE c99_anousu = ".db_getsession('DB_anousu')." and c99_instit = ".db_getsession('DB_instit');
+            $rsConsultaFimPeriodoContabil   = db_query($sSqlConsultaFimPeriodoContabil);
+        
+            if (pg_num_rows($rsConsultaFimPeriodoContabil) > 0) {
+                $oFimPeriodoContabil = db_utils::fieldsMemory($rsConsultaFimPeriodoContabil, 0);
+                if ($oFimPeriodoContabil->c99_data != '' && db_strtotime($sDataMovimento) <= db_strtotime($oFimPeriodoContabil->c99_data)) {                
+                    $erro = true;
+                }
+            }
+            if (!$erro) {
+                $justificativa = "Estorno da Arrecadação da Planilha  (" .$oParam->iPlanilha .")";
+                $clMovimentacao  = new cl_movimentacaodedivida();
+                $sSqlMovimentaca = $clMovimentacao->sql_query_file(null, "*", null, "op02_codigoplanilha = {$oParam->iPlanilha}" );
+                $rsMovimentaca   = $clMovimentacao->sql_record($sSqlMovimentaca);
+               
+                if ($clMovimentacao->numrows > 0) {
+                  for ( $i=0; $i<$clMovimentacao->numrows; $i++) {
+                    $oDadosMovimentacao = db_utils::fieldsMemory($rsMovimentaca, $i);   
+                    $clMovimentacao->op02_operacaodecredito = $oDadosMovimentacao->op02_operacaodecredito;
+                    $clMovimentacao->op02_movimentacao      = 3;
+                    $clMovimentacao->op02_tipo              = 1;
+                    $clMovimentacao->op02_data              = $sDataMovimento;
+                    $clMovimentacao->op02_justificativa     = $justificativa;
+                    $clMovimentacao->op02_valor             = $oDadosMovimentacao->op02_valor;
+                    $clMovimentacao->op02_movautomatica     = 't';
+                    $clMovimentacao->op02_codigoplanilha    = $oDadosMovimentacao->op02_codigoplanilha;
+                    $clMovimentacao->incluir();
+    
+                    if ($clMovimentacao->erro_status == "0"){
+                      $oRetorno->status = 2;
+                      $oRetorno->message = "Erro ao incluir movimentação automática na Dívida Consolidada.";
+                      throw new Exception($oRetorno->message);
+                    } 
+                  }
+                }
+            } else {
+                $oRetorno->status = 2;
+                $oRetorno->message = "Não foi possível incluir a movimentação automática na Dívida Consolidada.<br> A data é inferior à data de encerramento do período contábil.";
+                throw new Exception($oRetorno->message);
+            }
+          }
+        }
+      }
       db_fim_transacao(false);
       $oRetorno->message = urlencode("Planilha {$oPlanilhaArrecadacao->getCodigo()} estornada com sucesso.");
 
@@ -202,6 +328,7 @@ switch ($oParam->exec) {
         $oReceita->iCaracteriscaPeculiar = $oReceitaPlanilha->getCaracteristicaPeculiar()->getSequencial();
 
         $oContaTesouraria                = $oReceitaPlanilha->getContaTesouraria();
+        $oPlanilha->reduzconta           = $oContaTesouraria->getCodigoConta();
         $oReceita->iContaTesouraria      = $oContaTesouraria->getCodigoConta();
         $oReceita->sDescricaoConta       = urlencode($oContaTesouraria->getDescricao());
 
@@ -229,7 +356,7 @@ switch ($oParam->exec) {
     try {
 
       $oPlanilhaArrecadacao = new PlanilhaArrecadacao($oParam->iPlanilha);
-      $oPlanilhaArrecadacao->setDataAutenticacao(formateDateReverse($oParam->novaDtRecebimento));
+      $oPlanilhaArrecadacao->setDataAutenticacao(strpos($oParam->novaDtRecebimento, '/') ? formateDateReverse($oParam->novaDtRecebimento) : $oParam->novaDtRecebimento);
       $oPlanilhaArrecadacao->getReceitasPlanilha();
       $oPlanilhaArrecadacao->autenticar();
 
@@ -309,6 +436,71 @@ switch ($oParam->exec) {
         $oReceitaPlanilha->setConvenio($iConvenio);
 
         $oPlanilhaArrecadacao->adicionarReceitaPlanilha($oReceitaPlanilha);
+       
+        if ($oReceitas->iOperacaodecredito && substr($oReceitas->iEstrutural,1,2) == 21 ) {
+          
+          $sDataMovimento = App\Support\String\DateFormatter::convertDateFormatBRToISO($oParam->novaDtRecebimento);
+          $sSqlConsultaFimPeriodoContabil = "SELECT * FROM condataconf WHERE c99_anousu = ".db_getsession('DB_anousu')." and c99_instit = ".db_getsession('DB_instit');
+          $rsConsultaFimPeriodoContabil   = db_query($sSqlConsultaFimPeriodoContabil);
+      
+          if (pg_num_rows($rsConsultaFimPeriodoContabil) > 0) {
+              $oFimPeriodoContabil = db_utils::fieldsMemory($rsConsultaFimPeriodoContabil, 0);
+              
+              if ($oFimPeriodoContabil->c99_data != '' && db_strtotime($sDataMovimento) <= db_strtotime($oFimPeriodoContabil->c99_data)) {                
+                  $erro = true;
+              }
+          }
+         
+          if (!$erro) {
+            
+            $dtArrecadacao = App\Support\String\DateFormatter::convertDateFormatBRToISO($oParam->novaDtRecebimento);
+            $clMovimentacao = new cl_movimentacaodedivida();
+
+            $sSqlMovimentaca       = $clMovimentacao->sql_query_file(null, "*", null, "op02_codigoplanilha = {$oParam->iCodigoPlanilha}" );
+            $rsMovimentaca          = $clMovimentacao->sql_record($sSqlMovimentaca);
+            
+            if ($clMovimentacao->numrows > 0) {
+              $oDadosMovimentacao = db_utils::fieldsMemory($rsMovimentaca, 0);           
+
+              $clMovimentacao->op02_operacaodecredito = $oReceitas->iOperacaodecredito;
+              $clMovimentacao->op02_data              = $dtArrecadacao;
+              $clMovimentacao->op02_valor             = $oReceitas->nValor;
+
+              $clMovimentacao->alterar($oDadosMovimentacao->op02_sequencial);
+            
+              if ($clMovimentacao->erro_status == "0"){
+                  $oRetorno->status = 2;
+                  $oRetorno->message = "Erro ao alterar movimentação automática na Dívida Consolidada.";
+                  throw new Exception($oRetorno->message);
+              } 
+            }  else {
+                  $justificativa = "Arrecadação da Planilha (" .$oParam->iCodigoPlanilha .")";
+                  
+                  $clMovimentacao = new cl_movimentacaodedivida();
+                  $clMovimentacao->op02_operacaodecredito = $oReceitas->iOperacaodecredito;
+                  $clMovimentacao->op02_movimentacao      = 1;
+                  $clMovimentacao->op02_tipo              = 0;
+                  $clMovimentacao->op02_data              = $dtArrecadacao;
+                  $clMovimentacao->op02_justificativa     = $justificativa;
+                  $clMovimentacao->op02_valor             = $oReceitas->nValor;
+                  $clMovimentacao->op02_movautomatica     = 't';
+                  $clMovimentacao->op02_codigoplanilha     = $oParam->iCodigoPlanilha;
+                  $clMovimentacao->incluir();
+
+                  if ($clMovimentacao->erro_status == "0"){
+                    $oRetorno->status = 2;
+                    $oRetorno->message = "Erro ao incluir movimentação automática na Dívida Consolidada.";
+                    throw new Exception($oRetorno->message);
+                  } 
+            }
+          } else {
+
+              $oRetorno->status = 2;
+              $oRetorno->message = "Não foi possível alterar a movimentação automática na Dívida Consolidada.<br> A data é inferior à data de encerramento do período contábil.";
+              throw new Exception($oRetorno->message);
+          }
+      }
+
       }
       $oPlanilhaArrecadacao->salvar();
 
@@ -350,9 +542,20 @@ switch ($oParam->exec) {
       db_inicio_transacao();
 
       $oPlanilha = new PlanilhaArrecadacao($iPlanilha);
-      $oPlanilha->estornar();
+      if ($oPlanilha->getDataAutenticacao() != null) {
+        $oPlanilha->estornar();
+      }
       $oPlanilha->excluirAutenticacao();
 
+      $clMovimentacao  = new cl_movimentacaodedivida();
+      $sSqlMovimentaca = $clMovimentacao->sql_query_file(null, "*", null, "op02_codigoplanilha = {$iPlanilha}" );
+      $rsMovimentaca   = $clMovimentacao->sql_record($sSqlMovimentaca);
+     
+      if ($clMovimentacao->numrows > 0) {
+        $where = " op02_codigoplanilha =  $iPlanilha";
+        $clMovimentacao->excluir(null,$where);
+      }
+        
       db_fim_transacao(false);
 
     } catch (Exception $oExceptionErro) {

@@ -539,6 +539,7 @@ switch ($oParam->exec) {
 
         try {
 
+
             db_inicio_transacao();
 
             $lAcordoValido            = true;
@@ -659,8 +660,6 @@ switch ($oParam->exec) {
                 $oContrato->setCpfsignatariocontratante();
                 if (!empty($oParam->contrato->iComissao)) {
                     $oContrato->setComissao(new AcordoComissao($oParam->contrato->iComissao));
-                } else {
-                    $oContrato->setComissao(new AcordoComissao(1));
                 }
                 $oContrato->setPeriodoComercial($oParam->contrato->lPeriodoComercial);
                 $oContrato->setCategoriaAcordo($oParam->contrato->iCategoriaAcordo);

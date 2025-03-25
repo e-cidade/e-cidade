@@ -2420,19 +2420,20 @@ class cl_rhpessoal
 
     public function verificaMatriculaECargo($iNumCgm)
     {
+        $instit = db_getsession("DB_instit");
         $sSql = "SELECT DISTINCT rh01_regist, rh37_descr, z01_nome";
         $sSql .= " FROM rhpessoal";
         $sSql .= " LEFT JOIN rhfuncao ON rhfuncao.rh37_funcao = rh01_funcao AND rhfuncao.rh37_instit = rh01_instit  ";
         $sSql .= " LEFT JOIN cgm ON z01_numcgm = rh01_numcgm";
-        $sSql .= " WHERE rh01_regist = (";
+        $sSql .= " WHERE rh37_instit = {$instit} AND rh01_regist = (";
         $sSql .= " SELECT max(rh01_regist)";
         $sSql .= " FROM rhpessoal";
-        $sSql .= " WHERE rh01_numcgm = {$iNumCgm} AND rh01_regist NOT IN (";
+        $sSql .= " WHERE rh01_numcgm = {$iNumCgm} AND rh01_instit = {$instit} AND rh01_regist NOT IN (";
         $sSql .= " SELECT rh01_regist";
         $sSql .= " FROM rhpessoal";
         $sSql .= " LEFT JOIN rhpessoalmov  ON  rhpessoalmov.rh02_regist = rhpessoal.rh01_regist";
         $sSql .= " LEFT JOIN rhpesrescisao ON  rh02_seqpes = rh05_seqpes";
-        $sSql .= " WHERE rh05_recis IS NOT NULL AND rh01_numcgm = {$iNumCgm}))";
+        $sSql .= " WHERE rh05_recis IS NOT NULL AND rh01_numcgm = {$iNumCgm} AND rh01_instit = {$instit}))";
 
         return $sSql;
     }

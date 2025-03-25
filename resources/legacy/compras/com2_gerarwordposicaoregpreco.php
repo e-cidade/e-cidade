@@ -17,18 +17,155 @@ $clpcorcam   = new cl_pcorcam();
  * matriz de entrada
  */
 $what = array(
-    'ä', 'ã', 'à', 'á', 'â', 'ê', 'ë', 'è', 'é', 'ï', 'ì', 'í', 'ö', 'õ', 'ò', 'ó', 'ô', 'ü', 'ù', 'ú', 'û',
-    'Ä', 'Ã', 'À', 'Á', 'Â', 'Ê', 'Ë', 'È', 'É', 'Ï', 'Ì', 'Í', 'Ö', 'Õ', 'Ò', 'Ó', 'Ô', 'Ü', 'Ù', 'Ú', 'Û',
-    'ñ', 'Ñ', 'ç', 'Ç', '-', '(', ')', ',', ';', ':', '|', '!', '"', '#', '$', '%', '&', '=', '?', '~', '^', '>', '<', 'ª', '°', "°", chr(13), chr(10), "'"
+    'ä',
+    'ã',
+    'à',
+    'á',
+    'â',
+    'ê',
+    'ë',
+    'è',
+    'é',
+    'ï',
+    'ì',
+    'í',
+    'ö',
+    'õ',
+    'ò',
+    'ó',
+    'ô',
+    'ü',
+    'ù',
+    'ú',
+    'û',
+    'Ä',
+    'Ã',
+    'À',
+    'Á',
+    'Â',
+    'Ê',
+    'Ë',
+    'È',
+    'É',
+    'Ï',
+    'Ì',
+    'Í',
+    'Ö',
+    'Õ',
+    'Ò',
+    'Ó',
+    'Ô',
+    'Ü',
+    'Ù',
+    'Ú',
+    'Û',
+    'ñ',
+    'Ñ',
+    'ç',
+    'Ç',
+    '-',
+    '(',
+    ')',
+    ',',
+    ';',
+    ':',
+    '|',
+    '!',
+    '"',
+    '#',
+    '$',
+    '%',
+    '&',
+    '=',
+    '?',
+    '~',
+    '^',
+    '>',
+    '<',
+    'ª',
+    '°',
+    "°",
+    chr(13),
+    chr(10),
+    "'"
 );
 
 /**
  * matriz de saida
  */
 $by = array(
-    'a', 'a', 'a', 'a', 'a', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u',
-    'A', 'A', 'A', 'A', 'A', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U',
-    'n', 'N', 'c', 'C', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', " ", " ", " ", " "
+    'a',
+    'a',
+    'a',
+    'a',
+    'a',
+    'e',
+    'e',
+    'e',
+    'e',
+    'i',
+    'i',
+    'i',
+    'o',
+    'o',
+    'o',
+    'o',
+    'o',
+    'u',
+    'u',
+    'u',
+    'u',
+    'A',
+    'A',
+    'A',
+    'A',
+    'A',
+    'E',
+    'E',
+    'E',
+    'E',
+    'I',
+    'I',
+    'I',
+    'O',
+    'O',
+    'O',
+    'O',
+    'O',
+    'U',
+    'U',
+    'U',
+    'U',
+    'n',
+    'N',
+    'c',
+    'C',
+    ' ',
+    ' ',
+    ' ',
+    ' ',
+    ' ',
+    ' ',
+    ' ',
+    ' ',
+    ' ',
+    ' ',
+    ' ',
+    ' ',
+    ' ',
+    ' ',
+    ' ',
+    ' ',
+    ' ',
+    ' ',
+    ' ',
+    ' ',
+    ' ',
+    ' ',
+    " ",
+    " ",
+    " ",
+    " "
 );
 
 /**
@@ -234,34 +371,36 @@ header("Content-Disposition: attachment; Filename=Registro de Preço.doc");
 
                 $oSolicita->empenhada          = $oCompilacao->getValorEmpenhadoItem($oSolicita->pc11_codigo);
                 $oSolicita->solicitada         = $oCompilacao->getValorSolicitadoItem($oSolicita->pc11_codigo);
+                $oSolicita->anulada            = $oCompilacao->getValorSolAnuladoItem($oSolicita->pc11_codigo);
+                $oSolicita->empAnulada         = $oCompilacao->getValorEmpAnuladoItem($oSolicita->pc11_codigo);
 
                 $oDadosEstimativa                 = new stdClass();
                 $oDadosEstimativa->iSeq           = $oSolicita->pc11_seq;
                 $oDadosEstimativa->iCodItem       = $oSolicita->pc01_codmater;
-                $oDadosEstimativa->sDescrItem     = $oSolicita->pc01_descrmater." ".$oSolicita->pc01_complmater;
+                $oDadosEstimativa->sDescrItem     = $oSolicita->pc01_descrmater . " " . $oSolicita->pc01_complmater;
                 $oDadosEstimativa->sCompl         = $oSolicita->pc11_resum;
                 $oDadosEstimativa->sUnidade       = $oSolicita->m61_descr;
                 $oDadosEstimativa->sFornecedor    = $oSolicita->oDadosFornecedor->vencedor;
-                $oDadosEstimativa->iEmpenhada     = $oSolicita->empenhada;
-                $oDadosEstimativa->iSolicitada    = $oSolicita->solicitada;
+                $oDadosEstimativa->iEmpenhada     = $oSolicita->empenhada - $oSolicita->empAnulada;
+                $oDadosEstimativa->iSolicitada    = $oSolicita->solicitada - $oSolicita->anulada;
                 $oDadosEstimativa->lControlaValor = ($oCompilacao->getFormaDeControle() == aberturaRegistroPreco::CONTROLA_VALOR);
 
-                $oDadosEstimativa->nSolicitar    = ($oSolicita->pc11_quant - $oSolicita->solicitada);
-                $oDadosEstimativa->nEmpenhar     = ($oSolicita->solicitada - $oSolicita->empenhada);
+                $oDadosEstimativa->nSolicitar    = ($oSolicita->pc11_quant - $oDadosEstimativa->iSolicitada);
+                $oDadosEstimativa->nEmpenhar     = ($oDadosEstimativa->iSolicitada - $oDadosEstimativa->iEmpenhada);
 
                 $nQuantMin                     = (empty($oSolicita->pc57_quantmin)                   ? '0' : $oSolicita->pc57_quantmin);
                 $nQuantMax                     = (empty($oSolicita->pc11_quant)                      ? '0' : $oSolicita->pc11_quant);
                 $nVlrUnitario                  = (empty($oSolicita->oDadosFornecedor->valorunitario) ? '0' : $oSolicita->oDadosFornecedor->valorunitario);
 
-                $oDadosEstimativa->nQuantMin = (empty($oSolicita->pc57_quantmin)                   ? '0' : $oSolicita->pc57_quantmin);
-                $oDadosEstimativa->nQuantMax                     = (empty($oSolicita->pc11_quant)                      ? '0' : $oSolicita->pc11_quant);
+                $oDadosEstimativa->nQuantMin = (empty($oSolicita->pc57_quantmin)                     ? '0' : $oSolicita->pc57_quantmin);
+                $oDadosEstimativa->nQuantMax = (empty($oSolicita->pc11_quant)                        ? '0' : $oSolicita->pc11_quant);
 
                 /**
                  * Verifica se controla o registro de preço por valor e altera o conteúdo das colunas
                  */
                 if ($oDadosEstimativa->lControlaValor) {
 
-                    $oDadosEstimativa->nSolicitar = ($oSolicita->pc11_vlrun - $oSolicita->solicitada);
+                    $oDadosEstimativa->nSolicitar = ($oSolicita->pc11_vlrun - $oDadosEstimativa->iSolicitada);
                     $nVlrUnitario = $oSolicita->pc11_vlrun;
                 }
 

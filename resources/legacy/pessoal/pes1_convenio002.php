@@ -47,6 +47,9 @@ if(isset($alterar)){
   $r56_posq01 = $r56_posq011.$r56_posq012;
   $r56_posq02 = $r56_posq021.$r56_posq022;
   $r56_posq03 = $r56_posq031.$r56_posq032;
+  $r56_posq04 = $r56_posq041.$r56_posq042;
+  $r56_posq05 = $r56_posq051.$r56_posq052;
+  $r56_posq06 = $r56_posq061.$r56_posq062;
 
   $clconvenio->r56_posano = $r56_posano;
   $clconvenio->r56_posmes = $r56_posmes;
@@ -56,6 +59,9 @@ if(isset($alterar)){
   $clconvenio->r56_posq01 = $r56_posq01;
   $clconvenio->r56_posq02 = $r56_posq02;
   $clconvenio->r56_posq03 = $r56_posq03;
+  $clconvenio->r56_posq04 = $r56_posq04;
+  $clconvenio->r56_posq05 = $r56_posq05;
+  $clconvenio->r56_posq06 = $r56_posq06;
   $clconvenio->alterar($r56_codrel, db_getsession('DB_instit'));
   db_fim_transacao();
 }else if(isset($chavepesquisa)){
@@ -79,6 +85,12 @@ if(isset($alterar)){
   $r56_posq022 = substr($r56_posq02,3,3);
   $r56_posq031 = substr($r56_posq03,0,3);
   $r56_posq032 = substr($r56_posq03,3,3);
+  $r56_posq041 = substr($r56_posq04,0,3);
+  $r56_posq042 = substr($r56_posq04,3,3);
+  $r56_posq051 = substr($r56_posq05,0,3);
+  $r56_posq052 = substr($r56_posq05,3,3);
+  $r56_posq061 = substr($r56_posq06,0,3);
+  $r56_posq062 = substr($r56_posq06,3,3);
 }
 ?>
 <html>

@@ -101,11 +101,6 @@ db_app::load("estilos.css, grid.style.css");
 <script type="text/javascript">
     var form = document.getElementById('justificativaForm');
 
-    loadComponents([
-        'buttonsSolid',
-        'simpleModal'
-    ]);
-
     function js_showGrid() {
         let opcao = "<?= $db_opcao ?>";
         oGridItens = new DBGrid('gridItens');

@@ -444,6 +444,7 @@ db_app::import("configuracao.DBDepartamento");
             );
 
             $iCodigoComissao = $clAcordo->getComissao()->getCodigo();
+
             $oTabDetalhes->add(
                 "comissao",
                 "Comissões",
@@ -466,6 +467,16 @@ db_app::import("configuracao.DBDepartamento");
                 "Saldo",
                 "Saldo",
                 "con4_consacordosdetalhes001.php?ac16_sequencial={$oGet->ac16_sequencial}&exec=saldo"
+            );
+            $oTabDetalhes->add(
+                "Dados PNCP",
+                "Dados PNCP",
+                "con4_dadospncp.php?ac16_sequencial={$oGet->ac16_sequencial}&exec=dadospncp"
+            );
+            $oTabDetalhes->add(
+                "Documentos e anexos do PNCP",
+                "Documentos e anexos do PNCP",
+                "con4_anexospncp.php?ac16_sequencial={$oGet->ac16_sequencial}&exec=documentoseanexospncp"
             );
 
             if ($clAcordo->getNaturezaAcordo($oGet->ac16_sequencial) ==  "1" || $clAcordo->getNaturezaAcordo($oGet->ac16_sequencial) ==  "7") {

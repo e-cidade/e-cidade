@@ -418,8 +418,7 @@ class cl_pcorcamfornelic {
        $this->erro_banco = str_replace("\n","",@pg_last_error());
        $this->erro_sql   = "pcorcamfornelic nao Excluído. Exclusão Abortada.\\n";
        $this->erro_sql .= "Valores : ".$pc31_orcamforne;
-       $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
-       $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+       $this->erro_msg   .= " Usuário: Fornecedor possuí proposta lançada, para remove-lo é necessário remover primeiro sua proposta";
        $this->erro_status = "0";
        $this->numrows_excluir = 0;
        return false;

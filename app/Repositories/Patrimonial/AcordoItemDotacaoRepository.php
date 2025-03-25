@@ -5,7 +5,7 @@ namespace App\Repositories\Patrimonial;
 use App\Domain\Patrimonial\Aditamento\ItemDotacao;
 use App\Models\AcordoItemDotacao;
 use App\Repositories\Contracts\Patrimonial\AcordoItemDotacaoRepositoryInterface;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class AcordoItemDotacaoRepository implements AcordoItemDotacaoRepositoryInterface
 {

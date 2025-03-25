@@ -37,7 +37,7 @@ db_app::load("time.js");
 
                         <strong>Tipo: </strong>
                         <select name="tipo" id="tipo" onchange="js_getLicitacoes()">
-                            <option value="1">Inclusão</option>
+                        <option value="1">Inclusão</option>
                             <option value="2">Retificação</option>
                             <option value="3">Exclusão</option>
                         </select>
@@ -106,10 +106,6 @@ db_app::load("time.js");
 </style>
 
 <script>
-    loadComponents([
-        'buttonsSolid',
-        'simpleModal'
-    ]);
 
     var anoCompetenciaInput = document.getElementById("anocompetencia");
     var anoAtual = new Date().getFullYear();

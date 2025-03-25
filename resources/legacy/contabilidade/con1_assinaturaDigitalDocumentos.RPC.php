@@ -23,13 +23,24 @@ $assintaraDigital = new AssinaturaDigital();
 try {
     switch( $oParam->sExecuta ) {
 
-        case 'getDocumentos':
+        case 'getDocumentosPendentes':
 
             $oRetorno->link_base = '';
             $oRetorno->aDocumentos = [];
             if($assintaraDigital->verificaAssituraAtiva()){
                 $oRetorno->link_base  = $assintaraDigital->getUrlBaseUrlFile();
-                $oRetorno->aDocumentos = $assintaraDigital->getDocumentosPorUsuario($oParam->iPagina ?? 1);
+                $oRetorno->aDocumentos = $assintaraDigital->getDocumentosPententesPorUsuario($oParam->iPagina ?? 1);
+            }
+
+            break;
+
+        case 'getDocumentosAssinados':
+
+            $oRetorno->link_base = '';
+            $oRetorno->aDocumentos = [];
+            if($assintaraDigital->verificaAssituraAtiva()){
+                $oRetorno->link_base  = $assintaraDigital->getUrlBaseUrlFile();
+                $oRetorno->aDocumentosAssindados = $assintaraDigital->getDocumentosAssindadosPorUsuario($oParam->iPagina ?? 1);
             }
 
             break;
@@ -38,7 +49,7 @@ try {
 
             $response = $assintaraDigital->assinarDocumento($oParam->sUuid);
             $oRetorno->link_base  = $assintaraDigital->getUrlBaseUrlFile();
-            $oRetorno->aDocumentos = $assintaraDigital->getDocumentosPorUsuario();
+            $oRetorno->aDocumentos = $assintaraDigital->getDocumentosPententesPorUsuario();
             if(count($response->errors) > 0){
                 throw new Exception($response->errors[0]);
             }
@@ -50,9 +61,10 @@ try {
                 if (count($response->errors) > 0) {
                     throw new Exception($response->errors[0]);
                 }
+                sleep(4);
             }
             $oRetorno->link_base = $assintaraDigital->getUrlBaseUrlFile();
-            $oRetorno->aDocumentos = $assintaraDigital->getDocumentosPorUsuario();
+            $oRetorno->aDocumentos = $assintaraDigital->getDocumentosPententesPorUsuario();
             break;
 
         case 'assinarImprimirDocumentoAssinado':
@@ -164,6 +176,18 @@ try {
             $formularioAnulacaoEmpenho->solitarAssinatura();
 
             break;
+
+        case 'imprimirDocumentoSemAssinatura':
+
+            $response = $assintaraDigital->getDocumentoSemAssinatura($oParam->uuid);
+
+            if (count($response->errors) > 0) {
+                throw new Exception($response->errors[0]);
+            }
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: attachment; filename="ordem_pagamento_assinados.pdf"');
+            echo $response;
+            return;
     }
 
 } catch ( Exception $oErro ) {

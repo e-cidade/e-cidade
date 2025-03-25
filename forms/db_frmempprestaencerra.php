@@ -63,7 +63,7 @@ db_app::load("strings.js");
         foreach ($dadosItensNota as $itens): ?>
           <tr style="text-align:center;">
             <td style="border:1px solid #AACCCC; font-size: 9; color: black; background-color: #ccddcc;"> <?php echo $itens->e46_nota; ?></td>
-            <td id="valorItem<?php echo $i; ?>" style="border:1px solid #AACCCC; font-size: 9; color: black; background-color: #ccddcc;"> <?php echo $itens->valor; ?></td>
+            <td id="valorItem<?php echo $i; ?>" style="border:1px solid #AACCCC; font-size: 9; color: black; background-color: #ccddcc;"> <?php echo db_formatar($itens->valor, 'f'); ?></td>
 
             <td style="border:1px solid #AACCCC; font-size: 9; color: black; background-color: #ccddcc;">
               <input type="text" name="desconto<?php echo $i; ?>"
@@ -76,7 +76,7 @@ db_app::load("strings.js");
 
 
             </td>
-            <td style="border:1px solid #AACCCC; font-size: 9; color: black; background-color: #ccddcc;"id="total<?php echo $i; ?>"><?php echo $itens->valor - $itens->e999_desconto; ?></td>
+            <td style="border:1px solid #AACCCC; font-size: 9; color: black; background-color: #ccddcc;"id="total<?php echo $i; ?>"><?php echo db_formatar($itens->valor - $itens->e999_desconto, 'f'); ?></td>
 
           </tr>
           <?php $total+=$itens->valor-$itens->e999_desconto; ?>
@@ -146,6 +146,21 @@ db_app::load("strings.js");
   document.form1.e45_codmov.value = CurrentWindow.corpo.iframe_emppresta.document.form1.e45_codmov.value;
   function calculaDesconto(val1,val2){
 
+    let iValorDesconto = document.getElementById("desconto"+val1).value;
+
+    if (/\d+\.\d{3,}/.test(parseFloat(iValorDesconto))) {
+      document.getElementById("desconto"+val1).value = 0;
+      document.getElementById("total"+val1).innerText=js_formatar(val2, 'f');
+      
+      ttf = 0
+      for (var i = 0; i < document.form1.nItens.value; i++) {
+        ttf += parseFloat(document.getElementById("total"+i).innerText.replace(/\./g, '').replace(',','.'));
+      }
+
+      document.getElementById("totalfinal").innerText = js_formatar(ttf, 'f');
+      return alert("Valor do desconto inválido.");
+    }
+
     total = document.getElementById("total"+val1);
     valorCalculado = parseFloat(val2) - parseFloat(document.getElementById("desconto"+val1).value);
 
@@ -164,7 +179,7 @@ db_app::load("strings.js");
       document.getElementById("total"+val1).innerText=js_formatar(valorCalculado, 'f');
       ttf=0;
       for (var i = 0; i < document.form1.nItens.value; i++) {
-        ttf += parseFloat(document.getElementById("total"+i).innerText.replace(',','.'));
+        ttf += parseFloat(document.getElementById("total"+i).innerText.replace(/\./g, '').replace(',','.'));
       }
 
       document.getElementById("totalfinal").innerText = js_formatar(ttf, 'f');
@@ -172,8 +187,8 @@ db_app::load("strings.js");
   }
   function js_verifica(){
     var dtDataEncerramento = $F("e45_acerta");
-    var valoraux = document.getElementById("totalfinal").innerText.replace(".","");
-    var total = parseFloat(valoraux.replace(',','.'));
+    var valoraux = document.getElementById("totalfinal").innerText.replace(/\./g, '').replace(".","");
+    var total = parseFloat(valoraux.replace(/\./g, '').replace(',','.'));
     var totalempenho = parseFloat(document.form1.totalempenho.value);
 
     if (dtDataEncerramento == "") {

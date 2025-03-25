@@ -48,10 +48,14 @@ class db_app
     $aFiles["datagrid.widget.js"] = "<script language='JavaScript' type='text/javascript' src='scripts/datagrid.widget.js?version=" . $version . "'></script>";
     $aFiles["prototype.js"]       = "<script language='JavaScript' type='text/javascript' src='scripts/prototype.js?version=" . $version . "'></script>";
     $aFiles["sweetalert.js"]     = "<script language='JavaScript' type='text/javascript' src='scripts/sweetalert2.all.min.js'></script>";
+    $aFiles["webseller.js"]     = "<script language='JavaScript' type='text/javascript' src='scripts/webseller.js'></script>";
     $aFiles["just-validate.js"]     = "
         <script language='JavaScript' type='text/javascript' src='scripts/just-validate.production.min.js'></script>
         <script language='JavaScript' type='text/javascript' src='scripts/validator-form.js'></script>
     ";
+    $aFiles["tabsmanager.js"]     = "<script language='JavaScript' type='text/javascript' src='scripts/TabsManager.js'></script>";
+    $aFiles["accordion.js"]     = "<script language='JavaScript' type='text/javascript' src='scripts/Accordion.js'></script>";
+    $aFiles["dynamicloader.js"]     = "<script language='JavaScript' type='text/javascript' src='scripts/DynamicLoader.js'></script>";
     $aFileToLoad = explode(",", $files);
 
     foreach ($aFileToLoad as $index => $filename) {

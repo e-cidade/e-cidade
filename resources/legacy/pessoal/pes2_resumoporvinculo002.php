@@ -486,16 +486,19 @@ if (($tipo == 'R' && $separar == 1)) {
 
         foreach ($dado->proventos as $calcexc) {
             if ($calcexc->recursoexc != null || $calcexc->recursoexc != "") {
-                if ($dado->descontoempenho != "sim") {
+                if ($dado->descontoempenho != "sim" && $folha != 'r20') {
                     $percentualexc = $calcexc->valorprovento / ($dado->totalproventosfinal - $dado->valordescontoempenho) * 100;
                     $valorexcecao  = $dado->valordesc * $percentualexc / 100;
                     $sumvalorexcecao += $valorexcecao;
                     $dado->valorexcecaoformat = round($sumvalorexcecao, 2);
                 }
+                if ($folha == 'r20') {
+                    $dado->valorexcecaoformat = 0;
+                }
                 $dado->recursoexcecao = $calcexc->recursoexc;
                 $dado->descrrecursoexc = $calcexc->descrrecursoexc;
             }
-            $dado->valordescfinal = $dado->valordesc - $dado->valorexcecaoformat;
+            $dado->valordescfinal = $folha == 'r20' ? $dado->valordesc : $dado->valordesc - $dado->valorexcecaoformat;
         }
 
         foreach ($dado->proventosextra as $provextra) {
@@ -1028,6 +1031,7 @@ if ($tipo == 'R' && $tipoEmpenho == 2 && $folha != 'r20') {
                             rh73_sequencial = rh81_rhempenhofolharubrica
                         left join rhempenhofolha on
                             rh81_rhempenhofolha = rh72_sequencial
+                            and rh72_siglaarq = '{$folha}'
                         where 
                         rh72_anousu = {$ano} and rh72_mesusu = {$mes}
                         and rh73_tiporubrica = 2
@@ -1117,6 +1121,7 @@ if ($tipo == 'R' && $tipoEmpenho == 2 && $folha != 'r20') {
                             rh73_sequencial = rh81_rhempenhofolharubrica
                         left join rhempenhofolha on
                             rh81_rhempenhofolha = rh72_sequencial
+                            and rh72_siglaarq = '{$folha}'
                         where 
                         rh72_anousu = {$ano} and rh72_mesusu = {$mes}
                         and rh73_tiporubrica = 1

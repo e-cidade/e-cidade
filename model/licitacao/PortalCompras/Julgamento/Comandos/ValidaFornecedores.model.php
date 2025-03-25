@@ -23,7 +23,10 @@ class ValidaFornecedores
 
         $lotes = $julgamento->getLotes();
         $itens = array_map(fn(Lote $lote) => $lote->getItems(), $lotes);
-        $rankingItem = array_map(fn(array $item) => $item[0]->getRanking(), $itens);
+        $rankingItem = array_map(
+            fn($item) => $item[0]->getRanking(),
+            array_filter($itens, fn($item) => isset($item[0]) && $item[0]->getRanking() !== null)
+        );
 
         $cl_liclicitaimportarjulgamento =  new cl_liclicitaimportarjulgamento();
 
@@ -34,14 +37,13 @@ class ValidaFornecedores
                 $idFornecedor = $ranking->getIdFornecedor();
                 $resultado = $cl_liclicitaimportarjulgamento->buscaFornecedor($idFornecedor);
 
-                if (empty($resultado) && !in_array($idFornecedor, $fornecedores)) {
+                if (pg_num_rows($resultado) == 0 && !in_array($idFornecedor, $fornecedores)) {
                     $fornecedores[] = $idFornecedor;
                     $mensagem .= " \n - ". $idFornecedor;
                     $mensagem .= " - ". $this->filtraParticipantes($participantes, $idFornecedor);
                 }
             }
         }
-
         if (!empty($fornecedores)) {
             throw new Exception(utf8_encode($mensagem));
         }

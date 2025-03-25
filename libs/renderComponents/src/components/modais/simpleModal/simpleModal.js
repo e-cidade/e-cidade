@@ -1,4 +1,4 @@
-function openModal(modalId) {
+function openModal(modalId, windowClick = true) {
     var modal = document.getElementById(modalId);
     modal.style.display = 'block';
     modal.classList.remove("fadeOut");
@@ -6,9 +6,11 @@ function openModal(modalId) {
     modal.querySelector(".simple-modal-content").classList.remove("slideOut");
     modal.querySelector(".simple-modal-content").classList.add("slideIn");
 
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            closeModal(modalId);
+    if (windowClick) {
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal(modalId);
+            }
         }
     }
 }

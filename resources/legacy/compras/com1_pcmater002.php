@@ -36,6 +36,7 @@ include("classes/db_pcsubgrupo_classe.php");
 include("classes/db_historicoitem_classe.php");
 include("dbforms/db_funcoes.php");
 include("classes/db_condataconf_classe.php");
+require_once 'libs/renderComponents/index.php';
 parse_str($HTTP_SERVER_VARS["QUERY_STRING"]);
 db_postmemory($HTTP_POST_VARS);
 $clpcmater = new cl_pcmater;
@@ -52,11 +53,15 @@ if ((isset($HTTP_POST_VARS["db_opcao"]) && $HTTP_POST_VARS["db_opcao"]) == "Alte
   $sqlerro = false;
   $erro_justificativa = false;
   $db_opcao = 2;
+  
+  $pc01_data = implode('-', array_reverse(explode('/', $pc01_data)));
+
   $clpcmater->pc01_data   = $pc01_data;
   /*OC3770*/
   $clpcmater->pc01_tabela = $pc01_tabela;
   $clpcmater->pc01_taxa   = $pc01_taxa;
   $clpcmater->pc01_regimobiliario   = $pc01_regimobiliario;
+  $clpcmater->pc01_unid   = $pc01_unid;
 
   /*FIM - OC3770*/
 
@@ -100,52 +105,61 @@ if ((isset($HTTP_POST_VARS["db_opcao"]) && $HTTP_POST_VARS["db_opcao"]) == "Alte
     db_msgbox($erro_msg);
   }
 
-  $rsValidacaoAlteracaoDescricao = db_query("select * from pcmater where pc01_codmater = $pc01_codmater and pc01_descrmater = '$pc01_descrmater' and pc01_complmater = '$pc01_complmater' ");
-  if(pg_num_rows($rsValidacaoAlteracaoDescricao) == 0){
-    //Salva o item na tabela historicomaterial para gerar no sicom OC20960
+  if($sqlerro == false){
     $clhistoricomaterial = new cl_historicomaterial;
-
-    $rsHistoricoMaterial = $clhistoricomaterial->sql_record($clhistoricomaterial->sql_query(null,"db150_sequencial",null,"db150_pcmater =$pc01_codmater and db150_tipocadastro = 2"));
-
-    for($iMaterialTipo2 = 0; $iMaterialTipo2 < pg_num_rows($rsHistoricoMaterial); $iMaterialTipo2++ ){
-        db_fieldsmemory($rsHistoricoMaterial, $iMaterialTipo2);
-
-        $clhistoricomaterial->db150_sequencial                = $db150_sequencial;
-        $clhistoricomaterial->db150_justificativaalteracao    = $pc01_justificativa;
-        $clhistoricomaterial->db150_data                      = date("Y-m-d", db_getsession("DB_datausu"));
-        $clhistoricomaterial->db150_mes                       = date("m", db_getsession("DB_datausu"));
-        $clhistoricomaterial->db150_instit                    = db_getsession('DB_instit');
+    $rsHistoricoMaterial = $clhistoricomaterial->sql_record(
+        $clhistoricomaterial->sql_query(
+            null,
+            "*",
+            null,
+            "db150_coditem = $pc01_codmater"
+        )
+    );
+   
+    if(pg_num_rows($rsHistoricoMaterial) != 0){
+      for($index = 0; $index < pg_num_rows($rsHistoricoMaterial); $index++ ){
+        db_fieldsmemory($rsHistoricoMaterial, $index);
+       
+        $clhistoricomaterial->db150_coditem                = $db150_coditem;
+        $clhistoricomaterial->db150_sequencial             = $db150_sequencial;
+        $clhistoricomaterial->db150_pcmater                = $db150_pcmater;
+        $clhistoricomaterial->db150_dscitem                = $db150_dscitem;
+        $clhistoricomaterial->db150_justificativaalteracao = $pc01_justificativa;
+        $clhistoricomaterial->db150_data                   = date("Y-m-d", db_getsession("DB_datausu"));
+        $clhistoricomaterial->db150_mes                    = date("m", db_getsession("DB_datausu"));
+        $clhistoricomaterial->db150_instit                 = db_getsession('DB_instit');
+        $clhistoricomaterial->db150_codunid                = $pc01_unid;
         $clhistoricomaterial->alterar($db150_sequencial);
 
         if ($clhistoricomaterial->erro_status == 0) {
             $oRetorno->status  = 2;
             $oRetorno->message = urlencode($clhistoricomaterial->erro_msg);
         }
+      }
+    } else if(pg_num_rows($rsHistoricoMaterial) == 0){
+      //inserir na tabela historico material
+      $clhistoricomaterial->db150_tiporegistro           = 10;
+      $clhistoricomaterial->db150_coditem                = $pc01_codmater;
+      $clhistoricomaterial->db150_pcmater                = $pc01_codmater;
+      $clhistoricomaterial->db150_dscitem                = substr($pc01_descrmater.'-'.$pc01_complmater,0,999);
+      $clhistoricomaterial->db150_unidademedida          = null;
+      $clhistoricomaterial->db150_tipocadastro           = 1;
+      $clhistoricomaterial->db150_justificativaalteracao = '';
+      $clhistoricomaterial->db150_mes                    = date("m", db_getsession("DB_datausu"));
+      $clhistoricomaterial->db150_data                   = date("Y-m-d", db_getsession("DB_datausu"));
+      $clhistoricomaterial->db150_instit                 = db_getsession('DB_instit');
+      $clhistoricomaterial->db150_codunid                = $pc01_unid;
+      $clhistoricomaterial->incluir(null);
+
+      if ($clhistoricomaterial->erro_status == 0) {
+          $sqlerro = true;
+          $erro_msg = $clhistoricomaterial->erro_msg;
+      }
     }
-
-    $rsHistoricoMaterialTipo1 = $clhistoricomaterial->sql_record($clhistoricomaterial->sql_query(null,"db150_coditem,db150_pcmater,db150_dscitem,db150_unidademedida",null,"db150_pcmater =$pc01_codmater and db150_tipocadastro = 1 and db150_coditem not in (select db150_coditem from historicomaterial where db150_pcmater = $pc01_codmater and db150_tipocadastro = 2)"));
-    for($iMaterialTipo1 = 0; $iMaterialTipo1 < pg_num_rows($rsHistoricoMaterialTipo1); $iMaterialTipo1++ ){
-        db_fieldsmemory($rsHistoricoMaterialTipo1, $iMaterialTipo1);
-
-        $clhistoricomaterial->db150_tiporegistro              = 10;
-        $clhistoricomaterial->db150_coditem                   = $db150_coditem;
-        $clhistoricomaterial->db150_pcmater                   = $db150_pcmater;
-        $clhistoricomaterial->db150_dscitem                   = $db150_dscitem;
-        $clhistoricomaterial->db150_unidademedida             = $db150_unidademedida;
-        $clhistoricomaterial->db150_tipocadastro              = 2;
-        $clhistoricomaterial->db150_justificativaalteracao    = $pc01_justificativa;
-        $clhistoricomaterial->db150_data                      = date("Y-m-d", db_getsession("DB_datausu"));
-        $clhistoricomaterial->db150_mes                       = date("m", db_getsession("DB_datausu"));
-        $clhistoricomaterial->db150_instit                    = db_getsession('DB_instit');
-        $clhistoricomaterial->incluir(null);
-
-        if ($clhistoricomaterial->erro_status == 0) {
-            $oRetorno->status  = 2;
-            $oRetorno->message = urlencode($clhistoricomaterial->erro_msg);
-        }
-    }
-
   }
+  
+  // echo pg_last_error();
+  // exit;
 
   if (!$sqlerro) {
     $clpcmater->pc01_dataalteracao = date("Y-m-d", db_getsession("DB_datausu"));
@@ -186,7 +200,7 @@ if ((isset($HTTP_POST_VARS["db_opcao"]) && $HTTP_POST_VARS["db_opcao"]) == "Alte
       $sqlerro = true;
     }
   }
-
+  
   if ($sqlerro == false) {
     $arr =  explode("XX", $codeles);
     for ($i = 0; $i < count($arr); $i++) {
@@ -205,6 +219,7 @@ if ((isset($HTTP_POST_VARS["db_opcao"]) && $HTTP_POST_VARS["db_opcao"]) == "Alte
       }
     }
   }
+
   db_fim_transacao($sqlerro);
 }
 
@@ -229,6 +244,11 @@ if (isset($chavepesquisa) || $pc01_codmater) {
   }
 }
 ?>
+
+<script type="text/javascript" defer>
+  loadComponents(['buttonsSolid']);
+</script>
+
 <html>
 
 <head>
@@ -237,6 +257,7 @@ if (isset($chavepesquisa) || $pc01_codmater) {
   <meta http-equiv="Expires" CONTENT="0">
   <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
   <link href="estilos.css" rel="stylesheet" type="text/css">
+  <?php db_app::load("estilos.bootstrap.css");?>
 </head>
 
 <body bgcolor=#CCCCCC leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="a=1">

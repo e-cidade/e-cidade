@@ -25,6 +25,8 @@
  *                                licenca/licenca_pt.txt
  */
 
+use Illuminate\Support\Facades\DB;
+
 require_once(modification("libs/db_stdlib.php"));
 require_once("libs/db_utils.php");
 require_once("libs/db_conecta.php");
@@ -93,6 +95,9 @@ $db_botao = false;
 if(isset($alterar)){
     if($sqlerro==false){
 
+        $result_cgm = db_query("SELECT z01_cgccpf FROM cgm WHERE z01_numcgm = {$e60_numcgm}");
+        db_fieldsmemory($result_cgm, 0)->z01_cgccpf;
+
         $result=$clempefdreinf->sql_record($clempefdreinf->sql_query_file($e60_numemp));
 
         $clempefdreinf->efd60_cessaomaoobra = $efd60_cessaomaoobra;
@@ -121,6 +126,213 @@ if(isset($alterar)){
         }
     }
 }
+/**
+ * Altera o elemento específico em diversas tabelas relacionadas.
+ *
+ * @param bool $sqlerro Indica se houve um erro durante a execução.
+ * @param string $e64_codele Código do elemento atual.
+ * @param mixed $e56_codele Código do novo elemento.
+ * @param cl_empelemento $clempelemento Objeto para manipulação de elementos de empenho.
+ * @param mixed $e60_numemp Número do empenho.
+ * @param mixed $erro_msg Mensagem de erro a ser retornada em caso de falha.
+ * @param cl_empnota $clempnota Objeto para manipulação de notas de empenho.
+ * @param cl_empnotaele $clempnotaele Objeto para manipulação dos elementos de nota de empenho.
+ * @param cl_empempitem $clempempitem Objeto para manipulação dos itens de empenho.
+ * @param mixed $aItensAutori Lista de itens de autorização.
+ * @return array Retorna um array contendo o status do erro e a mensagem de erro.
+ */
+function alteraElemento(bool $sqlerro,
+                        string $e64_codele,
+                        $e56_codele,
+                        cl_empelemento $clempelemento,
+                        $e60_numemp,
+                        $erro_msg,
+                        cl_empnota $clempnota,
+                        cl_empnotaele $clempnotaele,
+                        cl_empempitem $clempempitem,
+                        $aItensAutori): array
+{
+
+    if (!$sqlerro && isset($e64_codele)) {
+
+        $clempelemento->e64_codele = $e56_codele;
+        $clempelemento->e64_numemp = $e60_numemp;
+        $clempelemento->alterar($e60_numemp);
+        if ($clempelemento->erro_status == "0") {
+            $sqlerro = true;
+            $erro_msg = $clempelemento->erro_msg;
+        }
+    }
+
+    if (!$sqlerro && isset($e64_codele)) {
+
+        $sqlNota = $clempnota->sql_query_file(null, "e69_codnota", null, "e69_numemp = {$e60_numemp}");
+        $rsNota = db_query($sqlNota);
+
+        $iNumRows = pg_num_rows($rsNota);
+
+        if ($iNumRows > 0) {
+
+            for ($i = 0; $i < $iNumRows; $i++) {
+
+                $oRow = db_utils::fieldsMemory($rsNota, $i);
+
+                $clempnotaele->e70_codele = $e56_codele;
+                $clempnotaele->e70_codnota = $oRow->e69_codnota;
+
+                $clempnotaele->alterar($oRow->e69_codnota);
+
+                if ($clempnotaele->erro_status == "0") {
+                    $sqlerro = true;
+                    $erro_msg = $clempnotaele->erro_msg;
+
+                }
+
+            }
+        }
+    }
+
+    if (!$sqlerro && isset($e64_codele)) {
+
+        $result = $clempempitem->sql_record($clempempitem->sql_query_file($e60_numemp, null, "e62_numemp,e62_sequen,e62_item"));
+
+        $iNumRows = pg_num_rows($result);
+
+        for ($i = 0; $i < $iNumRows; $i++) {
+
+            $oRow = db_utils::fieldsMemory($result, $i);
+            $clempempitem->e62_codele = $e56_codele;
+            $clempempitem->e62_numemp = $oRow->e62_numemp;
+            $clempempitem->e62_sequen = $oRow->e62_sequen;
+            $clempempitem->alterar($oRow->e62_numemp, $oRow->e62_sequen);
+
+            if ($clempempitem->erro_status == "0") {
+
+                $sqlerro = true;
+                $erro_msg = $clempempitem->erro_msg;
+                break;
+
+            }
+        }
+
+    }
+
+    if (!$sqlerro) {
+        $lancamentos = DB::table('contabilidade.conlancamele')
+            ->join('contabilidade.conlancamemp', 'conlancamemp.c75_codlan', '=', 'conlancamele.c67_codlan')
+            ->join('contabilidade.conlancamdoc', 'conlancamdoc.c71_codlan', '=', 'conlancamemp.c75_codlan')
+            ->where('conlancamemp.c75_numemp', '=', $e60_numemp)
+            ->select('conlancamele.c67_codlan')
+            ->get();
+
+        if (!empty($e56_codele)) {
+            foreach ($lancamentos as $lancamento) {
+                $updateResult = DB::table('contabilidade.conlancamele')
+                    ->where('conlancamele.c67_codlan', '=', $lancamento->c67_codlan)
+                    ->update(['conlancamele.c67_codele' => $e56_codele]);
+
+                if (!$updateResult) {
+                    $sqlerro = true;
+                    $msgAlteraElemento = false;
+                    $erro_msg = "Usuário: \\n\\n Itens conlancamele nao Alterado. Alteracao Abortada \\n\\n";
+                    break;
+                }
+            }
+        }
+    }
+
+    if (!$sqlerro) {
+        $clempautitem = new cl_empautitem;
+
+        foreach ($aItensAutori as $item) {
+            $clempautitem->e55_autori = $item->e55_autori;
+            $clempautitem->e55_codele = $e56_codele;
+            $clempautitem->alterar($item->e55_autori);
+            if ($clempautitem->erro_status == "0") {
+                $sqlerro = true;
+                $erro_msg = $clempautitem->erro_msg;
+                break;
+            }
+        }
+    }
+
+    return array($sqlerro, $erro_msg);
+}
+
+function getEmpParametro(): array
+{
+    return DB::table('empenho.empparametro')
+        ->select('e30_empsolicitadesdobramento')
+        ->where('e39_anousu', '=', db_getsession('DB_anousu'))
+        ->limit(1)
+        ->get()
+        ->toArray();
+}
+
+/**
+ * Recuperar dados da autorização de empenho.
+ *
+ * @param int $autorizacao Número da autorização de empenho.
+ * @return array Um array contendo os dados da autorização de empenho.
+ */
+function getEmpenhoProcCompras(int $autorizacao): array
+{
+    return DB::table('empenho.empempaut')
+        ->selectRaw('empenho.empautitempcprocitem.*, empenho.empempaut.*')
+        ->join('empenho.empautitempcprocitem', 'empautitempcprocitem.e73_autori', '=', 'empempaut.e61_autori')
+        ->join('compras.pcprocitem', 'pcprocitem.pc81_codprocitem', '=', 'empautitempcprocitem.e73_pcprocitem')
+        ->join('compras.pcproc', 'pcproc.pc80_codproc', '=', 'pcprocitem.pc81_codproc')
+        ->where('empempaut.e61_autori', '=', $autorizacao)
+        ->get()
+        ->toArray();
+}
+
+/**
+ * @param int $e60_numemp
+ * @return array
+ */
+function getItensAutori($e60_numemp): array
+{
+    $aItensAutori = DB::table('empenho.empautitem')
+        ->join('empenho.empempaut', 'empempaut.e61_autori', '=', 'empautitem.e55_autori')
+        ->where('empempaut.e61_numemp', '=', $e60_numemp)
+        ->selectRaw('distinct empautitem.*')->get()->toArray();
+    return $aItensAutori;
+}
+
+/**
+ * Retorna dados para usuario administrador
+ *
+ * @return array Um array contendo dados de usuario administrador.
+ */
+function getDadosPermissao(): array
+{
+    $aDadosPermissao = DB::table('configuracoes.db_usuarios')
+        ->select('*')
+        ->where('db_usuarios.administrador', '=', 1)
+        ->where('db_usuarios.id_usuario', '=', db_getsession("DB_id_usuario"))
+        ->get()->toArray();
+    return $aDadosPermissao;
+}
+
+/**
+ * Consulta lançamentos do empenho para verificar se há lançamentos do tipo 20 (liquidação).
+ *
+ * @param int $e60_numemp Sequencial do empenho a ser consultado.
+ * @return array Um array contendo os lançamentos de liquidação do empenho.
+ */
+function getEmpenhoLiquidado(int $e60_numemp): array
+{
+    $empenhoLiquidado = DB::table('contabilidade.conlancamemp')
+        ->join('contabilidade.conlancamdoc', 'conlancamdoc.c71_codlan', '=', 'conlancamemp.c75_codlan')
+        ->join('contabilidade.conhistdoc', 'conhistdoc.c53_coddoc', '=', 'conlancamdoc.c71_coddoc')
+        ->selectRaw('conlancamemp.*, conlancamdoc.*')
+        ->where('conlancamemp.c75_numemp', '=', $e60_numemp)
+        ->where('conhistdoc.c53_tipo', '=', 20)
+        ->get()->toArray();
+    return $empenhoLiquidado;
+}
+
 if(isset($alterar)){
 
     $sqlerro=false;
@@ -382,95 +594,51 @@ if(isset($alterar)){
         }
     }
 
-    if($sqlerro==false && isset($e64_codele)){
+    $aDadosPermissao = getDadosPermissao();
+    $empenhoLiquidado = getEmpenhoLiquidado($e60_numemp);
 
-        $clempelemento->e64_codele = $e56_codele;
-        $clempelemento->e64_numemp = $e60_numemp;
-        $clempelemento->alterar($e60_numemp);
-        if($clempelemento->erro_status=="0"){
-            $sqlerro=true;
-            $erro_msg = $clempelemento->erro_msg;
-        }
-    }
+    $msgPermissaoDesdobramento = !$aDadosPermissao && $empenhoLiquidado;
 
-    if($sqlerro==false && isset($e64_codele)){
+    if (!$sqlerro) {
+        $aItensAutori = getItensAutori($e60_numemp);
 
-        $sqlNota = $clempnota->sql_query_file(null,"e69_codnota",null,"e69_numemp = {$e60_numemp}");
-        $rsNota = db_query($sqlNota);
+        if (!$msgPermissaoDesdobramento && ($aItensAutori[0]->e55_codele != $e56_codele)) {
 
-        $iNumRows = pg_num_rows($rsNota);
+            if ($aDadosPermissao) {
+                $paramEmpProcCompras = getEmpParametro();
+                $autorizacao = $aItensAutori[0]->e55_autori;
+                $empenhoProcCompras = getEmpenhoProcCompras($autorizacao);
 
-        if($iNumRows > 0) {
-
-            for ($i=0; $i < $iNumRows; $i++) {
-
-                $oRow = db_utils::fieldsMemory($rsNota,$i);
-
-                $result = $clempnotaele->sql_record($clempnotaele->sql_query($oRow->e69_codnota));
-                db_fieldsmemory($result,0);
-
-                $clempnotaele->e70_codele = $e56_codele;
-                $clempnotaele->e70_codnota = $e69_codnota;
-
-                $clempnotaele->alterar($oRow->e69_codnota);
-
-                if($clempnotaele->erro_status=="0"){
-                    $sqlerro=true;
-                    $erro_msg = $clempnotaele->erro_msg;
-
+                if ($empenhoProcCompras) {
+                    if (!$paramEmpProcCompras[0]->e30_empsolicitadesdobramento) {
+                        throw new Exception("Contate o suporte!\nEmpenhos provenientes de Processo de Compras não podem ter desdobramento alterado.");
+                    }
                 }
 
-            }
-        }
-    }
+                try {
+                    list($sqlerro, $erro_msg) = alteraElemento(
+                        $sqlerro,
+                        $e64_codele,
+                        $e56_codele,
+                        $clempelemento,
+                        $e60_numemp,
+                        $erro_msg,
+                        $clempnota,
+                        $clempnotaele,
+                        $clempempitem,
+                        $aItensAutori
+                    );
 
-    if($sqlerro==false && isset($e64_codele)){
+                    $msgAlteraElemento = true;
 
-        $result = $clempempitem->sql_record($clempempitem->sql_query_file($e60_numemp,null,"e62_numemp,e62_sequen,e62_item"));
-
-        $iNumRows = pg_num_rows($result);
-
-        for ($i = 0; $i < $iNumRows; $i++) {
-
-            $oRow = db_utils::fieldsMemory($result,$i);
-            $clempempitem->e62_codele  = $e56_codele;
-            $clempempitem->e62_numemp  = $oRow->e62_numemp;
-            $clempempitem->e62_sequen  = $oRow->e62_sequen;
-            $clempempitem->alterar($oRow->e62_numemp,$oRow->e62_sequen);
-
-            if ($clempempitem->erro_status=="0") {
-
-                $sqlerro=true;
-                $erro_msg = $clempempitem->erro_msg;
-                break;
-
-            }
-        }
-
-    }
-
-    if($sqlerro==false){
-
-        $sSql = "SELECT c75_codlan, c67_codele from conlancamele inner join conlancamemp on c75_codlan = c67_codlan
-                                     inner join conlancamdoc on c71_codlan = c75_codlan
-              where c71_coddoc = 1 and c75_numemp = $e60_numemp ";
-        $rsSql = db_query($sSql);
-
-        $iNumRows = pg_num_rows($rsSql);
-        if(isset($e56_codele) && $e56_codele != ""){
-            for($i = 0; $i < $iNumRows; $i++){
-                $oRow = db_utils::fieldsMemory($rsSql,$i);
-                $sSqlUpdate = "update conlancamele set c67_codele = $e56_codele where c67_codlan = $oRow->c75_codlan ";
-
-                if(db_query($sSqlUpdate)===false){
-                    $sqlerro = true;
-                    $erro_msg = "Usuário: \\n\\n Itens conlancamele nao Alterado. Alteracao Abortada \\n\\n";
-                    break;
+                } catch (Exception $e) {
+                    throw new Exception("Erro ao alterar o desdobramento do empenho: " . $e->getMessage());
                 }
-
             }
         }
-
+        if ($aItensAutori[0]->e55_codele == $e56_codele) {
+            $msgPermissaoDesdobramento = false;
+        }
     }
 
     if ($sqlerro==false) {
@@ -506,6 +674,18 @@ if(isset($alterar)){
     }
 
     if ($sqlerro==false) {
+
+        if ($msgPermissaoDesdobramento){
+            $msgAlert = "Desdobramento do empenho não alterado.\n";
+            $msgAlert .= "Somente administradores podem alterar o desdobramento do empenho já liquidado.\n";
+            $msgAlert .= "Caso seja necessário alterar o desdobramento do empenho, entre em contato com o administrador do sistema.";
+        }
+        if ($msgAlteraElemento){
+            $msgAlert = "Após alteração do desdobramento do empenho é
+                        recomendado que seja realizado o reprocessamento dos
+                        lançamentos do empenho para evitar inconsistências na
+                        prestação de contas!";
+        }
         $erro_msg = "Alteração realizada com sucesso!";
     }
 
@@ -647,16 +827,17 @@ if(isset($alterar)){
     }
 </script>
 <?php
-if(isset($alterar)){
-    if($sqlerro == true){
-        db_msgbox($erro_msg.$msgCampoAlterado);
-        if($clempempenho->erro_campo!=""){
-            echo "<script> document.form1.".$clempempenho->erro_campo.".style.backgroundColor='#99A9AE';</script>";
-            echo "<script> document.form1.".$clempempenho->erro_campo.".focus();</script>";
+if (isset($alterar)) {
+    if ($sqlerro) {
+        db_msgbox($erro_msg . $msgCampoAlterado);
+        if ($clempempenho->erro_campo != "") {
+            echo "<script> document.form1." . $clempempenho->erro_campo . ".style.backgroundColor='#99A9AE';</script>";
+            echo "<script> document.form1." . $clempempenho->erro_campo . ".focus();</script>";
         }
-    }else{
+    } else {
         db_msgbox($erro_msg);
-//        db_redireciona('emp1_aba1empempenho002.php');
+        if ($msgAlert)
+            db_msgbox($msgAlert);
     }
 }
 

@@ -89,7 +89,7 @@ windowAux = function (iIdWindow, sTitle, iWidth, iHeight) {
   this.divTitleWindow.className = "windowAuxTitle";
   this.divTitleWindow.setAttribute('divParent',idWindow);
 
-  this.divTitleWindow.style.padding         = "0px";
+  this.divTitleWindow.style.padding         = "3px";
   this.divTitleWindow.style.textAlign       = "right";
   this.divTitleWindow.style.borderBottom    = "2px outset white";
   this.divTitleWindow.style.backgroundColor = "#2C7AFE";

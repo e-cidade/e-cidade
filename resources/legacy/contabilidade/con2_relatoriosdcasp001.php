@@ -58,7 +58,11 @@ $sPathFiltrosRelatorio = "con2_relatoriosdcasp011.php?codigoRelatorio={$codigoRe
 
 if ($iAnoSessao >= 2015 && $codigoRelatorio == BalancoFinanceiroDcasp::CODIGO_RELATORIO) {
 
-    $codigoRelatorio       = BalancoFinanceiroDCASP2015::CODIGO_RELATORIO;
+    if (db_getsession('DB_anousu') >= 2024) {
+        $codigoRelatorio = BalancoFinanceiroDCASP2024::CODIGO_RELATORIO;
+    } else {
+        $codigoRelatorio = BalancoFinanceiroDCASP2015::CODIGO_RELATORIO;
+    }
     $sPathFiltrosRelatorio = "con2_relatoriodcaspBalancoFinanceiro2015011.php?codigoRelatorio={$codigoRelatorio}";
 }
 

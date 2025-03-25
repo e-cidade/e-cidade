@@ -71,7 +71,7 @@ db_app::load("scripts.js,
   </tr>
 </table>
 <center>
-<table valign="top" marginwidth="0" width="600" border="0" cellspacing="0" cellpadding="0">
+<table valign="top" marginwidth="0" width="450" border="0" cellspacing="0" cellpadding="0">
  <tr>
   <td>&nbsp;</td>
  </tr>
@@ -124,27 +124,6 @@ db_app::load("scripts.js,
       <?  db_inputdata('dtini',@$dia,@$mes,@$ano,true,'text',1,"");
           echo " a ";
           db_inputdata('dtfim',@$dia,@$mes,@$ano,true,'text',1,"");
-       ?>
-     </td>
-     </tr>
-     <tr>
-     <td align="left" >
-       <b> Valor:</b>
-     </td>
-     <td>
-      <?
-        db_input('valor_ordem',20,$Ie53_valor,true,'text',2);
-       ?>
-     </td>
-     </tr>
-
-     <tr>
-     <td align="left" >
-       <b> Histórico:</b>
-     </td>
-     <td>
-      <?
-        db_textarea('historico',5,60,0,true,'text',2);
        ?>
      </td>
      </tr>
@@ -244,8 +223,6 @@ function js_abre(){
   var e60_codemp_ini = obj.e60_codemp_ini.value;
   var e60_codemp_fim = obj.e60_codemp_fim.value;
   var e60_numemp     = obj.e60_numemp.value;
-  var historico      = obj.historico.value;
-  var valor_ordem    = obj.valor_ordem.value;
   var dtini_dia      = sDtini[0];
   var dtini_mes      = sDtini[1];
   var dtini_ano      = sDtini[2];
@@ -304,7 +281,7 @@ function js_abre(){
    if(query == ''){
      alert("Selecione alguma ordem de pagamento ou indique o período!");
    }else{
-        var sUrl = 'emp2_emitenotaliq002.php?aFornecedor=' + aFornecedores + '&historico=' + historico + '&valor_ordem=' + valor_ordem + "&assinar=false&recursos="+ js_campo_recebe_valores_recursos() + query;
+        var sUrl = 'emp2_emitenotaliq002.php?aFornecedor=' + aFornecedores + "&assinar=false&recursos="+ js_campo_recebe_valores_recursos() + query;
         jan = window.open(sUrl,
                        '',
                        'width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0 ');
@@ -409,8 +386,6 @@ function js_imprimirAssinado(){
     var e60_codemp_ini    = obj.e60_codemp_ini.value;
     var e60_codemp_fim    = obj.e60_codemp_fim.value;
     var e60_numemp        = obj.e60_numemp.value;
-    var historico         = obj.historico.value;
-    var valor_ordem       = obj.valor_ordem.value;
     var dtini_dia         = sDtini[0];
     var dtini_mes         = sDtini[1];
     var dtini_ano         = sDtini[2];
@@ -419,61 +394,63 @@ function js_imprimirAssinado(){
     var dtfim_ano         = sDtfim[2];
     var aFornecedores     = getForncedores();
     var e50_numliquidacao = obj.e50_numliquidacao.value;
+    var aRecursos         = js_campo_recebe_valores_recursos();
 
     if(e50_codord_ini != ''){
-        oParametros.e50_codord_ini = e50_codord_ini;
-        if(e50_codord_fim != '') {
-            if(Number(e50_codord_fim) < Number(e50_codord_ini)) {
-                alert("Ordem inicial maior que o Ordem:O final. Verifique!");
-                return false;
-            }
+      oParametros.e50_codord_ini = e50_codord_ini;
+      if(e50_codord_fim != '') {
+        if(Number(e50_codord_fim) < Number(e50_codord_ini)) {
+          alert("Ordem inicial maior que a Ordem final. Verifique!");
+          return false;
         }
-        oParametros.e50_codord_fim=e50_codord_fim;
+      }
+      oParametros.e50_codord_fim=e50_codord_fim;
     }else{
-
-        if((dtini_dia != '') && (dtini_mes != '') && (dtini_ano != '')){
-            oParametros.dtini=dtini_ano+"X"+dtini_mes+"X"+dtini_dia;
-        }
-        if((dtfim_dia != '') && (dtfim_mes != '') && (dtfim_ano != '')){
-            oParametros.dtfim=dtfim_ano+"X"+dtfim_mes+"X"+dtfim_dia;
-        }
+      if((dtini_dia != '') && (dtini_mes != '') && (dtini_ano != '')){
+        oParametros.dtini=dtini_ano+"X"+dtini_mes+"X"+dtini_dia;
+      }
+      if((dtfim_dia != '') && (dtfim_mes != '') && (dtfim_ano != '')){
+        oParametros.dtfim=dtfim_ano+"X"+dtfim_mes+"X"+dtfim_dia;
+      }
     }
 
     if(e60_codemp_ini != '') {
-        oParametros.e60_codemp_ini=obj.e60_codemp_ini.value;
+      oParametros.e60_codemp_ini=obj.e60_codemp_ini.value;
 
-        if(e60_codemp_fim != '') {
-            if(Number(e60_codemp_fim) < Number(e60_codemp_ini)) {
-                alert("Empenho inicial maior que o empenho final. Verifique!");
-                return false;
-            }
+      if(e60_codemp_fim != '') {
+        if(Number(e60_codemp_fim) < Number(e60_codemp_ini)) {
+          alert("Empenho inicial maior que o empenho final. Verifique!");
+          return false;
         }
-        oParametros.e60_codemp_fim=obj.e60_codemp_fim.value;
+      }
+      oParametros.e60_codemp_fim=obj.e60_codemp_fim.value;
     }
 
     if(e60_numemp != '') {
-        oParametros.e60_numemp=e60_numemp;
+      oParametros.e60_numemp=e60_numemp;
     }
 
     if(e50_numliquidacao != ''){
-        if(e60_numemp != '' || (e60_codemp_ini != '' && e60_codemp_fim == '')){
-            oParametros=e50_numliquidacao;
-        }else{
-            alert("Indique o Sequencial do Empenho para utilizar o filtro Número da Liquidação.");
-            return false;
-        }
+      if(e60_numemp != '' || (e60_codemp_ini != '' && e60_codemp_fim == '')){
+        oParametros.e50_numliquidacao = e50_numliquidacao;
+      }else{
+        alert("Indique o Sequencial do Empenho para utilizar o filtro Número da Liquidação.");
+        return false;
+      }
     }
 
-    if(oParametros.e50_numliquidacao == ''){
-        alert("Selecione alguma ordem de pagamento ou indique o período!");
+    if(oParametros.length == 0){
+      alert("Selecione alguma ordem de pagamento ou indique o período!");
     }else{
-        var sRpcAssinaturaDigital = 'con1_assinaturaDigitalDocumentos.RPC.php';
-
-        oParametros.aFornecedores =aFornecedores;
-        oParametros.historico =historico;
-        oParametros.valor_ordem =valor_ordem;
-        oParametros.sExecuta = 'imprimirDocumentoAssinadoLiquidacao';
-        window.open(sRpcAssinaturaDigital+'?json='+encodeURIComponent(JSON.stringify(oParametros)), "_blank");
+      var sRpcAssinaturaDigital = 'con1_assinaturaDigitalDocumentos.RPC.php';
+      if (aFornecedores.length > 0){
+        oParametros.aFornecedores = aFornecedores;
+      }
+      if (aRecursos.length > 0) {
+        oParametros.aRecursos = aRecursos;
+      }
+      oParametros.sExecuta = 'imprimirDocumentoAssinadoLiquidacao';
+      window.open(sRpcAssinaturaDigital+'?json='+encodeURIComponent(JSON.stringify(oParametros)), "_blank");
     }
 }
 

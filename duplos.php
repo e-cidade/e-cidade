@@ -1,29 +1,4 @@
 <?php
-/*
- *     E-cidade Software Publico para Gestao Municipal
- *  Copyright (C) 2014  DBSeller Servicos de Informatica
- *                            www.dbseller.com.br
- *                         e-cidade@dbseller.com.br
- *
- *  Este programa e software livre; voce pode redistribui-lo e/ou
- *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme
- *  publicada pela Free Software Foundation; tanto a versao 2 da
- *  Licenca como (a seu criterio) qualquer versao mais nova.
- *
- *  Este programa e distribuido na expectativa de ser util, mas SEM
- *  QUALQUER GARANTIA; sem mesmo a garantia implicita de
- *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM
- *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais
- *  detalhes.
- *
- *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU
- *  junto com este programa; se nao, escreva para a Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
- *  02111-1307, USA.
- *
- *  Copia da licenca no diretorio licenca/licenca_en.txt
- *                                licenca/licenca_pt.txt
- */
 
 require("libs/db_utils.php");
 require("model/configuracao/TraceLog.model.php");
@@ -537,6 +512,13 @@ for ($record_correto=0; $record_correto < pg_num_rows($result_correto); $record_
                     $sSqlPcForneMov = "update pcfornemov set pc62_numcgm = $v_cgmcerto where pc62_numcgm = $v_cgmerrado";
                     $rsPcForneMov = db_query($sSqlPcForneMov);
                   }
+
+                  $sSqlHabilitacaoForn = "select * from habilitacaoforn where l206_fornecedor = $v_cgmerrado";
+                    $rsHabilitacaoForn = db_query($sSqlHabilitacaoForn);
+                    if ( pg_num_rows($rsHabilitacaoForn) > 0 ){
+                      $sSqlHabilitacaoForn = "update habilitacaoforn set l206_fornecedor = $v_cgmcerto where l206_fornecedor = $v_cgmerrado";
+                      $rsHabilitacaoForn = db_query($sSqlHabilitacaoForn);
+                    }
 
                   $sSqlPcForne = "delete from pcforne where pc60_numcgm = $v_cgmerrado";
                   $rsPcForne   = db_query($sSqlPcForne);
@@ -1189,6 +1171,7 @@ for ($record_correto=0; $record_correto < pg_num_rows($result_correto); $record_
 //echo "ok...\n";
 db_logduplos("");
 db_logduplos("Processamento concluido com sucesso...\n");
+echo "<script>alert('Processamento concluido com sucesso...')</script>";
 db_logduplos("");
 
 exit(0);

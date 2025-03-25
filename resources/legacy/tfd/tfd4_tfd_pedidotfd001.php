@@ -77,7 +77,7 @@ db_app::load(" grid.style.css");
     <td height="430" align="left" valign="top" bgcolor="#CCCCCC">
       <center>
         <fieldset style='width: 92%;'> <legend><b>Pedido</b></legend>
-      	  <?
+      	  <?php
 	        require_once("forms/db_frmtfd_pedidotfdini.php");
 	        ?>
         </fieldset>

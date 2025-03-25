@@ -1,68 +1,72 @@
 <?
 /*
- *     E-cidade Software Publico para Gestao Municipal                
- *  Copyright (C) 2009  DBselller Servicos de Informatica             
- *                            www.dbseller.com.br                     
- *                         e-cidade@dbseller.com.br                   
- *                                                                    
- *  Este programa e software livre; voce pode redistribui-lo e/ou     
- *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme  
- *  publicada pela Free Software Foundation; tanto a versao 2 da      
- *  Licenca como (a seu criterio) qualquer versao mais nova.          
- *                                                                    
- *  Este programa e distribuido na expectativa de ser util, mas SEM   
- *  QUALQUER GARANTIA; sem mesmo a garantia implicita de              
- *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM           
- *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais  
- *  detalhes.                                                         
- *                                                                    
- *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU     
- *  junto com este programa; se nao, escreva para a Free Software     
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA          
- *  02111-1307, USA.                                                  
- *  
- *  Copia da licenca no diretorio licenca/licenca_en.txt 
- *                                licenca/licenca_pt.txt 
+ *     E-cidade Software Publico para Gestao Municipal
+ *  Copyright (C) 2009  DBselller Servicos de Informatica
+ *                            www.dbseller.com.br
+ *                         e-cidade@dbseller.com.br
+ *
+ *  Este programa e software livre; voce pode redistribui-lo e/ou
+ *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme
+ *  publicada pela Free Software Foundation; tanto a versao 2 da
+ *  Licenca como (a seu criterio) qualquer versao mais nova.
+ *
+ *  Este programa e distribuido na expectativa de ser util, mas SEM
+ *  QUALQUER GARANTIA; sem mesmo a garantia implicita de
+ *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM
+ *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais
+ *  detalhes.
+ *
+ *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU
+ *  junto com este programa; se nao, escreva para a Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ *  02111-1307, USA.
+ *
+ *  Copia da licenca no diretorio licenca/licenca_en.txt
+ *                                licenca/licenca_pt.txt
  */
 
 //MODULO: material
 //CLASSE DA ENTIDADE matunid
-class cl_matunid { 
-   // cria variaveis de erro 
-   var $rotulo     = null; 
-   var $query_sql  = null; 
-   var $numrows    = 0; 
-   var $numrows_incluir = 0; 
-   var $numrows_alterar = 0; 
-   var $numrows_excluir = 0; 
-   var $erro_status= null; 
-   var $erro_sql   = null; 
-   var $erro_banco = null;  
-   var $erro_msg   = null;  
-   var $erro_campo = null;  
-   var $pagina_retorno = null; 
-   // cria variaveis do arquivo 
-   var $m61_codmatunid = 0; 
-   var $m61_descr = null; 
-   var $m61_usaquant = 'f'; 
-   var $m61_abrev = null; 
-   var $m61_usadec = 'f'; 
-   // cria propriedade com as variaveis do arquivo 
+class cl_matunid {
+   // cria variaveis de erro
+   var $rotulo     = null;
+   var $query_sql  = null;
+   var $numrows    = 0;
+   var $numrows_incluir = 0;
+   var $numrows_alterar = 0;
+   var $numrows_excluir = 0;
+   var $erro_status= null;
+   var $erro_sql   = null;
+   var $erro_banco = null;
+   var $erro_msg   = null;
+   var $erro_campo = null;
+   var $pagina_retorno = null;
+   // cria variaveis do arquivo
+   var $m61_codmatunid = 0;
+   var $m61_descr = null;
+   var $m61_usaquant = 'f';
+   var $m61_abrev = null;
+   var $m61_usadec = 'f';
+   var $m61_codsicom = null;
+   var $m61_ativo = null;
+    // cria propriedade com as variaveis do arquivo
    var $campos = "
-                 m61_codmatunid = int8 = Código da unidade 
-                 m61_descr = varchar(40) = Descrição da unidade 
-                 m61_usaquant = bool = Se usa quantidade da unidade 
-                 m61_abrev = varchar(6) = Abreviatura da descrição 
-                 m61_usadec = bool = Aceita casas decimais 
+                 m61_codmatunid = int8 = Código da unidade
+                 m61_descr = varchar(40) = Descrição da unidade
+                 m61_usaquant = bool = Se usa quantidade da unidade
+                 m61_abrev = varchar(6) = Abreviatura da descrição
+                 m61_usadec = bool = Aceita casas decimais
+                 m61_codsicom = int8 = codigo da unidade no TCE
+                 m61_ativo = bool = ativo
                  ";
-   //funcao construtor da classe 
-   function cl_matunid() { 
+   //funcao construtor da classe
+   function cl_matunid() {
      //classes dos rotulos dos campos
-     $this->rotulo = new rotulo("matunid"); 
+     $this->rotulo = new rotulo("matunid");
      $this->pagina_retorno =  basename($GLOBALS["HTTP_SERVER_VARS"]["PHP_SELF"]);
    }
-   //funcao erro 
-   function erro($mostra,$retorna) { 
+   //funcao erro
+   function erro($mostra,$retorna) {
      if(($this->erro_status == "0") || ($mostra == true && $this->erro_status != null )){
         echo "<script>alert(\"".$this->erro_msg."\");</script>";
         if($retorna==true){
@@ -78,14 +82,17 @@ class cl_matunid {
        $this->m61_usaquant = ($this->m61_usaquant == "f"?@$GLOBALS["HTTP_POST_VARS"]["m61_usaquant"]:$this->m61_usaquant);
        $this->m61_abrev = ($this->m61_abrev == ""?@$GLOBALS["HTTP_POST_VARS"]["m61_abrev"]:$this->m61_abrev);
        $this->m61_usadec = ($this->m61_usadec == "f"?@$GLOBALS["HTTP_POST_VARS"]["m61_usadec"]:$this->m61_usadec);
+       $this->m61_codsicom = ($this->m61_codsicom == "f"?@$GLOBALS["HTTP_POST_VARS"]["m61_codsicom"]:$this->m61_codsicom);
+       $this->m61_ativo = ($this->m61_ativo == "f"?@$GLOBALS["HTTP_POST_VARS"]["m61_ativo"]:$this->m61_ativo);
+
      }else{
        $this->m61_codmatunid = ($this->m61_codmatunid == ""?@$GLOBALS["HTTP_POST_VARS"]["m61_codmatunid"]:$this->m61_codmatunid);
      }
    }
    // funcao para inclusao
-   function incluir ($m61_codmatunid){ 
+   function incluir ($m61_codmatunid){
       $this->atualizacampos();
-     if($this->m61_descr == null ){ 
+     if($this->m61_descr == null ){
        $this->erro_sql = " Campo Descrição da unidade nao Informado.";
        $this->erro_campo = "m61_descr";
        $this->erro_banco = "";
@@ -94,7 +101,7 @@ class cl_matunid {
        $this->erro_status = "0";
        return false;
      }
-     if($this->m61_usaquant == null ){ 
+     if($this->m61_usaquant == null ){
        $this->erro_sql = " Campo Se usa quantidade da unidade nao Informado.";
        $this->erro_campo = "m61_usaquant";
        $this->erro_banco = "";
@@ -103,7 +110,7 @@ class cl_matunid {
        $this->erro_status = "0";
        return false;
      }
-     if($this->m61_abrev == null ){ 
+     if($this->m61_abrev == null ){
        $this->erro_sql = " Campo Abreviatura da descrição nao Informado.";
        $this->erro_campo = "m61_abrev";
        $this->erro_banco = "";
@@ -112,7 +119,7 @@ class cl_matunid {
        $this->erro_status = "0";
        return false;
      }
-     if($this->m61_usadec == null ){ 
+     if($this->m61_usadec == null ){
        $this->erro_sql = " Campo Aceita casas decimais nao Informado.";
        $this->erro_campo = "m61_usadec";
        $this->erro_banco = "";
@@ -122,16 +129,16 @@ class cl_matunid {
        return false;
      }
      if($m61_codmatunid == "" || $m61_codmatunid == null ){
-       $result = db_query("select nextval('matunid_m61_codmatunid_seq')"); 
+       $result = db_query("select nextval('matunid_m61_codmatunid_seq')");
        if($result==false){
          $this->erro_banco = str_replace("\n","",@pg_last_error());
-         $this->erro_sql   = "Verifique o cadastro da sequencia: matunid_m61_codmatunid_seq do campo: m61_codmatunid"; 
+         $this->erro_sql   = "Verifique o cadastro da sequencia: matunid_m61_codmatunid_seq do campo: m61_codmatunid";
          $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
          $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
          $this->erro_status = "0";
-         return false; 
+         return false;
        }
-       $this->m61_codmatunid = pg_result($result,0,0); 
+       $this->m61_codmatunid = pg_result($result,0,0);
      }else{
        $result = db_query("select last_value from matunid_m61_codmatunid_seq");
        if(($result != false) && (pg_result($result,0,0) < $m61_codmatunid)){
@@ -142,10 +149,10 @@ class cl_matunid {
          $this->erro_status = "0";
          return false;
        }else{
-         $this->m61_codmatunid = $m61_codmatunid; 
+         $this->m61_codmatunid = $m61_codmatunid;
        }
      }
-     if(($this->m61_codmatunid == null) || ($this->m61_codmatunid == "") ){ 
+     if(($this->m61_codmatunid == null) || ($this->m61_codmatunid == "") ){
        $this->erro_sql = " Campo m61_codmatunid nao declarado.";
        $this->erro_banco = "Chave Primaria zerada.";
        $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
@@ -154,21 +161,24 @@ class cl_matunid {
        return false;
      }
      $sql = "insert into matunid(
-                                       m61_codmatunid 
-                                      ,m61_descr 
-                                      ,m61_usaquant 
-                                      ,m61_abrev 
-                                      ,m61_usadec 
+                                       m61_codmatunid
+                                      ,m61_descr
+                                      ,m61_usaquant
+                                      ,m61_abrev
+                                      ,m61_usadec
+                                      ,m61_codsicom
                        )
                 values (
-                                $this->m61_codmatunid 
-                               ,'$this->m61_descr' 
-                               ,'$this->m61_usaquant' 
-                               ,'$this->m61_abrev' 
-                               ,'$this->m61_usadec' 
+                                $this->m61_codmatunid
+                               ,'$this->m61_descr'
+                               ,'$this->m61_usaquant'
+                               ,'$this->m61_abrev'
+                               ,'$this->m61_usadec'
+                               ,'$this->m61_codsicom'
+                               ,'$this->m61_ativo'
                       )";
-     $result = db_query($sql); 
-     if($result==false){ 
+     $result = db_query($sql);
+     if($result==false){
        $this->erro_banco = str_replace("\n","",@pg_last_error());
        if( strpos(strtolower($this->erro_banco),"duplicate key") != 0 ){
          $this->erro_sql   = "Unidades dos materiais ($this->m61_codmatunid) nao Incluído. Inclusao Abortada.";
@@ -204,16 +214,16 @@ class cl_matunid {
        $resac = db_query("insert into db_acount values($acount,1017,8637,'','".AddSlashes(pg_result($resaco,0,'m61_usadec'))."',".db_getsession('DB_datausu').",".db_getsession('DB_id_usuario').")");
      }
      return true;
-   } 
+   }
    // funcao para alteracao
-   function alterar ($m61_codmatunid=null) { 
+   function alterar ($m61_codmatunid=null) {
       $this->atualizacampos();
      $sql = " update matunid set ";
      $virgula = "";
-     if(trim($this->m61_codmatunid)!="" || isset($GLOBALS["HTTP_POST_VARS"]["m61_codmatunid"])){ 
+     if(trim($this->m61_codmatunid)!="" || isset($GLOBALS["HTTP_POST_VARS"]["m61_codmatunid"])){
        $sql  .= $virgula." m61_codmatunid = $this->m61_codmatunid ";
        $virgula = ",";
-       if(trim($this->m61_codmatunid) == null ){ 
+       if(trim($this->m61_codmatunid) == null ){
          $this->erro_sql = " Campo Código da unidade nao Informado.";
          $this->erro_campo = "m61_codmatunid";
          $this->erro_banco = "";
@@ -223,10 +233,10 @@ class cl_matunid {
          return false;
        }
      }
-     if(trim($this->m61_descr)!="" || isset($GLOBALS["HTTP_POST_VARS"]["m61_descr"])){ 
+     if(trim($this->m61_descr)!="" || isset($GLOBALS["HTTP_POST_VARS"]["m61_descr"])){
        $sql  .= $virgula." m61_descr = '$this->m61_descr' ";
        $virgula = ",";
-       if(trim($this->m61_descr) == null ){ 
+       if(trim($this->m61_descr) == null ){
          $this->erro_sql = " Campo Descrição da unidade nao Informado.";
          $this->erro_campo = "m61_descr";
          $this->erro_banco = "";
@@ -236,10 +246,10 @@ class cl_matunid {
          return false;
        }
      }
-     if(trim($this->m61_usaquant)!="" || isset($GLOBALS["HTTP_POST_VARS"]["m61_usaquant"])){ 
+     if(trim($this->m61_usaquant)!="" || isset($GLOBALS["HTTP_POST_VARS"]["m61_usaquant"])){
        $sql  .= $virgula." m61_usaquant = '$this->m61_usaquant' ";
        $virgula = ",";
-       if(trim($this->m61_usaquant) == null ){ 
+       if(trim($this->m61_usaquant) == null ){
          $this->erro_sql = " Campo Se usa quantidade da unidade nao Informado.";
          $this->erro_campo = "m61_usaquant";
          $this->erro_banco = "";
@@ -249,10 +259,10 @@ class cl_matunid {
          return false;
        }
      }
-     if(trim($this->m61_abrev)!="" || isset($GLOBALS["HTTP_POST_VARS"]["m61_abrev"])){ 
+     if(trim($this->m61_abrev)!="" || isset($GLOBALS["HTTP_POST_VARS"]["m61_abrev"])){
        $sql  .= $virgula." m61_abrev = '$this->m61_abrev' ";
        $virgula = ",";
-       if(trim($this->m61_abrev) == null ){ 
+       if(trim($this->m61_abrev) == null ){
          $this->erro_sql = " Campo Abreviatura da descrição nao Informado.";
          $this->erro_campo = "m61_abrev";
          $this->erro_banco = "";
@@ -262,10 +272,10 @@ class cl_matunid {
          return false;
        }
      }
-     if(trim($this->m61_usadec)!="" || isset($GLOBALS["HTTP_POST_VARS"]["m61_usadec"])){ 
+     if(trim($this->m61_usadec)!="" || isset($GLOBALS["HTTP_POST_VARS"]["m61_usadec"])){
        $sql  .= $virgula." m61_usadec = '$this->m61_usadec' ";
        $virgula = ",";
-       if(trim($this->m61_usadec) == null ){ 
+       if(trim($this->m61_usadec) == null ){
          $this->erro_sql = " Campo Aceita casas decimais nao Informado.";
          $this->erro_campo = "m61_usadec";
          $this->erro_banco = "";
@@ -275,6 +285,14 @@ class cl_matunid {
          return false;
        }
      }
+       if(trim($this->m61_codsicom)!="" || isset($GLOBALS["HTTP_POST_VARS"]["m61_codsicom"])){
+           $sql  .= $virgula." m61_codsicom = '$this->m61_codsicom' ";
+           $virgula = ",";
+       }
+       if(trim($this->m61_ativo)!="" || isset($GLOBALS["HTTP_POST_VARS"]["m61_ativo"])){
+           $sql  .= $virgula." m61_ativo = '$this->m61_ativo' ";
+           $virgula = ",";
+       }
      $sql .= " where ";
      if($m61_codmatunid!=null){
        $sql .= " m61_codmatunid = $this->m61_codmatunid";
@@ -299,7 +317,7 @@ class cl_matunid {
        }
      }
      $result = db_query($sql);
-     if($result==false){ 
+     if($result==false){
        $this->erro_banco = str_replace("\n","",@pg_last_error());
        $this->erro_sql   = "Unidades dos materiais nao Alterado. Alteracao Abortada.\\n";
          $this->erro_sql .= "Valores : ".$this->m61_codmatunid;
@@ -327,14 +345,14 @@ class cl_matunid {
          $this->erro_status = "1";
          $this->numrows_alterar = pg_affected_rows($result);
          return true;
-       } 
-     } 
-   } 
-   // funcao para exclusao 
-   function excluir ($m61_codmatunid=null,$dbwhere=null) { 
+       }
+     }
+   }
+   // funcao para exclusao
+   function excluir ($m61_codmatunid=null,$dbwhere=null) {
      if($dbwhere==null || $dbwhere==""){
        $resaco = $this->sql_record($this->sql_query_file($m61_codmatunid));
-     }else{ 
+     }else{
        $resaco = $this->sql_record($this->sql_query_file(null,"*",null,$dbwhere));
      }
      if(($resaco!=false)||($this->numrows!=0)){
@@ -364,7 +382,7 @@ class cl_matunid {
        $sql2 = $dbwhere;
      }
      $result = db_query($sql.$sql2);
-     if($result==false){ 
+     if($result==false){
        $this->erro_banco = str_replace("\n","",@pg_last_error());
        $this->erro_sql   = "Unidades dos materiais nao Excluído. Exclusão Abortada.\\n";
        $this->erro_sql .= "Valores : ".$m61_codmatunid;
@@ -392,11 +410,11 @@ class cl_matunid {
          $this->erro_status = "1";
          $this->numrows_excluir = pg_affected_rows($result);
          return true;
-       } 
-     } 
-   } 
-   // funcao do recordset 
-   function sql_record($sql) { 
+       }
+     }
+   }
+   // funcao do recordset
+   function sql_record($sql) {
      $result = db_query($sql);
      if($result==false){
        $this->numrows    = 0;
@@ -418,7 +436,7 @@ class cl_matunid {
       }
      return $result;
    }
-   function sql_query ( $m61_codmatunid=null,$campos="*",$ordem=null,$dbwhere=""){ 
+   function sql_query ( $m61_codmatunid=null,$campos="*",$ordem=null,$dbwhere=""){
      $sql = "select ";
      if($campos != "*" ){
        $campos_sql = explode("#",$campos);
@@ -434,8 +452,8 @@ class cl_matunid {
      $sql2 = "";
      if($dbwhere==""){
        if($m61_codmatunid!=null ){
-         $sql2 .= " where matunid.m61_codmatunid = $m61_codmatunid "; 
-       } 
+         $sql2 .= " where matunid.m61_codmatunid = $m61_codmatunid ";
+       }
      }else if($dbwhere != ""){
        $sql2 = " where $dbwhere";
      }
@@ -451,7 +469,7 @@ class cl_matunid {
      }
      return $sql;
   }
-   function sql_query_file ( $m61_codmatunid=null,$campos="*",$ordem=null,$dbwhere=""){ 
+   function sql_query_file ( $m61_codmatunid=null,$campos="*",$ordem=null,$dbwhere=""){
      $sql = "select ";
      if($campos != "*" ){
        $campos_sql = explode("#",$campos);
@@ -467,8 +485,8 @@ class cl_matunid {
      $sql2 = "";
      if($dbwhere==""){
        if($m61_codmatunid!=null ){
-         $sql2 .= " where matunid.m61_codmatunid = $m61_codmatunid "; 
-       } 
+         $sql2 .= " where matunid.m61_codmatunid = $m61_codmatunid ";
+       }
      }else if($dbwhere != ""){
        $sql2 = " where $dbwhere";
      }

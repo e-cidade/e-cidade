@@ -36,6 +36,7 @@ db_postmemory($HTTP_POST_VARS);
 parse_str($HTTP_SERVER_VARS["QUERY_STRING"]);
 $clorcreceita = new cl_orcreceita;
 $clorcfontes = new cl_orcfontes;
+$clorcsuplemval = new cl_orcsuplemval;
 $clorcreceita->rotulo->label("o70_anousu");
 $clorcreceita->rotulo->label("o70_codrec");
 $clorcreceita->rotulo->label("o70_codfon");
@@ -49,6 +50,19 @@ if (isset($lReceitaLancada)) {
 	if ($lReceitaLancada == 'true') {
 		$sWhereReceita = " o70_reclan is true ";
 	}
+}
+
+if ($manutecaosuple == 1) {
+  $sWhereReceita .= " and fc_estruturalreceita(2024,orcreceita.o70_codrec) !~ '^4.9\.' ";
+  if ($codsuplementacao) {
+    $instit = db_getsession("DB_instit");
+    $result = $clorcsuplemval->sql_record($clorcsuplemval->sql_query_suplemetacao($instit,$codsuplementacao));
+    if ($clorcsuplemval->numrows > 0 ) {
+      db_fieldsmemory($result,0);
+      $codigo = substr($o58_codigo,0,7);
+      $sWhereReceita .= " and o15_codtri :: integer = {$codigo}";
+    }
+  }
 }
 
 ?>

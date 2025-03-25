@@ -27,69 +27,95 @@
 
 //MODULO: material
 $clmatunid->rotulo->label();
+db_app::load("estilos.bootstrap.css");
 ?>
+
+<style>
+    .btn {
+        font-size: 12px;
+        margin: 2px;
+    }
+
+    .form-group{
+        padding: 5px;
+    }
+    .form-group label {
+        margin-right: 10px;
+        width: 246px;
+        text-align: right;
+    }
+
+    #m61_codmatunid,#m61_abrev,#m61_usaquant,#m61_usadec,#m61_codsicom,#m61_ativo{
+        width: 200px;
+        font-size: 12px;
+        font-family: Arial;
+    }
+
+    #m61_descr{
+        width: 400px;
+        font-size: 12px;
+        font-family: Arial;
+    }
+
+</style>
+
 <form name="form1" method="post" action="">
-<center>
-<table border="0">
-  <tr>
-    <td nowrap title="<?=@$Tm61_codmatunid?>">
-       <?=@$Lm61_codmatunid?>
-    </td>
-    <td>
-<?
-db_input('m61_codmatunid',8,$Im61_codmatunid,true,'text',3,"")
-?>
-    </td>
-  </tr>
-  <tr>
-    <td nowrap title="<?=@$Tm61_descr?>">
-       <?=@$Lm61_descr?>
-    </td>
-    <td>
-<?
-db_input('m61_descr',40,$Im61_descr,true,'text',$db_opcao,"onchange='js_abrev();'")
-?>
-    </td>
-  </tr>
-  <tr>
-    <td nowrap title="<?=@$Tm61_abrev?>">
-       <?=@$Lm61_abrev?>
-    </td>
-    <td>
-<?
-db_input('m61_abrev',6,$Im61_abrev,true,'text',$db_opcao,"")
-?>
-    </td>
-  </tr>
-  <tr>
-    <td nowrap title="<?=@$Tm61_usaquant?>">
-       <?=@$Lm61_usaquant?>
-    </td>
-    <td>
-<?
-$x = array("f"=>"NAO","t"=>"SIM");
-db_select('m61_usaquant',$x,true,$db_opcao,"");
-?>
-    </td>
-  </tr>
-  <tr>
-    <td nowrap title="<?=@$Tm61_usadec?>">
-       <?=@$Lm61_usadec?>
-    </td>
-    <td>
-<?
-if(!isset($m61_usadec)){
-  $m61_usadec = 't';
-}
-$x = array("f"=>"NAO","t"=>"SIM");
-db_select('m61_usadec',$x,true,$db_opcao,"");
-?>
-    </td>
-  </tr>
-</table>
-  </center>
-<input name="<?=($db_opcao==1?"incluir":($db_opcao==2||$db_opcao==22?"alterar":"excluir"))?>" type="submit" id="db_opcao" value="<?=($db_opcao==1?"Incluir":($db_opcao==2||$db_opcao==22?"Alterar":"Excluir"))?>" <?=($db_botao==false?"disabled":"")?> >
-<input name="pesquisar" type="button" id="pesquisar" value="Pesquisar" onclick="js_pesquisa();" >
+    <fieldset style="margin-bottom: 10px">
+        <legend><b>Cadastro de Unidades:</b></legend>
+        <div style="display: flex; flex-wrap: wrap;">
+            <div class="form-group" style="flex: 0;">
+                <label><strong>Código da unidade:</strong></label>
+                <input title="m61_codmatunid" value="<?=$m61_codmatunid?>" name="m61_codmatunid" type="text" id="m61_codmatunid" style="background-color:#DEB887;" class="form-control">
+            </div>
+            <div class="form-group" style="flex: 0;">
+                <label><strong>Unidade:</strong></label>
+                <input title="m61_descr" value="<?=$m61_descr?>" name="m61_descr" type="text" id="m61_descr" style="background-color:#DEB887;" class="form-control">
+            </div>
+            <div class="form-group" style="flex: 0;">
+                <label><strong>Abreviatura da descrição:</strong></label>
+                <input title="m61_abrev" value="<?=$m61_abrev?>" name="m61_abrev" type="text" id="m61_abrev" style="background-color:#DEB887;" class="form-control">
+            </div>
+            <div class="form-group" style="flex: 0;">
+                <label><strong>Se usa quantidade da unidade:</strong></label>
+                <select name="m61_usaquant" id="m61_usaquant" class="custom-select">
+                    <option value="t" <?php echo ($m61_usaquant == "t") ? 'selected' : ''; ?>>SIM</option>
+                    <option value="f" <?php echo ($m61_usaquant == "f") ? 'selected' : ''; ?>>NÃO</option>
+                </select>
+            </div>
+            <div class="form-group" style="flex: 0;">
+                <label><strong>Aceita casas decimais:</strong></label>
+                <select name="m61_usadec" id="m61_usadec" class="custom-select">
+                    <option value="t" <?php echo ($m61_usadec == "t") ? 'selected' : ''; ?>>SIM</option>
+                    <option value="f" <?php echo ($m61_usadec == "f") ? 'selected' : ''; ?>>NÃO</option>
+                </select>
+            </div>
+            <div class="form-group" style="flex: 0;">
+                <label><strong>Codigo Unidade no TCE:</strong></label>
+                <input title="m61_codsicom" value="<?=$m61_codsicom?>" name="m61_codsicom" type="text" id="m61_codsicom" class="form-control">
+            </div>
+            <div class="form-group" style="flex: 0;">
+                <label><strong>Ativo:</strong></label>
+                <select name="m61_ativo" id="m61_ativo" class="custom-select">
+                    <option value="t" <?php echo ($m61_ativo == "t") ? 'selected' : ''; ?>>SIM</option>
+                    <option value="f" <?php echo ($m61_ativo == "f") ? 'selected' : ''; ?>>NÃO</option>
+                </select>
+            </div>
+        </div>
+    </fieldset>
+    <div style="margin-left: 500px;">
+        <?php  if ($db_opcao == 1) : ?>
+            <input class="btn btn-success Secondary" name="incluir" type="submit" id="incluir" value="Incluir">
+        <?php endif;?>
+
+        <?php  if ($db_opcao == 2 || $db_opcao == 22) : ?>
+            <input class="btn btn-success Secondary" name="alterar" type="submit" id="alterar" value="Alterar">
+        <?php endif;?>
+
+        <?php  if ($db_opcao == 3 || $db_opcao == 33) : ?>
+            <input class="btn btn-danger" name="excluir" type="button" id="excluir" value="Excluir">
+        <?php endif;?>
+            <input style="width: 90px" class="btn btn-primary" name="pesquisar" onclick="js_pesquisa();" id="pesquisar" value="Pesquisar">
+    </div>
 </form>
 <script>
 function js_pesquisa(){

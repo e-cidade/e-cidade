@@ -266,7 +266,7 @@ function js_emite(){
           ?>
         </td>
       </tr>
-      <? if(isset($tipo) && $tipo == "R"){?>
+      <? if(isset($tipo) && $tipo == "R" && !(isset($folha) && $folha == "r20")){?>
       <tr id="linhaSeparar" >
         <td align="right" nowrap title="separar" ><strong>Separar Exceções :</strong>
         </td>
@@ -293,12 +293,17 @@ function js_emite(){
             } else {
               $aTiposEmpenho = array("1" => "Dotação", "2" => "Lotação");
             }
-
-          db_select('tipoEmpenho',$aTiposEmpenho,true,4,'onchange="js_validaTipo()"');
+            db_select('tipoEmpenho',$aTiposEmpenho,true,4,'onchange="js_validaTipo()"');
+            } 
+            if (isset($folha) && $folha == "r20") {              
+              $aTiposEmpenho = array("1" => "Dotação");
+              db_select('tipoEmpenho',$aTiposEmpenho,true,4,'hidden');
+              $s = array(1 => "Sim");
+              db_select('separar',$s,true,4,'hidden');    
+            }
           ?>
         </td>
       </tr>
-    <? } ?>
       <tr>
         <td >&nbsp;</td>
         <td >&nbsp;</td>

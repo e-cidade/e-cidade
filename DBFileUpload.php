@@ -124,11 +124,11 @@ try {
 <script type="text/javascript">
 (function() {
 
-  var sInputFile        = '<?php echo $sInputFile; ?>';
+  var sInputFile        = '<?php echo addslashes($sInputFile); ?>';
   var lSubmitFormulario = <?php echo $lSubmitFormulario ? 'true' : 'false'; ?>;
-  var sErro             = '<?php echo $sErro; ?>';
-  var sCaminhoArquivo   = '<?php echo $sCaminhoArquivo; ?>';
-  var sNomeArquivo      = '<?php echo $sNomeArquivo; ?>';
+  var sErro             = '<?php echo addslashes($sErro); ?>';
+  var sCaminhoArquivo   = '<?php echo addslashes($sCaminhoArquivo); ?>';
+  var sNomeArquivo      = '<?php echo addslashes($sNomeArquivo); ?>';
   var iIdComponente     = <?php echo $iIdComponente; ?>;
   var sExtensao         = '<?php echo pathinfo( $sNomeArquivo, PATHINFO_EXTENSION ); ?>';
 

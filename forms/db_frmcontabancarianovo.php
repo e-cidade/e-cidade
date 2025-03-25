@@ -405,15 +405,15 @@ $ano = db_getsession("DB_anousu"); //ano
 
 	function js_pesquisa() 
 	{
-		js_OpenJanelaIframe('top.corpo', 'db_iframe_contabancaria', 'func_cadcontabancariacadastro.php?convenio=true&funcao_js=parent.js_preenchepesquisa|db83_sequencial', 'Pesquisa', true);
+		js_OpenJanelaIframe('top.corpo', 'db_iframe_contabancaria', 'func_cadcontabancariacadastro.php?convenio=true&funcao_js=parent.js_preenchepesquisa|db83_sequencial|c61_reduz', 'Pesquisa', true);
 	}
 
-	function js_preenchepesquisa(chave) 
+	function js_preenchepesquisa(chave,chave2) 
 	{
 		db_iframe_contabancaria.hide();
 		<?
 		if ($db_opcao != 1) {
-			echo " location.href = '" . basename($GLOBALS["HTTP_SERVER_VARS"]["PHP_SELF"]) . "?chavepesquisa='+chave";
+			echo " location.href = '" . basename($GLOBALS["HTTP_SERVER_VARS"]["PHP_SELF"]) . "?chavepesquisa='+chave+'&reduzido='+chave2";
 		}
 		?>
 	}

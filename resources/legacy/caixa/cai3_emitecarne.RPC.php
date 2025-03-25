@@ -26,7 +26,7 @@
  */
 
 /**
- * @fileoverview Controla Geração de Recibos/Carnes conforme convenio.
+ * @fileoverview Controla Gerao de Recibos/Carnes conforme convenio.
  * @version $Revision: 1.98 $
  */
 require_once('dbforms/db_funcoes.php');
@@ -74,7 +74,7 @@ $rs_cgc = db_query($sql_cgc);
 $oConfig->db21_codcli = pg_result($rs_cgc,0,1);
 
 /**
- * Busca parâmetros do tributario
+ * Busca parmetros do tributario
  * para validar reemissao de recibo
  */
 $sSqlParametros         = $oDaoNumpref->sql_query_file(db_getsession('DB_anousu'),db_getsession('DB_instit'));
@@ -90,7 +90,7 @@ if ( $rsSqlParametros && pg_num_rows($rsSqlParametros) ) {
   }
 } else {
   $oRetorno->status       = 2;
-  $oRetorno->message      = 'Erro ao selecionar parâmetros do tributário.';
+  $oRetorno->message      = 'Erro ao selecionar parmetros do tributrio.';
 }
 
 /**
@@ -102,7 +102,7 @@ if($rsParJuridico && pg_num_rows($rsParJuridico) > 0) {
   $oParJuridico = db_utils::fieldsMemory($rsParJuridico,0);
 } else {
 	$oRetorno->status       = 2;
-  $oRetorno->message      = 'Erro ao selecionar parâmetros do jurídico.';
+  $oRetorno->message      = 'Erro ao selecionar parmetros do jurdico.';
 }
 
 /**
@@ -163,7 +163,7 @@ switch ($oParam->exec) {
   if ($lConfReemissaoRecibo){
 
     /**
-     * Separa os dados do Formulário
+     * Separa os dados do Formulrio
      */
 
     foreach ($oDadosNumpre->aDadosChecks as $aDadosFormulario) {
@@ -234,11 +234,11 @@ switch ($oParam->exec) {
       if ($lEncontrouValido) {
 
         $oRetorno->iConfirm = 1;
-        $oRetorno->message  = "Existem boletos válidos emitidos, Deseja emitir um novo boleto?"; //Com confirmação
+        $oRetorno->message  = "Existem boletos vlidos emitidos, Deseja emitir um novo boleto?"; //Com confirmao
       }
       if ($lEncontrouIgual) {
         $oRetorno->iConfirm = 0;
-        $oRetorno->message  = "Encoutrou recibo com mesmo NUMPRE, NUMPAR, e DATA VENCIMENTO iguais.";// Sem confirmação";
+        $oRetorno->message  = "Encoutrou recibo com mesmo NUMPRE, NUMPAR, e DATA VENCIMENTO iguais.";// Sem confirmao";
       }
 
     }
@@ -390,7 +390,7 @@ switch ($oParam->exec) {
         } else {
 
           $oRetorno->status  = 2;
-          $oRetorno->message = "Existe mais de um processo do foro encontrado para os débitos selecionados";
+          $oRetorno->message = "Existe mais de um processo do foro encontrado para os dbitos selecionados";
           $oRetorno->message = urlencode($oRetorno->message);
           echo $oJson->encode($oRetorno);
           exit;
@@ -417,7 +417,7 @@ switch ($oParam->exec) {
       $iTipoModeloReciboQuery = "{$iTipoModeloCarne}";
     }else {
       $oRetorno->iStatus   = 2;
-      $oRetorno->sMensagem = "Tipo de regra de emissão não encontrado";
+      $oRetorno->sMensagem = "Tipo de regra de emisso no encontrado";
     }
 
     $sDataHoje        = date("Y-m-d", db_getsession("DB_datausu") );
@@ -469,7 +469,7 @@ switch ($oParam->exec) {
       $aRegrasEmissaoGeral      = array();
 
       /**
-       * Separa as regras de emissao se são regras gerais e regras especificas para tipo de débito
+       * Separa as regras de emissao se so regras gerais e regras especificas para tipo de dbito
        */
       foreach ($aRegrasEmissao as $iIndiceRegra => $oRegraEmissao) {
         if ($oRegraEmissao->k49_tipo != "" || $oRegraEmissao->k36_ip != "") {
@@ -492,7 +492,7 @@ switch ($oParam->exec) {
       foreach ($aRegrasEmissao as $iIndiceRegra => $oRegraEmissao) {
 
         /**
-         * valida se tipo de convenio é refente cobrança
+         * valida se tipo de convenio  refente cobrana
          */
         if ($oRegraEmissao->ar11_cadtipoconvenio == 7) {
           $lCobrancaRegistrada = true;
@@ -501,7 +501,7 @@ switch ($oParam->exec) {
         }
 
         /**
-         * Instancia novo recibo para ser gerado ou não
+         * Instancia novo recibo para ser gerado ou no
          */
         if ($lCobrancaRegistrada || $sGeraCarne == "") {
           $oRecibo = new recibo(2, null, 1);
@@ -548,7 +548,7 @@ switch ($oParam->exec) {
            */
           if ( ($aValores["Numpar"] >= $oRegraEmissao->k48_parcini) && ($aValores["Numpar"] <= $oRegraEmissao->k48_parcfim) ) {
             /**
-             * Se for emissao de recibo, adiciona numpre ao recibo caso contrário apenas seta parâmetro para emissao de carne
+             * Se for emissao de recibo, adiciona numpre ao recibo caso contrrio apenas seta parmetro para emissao de carne
              */
             if ( ( $lCobrancaRegistrada || empty($sGeraCarne)) &&  $oRegraEmissao->k48_cadtipomod == $iTipoModeloRecibo ) {
               /**
@@ -579,7 +579,7 @@ switch ($oParam->exec) {
               $oRecibo->addNumpre($aValores["Numpre"], $aValores["Numpar"]);
               /**
                * Se o parametro estiver habilitado
-               * lista os recibos válidos emtidos
+               * lista os recibos vlidos emtidos
                */
               if ($lConfReemissaoRecibo) {
 
@@ -603,7 +603,7 @@ switch ($oParam->exec) {
             }
 
             /**
-             * Cria array de dados que serão gravados na sessao
+             * Cria array de dados que sero gravados na sessao
              * Tambem cria um array das parcelas para serem utilizadas valores maximos e minimos da regra de emissao
              */
             $aDadosCarne[$iIndiceRegra]["numpres_emissao"][] = array($aValores["Numpre"], $aValores["Numpar"]);
@@ -646,7 +646,7 @@ switch ($oParam->exec) {
           foreach ($aNumpreNumpar as $oNumpreNumpar) {
             /**
              * Compara o array de debitos e parcelas selecionadas e debitos e parcelas emitidas
-             * Caso exista caso para comparação apenas faz reemissao do recibo
+             * Caso exista caso para comparao apenas faz reemissao do recibo
              * Caso algum numpre ou numpar esteja faltanto ou sobrando emite um novo recibo.
              */
             $aComparaBanco     = explode("|", $oNumpreNumpar->numpre_numpar);
@@ -673,9 +673,9 @@ switch ($oParam->exec) {
 
             	/**
             	 *
-            	 * Caso a data do sistema foi maior que as datas de vencimento, significa que parcelas estão vencidas e
-            	 * a data de vencimento será a data do sistema. Caso a data do sistema for menor que a data de vencimento
-            	 * a data de vencimento será a menor dentre as das parcelas selecionadas
+            	 * Caso a data do sistema foi maior que as datas de vencimento, significa que parcelas esto vencidas e
+            	 * a data de vencimento ser a data do sistema. Caso a data do sistema for menor que a data de vencimento
+            	 * a data de vencimento ser a menor dentre as das parcelas selecionadas
             	 */
 
             	$sSqlVenc  = "select case                                                   ";
@@ -759,7 +759,7 @@ switch ($oParam->exec) {
               $iNumRowsValidaCustas = $oDaoProcessoForoPartilhaCusta->numrows;
 
               /**
-               * Busca o processo do foro conforme tipo de débito
+               * Busca o processo do foro conforme tipo de dbito
                */
               if ($oRegraEmissao->k03_tipo == 13) {
 
@@ -780,7 +780,7 @@ switch ($oParam->exec) {
               $iProcessosForo     = pg_num_rows($rsSqlProcessosForo);
 
               /**
-               * Valida se existem processos do foro e se não existem custas vinculadas a ele.
+               * Valida se existem processos do foro e se no existem custas vinculadas a ele.
                */
 
               $nValorTotalCustas = 0.00;
@@ -792,7 +792,7 @@ switch ($oParam->exec) {
 
 
                   /**
-                   * Verifica se existe lançamento manual ou isenção
+                   * Verifica se existe lanamento manual ou iseno
                    * do processo do foro na tabela processoforopartilha
                    */
                   $sWherePartilhaProcesso    = " v76_processoforo = {$oProcessoForo->v71_processoforo} and ";
@@ -825,7 +825,7 @@ switch ($oParam->exec) {
                     $aTaxas     = db_utils::getCollectionByRecord($rsSqlTaxas);
 
                     /**
-                     * Calcula o valor total de débitos no arrecad referentes ao processo do foro
+                     * Calcula o valor total de dbitos no arrecad referentes ao processo do foro
                      */
                     $dtEmissao    = date("Y-m-d", db_getsession('DB_datausu') );
                     $tsVencimento = db_strtotime($dVencimento);
@@ -862,9 +862,9 @@ switch ($oParam->exec) {
                         $nVlrPercentualDebito = $oValor->truncate($nTotalDebito * ($oTaxa->ar36_perc / 100), 2);
 
                         /**
-                         * Verifica se valor do percentual do débito é maior que maximo ou minimo permitido
-                         * caso ele ultrapasse um dos limites o valor da taxa será o limite
-                         * caso contrario sera o resultado da operaçao
+                         * Verifica se valor do percentual do dbito  maior que maximo ou minimo permitido
+                         * caso ele ultrapasse um dos limites o valor da taxa ser o limite
+                         * caso contrario sera o resultado da operaao
                          */
                         if ($nVlrPercentualDebito > $oTaxa->ar36_valormax) {
                           $nValorCusta = $oTaxa->ar36_valormax;
@@ -895,10 +895,10 @@ switch ($oParam->exec) {
                     unset($oDadosEnvio);
                   }//
                 }//FOREACH
-              }//Fim validação Processo Foro
+              }//Fim validao Processo Foro
 
               /**
-               *  Geração do Convenio de Cobrança
+               *  Gerao do Convenio de Cobrana
                */
 
               db_app::import('convenio');
@@ -914,7 +914,7 @@ switch ($oParam->exec) {
                                                      $oArretipo->k00_tercdigrecnormal);
 
 
-            }//Validação regra de emissao com as parcelas do numpre e numpar
+            }//Validao regra de emissao com as parcelas do numpre e numpar
             db_fim_transacao(false);
           } catch ( Exception $eException ) {
 
@@ -950,7 +950,7 @@ switch ($oParam->exec) {
       } //FOREACH QUE PERCORRE REGRAS DE EMISSAO
 
       /**
-       * Integração Webservice com TJ RJ
+       * Integrao Webservice com TJ RJ
        */
       if (count($aRecibosComCustasEmitidos) > 0 ) {
 
@@ -960,19 +960,19 @@ switch ($oParam->exec) {
     } else {
 
       $oRetorno->status  = 2;
-      $oRetorno->message = 'Erro: Nenhuma regra cadastrada para este tipo de débito \nVerifique Parâmetros.';
+      $oRetorno->message = 'Erro: Nenhuma regra cadastrada para este tipo de dbito \nVerifique Parmetros.';
     }
     $oRetorno->recibos_emitidos  = array_unique($aRecibopaga_numnov);
     break;
 
   case "getDadosRecibo":
     /**
-     * Percorre os Dados da Sessão indicada no POST
+     * Percorre os Dados da Sesso indicada no POST
      */
     $aSqlUnion  = array();
     foreach ($oParam->aSessoesRecibo as $sSessao) {
       /**
-       * Percorre os numpres e numpar gravados na sessão
+       * Percorre os numpres e numpar gravados na sesso
        */
       $oRetorno->sSessao = $sSessao;
 
@@ -1046,11 +1046,11 @@ switch ($oParam->exec) {
   case "getDadosCarne":
 
     /**
-     * Percorre os Dados da Sessão indicada no POST
+     * Percorre os Dados da Sesso indicada no POST
      */
     foreach ($oParam->aSessoesCarne as $sSessao) {
       /**
-       * Percorre os numpres e numpar gravados na sessão
+       * Percorre os numpres e numpar gravados na sesso
        */
       $oRetorno->sSessao = $sSessao;
 
@@ -1126,7 +1126,7 @@ switch ($oParam->exec) {
         $oDadosPartilhaArquivo = db_utils::fieldsMemory($rsPartilhaArquivoReg, 0);
 
         $oRetorno->status  = 2;
-        $oRetorno->message  = "Recibo não poderá ser cancelado pois foi enviado para cobrança registrada para o banco \\n\\n";
+        $oRetorno->message  = "Recibo no poder ser cancelado pois foi enviado para cobrana registrada para o banco \\n\\n";
         $oRetorno->message .= "Arquivo: {$oDadosPartilhaArquivo->v78_sequencial} - {$oDadosPartilhaArquivo->v78_nomearq} ";
         $oRetorno->message .= "em ".db_formatar($oDadosPartilhaArquivo->v78_dtgeracao, "f");
       }
@@ -1167,10 +1167,10 @@ echo $oJson->encode($oRetorno);
 
 
 /**
- * Retorna os Débitos  selecionados no formulário da CGF
- * Com minimo e maximo de parcelas array com combinação de numpre, numpar e receita e string de retorno
- * @param object   $oFormulario - Objeto contentdo os dados do Formulário da CGF
- * @param integer  $iTipoAgrupamento - Tipo de Agrupamento do Tipo de Débito
+ * Retorna os Dbitos  selecionados no formulrio da CGF
+ * Com minimo e maximo de parcelas array com combinao de numpre, numpar e receita e string de retorno
+ * @param object   $oFormulario - Objeto contentdo os dados do Formulrio da CGF
+ * @param integer  $iTipoAgrupamento - Tipo de Agrupamento do Tipo de Dbito
  */
 function retornaDebitosSelecionados($oFormulario,$iTipoAgrupamento = null) {
 
@@ -1183,7 +1183,7 @@ function retornaDebitosSelecionados($oFormulario,$iTipoAgrupamento = null) {
   $iTotalSelecionados = 0;
   $aObjDebitos        = array();
   /**
-   * Valida se é uma inicial do Foro
+   * Valida se  uma inicial do Foro
    *
    */
     if (isset($oFormulario->oDadosForm->inicial) ) {
@@ -1210,7 +1210,7 @@ function retornaDebitosSelecionados($oFormulario,$iTipoAgrupamento = null) {
             $aChecks["CHECK".$iI] = array("Numpre"=>$oInicial->k00_numpre, "Numpar"=>$oInicial->k00_numpar, "Receita"=>"0", "valor"=>$sValores);
 
             /**
-            * Cria array com os numpres e numpar dos débitos
+            * Cria array com os numpres e numpar dos dbitos
             */
             $oNumpreNumpar          = new stdClass();
             $oNumpreNumpar->iNumpre = $oInicial->k00_numpre;
@@ -1264,7 +1264,7 @@ function retornaDebitosSelecionados($oFormulario,$iTipoAgrupamento = null) {
             $aChecks["CHECK".$iI]   = array("Numpre"=>$iNumpre, "Numpar"=>$iNumpar, "Receita"=>$iReceita, "valor"=>"N".$sNumpres);
 
             /**
-             * Cria array com os numpres e numpar dos débitos
+             * Cria array com os numpres e numpar dos dbitos
              */
             $oNumpreNumpar          = new stdClass();
             $oNumpreNumpar->iNumpre = $iNumpre;
@@ -1311,8 +1311,8 @@ function retornaDebitosSelecionados($oFormulario,$iTipoAgrupamento = null) {
       }
     }
   /**
-   * Caso o agrupamento do débito seja do tipo 2 (Parcial)
-   * Adiciona os débitos do arrecad ao recibo.
+   * Caso o agrupamento do dbito seja do tipo 2 (Parcial)
+   * Adiciona os dbitos do arrecad ao recibo.
    */
 
   if ($iTipoAgrupamento == 2 && empty($oFormulario->oDadosForm->geracarne)) {
@@ -1354,7 +1354,7 @@ function retornaDebitosSelecionados($oFormulario,$iTipoAgrupamento = null) {
       );
 
       /**
-       * Cria array com os numpres e numpar dos débitos
+       * Cria array com os numpres e numpar dos dbitos
        */
       $oNumpreNumpar          = new stdClass();
       $oNumpreNumpar->iNumpre = $oDebitosAgrupados->iNumpre;
@@ -1370,7 +1370,7 @@ function retornaDebitosSelecionados($oFormulario,$iTipoAgrupamento = null) {
 
 
   /**
-   * Valida loteador quando matricula não estiver setada
+   * Valida loteador quando matricula no estiver setada
    */
 
   $lLoteador = false;
@@ -1404,7 +1404,7 @@ function retornaDebitosSelecionados($oFormulario,$iTipoAgrupamento = null) {
   $oRetornoFuncao->sGeraCarne                          = $sGeraCarne;
   $oRetornoFuncao->aValidaNumpre                       = $aNumpreValidacao;
   /**
-   * Variaveis para chamada da função
+   * Variaveis para chamada da funo
    * recibodesconto
    */
   $oRetornoFuncao->oReciboDesconto                     = new stdClass();
@@ -1417,15 +1417,15 @@ function retornaDebitosSelecionados($oFormulario,$iTipoAgrupamento = null) {
 }
 
 /**
- * Retorna regra de desconto referente ao numpre e numpar de um débito
- * @param integer $numpre                  - Numpre do débito
- * @param integer $numpar                  - Parcela do débito
- * @param integer $tipo                    - Tipo de débito(arretipo)
- * @param integer $tipo_debito             - Tipo de débito(arretipo)?
+ * Retorna regra de desconto referente ao numpre e numpar de um dbito
+ * @param integer $numpre                  - Numpre do dbito
+ * @param integer $numpar                  - Parcela do dbito
+ * @param integer $tipo                    - Tipo de dbito(arretipo)
+ * @param integer $tipo_debito             - Tipo de dbito(arretipo)?
  * @param string  $whereloteador           - Filtro quando houver loteador
  * @param integer $totalregistrospassados  - Total de parcelas selecionadas na CGF
- * @param integer $totregistros            - Variável da CGF "$totregistros"
- * @return integer $regraDesconto           - Inteiro indicando a regra de desconto que deve ser aplicada ao débito e parcela
+ * @param integer $totregistros            - Varivel da CGF "$totregistros"
+ * @return integer $regraDesconto           - Inteiro indicando a regra de desconto que deve ser aplicada ao dbito e parcela
  *                                            declarada.
  */
 function reciboDesconto2($numpre, $numpar, $tipo, $tipo_debito, $whereloteador, $totalregistrospassados, $totregistros) {
@@ -1528,7 +1528,7 @@ function recibodesconto($numpre, $numpar, $tipo, $tipo_debito, $whereloteador, $
   $oConfig->cgc         = pg_result($rs_cgc,0,0);
   $oConfig->db21_codcli = pg_result($rs_cgc,0,1);
 
-  /* testa se está em dia com IPTU */
+  /* testa se est em dia com IPTU */
   $iTemDesconto = 1;
   //die("ver_matric: $ver_matric - cgc: $oConfig->cgc");
 
@@ -1598,9 +1598,9 @@ function recibodesconto($numpre, $numpar, $tipo, $tipo_debito, $whereloteador, $
   $dDataUsu = date("Y-m-d",db_getsession("DB_datausu"));
 
   /**
-   * Alterado query para quando for cliente osório e regra 18 (REFIM)
-   * deve ser utilizado a data de operação para validação da regra e não
-   * a data de vencimento do débito
+   * Alterado query para quando for cliente osrio e regra 18 (REFIM)
+   * deve ser utilizado a data de operao para validao da regra e no
+   * a data de vencimento do dbito
    */
   $sqltipoparc = "select k40_codigo,
 	                       k40_todasmarc,
@@ -1626,9 +1626,9 @@ function recibodesconto($numpre, $numpar, $tipo, $tipo_debito, $whereloteador, $
   } else {
 
     /**
-     * Alterado query para quando for cliente osório e regra 18 (REFIM)
-     * deve ser utilizado a data de operação para validação da regra e não
-     * a data de vencimento do débito
+     * Alterado query para quando for cliente osrio e regra 18 (REFIM)
+     * deve ser utilizado a data de operao para validao da regra e no
+     * a data de vencimento do dbito
      */
     $sqltipoparc = "select k40_codigo,
 		                       k40_todasmarc,
@@ -1667,9 +1667,9 @@ function recibodesconto($numpre, $numpar, $tipo, $tipo_debito, $whereloteador, $
   } else {
 
     /**
-     * Alterado query para quando for cliente osório e regra 18 (REFIM)
-     * deve ser utilizado a data de operação para validação da regra e não
-     * a data de vencimento do débito
+     * Alterado query para quando for cliente osrio e regra 18 (REFIM)
+     * deve ser utilizado a data de operao para validao da regra e no
+     * a data de vencimento do dbito
      */
     $sqltipoparcdeb = "select k40_codigo, k40_todasmarc
 											   from cadtipoparcdeb
@@ -1700,7 +1700,7 @@ function recibodesconto($numpre, $numpar, $tipo, $tipo_debito, $whereloteador, $
 }
 
 /**
- * Quando houver agrupamento de débitos verifica no arrecad os débitos RETORNANDO NUMPRE E NUMPAR dos relacionados.
+ * Quando houver agrupamento de dbitos verifica no arrecad os dbitos RETORNANDO NUMPRE E NUMPAR dos relacionados.
  * @param array  $aNumpre_Numpar
  */
 function retornaDebitosAgrupados($aNumpre_Numpar, $iTipoDebito, $sTabela, $sWhere){

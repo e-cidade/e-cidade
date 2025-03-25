@@ -127,11 +127,11 @@ class Suplementacao {
    */
   public function getvalorSuplementacao() {
 
-    $sSqlTotalSuplementacao  = "select sum(o47_valor) as soma_suplem ";
+    $sSqlTotalSuplementacao  = "select coalesce(sum(o47_valor), 0) as soma_suplem ";
     $sSqlTotalSuplementacao .= "  from orcsuplemval ";
     $sSqlTotalSuplementacao .= " where o47_codsup={$this->iCodigo} and o47_valor > 0";
     $sSqlTotalSuplementacao .= " union all ";
-    $sSqlTotalSuplementacao .= "select sum(o136_valor) as soma_suplem ";
+    $sSqlTotalSuplementacao .= "select coalesce(sum(o136_valor), 0) as soma_suplem ";
     $sSqlTotalSuplementacao .= "  from orcsuplemdespesappa ";
     $sSqlTotalSuplementacao .= " where o136_orcsuplem={$this->iCodigo} and o136_valor > 0";
     $rsTotalSuplementacao    = db_query($sSqlTotalSuplementacao);

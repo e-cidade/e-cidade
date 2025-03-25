@@ -48,6 +48,7 @@ class cl_liclicitemlote
     var $l04_descricao = null;
     var $l04_seq = null;
     var $l04_numerolote = null;
+    var $l04_codlilicitalote = null;
     // cria propriedade com as variaveis do arquivo
     var $campos = "
                  l04_codigo = int8 = Cód. Sequencial
@@ -158,6 +159,7 @@ class cl_liclicitemlote
                                       ,l04_descricao
                                       ,l04_seq
                                       ,l04_numerolote
+                                      ,l04_codlilicitalote
                        )
                 values (
                                 $this->l04_codigo
@@ -165,6 +167,7 @@ class cl_liclicitemlote
                                ,'$this->l04_descricao'
                                ,$this->l04_seq
                                ,$this->l04_numerolote
+                               ,$this->l04_codlilicitalote
                       )";
         $result = db_query($sql);
         if ($result == false) {
@@ -247,6 +250,19 @@ class cl_liclicitemlote
                 return false;
             }
         }
+        if (trim($this->l04_codlilicitalote) != "" || isset($GLOBALS["HTTP_POST_VARS"]["l04_codlilicitalote"])) {
+            $sql  .= $virgula . " l04_codlilicitalote = '$this->l04_codlilicitalote' ";
+            $virgula = ",";
+            if (trim($this->l04_codlilicitalote) == null) {
+                $this->erro_sql = " Campo Lote não informado.";
+                $this->erro_campo = "l04_codlilicitalote";
+                $this->erro_banco = "";
+                $this->erro_msg   = "Usuário: \\n\\n " . $this->erro_sql . " \\n\\n";
+                $this->erro_msg   .=  str_replace('"', "", str_replace("'", "",  "Administrador: \\n\\n " . $this->erro_banco . " \\n"));
+                $this->erro_status = "0";
+                return false;
+            }
+        }
         $sql .= " where ";
         if ($l04_codigo != null) {
             $sql .= " l04_codigo = $this->l04_codigo";
@@ -306,6 +322,7 @@ class cl_liclicitemlote
         } else {
             $resaco = $this->sql_record($this->sql_query_file(null, "*", null, $dbwhere));
         }
+
         if (($resaco != false) || ($this->numrows != 0)) {
             for ($iresaco = 0; $iresaco < $this->numrows; $iresaco++) {
                 $resac = db_query("select nextval('db_acount_id_acount_seq') as acount");
@@ -330,6 +347,7 @@ class cl_liclicitemlote
         } else {
             $sql2 = $dbwhere;
         }
+
         $result = db_query($sql . $sql2);
         if ($result == false) {
             $this->erro_banco = str_replace("\n", "", @pg_last_error());

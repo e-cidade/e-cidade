@@ -5289,7 +5289,7 @@ function gerfsal($opcao_geral=null,$opcao_tipo=1)
             -(strtolower($d08_carnes)=="riogrande"?0:$valor_ferias_ )),2) <= 0 ) {
               db_delete("gerfsal", bb_condicaosubpes("r14_").$condicaoaux );
             } else {
-              $valor = ( (round(( $salario / 30 ) * ($dias_pagamento-$F019) ,2))
+              $valor = ( (round(( $salario / 30 ) * $dias_pagamento ,2))
               - (strtolower($d08_carnes)=="riogrande"? 0:$valor_ferias_ ));
 
               $matriz1 = array();
@@ -5306,7 +5306,7 @@ function gerfsal($opcao_geral=null,$opcao_tipo=1)
                 if ($F019 > 0 &&  'f' == $cadferia[0]["r30_paga13"] ) {
                   $quantidade = ( $qtd_salario/30) * ( $dividir_por - $dias_maternidade - (strtolower($d08_carnes)=="riogrande"? 0: $F019 ) );
                 } else {
-                  $quantidade = ( $qtd_salario/30) * ( 30 - $dias_maternidade - $F019 );
+                  $quantidade = ( $qtd_salario/30) * ( 30 - $dias_maternidade );
                 }
                 $matriz1[1] = "r14_quant";
                 $matriz2[1] = round($quantidade,2);
@@ -5707,16 +5707,6 @@ function gerfsal($opcao_geral=null,$opcao_tipo=1)
 
         $oFeriasPremio = db_utils::fieldsMemory($rsFeriasPremio, 0);
         inserirFeriasPremio($pessoal[$Ipessoal]["r01_regist"], $cfpess[0]['r11_feriaspremio'], $oFeriasPremio, $anousu, $mesusu);
-    }
-    
-    // //Calculo Plano de saude
-     $condicaops   = " r75_anousu = {$anousu} and r75_mesusu = {$mesusu} and r75_regist = " . db_sqlformat($pessoal[$Ipessoal]["r01_regist"]) ." group by r75_regist, r75_anousu, r75_mesusu, rh02_lota";
-     $joinps       = "inner join rhpessoalmov on rh02_regist = r75_regist and rh02_anousu = r75_anousu and r75_mesusu = rh02_mesusu";
-     $rsPlanoSaude = db_query("select sum(r75_valor) r75_valor,r75_regist,r75_anousu,r75_mesusu, rh02_lota from planosaude " .$joinps ." where " . $condicaops);
-     if ($opcao_geral == 1 && pg_num_rows($rsPlanoSaude) > 0 && !empty($cfpess[0]['r11_planosaude'])) {
-
-         $oPlanoSaude = db_utils::fieldsMemory($rsPlanoSaude, 0);
-         inserirPlanoSaude($pessoal[$Ipessoal]["r01_regist"], $cfpess[0]['r11_planosaude'], $oPlanoSaude, $anousu, $mesusu);
      }
 }
 
@@ -5803,7 +5793,36 @@ function ajusta_previdencia($arquivo, $rubrica_base, $sequencia, $sigla_ajuste)
       $numcgm = $previdencia_[$Ipreviden]["r60_numcgm"];
       $tbprev = $previdencia_[$Ipreviden]["r60_tbprev"];
       $registro = $previdencia_[$Ipreviden]["r60_regist"];
-      //echo "<BR> rubrica 35.2104 -->$numcgm  r60_regist --> $registro"; // reis
+      //echo "<BR> rubrica 35.2104 -->$numcgm  r60_regist --> $registro";
+      $soma_base = 0;
+      $soma_base_F = 0;
+      $soma_base_D = 0;
+      $checkPrevidenciaDiferente = false;
+      $checkDiferenteRegistPorCgm = false;
+      for ($Ipreviden2=$Ipreviden; $Ipreviden2 < count($previdencia_); $Ipreviden2++) {
+        if ($previdencia_[$Ipreviden2]["r60_numcgm"] == $numcgm && $previdencia_[$Ipreviden2]["r60_tbprev"] != $tbprev ) {
+          $checkPrevidenciaDiferente = true;
+          break;
+        }
+        if ($previdencia_[$Ipreviden2]["r60_numcgm"] != $numcgm) {
+          break;
+        }
+        if ($previdencia_[$Ipreviden2]["r60_regist"] != $previdencia_[$Ipreviden]["r60_regist"]) {
+          $checkDiferenteRegistPorCgm = true;
+        }
+
+        $soma_base   += $previdencia_[$Ipreviden2]["r60_base"];
+        $soma_base_F += $previdencia_[$Ipreviden2]["r60_basef"];
+
+        $Ipreviden = $Ipreviden2;
+      }
+      if (!$checkDiferenteRegistPorCgm) {
+        continue;
+      }
+      if ($checkPrevidenciaDiferente) {
+        ajusta_previdencia_diferente_tbprev($arquivo, $rubrica_base, $sigla_ajuste, $previdencia_[$Ipreviden]);
+        continue;
+      }
 
       $soma_base_teto = 0;
       if($rubrica_base == 'R985' && $arquivo == 'gerfsal' ){
@@ -5815,10 +5834,6 @@ function ajusta_previdencia($arquivo, $rubrica_base, $sequencia, $sigla_ajuste)
         }
       }
       //echo "<BR> soma_base_teto --> $soma_base_teto";
-
-      $soma_base = 0;
-      $soma_base_F = 0;
-      $soma_base_D = 0;
 
       global $pessoal_2,$pessoal_3;
       $condicaoaux = " and rh01_numcgm = ".db_sqlformat($previdencia_[$Ipreviden]["r60_numcgm"]);
@@ -5840,20 +5855,6 @@ function ajusta_previdencia($arquivo, $rubrica_base, $sequencia, $sigla_ajuste)
                                 from rhpessoalmov
                                 left join rhinssoutros on rh51_seqpes = rhpessoalmov.rh02_seqpes
                                 left join rhregime     on rh30_codreg = rhpessoalmov.rh02_codreg ".bb_condicaosubpes("rh02_" ).$condicaoaux );
-
-      for ($Ipreviden2=$Ipreviden; $Ipreviden2 < count($previdencia_); $Ipreviden2++) {
-        //echo "<BR> rubrica 35.2104 -->$numcgm  rubrica baser --> $rubrica_base"; // reis
-        if ($previdencia_[$Ipreviden2]["r60_numcgm"] == $numcgm && $previdencia_[$Ipreviden2]["r60_tbprev"] == $tbprev ) {
-          //echo "<BR> registro --> ".$previdencia_[$Ipreviden2]["r60_regist"] . " base --> ".$previdencia_[$Ipreviden2]["r60_base"];
-          $soma_base   += $previdencia_[$Ipreviden2]["r60_base"];
-          $soma_base_F += $previdencia_[$Ipreviden2]["r60_basef"];
-
-          $Ipreviden = $Ipreviden2;
-        } else {
-          $Ipreviden = $Ipreviden2 - 1;
-          break;
-        }
-      }
 
       $soma_base_D = $soma_base - $soma_base_F;
 
@@ -14372,36 +14373,6 @@ function insertRubricasEspeciaisAviso($matriz1, $matriz2, $cfpess, $arrValoresAv
 
 }
 
-function inserirPlanoSaude($regist, $r11_planosaude, $oPlanoSaude, $anousu, $mesusu){
-
-    $r75_valor = $oPlanoSaude->r75_valor;
-    $r75_lotac = $oPlanoSaude->rh02_lota;
-
-    $matriz_insertps1[1]  = "r14_regist";
-    $matriz_insertps1[2]  = "r14_rubric";
-    $matriz_insertps1[3]  = "r14_lotac";
-    $matriz_insertps1[4]  = "r14_valor";
-    $matriz_insertps1[5]  = "r14_quant";
-    $matriz_insertps1[6]  = "r14_pd";
-    $matriz_insertps1[7]  = "r14_semest";
-    $matriz_insertps1[8]  = "r14_anousu";
-    $matriz_insertps1[9]  = "r14_mesusu";
-    $matriz_insertps1[10] = "r14_instit";
-
-    $matriz_insertps2[1]  = $regist;
-    $matriz_insertps2[2]  = $r11_planosaude;
-    $matriz_insertps2[3]  = $r75_lotac;
-    $matriz_insertps2[4]  = $r75_valor;
-    $matriz_insertps2[5]  = 1;
-    $matriz_insertps2[6]  = 2;
-    $matriz_insertps2[7]  = 0;
-    $matriz_insertps2[8]  = $anousu;
-    $matriz_insertps2[9]  = $mesusu;
-    $matriz_insertps2[10] = db_getsession("DB_instit");
-    db_insert("gerfsal", $matriz_insertps1, $matriz_insertps2);
-
-}
-
 function inserirFeriasPremio($regist, $r11_feriaspremio, $oFeriasPremio, $anousu, $mesusu) {
 
     $condicaoaux = " and rh27_calcp = 't' and rh27_pd = 1 and r53_regist = " . db_sqlformat($regist);
@@ -14506,290 +14477,239 @@ function inserirFeriasPremio($regist, $r11_feriaspremio, $oFeriasPremio, $anousu
     }
 }
 
-function ajusta_previdencia_diferente_tbprev($arquivo, $rubrica_base, $sigla_ajuste)
+function ajusta_previdencia_diferente_tbprev($arquivo, $rubrica_base, $sigla_ajuste, $previdencia)
 {
   global $previden_,$opcao_geral,$subpes,$perc_inss;
   global ${$arquivo},$cfpess, $db_debug;
 
-  $matriz1 = array();
-  $matriz2 = array();
-  $matriz1[1] = "r60_ajuste";
-  $matriz2[1] = 'f';
+  $numcgm = $previdencia["r60_numcgm"];
+  $tbprev = $previdencia["r60_tbprev"];
+  $registro = $previdencia["r60_regist"];
 
-  db_update("previden", $matriz1, $matriz2, bb_condicaosubpes("r60_"));
-
-  if (db_selectmax("previden_", "select * from previden ".bb_condicaosubpes("r60_") ) ) {
-
-    // Todos que foram alterados vao sofrer ajuste
-    $condicaoaux  = " and r60_altera = 't' and r60_rubric = ".db_sqlformat($rubrica_base );
-    if($arquivo == 'gerfsal' ){
-       $condicaoaux  .= " and r60_folha = 'S'";
-    }elseif($arquivo == 'gerfcom' ){
-       $condicaoaux  .= " and r60_folha = 'C'";
+  $soma_base_teto = 0;
+  if($rubrica_base == 'R985' && $arquivo == 'gerfsal' ){
+    $condicaoaux  = " and r60_rubric = 'R987'";
+    $condicaoaux .= " and r60_numcgm = ".db_sqlformat($numcgm );
+    global $transacao1;
+    if( db_selectmax("transacao1", "select sum(r60_basef) as soma_basef from previden ".bb_condicaosubpes("r60_" ).$condicaoaux )){
+        $soma_base_teto = $transacao1[0]["soma_basef"];
     }
-    db_selectmax("previden_", "select * from previden ".bb_condicaosubpes("r60_").$condicaoaux );
-    for ($Ipreviden=0; $Ipreviden<count($previden_); $Ipreviden++) {
-      //echo "<BR> rubrica 35.1.1 numcgm -->".$previden_[$Ipreviden]["r60_numcgm"]."  rubrica baser --> $rubrica_base  r60_altera --> ".$previden_[$Ipreviden]["r60_altera"];  // reis
-      $numcgm = $previden_[$Ipreviden]["r60_numcgm"];
-      $matriz2[1] = 't' ;
-      $condicaoaux  = " and r60_numcgm = ".db_sqlformat($numcgm );
-      $condicaoaux .= " and r60_rubric = ".db_sqlformat($rubrica_base );
-      if ($arquivo == "gerfcom") {
-        $condicaoaux .= " and upper(r60_folha) in ('C','E') ";
-      }
-      db_update("previden", $matriz1, $matriz2, bb_condicaosubpes("r60_").$condicaoaux );
+  }
+
+  $soma_base = 0;
+  $soma_base_F = 0;
+  $soma_base_D = 0;
+
+  global $pessoal_2,$pessoal_3;
+  $condicaoaux = " and rh01_numcgm = ".db_sqlformat($previdencia["r60_numcgm"]);
+
+  db_selectmax("pessoal_3", "select sum(RH51_B13FO) as soma_b13fo,
+                                    sum(RH51_DESCFO) as soma_descfo,
+                                    sum(RH51_BASEFO) as soma_basefo,
+                                    sum(RH51_D13FO) as  soma_d13fo
+                            from rhpessoalmov
+                            inner join rhpessoal   on rh01_regist = rhpessoalmov.rh02_regist
+                            left join rhinssoutros on rh51_seqpes = rhpessoalmov.rh02_seqpes ".bb_condicaosubpes("rh02_" ).$condicaoaux );
+
+
+  $condicaoaux = " and rh02_regist = ".db_sqlformat($previdencia["r60_regist"] );
+  db_selectmax("pessoal_2", "select rh02_tpcont as r01_tpcont,
+                                    trim(TO_CHAR(RH02_LOTA,'9999')) as r01_lotac,
+                                    RH30_VINCULO as r01_tpvinc
+                            from rhpessoalmov
+                            left join rhinssoutros on rh51_seqpes = rhpessoalmov.rh02_seqpes
+                            left join rhregime     on rh30_codreg = rhpessoalmov.rh02_codreg ".bb_condicaosubpes("rh02_" ).$condicaoaux );
+
+  $soma_base_D = $soma_base - $soma_base_F;
+
+  $mat_r60_numcgm = array();
+  $mat_r60_tbprev = array();
+  $mat_r60_rubric = array();
+  $mat_r60_regist = array();
+  $mat_r60_folha  = array();
+  $mat_r60_novods = array();
+  $mat_r60_novodf = array();
+  $mat_r60_dif    = array();
+  $mat_r60_novop  = array();
+  $nro = 0;
+
+  $soma_base1 = 0;
+  $desc_prev_ext = 0;
+  global $pessoaltipoprevidencia_;
+  db_selectmax("pessoaltipoprevidencia_", "select rh02_tbprev
+                            from rhpessoalmov
+                            ".bb_condicaosubpes("rh02_" )." and rh02_regist = {$registro}");
+  if ($pessoaltipoprevidencia_[0]["rh02_tbprev"] == $cfpess[0]["r11_tbprev"]) {
+
+    if ($rubrica_base == "R986" ) {
+      $soma_base1 = $pessoal_3[0]["soma_b13fo"];
+      $desc_prev_ext = $pessoal_3[0]["soma_d13fo"];
+    }else{
+      $soma_base1 = $pessoal_3[0]["soma_basefo"];
+      $desc_prev_ext = $pessoal_3[0]["soma_descfo"];
+      $soma_base_D = ($soma_base+$pessoal_3[0]["soma_basefo"]) - $soma_base_F ;
     }
-    $condicaoaux  = " and r60_ajuste = 't' and r60_rubric = ".db_sqlformat($rubrica_base );
-    if($arquivo == 'gerfcom' ){
-       $condicaoaux  .= " and r60_folha = 'C'";
+  }
+  
+  $soma_base1 = $soma_base+$soma_base1;
+
+//ferias($registro);
+  if($arquivo == 'gerffer' ){
+    //echo "<BR> soma_base_F --> $soma_base_F";
+    $perc_inss = 0;
+    if($soma_base_F != 0 ){
+        $valor_desc_total_F = teto_tabprev($soma_base_F, db_str($tbprev+2,1),$pessoal_2[0]["r01_tpcont"]);
+        if($valor_desc_total_F <= 0 ){
+          $valor_desc_total_F = calc_tabprev($soma_base_F, db_str($tbprev+2,1),$pessoal_2[0]["r01_tpcont"]);
+        }
     }
-    $condicaoaux  .= " order by r60_numcgm, r60_regist";
-    global $previdencia_;
-    //db_criatabela(pg_query("select * from previden ".bb_condicaosubpes("r60_" ).$condicaoaux ));
-    db_selectmax("previdencia_", "select * from previden ".bb_condicaosubpes("r60_" ).$condicaoaux );
-    for ($Ipreviden=0; $Ipreviden<count($previdencia_); $Ipreviden++) {
-      $numcgm = $previdencia_[$Ipreviden]["r60_numcgm"];
-      $tbprev = $previdencia_[$Ipreviden]["r60_tbprev"];
-      $registro = $previdencia_[$Ipreviden]["r60_regist"];
 
-      $soma_base_teto = 0;
-      if($rubrica_base == 'R985' && $arquivo == 'gerfsal' ){
-        $condicaoaux  = " and r60_rubric = 'R987'";
-        $condicaoaux .= " and r60_numcgm = ".db_sqlformat($numcgm );
-        global $transacao1;
-        if( db_selectmax("transacao1", "select sum(r60_basef) as soma_basef from previden ".bb_condicaosubpes("r60_" ).$condicaoaux )){
-            $soma_base_teto = $transacao1[0]["soma_basef"];
+    //echo "<BR> soma_base_D --> $soma_base_D";
+    $perc_inss = 0;
+    if($soma_base_D != 0 ){
+        $valor_desc_total_D = teto_tabprev($soma_base_D, db_str($tbprev+2,1),$pessoal_2[0]["r01_tpcont"]);
+        if($valor_desc_total_D <= 0 ){
+          $valor_desc_total_D = calc_tabprev($soma_base_D, db_str($tbprev+2,1),$pessoal_2[0]["r01_tpcont"]);
         }
+    }
+  }else{
+    //echo "<BR>   if($rubrica_base = 'R985' && $arquivo == 'gerfsal' && isset($soma_base_teto) && $soma_base_teto > 0){";
+    if($rubrica_base == 'R985' && $arquivo == 'gerfsal' && isset($soma_base_teto) && $soma_base_teto > 0){
+        $valor_desconto_total = teto_tabprev($soma_base_teto, db_str($tbprev+2,1),$pessoal_2[0]["r01_tpcont"]);
+    }
+    $valor_desconto_total = calc_tabprev($soma_base1, db_str($tbprev+2,1),$pessoal_2[0]["r01_tpcont"]);
+    //echo "<BR> valor_desconto_total --> $valor_desconto_total --> soma_base1 --> $soma_base1";
+    $valor_a_ratear = $valor_desconto_total - $desc_prev_ext ;
+  }
+
+    $condicaoaux  = " and r60_numcgm = ".db_sqlformat($numcgm );
+    $condicaoaux .= " and r60_tbprev = ".db_sqlformat($tbprev );
+    $condicaoaux .= " and r60_rubric = ".db_sqlformat($rubrica_base );
+    $condicaoaux .= " and r60_altera = 't' ";
+    $sql = "select previden.*,
+                    rh30_vinculo as r01_tpvinc
+            from previden
+            inner join rhpessoalmov on rh02_regist = r60_regist
+                                    and rh02_anousu = ".substr("#".$subpes,1,4)."
+                                    and rh02_mesusu = ".substr("#".$subpes,6,2)."
+            left join rhregime     on rh30_codreg = rh02_codreg ".bb_condicaosubpes("r60_" ).$condicaoaux;
+    if (db_selectmax("previden_", $sql )) {
+
+      $matriz1 = array();
+      $matriz2 = array();
+      $matriz1[1] = $sigla_ajuste."valor";
+      $matriz1[2] = $sigla_ajuste."quant";
+      for ($Ipreviden_=0; $Ipreviden_<count($previden_); $Ipreviden_++) {
+
+
+        $mat_r60_regist[$nro] = $previden_[$Ipreviden_]["r60_regist"];
+        $mat_r60_tpvinc[$nro] = $previden_[$Ipreviden_]["r01_tpvinc"];
+        $mat_r60_numcgm[$nro] = $numcgm;
+
+        if($arquivo != 'gerffer' ) {
+            if ($valor_a_ratear > 0) {
+              $novo_desconto = $valor_a_ratear;
+            } else {
+              $novo_desconto = 0;
+            }
+
+            $registrop = $previden_[$Ipreviden_]["r60_regist"];
+            $qual_folha = strtoupper($previden_[$Ipreviden_]["r60_folha"]);
+            $valor_desconto_fer = 0;
+            $valor_desconto_com = 0;
+            //echo "<BR> matricula --> $registrop novo_desconto --> $novo_desconto = round(".$previden_[$Ipreviden_]["r60_base"]." / $soma_base  * $valor_a_ratear,2 )" ;
+            //echo "<BR> 2------->  if ($opcao_geral != 3) {";
+            if ($opcao_geral != 3) {
+              $sqlfer = " select sum(".$sigla_ajuste."valor) as valor_desconto_fer
+                      from ".$arquivo."
+                          inner join rhpessoal on rh01_regist = ".$sigla_ajuste."regist
+                      ".bb_condicaosubpes($sigla_ajuste)."
+                      and ".$sigla_ajuste."rubric in ('R903','R906','R909','R912') and rh01_numcgm = $numcgm and rh01_regist = $registrop";
+              $resfer = pg_exec($sqlfer);
+              if($resfer ==false){
+                //echo "erro no ajuste da previdencia.";exit;
+              }
+              if(pg_numrows($resfer)>0){
+                $valor_desconto_fer = pg_result($resfer,0,0);
+                //echo "<BR>  salario matricula --> $registrop valor_desconto_fer --> $valor_desconto_fer";
+              }
+              if($arquivo == 'gerfsal'){
+                  $sqlfer = " select sum(r48_valor) as valor_desconto_fer
+                      from gerfcom
+                            inner join rhpessoal on rh01_regist = r48_regist
+                      ".bb_condicaosubpes('r48_')."
+                      and r48_rubric in ('R903','R906','R909','R912') and rh01_numcgm = $numcgm and rh01_regist = $registrop";
+                  $resfer = pg_exec($sqlfer);
+                  if($resfer ==false){
+                    //echo "erro no ajuste da previdencia.";exit;
+                  }
+                  if(pg_numrows($resfer)>0){
+                    $valor_desconto_fer += pg_result($resfer,0,0);
+                //echo "<BR>  complementar  matricula --> $registrop valor_desconto_fer --> $valor_desconto_fer";
+                  }
+                  $sqlcom = " select sum(r48_valor) as valor_desconto_com
+                      from gerfcom
+                            inner join rhpessoal on rh01_regist = r48_regist
+                      ".bb_condicaosubpes('r48_')."
+                      and r48_rubric in ('R901','R902','R904','R905','R907','R908','R910','R911') and rh01_numcgm = $numcgm and rh01_regist = $registrop";
+                  $rescom = pg_exec($sqlcom);
+                  if(pg_numrows($rescom)>0){
+                    $valor_desconto_com += pg_result($rescom,0,0);
+                  }
+              }
+            }
+            if ($pessoal_2[0]["r01_tpcont"] == "13") {
+              $perc_inss = 11;
+            }
+            $mat_r60_numcgm[$nro] = $numcgm;
+            $mat_r60_tbprev[$nro] = $tbprev;
+            $mat_r60_rubric[$nro] = $rubrica_base ;
+            $mat_r60_folha[$nro]  = $qual_folha;
+            $mat_r60_novods[$nro] = round($novo_desconto - $valor_desconto_com,2);
+            $mat_r60_novodf[$nro] = round($valor_desconto_fer,2);
+            $mat_r60_dif[$nro]    = round(($novo_desconto - $valor_desconto_com - $valor_desconto_fer),2);
+            //echo "<BR> mat_r60_dif --> ".$mat_r60_dif[$nro]."    = round(($novo_desconto - $valor_desconto_com - $valor_desconto_fer),2); ";
+            $mat_r60_novop[$nro]  = $perc_inss;
+            //echo "<BR> $numcgm  $tbprev  $rubrica_base  $registrop $qual_folha ".round($novo_desconto,2)." ".round($valor_desconto_fer,2)." $perc_inss ".$mat_r60_dif[$nro];
+
+        }
+        $nro++;
       }
 
-      $soma_base = 0;
-      $soma_base_F = 0;
-      $soma_base_D = 0;
+      if($opcao_geral != 3) {
 
-      global $pessoal_2,$pessoal_3;
-      $condicaoaux = " and rh01_numcgm = ".db_sqlformat($previdencia_[$Ipreviden]["r60_numcgm"]);
-
-      db_selectmax("pessoal_3", "select sum(RH51_B13FO) as soma_b13fo,
-                                        sum(RH51_DESCFO) as soma_descfo,
-                                        sum(RH51_BASEFO) as soma_basefo,
-                                        sum(RH51_D13FO) as  soma_d13fo
-                                from rhpessoalmov
-                                inner join rhpessoal   on rh01_regist = rhpessoalmov.rh02_regist
-                                left join rhinssoutros on rh51_seqpes = rhpessoalmov.rh02_seqpes ".bb_condicaosubpes("rh02_" ).$condicaoaux );
-
-
-      $condicaoaux = " and rh02_regist = ".db_sqlformat($previdencia_[$Ipreviden]["r60_regist"] );
-      db_selectmax("pessoal_2", "select rh02_tpcont as r01_tpcont,
-                                       trim(TO_CHAR(RH02_LOTA,'9999')) as r01_lotac,
-                                       RH30_VINCULO as r01_tpvinc
-                                from rhpessoalmov
-                                left join rhinssoutros on rh51_seqpes = rhpessoalmov.rh02_seqpes
-                                left join rhregime     on rh30_codreg = rhpessoalmov.rh02_codreg ".bb_condicaosubpes("rh02_" ).$condicaoaux );
-
-      for ($Ipreviden2=$Ipreviden; $Ipreviden2 < count($previdencia_); $Ipreviden2++) {
-        if ($previdencia_[$Ipreviden2]["r60_numcgm"] == $numcgm && $previdencia_[$Ipreviden2]["r60_tbprev"] == $tbprev ) {
-          $soma_base   += $previdencia_[$Ipreviden2]["r60_base"];
-          $soma_base_F += $previdencia_[$Ipreviden2]["r60_basef"];
-
-          $Ipreviden = $Ipreviden2;
-        } else {
-          $Ipreviden = $Ipreviden2 - 1;
-          break;
+        asort($mat_r60_dif);
+        $valor = 0;
+        foreach ($mat_r60_dif as $key => $val) {
+            if($val < 0){
+              $mat_r60_novods[$key] = $valor_desconto_fer;
+              $valor += $val;
+              //echo "<BR> mat_r60_novods --> ".$mat_r60_novods[$key]." valor_desconto_fer --> $valor_desconto_fer valor --> $valor val --> $val";
+            }else{
+              //echo "<BR> 1 mat_r60_novods --> ".$mat_r60_novods[$key]." valor --> $valor ";
+              $mat_r60_novods[$key] = $mat_r60_novods[$key] + $valor;
+              //echo "<BR> 2 mat_r60_novods --> ".$mat_r60_novods[$key]." valor --> $valor ";
+            }
         }
       }
-
-      $soma_base_D = $soma_base - $soma_base_F;
-
-      $mat_r60_numcgm = array();
-      $mat_r60_tbprev = array();
-      $mat_r60_rubric = array();
-      $mat_r60_regist = array();
-      $mat_r60_folha  = array();
-      $mat_r60_novods = array();
-      $mat_r60_novodf = array();
-      $mat_r60_dif    = array();
-      $mat_r60_novop  = array();
-      $nro = 0;
-
-      $soma_base1 = 0;
-      $desc_prev_ext = 0;
-      global $pessoaltipoprevidencia_;
-      db_selectmax("pessoaltipoprevidencia_", "select rh02_tbprev
-                                from rhpessoalmov
-                                ".bb_condicaosubpes("rh02_" )." and rh02_regist = {$registro}");
-      if ($pessoaltipoprevidencia_[0]["rh02_tbprev"] == $cfpess[0]["r11_tbprev"]) {
-
-        if ($rubrica_base == "R986" ) {
-          $soma_base1 = $pessoal_3[0]["soma_b13fo"];
-          $desc_prev_ext = $pessoal_3[0]["soma_d13fo"];
-        }else{
-          $soma_base1 = $pessoal_3[0]["soma_basefo"];
-          $desc_prev_ext = $pessoal_3[0]["soma_descfo"];
-          $soma_base_D = ($soma_base+$pessoal_3[0]["soma_basefo"]) - $soma_base_F ;
+      for($nro=0;$nro<count($mat_r60_numcgm);$nro++){
+        if($opcao_geral != 3 ) {
+          echo "<BR> 1-$nro> ".$mat_r60_numcgm[$nro]." ".$mat_r60_regist[$nro]." ".$mat_r60_novods[$nro]." ".$mat_r60_novop[$nro];
+          $matriz1 = array();
+          $matriz2 = array();
+          $matriz1[ 1 ] = "r60_novod";
+          $matriz1[ 2 ] = "r60_novop";
+          $matriz2[ 1 ] = $mat_r60_novods[$nro];
+          $matriz2[ 2 ] = $mat_r60_novop[$nro];
+          $condicaoaux  = " and r60_numcgm = ".db_sqlformat($mat_r60_numcgm[$nro] );
+          $condicaoaux .= " and r60_tbprev = ".db_sqlformat($mat_r60_tbprev[$nro] );
+          $condicaoaux .= " and r60_rubric = ".db_sqlformat($mat_r60_rubric[$nro] );
+          $condicaoaux .= " and r60_regist = ".db_sqlformat($mat_r60_regist[$nro] );
+          $condicaoaux .= " and upper(r60_folha)  = ".db_sqlformat(strtoupper($mat_r60_folha[$nro]) );
+          //echo "<BR> condicaoaux  --> $condicaoaux"; // reis
+          db_update("previden", $matriz1, $matriz2, bb_condicaosubpes("r60_").$condicaoaux );
         }
-      }
-      
-      $soma_base1 = $soma_base+$soma_base1;
-
-    //ferias($registro);
-      if($arquivo == 'gerffer' ){
-        //echo "<BR> soma_base_F --> $soma_base_F";
-        $perc_inss = 0;
-        if($soma_base_F != 0 ){
-           $valor_desc_total_F = teto_tabprev($soma_base_F, db_str($tbprev+2,1),$pessoal_2[0]["r01_tpcont"]);
-           if($valor_desc_total_F <= 0 ){
-              $valor_desc_total_F = calc_tabprev($soma_base_F, db_str($tbprev+2,1),$pessoal_2[0]["r01_tpcont"]);
-           }
-        }
-
-        //echo "<BR> soma_base_D --> $soma_base_D";
-        $perc_inss = 0;
-        if($soma_base_D != 0 ){
-           $valor_desc_total_D = teto_tabprev($soma_base_D, db_str($tbprev+2,1),$pessoal_2[0]["r01_tpcont"]);
-           if($valor_desc_total_D <= 0 ){
-              $valor_desc_total_D = calc_tabprev($soma_base_D, db_str($tbprev+2,1),$pessoal_2[0]["r01_tpcont"]);
-           }
-        }
-      }else{
-        //echo "<BR>   if($rubrica_base = 'R985' && $arquivo == 'gerfsal' && isset($soma_base_teto) && $soma_base_teto > 0){";
-        if($rubrica_base == 'R985' && $arquivo == 'gerfsal' && isset($soma_base_teto) && $soma_base_teto > 0){
-           $valor_desconto_total = teto_tabprev($soma_base_teto, db_str($tbprev+2,1),$pessoal_2[0]["r01_tpcont"]);
-        }
-        $valor_desconto_total = calc_tabprev($soma_base1, db_str($tbprev+2,1),$pessoal_2[0]["r01_tpcont"]);
-        //echo "<BR> valor_desconto_total --> $valor_desconto_total --> soma_base1 --> $soma_base1";
-        $valor_a_ratear = $valor_desconto_total - $desc_prev_ext ;
-      }
-
-      $condicaoaux  = " and r60_numcgm = ".db_sqlformat($numcgm );
-      $condicaoaux .= " and r60_tbprev = ".db_sqlformat($tbprev );
-      $condicaoaux .= " and r60_rubric = ".db_sqlformat($rubrica_base );
-      $condicaoaux .= " and r60_altera = 't' ";
-      $sql = "select previden.*,
-                     rh30_vinculo as r01_tpvinc
-              from previden
-              inner join rhpessoalmov on rh02_regist = r60_regist
-                                     and rh02_anousu = ".substr("#".$subpes,1,4)."
-                                     and rh02_mesusu = ".substr("#".$subpes,6,2)."
-              left join rhregime     on rh30_codreg = rh02_codreg ".bb_condicaosubpes("r60_" ).$condicaoaux;
-      if (db_selectmax("previden_", $sql )) {
-
-        $matriz1 = array();
-        $matriz2 = array();
-        $matriz1[1] = $sigla_ajuste."valor";
-        $matriz1[2] = $sigla_ajuste."quant";
-        for ($Ipreviden_=0; $Ipreviden_<count($previden_); $Ipreviden_++) {
-
-
-          $mat_r60_regist[$nro] = $previden_[$Ipreviden_]["r60_regist"];
-          $mat_r60_tpvinc[$nro] = $previden_[$Ipreviden_]["r01_tpvinc"];
-          $mat_r60_numcgm[$nro] = $numcgm;
-
-          if($arquivo != 'gerffer' ) {
-             if ($valor_a_ratear > 0) {
-                $novo_desconto = $valor_a_ratear;
-             } else {
-               $novo_desconto = 0;
-             }
-
-             $registrop = $previden_[$Ipreviden_]["r60_regist"];
-             $qual_folha = strtoupper($previden_[$Ipreviden_]["r60_folha"]);
-             $valor_desconto_fer = 0;
-             $valor_desconto_com = 0;
-             //echo "<BR> matricula --> $registrop novo_desconto --> $novo_desconto = round(".$previden_[$Ipreviden_]["r60_base"]." / $soma_base  * $valor_a_ratear,2 )" ;
-             //echo "<BR> 2------->  if ($opcao_geral != 3) {";
-             if ($opcao_geral != 3) {
-                $sqlfer = " select sum(".$sigla_ajuste."valor) as valor_desconto_fer
-                       from ".$arquivo."
-                            inner join rhpessoal on rh01_regist = ".$sigla_ajuste."regist
-                       ".bb_condicaosubpes($sigla_ajuste)."
-                       and ".$sigla_ajuste."rubric in ('R903','R906','R909','R912') and rh01_numcgm = $numcgm and rh01_regist = $registrop";
-                $resfer = pg_exec($sqlfer);
-                if($resfer ==false){
-                  //echo "erro no ajuste da previdencia.";exit;
-                }
-                if(pg_numrows($resfer)>0){
-                  $valor_desconto_fer = pg_result($resfer,0,0);
-                  //echo "<BR>  salario matricula --> $registrop valor_desconto_fer --> $valor_desconto_fer";
-                }
-                if($arquivo == 'gerfsal'){
-                   $sqlfer = " select sum(r48_valor) as valor_desconto_fer
-                        from gerfcom
-                             inner join rhpessoal on rh01_regist = r48_regist
-                        ".bb_condicaosubpes('r48_')."
-                        and r48_rubric in ('R903','R906','R909','R912') and rh01_numcgm = $numcgm and rh01_regist = $registrop";
-                   $resfer = pg_exec($sqlfer);
-                   if($resfer ==false){
-                      //echo "erro no ajuste da previdencia.";exit;
-                   }
-                   if(pg_numrows($resfer)>0){
-                      $valor_desconto_fer += pg_result($resfer,0,0);
-                  //echo "<BR>  complementar  matricula --> $registrop valor_desconto_fer --> $valor_desconto_fer";
-                   }
-                   $sqlcom = " select sum(r48_valor) as valor_desconto_com
-                        from gerfcom
-                             inner join rhpessoal on rh01_regist = r48_regist
-                        ".bb_condicaosubpes('r48_')."
-                        and r48_rubric in ('R901','R902','R904','R905','R907','R908','R910','R911') and rh01_numcgm = $numcgm and rh01_regist = $registrop";
-                   $rescom = pg_exec($sqlcom);
-                   if(pg_numrows($rescom)>0){
-                      $valor_desconto_com += pg_result($rescom,0,0);
-                   }
-                }
-             }
-             if ($pessoal_2[0]["r01_tpcont"] == "13") {
-               $perc_inss = 11;
-             }
-             $mat_r60_numcgm[$nro] = $numcgm;
-             $mat_r60_tbprev[$nro] = $tbprev;
-             $mat_r60_rubric[$nro] = $rubrica_base ;
-             $mat_r60_folha[$nro]  = $qual_folha;
-             $mat_r60_novods[$nro] = round($novo_desconto - $valor_desconto_com,2);
-             $mat_r60_novodf[$nro] = round($valor_desconto_fer,2);
-             $mat_r60_dif[$nro]    = round(($novo_desconto - $valor_desconto_com - $valor_desconto_fer),2);
-             //echo "<BR> mat_r60_dif --> ".$mat_r60_dif[$nro]."    = round(($novo_desconto - $valor_desconto_com - $valor_desconto_fer),2); ";
-             $mat_r60_novop[$nro]  = $perc_inss;
-             //echo "<BR> $numcgm  $tbprev  $rubrica_base  $registrop $qual_folha ".round($novo_desconto,2)." ".round($valor_desconto_fer,2)." $perc_inss ".$mat_r60_dif[$nro];
-
-          }
-          $nro++;
-        }
-
-       if($opcao_geral != 3) {
-
-          asort($mat_r60_dif);
-          $valor = 0;
-          foreach ($mat_r60_dif as $key => $val) {
-             if($val < 0){
-                $mat_r60_novods[$key] = $valor_desconto_fer;
-                $valor += $val;
-                //echo "<BR> mat_r60_novods --> ".$mat_r60_novods[$key]." valor_desconto_fer --> $valor_desconto_fer valor --> $valor val --> $val";
-             }else{
-                //echo "<BR> 1 mat_r60_novods --> ".$mat_r60_novods[$key]." valor --> $valor ";
-                $mat_r60_novods[$key] = $mat_r60_novods[$key] + $valor;
-                //echo "<BR> 2 mat_r60_novods --> ".$mat_r60_novods[$key]." valor --> $valor ";
-             }
-          }
-       }
-       for($nro=0;$nro<count($mat_r60_numcgm);$nro++){
-         if($opcao_geral != 3 ) {
-            echo "<BR> 1-$nro> ".$mat_r60_numcgm[$nro]." ".$mat_r60_regist[$nro]." ".$mat_r60_novods[$nro]." ".$mat_r60_novop[$nro];
-            $matriz1 = array();
-            $matriz2 = array();
-            $matriz1[ 1 ] = "r60_novod";
-            $matriz1[ 2 ] = "r60_novop";
-            $matriz2[ 1 ] = $mat_r60_novods[$nro];
-            $matriz2[ 2 ] = $mat_r60_novop[$nro];
-            $condicaoaux  = " and r60_numcgm = ".db_sqlformat($mat_r60_numcgm[$nro] );
-            $condicaoaux .= " and r60_tbprev = ".db_sqlformat($mat_r60_tbprev[$nro] );
-            $condicaoaux .= " and r60_rubric = ".db_sqlformat($mat_r60_rubric[$nro] );
-            $condicaoaux .= " and r60_regist = ".db_sqlformat($mat_r60_regist[$nro] );
-            $condicaoaux .= " and upper(r60_folha)  = ".db_sqlformat(strtoupper($mat_r60_folha[$nro]) );
-            //echo "<BR> condicaoaux  --> $condicaoaux"; // reis
-            db_update("previden", $matriz1, $matriz2, bb_condicaosubpes("r60_").$condicaoaux );
-          }
-          grava_ajuste_irrf($numcgm,$mat_r60_regist[$nro],$mat_r60_tpvinc[$nro]);
-        }
+        grava_ajuste_irrf($numcgm,$mat_r60_regist[$nro],$mat_r60_tpvinc[$nro]);
       }
     }
   }
-}

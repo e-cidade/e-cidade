@@ -91,6 +91,7 @@ if(isset($incluir)){
 db_menu(db_getsession("DB_id_usuario"),db_getsession("DB_modulo"),db_getsession("DB_anousu"),db_getsession("DB_instit"));
 ?>
 </body>
+
 </html>
 <script>
 js_tabulacaoforms("form1","q71_estrutural",true,1,"q71_estrutural",true);

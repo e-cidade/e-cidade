@@ -58,6 +58,10 @@ function montagemWhere($oParametros)
     return $sWhere;
   }
 
+  if(!empty($oParametros->instit)){
+    $sWhere .= " AND ac16_instit = $oParametros->instit ";
+  }  
+
   return $sWhere;
 }
 
@@ -164,6 +168,7 @@ $oParametros      = db_utils::postMemory($_GET);
 $sWhere = montagemWhere($oParametros);
 $sOrder = montagemOrderBy($oParametros->ordem);
 $clacordoitem = new cl_acordoitem;
+
 $sSql = $clacordoitem->sqlQuerySaldocontratos($sWhere, $sOrder);
 $rsMateriais = db_query($sSql);
 

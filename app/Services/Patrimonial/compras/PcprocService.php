@@ -36,7 +36,6 @@ class PcprocService
         $pcproc['pcproc']->usuario = utf8_encode($rsPcproc[0]->nome);
 
         $rsPcprocItem = $this->pcprocitemRepository->getItensLicitacao($codproc);
-
         $pcproc['itens'] = $this->formatItems($rsPcprocItem);
 
         return $pcproc;

@@ -57,12 +57,15 @@
 	           ve21_descr      as descr_marca,
 	           ve01_anofab     as ano_fabricacao,
 	           ve01_ranavam    as renavam,
-	           case 
-	           when (select ve04_veiculo from veicbaixa where ve04_veiculo = veiccentral.ve40_veiculos) is not null
-	           then 'SIM'
-	           else 'NAO'
-	           end as baixado";
-	
+				case
+					when exists (
+						select 1 
+						from veicbaixa 
+						where veicbaixa.ve04_veiculo = veiccentral.ve40_veiculos
+					) then 'SIM'
+					else 'NAO'
+				end as baixado
+				";
 	$sVeiculoCentral = $clveiccadcentral->sql_query_veiculoscentral(null,$sql,$xordem,$where);
 	$result_central =  $clveiccadcentral->sql_record($sVeiculoCentral);
 	

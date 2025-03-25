@@ -4,6 +4,7 @@ namespace App\Reports\Tributario\ISSQN\Redesim;
 
 use App\Models\ISSQN\InscricaoRedesim;
 use App\Repositories\Reports\FpdfBaseReports;
+use App\Support\String\StringHelper;
 use DBDate;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -164,10 +165,11 @@ class RelatorioInscricoes extends FpdfBaseReports
 
             $this->setY($altura + 5);
             $this->setX(149);
+            $descricaoAtividade = StringHelper::utf8_decode_all($oInscricaoRedesim->q03_descr);
             $this->Cell(
                 140,
                 5,
-                substr("{$oInscricaoRedesim->q03_ativ} - {$oInscricaoRedesim->q03_descr}", 0, 70),
+                substr("{$oInscricaoRedesim->q03_ativ} - {$descricaoAtividade}", 0, 70),
                 1,
                 0,
                 "L",

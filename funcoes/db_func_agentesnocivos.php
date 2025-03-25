@@ -1,0 +1,3 @@
+<?
+$campos = "agentesnocivos.rh232_sequencial, agentesnocivos.rh232_regist, agentesnocivos.rh232_agente, agentesnocivos.rh232_tipoavaliacao, agentesnocivos.rh232_icdexposicao, agentesnocivos.rh232_ltolerancia, agentesnocivos.rh232_unidade, agentesnocivos.rh232_tecnicamed, agentesnocivos.rh232_epc, agentesnocivos.rh232_epceficaz, agentesnocivos.rh232_epi, agentesnocivos.rh232_epieficaz, agentesnocivos.rh232_epicertificado, agentesnocivos.rh232_epidescricao, agentesnocivos.rh232_epiporinviabilidade, agentesnocivos.rh232_epiobscondicoes, agentesnocivos.rh232_epiobsuso, agentesnocivos.rh232_epiobsprazo, agentesnocivos.rh232_obsperiodicidade, agentesnocivos.rh232_obshigienizacao";
+?>

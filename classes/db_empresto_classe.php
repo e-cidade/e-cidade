@@ -826,7 +826,7 @@ class cl_empresto {
 
       return $sqlperiodo;
    }
-   function sql_rp_novo($anousu="",$instit="1",$dtini="",$dtfim="",$sql_where="",$sql_where_externo="",$order="") {
+   function sql_rp_novo($anousu="",$instit="1",$dtini="",$dtfim="",$sql_where="",$sql_where_externo="",$order="", $sSelect=null) {
 	//##// função usada no relatorio de rp, não esta cadastrada como classe externa
 	//##// $sql_where : caso queira filtrar por recurso, por exemplo
 	//##//
@@ -837,8 +837,9 @@ class cl_empresto {
      }	else {
      	 $where_datas = " between '$dtini' and '$dtfim' ";
      }
-    $sqlperiodo = "
-	select
+     
+    if ($sSelect == null) {
+      $sSelect = "	
 	    e91_numemp,
 	    e91_vlremp,
 	    e91_vlranu,
@@ -880,7 +881,11 @@ class cl_empresto {
 	    vlranuliq,
       vlranuliqnaoproc,
       c70_anousu,
-      e64_codele
+      e64_codele";
+    } 
+
+    $sqlperiodo = "select 
+    {$sSelect}
 	from (
 	  select
 	       e91_numemp,

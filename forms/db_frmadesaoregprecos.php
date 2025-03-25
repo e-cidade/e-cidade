@@ -558,7 +558,9 @@ if (strpos($_SERVER['HTTP_REFERER'], 'sic1_adesaoregprecos003.php')) {
     if(lei == 1){
       document.getElementById("trRegimeContratacao").style.display = '';
       document.getElementById("si06_regimecontratacao").value = "0";
+
       document.getElementById("tr_edital").style.display = 'none';
+      
       document.getElementById("tr_modalidade").style.display = 'none';
       document.getElementById("tr_nummodalidade").style.display = 'none';
       document.getElementById("si06_regimecontratacao").style.pointerEvents = "";
@@ -569,7 +571,9 @@ if (strpos($_SERVER['HTTP_REFERER'], 'sic1_adesaoregprecos003.php')) {
     if(lei == 2){
       document.getElementById("trRegimeContratacao").style.display = '';
       document.getElementById("si06_regimecontratacao").value = "1";
+
       document.getElementById("tr_edital").style.display = '';
+
       document.getElementById("tr_modalidade").style.display = '';
       document.getElementById("tr_nummodalidade").style.display = '';
       document.getElementById("si06_regimecontratacao").style.pointerEvents = "none";

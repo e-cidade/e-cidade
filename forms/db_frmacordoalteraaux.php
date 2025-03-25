@@ -188,7 +188,7 @@ db_app::load("dbtextFieldData.widget.js");
                             );
                           }
                           db_select('ac16_origem', $aValores, true, $db_opcao,
-                            " onchange='js_desabilitaselecionar();js_exibeBotaoJulgamento();js_validaCampoValor();' style='width:100%;'");
+                            " onchange='js_desabilitaselecionar();js_verificaorigem();js_exibeBotaoJulgamento();js_validaCampoValor();' style='width:100%;'");
 
                           ?>
                         </td>
@@ -210,6 +210,8 @@ db_app::load("dbtextFieldData.widget.js");
                             7 => '7 - Licitação - Regime Diferenciado de Contratações Públicas - RDC',
                             8 => '8 - Licitação realizada por consorcio público',
                             9 => '9 - Licitação realizada por outro ente da federação',
+                            10 =>'10 - Dispensa ou Inexigibilidade realizada por consórcio público',
+                            99 =>'99 - Contrato não decorrente de licitação',
                           );
                           db_select('ac16_tipoorigem', $aValores, true, $db_opcao,"onchange='js_verificatipoorigem()'","style='width:100%;'");
 
@@ -1298,6 +1300,24 @@ db_app::load("dbtextFieldData.widget.js");
 
         if (iAcordoOrigem != 0) {
             $('ac16_origem').options[0].disabled = true;
+        }
+    }
+
+    function js_verificaorigem() {
+        iOrigem = document.form1.ac16_origem.value;
+
+        if(iOrigem == 2){
+            let select = document.getElementById("ac16_tipoorigem");
+            let option = select.querySelector("option[value='99']");
+            if (option) option.remove();
+        } else {
+                    // Verificar se a opção já existe antes de adicioná-la
+            let select = document.getElementById("ac16_tipoorigem");
+            let existeOpcao = select.querySelector(`option[value='99']`);
+            if (!existeOpcao) {
+                let novaOption = new Option("99 - Contrato não decorrente de licitação", "99");
+                select.appendChild(novaOption); // Adiciona no final
+            }
         }
     }
 

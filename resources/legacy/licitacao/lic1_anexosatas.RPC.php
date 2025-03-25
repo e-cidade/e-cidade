@@ -82,7 +82,7 @@ switch ($oParam->exec) {
             WHEN l216_tipoanexo = 11 THEN 'Ata de Registro de Preço'
         END AS l216_tipoanexo";
 
-        $resultAnexos = $cl_licanexoataspncp->sql_record($cl_licanexoataspncp->sql_query(null, $campos, null, "l216_codigoata = $oParam->sequencial"));
+        $resultAnexos = $cl_licanexoataspncp->sql_record($cl_licanexoataspncp->sql_query(null, $campos, null, "l216_codigoata = $oParam->sequencial and l216_instit = ".db_getsession('DB_instit')));
 
         for ($iCont = 0; $iCont < pg_num_rows($resultAnexos); $iCont++) {
             $oDadosAnexo = db_utils::fieldsMemory($resultAnexos, $iCont);

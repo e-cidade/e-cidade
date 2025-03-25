@@ -249,6 +249,17 @@ $db_opcao = 1;
                   </tr>
                   <tr>
                     <td>
+                       <b>Quebra por OP:</b>
+                    </td>
+                    <td>
+                      <?
+                        $aQuebras = array(2 => "Sim", 1 => "Não");
+                        db_select("quebraOp", $aQuebras,true,1,"style='width:10em'");
+                      ?>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
                        <b>Ordem:</b>
                     </td>
                     <td>
@@ -593,7 +604,7 @@ function js_emitir() {
   oParametro.group       = $F('group');
   oParametro.credorsim   = $F('credorsim');
   oParametro.tipo        = $F('tipo');
-
+  oParametro.quebraOp    = $F('quebraOp');
 
   /*OC4581*/
   oParametro.iTipoLancamento = $F('iTipoLancamento');

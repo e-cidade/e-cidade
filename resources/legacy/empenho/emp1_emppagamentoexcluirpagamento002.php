@@ -72,6 +72,7 @@ $clsaltes         = new cl_saltes;
 $clconplanoreduz  = new cl_conplanoreduz;
 $clconlancamord   = new cl_conlancamord;
 $clconlancamlr    = new cl_conlancamlr;
+$clMovimentacao   = new cl_movimentacaodedivida();
 
 
 /**
@@ -450,6 +451,9 @@ db_postmemory($HTTP_POST_VARS);
 	  	    	c99_instit = ".db_getsession("DB_instit");
 
 	  	    	$rsSqlMesFechado = db_query($sqlMesFechado);
+				$sqlMovimento = $clempord->sql_query_file(null,$e50_codord);
+				$rsMovimento  = $clempord->sql_record($sqlMovimento);
+				$qtdeMov      = $clempord->numrows;			
 
 		  	    if(pg_num_rows($rsSqlMesFechado) > 0){
 
@@ -637,6 +641,22 @@ db_postmemory($HTTP_POST_VARS);
                          echo "<script> alert('Houve um erro ao excluir o pagamento! {$erro_msg}');</script>";
                          db_redireciona('emp1_emppagamentoexcluirpagamento001.php');
                      }else {
+						if($qtdeMov!=0){
+							for ($t = 0; $t < $qtdeMov; $t++) {
+								$oMovimento = db_utils::fieldsMemory($rsMovimento, $t);
+              					$sSqlMovimentaca = $clMovimentacao->sql_query_file(null, "*", null, "op02_codigoplanilha = {$oMovimento->e82_codmov} " );
+              					$rsMovimentaca   = $clMovimentacao->sql_record($sSqlMovimentaca);
+              					if ($clMovimentacao->numrows > 0) {
+									for ($i = 0; $i < $clMovimentacao->numrows; $i++) {
+										$oDadosMovimentacao = db_utils::fieldsMemory($rsMovimentaca, $i); 
+										$clMovimentacao->excluir($oDadosMovimentacao->op02_sequencial);
+										if ($clMovimentacao->erro_status == "0"){
+											echo "<script> alert('Erro ao excluir movimentação.');</script>";
+										} 
+								    }
+								}
+							}
+						}
 			           echo "<script> alert('Pagamento excluído com sucesso!');</script>";
 			           db_redireciona('emp1_emppagamentoexcluirpagamento001.php');
 					 }

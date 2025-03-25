@@ -286,7 +286,6 @@ if (isset($db21_usasisagua) && $db21_usasisagua != '') {
       }
 
       function js_emiterecibo() {
-
         if(document.getElementById('forcarvencimento')){
 
           var forcarvencimento = debitos.document.createElement("INPUT");
@@ -340,7 +339,13 @@ if (isset($db21_usasisagua) && $db21_usasisagua != '') {
                parameters: 'json='+Object.toJSON(oParam),
                onComplete:
                  function(oAjax2) {
-
+                  var response = eval("("+oAjax2.responseText+")");
+                  if(response.code == 4){
+                    alert('Para emitir o recibo / carnê você deve selecionar todos os débitos da CDA');
+                  }else if (response.code == 5){
+                    alert('Para emitir o recibo / carnê você não deve selecionar débitos que não foram a protesto');
+                  }
+                 
                    var oRetorno = eval("("+oAjax2.responseText+")");
                    oParam.oDadosForm.k00_numpre = oRetorno.aNumpresForm[0];
                    var sMsg     = oRetorno.message.urlDecode().replace("/\\n/g","\n");
@@ -2229,6 +2234,18 @@ if (@$tipo_pesq[0] != "numpre") { // inicio do tipo de certidao
     </tr>
     </table>\n";
   }
+
+  $codigoParcelamento = $_POST['v07_parcel'];
+  $sqlParcelamento = "select * from cartorio.titulos where termo = $codigoParcelamento 
+  and status = 'PROTESTADO' or status = 'PROTESTO POR EDITAL'";
+  $sqlExecutar = db_query($sqlParcelamento);
+  $count = pg_num_rows($sqlExecutar);
+
+  if($count > 0)
+  {
+    echo "<p class='links' style='color:#FF0000'>CDA PROTESTADA</p>";
+  }
+
 
   ?>
   </td>

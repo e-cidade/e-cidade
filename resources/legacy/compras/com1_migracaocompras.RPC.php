@@ -6,7 +6,7 @@ use App\Models\PcSubGrupo;
 use App\Repositories\Patrimonial\Compras\PcgrupoRepository;
 use App\Services\ExcelService;
 use App\Repositories\Patrimonial\Compras\PcSubGrupoRepository;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 require_once("libs/db_stdlib.php");
 require_once("libs/db_app.utils.php");

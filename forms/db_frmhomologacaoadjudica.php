@@ -369,11 +369,11 @@ db_app::load("estilos.css, grid.style.css");
         var valor = document.getElementById('valor').value;
 
         if (pdf.checked) {
-            jan = window.open('lic1_homologacaoadjudica004.php?impjust=$impjustificativa&codigo_preco=' + ilicita + '&nome=' + nome + '&sequencial=' + sequencial + '&data=' + data + '&valor=' + valor + '&quant_casas=2&tipoprecoreferencia=',
+            jan = window.open('lic1_homologacaoadjudica004.php?codigoLicitacao=' + ilicita + '&tipoRelatorio=Homologacao' ,
                 'width=' + (screen.availWidth - 5) + ',height=' + (screen.availHeight - 40) + ',scrollbars=1,location=0 ');
             jan.moveTo(0, 0);
         } else if (word.checked) {
-            jan = window.open('lic1_homologacaoadjudica005.php?impjust=$impjustificativa&codigo_preco=' + ilicita + '&nome=' + nome + '&sequencial=' + sequencial + '&data=' + data + '&valor=' + valor + '&quant_casas=2&tipoprecoreferencia=',
+            jan = window.open('lic1_homologacaoadjudica005.php?codigoLicitacao=' + ilicita + '&tipoRelatorio=Homologacao' ,
                 'width=' + (screen.availWidth - 5) + ',height=' + (screen.availHeight - 40) + ',scrollbars=1,location=0 ');
             jan.moveTo(0, 0);
         }

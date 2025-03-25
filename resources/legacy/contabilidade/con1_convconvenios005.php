@@ -7,9 +7,8 @@ include("dbforms/db_funcoes.php");
 include("classes/db_convconvenios_classe.php");
 include("classes/db_convdetalhaconcedentes_classe.php");
 $clconvconvenios = new cl_convconvenios;
-  /*
 $clconvdetalhaconcedentes = new cl_convdetalhaconcedentes;
-  */
+ 
 db_postmemory($HTTP_POST_VARS);
    $db_opcao = 22;
 $db_botao = false;
@@ -22,13 +21,58 @@ if(isset($alterar)){
   }
   $erro_msg = $clconvconvenios->erro_msg;
   db_fim_transacao($sqlerro);
-   $db_opcao = 2;
-   $db_botao = true;
+  $db_opcao = 2;
+  $db_botao = true;
+
+  if(!empty($c206_sequencial)) {
+
+    $pacote_detalhamentos = '[' . str_replace('\"', '"', $pacote_detalhamentos) . ']';
+    $pacote_detalhamentos = json_decode(mb_convert_encoding($pacote_detalhamentos,'UTF-8', 'ISO-8859-1'), true);
+    $pacote_detalhamentos = mb_convert_encoding($pacote_detalhamentos,'ISO-8859-1', 'UTF-8');
+
+    $sNotDelete = $clconvdetalhaconcedentes->getNotDelete($pacote_detalhamentos);
+
+    if(empty($sNotDelete)) {
+      $sNotDelete = '0';
+    }
+
+    $clconvdetalhaconcedentes->excluir(null, 'c207_sequencial NOT IN(' .$sNotDelete. ') and c207_codconvenio = '. $c206_sequencial);
+
+    foreach ($pacote_detalhamentos as $key => $item_detalhe) {
+
+      switch ($item_detalhe["c207_esferaconcedente"]) {
+        case 'Federal': $item_detalhe["c207_esferaconcedente"] = 1;
+          break;
+        case 'Estadual': $item_detalhe["c207_esferaconcedente"] = 2;
+          break;
+        case 'Municipal': $item_detalhe["c207_esferaconcedente"] = 3;
+          break;
+        case 'Exterior': $item_detalhe["c207_esferaconcedente"] = 4;
+          break;
+        case 'Instituição Privada': $item_detalhe["c207_esferaconcedente"] = 5;
+          break;
+        default:  $item_detalhe["c207_esferaconcedente"] = 1;
+          break;
+      }
+
+      $item_detalhe['c207_codconvenio']    = $c206_sequencial;
+      $item_detalhe['c207_valorconcedido'] = str_replace(',', '.', str_replace('.', '', $item_detalhe['c207_valorconcedido']));
+
+      if(!empty($item_detalhe["c207_sequencial"])) { // altera existente
+        $clconvdetalhaconcedentes->alterar($item_detalhe["c207_sequencial"], $item_detalhe);
+      }
+  
+      if(empty($item_detalhe["c207_sequencial"])) {  // inclui novo
+        $clconvdetalhaconcedentes->incluir(null, $item_detalhe);
+      }
+    }
+  }
+
 }else if(isset($chavepesquisa)){
-   $db_opcao = 2;
-   $db_botao = true;
-   $result = $clconvconvenios->sql_record($clconvconvenios->sql_query($chavepesquisa));
-   db_fieldsmemory($result,0);
+  $db_opcao = 2;
+  $db_botao = true;
+  $result = $clconvconvenios->sql_record($clconvconvenios->sql_query($chavepesquisa));
+  db_fieldsmemory($result,0);
 }
 ?>
 <html>
@@ -69,14 +113,10 @@ if(isset($chavepesquisa)){
  echo "
   <script>
       function js_db_libera(){
-         parent.document.formaba.convdetalhaconcedentes.disabled=false;
          parent.document.formaba.convdetalhatermos.disabled=false;
-         CurrentWindow.corpo.iframe_convdetalhaconcedentes.location.href='con1_convdetalhaconcedentes001.php?c207_codconvenio=".@$c206_sequencial."';
          CurrentWindow.corpo.iframe_convdetalhatermos.location.href='con1_convdetalhatermos001.php?c208_codconvenio=".@$c206_sequencial."';
      ";
-         if(isset($liberaaba)){
-           echo "  parent.mo_camada('convdetalhaconcedentes');";
-         }
+
  echo"}\n
     js_db_libera();
   </script>\n

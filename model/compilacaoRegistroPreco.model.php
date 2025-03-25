@@ -1271,6 +1271,52 @@ class compilacaoRegistroPreco extends solicitacaoCompra {
     return db_utils::fieldsMemory($rsValorItem, 0)->valor;
 
   }
+
+  /**
+  * retorna a quantidade anulada do item.
+  *
+  * @param  integer codigo do item
+  * @return float codigo do item
+  */
+  public function getValorEmpAnuladoItem($iCodigoItem) {
+
+    $sSqlValorItem  = "SELECT coalesce(sum(" . ($this->iFormaControle == aberturaRegistroPreco::CONTROLA_QUANTIDADE ? "e37_qtd" : "e37_vlranu") . "), 0) as valor";
+    $sSqlValorItem .= "  from solicitem ";
+    $sSqlValorItem .= "        inner join solicitemvinculo      on pc11_codigo      = pc55_solicitemfilho";
+    $sSqlValorItem .= "        inner join pcprocitem            on pc11_codigo      = pc81_solicitem ";
+    $sSqlValorItem .= "        inner join empautitempcprocitem  on pc81_codprocitem = e73_pcprocitem";
+    $sSqlValorItem .= "        inner join empautitem            on e73_sequen       = e55_sequen";
+    $sSqlValorItem .= "                                        and e73_autori       = e55_autori";
+    $sSqlValorItem .= "        inner join empautoriza           on e55_autori       = e54_autori";
+    $sSqlValorItem .= "        inner join empempaut             on e61_autori       = e54_autori";
+    $sSqlValorItem .= "        inner join empempenho            on e61_numemp       = e60_numemp";
+    $sSqlValorItem .= "        inner join empempitem            on e60_numemp       = e62_numemp";
+    $sSqlValorItem .= "                                        and e62_sequen  = e55_sequen";
+    $sSqlValorItem .= "        left join empanuladoitem         on e37_empempitem   = e62_sequencial";
+    $sSqlValorItem .= "  where pc55_solicitempai = {$iCodigoItem}";
+    $rsValorItem    = db_query($sSqlValorItem);
+    return db_utils::fieldsMemory($rsValorItem, 0)->valor;
+
+  }
+
+ /**
+  * retorna a quantidade solicitada do item.
+  *
+  * @param unknown_type integer codigo do item
+  * @return float codigo do item
+  */
+  public function getValorSolAnuladoItem($iCodigoItem) {
+
+    $sSqlValorItem  = "SELECT coalesce(sum(" . ($this->iFormaControle == aberturaRegistroPreco::CONTROLA_QUANTIDADE ? "pc28_qtd" : "pc28_vlranu") . "), 0) as valor";
+    $sSqlValorItem .= " from solicitem ";
+    $sSqlValorItem .= " inner join solicitemvinculo on pc11_codigo = pc55_solicitemfilho";
+    $sSqlValorItem .= " inner join solicitemanul on pc28_solicitem = pc11_codigo";
+    $sSqlValorItem .= " where pc55_solicitempai = {$iCodigoItem}";
+    $rsValorItem    = db_query($sSqlValorItem);
+
+    return db_utils::fieldsMemory($rsValorItem, 0)->valor;
+  }
+
   /**
    * Verifica se a abertura está anulada
    *

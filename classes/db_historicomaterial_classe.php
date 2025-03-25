@@ -28,6 +28,7 @@ class cl_historicomaterial
     var $db150_mes = 0;
     var $db150_data = null;
     var $db150_instit = 0;
+    var $db150_codunid = null;
     // cria propriedade com as variaveis do arquivo
     var $campos = "
                  db150_sequencial = int8 = sequencial
@@ -41,6 +42,7 @@ class cl_historicomaterial
                  db150_mes = int8 = Mês
                  db150_data = date = data de cadastro
                  db150_instit = int8 = Instituição
+                 db150_codunid = int8 = Código Unidade Medida
                  ";
 
     //funcao construtor da classe
@@ -77,6 +79,7 @@ class cl_historicomaterial
             $this->db150_mes = ($this->db150_mes == "" ? @$GLOBALS["HTTP_POST_VARS"]["db150_mes"] : $this->db150_mes);
             $this->db150_data = ($this->db150_data == "" ? @$GLOBALS["HTTP_POST_VARS"]["db150_data"] : $this->db150_data);
             $this->db150_instit = ($this->db150_instit == "" ? @$GLOBALS["HTTP_POST_VARS"]["db150_instit"] : $this->db150_instit);
+            $this->db150_codunid = ($this->db150_codunid == "" ? @$GLOBALS["HTTP_POST_VARS"]["db150_codunid"] : $this->db150_codunid);
         } else {
             $this->db150_sequencial = ($this->db150_sequencial == "" ? @$GLOBALS["HTTP_POST_VARS"]["db150_sequencial"] : $this->db150_sequencial);
         }
@@ -169,6 +172,7 @@ class cl_historicomaterial
                                       ,db150_mes
                                       ,db150_data
                                       ,db150_instit
+                                      ,db150_codunid
                        )
                 values (
                                 $this->db150_sequencial
@@ -182,6 +186,7 @@ class cl_historicomaterial
                                ,$this->db150_mes
                                ,'$this->db150_data'
                                ,$this->db150_instit
+                               ,$this->db150_codunid
                       )";
         $result = db_query($sql);
         if ($result == false) {
@@ -317,10 +322,17 @@ class cl_historicomaterial
                 return false;
             }
         }
+
+        if (trim($this->db150_instit) != "" || isset($GLOBALS["HTTP_POST_VARS"]["db150_instit"])) {
+            $sql .= $virgula . " db150_codunid = $this->db150_codunid ";
+            $virgula = ",";
+        }
+
         $sql .= " where ";
         if ($db150_sequencial != null) {
             $sql .= " db150_sequencial = $this->db150_sequencial";
         }
+
         $resaco = $this->sql_record($this->sql_query_file($this->db150_sequencial));
         if ($this->numrows > 0) {
             for ($conresaco = 0; $conresaco < $this->numrows; $conresaco++) {

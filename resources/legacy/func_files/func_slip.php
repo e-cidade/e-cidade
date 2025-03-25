@@ -120,6 +120,7 @@ if (isset ($campos) == false) {
 $wh  = null;
 $wh2 = null;
 $where_instit = " and k17_instit = ".db_getsession("DB_instit");
+//$where_status = " and k17_situacao  = 1";
 if (isset($valida)){
 
 
@@ -163,26 +164,26 @@ if (!isset ($pesquisa_chave)) {
 		}
 		if (isset ($chave_k17_debito) && trim($chave_k17_debito) != "") {
 			if ($data == "")
-				$sql = $clslip->sql_query(null, $campos, null, " k17_debito = $chave_k17_debito $wh and to_char(k17_data,'YYYY') = '".db_getsession("DB_anousu")."' $where_instit");
+				$sql = $clslip->sql_query(null, $campos, null, " k17_debito = $chave_k17_debito $wh $where_instit");
 			else
-				$sql = $clslip->sql_query(null, $campos, null, " k17_debito = $chave_k17_debito $wh and k17_data='".$data."' and to_char(k17_data,'YYYY') = '".db_getsession("DB_anousu")."' $where_instit");
+				$sql = $clslip->sql_query(null, $campos, null, " k17_debito = $chave_k17_debito $wh and k17_data='".$data."' $where_instit");
 		} else
 			if (isset ($chave_k17_credito) && trim($chave_k17_credito) != "") {
 				if ($data == "")
-					$sql = $clslip->sql_query(null, $campos, null, " k17_debito = $chave_k17_credito $wh and to_char(k17_data,'YYYY') = '".db_getsession("DB_anousu")."' $where_instit");
+					$sql = $clslip->sql_query(null, $campos, null, " k17_debito = $chave_k17_credito $wh $where_instit");
 				else
-					$sql = $clslip->sql_query(null, $campos, null, " k17_debito = $chave_k17_credito $wh and k17_data='".$data."' and to_char(k17_data,'YYYY') = '".db_getsession("DB_anousu")."' $where_instit");
+					$sql = $clslip->sql_query(null, $campos, null, " k17_debito = $chave_k17_credito $wh and k17_data='".$data."' $where_instit");
 			} else
 				if (isset ($chave_k17_valor) && trim($chave_k17_valor) != "") {
 					if ($data == "")
-						$sql = $clslip->sql_query(null, $campos, null, " k17_valor = $chave_k17_valor $wh  and to_char(k17_data,'YYYY') = '".db_getsession("DB_anousu")."' $where_instit ");
+						$sql = $clslip->sql_query(null, $campos, null, " k17_valor = $chave_k17_valor $wh $where_instit");
 					else
-						$sql = $clslip->sql_query(null, $campos, null, " k17_valor = $chave_k17_valor $wh  and k17_data='".$data."' and to_char(k17_data,'YYYY') = '".db_getsession("DB_anousu")."' $where_instit");
+						$sql = $clslip->sql_query(null, $campos, null, " k17_valor = $chave_k17_valor $wh  and k17_data='".$data."' $where_instit");
 				} else {
 					if ($data == "")
-						$sql = $clslip->sql_query(null, $campos, null, " to_char(k17_data,'YYYY') = '".db_getsession("DB_anousu")."' $wh $where_instit");
+						$sql = $clslip->sql_query(null, $campos, null,  "k17_instit = " . db_getsession("DB_instit") . $wh);
 					else
-						$sql = $clslip->sql_query(null, $campos, null, "  k17_data='".$data."' $wh  and to_char(k17_data,'YYYY') = '".db_getsession("DB_anousu")."' $where_instit");
+						$sql = $clslip->sql_query(null, $campos, null, "  k17_data='".$data."' $wh $where_instit");
 				}
 
       /*OC4474*/

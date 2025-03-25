@@ -1,7 +1,7 @@
 <?php
 use App\Services\ExcelService;
 use App\Models\MaterCatMat;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 define( 'MENSAGENS_SAU4_IMPORTACAOCATMAT_RPC', 'saude.farmacia.far1_importacaoxls_RPC.' );
 

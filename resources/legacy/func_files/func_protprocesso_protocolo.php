@@ -228,7 +228,12 @@ $clprotprocesso->rotulo->label("p58_numero");
               $sCampoPesquisa = $oGet->sCampoPesquisa;
             }
 
-            $sSql   = $clprotprocesso->sql_query("", "*", "", "{$sCampoPesquisa} = '{$aPesquisa[0]}' and p58_ano = {$iAno} and $where");
+            if(!empty($oGet->sDesconsideraAno) && $oGet->sDesconsideraAno == 't'){
+                $sSql   = $clprotprocesso->sql_query("", "*", "", "{$sCampoPesquisa} = '{$aPesquisa[0]}' and $where");
+            } else {
+                $sSql   = $clprotprocesso->sql_query("", "*", "", "{$sCampoPesquisa} = '{$aPesquisa[0]}' and p58_ano = {$iAno} and $where");
+            }
+
             $result = $clprotprocesso->sql_record($sSql);
 
             if ($clprotprocesso->numrows != 0) {

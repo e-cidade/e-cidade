@@ -64,6 +64,11 @@ class cl_orcprojeto
   var $o39_usalimite = 'f';
   var $o39_tiposuplementacao = null;
   var $o39_justi = null;
+  var $o39_datapublicacao_dia = null;
+  var $o39_datapublicacao_mes = null;
+  var $o39_datapublicacao_ano = null;
+  var $o39_datapublicacao = null;
+  var $o39_localpublicacao = null;
   // cria propriedade com as variaveis do arquivo
   var $campos = "
                  o39_codproj = int4 = codigo do projeto
@@ -81,6 +86,8 @@ class cl_orcprojeto
                  o39_usalimite = bool = Usa limite da Loa
                  o39_tiposuplementacao = int = tipo de suplementacao
                  o39_justi = varchar(500) = justificativa
+                 o39_datapublicacao = date = Data de Publicação do Decreto
+                 o39_localpublicacao = varchar(1000) = Local de Publicação do Decreto
                  ";
   //funcao construtor da classe
   function cl_orcprojeto()
@@ -131,7 +138,16 @@ class cl_orcprojeto
       $this->o39_textolivre = ($this->o39_textolivre == "" ? @$GLOBALS["HTTP_POST_VARS"]["o39_textolivre"] : $this->o39_textolivre);
       $this->o39_compllei = ($this->o39_compllei == "" ? @$GLOBALS["HTTP_POST_VARS"]["o39_compllei"] : $this->o39_compllei);
       $this->o39_usalimite = ($this->o39_usalimite == "f" ? @$GLOBALS["HTTP_POST_VARS"]["o39_usalimite"] : $this->o39_usalimite);
-      $this->o39_tiposuplementacao = ($this->o39_tiposuplementacao == null ? @$GLOBALS["HTTP_POST_VARS"]["o39_tiposuplementacao"] : $this->o39_tiposuplementacao);
+      $this->o39_tiposuplementacao = ($this->o39_tiposuplementacao == null ? @$GLOBALS["HTTP_POST_VARS"]["o39_tiposuplementacao"] : $this->o39_tiposuplementacao);      
+      if ($this->o39_datapublicacao == "") {
+        $this->o39_datapublicacao_dia = ($this->o39_datapublicacao_dia == "" ? @$GLOBALS["HTTP_POST_VARS"]["o39_datapublicacao_dia"] : $this->o39_datapublicacao_dia);
+        $this->o39_datapublicacao_mes = ($this->o39_datapublicacao_mes == "" ? @$GLOBALS["HTTP_POST_VARS"]["o39_datapublicacao_mes"] : $this->o39_datapublicacao_mes);
+        $this->o39_datapublicacao_ano = ($this->o39_datapublicacao_ano == "" ? @$GLOBALS["HTTP_POST_VARS"]["o39_datapublicacao_ano"] : $this->o39_datapublicacao_ano);
+        if ($this->o39_datapublicacao_dia != "") {
+          $this->o39_datapublicacao = $this->o39_datapublicacao_ano . "-" . $this->o39_datapublicacao_mes . "-" . $this->o39_datapublicacao_dia;
+        }
+      }
+      $this->o39_localpublicacao = ($this->o39_localpublicacao == null ? @$GLOBALS["HTTP_POST_VARS"]["o39_localpublicacao"] : $this->o39_localpublicacao);
     } else {
       $this->o39_codproj = ($this->o39_codproj == "" ? @$GLOBALS["HTTP_POST_VARS"]["o39_codproj"] : $this->o39_codproj);
     }
@@ -273,6 +289,8 @@ class cl_orcprojeto
                                       ,o39_compllei
                                       ,o39_usalimite
                                       ,o39_tiposuplementacao
+                                      ,o39_datapublicacao
+                                      ,o39_localpublicacao
                                       
                        )
                 values (
@@ -291,6 +309,8 @@ class cl_orcprojeto
                                ,'$this->o39_compllei'
                                ,'$this->o39_usalimite'
                                ,$this->o39_tiposuplementacao
+                               ," . ($this->o39_datapublicacao == "null" || $this->o39_datapublicacao == "" ? "null" : "'" . $this->o39_datapublicacao . "'") . "
+                               ,'$this->o39_localpublicacao'
                                
                       )";
     $result = db_query($sql);
@@ -510,6 +530,11 @@ class cl_orcprojeto
     }
     if (trim($this->o39_tiposuplementacao) != "" || isset($GLOBALS["HTTP_POST_VARS"]["o39_tiposuplementacao"])) {
       $sql  .= $virgula . " o39_tiposuplementacao = '$this->o39_tiposuplementacao' ";
+    }
+    if (trim($this->o39_datapublicacao) != "" || isset($GLOBALS["HTTP_POST_VARS"]["o39_datapublicacao"])) {
+      $sql  .= $virgula . " o39_datapublicacao = '$this->o39_datapublicacao' ";
+    }    if (trim($this->o39_localpublicacao) != "" || isset($GLOBALS["HTTP_POST_VARS"]["o39_localpublicacao"])) {
+      $sql  .= $virgula . " o39_localpublicacao = '$this->o39_localpublicacao' ";
     }
     $sql .= " where ";
     if ($o39_codproj != null) {

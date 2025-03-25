@@ -5,6 +5,7 @@ namespace App\Http;
 use App\Http\Middleware\AuthEcidadeUser;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\LegacySessionMiddleware;
+use App\Http\Middleware\RedesimAuth;
 use Fruitcake\Cors\HandleCors;
 use App\Http\Middleware\EncryptCookies;
 use App\Http\Middleware\PreventRequestsDuringMaintenance;
@@ -87,6 +88,7 @@ class Kernel extends HttpKernel
         'throttle' => ThrottleRequests::class,
         'verified' => EnsureEmailIsVerified::class,
         'legacySession' => LegacySessionMiddleware::class,
-        'authEcidadeUser' => AuthEcidadeUser::class
+        'authEcidadeUser' => AuthEcidadeUser::class,
+        'redesimAuth' => RedesimAuth::class
     ];
 }

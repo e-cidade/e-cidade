@@ -9,7 +9,7 @@ use App\Repositories\Patrimonial\Licitacao\LiclicitaRepository;
 use App\Services\Patrimonial\Licitacao\LiclicitemService;
 use App\Services\Patrimonial\compras\PcprocService;
 use App\Services\Patrimonial\Licitacao\ItensLicitacao;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 require_once("libs/db_stdlib.php");
 require_once("libs/db_conecta.php");
@@ -37,11 +37,19 @@ try {
 
             $liclicitaRepository = new LiclicitaRepository();
             $rsLicitacao = $liclicitaRepository->getLicitacao($oParam->l20_codigo);
-
+            
             $where = 'AND pc10_solicitacaotipo IN(1,2,8)';
 
             if($rsLicitacao->l20_tipnaturezaproced == 2 || $rsLicitacao->l20_tipoprocesso == 5 || $rsLicitacao->l20_tipoprocesso == 6){
                 $where = 'AND pc10_solicitacaotipo IN(6)';
+            }
+
+            if ($rsLicitacao->l20_criterioadjudicacao == 1) {
+                $where .= " AND pc80_criterioadjudicacao = 1";
+            } elseif($rsLicitacao->l20_criterioadjudicacao == 2) {
+                $where .= " AND pc80_criterioadjudicacao = 2";
+            }else{
+                $where .= " AND pc80_criterioadjudicacao = 3";  
             }
 
             $pcprocRepository = new pcprocRepository();
@@ -88,8 +96,8 @@ try {
                             throw new Exception('Não foi possivel inserir item na tabela Liclicitem ');
                         }
                         if($oLicitacao->l20_tipojulg == 3){
-                            $item->l04_liclicitem = $oLiclicitem->l21_codigo;
-                            $oLiclicitemLote = $liclicitemLoteService->salvarItensLicitacaoLote($item);
+                            // $item->l04_liclicitem = $oLiclicitem->l21_codigo;
+                            // $oLiclicitemLote = $liclicitemLoteService->salvarItensLicitacaoLote($item, false);
                         }else{
                             $item->l04_liclicitem = $oLiclicitem->l21_codigo;
                             $oLiclicitemLote = $liclicitemLoteService->salvarItensLicitacaoLoteAutomatico($item);

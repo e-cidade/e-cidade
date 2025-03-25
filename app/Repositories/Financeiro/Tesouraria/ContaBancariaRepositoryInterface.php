@@ -19,7 +19,7 @@ interface ContaBancariaRepositoryInterface
 
     public function checkAccountExists(int $sequencial): ?Collection;
 
-    public function checkAllTables(int $sequencial): ?Collection;
+    public function checkAllTables(int $sequencial,int $reduzido,int $instituicao): ?Collection;
 
     public function checkRepeated(int $agencia, string $conta, int $tipoconta, string $fonte, int $nroseqaplicacao): ?Collection;
 

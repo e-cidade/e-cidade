@@ -3,7 +3,7 @@
 namespace App\Repositories\Patrimonial;
 
 use App\Models\Veiculo;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 
 class VeiculosRepository

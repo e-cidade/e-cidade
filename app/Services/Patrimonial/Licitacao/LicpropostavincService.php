@@ -5,7 +5,7 @@ namespace App\Services\Patrimonial\Licitacao;
 use App\Models\Patrimonial\Licitacao\Licproposta;
 use App\Models\Patrimonial\Licitacao\Licpropostavinc;
 use App\Repositories\Patrimonial\Licitacao\LicpropostavincRepository;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class LicpropostavincService
 {
@@ -31,7 +31,7 @@ class LicpropostavincService
         $sql = "select * from licpropostavinc where l223_liclicita = {$l20_codigo} and l223_fornecedor = {$l224_forne}";
         $rslicpropostavinc = DB::select($sql);
         return $rslicpropostavinc[0];
-      
+
     }
 
     public function deletaProposta($l223_codigo)

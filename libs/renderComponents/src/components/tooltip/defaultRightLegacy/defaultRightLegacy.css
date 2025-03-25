@@ -1,0 +1,58 @@
+/* Tooltip container */
+.tooltip-09343 {
+  position: relative;
+  display: inline-block;
+  display: flex;
+}
+
+/* Tooltip text */
+.tooltip-09343 .tooltip-text-09343 {
+  visibility: hidden;
+  width: 200px;
+  background: whitesmoke;
+  box-shadow: 0px 0px 2px 0px gray;
+  color: black;
+  text-align: start;
+  padding: 5px 0;
+  border-radius: 6px;
+  
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  transform: translateX(30px);
+
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip-09343:hover .tooltip-text-09343 {
+  visibility: visible;
+}
+
+/* Auto (auto) - auto */
+.tooltip-default-09343-auto {
+  width: auto;
+}
+
+/* Extra Large (XL) - 900px */
+.tooltip-default-09343-xl {
+  width: 900px;
+}
+
+/* Large (LG) - 700px */
+.tooltip-default-09343-lg {
+  width: 700px;
+}
+
+/* Medium (MD) - 500px */
+.tooltip-default-09343-md {
+  width: 500px;
+}
+
+/* Small (SM) - 300px */
+.tooltip-default-09343-sm {
+  width: 300px;
+}

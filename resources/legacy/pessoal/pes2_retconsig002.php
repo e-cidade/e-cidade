@@ -38,6 +38,304 @@ $clgerasql->inicio_rh = false;
 
 parse_str($HTTP_SERVER_VARS['QUERY_STRING']);
 
+function gerarDados($ano, $mes, $folha, $rubrs, $lRecisao)
+{
+  if ($lRecisao) {
+    $sGrupo = "rh02_seqpes";
+  } else {
+    $sGrupo = "rh02_lota";
+  }
+
+  $sSqlEmpenhos = " SELECT
+  COUNT(*) over (partition by {$sGrupo}, rh72_siglaarq) as qtdlota,
+  case
+    when COUNT(*) over (partition by {$sGrupo}, rh72_siglaarq) > 1
+    and COUNT(codlotavinc) over (partition by {$sGrupo}, rh72_siglaarq) = 0
+    and MIN(o56_elemento::bigint) over (partition by {$sGrupo}, rh72_siglaarq) = o56_elemento::bigint 
+    and MIN(rh72_recurso) over (partition by {$sGrupo}, rh72_siglaarq) = rh72_recurso then o56_elemento::bigint
+    when COUNT(*) over (partition by {$sGrupo}, rh72_siglaarq) > 1
+    and (COUNT(codlotavinc) over (partition by {$sGrupo}, rh72_siglaarq) > 0
+    and (row_number() over (partition by {$sGrupo}, rh72_siglaarq order by rh73_valor desc) = 1))
+    or (COUNT(codlotavinc) over (partition by {$sGrupo}, rh72_siglaarq) = 1)
+    or COUNT(*) over (partition by {$sGrupo}, rh72_siglaarq) = 1 then codlotavinc
+    else null
+  end as rh25_codlotavinc,
+  *
+  from
+  (
+  select		
+    {$sGrupo},
+    rh25_codlotavinc as codlotavinc,
+    rh72_sequencial,
+    rh72_coddot,
+    o56_elemento,
+    substr(o56_descr,
+    0,
+    46) as o56_descr,
+    o40_descr,
+    o15_descr,
+    rh72_unidade,
+    rh72_orgao,
+    rh72_projativ,
+    rh72_anousu,
+    rh72_mesusu,
+    rh72_recurso,
+    rh72_siglaarq,
+    rh72_concarpeculiar,
+    o56_elemento as elemento,
+    o56_descr,
+    o120_orcreserva,
+    e60_codemp,
+    e60_anousu,
+    pc01_descrmater,
+    round(sum(case when rh73_pd = 2 then rh73_valor *-1 else rh73_valor end),
+    2) as rh73_valor
+  from
+    rhempenhofolha
+  inner join rhempenhofolharhemprubrica on
+    rh81_rhempenhofolha = rh72_sequencial
+  inner join rhempenhofolharubrica on
+    rh73_sequencial = rh81_rhempenhofolharubrica
+  inner join orctiporec on
+  o15_codigo = rh72_recurso
+  inner join orcelemento on
+    o56_codele = rh72_codele
+    and o56_anousu = rh72_anousu
+  inner join orcorgao on
+    rh72_orgao = o40_orgao
+    and rh72_anousu = o40_anousu
+  inner join orcunidade on
+    rh72_orgao = o41_orgao
+    and rh72_unidade = o41_unidade
+    and rh72_anousu = o41_anousu
+  inner join rhpessoalmov on
+    rh73_seqpes = rh02_seqpes
+    and rh73_instit = rh02_instit
+  left join rhempenhofolhaempenho on
+    rh72_sequencial = rh76_rhempenhofolha and rh76_lota = rh02_lota
+  left join empempenho on
+  rh76_numemp = e60_numemp
+  left join orcreservarhempenhofolha on
+    rh72_sequencial = o120_rhempenhofolha
+    and rh02_lota = o120_lota
+  left join rhlotavinc on
+    rh02_lota = rh25_codigo
+    and rh02_anousu = rh25_anousu
+    and rh72_projativ = rh25_projativ
+    and rh72_recurso = rh25_recurso
+    and rh25_codlotavinc = (
+    select
+      rh28_codlotavinc
+    from
+      rhlotavincele
+    where
+      rh25_codlotavinc = rh28_codlotavinc
+      and rh72_codele = rh28_codelenov)
+  left join rhelementoemp on
+    rh72_codele = rh38_codele
+    and rh38_anousu = rh72_anousu
+  left join rhelementoemppcmater on
+    rh38_seq = rh36_rhelementoemp
+  left join pcmater on
+    rh36_pcmater = pc01_codmater";
+  if ($lRecisao) {
+    $sSqlEmpenhos .= "
+    join rhpesrescisao on 
+      rh02_seqpes = rh05_seqpes 
+      and rh72_mesusu = extract(month from rh05_recis)
+      and rh72_anousu = extract(year from rh05_recis)";
+  }
+  $sSqlEmpenhos .= " 
+  where
+    rh72_tipoempenho = 1
+    and rh73_tiporubrica = 1
+    and rh72_anousu = {$ano}
+    and rh72_mesusu = {$mes}
+    and rh72_siglaarq in ({$folha})
+    and rh73_instit = " . db_getsession('DB_instit');
+  $sSqlEmpenhos .= " group by
+    rh72_sequencial,
+    rh72_coddot,
+    {$sGrupo},
+    rh25_codlotavinc,
+    rh72_codele,
+    o40_descr,
+    o15_descr,
+    e60_codemp,
+    e60_anousu,
+    pc01_descrmater,
+    o41_descr,
+    rh72_unidade,
+    rh72_orgao,
+    rh72_projativ,
+    rh72_programa,
+    rh72_funcao,
+    rh72_subfuncao,
+    rh72_mesusu,
+    rh72_anousu,
+    rh72_recurso,
+    rh72_siglaarq,
+    rh72_concarpeculiar,
+    rh72_tabprev,
+    o56_elemento,
+    o56_descr,
+    o120_orcreserva
+  order by
+    rh72_recurso,
+    rh72_orgao,
+    rh72_unidade,
+    rh72_projativ,
+    rh72_coddot,
+    rh72_codele ) as x
+  where
+    rh73_valor <> 0
+  order by 
+    rh72_recurso,
+    {$sGrupo},
+    rh72_orgao,
+    rh72_unidade,
+    rh72_projativ,
+    elemento";
+  $rsDadosEmpenho = db_query($sSqlEmpenhos);
+  $aEmpenhos      = db_utils::getColectionByRecord($rsDadosEmpenho);
+
+  foreach ($aEmpenhos as &$oEmpenho) {
+    if ($oEmpenho->qtdlota > 1 && $oEmpenho->rh25_codlotavinc != null) {
+      $sqlDescontos = "SELECT 
+                        rh72_siglaarq, 
+                        rh72_anousu, 
+                        rh72_mesusu, 
+                        rh78_retencaotiporec,
+                        round(sum(rh73_valor), 2) as valorretencao,
+                        ROUND(SUM(SUM(rh73_valor)) OVER (), 2) AS total_valorretencao
+                        from rhempenhofolha 
+                            inner join rhempenhofolharhemprubrica on rh81_rhempenhofolha = rh72_sequencial 
+                            inner join rhempenhofolharubrica on rh73_sequencial = rh81_rhempenhofolharubrica
+                            inner join rhpessoalmov on rh73_seqpes = rh02_seqpes and rh73_instit = rh02_instit 
+                            inner join  rhempenhofolharubricaretencao on rh78_rhempenhofolharubrica = rh73_sequencial 
+                        where 
+                            {$sGrupo} = {$oEmpenho->$sGrupo}
+                            and rh72_tipoempenho = 1
+                            and rh73_tiporubrica = 2
+                            and rh73_pd          = 2
+                            and rh72_anousu = {$ano}
+                            and rh72_mesusu = {$mes}
+                            and rh72_siglaarq = '{$oEmpenho->rh72_siglaarq}'
+                        group by 
+                            rh72_siglaarq,  
+                            rh72_mesusu, 
+                            rh72_anousu, 
+                            rh78_retencaotiporec
+                    order by valorretencao DESC";
+      $rsDescontos = db_utils::getCollectionByRecord(db_query($sqlDescontos), false, false, true);
+      if ((float)$oEmpenho->rh73_valor < (float)$rsDescontos[0]->total_valorretencao) {
+        $aRetencoesLotacao = [];
+        $iSumRetencao = 0;
+        foreach ($rsDescontos as $oRetencao) {
+          if ($iSumRetencao + $oRetencao->valorretencao >= $oEmpenho->rh73_valor) {
+            $aRetencoesLotacao = array_merge($aRetencoesLotacao, array_slice($rsDescontos, array_search($oRetencao, $rsDescontos)));
+            break;
+          }
+          $oEmpenho->retencoescod[] = $oRetencao->rh78_retencaotiporec;
+          $iSumRetencao += $oRetencao->valorretencao;
+        }
+        if (count($aRetencoesLotacao) > 0) {
+          $sqlSecundario = "SELECT
+                           rh72_sequencial, 
+                           round(sum(case when rh73_pd = 2 then rh73_valor *-1 else rh73_valor end),2) as rh73_valor 
+                          from rhempenhofolha
+                          inner join rhempenhofolharhemprubrica on
+                            rh81_rhempenhofolha = rh72_sequencial
+                          inner join rhempenhofolharubrica on
+                            rh73_sequencial = rh81_rhempenhofolharubrica
+                          inner join rhpessoalmov on
+                            rh73_seqpes = rh02_seqpes and rh73_instit = rh02_instit
+                          where 
+                            $sGrupo = {$oEmpenho->$sGrupo}
+                            and rh72_tipoempenho = 1
+                            and rh73_instit = " . db_getsession("DB_instit") . "
+                            and rh73_tiporubrica = 1
+                            and rh72_anousu = {$ano}
+                            and rh72_mesusu = {$mes}
+                            and rh72_siglaarq = '{$oEmpenho->rh72_siglaarq}'
+                            and rh72_sequencial <> {$oEmpenho->rh72_sequencial} 
+                            group by rh72_sequencial order by rh73_valor desc limit 1";
+          $sequencialSecundario = db_utils::fieldsMemory(db_query($sqlSecundario), 0)->rh72_sequencial;
+          if ($sequencialSecundario) {
+            $empenhos = array_column($aEmpenhos, 'rh72_sequencial');
+            $iEmpenhoSecundario = array_search($sequencialSecundario, $empenhos);
+            foreach ($aRetencoesLotacao as $oRetencoesLotacao) {
+              $aEmpenhos[$iEmpenhoSecundario]->retencoescod[] = $oRetencoesLotacao->rh78_retencaotiporec;
+            }
+          }
+        }
+      } else {
+        $oEmpenho->retencoescod = array_map(function ($oRetencao) {
+          return $oRetencao->rh78_retencaotiporec;
+        }, $rsDescontos);
+      }
+    }
+  }
+  $aRecurso = array();
+  foreach ($aEmpenhos as &$oEmpenho) {
+    if (isset($oEmpenho->retencoescod) || $oEmpenho->qtdlota == '1') {
+      
+      $sSqlDescontos = "SELECT
+              rh02_regist,
+              rh73_rubric,
+              rh27_descr,
+              case when rh73_pd = 1 then 1 else rh73_tiporubrica end as tipo,
+              round(sum(rh73_valor), 2) as valordesconto
+          from
+              rhempenhofolha
+          inner join rhempenhofolharhemprubrica on
+              rh81_rhempenhofolha = rh72_sequencial
+          inner join rhempenhofolharubrica on
+              rh73_sequencial = rh81_rhempenhofolharubrica
+          inner join rhpessoalmov on
+              rh73_seqpes = rh02_seqpes
+              and rh73_instit = rh02_instit
+          left join rhrubricas on
+              rh73_rubric = rh27_rubric
+              and rh73_instit = rh27_instit
+          left join rhempenhofolharubricaretencao on
+              rh78_rhempenhofolharubrica = rh73_sequencial
+          where
+              rh72_tipoempenho = 1
+              and rh73_tiporubrica = 2
+              and rh73_pd = 2
+              and rh72_anousu = {$ano}
+              and rh72_mesusu = {$mes}
+              and rh72_siglaarq = '{$oEmpenho->rh72_siglaarq}'
+              and $sGrupo = {$oEmpenho->$sGrupo}";
+
+      if (isset($oEmpenho->retencoescod)) {
+        $sSqlDescontos  .= " and (rh78_retencaotiporec in (" . implode(',', $oEmpenho->retencoescod) . ") or (rh73_pd = 1 and rh73_tiporubrica = 2))";
+      } else {
+        $sSqlDescontos  .= " and rh72_sequencial = {$oEmpenho->rh72_sequencial} ";
+      }
+      if (trim($rubrs) != "") {
+        $sSqlDescontos  .= " and rh73_rubric in ('" . str_replace(",", "','", $rubrs) . "') ";
+      }
+      $sSqlDescontos .= " group by rh02_regist, rh73_rubric, rh27_descr, rh73_tiporubrica, rh73_pd";
+      $aDescontos = db_utils::getCollectionByRecord(db_query($sSqlDescontos), false, false, true);
+
+      foreach ($aDescontos as $oDesconto) {
+        $oRegistro = new stdClass;
+        $oRegistro->regist = $oDesconto->rh02_regist;
+        $oRegistro->recurso = $oEmpenho->rh72_recurso;
+        $oRegistro->descricaorecurso = $oEmpenho->o15_descr;
+        $oRegistro->codrubrica = $oDesconto->rh73_rubric;
+        $oRegistro->descrrubrica = urldecode($oDesconto->rh27_descr);
+        $oRegistro->valordescfinal = $oDesconto->valordesconto;
+        $oRegistro->tipo = $oDesconto->tipo;
+        $aRecurso[] = $oRegistro;
+      }
+    }
+  }
+  return $aRecurso;
+}
+
 $dbwhere = " rh23_rubric is null ";
 $dbwhererubs = "";
 
@@ -197,295 +495,32 @@ if ($tipoEmpenho == 2) {
                   rhempenhofolha.rh72_siglaarq IS NULL";
   $siglas = db_utils::fieldsMemory(db_query($sSqlPontos), 0)->pontos;
 
-  if ($siglas != "") {
-    $siglas = str_replace(array_keys($aPontos), array_values($aPontos), $siglas);
-    $msgErro = "Para gerar o relatório por Lotação é necessário processar a geração dos empenhos da folha (Mod. Pessoal > Procedimentos > Geração de Empenhos (Novo) > Folha ) e o(s) seguinte(s) ponto(s) não está(ão) processado(s): ". str_replace(array_keys($aPontos), array_values($aPontos), $siglas);
-    db_redireciona('db_erros.php?fechar=true&db_erro='.$msgErro);
-  }
+if ($siglas != "") {
+  $siglas = str_replace(array_keys($aPontos), array_values($aPontos), $siglas);
+  $msgErro = "Para gerar o relatório por Lotação é necessário processar a geração dos empenhos da folha (Mod. Pessoal > Procedimentos > Geração de Empenhos (Novo) > Folha ) e o(s) seguinte(s) ponto(s) não está(ão) processado(s): ". str_replace(array_keys($aPontos), array_values($aPontos), $siglas);
+  db_redireciona('db_erros.php?fechar=true&db_erro='.$msgErro);
+}
 
-  $folha = rtrim($pontos,',');
-  $sSqlEmpenhos = " SELECT
-                    COUNT(*) over (partition by rh02_lota, rh72_siglaarq) as qtdlota,
-                    case
-                      when COUNT(*) over (partition by rh02_lota, rh72_siglaarq) > 1
-                      and COUNT(codlotavinc) over (partition by rh02_lota, rh72_siglaarq) = 0
-                      and MIN(o56_elemento::bigint) over (partition by rh02_lota, rh72_siglaarq) = o56_elemento::bigint 
-                      and MIN(rh72_recurso) over (partition by rh02_lota, rh72_siglaarq) = rh72_recurso then o56_elemento::bigint
-                      when COUNT(*) over (partition by rh02_lota, rh72_siglaarq) > 1
-                      and (COUNT(codlotavinc) over (partition by rh02_lota, rh72_siglaarq) > 0
-                      and (row_number() over (partition by rh02_lota, rh72_siglaarq order by rh73_valor desc) = 1))
-                      or (COUNT(codlotavinc) over (partition by rh02_lota, rh72_siglaarq) = 1)
-                      or COUNT(*) over (partition by rh02_lota, rh72_siglaarq) = 1 then codlotavinc
-                      else null
-                    end as rh25_codlotavinc,
-                    *
-                    from
-                    (
-                    select		
-                      rh02_lota,
-                      rh25_codlotavinc as codlotavinc,
-                      rh72_sequencial,
-                      rh72_coddot,
-                      o56_elemento,
-                      substr(o56_descr,
-                      0,
-                      46) as o56_descr,
-                      o40_descr,
-                      o15_descr,
-                      rh72_unidade,
-                      rh72_orgao,
-                      rh72_projativ,
-                      rh72_anousu,
-                      rh72_mesusu,
-                      rh72_recurso,
-                      rh72_siglaarq,
-                      rh72_concarpeculiar,
-                      o56_elemento as elemento,
-                      o56_descr,
-                      o120_orcreserva,
-                      e60_codemp,
-                      e60_anousu,
-                      pc01_descrmater,
-                      round(sum(case when rh73_pd = 2 then rh73_valor *-1 else rh73_valor end),
-                      2) as rh73_valor
-                    from
-                      rhempenhofolha
-                    inner join rhempenhofolharhemprubrica on
-                      rh81_rhempenhofolha = rh72_sequencial
-                    inner join rhempenhofolharubrica on
-                      rh73_sequencial = rh81_rhempenhofolharubrica
-                    inner join orctiporec on
-                    o15_codigo = rh72_recurso
-                    inner join orcelemento on
-                      o56_codele = rh72_codele
-                      and o56_anousu = rh72_anousu
-                    inner join orcorgao on
-                      rh72_orgao = o40_orgao
-                      and rh72_anousu = o40_anousu
-                    inner join orcunidade on
-                      rh72_orgao = o41_orgao
-                      and rh72_unidade = o41_unidade
-                      and rh72_anousu = o41_anousu
-                    inner join rhpessoalmov on
-                      rh73_seqpes = rh02_seqpes
-                      and rh73_instit = rh02_instit
-                    left join rhempenhofolhaempenho on
-                      rh72_sequencial = rh76_rhempenhofolha and rh76_lota = rh02_lota
-                    left join empempenho on
-                    rh76_numemp = e60_numemp
-                    left join orcreservarhempenhofolha on
-                      rh72_sequencial = o120_rhempenhofolha
-                      and rh02_lota = o120_lota
-                    left join rhlotavinc on
-                      rh02_lota = rh25_codigo
-                      and rh02_anousu = rh25_anousu
-                      and rh72_projativ = rh25_projativ
-                      and rh72_recurso = rh25_recurso
-                      and rh25_codlotavinc = (
-                      select
-                        rh28_codlotavinc
-                      from
-                        rhlotavincele
-                      where
-                        rh25_codlotavinc = rh28_codlotavinc
-                        and rh72_codele = rh28_codelenov)
-                    left join rhelementoemp on
-                      rh72_codele = rh38_codele
-                      and rh38_anousu = rh72_anousu
-                    left join rhelementoemppcmater on
-                      rh38_seq = rh36_rhelementoemp
-                    left join pcmater on
-                      rh36_pcmater = pc01_codmater
-                    where
-                      rh72_tipoempenho = 1
-                      and rh73_tiporubrica = 1
-                      and rh72_anousu = {$ano}
-                      and rh72_mesusu = {$mes}
-                      and rh72_siglaarq in ({$folha})
-                      and rh73_instit = ".db_getsession('DB_instit');
-  $sSqlEmpenhos .= " group by
-                      rh72_sequencial,
-                      rh72_coddot,
-                      rh02_lota,
-                      rh25_codlotavinc,
-                      rh72_codele,
-                      o40_descr,
-                      o15_descr,
-                      e60_codemp,
-                      e60_anousu,
-                      pc01_descrmater,
-                      o41_descr,
-                      rh72_unidade,
-                      rh72_orgao,
-                      rh72_projativ,
-                      rh72_programa,
-                      rh72_funcao,
-                      rh72_subfuncao,
-                      rh72_mesusu,
-                      rh72_anousu,
-                      rh72_recurso,
-                      rh72_siglaarq,
-                      rh72_concarpeculiar,
-                      rh72_tabprev,
-                      o56_elemento,
-                      o56_descr,
-                      o120_orcreserva
-                    order by
-                      rh72_recurso,
-                      rh72_orgao,
-                      rh72_unidade,
-                      rh72_projativ,
-                      rh72_coddot,
-                      rh72_codele ) as x
-                    where
-                      rh73_valor <> 0
-                    order by 
-                      rh72_recurso,
-                      rh02_lota,
-                      rh72_orgao,
-                      rh72_unidade,
-                      rh72_projativ,
-                      elemento";
-    $rsDadosEmpenho   = db_query($sSqlEmpenhos);
-    $aEmpenhos        = db_utils::getColectionByRecord($rsDadosEmpenho);
-    if (count($aEmpenhos) == 0) {
-      db_redireciona('db_erros.php?fechar=true&db_erro=Nao existem lancamentos no periodo de ' . $mes . ' / ' . $ano . $erroajuda . ".");
-    }
+$aFolha = explode(',', rtrim($pontos,','));
+$lRecisao = false;
+if (($chave = array_search("'r20'", $aFolha)) !== false) {
+  unset($aFolha[$chave]);
+  $lRecisao = true;
+}
 
-    $aLinhasRelatorio = array();
-    foreach($aEmpenhos as &$oEmpenho) { 
-      if ($oEmpenho->qtdlota > 1 && $oEmpenho->rh25_codlotavinc != null ) {
-        $sqlDescontos = "SELECT 
-                            rh72_siglaarq, 
-                            rh72_anousu, 
-                            rh72_mesusu, 
-                            rh78_retencaotiporec,
-                            round(sum(rh73_valor), 2) as valorretencao,
-                            ROUND(SUM(SUM(rh73_valor)) OVER (), 2) AS total_valorretencao
-                            from rhempenhofolha 
-                                inner join rhempenhofolharhemprubrica on rh81_rhempenhofolha = rh72_sequencial 
-                                inner join rhempenhofolharubrica on rh73_sequencial = rh81_rhempenhofolharubrica
-                                inner join rhpessoalmov on rh73_seqpes = rh02_seqpes and rh73_instit = rh02_instit 
-                                inner join  rhempenhofolharubricaretencao on rh78_rhempenhofolharubrica = rh73_sequencial 
-                            where 
-                                rh02_lota = {$oEmpenho->rh02_lota}
-                                and rh72_tipoempenho = 1
-                                and rh73_tiporubrica = 2
-                                and rh73_pd          = 2
-                                and rh72_anousu = {$ano}
-                                and rh72_mesusu = {$mes}
-                                and rh72_siglaarq = '{$oEmpenho->rh72_siglaarq}'
-                            group by 
-                                rh72_siglaarq,  
-                                rh72_mesusu, 
-                                rh72_anousu, 
-                                rh78_retencaotiporec
-                        order by valorretencao DESC";
-        $rsDescontos = db_utils::getCollectionByRecord(db_query($sqlDescontos), false, false, true);
-        if ((float)$oEmpenho->rh73_valor < (float)$rsDescontos[0]->total_valorretencao){	
-          $aRetencoesLotacao = [];
-          $aRetencoesPrincipais = [];
-          $iSumRetencao = 0;
-          foreach ($rsDescontos as $oRetencao) {
-            if ($iSumRetencao + $oRetencao->valorretencao >= $oEmpenho->rh73_valor) {
-              $aRetencoesLotacao = array_merge($aRetencoesLotacao, array_slice($rsDescontos, array_search($oRetencao, $rsDescontos)));
-              break;
-            }
-            $oEmpenho->retencoescod[] = $oRetencao->rh78_retencaotiporec;
-            $iSumRetencao += $oRetencao->valorretencao;
-          }
-          if (count($aRetencoesLotacao) > 0) {
-            $sqlSecundario = "SELECT
-                               rh72_sequencial, 
-                               round(sum(case when rh73_pd = 2 then rh73_valor *-1 else rh73_valor end),2) as rh73_valor 
-                              from rhempenhofolha
-                              inner join rhempenhofolharhemprubrica on
-                                rh81_rhempenhofolha = rh72_sequencial
-                              inner join rhempenhofolharubrica on
-                                rh73_sequencial = rh81_rhempenhofolharubrica
-                              inner join rhpessoalmov on
-                                rh73_seqpes = rh02_seqpes and rh73_instit = rh02_instit
-                              where 
-                                rh02_lota = {$oEmpenho->rh02_lota}
-                                and rh72_tipoempenho = 1
-                                and rh73_instit = ".db_getsession("DB_instit")."
-                                and rh73_tiporubrica = 1
-                                and rh72_anousu = {$ano}
-                                and rh72_mesusu = {$mes}
-                                and rh72_siglaarq = '{$oEmpenho->rh72_siglaarq}'
-                                and rh72_sequencial <> {$oEmpenho->rh72_sequencial} 
-                                group by rh72_sequencial order by rh73_valor desc limit 1";
-            $sequencialSecundario = db_utils::fieldsMemory(db_query($sqlSecundario), 0)->rh72_sequencial;
-            if ($sequencialSecundario) {
-              $empenhos = array_column($aEmpenhos, 'rh72_sequencial');
-              $iEmpenhoSecundario = array_search($sequencialSecundario, $empenhos);
-              foreach ($aRetencoesLotacao as $oRetencoesLotacao) {
-                $aEmpenhos[$iEmpenhoSecundario]->retencoescod[] = $oRetencoesLotacao->rh78_retencaotiporec;
-              }
-            }
-          } 
-        } else {          
-          $oEmpenho->retencoescod = array_map(function($oRetencao) {
-            return $oRetencao->rh78_retencaotiporec;
-            }, $rsDescontos);
-        }
-      }
-    }
-    $aRecurso = array();
-    foreach ($aEmpenhos as &$oEmpenho){
-      if (isset($oEmpenho->retencoescod) || $oEmpenho->qtdlota == '1' ) {
-        $sSqlDescontos = "SELECT
-                  rh02_regist,
-                  rh73_rubric,
-                  rh27_descr,
-                  case when rh73_pd = 1 then 1 else rh73_tiporubrica end as tipo,
-                  round(sum(rh73_valor), 2) as valordesconto
-              from
-                  rhempenhofolha
-              inner join rhempenhofolharhemprubrica on
-                  rh81_rhempenhofolha = rh72_sequencial
-              inner join rhempenhofolharubrica on
-                  rh73_sequencial = rh81_rhempenhofolharubrica
-              inner join rhpessoalmov on
-                  rh73_seqpes = rh02_seqpes
-                  and rh73_instit = rh02_instit
-              left join rhrubricas on
-                  rh73_rubric = rh27_rubric
-                  and rh73_instit = rh27_instit
-              left join rhempenhofolharubricaretencao on
-                  rh78_rhempenhofolharubrica = rh73_sequencial
-              where
-                  rh72_tipoempenho = 1
-                  and rh73_tiporubrica = 2
-                  and rh73_pd = 2
-                  and rh72_anousu = {$ano}
-                  and rh72_mesusu = {$mes}
-                  and rh72_siglaarq = '{$oEmpenho->rh72_siglaarq}'
-                  and rh02_lota = {$oEmpenho->rh02_lota}";
-        if (isset($oEmpenho->retencoescod)) {
-            $sSqlDescontos  .= " and (rh78_retencaotiporec in (".implode(',', $oEmpenho->retencoescod).") or (rh73_pd = 1 and rh73_tiporubrica = 2))";
-        } else {
-            $sSqlDescontos  .= " and rh72_sequencial = {$oEmpenho->rh72_sequencial} ";
-        }
-        if (trim($rubrs) != "") {
-          $sSqlDescontos  .= " and rh73_rubric in ('".str_replace(",","','",$rubrs)."') ";
-        }
-        $sSqlDescontos .= " group by rh02_regist, rh73_rubric, rh27_descr, rh73_tiporubrica, rh73_pd";
+$sFolha = implode(",", $aFolha);
 
-        $aDescontos = db_utils::getCollectionByRecord(db_query($sSqlDescontos), false, false, true);
-        foreach ($aDescontos as $oDesconto){
-          $oRegistro = new stdClass;
-          $oRegistro->regist = $oDesconto->rh02_regist;
-          $oRegistro->recurso = $oEmpenho->rh72_recurso;
-          $oRegistro->descricaorecurso = $oEmpenho->o15_descr;
-          $oRegistro->codrubrica = $oDesconto->rh73_rubric;
-          $oRegistro->descrrubrica = urldecode($oDesconto->rh27_descr);
-          $oRegistro->valordescfinal = $oDesconto->valordesconto;
-          $oRegistro->tipo = $oDesconto->tipo;
-          $aRecurso[] = $oRegistro;
-        }
-      }
-    }               
+$aRecurso = gerarDados($ano, $mes, $sFolha, $rubrs, false);
+
+if ($lRecisao) {
+  $aRecurso = array_merge($aRecurso, gerarDados($ano, $mes, "'r20'", $rubrs, true));
+  
+}
+
+if (count($aRecurso) == 0) {
+  db_redireciona('db_erros.php?fechar=true&db_erro=Nao existem lancamentos no periodo de ' . $mes . ' / ' . $ano . $erroajuda . ".");
+}
+
 $sSqlRetExtras = $clgerasql->gerador_sql("", $ano, $mes, null, null,
                                     "rh25_recurso as recurso, o15_descr, rh27_descr, {$sigla}_regist as regist, {$sigla}_pd as tipo, {$sigla}_rubric as rubrica, round(sum({$sigla}_valor),2) as valor",
                                      "{$sigla}_rubric, rh25_recurso",

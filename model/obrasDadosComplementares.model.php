@@ -66,6 +66,9 @@ class obrasDadosComplementares
   private $sLote = null;
   private $lLote = false;
   private $seqobrascodigo = null;
+
+  private $descratividadeobra = null;
+
   private ?int $planilhaTce;
 
 
@@ -478,6 +481,21 @@ class obrasDadosComplementares
   public function setSeqObrasCodigos($sSeqObrasCodigo)
   {
     $this->seqobrascodigo = $sSeqObrasCodigo;
+  }
+
+  /**
+   * Metodo para setar a descrição da atividade obra
+   * @param string descratividadeobra
+   * @return void
+   */
+  public function setDescricaAtividadeObra($sDescrAtividadeObra)
+  {
+    $this->descratividadeobra = $sDescrAtividadeObra;
+  }
+
+  public function gettDescricaAtividadeObra()
+  {
+    return $this->descratividadeobra;
   }
 
   /**
@@ -905,6 +923,7 @@ class obrasDadosComplementares
     $oDaoObras->db150_atividadeservicoesp = $this->getAtividadeServicoEsp();
     $oDaoObras->db150_descratividadeservicoesp = $this->getDescrAtividadeServicoEsp();
     $oDaoObras->db150_seqobrascodigos = $iSeqObra;
+    $oDaoObras->db150_descratividadeobra = $this->gettDescricaAtividadeObra();
 
     if (!$this->getBdi() && $iNatureza == '1') {
       throw new Exception('Campo BDI não informado!');
@@ -963,6 +982,7 @@ class obrasDadosComplementares
       $oDaoObras->db150_descratividadeservico = $this->getDescrAtividadeServico();
       $oDaoObras->db150_atividadeservicoesp = $this->getAtividadeServicoEsp();
       $oDaoObras->db150_descratividadeservicoesp = $this->getDescrAtividadeServicoEsp();
+      $oDaoObras->db150_descratividadeobra = $this->gettDescricaAtividadeObra();
       $oDaoObras->db150_seqobrascodigos = $iSeqObra;
 
       if (!$this->getBdi() && $iNatureza == '1') {

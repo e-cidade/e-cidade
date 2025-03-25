@@ -2,91 +2,108 @@
 
 namespace App\Support\Database;
 
+use Illuminate\Support\Facades\DB;
+
 trait InsertMenu
 {
     public function getIdModulo($descrModulo)
     {
-        $sql = "SELECT id_item FROM db_modulos WHERE descr_modulo = '$descrModulo'";
+        $modulo = DB::table('configuracoes.db_modulos')
+            ->select('id_item')
+            ->where('descr_modulo', $descrModulo)
+            ->first();
 
-        if (empty($this->fetchRow($sql))){
-            $sql = "SELECT id_item FROM db_modulos WHERE nome_modulo = '$descrModulo'";
+        if (empty($modulo)) {
+            $modulo = DB::table('configuracoes.db_modulos')
+            ->select('id_item')
+            ->where('nome_modulo', $descrModulo)
+            ->first();
         }
 
-        return $this->fetchRow($sql);
+        return $modulo->id_item;
     }
 
-    public function getItemIdByDescr($descricao, $helper = null, $desctec = null): array
+    public function getItemIdByDescr($descricao, $helper = null, $desctec = null)
     {
-        $sql = "SELECT id_item FROM db_itensmenu WHERE descricao = '$descricao'";
 
-        if ($helper != null){
-            $sql .= " AND help = '$helper'";
+        $query = DB::table('configuracoes.db_itensmenu')
+            ->select('id_item')
+            ->where('descricao', $descricao);
+
+        if ($helper != null) {
+            $query->where('help', $helper);
         }
 
         if ($desctec != null){
-            $sql .= " AND desctec = '$desctec'";
+            $query->where('desctec', $desctec);
         }
-        return $this->fetchRow($sql);
+
+        return ($query->first())->id_item;
     }
 
-    public function getLastInsertedId(): array
+    public function getLastInsertedId(): int
     {
-        $sql = "SELECT max(id_item)+1 FROM db_itensmenu";
-        return $this->fetchRow($sql);
+        $id = DB::table('configuracoes.db_itensmenu')
+            ->max('id_item');
+        return $id + 1;
     }
 
-    public function getMaxMenuId(): array
+    public function getMaxMenuId(): int
     {
-        $sql = "SELECT max(id_item) from db_itensmenu";
-        return $this->fetchRow($sql);
+        return DB::table('configuracoes.db_itensmenu')->max('id_item');
     }
 
-    public function getNextSeqMenuId($idPrincipalMenu): ?string
+    public function getNextSeqMenuId($idPrincipalMenu): ?int
     {
-        $sql = "SELECT max(menusequencia) + 1 AS codmenu FROM db_menu WHERE id_item = {$idPrincipalMenu}";
-        $result = $this->fetchRow($sql);
-
-        if ($result && isset($result['codmenu'])) {
-            return (string) $result['codmenu'];
-        }
-        return 0;
+        $menu = DB::table('configuracoes.db_menu')->where('id_item', $idPrincipalMenu)->select('menusequencia')->orderBy('menusequencia', 'desc')->first();
+        return !empty($menu) ? $menu->menusequencia + 1 : 0;
     }
 
     public function insertItemMenu($descricao, $link, $titulo, $status = 't')
     {
-        $id = intval(implode(" ", $this->getLastInsertedId()));
 
-        $sql = "INSERT INTO db_itensmenu VALUES ($id, '$descricao', '$titulo', '$link', 1, 1, '$titulo', '$status')";
-        $this->executeQuery($sql);
+        DB::table('configuracoes.db_itensmenu')->insert([
+            'id_item' => $this->getLastInsertedId(),
+            'descricao' => $descricao,
+            'help' => $titulo,
+            'funcao' => $link,
+            'itemativo' => 1,
+            'manutencao' => 1,
+            'desctec' => $titulo,
+            'libcliente' => $status,
+        ]);
     }
 
     public function insertMenu($descricaoItemPai, $descrModulo, $helperItemPai = null, $desctecItemPai = null)
     {
-        $idItemPai = intval(implode(" ", $this->getItemIdByDescr($descricaoItemPai,$helperItemPai,$desctecItemPai)));
-        $idItemFilho = intval(implode(" ", $this->getMaxMenuId()));
+        $idItemPai = $this->getItemIdByDescr($descricaoItemPai, $helperItemPai, $desctecItemPai);
+        $idItemFilho = $this->getMaxMenuId();
 
         $menusequencia = $this->getNextSeqMenuId($idItemPai);
 
-        $idModulo = intval(implode(" ", $this->getIdModulo($descrModulo)));
+        $idModulo = $this->getIdModulo($descrModulo);
 
-        $sql = "INSERT INTO db_menu VALUES ($idItemPai, $idItemFilho, $menusequencia, $idModulo)";
-        $this->executeQuery($sql);
+        DB::table('configuracoes.db_menu')->insert([
+            'id_item' => $idItemPai,
+            'id_item_filho' => $idItemFilho,
+            'menusequencia' => $menusequencia,
+            'modulo' => $idModulo
+        ]);
     }
 
     public function insertMenuById($idItemPai, $menusequencia = null, $idModulo = 1)
     {
-        $idItemFilho = intval(implode(" ", $this->getMaxMenuId()));
+        $idItemFilho = $this->getMaxMenuId();
 
         if ($menusequencia == null){
             $menusequencia = $this->getNextSeqMenuId($idItemPai);
         }
 
-        $sql = "INSERT INTO db_menu VALUES ($idItemPai, $idItemFilho, $menusequencia, $idModulo)";
-        $this->executeQuery($sql);
-    }
-
-    public function executeQuery($sql)
-    {
-        $this->execute($sql);
+        DB::table('configuracoes.db_menu')->insert([
+            'id_item' => $idItemPai,
+            'id_item_filho' => $idItemFilho,
+            'menusequencia' => $menusequencia,
+            'modulo' => $idModulo
+        ]);
     }
 }

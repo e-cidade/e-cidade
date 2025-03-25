@@ -25,6 +25,10 @@
  *                                licenca/licenca_pt.txt
  */
 
+use App\Models\Patrimonial\Licitacao\LicLicitaLotes;
+use App\Repositories\Patrimonial\Licitacao\LicLicitaLotesRepository;
+use App\Repositories\Patrimonial\Licitacao\LiclicitemLoteRepository;
+
 require("libs/db_stdlib.php");
 require("libs/db_conecta.php");
 include("libs/db_sessoes.php");
@@ -68,6 +72,9 @@ if (isset($alterar) && trim($alterar) != "") {
     $l04_liclicitem = "";
     $l04_descricao  = "";
     $sequenciallote = 0;
+
+    $liclicitalotesRepository = new LicLicitaLotesRepository();
+    $licilicitemloteRepository = new LiclicitemLoteRepository();
     for ($i = 0; $i < sizeof($vetor); $i++) {
         $vetor_codigos  = split("_", $vetor[$i]);
 
@@ -93,10 +100,29 @@ if (isset($alterar) && trim($alterar) != "") {
         }
 
         if (strlen($l04_descricao) > 0) {
+            
+            $oLote = $liclicitalotesRepository->getLoteByName($l04_descricao, $licitacao);
+            if(empty($oLote)){
+                $oLoteData = new LicLicitaLotes([
+                    'l24_codigo' => $liclicitalotesRepository->getCodigo(),
+                    'l24_pcdesc' => $l04_descricao,
+                    'l24_codliclicita' => $licitacao
+                ]);
+                
+                $liclicitalotesRepository->save($oLoteData);
+    
+                $oLote = $liclicitalotesRepository->getLoteByName($l04_descricao, $licitacao);
+            }
+
             $sequenciallote++;
             $clliclicitemlote->l04_liclicitem = $l04_liclicitem;
             $clliclicitemlote->l04_descricao  = $l04_descricao;
             $clliclicitemlote->l04_seq = $sequenciallote;
+            
+            if(!empty($oLote['l24_codigo'])){
+                $clliclicitemlote->l04_codlilicitalote = $oLote['l24_codigo'];
+            }
+
             $clliclicitemlote->incluir(null);
             if ($clliclicitemlote->erro_status == 0) {
                 $sqlerro  = true;

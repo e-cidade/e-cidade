@@ -26,7 +26,7 @@
  */
 
 //MODULO: empenho
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 $clrotulo = new rotulocampo;
 $clrotulo->label("z01_nome");
 $clrotulo->label("o56_elemento");
@@ -137,20 +137,20 @@ if (USE_PCASP) {
 
                 $paramentosOrdenadores = buscarParamentosOrdenadores();
                 db_input('paramentosOrdenadores',10,$IparamentosOrdenadores,true,'hidden',3);
-             
+
                 if ($paramentosOrdenadores == 1) {
-                  
+
                   $dado = listarOrdenadores($e60_numemp);
                   foreach($dado as $dados) {
                     $o41_cgmordenador = $dados['z01_numcgm'];
-                  }         
+                  }
 
                   $where = $o41_cgmordenador ? " z01_numcgm in ($o41_cgmordenador) " :  "z01_numcgm is null";
                   $result_cgm = $clcgm->sql_record($clcgm->sql_buscar_ordenador(null," o41_nomeordenador asc ",$where));
                   if ($clcgm->numrows == 0 ) {
                     $result_cgm = $clcgm->sql_record($clcgm->sql_query_ordenador(null," o41_nomeordenador asc ",$where));
-                 } 
-                  if ($dados['erro'] == false) { 
+                 }
+                  if ($dados['erro'] == false) {
                   ?>
 
                     <tr>
@@ -160,13 +160,13 @@ if (USE_PCASP) {
                           ?>
                       </td>
                       <td colspan="4">
-                          <?  
+                          <?
                             db_input("o41_cgmordenador",10,$Io41_cgmordenador,true,"text",$fimperiodocontabil,"onChange='js_pesquisa_cgm(false);'");
                             db_input("o41_cgmordenadordescr",40,$Io41_cgmordenadordescr,true,"text",3);
                           ?>
                       </td>
                     </tr>
-                  <?php    
+                  <?php
                   } else {
                   ?>
                       <td nowrap title="<?= @$Te54_numcgm ?>">
@@ -176,30 +176,30 @@ if (USE_PCASP) {
                           <?=
                              db_selectrecord("o41_cgmordenador", $result_cgm, true, $db_opcao, "", "", "", "","");
                           ?>
-                      </td>  
-                  <?php 
+                      </td>
+                  <?php
                   }
                 } elseif ($paramentosOrdenadores == 2) {
                   if ($e60_numemp) {
                     $ordenadoresArray = listarOrdenadores($e60_numemp);
-                    $arrayCount = count($ordenadoresArray); 
+                    $arrayCount = count($ordenadoresArray);
                     $cont       = 0;
                     $numCgm     = '';
-                   
+
                     if ($arrayCount > 1) {
                       foreach($ordenadoresArray as $ordenadores) {
-                        $cont++; 
+                        $cont++;
                         $numCgm .= "'";
-                        $numCgm .= $ordenadores['z01_numcgm']; 
+                        $numCgm .= $ordenadores['z01_numcgm'];
                         if ($arrayCount == $cont) {
-                          $numCgm .= "'";   
+                          $numCgm .= "'";
                         } else {
-                          $numCgm .= "',";  
-                        }        
+                          $numCgm .= "',";
+                        }
                           }
                         $where = " z01_numcgm in ($numCgm) ";
                         $result_cgm = $clcgm->sql_record($clcgm->sql_query_ordenador(null," sort_order asc, o41_nomeordenador asc ",$where));
-                       
+
                         if ($ordenadores['erro'] == false) { ?>
 
                           <tr>
@@ -207,7 +207,7 @@ if (USE_PCASP) {
                               <?db_ancora('<b>Ordenador da Liquidação</b>',"js_pesquisa_cgm(true);",$fimperiodocontabil);?>
                           </td>
                           <td colspan="4">
-                              <?  
+                              <?
                                   db_input("o41_cgmordenador",10,$Io41_cgmordenador,true,"text",$fimperiodocontabil,"onChange='js_pesquisa_cgm(false);'");
                                   db_input("o41_cgmordenadordescr",40,$Io41_cgmordenadordescr,true,"text",3);
                                   db_input('db243_data_inicio',10,$Idb243_data_inicio,true,'hidden',3);
@@ -215,7 +215,7 @@ if (USE_PCASP) {
                               ?>
                           </td>
                           </tr>
-                          <?php    
+                          <?php
                           } else {
                       ?>
                        <td nowrap title="<?= @$Te54_numcgm ?>">
@@ -223,23 +223,23 @@ if (USE_PCASP) {
                        </td>
                         <td colspan="2"><?=
                           db_selectrecord("o41_cgmordenador", $result_cgm, true, $db_opcao, "", "", "", "","js_dadosordenador(this.value,$e60_numemp)");
-                        ?></td>  
+                        ?></td>
                         <?php
                         db_input('db243_data_inicio',10,$Idb243_data_inicio,true,'hidden',3);
                         db_input('db243_data_final',10,$Idb243_data_final,true,'hidden',3);
                           }
                     } else {
-                     
+
                           $dado = listarOrdenadores($e60_numemp);
                           foreach($dado as $dados) {
                             $o41_cgmordenador = $dados['z01_numcgm'];
                           }
-                          
+
                           $where = $o41_cgmordenador ? " z01_numcgm in ($o41_cgmordenador) " :  "z01_numcgm is null";
                           $result_cgm = $clcgm->sql_record($clcgm->sql_buscar_ordenador(null," o41_nomeordenador asc ",$where));
                           if ($clcgm->numrows == 0 ) {
                              $result_cgm = $clcgm->sql_record($clcgm->sql_query_ordenador(null," o41_nomeordenador asc ",$where));
-                          } 
+                          }
                           if ($dados['erro'] == 0) { ?>
 
                               <tr>
@@ -247,16 +247,16 @@ if (USE_PCASP) {
                                   <?db_ancora('<b>Ordenador da Liquidação</b>',"js_pesquisa_cgm(true);",$fimperiodocontabil);?>
                               </td>
                               <td colspan="4">
-                                  <?  
+                                  <?
                                       db_input("o41_cgmordenador",8,$Io41_cgmordenador,true,"text",$fimperiodocontabil,"onChange='js_pesquisa_cgm(false);'");
                                       db_input("o41_cgmordenadordescr",40,$Io41_cgmordenadordescr,true,"text",3);
                                       db_input('db243_data_inicio',10,$Idb243_data_inicio,true,'hidden',3);
                                       db_input('db243_data_final',10,$Idb243_data_final,true,'hidden',3);
-                                  
+
                                   ?>
                               </td>
                               </tr>
-                              <?php    
+                              <?php
                               } else {
                           ?>
                            <td nowrap title="<?= @$Te54_numcgm ?>">
@@ -268,7 +268,7 @@ if (USE_PCASP) {
                                  db_input('db243_data_inicio',10,$Idb243_data_inicio,true,'hidden',3);
                                  db_input('db243_data_final',10,$Idb243_data_final,true,'hidden',3);
                               ?>
-                          </td>  
+                          </td>
                       <?php
                     }
                   }
@@ -281,24 +281,24 @@ if (USE_PCASP) {
                         <?db_ancora('<b>Ordenador da Liquidação</b>',"js_pesquisa_cgm(true);",$fimperiodocontabil);?>
                       </td>
                       <td colspan="4">
-                        <?  
+                        <?
                           db_input("o41_cgmordenador",8,$Io41_cgmordenador,true,"text",$fimperiodocontabil,"onChange='js_pesquisa_cgm(false);'");
                           db_input("o41_cgmordenadordescr",40,$Io41_cgmordenadordescr,true,"text",3);
                           db_input('db243_data_inicio',10,$Idb243_data_inicio,true,'hidden',3);
                           db_input('db243_data_final',10,$Idb243_data_final,true,'hidden',3);
-                                 
+
                         ?>
                       </td>
                       </tr>
-                   
+
                       <?php
                     }
-                  ?>     
-              </tr> 
+                  ?>
+              </tr>
               <tr>
                 <td><strong>Conta Fornecedor: </strong></td>
                 <td colspan='3'>
-                  <?                
+                  <?
                     db_select("e50_contafornecedor",null,true,1,"style='width:98%'");
                   ?>
                 </td>
@@ -731,7 +731,7 @@ if (USE_PCASP) {
       js_OpenJanelaIframe('top.corpo','db_iframe_empempenho','func_empempenho.php?funcao_js=parent.js_preenchepesquisa|e60_numemp|si172_nrocontrato|si172_datafinalvigencia|si174_novadatatermino','Pesquisa',true);
     } else {
        js_consultaEmpenho(iNumEmp,<?=$operacao?>);
-  }  
+  }
   }
   function js_preenchepesquisa(chave,chave2,chave3,chave4){
     r = true;
@@ -959,6 +959,7 @@ function validarVinculos(){
     $('e11_inscricaosubstitutofiscal').value = "";
     $('e11_cfop').value                      = "";
     //$('pesquisar').disabled = true;
+    console.log(strJson);
     url     = 'emp4_liquidacao004.php';
     oAjax   = new Ajax.Request(
       url,
@@ -984,6 +985,7 @@ function validarVinculos(){
     document.form1.reset();
     js_removeObj("msgBox");
     obj  = eval("("+oAjax.responseText+")");
+    console.log(obj);
     var sMensagemGrupoDesdobramento = null;
 
     if (obj.e60_numemp != iEmpenho) {
@@ -1072,7 +1074,7 @@ function validarVinculos(){
     opcaoPadrao.textContent = "Sem conta definida.";
     $("e50_contafornecedor").appendChild(opcaoPadrao);
 
-      if (obj.contas.length > 0) {      
+      if (obj.contas.length > 0) {
         obj.contas.forEach(function(conta) {
           const novaConta = document.createElement('option');
           novaConta.value = conta.pc63_contabanco;
@@ -1114,14 +1116,15 @@ function validarVinculos(){
                                                       || desdobramento == '333903603' || desdobramento == '333903607' || desdobramento == '333903608'
                                                       || desdobramento == '333903609' || desdobramento == '333903614' || desdobramento == '333903640'
                                                       || desdobramento == '333903641')){
-     tipodesdobramento = 1;
-     opcao = 1;
-     document.getElementById('esocial').style.display = "table-cell";
-   }else{
-     document.getElementById('esocial').style.display = "none";
-     tipodesdobramento = 0;
-     opcao = 3;
-   }
+      tipodesdobramento = 1;
+      opcao = 1;
+      document.getElementById('esocial').style.display = "table-cell";
+    }else{
+      document.getElementById('esocial').style.display = "none";
+      tipodesdobramento = 0;
+      opcao = 3;
+    }
+
      if(db_opcao != '3' && (obj.Tipofornec == 'cnpj' && !(desdobramento.substr(0, 3) == '331' || desdobramento.substr(0, 3) == '345' || desdobramento.substr(0, 3) == '346'
                                   || desdobramento.substr(0, 3) == '332' || desdobramento.substr(0, 7) == '3335041' || desdobramento.substr(0, 7) == '3333041'
                                   || desdobramento.substr(0, 7) == '3337041' || desdobramento.substr(0, 7) == '3339008' || desdobramento.substr(0, 7) == '3339041'
@@ -1181,7 +1184,7 @@ function validarVinculos(){
     if (obj.numnotas > 0){
 
       for (i = 0; i < obj.data.length;i++){
-
+        console.log(obj.data[i]);
         var sDisabilitaQuantidade  = '';
         var sDesabilitaValor       = '';
         descrmater = obj.data[i].pc01_descrmater.replace(/\+/g," ");
@@ -1380,7 +1383,7 @@ function validarVinculos(){
       let dataliquidacao = $F('dataLiquidacao').split('/');
       let dataliquidacaoformatada = new Date(dataliquidacao[2], dataliquidacao[1] - 1, dataliquidacao[0]).toISOString();
       var  datainicioformatada = new Date($F('db243_data_inicio')).toISOString();
-      
+
       var datafimformatada = new Date($F('db243_data_final')).toISOString();
       var datafinal = $F('db243_data_final').split('-');
       datafinal     = datafinal[2]+'/'+datafinal[1]+'/'+datafinal[0];
@@ -1397,130 +1400,134 @@ function validarVinculos(){
           }
           $('o41_cgmordenador').focus();
           return false;
-      } 
+      }
     }
-  if(document.form1.aIncide.value == 1){
-   if(opcao != '3' && !document.form1.ct01_codcategoria.value &&  obj.Tipofornec =='cpf' && tipodesdobramento == '1' ){
-      alert("Campo Categoria do Trabalhador Obrigatorio")
-      return false;
-   }
-   if(opcao != '3' && !document.form1.multiplosvinculos.value &&  obj.Tipofornec =='cpf' && tipodesdobramento == '1' ){
-        alert("Campo Possui múltiplos vínculos Obrigatorio")
-        return false;
-    }
-    if(document.form1.multiplosvinculos.value == 1 && opcao != '3' && !document.form1.contribuicaoPrev.value &&  obj.Tipofornec =='cpf' && tipodesdobramento == '1' ){
-      alert("Campo Indicador de Desconto da Contribuição Previdenciária Obrigatorio")
-      return false;
-   }
-   if(!document.form1.numempresa.value &&  opcao != '3' && (document.form1.contribuicaoPrev.value == '1' || document.form1.contribuicaoPrev.value == '2' || document.form1.contribuicaoPrev.value == '3') &&  obj.Tipofornec =='cpf' && tipodesdobramento == '1' ){
-      alert("Campo Empresa que efetuou desconto Obrigatorio")
-      return false;
-   }
-   if(!document.form1.ct01_codcategoriaremuneracao.value &&  opcao != '3' && (document.form1.contribuicaoPrev.value == '1' || document.form1.contribuicaoPrev.value == '2' || document.form1.contribuicaoPrev.value == '3') &&  obj.Tipofornec =='cpf' && tipodesdobramento == '1' ){
-      alert("Campo Categoria do trabalhador na qual houve a remuneração Obrigatorio")
-      return false;
-   }
-   if(!document.form1.valorremuneracao.value &&  opcao != '3' && (document.form1.contribuicaoPrev.value == '1' || document.form1.contribuicaoPrev.value == '2' || document.form1.contribuicaoPrev.value == '3') &&  obj.Tipofornec =='cpf' && tipodesdobramento == '1' ){
-      alert("Campo Valor da Remuneração Obrigatorio")
-      return false;
-   }
-   if(!document.form1.valordesconto.value &&  opcao != '3' && (document.form1.contribuicaoPrev.value == '2' || document.form1.contribuicaoPrev.value == '3') &&  obj.Tipofornec =='cpf' && tipodesdobramento == '1' ){
-      alert("Campo Valor do Desconto Obrigatorio")
-      return false;
-   }
-   if(!document.form1.competencia.value &&  opcao != '3' && (document.form1.contribuicaoPrev.value == '1' || document.form1.contribuicaoPrev.value == '2' || document.form1.contribuicaoPrev.value == '3') &&  obj.Tipofornec =='cpf' && tipodesdobramento == '1' ){
-      alert("Campo Competência Obrigatorio")
-      return false;
-   }
-  }
 
-  if(opcaoReinf != '3'){
-    if($('reinfRetencao').value != 0){
-      if($('reinfRetencao').value == 'sim' && ($('naturezaCod').value == '' || $('naturezaDesc').value == '')){
-        alert("Campo 'Natureza de Bem ou Serviço' Obrigatorio")
+
+    if(document.form1.aIncide.value == 1){
+      if(opcao != '3' && !document.form1.ct01_codcategoria.value &&  obj.Tipofornec =='cpf' && tipodesdobramento == '1' ){
+        alert("Campo Categoria do Trabalhador Obrigatorio")
         return false;
       }
-    }else{
-      alert("Campo 'Incide Retenção do Imposto de Renda' Obrigatorio")
-      return false;
-    }
-  }
 
-  if($('reinfRetencaoEstabelecimento').value != 0 && opcaoReinf != '3'){
-    if(aEstabelecimentos.length == 0){
-      alert("Informe um estabelecimento");
-    return false;
-    }
-  }
-
-  const aNAturezasCpf = ['15','17','18','19','20'];
-  if(obj.Tipofornec =='cpf' && (aNAturezasCpf.includes(($('naturezaCod').value).substr(0,2))) &&  opcaoReinf != '3'){
-    alert("A natureza do rendimento é incompatível com o tipo de credor CPF")
-    return false;
-  }
-
-  const aNaturezasCnpj = ['10','19'];
-  if(obj.Tipofornec =='cnpj' && (aNaturezasCnpj.includes(($('naturezaCod').value).substr(0,2))) &&  opcaoReinf != '3'){
-    alert("A natureza do rendimento é incompatível com o tipo de credor CNPJ")
-    return false;
-  }
-
-  const desdobramentoDiaria = desdobramento.substr(5, 2);
-  if((desdobramentoDiaria == '14' || desdobramentoDiaria == '33') && obrigaDiaria == true){
-    if($F('e140_matricula') == '' || $F('e140_matricula') == null){
-      alert('Campo Matricula Obrigatório.');
-      return false;
-    }
-    if($F('e140_cargo') == '' || $F('e140_cargo') == null){
-      alert('Campo Cargo Obrigatório.');
-      return false;
-    }
-    if($F('diariaOrigemMunicipio') == '' || $F('diariaOrigemMunicipio') == null
-      || $F('diariaOrigemUf') == '' || $F('diariaOrigemUf') == null){
-      alert('Campo Origem Obrigatório.');
-      return false;
-    }
-    if($F('diariaDestinoMunicipio') == '' || $F('diariaDestinoMunicipio') == null
-      || $F('diariaDestinoUf') == '' || $F('diariaDestinoUf') == null){
-      alert('Campo Destino Obrigatório.');
-      return false;
-    }
-    if($F('e140_dtautorizacao') == '' || $F('e140_dtautorizacao') == null){
-      alert('Campo Data da Autorização Obrigatório.');
-      return false;
-    }
-    if($F('e140_dtinicial') == '' || $F('e140_dtinicial') == null){
-      alert('Campo Data Inicial da Viagem Obrigatório.');
-      return false;
-    }
-    if($F('e140_horainicial') == '' || $F('e140_horainicial') == null){
-        alert('Campo Hora Inicial Obrigatório.');
+      if(opcao != '3' && !document.form1.multiplosvinculos.value &&  obj.Tipofornec =='cpf' && tipodesdobramento == '1' ){
+          alert("Campo Possui múltiplos vínculos Obrigatorio")
+          return false;
+      }
+      if(document.form1.multiplosvinculos.value == 1 && opcao != '3' && !document.form1.contribuicaoPrev.value &&  obj.Tipofornec =='cpf' && tipodesdobramento == '1' ){
+        alert("Campo Indicador de Desconto da Contribuição Previdenciária Obrigatorio")
         return false;
+      }
+      if(!document.form1.numempresa.value &&  opcao != '3' && (document.form1.contribuicaoPrev.value == '1' || document.form1.contribuicaoPrev.value == '2' || document.form1.contribuicaoPrev.value == '3') &&  obj.Tipofornec =='cpf' && tipodesdobramento == '1' ){
+          alert("Campo Empresa que efetuou desconto Obrigatorio")
+          return false;
+      }
+      if(!document.form1.ct01_codcategoriaremuneracao.value &&  opcao != '3' && (document.form1.contribuicaoPrev.value == '1' || document.form1.contribuicaoPrev.value == '2' || document.form1.contribuicaoPrev.value == '3') &&  obj.Tipofornec =='cpf' && tipodesdobramento == '1' ){
+          alert("Campo Categoria do trabalhador na qual houve a remuneração Obrigatorio")
+          return false;
+      }
+      if(!document.form1.valorremuneracao.value &&  opcao != '3' && (document.form1.contribuicaoPrev.value == '1' || document.form1.contribuicaoPrev.value == '2' || document.form1.contribuicaoPrev.value == '3') &&  obj.Tipofornec =='cpf' && tipodesdobramento == '1' ){
+          alert("Campo Valor da Remuneração Obrigatorio")
+          return false;
+      }
+      if(!document.form1.valordesconto.value &&  opcao != '3' && (document.form1.contribuicaoPrev.value == '2' || document.form1.contribuicaoPrev.value == '3') &&  obj.Tipofornec =='cpf' && tipodesdobramento == '1' ){
+          alert("Campo Valor do Desconto Obrigatorio")
+          return false;
+      }
+      if(!document.form1.competencia.value &&  opcao != '3' && (document.form1.contribuicaoPrev.value == '1' || document.form1.contribuicaoPrev.value == '2' || document.form1.contribuicaoPrev.value == '3') &&  obj.Tipofornec =='cpf' && tipodesdobramento == '1' ){
+          alert("Campo Competência Obrigatorio")
+          return false;
+      }
     }
-    if($F('e140_dtfinal') == '' || $F('e140_dtfinal') == null){
-      alert('Campo Data Final da Viagem Obrigatório.');
-      return false;
-    }
-    if($F('e140_horafinal') == '' || $F('e140_horafinal') == null){
-      alert('Campo Hora Final Obrigatório.');
-      return false;
-    }
-    if($F('e140_objetivo') == '' || $F('e140_objetivo') == null){
-      alert('Campo Objetivo da Viagem Obrigatório.');
-      return false;
-    }
-  }
 
-  if($F('dataLiquidacao') == ''){
-    alert('Campo Data da Liquidação obrigatório!');
-    $('dataLiquidacao').focus();
-    return false;
-  }
+    if(opcaoReinf != '3'){
+      if($('reinfRetencao').value != 0){
+        if($('reinfRetencao').value == 'sim' && ($('naturezaCod').value == '' || $('naturezaDesc').value == '')){
+          alert("Campo 'Natureza de Bem ou Serviço' Obrigatorio")
+          return false;
+        }
+      }else{
+        alert("Campo 'Incide Retenção do Imposto de Renda' Obrigatorio")
+        return false;
+      }
+    }
+
+    if($('reinfRetencaoEstabelecimento').value != 0 && opcaoReinf != '3'){
+      if(aEstabelecimentos.length == 0){
+        alert("Informe um estabelecimento");
+        return false;
+      }
+    }
+
+    const aNAturezasCpf = ['15','17','18','19','20'];
+    if(obj.Tipofornec =='cpf' && (aNAturezasCpf.includes(($('naturezaCod').value).substr(0,2))) &&  opcaoReinf != '3'){
+      alert("A natureza do rendimento é incompatível com o tipo de credor CPF")
+      return false;
+    }
+
+    const aNaturezasCnpj = ['10','19'];
+    if(obj.Tipofornec =='cnpj' && (aNaturezasCnpj.includes(($('naturezaCod').value).substr(0,2))) &&  opcaoReinf != '3'){
+      alert("A natureza do rendimento é incompatível com o tipo de credor CNPJ")
+      return false;
+    }
+
+    const desdobramentoDiaria = desdobramento.substr(5, 2);
+    if((desdobramentoDiaria == '14' || desdobramentoDiaria == '33') && obrigaDiaria == true){
+      if($F('e140_matricula') == '' || $F('e140_matricula') == null){
+        alert('Campo Matricula Obrigatório.');
+        return false;
+      }
+      if($F('e140_cargo') == '' || $F('e140_cargo') == null){
+        alert('Campo Cargo Obrigatório.');
+        return false;
+      }
+      if($F('diariaOrigemMunicipio') == '' || $F('diariaOrigemMunicipio') == null
+        || $F('diariaOrigemUf') == '' || $F('diariaOrigemUf') == null){
+        alert('Campo Origem Obrigatório.');
+        return false;
+      }
+      if($F('diariaDestinoMunicipio') == '' || $F('diariaDestinoMunicipio') == null
+        || $F('diariaDestinoUf') == '' || $F('diariaDestinoUf') == null){
+        alert('Campo Destino Obrigatório.');
+        return false;
+      }
+      if($F('e140_dtautorizacao') == '' || $F('e140_dtautorizacao') == null){
+        alert('Campo Data da Autorização Obrigatório.');
+        return false;
+      }
+      if($F('e140_dtinicial') == '' || $F('e140_dtinicial') == null){
+        alert('Campo Data Inicial da Viagem Obrigatório.');
+        return false;
+      }
+      if($F('e140_horainicial') == '' || $F('e140_horainicial') == null){
+          alert('Campo Hora Inicial Obrigatório.');
+          return false;
+      }
+      if($F('e140_dtfinal') == '' || $F('e140_dtfinal') == null){
+        alert('Campo Data Final da Viagem Obrigatório.');
+        return false;
+      }
+      if($F('e140_horafinal') == '' || $F('e140_horafinal') == null){
+        alert('Campo Hora Final Obrigatório.');
+        return false;
+      }
+      if($F('e140_objetivo') == '' || $F('e140_objetivo') == null){
+        alert('Campo Objetivo da Viagem Obrigatório.');
+        return false;
+      }
+    }
+
+    if($F('dataLiquidacao') == ''){
+      alert('Campo Data da Liquidação obrigatório!');
+      $('dataLiquidacao').focus();
+      return false;
+    }
 
     $('pesquisar').disabled = true;
     $('confirmar').disabled = true;
     valorTotal = 0;
     var aNotas = new Array();
+
     for (var i = 0;i < itens.length;i++){
       if (itens[i].checked == true){
 
@@ -1556,11 +1563,11 @@ function validarVinculos(){
         }
         var iCodigoCriterioCusto = "";
         /*
-         * controlamos se deve ser solicitado o centro de custo para o item.
-         * iTipoControle = 2 Uso Obrigatorio.
-         *                 1 uso nao obrigatorio
-         *                  0 Nao usa
-         */
+          * controlamos se deve ser solicitado o centro de custo para o item.
+          * iTipoControle = 2 Uso Obrigatorio.
+          *                 1 uso nao obrigatorio
+          *                  0 Nao usa
+          */
         if (iTipoControle  == 2  ) {
 
           if ($('cc08_sequencial'+itens[i].value).innerHTML.trim() == "") {
@@ -1623,6 +1630,7 @@ function validarVinculos(){
         return false;
 
       }
+
       var iTipoDocumentoFiscal = $F('e69_tipodocumentofiscal');
       var iCfop                = $F('e11_cfop');
       var iInscrSubstituto     = $F('e11_inscricaosubstitutofiscal');
@@ -1679,11 +1687,11 @@ function validarVinculos(){
         }
       }
 
-    if ($F('permitido_Liquidacao') == 'false') {
-        alert("Não é permitido liquidar com data anterior ao último lançamento de liquidação.");
-        $('confirmar').disabled = true;
-        return false;
-    }
+      if ($F('permitido_Liquidacao') == 'false') {
+          alert("Não é permitido liquidar com data anterior ao último lançamento de liquidação.");
+          $('confirmar').disabled = true;
+          return false;
+      }
 
       /* Extensao [CotaMensalLiquidacao] - Parte 4 */
 
@@ -1774,7 +1782,8 @@ function validarVinculos(){
           onComplete: js_saidaLiquidacao
         }
       );
-    }else{
+
+    } else {
 
       alert('Selecione ao menos 1 (uma) nota para liquidar');
       $('pesquisar').disabled = false;
@@ -1782,6 +1791,7 @@ function validarVinculos(){
 
     }
   }
+  
   function js_saidaLiquidacao(oAjax){
 
     obj      = eval("("+oAjax.responseText+")");
@@ -2454,7 +2464,7 @@ function js_mostraCatTrabalhadorremuneracao1(chave1,chave2){
         );
     }
 
-    function js_retornogetOrdenador(oAjax) 
+    function js_retornogetOrdenador(oAjax)
     {
 
         js_removeObj('msgBox');
@@ -2462,7 +2472,7 @@ function js_mostraCatTrabalhadorremuneracao1(chave1,chave2){
         document.getElementById('db243_data_inicio').value = oResposta.db243_data_inicio;
         document.getElementById('db243_data_final').value = oResposta.db243_data_final;
 
-    }  
+    }
 
     function js_pesquisa_cgm(mostra)
     {
@@ -2478,7 +2488,7 @@ function js_mostraCatTrabalhadorremuneracao1(chave1,chave2){
     }
 
     function js_mostracgm(erro, chave,chave2)
-    { 
+    {
         if (chave2 == 'JURIDICA') {
             alert("É obrigatório que o ordenador seja uma pessoa física.")
             document.form1.o41_cgmordenador.value = '';
@@ -2493,9 +2503,9 @@ function js_mostraCatTrabalhadorremuneracao1(chave1,chave2){
         }
     }
 
-    function js_mostracgm1(chave, chave1,chave2) 
+    function js_mostracgm1(chave, chave1,chave2)
     {
-       
+
         if (chave2 == 'JURIDICA') {
             alert("É obrigatório que o ordenador seja uma pessoa física.")
             document.form1.o41_cgmordenador.value = '';
@@ -2506,7 +2516,7 @@ function js_mostraCatTrabalhadorremuneracao1(chave1,chave2){
             document.form1.o41_cgmordenadordescr.value = chave1;
             db_iframe_cgm.hide();
         }
-      
+
     }
 
     $('contribuicaoPrev').style.width =' 495px';
@@ -2549,9 +2559,8 @@ function buscarParamentosOrdenadores()
   return db_utils::fieldsMemory($clempparametro->sql_record($clempparametro->sql_query(db_getsession("DB_anousu"), "e30_buscarordenadoresliqui", null, "")), 0)->e30_buscarordenadoresliqui;
 }
 
-function listarOrdenadores($e60_numemp) 
+function listarOrdenadores($e60_numemp)
 {
- 
   $o58_anousu  = 0;
   $o58_instit  = 0;
   $o58_orgao   = 0;
@@ -2567,44 +2576,40 @@ function listarOrdenadores($e60_numemp)
   $coddotacao = db_utils::fieldsMemory($rsBuscaElemento, 0)->e60_coddot;
 
   $anoUsu = db_getsession("DB_anousu");
-  $sWhere = "e56_coddot =	" . $coddotacao . " and ( e56_anousu = " . $anoUsu ."or e64_vlrpag > 0 ) and e61_numemp = ".$e60_numemp; 
+  $sWhere = "e56_coddot =	" . $coddotacao . " and ( e56_anousu = " . $anoUsu ."or e64_vlrpag > 0 ) and e61_numemp = ".$e60_numemp;
   $rsResult = $clempautidot->sql_record($clempautidot->sql_query_dotacao_empenho(null, "*", null, $sWhere));
   $numrows = $clempautidot->numrows;
 
   if ($numrows > 0) {
-     
-      $o58_anousu  = db_utils::fieldsMemory($rsResult, 0)->o58_anousu;
-      $o58_instit  = db_utils::fieldsMemory($rsResult, 0)->o58_instit;
-      $o58_orgao   = db_utils::fieldsMemory($rsResult, 0)->o58_orgao;
-      $o58_unidade = db_utils::fieldsMemory($rsResult, 0)->o58_unidade;
-      $e56_autori  = db_utils::fieldsMemory($rsResult, 0)->e56_autori;
+    $o58_anousu  = db_utils::fieldsMemory($rsResult, 0)->o58_anousu;
+    $o58_instit  = db_utils::fieldsMemory($rsResult, 0)->o58_instit;
+    $o58_orgao   = db_utils::fieldsMemory($rsResult, 0)->o58_orgao;
+    $o58_unidade = db_utils::fieldsMemory($rsResult, 0)->o58_unidade;
+    $e56_autori  = db_utils::fieldsMemory($rsResult, 0)->e56_autori;
   }
 
   $buscarOrdenadores = buscarParamentosOrdenadores();
   if ($buscarOrdenadores == 1 ) {
 
-     $whereUnidades = " o41_anousu = {$anoUsu} and o41_instit = {$o58_instit} and o41_orgao = {$o58_orgao} and o41_unidade = {$o58_unidade} ";
-     $o41_cgmordenador =  db_utils::fieldsMemory($clorcunidade->sql_record($clorcunidade->sql_query($anoUsu,null,null, " o41_ordliquidacao ",null,$whereUnidades)), 0)->o41_ordliquidacao;
-     $result_cgmorliquidaca = db_query("SELECT z01_nome as nomeordenador FROM cgm WHERE z01_numcgm = {$o41_cgmordenador}");
-     $o41_nomeordenador = db_utils::fieldsMemory($result_cgmorliquidaca, 0)->nomeordenador;
+    $whereUnidades = " o41_anousu = {$anoUsu} and o41_instit = {$o58_instit} and o41_orgao = {$o58_orgao} and o41_unidade = {$o58_unidade} ";
+    $o41_cgmordenador =  db_utils::fieldsMemory($clorcunidade->sql_record($clorcunidade->sql_query($anoUsu,null,null, " o41_ordliquidacao ",null,$whereUnidades)), 0)->o41_ordliquidacao;
+    $result_cgmorliquidaca = db_query("SELECT z01_nome as nomeordenador FROM cgm WHERE z01_numcgm = {$o41_cgmordenador}");
+    $o41_nomeordenador = db_utils::fieldsMemory($result_cgmorliquidaca, 0)->nomeordenador;
 
-     if ($numrows > 0) {
-
+    if ($numrows > 0) {
       $ordenadoresArray[] = [
-
         'z01_numcgm' => $o41_cgmordenador,
         'o41_nomeordenador' => $o41_nomeordenador,
         'erro'        =>  true,
-      ];
-      return $ordenadoresArray; 
-     }
+        ];
+      return $ordenadoresArray;
+    }
+    return ['erro' => false];
 
-     return ['erro' => false];
-    
-  } elseif ($buscarOrdenadores == 2 ) {
-
-   $anoUsu = db_getsession("DB_anousu");
-   $results = DB::table('empenho.empautidot')
+  } else {
+    $anoUsu = db_getsession("DB_anousu");
+    if ($e56_autori) {
+      $results = DB::table('empenho.empautidot')
                ->join('orcdotacao', function($join) {
                $join->on('orcdotacao.o58_anousu', '=', 'empautidot.e56_anousu')
                     ->on('orcdotacao.o58_coddot', '=', 'empautidot.e56_coddot');
@@ -2625,14 +2630,30 @@ function listarOrdenadores($e60_numemp)
                })
                ->get()->toArray();
 
-   foreach ($results as $autorizacao) {  
-       $o58_instit  =  $autorizacao->o58_instit; 
-       $o58_orgao   =  $autorizacao->o58_orgao; 
-       $o58_unidade =  $autorizacao->o58_unidade; 
-       $o58_anousu  =  $autorizacao->o58_anousu; 
-   }   
+      foreach ($results as $autorizacao) {
+        $o58_instit  =  $autorizacao->o58_instit;
+        $o58_orgao   =  $autorizacao->o58_orgao;
+        $o58_unidade =  $autorizacao->o58_unidade;
+        $o58_anousu  =  $autorizacao->o58_anousu;
+      }
 
-   $aAssinantes = DB::table('configuracoes.assinatura_digital_assinante')
+    } else {
+      $rsResult = DB::table('empenho.empempenho')
+      ->join('orcamento.orcdotacao', 'o58_coddot', 'e60_coddot')
+      ->where("e60_numemp", $e60_numemp)
+      ->select('o58_instit',
+                'o58_orgao',
+                'o58_unidade')
+      ->first();
+
+      if ($rsResult) {
+        $o58_instit  =  $rsResult->o58_instit;
+        $o58_orgao   =  $rsResult->o58_orgao;
+        $o58_unidade =  $rsResult->o58_unidade;
+        $numrows     = 1;
+      }
+    }
+    $aAssinantes = DB::table('configuracoes.assinatura_digital_assinante')
                ->join('configuracoes.db_usuarios', 'configuracoes.assinatura_digital_assinante.db243_usuario', '=', 'configuracoes.db_usuarios.id_usuario')
                ->join('configuracoes.db_usuacgm', 'configuracoes.db_usuacgm.id_usuario', '=', 'configuracoes.db_usuarios.id_usuario')
                ->join('protocolo.cgm', 'protocolo.cgm.z01_numcgm', '=', 'configuracoes.db_usuacgm.cgmlogin')
@@ -2644,35 +2665,31 @@ function listarOrdenadores($e60_numemp)
                ->where('configuracoes.assinatura_digital_assinante.db243_documento', '=', 1)
                ->select('configuracoes.db_usuarios.login', 'configuracoes.db_usuarios.nome', 'configuracoes.db_usuarios.email', 'protocolo.cgm.z01_cgccpf' , 'configuracoes.assinatura_digital_assinante.db243_cargo','protocolo.cgm.z01_numcgm','configuracoes.assinatura_digital_assinante.db243_data_inicio','configuracoes.assinatura_digital_assinante.db243_data_final')
                ->distinct('login', 'nome', 'z01_cgccpf', 'db243_cargo')
-               ->get()->toArray();         
+               ->get()->toArray();
 
-   $rowCount = count($aAssinantes);  
-   $ordenadoresArray = array(); 
-   $uniqueKeys = array(); 
-   
-   foreach ($aAssinantes as $assinante) {
-       $uniqueKey = $assinante->nome . '|' . $assinante->z01_numcgm;
-   
-    
-           if (!in_array($uniqueKey, $uniqueKeys)) {
-               $ordenadoresArray[] = [
-                   'nome' => $assinante->nome,
-                   'z01_numcgm' => $assinante->z01_numcgm,
-                   'db243_data_inicio' => $assinante->db243_data_inicio,
-                   'db243_data_final' => $assinante->db243_data_final,
-                   'rowCount'    => $rowCount,
-                   'erro'        =>  $numrows,
-               ];
-               $uniqueKeys[] = $uniqueKey;
-           }
-          
-      
-   }
-   if ($rowCount > 0) {
+    $rowCount = count($aAssinantes);
+    $ordenadoresArray = array();
+    $uniqueKeys = array();
+
+    foreach ($aAssinantes as $assinante) {
+      $uniqueKey = $assinante->nome . '|' . $assinante->z01_numcgm;
+
+      if (!in_array($uniqueKey, $uniqueKeys)) {
+        $ordenadoresArray[] = [
+            'nome' => $assinante->nome,
+            'z01_numcgm' => $assinante->z01_numcgm,
+            'db243_data_inicio' => $assinante->db243_data_inicio,
+            'db243_data_final' => $assinante->db243_data_final,
+            'rowCount'    => $rowCount,
+            'erro'        =>  $numrows,
+        ];
+        $uniqueKeys[] = $uniqueKey;
+      }
+    }
+    if ($rowCount > 0) {
       return $ordenadoresArray;
-   }
-
-   return ['erro' => false];
+    }
+    return ['erro' => false];
   }
 }
 ?>

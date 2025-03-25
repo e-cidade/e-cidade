@@ -3,7 +3,7 @@
 namespace App\Repositories\Patrimonial\Compras;
 
 use App\Models\Patrimonial\Compras\Pcorcamitem;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class PcorcamitemRepository
 {
@@ -12,6 +12,22 @@ class PcorcamitemRepository
     public function __construct()
     {
         $this->model = new Pcorcamitem();
+    }
+
+    public function all()
+    {
+        return Pcorcamitem::all();
+    }
+
+    /**
+     * Busca um item pelo ID.
+     *
+     * @param int $id
+     * @return Pcorcamitem
+     */
+    public function find($id)
+    {
+        return Pcorcamitem::findOrFail($id);
     }
 
     public function insert($dados): Pcorcamitem

@@ -1,0 +1,66 @@
+/* Textfield Container */
+.textfield-container {
+    margin-bottom: 15px
+}
+
+/* Estilos gerais de rótulos */
+.textfield-container .label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #111827; /* Texto cinza-claro para temas claros */
+}
+
+/* Estilos gerais de input */
+.textfield-container .textfield-input {
+    display: block;
+    width: 100%;
+    font-size: 0.875rem;
+    color: #111827;
+    background-color: #F9FAFB;
+    border: 1px solid #D1D5DB;
+    border-radius: 0.5rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.textfield-container .textfield-input:disabled {
+    background-color: #dddddd;
+}
+
+.textfield-container-sm {
+    padding: 0.5rem; /* 8px */
+    font-size: 0.75rem; /* 12px */
+}
+
+.textfield-container-md {
+    padding: 0.625rem; /* 10px */
+    font-size: 0.875rem; /* 14px */
+}
+
+.textfield-container-lg {
+    padding: 1rem; /* 16px */
+    font-size: 1.125rem; /* 18px */
+}
+
+.textfield-container .form-input:focus {
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+
+.loading {
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* Animação de pulsação */
+@keyframes pulse {
+    0% {
+        background-color: #e5e7eb; /* Cor clara (equivalente a bg-gray-200) */
+    }
+    50% {
+        background-color: #d1d5db; /* Cor intermediária para o efeito de pulsação */
+    }
+    100% {
+        background-color: #e5e7eb; /* Cor clara novamente */
+    }
+}

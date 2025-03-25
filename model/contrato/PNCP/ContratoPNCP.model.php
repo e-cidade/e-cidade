@@ -128,7 +128,7 @@ class ContratoPNCP extends ModeloBasePNCP
 
         ////erro ao enviar aviso
         if ($retorno[23]) {
-            return array(422, $retorno[17]);
+            return array(422, $retorno[17].$retorno[22]);
         }
         //caso tenha enviado com sucesso!
         else {
@@ -327,7 +327,7 @@ class ContratoPNCP extends ModeloBasePNCP
 
         $url = $this->envs['URL'] . "orgaos/" . $cnpj . "/contratos" . "/" . $dados->ac214_ano . "/" . $dados->ac214_sequencialpncp . "/arquivos" . "/" . $dados->ac214_sequencialarquivo;
 
-        $justificativa['justificativa'] = $dados->justificativa; 
+        $justificativa['justificativa'] = $dados->justificativa;
 
         $chpncp      = curl_init($url);
 
@@ -382,7 +382,7 @@ class ContratoPNCP extends ModeloBasePNCP
     {
         // Remove caracteres não numéricos
         $numero = preg_replace('/[^0-9]/', '', $numero);
-    
+
         // Verifica a quantidade de caracteres
         if (strlen($numero) == 11) {
             return "PF";

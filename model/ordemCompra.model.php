@@ -1046,7 +1046,7 @@ class ordemCompra {
       $oMaterial->coddeptoconsumo   = urlencode(urldecode($oMaterial->coddeptoconsumo));
       $oMaterial->descrdeptoconsumo = urlencode(urldecode($oMaterial->descrdeptoconsumo));
     }
-    
+
     if ($oMaterial->iIndiceEntrada != "") {
 
 
@@ -1151,7 +1151,7 @@ class ordemCompra {
    * @return object
    */
   function getInfoItem($iCodLanc,  $iIndice) {
-    
+
     $oItemAtivo = $_SESSION["matordem{$this->iCodOrdem}"][$iCodLanc][$iIndice];
 
     $_SESSION["matordem{$this->iCodOrdem}"][$iCodLanc][$iIndice]->checked = " checked ";
@@ -1170,11 +1170,15 @@ class ordemCompra {
       }
     }
 
+    $sqlUndCompras = 'select pc01_unid from pcmater where pc01_codmater = '.$oItemAtivo->pc01_codmater;
+    $rsUndCompras = $oDaoTransMater->sql_record($sqlUndCompras);
+
+    $oItemAtivo->undCompras = db_utils::fieldsMemory($rsUndCompras,0)->pc01_unid;
     $iSequencialEmpEmpItem = $oItemAtivo->e62_sequencial;
 
     $oItemAtivo->aMateriaisEstoque = $aItensMaterial;
     $oItemAtivo->sServicoQuantidade = ordemCompra::getServicoQuantidade($iSequencialEmpEmpItem);
-    return $oItemAtivo; 
+    return $oItemAtivo;
   }
   /**
    * Cancela o fracionamento do Item passado;

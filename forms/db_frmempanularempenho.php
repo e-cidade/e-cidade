@@ -906,9 +906,10 @@ if (empty ($e60_numemp)) {
                 lRecriarReserva = false;
             }
 
+            let iSaldoDisponivel = parseFloat($F('saldo_dis').replace(/\./g, '').replace(',', '.'));
             var sJson  = '{"method":"anularEmpenho","iEmpenho":"'+$F('e60_numemp')+'","itensAnulados":['+itensEmp+'],"nValor":"'+valorTotal+'",';
             sJson     += '"aSolicitacoes":['+sSolicAtend+'],"lRecriarReserva":'+lRecriarReserva+',"sMotivo":"'+encodeURIComponent($F('motivo'))+'",';
-            sJson     += '"iTipoAnulacao":'+$F('e94_empanuladotipo')+'}';
+            sJson     += '"iTipoAnulacao":'+$F('e94_empanuladotipo')+',"iSaldoDisponivel":'+iSaldoDisponivel+'}';
             if (itensEmp != ''){
 
                 js_divCarregando("Aguarde, efetuando Anulação do Empenho.","msgBox");

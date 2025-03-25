@@ -210,11 +210,6 @@ $oRotulo->label("pc80_resumo");
 </style>
 
 <script type="text/javascript">
-    loadComponents([
-        'buttonsSolid',
-        'simpleModal'
-    ]);
-
     document.getElementById("btnAlterar").style.display = "none";
 
     /**

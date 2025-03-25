@@ -242,7 +242,7 @@ switch ($oParam->exec) {
                     $oDadosLicitacao = db_utils::fieldsMemory($rsDadosEnvio, $lic);
                 }
 
-                $oDadosLicitacao->justificativa = $oParam->justificativa; 
+                $oDadosLicitacao->justificativa = $oParam->justificativa;
                 $clAvisoLicitacaoPNCP = new AvisoLicitacaoPNCP($oDadosLicitacao);
                 $oDadosRatificacao = $clAvisoLicitacaoPNCP->montarRetificacao();
 
@@ -263,7 +263,7 @@ switch ($oParam->exec) {
                     $clliccontrolepncp->incluir();
 
                     $rsDadosEnvioItens = $clLicitacao->sql_record($clLicitacao->sql_query_pncp_itens($aLicitacao->codigo));
-        
+
                     for ($item = 0; $item < pg_numrows($rsDadosEnvioItens); $item++) {
                         $oDadosLicitacaoItens = db_utils::fieldsMemory($rsDadosEnvioItens, $item);
 
@@ -272,14 +272,14 @@ switch ($oParam->exec) {
                             db_fieldsmemory($rsReservado, 0);
                             $oDadosLicitacaoItens->valorunitarioestimado = $valorunitarioestimado;
                         }
-        
+
                         $aItensLicitacaoItens[] = $oDadosLicitacaoItens;
                     }
-        
+
                     $oDadosLicitacaoItens = $aItensLicitacaoItens;
                     $clAvisoLicitacaoPNCP = new AvisoLicitacaoPNCP($oDadosLicitacaoItens);
                     $aDadosRatificacaoItens = $clAvisoLicitacaoPNCP->montarRetificacaoItens();
-                    
+
                     $rsApiPNCPItensMessage = "";
 
                     foreach ($aDadosRatificacaoItens as $key => $item) {
@@ -289,11 +289,11 @@ switch ($oParam->exec) {
                         $aDataRatificacaoItem['tipoBeneficioId'] = $item['tipoBeneficioId'];
                         $aDataRatificacaoItem['incentivoProdutivoBasico'] = $item['incentivoProdutivoBasico'];
                         $aDataRatificacaoItem['descricao'] = mb_convert_encoding($item['descricao'], 'UTF-8', 'ISO-8859-1');
-                        $aDataRatificacaoItem['quantidade'] = intval($item['quantidade']);
+                        $aDataRatificacaoItem['quantidade'] = $item['quantidade'];
                         $aDataRatificacaoItem['unidadeMedida'] = mb_convert_encoding($item['unidadeMedida'], 'UTF-8', 'ISO-8859-1');
                         $aDataRatificacaoItem['orcamentoSigiloso'] = $item['orcamentoSigiloso'];
-                        $aDataRatificacaoItem['valorUnitarioEstimado'] = intval($item['valorUnitarioEstimado']);
-                        $aDataRatificacaoItem['valorTotal'] = intval($item['valorTotal']);
+                        $aDataRatificacaoItem['valorUnitarioEstimado'] = $item['valorUnitarioEstimado'];
+                        $aDataRatificacaoItem['valorTotal'] = $item['valorTotal'];
                         $aDataRatificacaoItem['situacaoCompraItemId'] = '1';
                         $aDataRatificacaoItem['criterioJulgamentoId'] = intval($item['criterioJulgamentoId']);
                         $aDataRatificacaoItem['justificativa'] = $oParam->justificativa;
@@ -441,7 +441,7 @@ switch ($oParam->exec) {
 
                 for ($licAta = 0; $licAta < pg_num_rows($rsDadosEnvioAta); $licAta++) {
                     $oDadosLicitacao = db_utils::fieldsMemory($rsDadosEnvioAta, $licAta);
-                    $oDadosLicitacao->justificativa = $oParam->justificativa; 
+                    $oDadosLicitacao->justificativa = $oParam->justificativa;
                     $clAtaRegistroprecoPNCP = new AtaRegistroprecoPNCP($oDadosLicitacao);
                     //monta o json com os dados da licitacao
                     $odadosEnvioAta = $clAtaRegistroprecoPNCP->montarDados();

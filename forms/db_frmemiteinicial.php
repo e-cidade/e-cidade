@@ -136,6 +136,18 @@ $clrotulo->label("v51_certidao");
 
              $oCertidao = new Certidao($certidao);
 
+             $query = "select  * from cartorio.titulos where cda_id = $certidao and status = 'PROTESTADO' 
+             or status = 'PROTESTO POR EDITAL'";
+
+             $exec = db_query($query);
+             $count = pg_num_rows($exec);
+              
+             if($count > 0){
+                $protestado = "<span style='color:red'>(Essa certidão está protestada)</span>";
+             }else{
+              $protestado = '';
+             }
+
              $sEcho = "<td rel='ignore-css'>
                          <input class='chkcert' type='checkbox' name='certid$i'      value='$certidao' ".(isset($$x)||isset($chavepesquisa)?'checked':'checked')." ".($db_opcao==3?'disabled':'')."  >\n
                          <input type='hidden'   name='veri_certid$i' value='$certidao'> $certidao

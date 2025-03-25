@@ -3,7 +3,7 @@
 namespace App\Services\Patrimonial\Licitacao;
 use App\Models\Patrimonial\Licitacao\Licproposta;
 use App\Repositories\Patrimonial\Licitacao\LicpropostaRepository;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class LicpropostaService
 {
@@ -28,7 +28,7 @@ class LicpropostaService
             return $this->licpropostaRepository->insert($alicproposta);
     }
     public function atualizarProposta($dados):bool
-    {   
+    {
         $alicproposta = [];
         $alicproposta['l224_sequencial'] = $dados->l224_sequencial;
         $alicproposta['l224_codigo']   = $dados->l224_codigo;

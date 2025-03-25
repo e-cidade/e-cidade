@@ -25,5 +25,4 @@
  *                                licenca/licenca_pt.txt 
  */
 
-$campos = "movrel.r54_anomes,movrel.r54_codrel,movrel.r54_regist,movrel.r54_codeve,movrel.r54_quant1,movrel.r54_quant2,movrel.r54_quant3,movrel.r54_lancad";
-?>
+$campos = "movrel.r54_anomes,movrel.r54_codrel,movrel.r54_regist,movrel.r54_codeve,movrel.r54_quant1,movrel.r54_quant4,movrel.r54_quant2,movrel.r54_quant5,movrel.r54_quant3,movrel.r54_quant6,movrel.r54_lancad";

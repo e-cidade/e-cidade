@@ -188,7 +188,8 @@ try {
             $sSqlUnidades = $oDaoMatUnid->sql_query_file(
                 null,
                 "m61_codmatunid,substr(m61_descr,1,20) as m61_descr",
-                "m61_descr"
+                "m61_descr",
+                "m61_ativo = 't'"
             );
             $rsUnidades      = $oDaoMatUnid->sql_record($sSqlUnidades);
             $iNumRowsUnidade = $oDaoMatUnid->numrows;

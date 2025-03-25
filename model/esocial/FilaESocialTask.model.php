@@ -15,6 +15,7 @@ class FilaESocialTask extends Task implements iTarefa
 
     public function iniciar()
     {
+        
         // $job = new \Job();
         // $job->setNome("eSocial_Evento_" . $this->tipoEvento . "_$idFila");
 
@@ -29,41 +30,17 @@ class FilaESocialTask extends Task implements iTarefa
         $_SESSION['DB_desativar_account'] = true;
 
         require_once("libs/db_conn.php");
-        require_once("libs/db_stdlib.php");
-        require_once("libs/db_utils.php");
-        require_once("dbforms/db_funcoes.php");
-        
-        //require_once("libs/db_conecta.php");
 
         $dao = new \cl_esocialenvio();
 
-
-        $hostname = gethostname();
-        //var_dump($hostname);exit;
-        $cmd = shell_exec("cat updatedb/conn | grep -e {$hostname}$");
-        $rows        = preg_split('/\s+/', $cmd);
-        $rows = array_filter($rows);
-        $array_global = array();
-        $array_interno = array();
-        
-        foreach ($rows as $row) {
-            if (count($array_interno) <= 3) {
-                $array_interno[] = $row;
-                if (count($array_interno) == 3) {
-                    array_push($array_global, $array_interno);
-                    $array_interno = array();
-                }
-            }
-        }
-
-        foreach ($array_global as $row) {
             try {
 
                 /**
                  * Conecta no banco com variaveis definidas no 'libs/db_conn.php'
                  */
-                if (!($conn = @pg_connect("host=localhost dbname=$row[0] port=$row[1] user=dbportal password=dbportal"))) {
-                    throw new Exception("Erro ao conectar ao banco. host=$DB_SERVIDOR dbname=$row[0] port=$row[1] user=dbportal password=dbportal");
+                
+                if (!($conn = @pg_connect("host=$DB_SERVIDOR dbname=$DB_BASE port=$DB_PORTA user=$DB_USUARIO password=$DB_SENHA"))) {
+                    throw new Exception("Erro ao conectar ao banco. host=$DB_SERVIDOR dbname=$DB_BASE port=$DB_PORTA user=$DB_USUARIO password=$DB_SENHA");
                 }
 
                 $sql = $dao->sql_query_file(null, "*", "rh213_sequencial", "rh213_situacao = " . cl_esocialenvio::SITUACAO_NAO_ENVIADO);
@@ -82,9 +59,8 @@ class FilaESocialTask extends Task implements iTarefa
                 }
             } catch (\Exception $e) {
                 echo "Erro na execução:\n{$e->getMessage()} \n";
-                continue;
+                //continue;
             }
-        }
     }
 
     private function enviar($conn, $dadosEnvio)
@@ -107,9 +83,9 @@ class FilaESocialTask extends Task implements iTarefa
             $exportar = new ESocial(Registry::get('app.config'), "run.php");
             $exportar->setDados($dados);
             //var_dump($exportar);exit;
-            
+
             $retorno = $exportar->request();
-            
+
             //var_dump($exportar->getDescResposta());exit;
             if (!$retorno) {
                 throw new Exception("Erro no envio das informações. \n {$exportar->getDescResposta()}");
@@ -118,7 +94,7 @@ class FilaESocialTask extends Task implements iTarefa
             if ($dao->erro_status == "0") {
                 throw new Exception("N?o foi poss?vel alterar situação ENVIADO da fila.");
             }
-            
+
             $dados[] = $exportar->getProtocoloEnvioLote();
 
             $dao->setProtocolo($dadosEnvio->rh213_sequencial, $exportar->getProtocoloEnvioLote());
@@ -139,7 +115,7 @@ class FilaESocialTask extends Task implements iTarefa
             }
             //var_dump($exportar->getCdRespostaProcessamento());exit;
             if ($exportar->getCdRespostaProcessamento() != self::LOTE_PROCESSADO_SUCESSO) {
-                throw new Exception($exportar->getCdRespostaProcessamento(). " Erro no processamento do lote. " . utf8_decode($exportar->getDescRespostaProcessamento()));
+                throw new Exception($exportar->getCdRespostaProcessamento() . " Erro no processamento do lote. " . utf8_decode($exportar->getDescRespostaProcessamento()));
             }
 
             $this->incluirRecido($dadosEnvio->rh213_sequencial, $exportar->getNumeroRecibo());
@@ -163,35 +139,15 @@ class FilaESocialTask extends Task implements iTarefa
         $_SESSION['DB_desativar_account'] = true;
 
         require_once("libs/db_conn.php");
-        require_once("libs/db_stdlib.php");
-        require_once("libs/db_utils.php");
-        require_once("dbforms/db_funcoes.php");
 
-        $hostname = gethostname();
-        $cmd = shell_exec("cat updatedb/conn | grep -e {$hostname}$");
-        $rows        = preg_split('/\s+/', $cmd);
-        $rows = array_filter($rows);
-        $array_global = array();
-        $array_interno = array();
-
-        foreach ($rows as $row) {
-            if (count($array_interno) <= 3) {
-                $array_interno[] = $row;
-                if (count($array_interno) == 3) {
-                    array_push($array_global, $array_interno);
-                    $array_interno = array();
-                }
-            }
-        }
-
-        foreach ($array_global as $row) {
             try {
 
                 /**
                  * Conecta no banco com variaveis definidas no 'libs/db_conn.php'
                  */
-                if (!($conn = @pg_connect("host=$DB_SERVIDOR dbname=$row[0] port=$row[1] user=dbportal password=dbportal"))) {
-                    throw new Exception("Erro ao conectar ao banco. host=$DB_SERVIDOR dbname=$row[0] port=$row[1] user=dbportal password=dbportal");
+                
+                if (!($conn = @pg_connect("host=$DB_SERVIDOR dbname=$DB_BASE port=$DB_PORTA user=$DB_USUARIO password=$DB_SENHA"))) {
+                    throw new Exception("Erro ao conectar ao banco. host=$DB_SERVIDOR dbname=$DB_BASE port=$DB_PORTA user=$DB_USUARIO password=$DB_SENHA");
                 }
 
                 $dao = new \cl_esocialenvio();
@@ -215,7 +171,7 @@ class FilaESocialTask extends Task implements iTarefa
                 if (!$rs || pg_num_rows($rs) == 0) {
                     //throw new Exception("Agendamento nao encontrado.");
                     echo "Agendamento n?o encontrado.";
-                    continue;
+                    //continue;
                 }
 
                 for ($iCont = 0; $iCont < pg_num_rows($rs); $iCont++) {
@@ -244,16 +200,11 @@ class FilaESocialTask extends Task implements iTarefa
             } catch (\Exception $e) {
                 echo "Erro na execução:\n{$e->getMessage()} \n";
             }
-        }
     }
 
-    public function cancelar()
-    {
-    }
+    public function cancelar() {}
 
-    public function abortar()
-    {
-    }
+    public function abortar() {}
 
     public function incluirRecido($codigoEsocialEnvio, $numeroRecibo)
     {

@@ -120,7 +120,6 @@ $clrotulo->label("op01_dataassinaturacop");
           if (isset($digito) && trim($digito) != '') {
 
             if ($pesquisa_chave != null && $pesquisa_chave != "") {
-
               $result = $cldb_operacaodecredito->sql_record($cldb_operacaodecredito->sql_query($pesquisa_chave));
 
               if ($cldb_operacaodecredito->numrows != 0) {
@@ -135,7 +134,6 @@ $clrotulo->label("op01_dataassinaturacop");
             }
 
           } else {
-            
             if ($pesquisa_chave != null && $pesquisa_chave != "") {
 
               if(!empty($tipos_lancamento)) {
@@ -143,10 +141,9 @@ $clrotulo->label("op01_dataassinaturacop");
               } else if(!empty($credor) && !empty($regras)) {
                 $result = $cldb_operacaodecredito->sql_record($cldb_operacaodecredito->sql_query($pesquisa_chave, "*", null, "op01_credor = $credor" . $regras));
               }
-   
               if ($cldb_operacaodecredito->numrows != 0) {
                 db_fieldsmemory($result, 0);
-                echo "<script>" . $funcao_js . "('$op01_numerocontratoopc','$op01_dataassinaturacop',false);</script>";
+                echo "<script>" . $funcao_js . "('$op01_numerocontratoopc','$op01_dataassinaturacop','$op01_objetocontrato',false);</script>";
               } else {
                 echo "<script>" . $funcao_js . "('Chave(" . $pesquisa_chave . ") não Encontrado',true);</script>";
               }

@@ -141,7 +141,7 @@ if (pg_num_rows($this->rsLotes) > 0) {
         LEFT JOIN solicitaprotprocesso ON pc90_solicita = pc10_numero
         LEFT JOIN processocompraloteitem ON pc69_pcprocitem = pcprocitem.pc81_codprocitem
         WHERE pc81_codproc={$this->codpreco} and pc69_processocompralote = $oLotes->pc68_sequencial
-            AND pc24_pontuacao=1 order by pc11_seq;
+            order by pc11_seq;
         ";
 
         $rsResult = db_query($sSql) or die(pg_last_error());

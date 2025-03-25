@@ -1927,7 +1927,7 @@ class Acordoaux
         $oDaoAcordo->ac16_numero = $this->getNumero();
         $oDaoAcordo->ac16_objeto = "{$this->getObjeto()}";
         $oDaoAcordo->ac16_resumoobjeto = "" . $this->getResumoObjeto() . "";
-        $oDaoAcordo->ac16_acordocomissao = $this->getComissao()->getCodigo();
+        $oDaoAcordo->ac16_acordocomissao = empty($this->getComissao()) ? 'null' : $this->getComissao()->getCodigo();
         $oDaoAcordo->ac16_origem = $this->getOrigem();
         $oDaoAcordo->ac16_tipoorigem = $this->getTipoOrigem();
         $oDaoAcordo->ac16_qtdrenovacao = $this->getQuantidadeRenovacao();

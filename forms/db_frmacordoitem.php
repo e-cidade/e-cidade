@@ -186,7 +186,7 @@ db_app::load("estilos.css, grid.style.css");
                                 <td>
                                     <?
                                     $oDaoMatUnid = db_utils::getDao("matunid");
-                                    $sSqlUnidades = $oDaoMatUnid->sql_query_file(null, "m61_codmatunid,substr(m61_descr,1,20) as m61_descr", "m61_descr");
+                                    $sSqlUnidades = $oDaoMatUnid->sql_query_file(null, "m61_codmatunid,substr(m61_descr,1,20) as m61_descr", "m61_descr","m61_ativo = 't'");
                                     $rsUnidades = $oDaoMatUnid->sql_record($sSqlUnidades);
                                     $iNumRowsUnidade = $oDaoMatUnid->numrows;
                                     $aUnidades = array(0 => "Selecione");
@@ -419,6 +419,7 @@ db_app::load("estilos.css, grid.style.css");
                     document.form1.ac20_pcmater.value = '';
                 } else {
                     isServico = chave2;
+                    getUnidade();
                     js_verificaServico();
                     js_getElementosMateriais();
                 }
@@ -451,6 +452,7 @@ db_app::load("estilos.css, grid.style.css");
                 document.form1.pc01_descrmater.value = chave2;
                 db_iframe_pcmater.hide();
                 isServico = chave3;
+                getUnidade();
                 js_verificaServico();
                 js_getElementosMateriais();
             } else {
@@ -1052,6 +1054,7 @@ db_app::load("estilos.css, grid.style.css");
                 js_getElementosMateriais(elemento);
                 js_desabilitaItemSelecionar();
                 js_verificaServico();
+                getUnidade();
             }
             aPeriodoItem = oRetorno.item.aPeriodosItem;
             oGridPeriodos.clearAll(true);
@@ -2619,6 +2622,41 @@ db_app::load("estilos.css, grid.style.css");
             $('ac20_servicoquantidade').options[1].disabled = false;
         }
     }
+
+    function getUnidade(){
+    let oParametro = new Object();
+        let oRetorno;
+        oParametro.pc01_codmater = document.getElementById('ac20_pcmater').value;
+        let oAjax = new Ajax.Request('com_getunidpcmater.RPC.php', {
+            method: 'post',
+            parameters: 'json=' + Object.toJSON(oParametro),
+            asynchronous: false,
+            onComplete: function(oAjax) {
+                oRetorno = eval("(" + oAjax.responseText.urlDecode() + ")");
+                let codigoUnidade = oRetorno.pc01_unid;
+                if(codigoUnidade != "" && codigoUnidade != null){
+                  document.getElementById('ac20_matunid').value = codigoUnidade;
+                  document.getElementById('ac20_matunid').style.backgroundColor = '#DEB887';
+                  let ac20_matunid = document.getElementById("ac20_matunid");
+                  ac20_matunid.onmousedown = function(e) {
+                      e.preventDefault(); // Impede a interação com o `select`
+                      this.blur();        // Remove o foco do `select`
+                      return false;
+                  };
+
+
+                }else{
+                  document.getElementById('ac20_matunid').style.backgroundColor = 'white';
+                  document.getElementById('ac20_matunid').removeAttribute('disabled');
+                  let ac20_matunid = document.getElementById("ac20_matunid");
+                  ac20_matunid.onmousedown = null;
+
+                }
+
+
+            }
+        });
+  }
 
     js_showGrid();
     js_windowItensEmpenho();

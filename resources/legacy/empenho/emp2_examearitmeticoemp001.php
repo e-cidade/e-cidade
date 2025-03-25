@@ -142,7 +142,8 @@ include("dbforms/db_classesgenericas.php");
   </tr>
   <tr>
     <td align='center'>
-      <input name='pesquisar' type='button' value='Consultar' onclick='js_abre();'>
+      <input name='pesquisar' type='button' value='Gerar PDF' onclick='js_abre("pdf");'>
+      <input name='pesquisar' type='button' value='Gerar CSV' onclick='js_abre("csv");'>
     </td>
   </tr>
 </table>
@@ -151,25 +152,33 @@ include("dbforms/db_classesgenericas.php");
 </html>
 <script>
 
-function js_abre(){
+function js_abre(formato){
 
-	   obj = document.form1;
-	   query  = "MesReferencia="+obj.MesReferencia.value;
-	  // query += "&tipoExame="+obj.tipoExame.value;
-	  // query += "&tipoPasta="+obj.tipoPasta.value;
-	   query += "&recursos="+js_campo_recebe_valores_recursos ();
-       query += "&ExibirHistoricoDoEmpenho="+obj.ExibirHistoricoDoEmpenho.value;
-       query += "&ordenar="+obj.ordenar.value;
-       query += "&iTipo="+obj.iTipo.value;
-       query += "&filtros="+parent.iframe_filtro.js_atualiza_variavel_retorno();
-       query += "&iRestosPagar="+obj.iRestosPagar.value;
+    obj = document.form1;
 
-	   jan = window.open('emp2_examearitmetico002.php?'+query,
-	                 '',
-	                   'width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0 ');
-	   jan.moveTo(0,0);
+    query  = "MesReferencia="+obj.MesReferencia.value;
+    query += "&recursos="+js_campo_recebe_valores_recursos ();
+    query += "&ExibirHistoricoDoEmpenho="+obj.ExibirHistoricoDoEmpenho.value;
+    query += "&ordenar="+obj.ordenar.value;
+    query += "&iTipo="+obj.iTipo.value;
+    query += "&filtros="+parent.iframe_filtro.js_atualiza_variavel_retorno();
+    query += "&iRestosPagar="+obj.iRestosPagar.value;
 
-	}
+    if(formato == 'pdf') {
+
+      jan = window.open('emp2_examearitmetico002.php?'+query,
+                    '',
+                      'width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0 ');
+      jan.moveTo(0,0);
+    }
+
+    if(formato == 'csv') {
+      
+      return window.open('emp2_examearitmetico003.php?'+query, '',
+                                'width='+(screen.availWidth-5)+',height='+
+                                (screen.availHeight-40)+',scrollbars=1,location=0 ');
+    }
+}
 
 function mostra_tipo_pasta() {
 

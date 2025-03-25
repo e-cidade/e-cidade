@@ -49,7 +49,7 @@ $oPDF->addpage();
 $oPDF->setfont('arial', 'b', 14);
 
 $oPDF->ln(20);
-$oPDF->cell(0, 5, utf8_decode($l214_tipo), 0, 1, "C", 0);
+$oPDF->cell(0, 5, db_utils::convertToUtf8($l214_tipo, 'UTF-8', 'ISO-8859-1'), 0, 1, "C", 0);
 $oPDF->ln(5);
 $oPDF->setfont('arial', '', 11);
 
@@ -89,8 +89,7 @@ $arr_tipo = array(
 );
 
 $licita->l20_tipliticacao = $arr_tipo[$licita->l20_tipliticacao];
-
-$texto = str_replace('$l20_edital', "$licita->l20_edital", utf8_decode($l214_texto));
+$texto = str_replace('$l20_edital', "$licita->l20_edital", db_utils::convertToUtf8($l214_texto, 'UTF-8', 'ISO-8859-1'));
 $texto = str_replace('$l20_codtipocomdescr', "$licita->l03_descr", $texto);
 $texto = str_replace('$l20_numero', "$licita->l20_numero", $texto);
 $texto = str_replace('$l20_tipliticacao', "$licita->l20_tipliticacao", $texto);
@@ -101,7 +100,6 @@ $texto = str_replace('$l20_localentrega', "$licita->l20_localentrega", $texto);
 
 $texto = str_replace('$instituição,', "", $texto);
 $texto = str_replace('data sistema (formato 01 de Janeiro de 2022.', "", $texto);
-
 $texto = str_replace('<br />', "\n", $texto);
 nl2br("One line.\nAnother line.");
 
@@ -112,7 +110,6 @@ $yAtual = $oPDF->GetY();
 $yAtual = ($yAtual - 65) / 2;
 $altura_ret = $altura_ret + $yAtual;
 $oPDF->Rect($rectx, $recty, $largura_ret, $oPDF->GetY() - 40, 'D'); //retangulo
-
 
 
 $oPDF->Output();

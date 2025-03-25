@@ -161,13 +161,13 @@ if(isset($alterar)){
          parent.document.formaba.a6.disabled = false;
          parent.document.formaba.a7.disabled = false;
          parent.document.formaba.a8.disabled = false;
-         CurrentWindow.corpo.iframe_a2.location.href='lab1_lab_labresp001.php?la06_i_laboratorio=<?=$chavepesquisa?>&la02_c_descr=<?=$la02_c_descr?>';
-         CurrentWindow.corpo.iframe_a3.location.href='lab1_lab_labusuario001.php?la05_i_laboratorio=<?=$chavepesquisa?>&la02_c_descr=<?=$la02_c_descr?>';
-         CurrentWindow.corpo.iframe_a4.location.href='lab1_lab_labsetor001.php?la24_i_laboratorio=<?=$chavepesquisa?>&la02_c_descr=<?=$la02_c_descr?>';
-         CurrentWindow.corpo.iframe_a5.location.href='lab1_lab_setorexame001.php?la24_i_laboratorio=<?=$chavepesquisa?>&la02_c_descr=<?=$la02_c_descr?>';
-         CurrentWindow.corpo.iframe_a6.location.href='lab1_lab_horario001.php?la02_i_codigo=<?=$chavepesquisa?>&la02_c_descr=<?=$la02_c_descr?>';
-         CurrentWindow.corpo.iframe_a7.location.href='lab1_lab_ausencia001.php?la02_i_codigo=<?=$chavepesquisa?>&la02_c_descr=<?=$la02_c_descr?>';
-         CurrentWindow.corpo.iframe_a8.location.href='lab1_lab_paralizacao001.php?la37_i_laboratorio=<?=$chavepesquisa?>&la02_c_descr=<?=$la02_c_descr?>';
+         (window.CurrentWindow || parent.CurrentWindow).corpo.iframe_a2.location.href='lab1_lab_labresp001.php?la06_i_laboratorio=<?=$chavepesquisa?>&la02_c_descr=<?=$la02_c_descr?>';
+         (window.CurrentWindow || parent.CurrentWindow).corpo.iframe_a3.location.href='lab1_lab_labusuario001.php?la05_i_laboratorio=<?=$chavepesquisa?>&la02_c_descr=<?=$la02_c_descr?>';
+         (window.CurrentWindow || parent.CurrentWindow).corpo.iframe_a4.location.href='lab1_lab_labsetor001.php?la24_i_laboratorio=<?=$chavepesquisa?>&la02_c_descr=<?=$la02_c_descr?>';
+         (window.CurrentWindow || parent.CurrentWindow).corpo.iframe_a5.location.href='lab1_lab_setorexame001.php?la24_i_laboratorio=<?=$chavepesquisa?>&la02_c_descr=<?=$la02_c_descr?>';
+         (window.CurrentWindow || parent.CurrentWindow).corpo.iframe_a6.location.href='lab1_lab_horario001.php?la02_i_codigo=<?=$chavepesquisa?>&la02_c_descr=<?=$la02_c_descr?>';
+         (window.CurrentWindow || parent.CurrentWindow).corpo.iframe_a7.location.href='lab1_lab_ausencia001.php?la02_i_codigo=<?=$chavepesquisa?>&la02_c_descr=<?=$la02_c_descr?>';
+         (window.CurrentWindow || parent.CurrentWindow).corpo.iframe_a8.location.href='lab1_lab_paralizacao001.php?la37_i_laboratorio=<?=$chavepesquisa?>&la02_c_descr=<?=$la02_c_descr?>';
 
      </script>
    <?

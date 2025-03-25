@@ -240,7 +240,7 @@ db_app::load("dbtextFieldData.widget.js");
                                                     <?
                                                     $aValores = array(
                                                         0 => 'Selecione',
-                                                        1 => '1 - Não ou dispensa por valor',
+                                                        1 => '1 - Dispensa por valor',
                                                         2 => '2 - Licitação',
                                                         3 => '3 - Dispensa ou Inexigibilidade',
                                                         4 => '4 - Adesão à ata de registro de preços',
@@ -249,6 +249,8 @@ db_app::load("dbtextFieldData.widget.js");
                                                         7 => '7 - Licitação - Regime Diferenciado de Contratações Públicas - RDC',
                                                         8 => '8 - Licitação realizada por consorcio público',
                                                         9 => '9 - Licitação realizada por outro ente da federação',
+                                                        10 =>'10 - Dispensa ou Inexigibilidade realizada por consórcio público',
+                                                        99 =>'99 - Contrato não decorrente de licitação',
                                                     );
                                                     db_select('ac16_tipoorigem', $aValores, true, $db_opcao, "onchange='js_verificatipoorigem();exibicaoVigenciaIndeterminada();'", "");
 
@@ -1898,7 +1900,7 @@ db_app::load("dbtextFieldData.widget.js");
         iTipoOrigem = document.form1.ac16_tipoorigem.value;
         iOrigem = document.form1.ac16_origem.value;
 
-        if ((iOrigem == 3 && iTipoOrigem == 5) || (iOrigem == 3 && iTipoOrigem == 6) || (iOrigem == 3 && iTipoOrigem == 7) || (iOrigem == 3 && iTipoOrigem == 8) || (iOrigem == 3 && iTipoOrigem == 9)) {
+        if ((iOrigem == 3 && iTipoOrigem == 5) || (iOrigem == 3 && iTipoOrigem == 6) || (iOrigem == 3 && iTipoOrigem == 7) || (iOrigem == 3 && iTipoOrigem == 8) || (iOrigem == 3 && iTipoOrigem == 9) || (iOrigem == 3 && iTipoOrigem == 10)) {
             document.getElementById('trlicoutroorgao').style.display = "";
             document.getElementById('tradesaoregpreco').style.display = "none";
             document.getElementById('trLicitacao').style.display = "none";
@@ -2026,6 +2028,20 @@ db_app::load("dbtextFieldData.widget.js");
     function js_verificaorigem() {
 
         iOrigem = document.form1.ac16_origem.value;
+
+        if(iOrigem == 2){
+            let select = document.getElementById("ac16_tipoorigem");
+            let option = select.querySelector("option[value='99']");
+            if (option) option.remove();
+        } else {
+                    // Verificar se a opção já existe antes de adicioná-la
+            let select = document.getElementById("ac16_tipoorigem");
+            let existeOpcao = select.querySelector(`option[value='99']`);
+            if (!existeOpcao) {
+                let novaOption = new Option("99 - Contrato não decorrente de licitação", "99");
+                select.appendChild(novaOption); // Adiciona no final
+            }
+        }
 
         if (iOrigem == 1 || iOrigem == 2) {
             document.getElementById('trLicitacao').style.display = "none";

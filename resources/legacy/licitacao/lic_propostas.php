@@ -230,7 +230,7 @@ db_postmemory($HTTP_POST_VARS);
 
             <fieldset>
                 <legend><b>Legenda</b></legend>
-                <table>
+                <table style="width: auto;">
                     <tr>
                         <td align="center" class="legend" height="15px" width="100px"><b>Itens ME/EPP</b></td>
                     </tr>
@@ -255,7 +255,11 @@ db_postmemory($HTTP_POST_VARS);
     let fornecedores = [];
     let lote = [];
 
-    js_pesquisa();
+    <?php if (!empty($l20_codigo)): ?> 
+        js_getDadosItenseFornecedores();
+    <?php else: ?>
+        js_pesquisa();
+    <?php endif; ?>
 
     function js_gerarxlsproposta() {
         let codLicitacao = document.getElementById('l20_codigo').value;

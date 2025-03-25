@@ -86,7 +86,7 @@ $oRotulo->label("z01)i_numero");
   <table border="0" width="90%">
     <tr>
       <td width="50%" valign="top">
-        <fieldset style="height: 165px;"> <legend><b>Endereço</b></legend>
+        <fieldset style="height: 190px;"> <legend><b>Endereço</b></legend>
           <table width="100%">
             <tr>
               <td nowrap title="<?php echo $Tz01_v_ender;?>" width="62px">
@@ -150,7 +150,7 @@ $oRotulo->label("z01)i_numero");
         </fieldset>
       </td>
       <td width="50%" valign="top">
-        <fieldset style="height: 165px; padding-left: 3px;"> <legend><b>Dados Pessoais</b></legend>
+        <fieldset style="height: 190px; padding-left: 3px;"> <legend><b>Dados Pessoais</b></legend>
           <table width="100%">
             <tr>
               <td nowrap>
@@ -252,6 +252,14 @@ $oRotulo->label("z01)i_numero");
               <td nowrap>
                 <?php db_input('z01_v_telcel', 12, $Iz01_v_telcel, true, 'text', $db_opcao, 'onchange="js_change();"');?>
               </td>
+            </tr>
+            <tr>
+               <td nowrap title="Número TFD">
+                   <label><strong>Número TFD:</strong></label>
+               </td>
+               <td nowrap>
+                   <?php db_input('z01_i_numtfd', 12, $Iz01_i_numtfd, true, 'text', $db_opcao, 'onchange="js_change();"'); ?>
+               </td>
             </tr>
           </table>
         </fieldset>
@@ -442,10 +450,10 @@ function js_ajax( oParam, jsRetorno ) {
 	var objAjax = new Ajax.Request(
                          sUrl,
                          {
-                          method:       'post',
-                          asynchronous: false,
-                          parameters:   'json='+Object.toJSON(oParam),
-                          onComplete:   function( objAjax ) {
+                           method:       'post',
+                           asynchronous: false,
+                           parameters:   'json='+Object.toJSON(oParam),
+                           onComplete:   function( objAjax ) {
 
                           			        	var evlJS = jsRetorno+'(objAjax);';
                                           return eval(evlJS);
@@ -734,6 +742,7 @@ function js_retornogetInfoCgs( oRetorno ) {
   $('z01_v_telcel').value  = oRetorno.z01_v_telcel.urlDecode();
   $('z01_i_numero').value  = oRetorno.z01_i_numero.urlDecode();
   $('z01_v_compl').value   = oRetorno.z01_v_compl.urlDecode();
+  $('z01_i_numtfd').value   = oRetorno.z01_i_numtfd.urlDecode();
   var sSexo                = oRetorno.z01_v_sexo.urlDecode();
 
   if ( sSexo.toUpperCase() == 'M' ) {
@@ -808,6 +817,7 @@ function js_limpaInfoCgs() {
   $('tf30_i_encaminhamento').value     = '';
   $('tf01_i_cgsund').value             = '';
   $('z01_v_nome').value                = '';
+  $('z01_i_numtfd').value              = '';
 
   // Limpa o gride também
   oDBGridPedidostfd.clearAll(true);
@@ -848,6 +858,7 @@ function js_atualizarCgs() {
   oParam.s115_c_tipo      = $F('s115_c_tipo');
   oParam.s115_i_codigo    = $F('s115_i_codigo');
   oParam.z01_codigoibge   = $F('z01_codigoibge');
+  oParam.z01_i_numtfd     = $F('z01_i_numtfd');
 
 
   js_ajax(oParam, 'js_retornoatualizarCgs');

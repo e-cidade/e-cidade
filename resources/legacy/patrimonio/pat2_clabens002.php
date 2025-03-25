@@ -59,7 +59,8 @@ $order_by = "t64_class";
 $head3 = "CADASTRO DE CLASSIFICAÇÃO DOS BENS";
 $head5 = "ORDEM $desc_ordem";
 
-$result = $clclabens->sql_record($clclabens->sql_query(null,"*",$order_by,"t64_instit = ".db_getsession("DB_instit")));
+$campos = "*,conplanodepre.c60_estrut as estrutdepreciacao,	conplanoreduzdepre.c61_reduz as reduzdepreciacao, conplanodepre.c60_descr as descrdepreciacao";
+$result = $clclabens->sql_record($clclabens->sql_query(null,$campos,$order_by,"t64_instit = ".db_getsession("DB_instit")));
 //db_criatabela($result);exit;
 
 if ($clclabens->numrows == 0) {
@@ -84,35 +85,36 @@ for($x = 0; $x < $clclabens->numrows;$x++){
    if ($pdf->gety() > $pdf->h - 30 || $troca != 0 ){
       $pdf->addpage("L");
       $pdf->setfont('arial','b',8);
-      $pdf->cell(15,$alt,$RLt64_codcla,1,0,"C",1);
-      $pdf->cell(15,$alt,"Analitica",1,0,"C",1);
+      $pdf->cell(80,$alt,"",1,0,"C",1);
+      $pdf->cell(105,$alt,"Conta Plano",1,0,"C",1);
+      $pdf->cell(0,$alt,"Conta Depreciação",1,1,"C",1);
+
       $pdf->cell(20,$alt,$RLt64_class,1,0,"C",1);
       $pdf->cell(60,$alt,$RLt64_descr,1,0,"C",1);
-      $pdf->cell(15,$alt,$RLc60_codcon,1,0,"C",1);
       $pdf->cell(15,$alt,$RLc61_reduz,1,0,"C",1);
-      $pdf->cell(25,$alt,$RLc60_estrut,1,0,"C",1);
+      $pdf->cell(30,$alt,$RLc60_estrut,1,0,"C",1);
       $pdf->cell(60,$alt,$RLc60_descr,1,0,"C",1);
-      $pdf->cell(0,$alt,$RLt64_obs,1,1,"C",1);
+      $pdf->cell(15,$alt,$RLc61_reduz,1,0,"C",1);
+      $pdf->cell(30,$alt,$RLc60_estrut,1,0,"C",1);
+      $pdf->cell(0,$alt,$RLc60_descr,1,1,"C",1);
       $troca = 0;
    }
    $p=0;
    if($t64_analitica=='t'){
-     $analise = "Sim";
      $p=0;
    }else{
-     $analise = "Não";
      $p=1;
    }
    $pdf->setfont('arial','',7);
-   $pdf->cell(15,$alt,$t64_codcla,0,0,"C",$p);
-   $pdf->cell(15,$alt,$analise,0,0,"C",$p);
    $pdf->cell(20,$alt,$t64_class,0,0,"C",$p);
-   $pdf->cell(60,$alt,$t64_descr,0,0,"L",$p);
-   $pdf->cell(15,$alt,$c60_codcon,0,0,"C",$p);
+   $pdf->cell(60,$alt,substr($t64_descr,0,40),0,0,"L",$p);
    $pdf->cell(15,$alt,$c61_reduz,0,0,"C",$p);
-   $pdf->cell(25,$alt,$c60_estrut,0,0,"C",$p);
+   $pdf->cell(30,$alt,$c60_estrut,0,0,"C",$p);
    $pdf->cell(60,$alt,substr($c60_descr,0,40),0,0,"L",$p);
-   $pdf->multicell(0,$alt,$t64_obs,0,"L",$p);
+   $pdf->cell(15,$alt,$reduzdepreciacao,0,0,"C",$p);
+   $pdf->cell(30,$alt,$estrutdepreciacao,0,0,"C",$p);
+   $pdf->multicell(0,$alt,$descrdepreciacao,0,40,0,"L",$p);
+ 
    $total++;
 }
 

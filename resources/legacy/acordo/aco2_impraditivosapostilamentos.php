@@ -150,6 +150,8 @@ if($where){
   $where .= ' ac26_acordoposicaotipo <> 1 ';
 }
 
+$where .= " and ac16_instit = " . db_getsession("DB_instit");
+
 $sSql = "SELECT DISTINCT ".$campos."
           FROM acordo
           INNER JOIN acordoposicao ON ac26_acordo = ac16_sequencial
@@ -158,7 +160,6 @@ $sSql = "SELECT DISTINCT ".$campos."
           LEFT JOIN acordoposicaotipo ON ac27_sequencial = ac26_acordoposicaotipo
           INNER JOIN cgm on z01_numcgm = ac16_contratado ".$sSql2." where ".$where. " ORDER BY ".$orderBy;
 
-// print_r($sSql);die();
 $result = $acordo->sql_record($sSql);
 $numrows = $acordo->numrows;
 

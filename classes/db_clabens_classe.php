@@ -550,6 +550,11 @@ class cl_clabens {
      $sql .= "      left join conclass  on  conclass.c51_codcla = conplano.c60_codcla";
      $sql .= "      left join consistema  on  consistema.c52_codsis = conplano.c60_codsis";
      $sql .= "      left join benstipodepreciacao  on clabens.t64_benstipodepreciacao = benstipodepreciacao.t46_sequencial";
+     $sql .= "      left join conplanoreduz as conplanoreduzdepre on conplanoreduzdepre.c61_codcon = clabensconplano.t86_conplanodepreciacao  ";
+     $sql .= "                               and conplanoreduzdepre.c61_anousu =  ".db_getsession("DB_anousu");
+     $sql .= "                               and conplanoreduzdepre.c61_instit =  ".db_getsession("DB_instit");
+     $sql .= "      left join conplano as conplanodepre on conplanodepre.c60_codcon = clabensconplano.t86_conplanodepreciacao ";
+     $sql .= "                               and conplanodepre.c60_anousu = ".db_getsession("DB_anousu");
      $sql2 = "";
      if($dbwhere==""){
        if($t64_codcla!=null ){

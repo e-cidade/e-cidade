@@ -24,8 +24,8 @@
  *  Copia da licenca no diretorio licenca/licenca_en.txt
  *                                licenca/licenca_pt.txt
  */
-
 // Para garantir que nao houve erros em outros itens
+
 if ($sqlerro==false) {
 
   //TRANSAÇÕES";
@@ -37,7 +37,7 @@ if ($sqlerro==false) {
   // Se existir contrans no destino significa que ja foi processada virada entao...
   if($linhasdestino>0) {
     // Desprocessar Transacoes de TIPO 1000-Fechamento Exercicio e 2000-Abertura Exercicio
-    $_tipodoc = "1000, 2000";
+    $_tipodoc = "1000, 2000, 11, 20, 21, 30, 31";
 
     // Apaga ContransLr
     $sqldelete  = "delete ";
@@ -100,7 +100,7 @@ if ($sqlerro==false) {
       }
     }
 
-    $_where = "and exists (select 1 from conhistdoc where c53_coddoc = c45_coddoc and c53_tipo in ($_tipodoc))";
+    $_where = "and exists (select 1 from conhistdoc where c53_coddoc = c45_coddoc and c53_tipo in ($_tipodoc)) ";
     $sMensagemTermometroItem .= " [Reprocessando Transações Abertura/Encerramento Exercício]";
     $linhasdestino = 0;
 
@@ -117,17 +117,13 @@ if ($sqlerro==false) {
     }
 
   }
-
-
   if($sqlerro==false) {
 
     $sqlorigem = "select * from contrans where c45_anousu = $anoorigem $_where";
+
     $resultorigem = db_query($sqlorigem);
     $linhasorigem = pg_num_rows($resultorigem);
 
-    //db_criatabela($resultorigem);
-    //echo "<br>$sqlorigem";
-    //echo "<br>linhasorigem $linhasorigem<br>linhasdestino $linhasdestino";
     if (($linhasorigem > 0) && ($linhasdestino == 0 )) {
       // duplica contrans
 
@@ -146,6 +142,7 @@ if ($sqlerro==false) {
         $cl_contrans->c45_anousu = $anodestino;
         $cl_contrans->c45_coddoc = $c45_coddoc;
         $cl_contrans->c45_instit = $c45_instit;
+   
         $cl_contrans->incluir(null);
         if ($cl_contrans->erro_status==0) {
           $sqlerro   = true;
@@ -162,7 +159,7 @@ if ($sqlerro==false) {
         $sqlcontranslan .= " where contrans.c45_anousu={$anoorigem} {$_where} ";
         $resultcontranslan = db_query($sqlcontranslan);
         $linhascontranslan = pg_num_rows($resultcontranslan);
-        //db_criatabela($resultcontranslan);
+        db_criatabela($resultcontranslan);
         //die();
         for ($c=0; $c<$linhascontranslan; $c++) {
           db_fieldsmemory($resultcontranslan,$c);
@@ -198,6 +195,7 @@ if ($sqlerro==false) {
           $cl_contranslan->c46_descricao   = "$c46_descricao";
           $cl_contranslan->c46_ordem       = "$c46_ordem";
           $cl_contranslan->c46_evento      = $c46_evento;
+
           $cl_contranslan->incluir(null);
           if ($cl_contranslan->erro_status==0) {
             $sqlerro   = true;
@@ -227,12 +225,36 @@ if ($sqlerro==false) {
                                     END";
           $resultcontranslr = db_query($sqlcontranslr);
           $linhascontranslr = pg_num_rows($resultcontranslr);
+
           if ($linhascontranslr > 0) {
             for ($h=0; $h < $linhascontranslr; $h++) {
               db_fieldsmemory($resultcontranslr,$h);
 
               if ($c45_coddoc!=31 && $c45_coddoc!=32 && $c45_coddoc!=33 && $c45_coddoc!=34 && $c45_coddoc!=35 && $c45_coddoc!=36 && $c45_coddoc!=37 && $c45_coddoc!=38) {
                 $c47_anousu = $anodestino;
+              } else {
+                if (in_array($c45_coddoc, array(31, 32, 33, 34, 35, 36, 37, 38))) {
+                  if ($c47_anousu == ($anoorigem - 1)) {
+                    // Insere registro referente ao origem
+                    //insert into contranslr
+                    $cl_contranslr->c47_seqtranslan = $cl_contranslan->c46_seqtranslan;
+                    $cl_contranslr->c47_debito      = $c47_debito;
+                    $cl_contranslr->c47_credito     = $c47_credito;
+                    $cl_contranslr->c47_obs         = "$c47_obs";
+                    $cl_contranslr->c47_ref         = $c47_ref;
+                    $cl_contranslr->c47_anousu      = $anoorigem;
+                    $cl_contranslr->c47_instit      = $c47_instit;
+                    $cl_contranslr->c47_compara     = $c47_compara;
+                    $cl_contranslr->c47_tiporesto   = $c47_tiporesto;
+
+                    $cl_contranslr->incluir(null);
+                    if ($cl_contranslr->erro_status==0) {
+                      $sqlerro   = true;
+                      $erro_msg .= $cl_contranslr->erro_msg;
+                      break;
+                    }
+                  }
+                }
               }
 
               //insert into contranslr
@@ -245,13 +267,13 @@ if ($sqlerro==false) {
               $cl_contranslr->c47_instit      = $c47_instit;
               $cl_contranslr->c47_compara     = $c47_compara;
               $cl_contranslr->c47_tiporesto   = $c47_tiporesto;
+
               $cl_contranslr->incluir(null);
               if ($cl_contranslr->erro_status==0) {
                 $sqlerro   = true;
                 $erro_msg .= $cl_contranslr->erro_msg;
                 break;
               }
-
             }
             if($sqlerro==true) {
               break;
@@ -260,7 +282,6 @@ if ($sqlerro==false) {
         }
         // for
       }
-
     } else {
 
       if ($linhasorigem == 0) {
@@ -278,9 +299,7 @@ if ($sqlerro==false) {
         $erro_msg .= $cldb_viradaitemlog->erro_msg;
       }
     }
+
   }
-
-
-
 }
 ?>

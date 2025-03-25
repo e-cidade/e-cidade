@@ -1,30 +1,30 @@
-<?
+<?php
 /*
- *     E-cidade Software Publico para Gestao Municipal                
- *  Copyright (C) 2014  DBSeller Servicos de Informatica             
- *                            www.dbseller.com.br                     
- *                         e-cidade@dbseller.com.br                   
- *                                                                    
- *  Este programa e software livre; voce pode redistribui-lo e/ou     
- *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme  
- *  publicada pela Free Software Foundation; tanto a versao 2 da      
- *  Licenca como (a seu criterio) qualquer versao mais nova.          
- *                                                                    
- *  Este programa e distribuido na expectativa de ser util, mas SEM   
- *  QUALQUER GARANTIA; sem mesmo a garantia implicita de              
- *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM           
- *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais  
- *  detalhes.                                                         
- *                                                                    
- *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU     
- *  junto com este programa; se nao, escreva para a Free Software     
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA          
- *  02111-1307, USA.                                                  
- *  
- *  Copia da licenca no diretorio licenca/licenca_en.txt 
- *                                licenca/licenca_pt.txt 
+ *     E-cidade Software Publico para Gestao Municipal
+ *  Copyright (C) 2014  DBSeller Servicos de Informatica
+ *                            www.dbseller.com.br
+ *                         e-cidade@dbseller.com.br
+ *
+ *  Este programa e software livre; voce pode redistribui-lo e/ou
+ *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme
+ *  publicada pela Free Software Foundation; tanto a versao 2 da
+ *  Licenca como (a seu criterio) qualquer versao mais nova.
+ *
+ *  Este programa e distribuido na expectativa de ser util, mas SEM
+ *  QUALQUER GARANTIA; sem mesmo a garantia implicita de
+ *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM
+ *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais
+ *  detalhes.
+ *
+ *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU
+ *  junto com este programa; se nao, escreva para a Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ *  02111-1307, USA.
+ *
+ *  Copia da licenca no diretorio licenca/licenca_en.txt
+ *                                licenca/licenca_pt.txt
  */
- 
+
 require("libs/db_stdlib.php");
 require("libs/db_conecta.php");
 include("libs/db_sessoes.php");
@@ -38,9 +38,9 @@ include("dbforms/db_funcoes.php");
 parse_str($HTTP_SERVER_VARS['QUERY_STRING']); // ta com o globals desativado no php -- Crestani
 
 
-class calendario{ 
-  var $sem;//Array com os dias da semana como índice 
-  var $mes;//Array com os meses do ano 
+class calendario{
+  var $sem;//Array com os dias da semana como índice
+  var $mes;//Array com os meses do ano
   var $nome_objeto_data;
   var $shutdown_function = "";
   var $centralagenda="N";
@@ -59,14 +59,14 @@ class calendario{
                      '11'=>'NOVEMBRO',
                      '12'=>'DEZEMBRO'
                     );
-  } 
+  }
 
-  function aux($i){//Complementa a tabela com espaços em branco 
-    $retval = ""; 
-    for ($k = 0; $k < $i; $k++) { 
-      $retval .= "<td width=\"20\">&nbsp;</td>"; 
-    } 
-    return $retval; 
+  function aux($i){//Complementa a tabela com espaços em branco
+    $retval = "";
+    for ($k = 0; $k < $i; $k++) {
+      $retval .= "<td width=\"20\">&nbsp;</td>";
+    }
+    return $retval;
   }
 
   function arr_search( $array, $valor ){
@@ -126,7 +126,7 @@ class calendario{
       }
       $str .=" width=\"25\" ";
 
-      if (( $ano.str_pad($mes,2,'0',STR_PAD_LEFT).str_pad($i,2,'0',STR_PAD_LEFT) >= date("Ymd") 
+      if (( $ano.str_pad($mes,2,'0',STR_PAD_LEFT).str_pad($i,2,'0',STR_PAD_LEFT) >= date("Ymd")
            || $objSau_Config->s103_c_cancelafa == 'S' ) &&
           ( isset($arr_diasem) && $this->arr_search( $arr_diasem, $this->sem[$diasem] ) )
          ) {
@@ -141,7 +141,7 @@ class calendario{
                                                                         $str_where,
                                                                         $this->sem[$diasem],
                                                                         "");
-          $result_undmedhorario = db_query( $str_query ) or die( "ERRO: <p> $str_query ");
+          $result_undmedhorario = db_query( $str_query ) or die( "ERRO1: agendamento ");
 
         } else {
 
@@ -155,13 +155,13 @@ class calendario{
                           sd30_i_codigo,
                           ausencias.sd06_c_horainicio,
                           ausencias.sd06_c_horafim,
-                          case when sd06_i_undmedhorario=sd30_i_codigo 
+                          case when sd06_i_undmedhorario=sd30_i_codigo
                             then sd06_i_undmedhorario
-                            else null 
+                            else null
                           end as sd06_i_undmedhorario,
-                          case when (sd06_i_undmedhorario = undmedhorario.sd30_i_codigo or ausencias.sd06_i_undmedhorario is null) 
-                            then sau_motivo_ausencia.s139_c_descr 
-                            else null 
+                          case when (sd06_i_undmedhorario = undmedhorario.sd30_i_codigo or ausencias.sd06_i_undmedhorario is null)
+                            then sau_motivo_ausencia.s139_c_descr
+                            else null
                           end as sd06_c_tipo,
                        ( select count(sd23_d_consulta)
                            from agendamentos
@@ -179,23 +179,23 @@ class calendario{
                      inner join medicos        on sd03_i_codigo  = sd04_i_medico
                      left join sau_tipoficha  on sau_tipoficha.sd101_i_codigo = undmedhorario.sd30_i_tipoficha
                      left join ausencias on '$ano/$mes/$s' between ausencias.sd06_d_inicio and ausencias.sd06_d_fim
-                           and ( ( (ausencias.sd06_i_especmed = especmedico.sd27_i_codigo) 
-                                    and (ausencias.sd06_i_undmedhorario is null) 
-                                   ) 
-                                 or 
+                           and ( ( (ausencias.sd06_i_especmed = especmedico.sd27_i_codigo)
+                                    and (ausencias.sd06_i_undmedhorario is null)
+                                   )
+                                 or
                                  (ausencias.sd06_i_undmedhorario = undmedhorario.sd30_i_codigo)
                                )
 
-                     left join sau_motivo_ausencia on ausencias.sd06_i_tipo = sau_motivo_ausencia.s139_i_codigo 
-                   where $str_where 
+                     left join sau_motivo_ausencia on ausencias.sd06_i_tipo = sau_motivo_ausencia.s139_i_codigo
+                   where $str_where
                      and sd30_i_diasemana = {$this->sem[$diasem]}
-                     and ( sd30_d_valfinal is null or 
-                         ( sd30_d_valfinal is not null and sd30_d_valfinal >= '$ano/$mes/$s' ) 
+                     and ( sd30_d_valfinal is null or
+                         ( sd30_d_valfinal is not null and sd30_d_valfinal >= '$ano/$mes/$s' )
                          )
-                    and ( sd30_d_valinicial is null or 
-                          ( sd30_d_valinicial is not null and sd30_d_valinicial <= '$ano/$mes/$s' ) 
-                        )"; 
-          $result_undmedhorario = db_query( $str_query ) or die( "ERRO: <p> $str_query ");
+                    and ( sd30_d_valinicial is null or
+                          ( sd30_d_valinicial is not null and sd30_d_valinicial <= '$ano/$mes/$s' )
+                        )";
+          $result_undmedhorario = db_query( $str_query ) or die( "ERRO2: Agendamento ");
           $iTam = pg_num_rows($result_undmedhorario);
           if ($iTam > 0) {
 
@@ -207,10 +207,10 @@ class calendario{
 
               $obj_undmedhorario  = db_utils::fieldsMemory($result_undmedhorario,$iY);
               if (($obj_undmedhorario->sd06_c_tipo != '')
-                  && (($obj_undmedhorario->sd06_c_horainicio == '') 
+                  && (($obj_undmedhorario->sd06_c_horainicio == '')
                       || ($obj_undmedhorario->sd06_i_undmedhorario != '')
                      )
-                  || ( $obj_undmedhorario->sd06_c_horainicio <=  $obj_undmedhorario->sd30_c_horaini 
+                  || ( $obj_undmedhorario->sd06_c_horainicio <=  $obj_undmedhorario->sd30_c_horaini
                        && $obj_undmedhorario->sd06_c_horafim >=  $obj_undmedhorario->sd30_c_horafim
                      )
                  ) {
@@ -227,7 +227,7 @@ class calendario{
                                                                                  $obj_undmedhorario->sd06_c_tipo;
 
               }
-              
+
 
             }
             if ($sMotivosAusencias != "") {
@@ -294,18 +294,18 @@ class calendario{
               $int_sd30_i_fichas  += $obj_undmedhorario->sd30_i_fichas + $obj_undmedhorario->sd30_i_reservas;
               $str_msg            .= $str_br."{$obj_undmedhorario->sd101_c_descr} {$obj_undmedhorario->sd30_c_horaini} ";
               $str_msg            .=  "as {$obj_undmedhorario->sd30_c_horafim} ";
-              if (($obj_undmedhorario->sd06_c_tipo == "") 
-                  || (($obj_undmedhorario->sd06_c_horainicio != '') 
+              if (($obj_undmedhorario->sd06_c_tipo == "")
+                  || (($obj_undmedhorario->sd06_c_horainicio != '')
                       && ($obj_undmedhorario->sd06_i_undmedhorario == '')
                      ) ) {
-           
+
                 $str_msg .=  "- Saldo: ";
                 $str_msg .=  ($obj_undmedhorario->sd30_i_fichas+$obj_undmedhorario->sd30_i_reservas - $obj_undmedhorario->total_agendado );
-           
+
               } else {
-           
+
                 $str_msg            .=  "- Ausencia :".$obj_undmedhorario->sd06_c_tipo;
-           
+
               }
               $str_br              = "<br>";
 
@@ -341,9 +341,9 @@ class calendario{
         if ($booMostradiv) {
 
           //*Div
-          $str .= "  <div  onmouseover=js_oculta('parecerr$i',event)  
-                           name='parecerr$i' 
-                           id='parecerr$i' 
+          $str .= "  <div  onmouseover=js_oculta('parecerr$i',event)
+                           name='parecerr$i'
+                           id='parecerr$i'
                            style='position:absolute;visibility:hidden; left: 183px; top: 0px;  ' >
                       <table align='left' height='100%' width='100%' border='1' cellspacing='1' cellpadding='1'>
                        <tr>
@@ -404,7 +404,7 @@ class calendario{
                         "&ano_solicitado=".($ano+1).
                         "&".$str_where.
                         "&sd02_c_centralagenda={$this->centralagenda}
-                        &fechar=true \"> >> </a>   
+                        &fechar=true \"> >> </a>
               </font>
            </td>
            </tr>
@@ -428,7 +428,7 @@ class calendario{
                         "&".$str_where.
                         "&sd02_c_centralagenda={$this->centralagenda}
                         &fechar=true \"> >> </a>
-              </FONT> 
+              </FONT>
              </td>
            </tr>
            <tr align=\"center\">
@@ -451,12 +451,12 @@ class calendario{
               <td bgcolor='red'><font size=1>Lotado</td>
            </tr>
           </table>";
-    echo $str; 
-  } //fim function 
-} 
+    echo $str;
+  } //fim function
+}
 
 //Inicializa classe
-$clcalendario = new calendario; 
+$clcalendario = new calendario;
 
 $clcalendario->nome_objeto_data = $nome_objeto_data;
 $clcalendario->centralagenda    = @$sd02_c_centralagenda!="S"?"N":"S";
@@ -499,15 +499,15 @@ if( ( isset($sd27_i_rhcbo) && (int)@$sd27_i_rhcbo != 0 ) ||( isset($sd27_i_codig
   }
 
   $str_query = "select distinct sd30_i_diasemana
-                  from undmedhorario 
-                 inner join especmedico    on sd27_i_codigo = sd30_i_undmed  
+                  from undmedhorario
+                 inner join especmedico    on sd27_i_codigo = sd30_i_undmed
                  inner join unidademedicos on sd04_i_codigo = sd27_i_undmed
-                 inner join unidades       on sd02_i_codigo = sd04_i_unidade 
+                 inner join unidades       on sd02_i_codigo = sd04_i_unidade
                  where $str_where
-                   $str_centralagenda 
-                   --and ( ( sd30_d_valinicial is null or sd30_d_valfinal is null ) or  
+                   $str_centralagenda
+                   --and ( ( sd30_d_valinicial is null or sd30_d_valfinal is null ) or
                    --       '$strData' between sd30_d_valinicial and sd30_d_valfinal)
-                 order by sd30_i_diasemana 
+                 order by sd30_i_diasemana
                 ";
 
   $result     = db_query($str_query) or die("ERRO: nos horários do profissional.");
@@ -525,7 +525,7 @@ if( ( isset($sd27_i_rhcbo) && (int)@$sd27_i_rhcbo != 0 ) ||( isset($sd27_i_codig
     echo "Nehuma informação encontrada";
   }
 } else {
-  echo "Não foi informado Profissional."; 
+  echo "Não foi informado Profissional.";
 }
 
 ?>
@@ -536,7 +536,7 @@ function js_mostra(nomepar,event){
     PosMouseX = event.layerX;
     PosMouseY = event.layerY;
     //alert( PosMouseY );
-    
+
     if( nomepar != undefined && document.getElementById(nomepar) != undefined){
 		if( PosMouseY > 80 ){
 			document.getElementById(nomepar).style.top = 0;
@@ -545,7 +545,7 @@ function js_mostra(nomepar,event){
 		}
 		document.getElementById(nomepar).style.visibility = "visible";
 	}
-   
+
   // alert(event.layerY);
 }
 function js_oculta(nomepar,event){
@@ -572,16 +572,16 @@ function janela(d,m,a,fechar,saldo){
 
   if(parent.document.form1.saldo!=undefined){
      parent.document.form1.saldo.value=saldo;
-  }       
- 
+  }
+
   <?
   echo "parent.document.getElementById('".$nome_objeto_data."_dia').value = (d<10?'0'+d:d);\n";
   echo "parent.document.getElementById('".$nome_objeto_data."_mes').value = (m<10?'0'+m:m);\n";
   echo "parent.document.getElementById('".$nome_objeto_data."_ano').value = a;\n";
   echo "parent.js_comparaDatas".$nome_objeto_data."((d<10?'0'+d:d),(m<10?'0'+m:m),a);\n";
-  
+
   echo "parent.document.getElementById('".$nome_objeto_data."_ano').setfocus;\n";
-  
+
   if (isset($shutdown_function) && ($shutdown_function!='none')){
       echo $shutdown_function."\n";
   }
@@ -604,7 +604,7 @@ function janela(d,m,a,fechar,saldo){
 }
 
 
-function janela_zera(){ 
+function janela_zera(){
   <?
   echo "parent.document.getElementById('".$nome_objeto_data."_dia').value = '';\n";
   echo "parent.document.getElementById('".$nome_objeto_data."_mes').value = '';\n";

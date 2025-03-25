@@ -114,10 +114,10 @@ if (!isset($emite_recibo_protocolo) and !isset($reemite_recibo)) {
   if (isset($k03_numnov) && $k03_numnov != null){
 
     /**
-     *  Na tarefa 29472 foi alterado a forma de emissão de recibo passando a utilizar o model recibo.model.php
-     *  porém foi detectado que essa variável (k03_numnov) substitui o valor do numpre gerado pelo model.
-     *  Como não foi encontrado o fonte que faz o envio dessa variável colocamos o redirecionamento de erro para ser
-     *  identificado  algum caso, encontrando assim a rotina que faz o envio dessa variável.
+     *  Na tarefa 29472 foi alterado a forma de emisso de recibo passando a utilizar o model recibo.model.php
+     *  porm foi detectado que essa varivel (k03_numnov) substitui o valor do numpre gerado pelo model.
+     *  Como no foi encontrado o fonte que faz o envio dessa varivel colocamos o redirecionamento de erro para ser
+     *  identificado  algum caso, encontrando assim a rotina que faz o envio dessa varivel.
      */
     //db_fim_transacao(true);
     //db_redireciona("db_erros.php?fechar=true&db_erro=Erro ao emitir recibo. Contate o suporte!");
@@ -132,7 +132,7 @@ if (!isset($emite_recibo_protocolo) and !isset($reemite_recibo)) {
 
   if(pg_numrows($result)==0){
     db_fim_transacao(true);
-    echo "O código do banco não esta cadastrado no arquivo arretipo para este tipo.";
+    echo "O cdigo do banco no esta cadastrado no arquivo arretipo para este tipo.";
     exit;
   }
   db_fieldsmemory($result,0);
@@ -525,7 +525,7 @@ if (!isset($emite_recibo_protocolo) and !isset($reemite_recibo)) {
 
 } else {
 
-  //Apenas reemisão do recibo
+  //Apenas reemiso do recibo
   //pega os numpres da ca3_gerfinanc002.php, separa e insere em db_reciboweb
   $sSqlArreTipo = "select k00_codbco,
                           k00_codage,
@@ -569,7 +569,7 @@ if (!isset($emite_recibo_protocolo) and !isset($reemite_recibo)) {
   if(pg_numrows($result)==0){
     db_fim_transacao(true);
     echo $tipo;
-    echo "O código do banco não esta cadastrado no arquivo arretipo para este tipo.";
+    echo "O cdigo do banco no esta cadastrado no arquivo arretipo para este tipo.";
     exit;
   }
   db_fieldsmemory($result,0);
@@ -629,14 +629,14 @@ if (!isset($emite_recibo_protocolo) and !isset($reemite_recibo)) {
 
   if (isset($db_datausu)) {
     if (!checkdate(substr($db_datausu,5,2),substr($db_datausu,8,2),substr($db_datausu,0,4))) {
-      echo "Data para Cálculo Inválida. <br><br>";
-      echo "Data deverá se superior a : ".date('Y-m-d',db_getsession("DB_datausu"));
+      echo "Data para Clculo Invlida. <br><br>";
+      echo "Data dever se superior a : ".date('Y-m-d',db_getsession("DB_datausu"));
       exit;
     }
 
     if (mktime(0,0,0,substr($db_datausu,5,2),substr($db_datausu,8,2),substr($db_datausu,0,4)) < mktime(0,0,0,date('m',db_getsession("DB_datausu")),date('d',db_getsession("DB_datausu")),date('Y',db_getsession("DB_datausu"))) ) {
-      echo "Data não permitida para cálculo. <br><br>";
-      echo "Data deverá se superior a : ".date('Y-m-d',db_getsession("DB_datausu"));
+      echo "Data no permitida para clculo. <br><br>";
+      echo "Data dever se superior a : ".date('Y-m-d',db_getsession("DB_datausu"));
       exit;
     }
 
@@ -841,7 +841,7 @@ $sSqlDadosInstit = "select db12_uf,
                      inner join db_uf on db_uf.db12_uf = db_config.uf
                      where codigo = ".db_getsession("DB_instit");
 $DadosInstit = db_query($sSqlDadosInstit);
-//cria codigo de barras e linha digitável
+//cria codigo de barras e linha digitvel
 
 $sSqlTxBancaria = "select to_char(k00_txban,'99.99') as tx_banc
                      from arretipo
@@ -867,7 +867,7 @@ if ( $total_recibo == 0 ){
 $valor_parm = $total_recibo;
 $pql_localizacao = '';
 
-//seleciona dados de identificacao. Verifica se é inscr ou matric e da o respectivo select
+//seleciona dados de identificacao. Verifica se  inscr ou matric e da o respectivo select
 //essa variavel vem do cai3_gerfinanc002.php, pelo window open, criada por parse_str
 if (!empty($aDados["ver_matric"]) || $matricularecibo > 0 ) {
 
@@ -909,7 +909,7 @@ if (!empty($aDados["ver_matric"]) || $matricularecibo > 0 ) {
 
   $sPQLLocal = "PQL: {$pql_localizacao}";
 
-  $ident_tipo_ii = 'Imóvel';
+  $ident_tipo_ii = 'Imvel';
 
   $numero = ($db21_usadistritounidade == 't') ? $numero." DSQLU: ".$sql : $numero." SQL: ".$sql;
 
@@ -957,10 +957,10 @@ if (!empty($aDados["ver_matric"]) || $matricularecibo > 0 ) {
   $Identificacao = db_query($sqlidentificacao) or die($sqlidentificacao);
 
   if(pg_numrows($Identificacao)==0) {
-    db_redireciona('db_erros.php?fechar=true&db_erro=[10] - Problemas no Cadastro da Inscrição ' . $numero);
+    db_redireciona('db_erros.php?fechar=true&db_erro=[10] - Problemas no Cadastro da Inscrio ' . $numero);
   }
 
-  $ident_tipo_ii = 'Alvará';
+  $ident_tipo_ii = 'Alvar';
   db_fieldsmemory($Identificacao,0);
 
 } else if(!empty($aDados["ver_numcgm"]) || $numcgmrecibo > 0 ) {
@@ -1026,7 +1026,7 @@ if (!empty($aDados["ver_matric"]) || $matricularecibo > 0 ) {
 
 }
 
-// Controle de Limitação do Tamanho do Historico em 210 Caracteres
+// Controle de Limitao do Tamanho do Historico em 210 Caracteres
 $lHistLimitado = true;
 
 if (isset($tipo_debito)) {
@@ -1123,7 +1123,7 @@ if (isset($tipo_debito)) {
 
         if ( $exercv != pg_result($result,$xy,0)) {
           $exercv = pg_result($result,$xy,0);
-          $histparcela .= "  ".pg_result($result,$xy,0).": Mês:";
+          $histparcela .= "  ".pg_result($result,$xy,0).": Ms:";
         }
         $histparcela .= "-".pg_result($result,$xy,1);
 
@@ -1169,7 +1169,7 @@ if (isset($tipo_debito)) {
       }
 
       /**
-       * Histórico da origem do parcelamento
+       * Histrico da origem do parcelamento
        */
       $histparcela .= getHistoricoOrigemParcelamento($numpre);
     }
@@ -1231,7 +1231,7 @@ if (isset($tipo_debito)) {
         $oDadosInicial = db_utils::fieldsmemory($rsIniciaisParcelamento, $xy);
         $aProcessoForo[]    = $oDadosInicial->v70_sequencial;
         $aCodProcessoForo[] = $oDadosInicial->v70_codforo;
-        $sHistoricoIniciaisParcelamento  .= "Inicial: $oDadosInicial->inicial - Processo do Foro: {$oDadosInicial->v70_codforo} \nExercício(s): ".str_replace("{", "", str_replace("}", "", $oDadosInicial->exerc))."\n";
+        $sHistoricoIniciaisParcelamento  .= "Inicial: $oDadosInicial->inicial - Processo do Foro: {$oDadosInicial->v70_codforo} \nExerccio(s): ".str_replace("{", "", str_replace("}", "", $oDadosInicial->exerc))."\n";
      }
 
     }
@@ -1320,7 +1320,7 @@ if (isset($tipo_debito)) {
         $aCodProcessoForo[] = $oHistParcela->v70_codforo;
         if ( $exercv != $oHistParcela->inicial) {
           $exercv = $oHistParcela->inicial;
-          $histparcela .= $oHistParcela->inicial." - Processo do Foro: {$oHistParcela->v70_codforo} \nExercício(s): ";
+          $histparcela .= $oHistParcela->inicial." - Processo do Foro: {$oHistParcela->v70_codforo} \nExerccio(s): ";
         }
         $histparcela .= $sSeparador.$oHistParcela->exerc;
 
@@ -1437,7 +1437,7 @@ if (isset($tipo_debito)) {
       }
       $nArea = pg_result($result,0,"q30_area");
       if(!empty($nArea)) {
-        $histparcela .= " - Área: " . $nArea . "m2 ";
+        $histparcela .= " - rea: " . $nArea . "m2 ";
       }
 
     } else {
@@ -1609,8 +1609,8 @@ $pdf1->pretipolograd    = 'Logradouro:';
 $pdf1->nomepri          = $nomepri;
 $pdf1->nomepriimo       = $nomepri;
 $pdf1->prenomepri       = $nomepri;
-$pdf1->tipocompl        = 'Número:';
-$pdf1->pretipocompl     = 'Número:';
+$pdf1->tipocompl        = 'Nmero:';
+$pdf1->pretipocompl     = 'Nmero:';
 $pdf1->nrpri            = $j39_numero;
 $pdf1->prenrpri         = $j39_numero;
 $pdf1->complpri         = $j39_compl;
@@ -1790,10 +1790,10 @@ $pdf1->codigo_barras       = $codigobarras;
 $pdf1->descr6              = $datavencimento;  // Data de Vencimento
 
 $pdf1->descr7              = db_formatar(@$valor_parm,'f');  // qtd de URM ou valor
-$pdf1->descr9              = str_pad($k03_numpre."000",11,0,STR_PAD_LEFT); // cod. de arrecadação
+$pdf1->descr9              = str_pad($k03_numpre."000",11,0,STR_PAD_LEFT); // cod. de arrecadao
 $pdf1->predescr6           = $datavencimento;  // Data de Vencimento
 $pdf1->predescr7           = db_formatar(@$valor_parm,'f');  // qtd de URM ou valor
-$pdf1->predescr9           = str_pad($k03_numpre."000",11,0,STR_PAD_LEFT); // cod. de arrecadação
+$pdf1->predescr9           = str_pad($k03_numpre."000",11,0,STR_PAD_LEFT); // cod. de arrecadao
 
 /***************************************************************************************************************************************/
 
@@ -1868,13 +1868,13 @@ $pdf1->especie     = "R$";
 if (db_strtotime($mindatop) < db_strtotime(date("Y-m-d"))) {
   $pdf1->data_processamento = date("d/m/Y");
 } else {
-  $pdf1->data_processamento = db_formatar($mindatop,'d');  // data do documento = menor data de operação do numpre
+  $pdf1->data_processamento = db_formatar($mindatop,'d');  // data do documento = menor data de operao do numpre
 }
 $pdf1->dtparapag  = $datavencimento; //date('d/m/Y',db_getsession('DB_datausu'));
 $pdf1->loteamento = $loteador;
 
 // ###################### BUSCA OS DADOS PARA IMPRIMIR O LOGO DO BANCO #########################
-//verifica se é ficha e busca o codigo do banco
+//verifica se  ficha e busca o codigo do banco
 
 if ($oRegraEmissao->isCobranca()) {
 
@@ -1891,8 +1891,8 @@ if ($oRegraEmissao->isCobranca()) {
 
 
   /*
-   * Caso o tipo de convênio seja cobrança registrada buscamos os dados das taxas com o grupo de taxa
-   * vinculado ao cadastro de convênio utilizado
+   * Caso o tipo de convnio seja cobrana registrada buscamos os dados das taxas com o grupo de taxa
+   * vinculado ao cadastro de convnio utilizado
    */
   if ( $k03_tipo == 18 || $k03_tipo == 12 || $k03_tipo == 13 ) {
 
@@ -1912,8 +1912,8 @@ if ($oRegraEmissao->isCobranca()) {
        *
        * Buscamos os dados das custas envolvidas na partilha do Recibo
        *
-       * Caso não sejam encontrados registros, significa que não foram geradas custas para este recibo pois foi efetuado o
-       * pagamento do recibo com as custas emitidas ou um lançamento manual ou uma isenção para o processo do foro
+       * Caso no sejam encontrados registros, significa que no foram geradas custas para este recibo pois foi efetuado o
+       * pagamento do recibo com as custas emitidas ou um lanamento manual ou uma iseno para o processo do foro
        *
        */
       $sSqlPartilhaReciboPaga = "select ar37_descricao,
@@ -1951,8 +1951,8 @@ if ($oRegraEmissao->isCobranca()) {
         /*
          * Se foram encontradas custas para o recibo gerado
          *
-         * Chamamos novamente a classe convenio só que somando o valor total das custas ao valor do débito para geração
-         * do código de barras e da linha digtável com o valor total a ser pago
+         * Chamamos novamente a classe convenio s que somando o valor total das custas ao valor do dbito para gerao
+         * do cdigo de barras e da linha digtvel com o valor total a ser pago
          */
         try {
           $nValor    = number_format(round($total_recibo+$nTotalTaxas,2), 2, '', '');
@@ -1977,7 +1977,7 @@ if ($oRegraEmissao->isCobranca()) {
 
         /*
          *
-         * Buscamos os dados das custas envolvidas na partilha do processo do foro pois não foram geradas as custas para o recibo
+         * Buscamos os dados das custas envolvidas na partilha do processo do foro pois no foram geradas as custas para o recibo
          * Retornando apenas quando as custas foram pagas (processoforopartilha.v76_dtpagamento is not null) ou o tipo de lancamento
          * seja manual ou isento (processoforopartilha.v76_tipolancamento)
          *
@@ -2018,11 +2018,11 @@ if ($oRegraEmissao->isCobranca()) {
           }
 
           /*
-           * Situação das Custas de Acordo com o tipo de lançamento
+           * Situao das Custas de Acordo com o tipo de lanamento
            *
-           * Caso o tipo de lancamento seja 1 (Automático) e a data de pagamento não seja nula significa que as custas foram pagas
-           * Caso o tipo de lancamento seja 2 (Manual) significa que as custas foram pagas no Foro e lançadas manualmente com a data de pagamento
-           * Caso o tipo de lancamento seja 3 (Isento) significa que o processo é isento de Custas
+           * Caso o tipo de lancamento seja 1 (Automtico) e a data de pagamento no seja nula significa que as custas foram pagas
+           * Caso o tipo de lancamento seja 2 (Manual) significa que as custas foram pagas no Foro e lanadas manualmente com a data de pagamento
+           * Caso o tipo de lancamento seja 3 (Isento) significa que o processo  isento de Custas
            *
            */
           if ($iLinhasPartilha > 0) {
@@ -2276,7 +2276,7 @@ function recibodesconto($numpre, $numpar, $tipo, $tipo_debito, $whereloteador, $
   $rs_cgc = db_query($sql_cgc);
   $oConfig->cgc = pg_result($rs_cgc,0,0);
 
-  /* testa se está em dia com IPTU */
+  /* testa se est em dia com IPTU */
   $iTemDesconto = 1;
 
   if ( isset($ver_matric) and $oConfig->db21_codcli == 19985 and false ) { // marica/rj
@@ -2444,7 +2444,7 @@ function getHistoricoOrigemParcelamento($iNumpreParcelamento){
   $result = db_query($sqlhist);
 
   $aResults = db_utils::getCollectionByRecord($result);
-  $sHistorico = "\n Referência: \n";
+  $sHistorico = "\n Referncia: \n";
   foreach($aResults as $obj){
     $sHistorico .= "{$obj->v03_descr}/{$obj->v01_exerc}, ";
   }

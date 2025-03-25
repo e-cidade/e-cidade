@@ -2,14 +2,14 @@
 
 global $contapagina;
 $contapagina=1;
-	
+
 ////modelo de comprovante de ajuda de custo
- 	
+
 $this->objpdf->AliasNbPages();
 $this->objpdf->settopmargin(1);
 $this->objpdf->SetAutoPageBreak('on',0);
 $this->objpdf->line(2,148.5,208,148.5);
-	
+
 $xlin        = 21;
 $xcol        = 4;
 $comeco      = 0;
@@ -29,42 +29,42 @@ $contaobs    = 0;
 
 //verifica se algum item tem observação
 for ($j = 0 ;$j < $this->linhasdositens; $j++) {
-  
+
   $obs = trim(pg_result($this->recorddositens, $j, $this->robsdositens));
   if ($obs != '') {
     $cont_obs++;
   }
-  
+
 }
 if ((int)$cont_obs > 0){
 
-  // MAXIMO QUE PODER SER IMPRESSO 
+  // MAXIMO QUE PODER SER IMPRESSO
   $quant_itens = 5;
   $qReg        = $this->linhasdositens;
   $passou      = 0;
   for ($i = 0; $i < $qReg; $i++) {
-       
+
     $contaobs++;
     if ((($contaobs == $quant_itens) || ($passou == 0 && $qReg > $quant_itens)) && ($qReg > $quant_itens)) {
-          
+
       $iVias++;
       $total   += $contaobs;
       $contaobs = 0;
       $iPag_a   = true;
       $passou   = 1;
-       
+
     }
     if (isset($total) && $qReg < $quant_itens) {
-           
-      $iVias++;   
+
+      $iVias++;
       $contaobs = 0;
-      $iPag_b   = true;        
+      $iPag_b   = true;
       break;
-       
+
     }
-   
+
   }
-  
+
   if ($iPag_a == true && $iPag_b == true) {
     $iVias = $iVias;
   } elseif ($iPag_a == true && $iPag_b == false) {
@@ -74,32 +74,32 @@ if ((int)$cont_obs > 0){
   }
 
 } else {
-  
+
   //14 itens por folha se não conter observação em nenhum item
   $quant_itens = 8;
   $qReg        = $this->linhasdositens;
   for ($i = 0; $i < $qReg; $i++){
-       
+
     $contaobs++;
-    if ((($contaobs == $quant_itens) || ($passou == 0 && $qReg >$quant_itens)) && ($qReg >$quant_itens)){   
-          
+    if ((($contaobs == $quant_itens) || ($passou == 0 && $qReg >$quant_itens)) && ($qReg >$quant_itens)){
+
       $iVias++;
       $total   += $contaobs;
       $contaobs = 0;
       $iPag_a   = true;
       $passou   = 1;
-       
+
     }
     if (isset($total) && $qReg < $quant_itens){
-           
+
       $iVias++;
       $contaobs = 0;
       $iPag_b   = true;
       break;
-       
+
     }
-    
-  }  
+
+  }
 
   if ($iPag_a == true && $iPag_b == true) {
     $iVias = $iVias;
@@ -115,14 +115,15 @@ $iVias = $iVias * 2;
 
 
 function printHead($oPdf, $iLin, $iCol, $oImp) {
-  
+
   $oPdf->setfillcolor(245);
   $oPdf->roundedrect($iCol - 2, $iLin - 18, 206, 145, 2, 'DF',' 1234');
   $oPdf->setfillcolor(255, 255, 255);
   $oPdf->Setfont('Arial', 'B', 8);
-  $oPdf->text(110, $iLin - 13, 'RECIBO DE AJUDA DE CUSTO N'.chr(176).' '.$oImp->Rnumero);
-  $oPdf->text(110, $iLin - 9, 'PEDIDO TFD N'.chr(176).' '.$oImp->iRtf01_i_codigo);
-  
+  $oPdf->text(110, $iLin - 13, 'RECIBO DE AJUDA DE CUSTO N: '.chr(176).' '.$oImp->Rnumero);
+  $oPdf->text(110, $iLin - 9, 'PEDIDO TFD N: '.chr(176).' '.$oImp->iRtf01_i_codigo);
+  $oPdf->text(110, $iLin - 5, 'NÚMERO TFD: '.chr(176).' '.$oImp->iNumtfd);
+
 	$oPdf->Image('imagens/files/logo_boleto.png', 10, $iLin - 16, 12);
 	$oPdf->Setfont('Arial','B',9);
 	$oPdf->text(30, $iLin - 14, $oImp->prefeitura);
@@ -131,11 +132,11 @@ function printHead($oPdf, $iLin, $iCol, $oImp) {
 	$oPdf->text(30, $iLin - 8, $oImp->municpref);
 	$oPdf->text(30, $iLin - 4, $oImp->telefpref);
 	$oPdf->text(30, $iLin - 1, $oImp->emailpref);
-  
+
 }
 
 function printRectangleRetiradoPor ($oPdf, $iLin, $iCol, $oImp) {
-  
+
   $iLin += 32;
   $oPdf->Roundedrect($iCol, $iLin + 1, $iCol + 98 + 100, 16, 2, 'DF', '1234');
 	$oPdf->Setfont('Arial' ,'b', 8);
@@ -154,7 +155,7 @@ function printRectangleRetiradoPor ($oPdf, $iLin, $iCol, $oImp) {
 	$oPdf->text($iCol + 110, $iLin + 10, 'Data: ');
 	$oPdf->Setfont('Arial', '', 8);
 	$oPdf->text($iCol + 120, $iLin + 10, '        '.db_formatar($oImp->Rdatatfd,"d"));
-	  
+
 	$oPdf->Setfont('Arial', 'b', 8);
   $oPdf->text($iCol + 2, $iLin + 14, 'Identidade:');
   $oPdf->Setfont('Arial', '', 8);
@@ -167,10 +168,10 @@ function printRectangleRetiradoPor ($oPdf, $iLin, $iCol, $oImp) {
 }
 
 
-function printRectanglePaciente($oPdf, $iY, $iX, $oImp) {  
+function printRectanglePaciente($oPdf, $iY, $iX, $oImp) {
 
   $iY -= 11;
-  $oPdf->Roundedrect(4, $iY + 11, 202, 32, 2, 'DF', '1234');  
+  $oPdf->Roundedrect(4, $iY + 11, 202, 32, 2, 'DF', '1234');
   $oPdf->Setfont('arial', 'B', 8);
   $oPdf->text(6, $iY + 16, 'PACIENTE');
   $oPdf->Setfont('arial', 'B', 8);-
@@ -245,7 +246,7 @@ function printRectanglePaciente($oPdf, $iY, $iX, $oImp) {
 }
 
 function printItens($oPdf, $iLin, $iCol, $oImp, $comeco, $quant_itens, $passada) {
-  
+
   $iLin += 8;
   $oPdf->Roundedrect($iCol, $iLin + 42, 202, 55, 2, 'DF', '1234');
   $oPdf->Setfont('Arial', 'b', 8);
@@ -255,21 +256,23 @@ function printItens($oPdf, $iLin, $iCol, $oImp, $comeco, $quant_itens, $passada)
   $oPdf->text($iCol + 180, $iLin + 46, 'VALOR');
   $oPdf->Setfont('Arial','',8);
   $oPdf->sety($iLin+47);
-	  
+
 	$maiscol      = 0;
 	$cont         = 0;
 	$yy 	        = $oPdf->gety();
   $oImp->rtotal = 0;
-      
+
   for($ii = $comeco;$ii < $oImp->linhasdositens ;$ii++) {
 
     $cont++;
     $oImp->rtotal += pg_result($oImp->recorddositens,$ii,$oImp->rvalor);
     $oPdf->setx($iCol+3+$maiscol);
-    
+
     $oPdf->cell(10 ,5, trim(pg_result($oImp->recorddositens,$ii,$oImp->rcodcgs))                       ,0,0,"L",0);
     $oPdf->cell(66 ,5, substr(trim(pg_result($oImp->recorddositens,$ii,$oImp->rbeneficiado)),0,50)     ,0,0,"L",0);
-    $oPdf->cell(100,5, pg_result($oImp->recorddositens,$ii, 'tf12_descricao')                          ,0,0,"L",0);
+    $codigoItem = pg_result($oImp->recorddositens,$ii, 'sd63_c_procedimento');
+    $descricaoItem =  pg_result($oImp->recorddositens,$ii, 'tf12_descricao');
+    $oPdf->cell(100,5,        $codigoItem." - ".$descricaoItem                   ,0,0,"L",0);
     if (trim(pg_result($oImp->recorddositens,$ii,$oImp->robsdositens)) != '') {
 
       $oPdf->cell(15, 4, number_format(pg_result($oImp->recorddositens,$ii,$oImp->rvalor), 2, ',', '.'),0,1,"R",0);
@@ -277,45 +280,45 @@ function printItens($oPdf, $iLin, $iCol, $oImp, $comeco, $quant_itens, $passada)
       $oPdf->Setfont('Arial', '', 6);
       $oPdf->multicell(200, 4,$obsitens);
       $oPdf->Setfont('Arial', '', 8);
-	  
+
     } else {
       $oPdf->cell(15,5,number_format(pg_result($oImp->recorddositens,$ii,$oImp->rvalor), 2, ',', '.'),0,1,"R",0);
     }
-    
+
     if ($quant_itens==6 && (trim(pg_result($oImp->recorddositens,$ii,$oImp->robsdositens)) == '')){
 
       $obsitens="";
       $oPdf->multicell(180,4,"");
-     
+
     }
-       
+
     if ((($ii+1) % $quant_itens ) == 0 && $ii > 0 && $passada == 0){
-				 
+
       $maiscol = 0;
 			$passada ++;
 			$comeco  = $ii+1;
 			break;
-	     
+
     }
 
 	  if(($ii+1) == $oImp->linhasdositens){
-	     
+
 	    $comeco  = 0;
 	    $passada = 0;
-	    break;  
-	     
+	    break;
+
 	  }
 
 	  if ($cont == $quant_itens && $passada > 0){
-				 
+
 	    $maiscol = 0;
 			$oPdf->sety($yy);
 			$comeco  = $ii+1;
 			$passada = 0;
 			break;
-	     
+
 	  }
-              
+
   }
   $iLin -= 7;
 	$oPdf->Setfont('Arial','b',8);
@@ -332,11 +335,11 @@ function printItens($oPdf, $iLin, $iCol, $oImp, $comeco, $quant_itens, $passada)
 	$oPdf->sety($iLin+112);
 	$oPdf->setx($iCol+1);
   $oPdf->multicell(107,5,"R$  ". number_format($oImp->rtotal, 2, ',', '.') ." - ". db_extenso($oImp->rtotal,true),0,"L");
-  
+
 }
 
 for ($i = 0;$i < $iVias; $i++){
-	  
+
   if (($i % 2 ) == 0) {
 	   $this->objpdf->AddPage();
   }
@@ -344,12 +347,12 @@ for ($i = 0;$i < $iVias; $i++){
 	if ($this->linhasdositens <= $quant_itens) {
     $comeco = 0;
   }
-  
+
 	printHead($this->objpdf, $xlin, $xcol, $this);
   printRectanglePaciente($this->objpdf, $xlin, $xcol, $this);
-  printRectangleRetiradoPor($this->objpdf, $xlin, $xcol, $this);  
+  printRectangleRetiradoPor($this->objpdf, $xlin, $xcol, $this);
   printItens($this->objpdf, $xlin, $xcol, $this, $comeco, $quant_itens, $passada);
-	  
+
 	if (($i % 2 ) == 0)
 	  $xlin = 169;
 	else

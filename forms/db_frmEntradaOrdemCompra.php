@@ -423,7 +423,7 @@ if (count($aParametrosEmpenho) > 0) {
               <td>
                 <?php
                 $oDaoUnid = db_utils::getDao("matunid");
-                $rsUnidades = $oDaoUnid->sql_record($oDaoUnid->sql_query_file(null, "*", "m61_descr"));
+                $rsUnidades = $oDaoUnid->sql_record($oDaoUnid->sql_query_file(null, "*", "m61_descr","m61_ativo = 't'"));
                 $aUnidades = array();
                 for ($i = 0; $i < $oDaoUnid->numrows; $i++) {
 
@@ -953,7 +953,7 @@ if (count($aParametrosEmpenho) > 0) {
     $('valorRecebido').value = new Number(oItemAtivo.m52_valor).toFixed(2);
     $('saldovalor').innerHTML = new Number(oItemAtivo.saldovalor).toFixed(2);
     $('saldoitens').innerHTML = oItemAtivo.saldoitens;
-    $('unidadeentrada').value = oItemAtivo.m60_codmatunid;
+    $('unidadeentrada').value = oItemAtivo.undCompras;
     $('m52_codlanc').value = oItemAtivo.m52_codlanc;
     $('iIndice').value = oItemAtivo.iIndiceEntrada;
     $('sJson').value = oAjax.responseText;
@@ -1473,7 +1473,7 @@ if (count($aParametrosEmpenho) > 0) {
     numemp = oItemAtivo.e60_numemp;
     sequen = oItemAtivo.e62_sequencial;
     js_OpenJanelaIframe('top.corpo', 'iframe_material',
-      'mat1_matmater011.php?m63_codpcmater=' + cod + '&numemp=' + numemp + '&sequen=' + sequen + '&lLotes=1',
+      'mat1_matmater011.php?m63_codpcmater=' + cod + '&numemp=' + numemp + '&sequen=' + sequen + '&lLotes=1' + '&m60_codmatunid=331',
       'Incluir Item de Entrada Novo', true);
   }
 
@@ -1614,7 +1614,7 @@ if (count($aParametrosEmpenho) > 0) {
 
     }
 
-    /* Requisição Ajax responsável por emitir mensagem informativa 
+    /* Requisição Ajax responsável por emitir mensagem informativa
      * quando o elemento da dotação não for o requisitado e o tipo no cadastro do material for false */
 
 

@@ -1,186 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
 
-<?php require_once 'libs/renderComponents/doc.php'; ?>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
 
-<!-- Primary -->
-<?= $component->render('buttons/solid', [
-    'designButton' => 'primary',
-    'size' => 'xl'
-]); ?>
+<body>
+    <?php require_once 'libs/renderComponents/doc.php'; ?>
 
-<?= $component->render('buttons/solid', [
-    'designButton' => 'primary',
-    'size' => 'lg'
-]); ?>
+    <!-- Primary -->
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'primary',
+        'size' => 'xl'
+    ]); ?>
 
-<?= $component->render('buttons/solid', [
-    'designButton' => 'primary',
-    'size' => 'md'
-]); ?>
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'primary',
+        'size' => 'lg'
+    ]); ?>
 
-<?= $component->render('buttons/solid', [
-    'designButton' => 'primary',
-    'size' => 'sm'
-]); ?>
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'primary',
+        'size' => 'md'
+    ]); ?>
 
-<hr>
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'primary',
+        'size' => 'sm'
+    ]); ?>
 
-<!-- Secondary -->
-<?= $component->render('buttons/solid', [
-    'designButton' => 'secondary',
-    'size' => 'xl'
-]); ?>
+    <hr>
 
-<?= $component->render('buttons/solid', [
-    'designButton' => 'secondary',
-    'size' => 'lg'
-]); ?>
+    <!-- Secondary -->
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'secondary',
+        'size' => 'xl'
+    ]); ?>
 
-<?= $component->render('buttons/solid', [
-    'designButton' => 'secondary',
-    'size' => 'md'
-]); ?>
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'secondary',
+        'size' => 'lg'
+    ]); ?>
 
-<?= $component->render('buttons/solid', [
-    'designButton' => 'secondary',
-    'size' => 'sm'
-]); ?>
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'secondary',
+        'size' => 'md'
+    ]); ?>
 
-<hr>
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'secondary',
+        'size' => 'sm'
+    ]); ?>
 
-<!-- Success -->
-<?= $component->render('buttons/solid', [
-    'designButton' => 'success',
-    'size' => 'xl'
-]); ?>
+    <hr>
 
-<?= $component->render('buttons/solid', [
-    'designButton' => 'success',
-    'size' => 'lg'
-]); ?>
+    <!-- Success -->
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'success',
+        'size' => 'xl'
+    ]); ?>
 
-<?= $component->render('buttons/solid', [
-    'designButton' => 'success',
-    'size' => 'md'
-]); ?>
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'success',
+        'size' => 'lg'
+    ]); ?>
 
-<?= $component->render('buttons/solid', [
-    'designButton' => 'success',
-    'size' => 'sm'
-]); ?>
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'success',
+        'size' => 'md'
+    ]); ?>
 
-<hr>
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'success',
+        'size' => 'sm'
+    ]); ?>
 
-<!-- Danger -->
-<?= $component->render('buttons/solid', [
-    'designButton' => 'danger',
-    'size' => 'xl'
-]); ?>
+    <hr>
 
-<?= $component->render('buttons/solid', [
-    'designButton' => 'danger',
-    'size' => 'lg'
-]); ?>
+    <!-- Danger -->
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'danger',
+        'size' => 'xl'
+    ]); ?>
 
-<?= $component->render('buttons/solid', [
-    'designButton' => 'danger',
-    'size' => 'md'
-]); ?>
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'danger',
+        'size' => 'lg'
+    ]); ?>
 
-<?= $component->render('buttons/solid', [
-    'designButton' => 'danger',
-    'size' => 'sm'
-]); ?>
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'danger',
+        'size' => 'md'
+    ]); ?>
 
-<hr>
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'danger',
+        'size' => 'sm'
+    ]); ?>
 
-<!-- Warning -->
-<?= $component->render('buttons/solid', [
-    'designButton' => 'warning',
-    'size' => 'xl'
-]); ?>
+    <hr>
 
-<?= $component->render('buttons/solid', [
-    'designButton' => 'warning',
-    'size' => 'lg'
-]); ?>
+    <!-- Warning -->
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'warning',
+        'size' => 'xl'
+    ]); ?>
 
-<?= $component->render('buttons/solid', [
-    'designButton' => 'warning',
-    'size' => 'md'
-]); ?>
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'warning',
+        'size' => 'lg'
+    ]); ?>
 
-<?= $component->render('buttons/solid', [
-    'designButton' => 'warning',
-    'size' => 'sm'
-]); ?>
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'warning',
+        'size' => 'md'
+    ]); ?>
 
-<hr>
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'warning',
+        'size' => 'sm'
+    ]); ?>
 
-<!-- Info -->
-<?= $component->render('buttons/solid', [
-    'designButton' => 'info',
-    'size' => 'xl'
-]); ?>
+    <hr>
 
-<?= $component->render('buttons/solid', [
-    'designButton' => 'info',
-    'size' => 'lg'
-]); ?>
+    <!-- Info -->
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'info',
+        'size' => 'xl'
+    ]); ?>
 
-<?= $component->render('buttons/solid', [
-    'designButton' => 'info',
-    'size' => 'md'
-]); ?>
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'info',
+        'size' => 'lg'
+    ]); ?>
 
-<?= $component->render('buttons/solid', [
-    'designButton' => 'info',
-    'size' => 'sm'
-]); ?>
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'info',
+        'size' => 'md'
+    ]); ?>
 
-<hr>
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'info',
+        'size' => 'sm'
+    ]); ?>
 
-<!-- Disabled -->
-<?= $component->render('buttons/solid', [
-    'designButton' => 'disabled',
-    'size' => 'xl'
-]); ?>
+    <hr>
 
-<?= $component->render('buttons/solid', [
-    'designButton' => 'disabled',
-    'size' => 'lg'
-]); ?>
+    <!-- Disabled -->
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'disabled',
+        'size' => 'xl'
+    ]); ?>
 
-<?= $component->render('buttons/solid', [
-    'designButton' => 'disabled',
-    'size' => 'md'
-]); ?>
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'disabled',
+        'size' => 'lg'
+    ]); ?>
 
-<?= $component->render('buttons/solid', [
-    'designButton' => 'disabled',
-    'size' => 'sm'
-]); ?>
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'disabled',
+        'size' => 'md'
+    ]); ?>
 
-<hr>
+    <?= $component->render('buttons/solid', [
+        'designButton' => 'disabled',
+        'size' => 'sm'
+    ]); ?>
 
-<!-- Disabled -->
-<?= $component->render('buttons/solid', [
-    'size' => 'xl'
-]); ?>
+    <hr>
 
-<?= $component->render('buttons/solid', [
-    'size' => 'lg'
-]); ?>
+    <!-- Disabled -->
+    <?= $component->render('buttons/solid', [
+        'size' => 'xl'
+    ]); ?>
 
-<?= $component->render('buttons/solid', [
-    'size' => 'md'
-]); ?>
+    <?= $component->render('buttons/solid', [
+        'size' => 'lg'
+    ]); ?>
 
-<?= $component->render('buttons/solid', [
-    'size' => 'sm'
-]); ?>
+    <?= $component->render('buttons/solid', [
+        'size' => 'md'
+    ]); ?>
 
-<script type="text/javascript">
-    loadComponents([
-        "buttonsSolid",
-    ]);
-</script>
+    <?= $component->render('buttons/solid', [
+        'size' => 'sm'
+    ]); ?>
+</body>
+
+</html>

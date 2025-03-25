@@ -530,6 +530,7 @@ if (isset($e60_numemp) and $e60_numemp != "") {
         //$oTabDetalhes->add("prestaconta", "Prestação de Contas","", false);
         $oTabDetalhes->add("contratos", "Contratos","emp2_listacontratosempenho001.php?e60_numemp={$e60_numemp}");
         $oTabDetalhes->add("impressao", "Imprimir Consulta","emp2_consultas001.php?e60_numemp={$e60_numemp}", $lPermissaoImpressao);
+        $oTabDetalhes->add("convenios", "Convênios","emp2_consultaconveniosempenho001.php?e60_numemp={$e60_numemp}"); 
         $oTabDetalhes->show();
         ?>
     </fieldset>

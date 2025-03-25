@@ -153,6 +153,15 @@ db_app::load("widgets/windowAux.widget.js, widgets/dbmessageBoard.widget.js");
             ?>
           </td>
         </tr>
+        <tr style="display: none">
+          <td><strong>Movimentação: </strong></td>
+          <td>
+            <?
+             $op02_movautomatica = 'f';
+             db_input('op02_movautomatica', 13, 4, true, 'hidden', 1);
+            ?>
+          </td>
+        </tr>
       </table>
     </fieldset>
   </center>
@@ -314,27 +323,28 @@ db_app::load("widgets/windowAux.widget.js, widgets/dbmessageBoard.widget.js");
     justificativa.innerHTML = item.op02_justificativa;
     justificativa.style = "display: none";
 
-    const opcoes = novaMovimentacao.insertCell(6);
-    opcoes.className = "corpoTable";
-    opcoes.style = "display: flex; justify-content: space-around;"
+    if ((!item.op02_movautomatica && $("op02_movautomatica").value == 'f') ||  item.op02_movautomatica == 'f') {
+      const opcoes = novaMovimentacao.insertCell(6);
+      opcoes.className = "corpoTable";
+      opcoes.style = "display: flex; justify-content: space-around;"
+      const botaoAlterar = document.createElement("a");
+      botaoAlterar.className = 'anchor';
+      botaoAlterar.innerHTML = "A";
+      botaoAlterar.href = "#";
+      botaoAlterar.addEventListener("click", function() {
+        js_alterar(novaMovimentacao, table);
+      });
 
-    const botaoAlterar = document.createElement("a");
-    botaoAlterar.className = 'anchor';
-    botaoAlterar.innerHTML = "A";
-    botaoAlterar.href = "#";
-    botaoAlterar.addEventListener("click", function() {
-      js_alterar(novaMovimentacao, table);
-    });
-
-    const botaoExcluir = document.createElement("a");
-    botaoExcluir.className = 'anchor';
-    botaoExcluir.innerHTML = "E";
-    botaoExcluir.href = "#";
-    botaoExcluir.addEventListener("click", function() {
-      js_excluir(novaMovimentacao.rowIndex - 1, table, item.op02_sequencial, item.movimentacao, item.op02_valor, item.op02_data);
-    });
-    opcoes.appendChild(botaoAlterar);
-    opcoes.appendChild(botaoExcluir);
+      const botaoExcluir = document.createElement("a");
+      botaoExcluir.className = 'anchor';
+      botaoExcluir.innerHTML = "E";
+      botaoExcluir.href = "#";
+      botaoExcluir.addEventListener("click", function() {
+        js_excluir(novaMovimentacao.rowIndex - 1, table, item.op02_sequencial, item.movimentacao, item.op02_valor, item.op02_data);
+      });
+      opcoes.appendChild(botaoAlterar);
+      opcoes.appendChild(botaoExcluir);
+    }
   }
 
   function js_excluir(numLinha, table, iSequencial, iMov, iValor, sDataMov) {

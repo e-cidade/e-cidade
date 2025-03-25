@@ -29,10 +29,10 @@ $db_opcao = 1;
   <tr> 
     <td height="430" align="left" valign="top" bgcolor="#CCCCCC"> 
      <?
-	    $clcriaabas->identifica = array("convconvenios"=>"Convênios","convdetalhaconcedentes"=>"Detalhamento dos concedentes","convdetalhatermos"=>"Termos Aditivos dos Convênios");
-       $clcriaabas->src = array("convconvenios"=>"con1_convconvenios006.php","convdetalhaconcedentes"=>"con1_convdetalhaconcedentes001.php", "convdetalhatermos"=>"con1_convdetalhatermos001.php");
-       $clcriaabas->disabled   =  array("convdetalhaconcedentes"=>"true","convdetalhatermos"=>"true");
-	     $clcriaabas->cria_abas(); 
+	    $clcriaabas->identifica = array("convconvenios"=>"Convênios","convdetalhatermos"=>"Termos Aditivos dos Convênios");
+      $clcriaabas->src        = array("convconvenios"=>"con1_convconvenios006.php","convdetalhatermos"=>"con1_convdetalhatermos001.php");
+      $clcriaabas->sizecampo  = array("convconvenios"=>"10", "convdetalhatermos"=>"25");
+      $clcriaabas->cria_abas(); 
      ?> 
     </td>
   </tr>

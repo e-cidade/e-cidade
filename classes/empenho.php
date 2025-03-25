@@ -1563,7 +1563,7 @@ class empenho {
    *  @param  string [sWhere]
    *  @return string json;
    */
-  function empenho2Json($sWhere = '',$itens = 0, $aItensPendentesPatrimonio = array()){
+  function empenho2Json($sWhere = '',$itens = 0, $aItensPendentesPatrimonio = array(), $lParamAnulacao = false){
 
     if (!class_exists("services_json")){
       require_once "libs/JSON.php";
@@ -1716,7 +1716,12 @@ class empenho {
           }
         }
       }else if ($itens == 1){
-        $rsItens = $this->getItensSaldo();
+
+        if ($lParamAnulacao) {
+          $rsItens = $this->getItensSaldo();
+        } else {         
+          $rsItens = $this->getItensSaldoAnulacao();
+        }
         if ($rsItens){
 
           if ($this->iNumRowsItens > 0){
@@ -2125,8 +2130,45 @@ class empenho {
     $sqlItensEmpenho .= "       rnsaldovalor as saldovalor, ";
     $sqlItensEmpenho .= "       rnvaloruni as e62_vlrun, ";
     $sqlItensEmpenho .= "       rnsaldoentradaempenho as saldocentavos, ";
-    $sqlItensEmpenho .= "       rlcontrolaquantidade as servicoquantidade ";
+    $sqlItensEmpenho .= "       e55_servicoquantidade as servicoquantidade ";
     $sqlItensEmpenho .= "  From fc_saldoitensempenho({$this->numemp}) ";
+    $sqlItensEmpenho .= "       inner join pcmater on riCodmater = pc01_codmater " ;
+    $sqlItensEmpenho .= "      left join empempaut on empempaut.e61_numemp = riNumEmp ";
+    $sqlItensEmpenho .= "       left join empautitem on empautitem.e55_autori = empempaut.e61_autori ";
+    $sqlItensEmpenho .= "   and riseqitem = e55_sequen " ;
+    $sqlItensEmpenho .= " order by e62_sequen ";
+    $rsItems         = $this->clempempitem->sql_record($sqlItensEmpenho);
+    if ($rsItems){
+      $this->iNumRowsItens = pg_num_rows($rsItems);
+      return $rsItems;
+    }else{
+      echo pg_last_error();
+      return false;
+    }
+  }
+
+    /**
+   *  nova funcao para para retornar itens do empenho (com saldo) para anulação de empenho ;
+   *  @return recordset;
+   */
+
+   function getItensSaldoAnulacao(){
+
+    $this->clempempitem = new cl_empempitem();
+    $sqlItensEmpenho  = "select rsdescr as pc01_descrmater, ";
+    $sqlItensEmpenho .= "       rnquantini as e62_quant, ";
+    $sqlItensEmpenho .= "       pc01_servico,";
+    $sqlItensEmpenho .= "       pc01_fraciona,";
+    $sqlItensEmpenho .= "       riseqitem as e62_sequen,";
+    $sqlItensEmpenho .= "       ricoditem as e62_sequencial,";
+    $sqlItensEmpenho .= "       (select e62_item from empempitem where e62_sequencial = ricoditem) as e62_item,";
+    $sqlItensEmpenho .= "       rnsaldoitem as saldo, ";
+    $sqlItensEmpenho .= "       rnvalorini as e62_vltot, ";
+    $sqlItensEmpenho .= "       rnsaldovalor as saldovalor, ";
+    $sqlItensEmpenho .= "       rnvaloruni as e62_vlrun, ";
+    $sqlItensEmpenho .= "       rnsaldoentradaempenho as saldocentavos, ";
+    $sqlItensEmpenho .= "       rlcontrolaquantidade as servicoquantidade ";
+    $sqlItensEmpenho .= "  From fc_saldoitensempenho_anulacao({$this->numemp}) ";
     $sqlItensEmpenho .= "       inner join pcmater on riCodmater = pc01_codmater " ;
     $sqlItensEmpenho .= " order by e62_sequen ";
     $rsItems         = $this->clempempitem->sql_record($sqlItensEmpenho);
@@ -3451,7 +3493,7 @@ class empenho {
    * @param integer $iTipo  define o tipo de rp 1 - Nao Processao 2 processado
    */
 
-  function getDadosRP($iTipo){
+  function getDadosRP($iTipo, $lParamAnulacao = true){
 
     $this->getDados($this->numemp);
     $oEmpResto      = $this->usarDao("empresto", true);
@@ -3518,7 +3560,13 @@ class empenho {
           }
         }
         $this->dadosEmpenho->nValorProcessado = $nValorNaoProcessado;
-        $rsItens = $this->getItensSaldo();
+
+
+        if ($lParamAnulacao) {
+          $rsItens = $this->getItensSaldo();
+        } else {         
+          $rsItens = $this->getItensSaldoAnulacao();
+        }
         $aItens = array();
         //print_r($aItensNota);
         if ($rsItens) {
@@ -4052,40 +4100,47 @@ class empenho {
          vamos verificar se essa nota possui algum item em estoque.
          se possui, nao podemos deixar extornar a liquidacao
        */
+      $clEmpparametro = new cl_empparametro();
+      $rsEmpparametro = $clEmpparametro->sql_record($clEmpparametro->sql_query(db_getsession('DB_anousu'), "e30_anularpprocessado"));
+      $lParamAnulaRPProcessado = db_utils::fieldsMemory($rsEmpparametro, 0)->e30_anularpprocessado;
+      
       for ($j = 0; $j < pg_num_rows($rOrdem);$j++) {
 
         $oMatordemItem = db_utils::fieldsMemory($rOrdem,$j);
-        if ($oMatordemItem->m73_codmatestoqueitem != null and $oMatordemItem->m51_tipo == 2) {
+        if ($lParamAnulaRPProcessado == 'f') {
 
-          $this->lSqlErro  = true;
-          $this->sMsgErro  = "Nota ({$objNota->e69_numero}) possui Itens com entrada no estoque.";
-          $this->sMsgErro .= "\nNão podera ser estornada (anulada) a liquidação.";
-          throw new exception($this->sMsgErro);
+          if ($oMatordemItem->m73_codmatestoqueitem != null and $oMatordemItem->m51_tipo == 2) {
 
-        } else if ($oMatordemItem->m51_tipo == 1) {
-
-          /*
-           * Como estamos tratando de RP, devemos antes de anular o empenho,
-           * solicitar ao usuário anular entradas no estoque, e ordens de compra
-           * da nota selecionada
-           */
-          if ($oMatordemItem->m73_codmatestoqueitem != null) {
-
+            $this->lSqlErro  = true;
             $this->sMsgErro  = "Nota ({$objNota->e69_numero}) possui Itens com entrada no estoque.";
             $this->sMsgErro .= "\nNão podera ser estornada (anulada) a liquidação.";
+            throw new exception($this->sMsgErro);
 
-          }else {
+          } else if ($oMatordemItem->m51_tipo == 1) {
 
-            $this->sMsgErro  = "[Erro 26]:\nNota ({$objNota->e69_numero}) possui a Ordem de Compra ";
-            $this->sMsgErro .= "{$oMatordemItem->m72_codordem} em Aberto.";
-            $this->sMsgErro .= "\nPara prosseguir, anule a ordem de compra.";
-            $this->sMsgErro .= "\nNão podera ser estornada (anulada) a liquidação.";
+            /*
+            * Como estamos tratando de RP, devemos antes de anular o empenho,
+            * solicitar ao usuário anular entradas no estoque, e ordens de compra
+            * da nota selecionada
+            */
+            if ($oMatordemItem->m73_codmatestoqueitem != null) {
+
+              $this->sMsgErro  = "Nota ({$objNota->e69_numero}) possui Itens com entrada no estoque.";
+              $this->sMsgErro .= "\nNão podera ser estornada (anulada) a liquidação.";
+
+            }else {
+
+              $this->sMsgErro  = "[Erro 26]:\nNota ({$objNota->e69_numero}) possui a Ordem de Compra ";
+              $this->sMsgErro .= "{$oMatordemItem->m72_codordem} em Aberto.";
+              $this->sMsgErro .= "\nPara prosseguir, anule a ordem de compra.";
+              $this->sMsgErro .= "\nNão podera ser estornada (anulada) a liquidação.";
+
+            }
+            $this->lSqlErro  = true;
+
+            throw new exception($this->sMsgErro);
 
           }
-          $this->lSqlErro  = true;
-
-          throw new exception($this->sMsgErro);
-
         }
         if (!$this->lSqlErro and $oMatordemItem->m51_tipo == 2){
 
@@ -6536,4 +6591,12 @@ class empenho {
     }
 
   }
+
+    function alterarFormaControle($bFormaControle, $iAutoriza, $iSequencia)
+    {
+        DB::table('empenho.empautitem')
+            ->where('e55_autori', '=', $iAutoriza)
+            ->where('e55_sequen', '=', $iSequencia)
+            ->update(['e55_servicoquantidade' => ($bFormaControle == 'f' ? FALSE : TRUE)]);
+    }
 }

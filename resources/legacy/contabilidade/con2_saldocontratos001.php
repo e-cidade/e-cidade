@@ -71,6 +71,7 @@ $oRotulo->label("descrdepto");
       <input type="hidden" id="ordemdescricao"               name="ordemdescricao"               value="" />
       <input type="hidden" id="sDepartsInclusao"             name="sDepartsInclusao"             value="" />
       <input type="hidden" id="sDepartsResponsavel"          name="sDepartsResponsavel"          value="" />
+      <input type="hidden" name="instit" id="instit" value="<?= db_getsession("DB_instit") ?>">
       <table style="margin-top: 20px;">
         <tr>
           <td>
@@ -359,7 +360,7 @@ function js_gerarRelatorio(){
     filtros = 'ac16_sequencial=' + $F("ac16_sequencial") + '&iAgrupamento=' + $F("iAgrupamento") +
     '&ac02_acordonatureza=' + $F("ac02_acordonatureza") + '&ac16_datainicio=' + $F('ac16_datainicio') +
     '&ac16_datafim=' + $F('ac16_datafim') + '&ordem=' + $F('ordem') + '&sDepartsInclusao=' + $F('sDepartsInclusao') +
-    '&sDepartsResponsavel=' + $F('sDepartsResponsavel') + '&ac16_licitacao=' + $F("ac16_licitacao");
+    '&sDepartsResponsavel=' + $F('sDepartsResponsavel') + '&ac16_licitacao=' + $F("ac16_licitacao") + '&instit=' + $F("instit");
 
     if (document.getElementById('pdf').checked == true) {
       jan = window.open('con2_saldocontratos002.php?'+filtros, '', 'width=' + (screen.availWidth - 5) + ',height=' + (screen.availHeight - 40) + ',scrollbars=1,location=0 ');

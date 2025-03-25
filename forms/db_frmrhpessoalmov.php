@@ -216,7 +216,7 @@ if (isset($db_opcaoal)) {
                                     db_input('r70_descr', 34, $Ir70_descr, true, 'text', 3, '', '', '', "width: 205px");
                                     ?>
                                     <?
-                                    db_input('recurso', 8, '', true,'text', 3, '', '', '');
+                                    db_input('recurso', 8, '', true, 'text', 3, '', '', '');
                                     ?>
                                 </td>
                                 <td nowrap title="<?= @$Trh02_funcao ?>" align="right">
@@ -304,6 +304,9 @@ if (isset($db_opcaoal)) {
                                     <?php
                                     db_input('h13_descr', 28, $Ih13_descr, true, 'text', 3, '');
                                     ?>
+                                    <?php
+                                    db_input('h13_tipocargo', 2, $Ih13_tipocargo, true, 'hidden', 3, '');
+                                    ?>
                                 </td>
                                 <td nowrap title="<?= @$Trh03_padrao ?>" align="right" id="Labelpadrao">
                                     <?php
@@ -316,6 +319,26 @@ if (isset($db_opcaoal)) {
                                     ?>
                                     <?php
                                     db_input('r02_descr', 33, $Ir02_descr, true, 'text', 3, '');
+                                    ?>
+                                </td>
+                            </tr>
+                            <tr id="trvinculoefetivo" <? if ($h13_tipocargo != 6) { ?> style="display: none;" <? } else { ?> style="display: table-row;" <? } ?>>
+                                <td align="right">
+                                    <strong>Possui Outro Vinculo Efetivo:</strong>
+                                </td>
+                                <td>
+                                    <?
+                                    $aOutroVincEfet = array('f' => 'Não', 't' => 'Sim');
+                                    db_select("rh02_outrovincefetivo", $aOutroVincEfet, true, $db_opcao, "style='width:65';", "", "", "");
+                                    ?>
+                                </td>
+                                <td align="right">
+                                    <strong>Optou Pela Rem. Cargo Efetivo:</strong>
+                                </td>
+                                <td>
+                                    <?
+                                    $aOptaRemCargEfet = array('f' => 'Não', 't' => 'Sim');
+                                    db_select("rh02_remcargoefetivo", $aOptaRemCargEfet, true, $db_opcao, "style='width:65';", "", "", "");
                                     ?>
                                 </td>
                             </tr>
@@ -562,7 +585,14 @@ if (isset($db_opcaoal)) {
                                     <td>
                                         <?php
                                         $aTipoJornada = array(
-                                            '0' => 'Selecione', '2' => 'Jornada 12 x 36 (12 horas de trabalho seguidas de 36 horas ininterruptas de descanso', '3' => 'Jornada com horário diário fixo e folga variável', '4' => 'Jornada com horário diário fixo e folga fixa (no domingo)', '5' => 'Jornada com horário diário fixo e folga fixa (exceto no domingo)', '6' => 'Jornada com horário diário fixo e folga fixa (em outro dia da semana), com folga adicional ', '7' => 'Turno ininterrupto de revezamento', '9' => 'Demais tipos de jornada'
+                                            '0' => 'Selecione',
+                                            '2' => 'Jornada 12 x 36 (12 horas de trabalho seguidas de 36 horas ininterruptas de descanso',
+                                            '3' => 'Jornada com horário diário fixo e folga variável',
+                                            '4' => 'Jornada com horário diário fixo e folga fixa (no domingo)',
+                                            '5' => 'Jornada com horário diário fixo e folga fixa (exceto no domingo)',
+                                            '6' => 'Jornada com horário diário fixo e folga fixa (em outro dia da semana), com folga adicional ',
+                                            '7' => 'Turno ininterrupto de revezamento',
+                                            '9' => 'Demais tipos de jornada'
                                         );
                                         db_select("rh02_tipojornada", $aTipoJornada, true, $db_opcao, "style='width:313;'", "", "", "");
                                         ?>
@@ -651,8 +681,8 @@ if (isset($db_opcaoal)) {
                                         db_input('rh02_laudodeficiencia_file', 10, 0, true, 'file', $db_opcao, "", "", "", "height: 29px;");
                                         if (!empty($GLOBALS['rh02_laudodeficiencia'])) {
                                             db_input('rh02_laudodeficiencia', 10, 0, true, 'hidden', $db_opcao, "", "", "", ""); ?> <input type="button" name="imprimir_laudodeficiencia" value="Imprimir" onclick="js_imprimir_laudo('rh02_laudodeficiencia');"> <?php
-                                        }
-                                                                                                                                                                            ?>
+                                                                                                                                                                                                                                                                }
+                                                                                                                                                                                                                                                                    ?>
                                     </td>
                                 </tr>
                                 <tr id="row_rh02_cotadeficiencia" <?php echo ($GLOBALS['rh02_deficientefisico'] == 't') ? '' : 'style="display: none;"' ?>>
@@ -693,7 +723,7 @@ if (isset($db_opcaoal)) {
                                             db_input('rh02_laudoportadormolestia_file', 10, 0, true, 'file', $db_opcao, "", "", "", "height: 29px;");
                                             if (!empty($GLOBALS['rh02_laudoportadormolestia'])) {
                                                 db_input('rh02_laudoportadormolestia', 10, 0, true, 'hidden', $db_opcao, "", "", "", ""); ?> <input type="button" name="imprimir_laudoportadormolestia" value="Imprimir" onclick="js_imprimir_laudo('rh02_laudoportadormolestia');"> <?php
-                                            } ?>
+                                                                                                                                                                                                                                                                                    } ?>
 
                                             <?= @$Lrh02_datalaudomolestia ?>
                                             <?php
@@ -1019,96 +1049,96 @@ if (isset($db_opcaoal)) {
                                 </tr>
                             </table>
                             <fieldset>
-                            <legend align="left"><b>Art. 61 da LDB</b></legend>
-                            <table width="100%">
-                                <?php
-                                $aArtSiopeOpcao = array(
-                                    'f' => 'Não',
-                                    't' => 'Sim',
-                                );
-                                $cldbsyscampo = db_utils::getDao('db_syscampo');
-                                $rsArtSiopeCampos = $cldbsyscampo->sql_record($cldbsyscampo->sql_query_file(null, "descricao", "codcam", "nomecam in ('rh02_art61ldb1','rh02_art61ldb2','rh02_art61ldb3','rh02_art61ldb4','rh02_art61ldb5','rh02_art1leiprestpsiccologia','rh02_art1leiprestservsocial','rh02_art61ldboutros','rh02_art1leioutros')"));
-                                $aArtSiopeCampos = db_utils::getColectionByRecord($rsArtSiopeCampos);
-                                ?>
-                                <tr>
-                                    <td nowrap="nowrap" title="<?php echo $aArtSiopeCampos[0]->descricao; ?>" align="left" colspan="2">
-                                        <?php
-                                        db_select("rh02_art61ldb1", $aArtSiopeOpcao, true, $db_opcao);
-                                        ?>
-                                        <strong><?= @substr($aArtSiopeCampos[0]->descricao, 0, 140) ?> </strong>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td nowrap="nowrap" title="<?php echo $aArtSiopeCampos[1]->descricao; ?>" align="left" colspan="2">
-                                        <?php
-                                        db_select("rh02_art61ldb2", $aArtSiopeOpcao, true, $db_opcao);
-                                        ?>
-                                        <strong><?= @substr($aArtSiopeCampos[1]->descricao, 0, 140) ?> </strong>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td nowrap="nowrap" title="<?php echo $aArtSiopeCampos[2]->descricao; ?>" align="left" colspan="2">
-                                        <?php
-                                        db_select("rh02_art61ldb3", $aArtSiopeOpcao, true, $db_opcao);
-                                        ?>
-                                        <strong><?= @substr($aArtSiopeCampos[2]->descricao, 0, 140) ?> </strong>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td nowrap="nowrap" title="<?php echo $aArtSiopeCampos[3]->descricao; ?>" align="left" colspan="2">
-                                        <?php
-                                        db_select("rh02_art61ldb4", $aArtSiopeOpcao, true, $db_opcao);
-                                        ?>
-                                        <strong><?= @substr($aArtSiopeCampos[3]->descricao, 0, 140) ?> </strong>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td nowrap="nowrap" title="<?php echo $aArtSiopeCampos[4]->descricao; ?>" align="left" colspan="2">
-                                        <?php
-                                        db_select("rh02_art61ldb5", $aArtSiopeOpcao, true, $db_opcao);
-                                        ?>
-                                        <strong><?= @substr($aArtSiopeCampos[4]->descricao, 0, 140) ?> </strong>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td nowrap="nowrap" title="<?php echo $aArtSiopeCampos[7]->descricao; ?>" align="left" colspan="2">
-                                        <?php
-                                        db_select("rh02_art61ldboutros", $aArtSiopeOpcao, true, $db_opcao);
-                                        ?>
-                                        <strong><?= @substr($aArtSiopeCampos[7]->descricao, 0, 140) ?> </strong>
-                                    </td>
-                                </tr>
-                            </table>
+                                <legend align="left"><b>Art. 61 da LDB</b></legend>
+                                <table width="100%">
+                                    <?php
+                                    $aArtSiopeOpcao = array(
+                                        'f' => 'Não',
+                                        't' => 'Sim',
+                                    );
+                                    $cldbsyscampo = db_utils::getDao('db_syscampo');
+                                    $rsArtSiopeCampos = $cldbsyscampo->sql_record($cldbsyscampo->sql_query_file(null, "descricao", "codcam", "nomecam in ('rh02_art61ldb1','rh02_art61ldb2','rh02_art61ldb3','rh02_art61ldb4','rh02_art61ldb5','rh02_art1leiprestpsiccologia','rh02_art1leiprestservsocial','rh02_art61ldboutros','rh02_art1leioutros')"));
+                                    $aArtSiopeCampos = db_utils::getColectionByRecord($rsArtSiopeCampos);
+                                    ?>
+                                    <tr>
+                                        <td nowrap="nowrap" title="<?php echo $aArtSiopeCampos[0]->descricao; ?>" align="left" colspan="2">
+                                            <?php
+                                            db_select("rh02_art61ldb1", $aArtSiopeOpcao, true, $db_opcao);
+                                            ?>
+                                            <strong><?= @substr($aArtSiopeCampos[0]->descricao, 0, 140) ?> </strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td nowrap="nowrap" title="<?php echo $aArtSiopeCampos[1]->descricao; ?>" align="left" colspan="2">
+                                            <?php
+                                            db_select("rh02_art61ldb2", $aArtSiopeOpcao, true, $db_opcao);
+                                            ?>
+                                            <strong><?= @substr($aArtSiopeCampos[1]->descricao, 0, 140) ?> </strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td nowrap="nowrap" title="<?php echo $aArtSiopeCampos[2]->descricao; ?>" align="left" colspan="2">
+                                            <?php
+                                            db_select("rh02_art61ldb3", $aArtSiopeOpcao, true, $db_opcao);
+                                            ?>
+                                            <strong><?= @substr($aArtSiopeCampos[2]->descricao, 0, 140) ?> </strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td nowrap="nowrap" title="<?php echo $aArtSiopeCampos[3]->descricao; ?>" align="left" colspan="2">
+                                            <?php
+                                            db_select("rh02_art61ldb4", $aArtSiopeOpcao, true, $db_opcao);
+                                            ?>
+                                            <strong><?= @substr($aArtSiopeCampos[3]->descricao, 0, 140) ?> </strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td nowrap="nowrap" title="<?php echo $aArtSiopeCampos[4]->descricao; ?>" align="left" colspan="2">
+                                            <?php
+                                            db_select("rh02_art61ldb5", $aArtSiopeOpcao, true, $db_opcao);
+                                            ?>
+                                            <strong><?= @substr($aArtSiopeCampos[4]->descricao, 0, 140) ?> </strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td nowrap="nowrap" title="<?php echo $aArtSiopeCampos[7]->descricao; ?>" align="left" colspan="2">
+                                            <?php
+                                            db_select("rh02_art61ldboutros", $aArtSiopeOpcao, true, $db_opcao);
+                                            ?>
+                                            <strong><?= @substr($aArtSiopeCampos[7]->descricao, 0, 140) ?> </strong>
+                                        </td>
+                                    </tr>
+                                </table>
                             </fieldset>
 
                             <fieldset>
                                 <legend align="left"><b>Art. 1 da Lei nº 13.935/2019</b></legend>
-                            <table width="100%">
-                                <tr>
-                                    <td nowrap="nowrap" title="<?php echo $Trh02_art1leiprestpsiccologia; ?>" align="left" colspan="2">
-                                        <?php
-                                        db_select("rh02_art1leiprestpsiccologia", $aArtSiopeOpcao, true, $db_opcao);
-                                        ?>
-                                        <strong><?= @substr($aArtSiopeCampos[5]->descricao, 0, 140) ?> </strong>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td nowrap="nowrap" title="<?php echo $Trh02_art1leiprestservsocial; ?>" align="left" colspan="2">
-                                        <?php
-                                        db_select("rh02_art1leiprestservsocial", $aArtSiopeOpcao, true, $db_opcao);
-                                        ?>
-                                        <strong><?= @substr($aArtSiopeCampos[6]->descricao, 0, 140) ?> </strong>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td nowrap="nowrap" title="<?php echo $aArtSiopeCampos[8]->descricao; ?>" align="left" colspan="2">
-                                        <?php
-                                        db_select("rh02_art1leioutros", $aArtSiopeOpcao, true, $db_opcao);
-                                        ?>
-                                        <strong><?= @substr($aArtSiopeCampos[8]->descricao, 0, 140) ?> </strong>
-                                    </td>
-                                </tr>
-                            </table>
+                                <table width="100%">
+                                    <tr>
+                                        <td nowrap="nowrap" title="<?php echo $Trh02_art1leiprestpsiccologia; ?>" align="left" colspan="2">
+                                            <?php
+                                            db_select("rh02_art1leiprestpsiccologia", $aArtSiopeOpcao, true, $db_opcao);
+                                            ?>
+                                            <strong><?= @substr($aArtSiopeCampos[5]->descricao, 0, 140) ?> </strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td nowrap="nowrap" title="<?php echo $Trh02_art1leiprestservsocial; ?>" align="left" colspan="2">
+                                            <?php
+                                            db_select("rh02_art1leiprestservsocial", $aArtSiopeOpcao, true, $db_opcao);
+                                            ?>
+                                            <strong><?= @substr($aArtSiopeCampos[6]->descricao, 0, 140) ?> </strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td nowrap="nowrap" title="<?php echo $aArtSiopeCampos[8]->descricao; ?>" align="left" colspan="2">
+                                            <?php
+                                            db_select("rh02_art1leioutros", $aArtSiopeOpcao, true, $db_opcao);
+                                            ?>
+                                            <strong><?= @substr($aArtSiopeCampos[8]->descricao, 0, 140) ?> </strong>
+                                        </td>
+                                    </tr>
+                                </table>
                             </fieldset>
                             <center>
                     </fieldset>
@@ -1119,8 +1149,8 @@ if (isset($db_opcaoal)) {
                     <input type="hidden" name="tipadm" value="<?= $GLOBALS['rh01_tipadm'] ?>">
                     <input type="hidden" name="<?= ($db_opcao == 1 ? "incluir" : ($db_opcao == 2 || $db_opcao == 22 ? "alterar" : "excluir")) ?>" value="<?= ($db_opcao == 1 ? "Incluir" : ($db_opcao == 2 || $db_opcao == 22 ? "Alterar" : "Excluir")) ?>" />
                     <input type="button" id="db_opcao" value="<?= ($db_opcao == 1 ? "Incluir" : ($db_opcao == 2 || $db_opcao == 22 ? "Alterar" : "Excluir")) ?>" <?= ($db_botao == false ? "disabled" : "") ?> <?php if ($db_opcao != 3) {
-                                            echo "onclick='js_validaDados();'";
-                                        } ?>>
+                                                                                                                                                                                                                    echo "onclick='js_validaDados();'";
+                                                                                                                                                                                                                } ?>>
                 </td>
             </tr>
         </table>
@@ -1437,7 +1467,7 @@ if (isset($db_opcaoal)) {
             function js_pesquisarh02_tpcont(mostra) {
                 if (document.form1.rh30_regime.value != "") {
                     if (mostra == true) {
-                        js_OpenJanelaIframe('top.corpo.iframe_rhpessoalmov', 'db_iframe_tpcontra', 'func_tpcontra.php?funcao_js=parent.js_mostratpcontra1|h13_codigo|h13_descr|h13_tpcont&regime=' + document.form1.rh30_regime.value, 'Pesquisa', true, '0');
+                        js_OpenJanelaIframe('top.corpo.iframe_rhpessoalmov', 'db_iframe_tpcontra', 'func_tpcontra.php?funcao_js=parent.js_mostratpcontra1|h13_codigo|h13_descr|h13_tpcont|h13_tipocargo&regime=' + document.form1.rh30_regime.value, 'Pesquisa', true, '0');
                     } else {
                         if (document.form1.rh02_tpcont.value != '') {
                             js_OpenJanelaIframe('top.corpo.iframe_rhpessoalmov', 'db_iframe_tpcontra', 'func_tpcontra.php?pesquisa_chave=' + document.form1.rh02_tpcont.value + '&funcao_js=parent.js_mostratpcontra&regime=' + document.form1.rh30_regime.value, 'Pesquisa', false, '0');
@@ -1445,6 +1475,7 @@ if (isset($db_opcaoal)) {
                             document.form1.rh02_tpcont.value = '';
                             document.form1.h13_descr.value = '';
                             document.form1.h13_tpcont.value = '';
+                            document.form1.h13_tipocargo.value = '';
                         }
                     }
                 } else {
@@ -1452,25 +1483,47 @@ if (isset($db_opcaoal)) {
                     document.form1.rh02_tpcont.value = '';
                     document.form1.h13_descr.value = '';
                     document.form1.h13_tpcont.value = '';
+                    document.form1.h13_tipocargo.value = '';
                 }
             }
 
-            function js_mostratpcontra(chave, chave2, erro) {
+            function js_mostratpcontra(chave, chave2, chave3, erro) {
                 document.form1.h13_descr.value = chave;
                 if (erro == true) {
                     document.form1.rh05_causa.focus();
                     document.form1.rh02_tpcont.value = '';
                     document.form1.h13_tpcont.value = '';
+                    document.form1.h13_tipocargo.value = '';
                 } else {
                     document.form1.h13_tpcont.value = chave2;
+                    document.form1.h13_tipocargo.value = chave3;
+                }
+                if (chave3 == 6) {
+                    document.getElementById('trvinculoefetivo').style.display = '';
+                    document.getElementById('trvinculoefetivo').style.display = '';
+                } else {
+                    document.getElementById('trvinculoefetivo').style.display = 'none';
+                    document.getElementById('trvinculoefetivo').style.display = 'none';
+                    document.getElementById('rh02_outrovincefetivo').value = "f";
+                    document.getElementById('rh02_remcargoefetivo').value = "f";
                 }
             }
 
-            function js_mostratpcontra1(chave1, chave2, chave3) {
+            function js_mostratpcontra1(chave1, chave2, chave3, chave4) {
                 document.form1.rh02_tpcont.value = chave1;
                 document.form1.h13_descr.value = chave2;
                 document.form1.h13_tpcont.value = chave3;
+                document.form1.h13_tipocargo.value = chave4;
                 db_iframe_tpcontra.hide();
+                if (chave4 == 6) {
+                    document.getElementById('trvinculoefetivo').style.display = '';
+                    document.getElementById('trvinculoefetivo').style.display = '';
+                } else {
+                    document.getElementById('trvinculoefetivo').style.display = 'none';
+                    document.getElementById('trvinculoefetivo').style.display = 'none';
+                    document.getElementById('rh02_outrovincefetivo').value = "f";
+                    document.getElementById('rh02_remcargoefetivo').value = "f";
+                }
             }
 
             function js_pesquisarh05_causa(mostra) {
@@ -1590,13 +1643,13 @@ if (isset($db_opcaoal)) {
                     }
                 }
 
-                if (document.form1.rh30_regime.value == 2 
-                    && document.form1.rh02_jornadadetrabalho.value == '') {
+                if (document.form1.rh30_regime.value == 2 &&
+                    document.form1.rh02_jornadadetrabalho.value == '') {
                     alert('O campo Jornada de Trabalho é obrigatório.');
                     return false;
                 }
-                if (document.form1.rh30_regime.value == 2 
-                    && document.form1.rh02_tipojornada.value == 0) {
+                if (document.form1.rh30_regime.value == 2 &&
+                    document.form1.rh02_tipojornada.value == 0) {
                     alert('O campo Tipo de Jornada é obrigatório.');
                     return false;
                 }
@@ -1814,6 +1867,7 @@ if (isset($db_opcaoal)) {
                         document.form1.rh02_tpcont.value = '';
                         document.form1.h13_descr.value = '';
                         document.form1.h13_tpcont.value = '';
+                        document.form1.h13_tipocargo.value = '';
                         js_camposorigem(false);
                         js_disabpropri("");
                         js_disabledtipoapos("");
@@ -1835,6 +1889,7 @@ if (isset($db_opcaoal)) {
                     document.form1.rh02_tpcont.value = '';
                     document.form1.h13_descr.value = '';
                     document.form1.h13_tpcont.value = '';
+                    document.form1.h13_tipocargo.value = '';
                     js_pesquisarh02_tpcont(true);
                     if (chave3 == "P") {
                         document.getElementById('trservidorinstituidor').style.display = '';
@@ -1861,6 +1916,7 @@ if (isset($db_opcaoal)) {
                 document.form1.rh02_tpcont.value = '';
                 document.form1.h13_descr.value = '';
                 document.form1.h13_tpcont.value = '';
+                document.form1.h13_tipocargo.value = '';
                 js_pesquisarh02_tpcont(true);
                 if (chave4 == "P") {
                     document.getElementById('trservidorinstituidor').style.display = '';

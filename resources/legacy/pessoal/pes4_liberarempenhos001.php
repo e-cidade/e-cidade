@@ -390,7 +390,8 @@ js_montaCombo();
 	    if ($F('ponto') == 'r48') {
 	      js_consultaFolhaComplementar();
 	    } else if ($F('ponto') == 'r20') {
-	      js_getRescisoes();
+        $('filtroRescisao').style.display = '';
+        $('linhaRescisoes').style.display = '';
 	    } else if ($F('ponto') == 'sup') {
         js_consultaFolhaSuplementar();
       }

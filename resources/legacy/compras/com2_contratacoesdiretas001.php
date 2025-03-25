@@ -10,18 +10,11 @@ $clcontratacoesdiretas = new cl_contratacoesdiretas();
 $aDepartamentos = $clcontratacoesdiretas->getDepartmentsSelect($_SESSION['DB_instit']);
 
 db_postmemory($HTTP_POST_VARS);
+db_app::load("estilos.bootstrap.css");
+db_app::load("just-validate.js");
 ?>
 
 <script type="text/javascript" defer>
-  loadComponents([
-    'todosIcones',
-    'selectsChoicesSimple',
-    'cardsSimple',
-    'radiosBordered',
-    'dateSimple',
-    'buttonsSolid'
-  ]);
-
   function fn_loadReport() {
     validatePreReport(function() {
       // Pegando os valores dos campos
@@ -63,11 +56,11 @@ db_postmemory($HTTP_POST_VARS);
   <title>DBSeller Inform&aacute;tica Ltda - P&aacute;gina Inicial</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
   <meta http-equiv="Expires" CONTENT="0">
-  <script language="JavaScript" type="text/javascript" src="../../../scripts/scripts.js"></script>
-  <link href="../../../FrontController.php" rel="stylesheet" type="text/css">
+  <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
+  <link href="FrontController.php" rel="stylesheet" type="text/css">
 </head>
 
-<body bgcolor=#CCCCCC leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="a=1" bgcolor="#cccccc">
+<body bgcolor=#f5fffb leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="a=1" bgcolor="#cccccc">
 
   <div style="width: 100%; display: flex; justify-content: center; align-items: center; height: 100vh;">
 
@@ -172,7 +165,7 @@ db_postmemory($HTTP_POST_VARS);
       };
 
       // URL para o script PHP
-      var sUrlRpc = 'con2_contratacoesdiretas.RPC.php';
+      var sUrlRpc = 'com2_contratacoesdiretas.RPC.php';
 
       // Requisição AJAX utilizando Prototype.js
       var oAjax = new Ajax.Request(sUrlRpc, {

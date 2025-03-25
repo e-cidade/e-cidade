@@ -100,8 +100,8 @@ if(isset($incluir) || isset($confirma)){
       }
     }
 
-    $pos_q0101 = ((int)substr($r56_posq01,0,3))-1; // 3 caracteres da primeira posição do valor/quantidade 01
-    $pos_q0102 = ((int)substr($r56_posq01,3,3))-1; // 3 caracteres da posição limite do valor/quantidade 01
+    $pos_q0101 = ((int)substr($r56_posq01,0,3))-1; // 3 caracteres da primeira posição do valor 01
+    $pos_q0102 = ((int)substr($r56_posq01,3,3))-1; // 3 caracteres da posição limite do valor 01
     $cas_q0112 = 0;                                // Quantos caracteres
     // Busca quantidade de caracteres para usar no SUBSTR
     if($pos_q0101 > -1){
@@ -130,6 +130,35 @@ if(isset($incluir) || isset($confirma)){
       }
     }
 
+    $pos_q0401 = ((int)substr($r56_posq04,0,3))-1; // 3 caracteres da primeira posição da quantidade 01
+    $pos_q0402 = ((int)substr($r56_posq04,3,3))-1; // 3 caracteres da posição limite da quantidade 01
+    $cas_q0412 = 0;                                // Quantos caracteres
+    // Busca quantidade de caracteres para usar no SUBSTR
+    if($pos_q0401 > -1){
+      for($i=$pos_q0401; $i<=$pos_q0402; $i++){
+        $cas_q0412 ++;
+      }
+    }
+
+    $pos_q0501 = ((int)substr($r56_posq05,0,3))-1; // 3 caracteres da primeira posição da quantidade 01
+    $pos_q0502 = ((int)substr($r56_posq05,3,3))-1; // 3 caracteres da posição limite da quantidade 01
+    $cas_q0512 = 0;                                // Quantos caracteres
+    // Busca quantidade de caracteres para usar no SUBSTR
+    if($pos_q0501 > -1){
+      for($i=$pos_q0501; $i<=$pos_q0502; $i++){
+        $cas_q0512 ++;
+      }
+    }
+
+    $pos_q0601 = ((int)substr($r56_posq06,0,3))-1; // 3 caracteres da primeira posição da quantidade 01
+    $pos_q0602 = ((int)substr($r56_posq06,3,3))-1; // 3 caracteres da posição limite da quantidade 01
+    $cas_q0612 = 0;                                // Quantos caracteres
+    // Busca quantidade de caracteres para usar no SUBSTR
+    if($pos_q0601 > -1){
+      for($i=$pos_q0601; $i<=$pos_q0602; $i++){
+        $cas_q0612 ++;
+      }
+    }
 
     if(!isset($confirma)){
       // Nome do novo arquivo
@@ -172,6 +201,9 @@ if(isset($incluir) || isset($confirma)){
       $q01 = trim(substr($poslinha,$pos_q0101,$cas_q0112));
       $q02 = trim(substr($poslinha,$pos_q0201,$cas_q0212));
       $q03 = trim(substr($poslinha,$pos_q0301,$cas_q0312));
+      $q04 = trim(substr($poslinha,$pos_q0401,$cas_q0412));
+      $q05 = trim(substr($poslinha,$pos_q0501,$cas_q0512));
+      $q06 = trim(substr($poslinha,$pos_q0601,$cas_q0612));
 
       if(trim($ano) == ""){
       	$ano = db_anofolha();
@@ -224,6 +256,24 @@ if(isset($incluir) || isset($confirma)){
         $val = $q03;
         $q03 = substr($val,0,-2).".".substr($val,-2);
       }
+      if(trim($q04) == ""){
+        $q04 = 0;
+      }else{
+        $val = $q04;
+        $q04 = substr($val,0,-2).".".substr($val,-2);
+      }
+      if(trim($q05) == ""){
+        $q05 = 0;
+      }else{
+        $val = $q05;
+        $q05 = substr($val,0,-2).".".substr($val,-2);
+      }
+      if(trim($q06) == ""){
+        $q06 = 0;
+      }else{
+        $val = $q06;
+        $q06 = substr($val,0,-2).".".substr($val,-2);
+      }
 
       if($sqlerro == false){
         $clmovrel->r54_anomes = $ano.$mes;
@@ -237,6 +287,12 @@ if(isset($incluir) || isset($confirma)){
         $clmovrel->r54_quant2 = "$q02";
         $q03 = testavalor($q03);
         $clmovrel->r54_quant3 = "$q03";
+        $q04 = testavalor($q04);
+        $clmovrel->r54_quant4 = "$q04";
+        $q05 = testavalor($q05);
+        $clmovrel->r54_quant5 = "$q05";
+        $q06 = testavalor($q06);
+        $clmovrel->r54_quant6 = "$q06";
         $clmovrel->r54_lancad = "false";
         $clmovrel->r54_instit = db_getsession("DB_instit");
         $clmovrel->incluir();

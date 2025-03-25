@@ -4,7 +4,7 @@ namespace App\Services\Tributario\Arrecadacao;
 
 use App\Services\DTO\MonetaryAdjustmentServiceResponse;
 use DateTime;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class MonetaryAdjustmentService
 {

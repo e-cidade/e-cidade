@@ -153,6 +153,7 @@ class cl_liclicita
     var $l20_horaencerramentoprop = null;
     var $l20_dispensaporvalor = null;
     var $l20_lances = null;
+    var $l20_statusenviosicom = null;
 
     // cria propriedade com as variaveis do arquivo
     var $campos = "
@@ -234,6 +235,7 @@ class cl_liclicita
                  l20_horaencerramentoprop = string = hora de encerramento das propostas
                  l20_dispensaporvalor = bool = dispensa por valor
                  l20_lances = bool = apuracao de lances pelo sistema
+                 l20_statusenviosicom = int = status envio sicom
                  ";
 
     //funcao construtor da classe
@@ -434,6 +436,7 @@ class cl_liclicita
         $this->l20_horaencerramentoprop = ($this->l20_horaencerramentoprop == "" ? @$GLOBALS["HTTP_POST_VARS"]["l20_horaencerramentoprop"] : $this->l20_horaencerramentoprop);
         $this->l20_dispensaporvalor = ($this->l20_dispensaporvalor == "" ? @$GLOBALS["HTTP_POST_VARS"]["l20_dispensaporvalor"] : $this->l20_dispensaporvalor);
         $this->l20_lances = ($this->l20_lances == "" ? @$GLOBALS["HTTP_POST_VARS"]["l20_lances"] : $this->l20_lances);
+        $this->l20_statusenviosicom = ($this->l20_statusenviosicom == "" ? @$GLOBALS["HTTP_POST_VARS"]["l20_statusenviosicom"] : $this->l20_statusenviosicom);
     }
 
     // funcao para inclusao aqui
@@ -631,9 +634,9 @@ class cl_liclicita
             $this->erro_status = "0";
             return false;
         }
-        if($this->l20_dispensaporvalor == null || $this->l20_dispensaporvalor == ""){
+        if ($this->l20_dispensaporvalor == null || $this->l20_dispensaporvalor == "") {
             $this->l20_dispensaporvalor = 'f';
-          }
+        }
         if ($this->l20_nroedital == null) {
             if (in_array($tribunal, array(48, 49, 50, 52, 53, 54)) && db_getsession('DB_anousu') >= 2020) {
                 $this->erro_sql = " Campo Numero Edital não Informado.";
@@ -915,7 +918,7 @@ class cl_liclicita
             $this->erro_status = "0";
             return false;
         }
-        
+
         if (db_getsession('DB_anousu') >= 2020 && !$this->l20_dispensaporvalor) {
             $this->l20_cadinicial = 1;
             $this->l20_exercicioedital = db_getsession('DB_anousu');
@@ -923,7 +926,7 @@ class cl_liclicita
             $this->l20_cadinicial = $this->l20_cadinicial;
             $this->l20_exercicioedital = 'null';
         }
-        
+
         $sql = "insert into liclicita(
                                  l20_codigo
                 ,l20_edital
@@ -986,6 +989,7 @@ class cl_liclicita
                 ,l20_horaencerramentoprop
                 ,l20_dispensaporvalor
                 ,l20_lances
+                ,l20_statusenviosicom
                        )
                 values (
                  $this->l20_codigo
@@ -1049,11 +1053,13 @@ class cl_liclicita
                 ,'$this->l20_horaencerramentoprop'
                 ,'$this->l20_dispensaporvalor'
                 ,'$this->l20_lances'
+                ," . ($this->l20_statusenviosicom == "null" || $this->l20_statusenviosicom == "" ? "null" : "'" . $this->l20_statusenviosicom . "'") . "
+
                       )";
         $result = db_query($sql);
         // echo $sql;
         // exit;
-        
+
         if ($result == false) {
             $this->erro_banco = str_replace("\n", "", @pg_last_error());
             if (strpos(strtolower($this->erro_banco), "duplicate key") != 0) {
@@ -1070,7 +1076,7 @@ class cl_liclicita
             $this->numrows_incluir = 0;
             return false;
         }
-        
+
         $this->erro_banco = "";
         $this->erro_sql = "Inclusao efetuada com Sucesso\\n";
         $this->erro_sql .= "Valores : " . $this->l20_codigo;
@@ -1133,7 +1139,7 @@ class cl_liclicita
         }
         return true;
     }
-    
+
     // funcao para alteracao
     function alterar($l20_codigo = null, $convite, $ibuscartribunal = null)
     {
@@ -1636,9 +1642,9 @@ class cl_liclicita
             }
         }
 
-        if($this->l20_equipepregao == null && in_array($tribunal, array(100,101,102,103))){
+        if ($this->l20_equipepregao == null && in_array($tribunal, array(100, 101, 102, 103))) {
             $this->l20_equipepregao = '0';
-          }
+        }
 
         if (trim($this->l20_equipepregao) != "" || isset($GLOBALS["HTTP_POST_VARS"]["l20_equipepregao"])) {
             $sql .= $virgula . " l20_equipepregao = $this->l20_equipepregao";
@@ -3805,7 +3811,8 @@ class cl_liclicita
         return $sql;
     }
 
-    public function sql_query_pncp_itens_retifica_situacao ($l20_codigo,$ordem){
+    public function sql_query_pncp_itens_retifica_situacao($l20_codigo, $ordem)
+    {
         return "SELECT DISTINCT    liclicitem.l21_ordem AS numeroItem,
                 CASE
                     WHEN pcmater.pc01_servico='t' THEN 'S'
@@ -4153,7 +4160,7 @@ class cl_liclicita
         return $sql;
     }
 
-    public function sql_query_resultado_pncp($l20_codigo, $ordem,$z01_numcgm)
+    public function sql_query_resultado_pncp($l20_codigo, $ordem, $z01_numcgm)
     {
 
         $sql  = "SELECT pcorcamval.pc23_quant AS quantidadeHomologada,
@@ -4392,7 +4399,7 @@ class cl_liclicita
         return $sql;
     }
 
-    public function sql_query_ata_pncp($l20_codigo,$l221_numata)
+    public function sql_query_ata_pncp($l20_codigo, $l221_numata)
     {
         $sql = "SELECT   l221_numata AS numeroAtaRegistroPreco,
                         l221_exercicio AS anoAta,
@@ -4852,14 +4859,15 @@ class cl_liclicita
                 AND l03_pctipocompratribunal IN (110,51,53,52,102,101,100,101,50,103)
                 AND l213_numerocontrolepncp IS NOT NULL
                 AND liclicita.l20_leidalicitacao = 1
-                AND l20_instit = ".db_getsession('DB_instit')."
+                AND l20_instit = " . db_getsession('DB_instit') . "
             ORDER BY l20_codigo,l221_numata DESC
         ";
     }
 
-    public function verificaMembrosModalidadeParaLei1($modalidade,$sequencialComissao){
+    public function verificaMembrosModalidadeParaLei1($modalidade, $sequencialComissao)
+    {
 
-        if($modalidade == "pregao"){
+        if ($modalidade == "pregao") {
             $rsLicPregao = db_query("
             select
                 *
@@ -4870,11 +4878,11 @@ class cl_liclicita
             where
                 l45_sequencial = $sequencialComissao and l46_tipo = 6;");
 
-               if(pg_num_rows($rsLicPregao) > 0){
-                    return true;
-               }
+            if (pg_num_rows($rsLicPregao) > 0) {
+                return true;
+            }
 
-               return false;
+            return false;
         }
 
         $rsLicPregao = db_query("
@@ -4887,11 +4895,10 @@ class cl_liclicita
         where
             l45_sequencial = $sequencialComissao and l46_tipo in(7, 8)");
 
-           if(pg_num_rows($rsLicPregao) > 0){
-                return true;
-           }
+        if (pg_num_rows($rsLicPregao) > 0) {
+            return true;
+        }
 
-           return false;
-
+        return false;
     }
 }

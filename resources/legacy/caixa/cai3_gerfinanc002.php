@@ -75,6 +75,35 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
   db_postmemory($HTTP_GET_VARS);
 
 
+  $termo = $_GET['Parcelamento'];
+  $flag_inicio = false;
+  if(!empty($termo)){
+    $flag_inicio = true;
+  }
+  if(empty($termo)){
+    $result_parcel = db_query("select distinct v07_parcel from termo where v07_numpre = " . $_GET['numpre']);
+    if (pg_numrows($result_parcel) > 0){
+      db_fieldsmemory($result_parcel,0);
+    }
+    $termo = $v07_parcel;
+  }
+
+  $query = "select * from cartorio.titulos where termo = $termo and status = 'ENVIADO'";
+  $query_exec = db_query($query);
+  $count_enviado = pg_num_rows($query_exec);
+
+  $query_protesto = "select * from cartorio.titulos where termo = $termo and status = 'PROTESTADO' or status = 'PROTESTO POR EDITAL'";
+  $protesto_exec = db_query($query_protesto);
+  $count_protesto = pg_num_rows($protesto_exec);
+
+  $query_pago = "select * from cartorio.titulos where termo = $termo and status = 'PAGO'";
+  $pago_exec = db_query($query_pago);
+  $count_pago = pg_num_rows($pago_exec);
+
+  $query_pendente = "select * from cartorio.titulos where termo = $termo and status = 'ENVIO_PENDENTE'";
+  $pendente_exec = db_query($query_pendente);
+  $count_pendente = pg_num_rows($pendente_exec);
+
 
   if(isset($HTTP_POST_VARS["calculavalor"])) {
 
@@ -185,7 +214,24 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
       }
 
       function js_desabilitaBotoes() {
+        parent.document.getElementById("geranotif").disabled  	  = true; //botao Gerar Notificacao
+        parent.document.getElementById("btnSuspender").disabled   = false; //botao Suspender
+        parent.document.getElementById("btparc").disabled    	    = true; //botao Parcelamento
+        parent.document.getElementById("btcda").disabled      	  = true; //botao Certidao
+        parent.document.getElementById("btcancela").disabled  	  = true; //botao Cancelamento
+        parent.document.getElementById("btnSuspender").disabled   = false; //botao Parcelamento
+        parent.document.getElementById("btcarne").disabled    	  = true; //botao emite carne
+        parent.document.getElementById("emisscarne").disabled 	  = true; //botao emite carne
+        parent.document.getElementById("btimpdiverso").disabled   = true; //botao Imp. Divesos
+        parent.document.getElementById("btjust").disabled         = true; //botao justifica
+        parent.document.getElementById("btnotifica").disabled 	  = true;
 
+        if ( parent.document.getElementById("enviar").value == 'Recibo'){
+          parent.document.getElementById("enviar").disabled     = true; //botao Recibo
+        }
+      }
+
+      function js_desabilitaTodosBotoes() {
         parent.document.getElementById("geranotif").disabled  	  = true; //botao Gerar Notificacao
         parent.document.getElementById("btnSuspender").disabled   = true; //botao Suspender
         parent.document.getElementById("btparc").disabled    	    = true; //botao Parcelamento
@@ -197,12 +243,71 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
         parent.document.getElementById("btimpdiverso").disabled   = true; //botao Imp. Divesos
         parent.document.getElementById("btjust").disabled         = true; //botao justifica
         parent.document.getElementById("btnotifica").disabled 	  = true;
+        parent.document.getElementById("btmarca").disabled 	  = true;
+
+        parent.document.getElementById("btmarcavencidas").disabled 	  = true;
 
         if ( parent.document.getElementById("enviar").value == 'Recibo'){
           parent.document.getElementById("enviar").disabled     = true; //botao Recibo
         }
+      }
+
+      function js_habilitarBotoes() {
+        parent.document.getElementById("geranotif").disabled  	  = false; //botao Gerar Notificacao
+        parent.document.getElementById("btnSuspender").disabled   = false; //botao Suspender
+        parent.document.getElementById("btparc").disabled    	    = false; //botao Parcelamento
+        parent.document.getElementById("btcda").disabled      	  = false; //botao Certidao
+        parent.document.getElementById("btcancela").disabled  	  = false; //botao Cancelamento
+        parent.document.getElementById("btnSuspender").disabled   = false; //botao Parcelamento
+        parent.document.getElementById("btcarne").disabled    	  = false; //botao emite carne
+        parent.document.getElementById("emisscarne").disabled 	  = false; //botao emite carne
+        parent.document.getElementById("btimpdiverso").disabled   = false; //botao Imp. Divesos
+        parent.document.getElementById("btjust").disabled         = false; //botao justifica
+        parent.document.getElementById("btnotifica").disabled 	  = false;
+
+          if ( parent.document.getElementById("enviar").value == 'Recibo'){
+            parent.document.getElementById("enviar").disabled     = false; //botao Recibo
+          }
+      }
+
+      function js_desabilitaBotoesProtesto() {
+
+      parent.document.getElementById("geranotif").disabled  	  = false; //botao Gerar Notificacao
+      parent.document.getElementById("btnSuspender").disabled   = true; //botao Suspender
+      parent.document.getElementById("btparc").disabled    	    = false; //botao Parcelamento
+      parent.document.getElementById("btcda").disabled      	  = false; //botao Certidao
+      parent.document.getElementById("btcancela").disabled  	  = true; //botao Cancelamento
+      parent.document.getElementById("btnSuspender").disabled   = true; //botao Parcelamento
+      parent.document.getElementById("btcarne").disabled    	  = false; //botao emite carne
+      parent.document.getElementById("emisscarne").disabled 	  = false; //botao emite carne
+      parent.document.getElementById("btimpdiverso").disabled   = true; //botao Imp. Divesos
+      parent.document.getElementById("btjust").disabled         = true; //botao justifica
+      parent.document.getElementById("btnotifica").disabled 	  = false;
+
+      if ( parent.document.getElementById("enviar").value == 'Recibo'){
+        parent.document.getElementById("enviar").disabled     = false; //botao Recibo
+      }
 
       }
+
+      function js_desabilitaBotoesPago () {
+        parent.document.getElementById("geranotif").disabled  	  = true; //botao Gerar Notificacao
+        parent.document.getElementById("btnSuspender").disabled   = true; //botao Suspender
+        parent.document.getElementById("btparc").disabled    	    = true; //botao Parcelamento
+        parent.document.getElementById("btcda").disabled      	  = true; //botao Certidao
+        parent.document.getElementById("btcancela").disabled  	  = true; //botao Cancelamento
+        parent.document.getElementById("btcarne").disabled    	  = true; //botao emite carne
+        parent.document.getElementById("emisscarne").disabled 	  = true; //botao emite carne
+        parent.document.getElementById("btimpdiverso").disabled   = true; //botao Imp. Divesos
+        parent.document.getElementById("btjust").disabled         = true; //botao justifica
+        parent.document.getElementById("btnotifica").disabled 	  = true;
+        
+        if ( parent.document.getElementById("enviar").value == 'Recibo'){
+          parent.document.getElementById("enviar").disabled     = true; //botao Recibo
+        }
+
+        }
+
 
       function js_disabilitarFormEmissao() {
 
@@ -483,6 +588,12 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
         var k03_tipo = '<?=$k03_tipo?>';
         var perfil_procuradoria = '<?=$perfil_procuradoria?>';
 
+        //variaveis para controle dos recursos - sistema cartorio.
+        var count_enviado = '<?=$count_enviado?>';
+        var count_protesto = '<?=$count_protesto?>';
+        var count_pago = '<?=$count_pago?>';
+        var count_pendente =  '<?=$count_pendente?>';
+
         var permissao_parcelamento     = <?=db_permissaomenu(db_getsession("DB_anousu"),81,3415)?>;
         var permissao_certidao         = <?=db_permissaomenu(db_getsession("DB_anousu"),81,4125)?>;
         var permissao_cancelar         = <?=db_permissaomenu(db_getsession("DB_anousu"),81,4554)?>;
@@ -636,7 +747,20 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
         }
 
         console.info(' ----sai js_soma ----------------------------- ');
-
+        if (window.location.href.includes('certidao') && window.location.href.includes('k00_tipo')) {
+          if(count_enviado > 0){
+            js_desabilitaTodosBotoes();
+          }else if(count_protesto > 0){
+            js_desabilitaBotoesProtesto();
+          }else if(count_pago > 0){
+            
+            js_desabilitaTodosBotoes(); 
+          }else if(count_pendente > 0){
+            js_desabilitaTodosBotoes();
+          }else{
+            js_habilitarBotoes();
+          }
+        }
       }
 
       function js_marca() {
@@ -766,7 +890,6 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
       }
 
       function js_soma_vencidas(sNumpres) {
-
         var sUrl          = 'con3_parcelasvencidas.RPC.php';
         var oParam        = new Object();
         oParam.exec       = "getSomaParcelasVencidas";
@@ -1053,10 +1176,12 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
       echo "<th title=\"Valor Multa\" class=\"borda\" style=\"font-size:12px\" nowrap>Mul.</th>\n";
       echo "<th title=\"Valor Desconto\" class=\"borda\" style=\"font-size:12px\" nowrap>Desc.</th>\n";
       echo "<th title=\"Total a Pagar\" class=\"borda\" style=\"font-size:12px\" nowrap>Tot.</th>\n";
-      echo "<th title=\"Marca/Desmarca Todas\" class=\"borda\" style=\"font-size:12px\" nowrap>
-          <a id=\"marca\" href=\"\" style=\"color:black\" onclick=\"js_marca();return false\">M</a>
-          <input type=\"hidden\" name=\"numpre_unica\">
-        </th>\n";
+      echo "<th title=\"Marca/Desmarca Todas\" class=\"borda\" style=\"font-size:12px\" nowrap>";
+
+        if($count_enviado == 0 && $count_pendente == 0 && $count_protesto == 0){
+          echo "<a id=\"marca\" href=\"\" style=\"color:black\" onclick=\"js_marca();return false\">M</a>";
+        }
+        echo "<input type=\"hidden\" name=\"numpre_unica\">";
       echo "</tr>\n";
 
       echo " <input type='hidden' id='txtNumpreUnicaSelecionados' name='txtNumpreUnicaSelecionados'>";
@@ -1267,7 +1392,7 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
               echo "  <td class=\"borda\" style=\"font-size:11px\" align=\"right\" nowrap>" . db_formatar($uvlrdesconto, "f") . "</td>\n";
                 echo "  <td class=\"borda\" style=\"font-size:11px\" align=\"right\" nowrap>" . db_formatar($utotal, "f") . "</td>\n";
               echo "  <td class=\"borda\" style=\"font-size:11px\" align=\"right\" nowrap> ";
-              echo "    <input class='{$sClassVenc}' type=\"checkbox\" id=\"check_id_".($iContadorUnica)."\" style=\"border:none;background-color:write\" name=\"unica\" onclick=\"js_emiteunica('".$k00_numpre."','".$dtvencunic."',this)\" value=\"unica_".$unicont."\">";
+              echo "  <input class='{$sClassVenc}' type=\"checkbox\" id=\"check_id_".($iContadorUnica)."\" style=\"border:none;background-color:write\" name=\"unica\" onclick=\"js_emiteunica('".$k00_numpre."','".$dtvencunic."',this)\" value=\"unica_".$unicont."\">";
               echo "  </td>\n ";
               echo "</tr>";
 
@@ -1287,7 +1412,79 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
 
           }
 
-          echo "<label for=\"CHECK$i\"><tr style=\"cursor: hand\" bgcolor=\"".(@$cor = (@$cor=="#E4F471"?"#EFE029":"#E4F471"))."\">\n";
+          if ($verEntidade == 0 || $qteParcelamento == 0){
+            $xNumpre = $REGISTRO[$i]["k00_numpre"];
+          }else{
+            $xNumpre = $REGISTRO[$i]["k00_numpre"]." ($qteParcelamento)";
+          }
+
+          $query_termo = "SELECT * FROM termodiv t
+          LEFT JOIN divida d ON t.coddiv = d.v01_coddiv
+          where numpreant = $xNumpre;";
+
+          $execute_query = db_query($query_termo);
+          $count_query = pg_num_rows($execute_query);
+          
+          if($count_query > 0){
+            $background = '#e8d8ff';
+          }else{
+            $background = null;
+          }
+
+          $total_condicoes = 0;
+          $parcelamentos = db_query("select distinct v07_parcel from termo where v07_numpre =".$REGISTRO[$i]["k00_numpre"]);
+          $z = pg_fetch_object($parcelamentos);
+          $termo_usuario = $z->v07_parcel;
+
+          $query_verificar = "select * from cartorio.titulos where termo = $termo_usuario";
+          $result_verificar = db_query($query_verificar);
+          $count_verificar = pg_numrows($result_verificar);
+
+          $query = "select * from cartorio.titulos where termo = $termo_usuario and status = 'ENVIADO'";
+          $query_exec = db_query($query);
+          $count_enviado = pg_num_rows($query_exec);
+
+          $query_protesto = "select * from cartorio.titulos where termo = $termo_usuario and status = 'PROTESTADO' or status = 'PROTESTO POR EDITAL'";
+          $protesto_exec = db_query($query_protesto);
+          $count_protesto = pg_num_rows($protesto_exec);
+
+          $query_pago = "select * from cartorio.titulos where termo = $termo_usuario and status = 'PAGO'";
+          $pago_exec = db_query($query_pago);
+          $count_pago = pg_num_rows($pago_exec);
+
+          $query_pendente = "select * from cartorio.titulos where termo = $termo_usuario and status = 'ENVIO_PENDENTE'";
+          $pendente_exec = db_query($query_pendente);
+          $count_pendente = pg_num_rows($pendente_exec);
+
+          $total_condicoes += $count_pendente + $count_pago + $count_enviado + $count_protesto;
+
+          if($count_verificar == 1){
+            $bgcolor = "#D3D3D3";
+          }else{
+            $bgcolor = null;
+          }
+
+          if($total_condicoes == 0){
+            $flag_checkbox = true;
+          }else{
+            $flag_checkbox = false;
+          }
+
+          $cda_id = getCda($REGISTRO[$i]["k00_numpre"],$REGISTRO[$i]["k00_numpar"]);
+          if(!empty($cda_id)){
+            $select_cda = "SELECT * from cartorio.titulos where cda_id = $cda_id";
+            $exec_cda = db_query($select_cda);
+            $rows_cda = pg_numrows($exec_cda);
+
+            if($rows_cda > 0){
+              $bgcolor = '#D3D3D3';
+            }else{
+              $bgcolor = null;
+            }
+          }
+                        
+          echo "<label for=\"CHECK$i\">\n";
+echo "<tr style=\"cursor: hand\" bgcolor=\"".(isset($bgcolor) && $bgcolor !== null ? '#D3D3D3' : (@$cor = (@$cor == '#E4F471' ? '#EFE029' : '#E4F471')))."\">\n";
           echo "<td title=\"Informações Adicionais\" class=\"borda\" style=\"font-size:11px\" nowrap onclick=\"parent.js_mostradetalhes('cai3_gerfinanc005.php?".base64_encode($tipo."#".$REGISTRO[$i]["k00_numpre"]."#"."0")."','','width=600,height=500,scrollbars=1')\"><a href=\"\" onclick=\"return false;\">
         MI</a></td>\n";
           if($temnoti){
@@ -1301,6 +1498,7 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
 
           $sqlMacroMat = "SELECT k00_numpre, k00_matric, k00_perc FROM caixa.arrematric where k00_numpre=" . $REGISTRO[$i]["k00_numpre"];
           $rMacroMat = pg_query($sqlMacroMat);
+          $t = pg_fetch_object($result);
           if (pg_num_rows($rMacroMat) > 0) {
             $vMacroMat = pg_fetch_object($rMacroMat);
             //busca ref anterior:
@@ -1334,6 +1532,7 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
             if (pg_numrows($result_parcel)==1){
               db_fieldsmemory($result_parcel,0);
             }
+            
         echo "<td class=\"borda\" style=\"font-size:11px\" align=\"right\" nowrap><input type=\"hidden\" id=\"\" value=\"\">".@$v07_parcel."&nbsp;</td>\n";
               }
             if(in_array($k03_tipo, array(15,18))){
@@ -1353,11 +1552,15 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
             echo "<td class=\"borda\" style=\"font-size:11px\" align=\"right\" nowrap><input type=\"hidden\" id=\"total$i\" value=\"" . $total . "\">" . db_formatar($total, "f") . "</td>\n";
 
           //      if($emrec == "t")
-          echo "<td class=\"borda\" style=\"font-size:11px\" id=\"coluna$i\" nowrap>".
-              ""
-              ."<input class='{$sClassVenc} checkBoxNumpre' style=\"visibility:'visible'\" type=\""."checkbox"."\" value=\"".$numpres."\" onclick=\"js_soma(2); js_appendSelected(this);\" data-numpre=\"".pg_result($result,$i,"k00_numpre")."\" data-numpar=\"".pg_result($result,$i,"k00_numpar")."\" data-receita=\"".pg_result($result,$i,"k00_receit")."\" id=\"CHECK$i\" name=\"CHECK$i\" ".((abs($REGISTRO[$i]["k00_valor"])!=0 && $tipo==3)?"":"").">
-        <input style=\"visibility:'visible'\" type=\""."hidden"."\" value=\"".$numpres_valores."\" id=\"_VALORES$i\" name=\"_VALORES$i\">
-        </td>\n";
+          if($flag_checkbox == true || $flag_inicio == true){
+              echo "<td class=\"borda\" style=\"font-size:11px\" id=\"coluna$i\" nowrap>".
+                  ""
+                  ."<input class='{$sClassVenc} checkBoxNumpre' style=\"visibility:'visible'\" type=\""."checkbox"."\" value=\"".$numpres."\" onclick=\"js_soma(2); js_appendSelected(this);\" data-numpre=\"".pg_result($result,$i,"k00_numpre")."\" data-numpar=\"".pg_result($result,$i,"k00_numpar")."\" data-receita=\"".pg_result($result,$i,"k00_receit")."\" id=\"CHECK$i\" name=\"CHECK$i\" ".((abs($REGISTRO[$i]["k00_valor"])!=0 && $tipo==3)?"":"").">
+            <input style=\"visibility:'visible'\" type=\""."hidden"."\" value=\"".$numpres_valores."\" id=\"_VALORES$i\" name=\"_VALORES$i\">
+            </td>\n";
+          }else{
+            echo "<td></td>";
+          }
 
           echo "</tr></label>\n";
           /***************************/
@@ -1383,6 +1586,7 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
         $bool = 1;
         //faz a mao..
         //$separadortroca		= "";
+        $termos = [];
         for($x = 0;$x < sizeof($elementos_numpres);$x++) {
           //cria um array com as parcelas do numpre não repetidos
 
@@ -1549,7 +1753,7 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
                   echo "<td class=\"borda\" style=\"font-size:11px\" align=\"right\" nowrap>".db_formatar($uvlrdesconto,"f")."</td>\n";
                   echo "<td class=\"borda\" style=\"font-size:11px\" align=\"right\" nowrap>".db_formatar($utotal,"f")."</td>\n";
                   echo "<td class=\"borda\" style=\"font-size:11px\" align=\"center\" nowrap>";
-                  echo "   <input class='{$sClassVenc}' type=\"checkbox\" id=\"check_id_".($iContadorUnica)."\" style=\"border:none;background-color:write\" name=\"unica\" onclick=\"js_emiteunica('".$k00_numpre."','".$dtvencunic."',this)\" value=\"unica_".$unicont."\">";
+                  echo "  <input class='{$sClassVenc}' type=\"checkbox\" id=\"check_id_".($iContadorUnica)."\" style=\"border:none;background-color:write\" name=\"unica\" onclick=\"js_emiteunica('".$k00_numpre."','".$dtvencunic."',this)\" value=\"unica_".$unicont."\">";
                   echo " </td>\n ";
                   echo "</tr>";
 
@@ -1574,9 +1778,36 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
               }
             }
 
+            $a = db_query("select distinct v07_hist,v07_parcel from termo where v07_numpre = $elementos_numpres[$x]");
+            $b = pg_fetch_object($a);
+            $termo_parcelamento = $b->v07_parcel;
 
+            $check_status = "SELECT * from cartorio.titulos where termo = $termo_parcelamento";
+            $check_db = db_query($check_status);
+            $check_rows = pg_numrows($check_db);
 
-            echo "<label for=\"CHECK$ContadorUnico\"><tr style=\"cursor: hand\" bgcolor=\"".($cor = (@$cor==$ConfCor2?$ConfCor1:$ConfCor2))."\">\n";
+            if($check_rows > 0){
+              $bgcolor = '#D3D3D3';
+            }else{
+              $bgcolor = null;
+            }
+
+            $cda_id = getCda($REGISTRO[$i]["k00_numpre"],$REGISTRO[$i]["k00_numpar"]);
+            if(!empty($cda_id)){
+              $query_cda_count = "SELECT * from cartorio.titulos where cda_id = $cda_id";
+              $exec_cda_count = db_query($query_cda_count);
+              $cda_count = pg_numrows($exec_cda_count);
+              if($cda_count > 0){
+                
+                $bgcolor = '#D3D3D3';
+              }else{
+                $bgcolor = null;
+              }
+            }
+            
+            $corFundo = ($bgcolor !== null) ? $bgcolor : ($cor = (@$cor == $ConfCor2 ? $ConfCor1 : $ConfCor2));
+
+            echo "<label for=\"CHECK$ContadorUnico\"><tr style=\"cursor: hand\" bgcolor=\"$corFundo\">\n";
             echo "<td title=\"Informações Adicionais\" class=\"borda\" style=\"font-size:11px\" nowrap onclick=\"parent.js_mostradetalhes('cai3_gerfinanc005.php?".base64_encode($tipo."#".$REGISTRO[$i]["k00_numpre"]."#".$REGISTRO[$i]["k00_numpar"])."','','width=600,height=500,scrollbars=1')\"><a href=\"\" onclick=\"return false;\">
           MI</a></td>\n";
 
@@ -1631,7 +1862,7 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
                 db_fieldsmemory($result_parcel,0);
               }
           echo "<td class=\"borda\" style=\"font-size:11px\" align=\"right\" nowrap><input type=\"hidden\" id=\"\" value=\"\">".@$v07_parcel."&nbsp;</td>\n";
-                }
+        }
             if(in_array($k03_tipo, array(15,18))){
               echo "<td class=\"borda\" style=\"font-size:11px\" align=\"right\" nowrap><input type=\"hidden\" id=\"\" value=\"\">".getCda($REGISTRO[$i]["k00_numpre"],$REGISTRO[$i]["k00_numpar"])."&nbsp;</td>\n";
             }
@@ -1653,9 +1884,18 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
             echo "<td class=\"borda\" style=\"font-size:11px\" align=\"right\" nowrap><input type=\"hidden\" id=\"multa$ContadorUnico\" value=\"".$multa."\">".db_formatar($multa,"f")."</td>\n";
             echo "<td class=\"borda\" style=\"font-size:11px\" align=\"right\" nowrap><input type=\"hidden\" id=\"desconto$ContadorUnico\" value=\"" . $desconto . "\">" . db_formatar($desconto, "f") . "</td>\n";
               echo "<td class=\"borda\" style=\"font-size:11px\" align=\"right\" nowrap><input type=\"hidden\" id=\"total$ContadorUnico\" value=\"" . $total . "\">" . db_formatar($total, "f") . "</td>\n";
-            echo "<td class=\"borda\" style=\"font-size:11px\" id=\"coluna$ContadorUnico\" nowrap>".""."<input class='{$sClassVenc} checkBoxNumpre' style=\"visibility:'visible'\" type=\"".($tipo==3?"checkbox":"checkbox")."\" value=\"".$numpres."\" onclick=\"js_soma(2); js_appendSelected(this)\" data-numpre=\"".pg_result($result,$i,"k00_numpre")."\" data-numpar=\"".pg_result($result,$i,"k00_numpar")."\" data-receita=\"".pg_result($result,$i,"k00_receit")."\" id=\"CHECK$ContadorUnico\" name=\"CHECK".$ContadorUnico++."\" ".((abs($REGISTRO[$i]["k00_valor"])!=0 && $tipo==3)?"":"").">
+          
+          $check_status = "SELECT * from cartorio.titulos where termo = $v07_parcel and (status = 'PAGO' or status = 'ENVIADO' or status = 'ENVIO_PENDENTE');";
+          $check_db = db_query($check_status);
+          $check_flag = pg_numrows($check_db);
+             
+          if($check_flag == 0){  
+          echo "<td class=\"borda\" style=\"font-size:11px\" id=\"coluna$ContadorUnico\" nowrap>".""."<input class='{$sClassVenc} checkBoxNumpre' style=\"visibility:'visible'\" type=\"".($tipo==3?"checkbox":"checkbox")."\" value=\"".$numpres."\" onclick=\"js_soma(2); js_appendSelected(this)\" data-numpre=\"".pg_result($result,$i,"k00_numpre")."\" data-numpar=\"".pg_result($result,$i,"k00_numpar")."\" data-receita=\"".pg_result($result,$i,"k00_receit")."\" id=\"CHECK$ContadorUnico\" name=\"CHECK".$ContadorUnico++."\" ".((abs($REGISTRO[$i]["k00_valor"])!=0 && $tipo==3)?"":"").">
           <input style=\"visibility:'visible'\" type=\"hidden\" value=\"".$numpres_valores."\" id=\"_VALORES$ContadorUnico\" name=\"_VALORES".$ContadorUnico++."\">
           </td>\n";
+          }else{
+            echo "<td></td>";
+          }
             /*
 
         echo "<td class=\"borda\" style=\"font-size:11px\" id=\"valor$ContadorUnico\" align=\"right\" nowrap>".number_format($valor,2,".",",")."</td>\n";
@@ -1748,6 +1988,8 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
         $ConfCor2 = "#E4F471";
 
         $listaunica = true;
+        $termos = [];
+
         for($i = 0;$i < $numrows;$i++) {
           if($elementos_numpres[$cont] != pg_result($result,$i,"k00_numpre")) {
             $listaunica = true;
@@ -1844,7 +2086,7 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
                       $histdesc .= $dtlhist." ".$k00_hora." ".$login." ".$k00_histtxt."\n";
                     }
                   }
-
+                
                   $iMatric = "#";
 
                   $sqlMacroMat = "SELECT k00_numpre, k00_matric, k00_perc FROM caixa.arrematric where k00_numpre=" . $k00_numpre;
@@ -1894,17 +2136,37 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
             //busca ref anterior:
             $iMatric = $vMacroMat->k00_matric;
           }
+          
           //
           $noti_sql = "select k53_numpre
           from notidebitos
           where k53_numpre = ".pg_result($result,$i,"k00_numpre")." and
           k53_numpar = ".pg_result($result,$i,"k00_numpar")."
           limit 1";
-          $noti_result = db_query($noti_sql);
+          
           $temnoti = false;
           if(pg_numrows($noti_result)){
             $temnoti = true;
+          }
 
+          $a = db_query("select distinct v07_hist,v07_parcel from termo where v07_numpre =".pg_result($result,$i,"k00_numpre"));
+          $b = pg_fetch_object($a);
+          $termo = $b->v07_parcel;
+
+          $check_status = "SELECT * from cartorio.titulos where termo = $termo";
+          $check_db = db_query($check_status);
+          $check_rows = pg_numrows($check_db);
+
+          if($check_rows > 0){
+            $cor = "#D3D3D3";
+          }else{
+            $cda_id = getCda(pg_result($result,$i,"k00_numpre"),pg_result($result,$i,"k00_numpar"));
+            $check_numpre = "SELECT * from cartorio.titulos where cda_id = $cda_id";
+            $check_numpre_row = db_query($check_numpre);
+            $numpre_rows = pg_numrows($check_numpre_row);
+            if($numpre_rows > 0){
+              $cor = "#D3D3D3";
+            }
           }
 
           echo "<label for=\"CHECK$i\"><tr style=\"cursor: hand\" bgcolor=\"".$cor."\">\n";
@@ -1926,6 +2188,18 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
             $xNumpre = pg_result($result,$i,"k00_numpre");
           }else{
             $xNumpre = pg_result($result,$i,"k00_numpre")." ($qteParcelamento)";
+          }
+
+          if(!empty($cda_id)){
+            $select_cda = "SELECT * from cartorio.titulos where cda_id = $cda_id";
+            $exec_cda = db_query($select_cda);
+            $rows_cda = pg_numrows($exec_cda);
+
+            if($rows_cda > 0){
+              $bgcolor = '#D3D3D3';
+            }else{
+              $bgcolor = null;
+            }
           }
           
           echo "<td class=\"borda\" style=\"font-size:11px\" nowrap><input style=\"border:none;background-color:$cor\" onclick=\"location.href='cai3_gerfinanc008.php?".base64_encode("numpre=".pg_result($result,$i,"k00_numpre"))."'\" type=\"button\" value=\"".$xNumpre."\"></td>\n";
@@ -1980,16 +2254,28 @@ if(isset($HTTP_POST_VARS["ver_matric"]) && !isset($HTTP_POST_VARS["calculavalor"
           echo "<td class=\"borda\" style=\"font-size:11px\" align=\"right\" nowrap><input type=\"hidden\" id=\"multa$i\" value=\"".$SomaDasParcelasMulta[pg_result($result,$i,"k00_numpre")][pg_result($result,$i,"k00_numpar")][pg_result($result,$i,"k00_receit")]."\">".(trim(pg_result($result,$i,"vlrmulta"))==""?"&nbsp":db_formatar(pg_result($result,$i,"vlrmulta"),"f"))."</td>\n";
           echo "<td class=\"borda\" style=\"font-size:11px\" align=\"right\" nowrap><input type=\"hidden\" id=\"desconto$i\" value=\"" . $SomaDasParcelasDesconto[pg_result($result, $i, "k00_numpre")][pg_result($result, $i, "k00_numpar")][pg_result($result, $i, "k00_receit")] . "\">" . (trim(pg_result($result, $i, "vlrdesconto")) == "" ? "&nbsp" : db_formatar(pg_result($result, $i, "vlrdesconto"), "f")) . "</td>\n";
             echo "<td class=\"borda\" style=\"font-size:11px\" align=\"right\" nowrap><input type=\"hidden\" id=\"total$i\" value=\"" . $SomaDasParcelasTotal[pg_result($result, $i, "k00_numpre")][pg_result($result, $i, "k00_numpar")][pg_result($result, $i, "k00_receit")] . "\">" . (trim(pg_result($result, $i, "total")) == "" ? "&nbsp" : db_formatar(pg_result($result, $i, "total"), "f")) . "</td>\n";
-
+          $check_status = "SELECT * from cartorio.titulos where termo = $v07_parcel and (status = 'PAGO' or status = 'ENVIADO' or status = 'ENVIO_PENDENTE');";
+          $check_db = db_query($check_status);
+          $check_flag = pg_numrows($check_db);
+          
           if($elementos_numpres[$cont2] == pg_result($result,$i,"k00_numpre")) {
+            if($check_flag == 0){
             echo "<td class=\"borda\" style=\"font-size:11px\" id=\"coluna$i\" nowrap>".($tipo==3?"<input type=\"submit\" class=\"opa1\"  onclick=\"this.form.target = '';return js_validatamanho(document.getElementById('VAL_ISS$i').value,'calculavalor$i','VAL_ISS$i');\" name=\"calculavalor\" id=\"calculavalor$i\" value=\"Calcular\" $sDisabled >":"")."<input class='{$sClassVenc} checkBoxNumpre' style=\"visibility:'visible'\" type=\"".($tipo==3?"hidden":"checkbox")."\" value=\"".pg_result($result,$i,"k00_numpre")."P".pg_result($result,$i,"k00_numpar")."R".pg_result($result,$i,"k00_receit")."\" onclick=\"js_soma(2)\" onchange=\"js_appendSelected(this)\" data-numpre=\"".pg_result($result,$i,"k00_numpre")."\" data-numpar=\"".pg_result($result,$i,"k00_numpar")."\" data-receita=\"".pg_result($result,$i,"k00_receit")."\" id=\"CHECK$i\" name=\"CHECK$i\" ".((abs(pg_result($result,$i,"k00_valor"))!=0 && $tipo==3)?"disabled":"").">
                 <input style=\"visibility:'visible'\" type=\""."hidden"."\" value=\"".pg_result($result,$i,"total")."\" id=\"_VALORES$i\" name=\"_VALORES$i\">
                 </td>\n";
+            }else{
+              echo "<td></td>";
+            }
             $verf_parc = pg_result($result,$i,"k00_numpar");
           } else {
+            
             $cont2++;
             $verf_parc = pg_result($result,$i,"k00_numpar");
-            echo "<td class=\"borda\" style=\"font-size:11px\" id=\"coluna$i\" nowrap>".($tipo==3?"<input type=\"submit\" class=\"opa2\" onclick=\"this.form.target = ''\" name=\"calculavalor\"  id=\"calculavalor$i\" value=\"Calcular\" $sDisabled >":"")."<input class='{$sClassVenc} checkBoxNumpre' style=\"visibility:'visible'\" type=\"".($tipo==3?"hidden":"checkbox")."\" value=\"".pg_result($result,$i,"k00_numpre")."P".pg_result($result,$i,"k00_numpar")."R".pg_result($result,$i,"k00_receit")."\" onclick=\"js_soma(2)\" onchange=\"js_appendSelected(this)\" data-numpre=\"".pg_result($result,$i,"k00_numpre")."\" data-numpar=\"".pg_result($result,$i,"k00_numpar")."\" data-receita=\"".pg_result($result,$i,"k00_receit")."\" id=\"CHECK$i\" name=\"CHECK$i\" ".((abs(pg_result($result,$i,"k00_valor"))!=0 && $tipo==3)?"disabled":"")."></td>\n";
+            if($check_flag == 0){
+              echo "<td class=\"borda\" style=\"font-size:11px\" id=\"coluna$i\" nowrap>".($tipo==3?"<input type=\"submit\" class=\"opa2\" onclick=\"this.form.target = ''\" name=\"calculavalor\"  id=\"calculavalor$i\" value=\"Calcular\" $sDisabled >":"")."<input class='{$sClassVenc} checkBoxNumpre' style=\"visibility:'visible'\" type=\"".($tipo==3?"hidden":"checkbox")."\" value=\"".pg_result($result,$i,"k00_numpre")."P".pg_result($result,$i,"k00_numpar")."R".pg_result($result,$i,"k00_receit")."\" onclick=\"js_soma(2)\" onchange=\"js_appendSelected(this)\" data-numpre=\"".pg_result($result,$i,"k00_numpre")."\" data-numpar=\"".pg_result($result,$i,"k00_numpar")."\" data-receita=\"".pg_result($result,$i,"k00_receit")."\" id=\"CHECK$i\" name=\"CHECK$i\" ".((abs(pg_result($result,$i,"k00_valor"))!=0 && $tipo==3)?"disabled":"")."></td>\n";
+            }else{
+              echo "<td></td>";
+            }
           }
           echo "</tr></label>\n";
 

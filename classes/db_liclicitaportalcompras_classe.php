@@ -29,9 +29,11 @@ class cl_liclicitaportalcompras
                 l03_presencial=true then 2
                 else 1
         end as tiporealizacao,
-        case when  l20_tipliticacao = null or l20_tipliticacao=0 then 1
-        	else l20_tipliticacao
-        end as tipojulgamento,
+        CASE 
+                WHEN l20_tipliticacao IS NULL OR l20_tipliticacao = 0 THEN 1
+                WHEN l20_tipliticacao = 2 THEN 3
+                ELSE l20_tipliticacao
+        END AS tipojulgamento,
         l20_edital as numeroprocessointerno,
         l20_numero as numeroprocesso,
         l20_anousu as anoprocesso,

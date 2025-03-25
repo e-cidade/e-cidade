@@ -44,14 +44,12 @@ if ($oParam->exec == "consultarNotas") {
    $oAgenda = new agendaPagamento();
     $oAgenda->setUrlEncode(true);
     $sWhere     = " (round(e53_valor,2)-round(e53_vlranu,2)-round(e53_vlrpag,2)) > 0 ";
-    //$sWhere     = " (round(e60_vlremp,2)-round(e60_vlranu,2)-round(e60_vlrpag,2)) > 0 ";
     $sWhere     .= " and e80_data  <= '".date("Y-m-d",db_getsession("DB_datausu"))."'";
     $sWhere     .= " and k12_data is null";
     $sWhere     .= " and e97_codmov is null";
     $sWhere     .= " and e81_cancelado is null";
     $sWhere     .= " and e60_instit = ".db_getsession("DB_instit");
     $sWhereSlip  = " k17_situacao in(1,3)  and e81_cancelado is null";
-    $sWhereSlip .= " and extract(year from k17_data ) = ".db_getsession("DB_anousu");
     
     if ($oParam->iOrdemIni != '' && $oParam->iOrdemFim == "") {
       $sWhere     .= " and e50_codord = {$oParam->iOrdemIni}";

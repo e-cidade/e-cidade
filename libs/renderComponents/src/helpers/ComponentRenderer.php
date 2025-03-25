@@ -81,9 +81,7 @@
                 $this->baseUrl = $this->requestScheme . "://" . $this->httpHost . "/" . $this->relativePath() . "/w/" . $this->uriNumberWindow();
             }
 
-            // Injeta o script JavaScript para carregar os componentes
-            echo "<script src='{$this->baseUrl}/libs/renderComponents/public/loadComponents.js'></script>";
-            echo "<script>const baseUrl = '{$this->baseUrl}';</script>";
+            echo "<section id='scriptSessionAndComponentRenderingStyles'></section>";
         }
 
         /**
@@ -128,7 +126,13 @@
         private function uriNumberWindow()
         {
             preg_match('/w\/(\d+)/', $this->requestUri, $matches);
-            $numero = $matches[1];
+
+            if(empty($matches[1])) {
+                $numero = 0;
+            } else {
+                $numero = $matches[1];
+            }
+
             return $numero;
         }
 
@@ -145,7 +149,7 @@
          */
         private function relativePath()
         {
-            // Calcula o caminho relativo do projeto em relação ao DOCUMENT_ROOT
+            // Calcula o caminho relativo do projeto em relaï¿½ï¿½o ao DOCUMENT_ROOT
             $relativePath = str_replace($this->documentRoot, '', $this->projectPath);
             $relativePath = ltrim($relativePath, '/'); // Remove barra inicial, se existir
             return $relativePath;

@@ -61,6 +61,14 @@ $excessoarrecad= $suplementacaoparametro->o134_excessoarrecad;
               <td><? db_inputdata('o39_data', @$o39_data_dia, @$o39_data_mes, @$o39_data_ano, true, 'text', $db_opcao, "") ?> </td>
             </tr>
             <tr>
+              <td nowrap title="<?= @$To39_datapublicacao ?>"><?= @$Lo39_datapublicacao ?> </td>
+              <td><? db_inputdata('o39_datapublicacao', @$o39_datapublicacao_dia, @$o39_datapublicacao_mes, @$o39_datapublicacao_ano, true, 'text', $db_opcao, "") ?> </td>
+            </tr>
+            <tr>
+              <td nowrap title="<?= @$To39_localpublicacao ?>"><?= @$Lo39_localpublicacao ?></td>
+              <td><? db_textarea('o39_localpublicacao', 0, 72, $Io39_localpublicacao, true, 'text', $db_opcao, "", "","", 1000) ?></td>
+            </tr>
+            <tr>
               <td nowrap title="<?= @$To39_descr ?>"><?= @$Lo39_descr ?></td>
               <td><? db_textarea('o39_descr', 0, 72, $Io39_descr, true, 'text', $db_opcao, "") ?></td>
             </tr>
@@ -277,17 +285,47 @@ function js_validacaracter() {
     let contcaracteres = js_validacaracter();
 
     if ( contcaracteres < 100) {
-      alert("O campo Justificativa deve ter no mínimo 100 caracteres");
       event.preventDefault();
+      return alert("O campo Justificativa deve ter no mínimo 100 caracteres.");
     }
 
      
     if (document.form1.o39_tiposuplementacao.value == 'Selecione') {
-      alert("Informe o Tipo de Suplementação.");
       event.preventDefault();
+      return alert("Informe o Tipo de Suplementação.");
     }
 
+    if (document.form1.o39_datapublicacao.value == '') {
+      event.preventDefault();
+      return alert("Informe a Data de publicação do Decreto.");
+    }
 
+    if (compararData()) {
+      event.preventDefault();
+      return alert("A Data de publicação do Decreto não pode ser anterior a data do decreto.");
+    }
+
+    if (document.form1.o39_localpublicacao.value == '') {
+      event.preventDefault();
+      return alert("Informe o Local de publicação do Decreto.");
+    }
+
+    if ( document.form1.o39_localpublicacao.value.length < 30) {
+      event.preventDefault();
+      return alert("O campo Local de publicação do Decreto deve ter no mínimo 30 caracteres.");
+    }
+
+  }
+
+  function compararData() {
+    let dataDecreto = document.form1.o39_data.value;
+    let dataPublicacaoDecreto = document.form1.o39_datapublicacao.value;
+
+
+    let [diaDecreto, mesDecreto, anoDecreto] = dataDecreto.split("/").map(Number);
+    let [diaPublicacao, mesPublicacao, anoPublicacao] = dataPublicacaoDecreto.split("/").map(Number);
+    
+    return new Date(anoPublicacao, mesPublicacao - 1, diaPublicacao) < new Date(anoDecreto, mesDecreto - 1, diaDecreto) ? true : false;
   }
 
   function js_pesquisao39_codlei(mostra) {

@@ -903,7 +903,7 @@ where j18_anousu = iptucalc.j23_anousu and j21_matric = iptucalc.j23_matric limi
 
         // trocado porque bage pediu
         if($oRegraEmissao->isCobranca()){
-          $xender = ', ' . $j23_numero;
+          $xender = strtoupper($j23_ender). ($j23_numero == "" ? "" : ', '.$j23_numero.'  '.$j23_compl);
         }else{
           $xender = $nomepri.', '.$j39_numero.'  '.$j39_compl;
         }
@@ -1003,8 +1003,8 @@ where j18_anousu = iptucalc.j23_anousu and j21_matric = iptucalc.j23_matric limi
             $pdfcapa->prefeitura      = $nomeinst;
             $pdfcapa->titulo1     = "Matricula";
             $pdfcapa->descr1      = $numero;
-            $pdfcapa->endcapa     = ', ' . $j23_numero;
-            $pdfcapa->cidufcapa       = " - " . $j23_uf;
+            $pdfcapa->endcapa     = strtoupper($j23_ender). ($j23_numero == "" ? "" : ', '.$j23_numero.'  '.$j23_compl);
+            $pdfcapa->cidufcapa       = strtoupper($j23_munic).($j23_uf==""?"":" - ".$j23_uf);
             $pdfcapa->bairrocapa      = strtoupper($j23_bairro);
             $pdfcapa->cepcapa         = "CEP: ".$z01_cep;
             $pdfcapa->titulo4       = "Dados";
@@ -1179,7 +1179,7 @@ where j18_anousu = iptucalc.j23_anousu and j21_matric = iptucalc.j23_matric limi
                         $pdf1->carteira = $oConvenio->getCarteira();
 
                         if (strlen(trim($oConvenio->getConvenioCobranca())) == 7) {
-                            $pdf1->nosso_numero = cad4_geracarnesiptu_geral . phptrim($oConvenio->getConvenioCobranca()) . "00";
+                            $pdf1->nosso_numero = trim($oConvenio->getConvenioCobranca()) . str_pad($k00_numpre, 8, "0", STR_PAD_LEFT) . "00";
                         } else {
                             $pdf1->nosso_numero = $oConvenio->getNossoNumero();
                         }
@@ -1221,7 +1221,7 @@ where j18_anousu = iptucalc.j23_anousu and j21_matric = iptucalc.j23_matric limi
                     $pdf1->tipobairro = 'Bairro:';
                     $pdf1->bairropri = $z01_bairro;
                     $pdf1->descr11_1 = $z01_numcgm . " - " . $nome_contri;
-                    $pdf1->descr11_2 = ', ' . $j23_numero;
+                    $pdf1->descr11_2 = strtoupper($j23_ender) . ($j23_numero == "" ? "" : ', ' . $j23_numero . '  ' . $j23_compl);
                     $pdf1->descr11_3 = $xbairro;
                     $pdf1->descr17 = $bql;
                     $pdf1->bairrocontri = $j23_bairro;
@@ -1231,9 +1231,9 @@ where j18_anousu = iptucalc.j23_anousu and j21_matric = iptucalc.j23_matric limi
                     $pdf1->descr3_1 = $z01_numcgm . " - " . $nome_contri;
                     $pdf1->cgmpessoa = $z01_cgmpri;
                     $pdf1->nomepessoa = $z01_nome;
-                    $pdf1->descr3_2 = ', ' . $j23_numero . " - " . $j23_bairro;
+                    $pdf1->descr3_2 = strtoupper($j23_ender) . ($j23_numero == "" ? "" : ', ' . $j23_numero . '  ' . $j23_compl) . " - " . $j23_bairro;
                     $pdf1->predescr3_1 = $z01_numcgm . " - " . $nome_contri;
-                    $pdf1->predescr3_2 = ', ' . $j23_numero;
+                    $pdf1->predescr3_2 = strtoupper($j23_ender) . ($j23_numero == "" ? "" : ', ' . $j23_numero . '  ' . $j23_compl);
                     $pdf1->descr3_3 = $j23_bairro;
                     $pdf1->tipoinscr = 'Cgm';
                     $pdf1->nrinscr = $z01_numcgm;
@@ -1590,8 +1590,8 @@ where j18_anousu = iptucalc.j23_anousu and j21_matric = iptucalc.j23_matric limi
           $vlrbar    = "00000000000";
         }
 
-        $datavencimento = cad4_geracarnesiptu_geral . phpsubstr($k00_dtvenc, 6, 4) .substr($k00_dtvenc, 0, 2);
-        $tmpdt      = cad4_geracarnesiptu_geral . phpsubstr($db_datausu, 0, 4) .substr($db_datausu,8,2);
+        $datavencimento = substr($k00_dtvenc, 6, 4).substr($k00_dtvenc, 3, 2).substr($k00_dtvenc, 0, 2);
+        $tmpdt      = substr($db_datausu,0,4).substr($db_datausu,5,2).substr($db_datausu,8,2);
 
         if ($tmpdt > $datavencimento) {
           $datavencimento = $tmpdt;
@@ -1644,7 +1644,7 @@ where j18_anousu = iptucalc.j23_anousu and j21_matric = iptucalc.j23_matric limi
           $oRecibo = new recibo(2, null, 5);
           $oRecibo->addNumpre($k00_numpre,$k00_numpar);
           $oRecibo->setNumBco($oRegraEmissao->getCodConvenioCobranca());
-          $datavencimento = cad4_geracarnesiptu_geral . phpsubstr($k00_dtvenc, 6, 4) .substr($k00_dtvenc, 0, 2);
+          $datavencimento = substr($k00_dtvenc, 6, 4).substr($k00_dtvenc, 3, 2).substr($k00_dtvenc, 0, 2);
           $oRecibo->setDataVencimentoRecibo($datavencimento);
           $oRecibo->emiteRecibo();
           $novo_numpre = $oRecibo->getNumpreRecibo();
@@ -1675,7 +1675,7 @@ where j18_anousu = iptucalc.j23_anousu and j21_matric = iptucalc.j23_matric limi
         if($oRegraEmissao->isCobranca()){
 
           if(strlen(trim($oConvenio->getConvenioCobranca())) == 7) {
-            $pdf1->nosso_numero = cad4_geracarnesiptu_geral . phptrim($oConvenio->getConvenioCobranca()) . str_pad($k00_numpar,2,"0",STR_PAD_LEFT);
+            $pdf1->nosso_numero = trim($oConvenio->getConvenioCobranca()) . str_pad($k00_numpre,8,"0",STR_PAD_LEFT) . str_pad($k00_numpar,2,"0",STR_PAD_LEFT);
           } else {
             $pdf1->nosso_numero = $oConvenio->getNossoNumero();
           }
@@ -1697,7 +1697,7 @@ where j18_anousu = iptucalc.j23_anousu and j21_matric = iptucalc.j23_matric limi
         $pdf1->descr12_2  = '';
         $pdf1->titulo1    = $descr;
         $pdf1->descr1     = $numero;
-        $pdf1->descr2     = cad4_geracarnesiptu_geral . phpdb_numpre($novo_numpre, 0);
+        $pdf1->descr2     = db_numpre($novo_numpre, 0).db_formatar(0, 's', "0", 3, "e");
         $pdf1->tipo_exerc = "$k00_tipo / ".substr($k00_dtoper,0,4);
 
         /************  P E G A   A S   R E C E I T A S   C O M   O S   V A L O R E S  *****************/
@@ -1813,15 +1813,15 @@ where j18_anousu = iptucalc.j23_anousu and j21_matric = iptucalc.j23_matric limi
 
         }
         $pdf1->descr11_1     = $z01_numcgm." - ".$nome_contri;
-        $pdf1->descr11_2     = ', ' . $j23_numero . " - " . $j23_bairro;
+        $pdf1->descr11_2     = strtoupper($j23_ender). ($j23_numero == "" ? "" : ', '.$j23_numero.'  '.$j23_compl) . " - " . $j23_bairro;
         $pdf1->descr11_3     = $j23_bairro;
         $pdf1->descr17       = $bql;
         $pdf1->descr3_1      = $z01_numcgm." - ".$nome_contri;
         $pdf1->cgmpessoa     = $z01_cgmpri;
         $pdf1->nomepessoa    = $z01_nome;
-        $pdf1->descr3_2      = ', ' . $j23_numero . " - " . $j23_bairro;
+        $pdf1->descr3_2      = strtoupper($j23_ender). ($j23_numero == "" ? "" : ', '.$j23_numero.'  '.$j23_compl) . " - " . $j23_bairro;
         $pdf1->predescr3_1   = $z01_numcgm." - ".$nome_contri;
-        $pdf1->predescr3_2   = ', ' . $j23_numero;
+        $pdf1->predescr3_2   = strtoupper($j23_ender). ($j23_numero == "" ? "" : ', '.$j23_numero.'  '.$j23_compl);
         $pdf1->descr3_3      = $j23_bairro;
         $pdf1->bairrocontri  = $j23_bairro;
         $pdf1->prebairropri  = $j23_bairro;
@@ -1882,11 +1882,11 @@ where j18_anousu = iptucalc.j23_anousu and j21_matric = iptucalc.j23_matric limi
         $pdf1->descr8  = $numero;
         $pdf1->predescr8  = $numero;
         if($recibopaga ==false){
-          $pdf1->descr9  = cad4_geracarnesiptu_geral . phpdb_numpre($novo_numpre, 0);
-          $pdf1->predescr9  = cad4_geracarnesiptu_geral . phpdb_numpre($novo_numpre, 0);
+          $pdf1->descr9  = db_numpre($novo_numpre, 0).db_formatar(0, 's', "0", 3, "e");
+          $pdf1->predescr9  = db_numpre($novo_numpre, 0).db_formatar(0, 's', "0", 3, "e");
         }else{
-          $pdf1->descr9  = cad4_geracarnesiptu_geral . phpdb_numpre($novo_numpree, 0);
-          $pdf1->predescr9  = cad4_geracarnesiptu_geral . phpdb_numpre($novo_numpre, 0);
+          $pdf1->descr9  = db_numpre($novo_numpree, 0).db_formatar(0, 's', "0", 3, "e");
+          $pdf1->predescr9  = db_numpre($novo_numpre, 0).db_formatar(0, 's', "0", 3, "e");
         }
         $pdf1->descr10 = $k00_numpar.' / '.$k00_numtot;
         $pdf1->descr14 = $k00_dtvenc;

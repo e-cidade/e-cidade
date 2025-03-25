@@ -164,8 +164,12 @@ class cl_emite_nota_empenho {
         return $sProcessoAdministrativo;
     }
 
-    function get_sql_item($sCondtipos, $e60_numemp) {
+    function get_sql_item($sCondtipos, $e60_numemp, $emiteempenho = null) {
 
+        $join = " left join matunid on matunid.m61_codmatunid = solicitemunid.pc17_unid or matunid.m61_codmatunid = e55_unid";
+        if ($emiteempenho) {
+            $join = " left join matunid on matunid.m61_codmatunid = solicitemunid.pc17_unid";
+        } 
         $sqlitem  = " select distinct ";
         $sqlitem .= "        pc01_complmater, ";
         $sqlitem .= "        pc01_descrmater, ";
@@ -223,7 +227,7 @@ class cl_emite_nota_empenho {
         $sqlitem .= "       left join pcorcamval                           on pcorcamval.pc23_orcamitem       = pcorcamjulg.pc24_orcamitem ";
         $sqlitem .= "                                                     and pcorcamval.pc23_orcamforne      = pcorcamjulg.pc24_orcamforne ";
         $sqlitem .= "		left join solicitemunid on solicitem.pc11_codigo = solicitemunid.pc17_codigo";
-        $sqlitem .= "		left join matunid on matunid.m61_codmatunid = solicitemunid.pc17_unid or matunid.m61_codmatunid = e55_unid";
+        $sqlitem .=         $join;
         $sqlitem .= "       left join liclicita on liclicitem.l21_codliclicita = liclicita.l20_codigo ";
         $sqlitem .= "  where e62_numemp = '{$e60_numemp}' ";
         $sqlitem .= " order by e62_sequen, o56_elemento,pc01_descrmater";

@@ -6,7 +6,7 @@ use App\Repositories\Patrimonial\Licitacao\LicpropostaRepository;
 use App\Repositories\Patrimonial\Licitacao\PcorcamforneRepository;
 use App\Services\Patrimonial\Licitacao\LicpropostaService;
 use App\Services\Patrimonial\Licitacao\LicpropostavincService;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 use App\Services\ExcelService;
 
 global $oErro;
@@ -40,13 +40,13 @@ try {
 
         foreach ($oRetorno->forne as $forne) {
             $itemforne = new stdClass();
-            $itemforne->z01_numcgm = $forne->z01_numcgm;
+            $itemforne->z01_numcgm = $forne->pc31_orcamforne;
             $itemforne->z01_nome = utf8_encode($forne->z01_nome);
             $itemforne->z01_cgccpf = $forne->z01_cgccpf;
             $itensFornecedor[] = $itemforne;
         }
         $oRetorno->fornecedores = $itensFornecedor;
-        
+
         break;
 
         case 'getDadosItensLicitacao':
@@ -58,20 +58,20 @@ try {
             $rsProposta = $licpropostaservicevinc->getLicpropostavinc($oParam->l20_codigo,$oParam->fornecedor);
             $rsCriterio = $licpropostaservice->getCriterio($oParam->l20_codigo);
             $rsPrecoReferencia = $liclicitaRepository->getPrecoReferencia($oParam->l20_codigo);
-            
+
             foreach($rsPrecoReferencia as $pcref){
-                
+
                 $itemPreco = new stdClass();
                 $itemPreco = $pcref->valortabela;
                 $precoreferencia[] = $itemPreco;
-                
+
             }
-            
+
             $oRetorno->preco = $precoreferencia;
-           
+
 
             foreach ($rsitensProposta as $item) {
-                
+
                 $itemNovo = new stdClass();
                 $itemNovo->l04_descricao = $item->l04_descricao;
                 $itemNovo->l21_ordem     = $item->l21_ordem;
@@ -90,8 +90,8 @@ try {
                 $itemNovo->l20_criterioadjudicacao = $item->l20_criterioadjudicacao;
                 $itensProposta[] = $itemNovo;
             }
-            
-            
+
+
             $oRetorno->itens = $itensProposta;
             $oRetorno->proposta = $rsProposta->l223_codigo;
             $oRetorno->criterio = $rsCriterio[0]->l20_criterioadjudicacao;
@@ -210,7 +210,7 @@ try {
                     // Usando preg_replace para remover todos os caracteres não numéricos
                     $cnpjNumero = preg_replace('/\D/', '', $cnpjCompleto);
 
-                    
+
                     foreach ($aDadosPlanilha as $dados) {
                         $aDadosImportar[] = [
                             'vlr_unit' => ($dados['H'] == 0 ? '' : $dados['H']),
@@ -220,8 +220,8 @@ try {
                             'ordem' => $dados['A']
                         ];
                     }
-                    
-                    
+
+
                     $resultadoChunks = array_chunk($aDadosImportar, 500);
                     $oRetorno->import = $resultadoChunks;
                     $oRetorno->cnpj = $cnpjNumero;

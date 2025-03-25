@@ -4,7 +4,7 @@ namespace App\Repositories\Configuracoes;
 
 use App\Models\Configuracoes\DbConfig;
 use App\Repositories\Contracts\Configuracoes\DbConfigRepositoryInterface;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class DbConfigRepository implements DbConfigRepositoryInterface
 {
@@ -35,4 +35,47 @@ class DbConfigRepository implements DbConfigRepositoryInterface
     {
         return $this->model->where('codigo', $iCodigo)->first();
     }
+
+
+    public function getDadosFile($instit){
+        return $this->model->select(
+            DB::raw('db21_codigomunicipoestado AS codmunicipio'),
+            DB::raw('cgc AS cnpjmunicipio'),
+            DB::raw('si09_tipoinstit AS tipoorgao'),
+            DB::raw('si09_codorgaotce AS codorgao')
+        )
+        ->leftJoin(
+            'infocomplementaresinstit',
+            'si09_instit',
+            '=',
+            DB::raw($instit)
+        )
+        ->where('codigo', $instit)
+        ->get();
+    }
+
+    public function getDadosComplementaresByCodigo(int $iCodigo): ?DbConfig
+    {
+        return $this->model
+            ->select(
+                DB::raw('db21_codigomunicipoestado AS codmunicipio'),
+                DB::raw("
+                    CASE 
+                        WHEN si09_tipoinstit::varchar != '2' THEN cgc::varchar 
+                        ELSE si09_cnpjprefeitura::varchar 
+                    END AS cnpjmunicipio
+                "),            
+                DB::raw('si09_tipoinstit AS tipoorgao'),
+                DB::raw('si09_codorgaotce AS codorgao')
+            )
+            ->leftJoin(
+                'public.infocomplementaresinstit',
+                'si09_instit',
+                '=',
+                'codigo'
+            )
+            ->where('codigo', $iCodigo)
+            ->first();
+    }
+
 }

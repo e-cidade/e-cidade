@@ -205,7 +205,7 @@ for ($i = 0; $i < pg_numrows($result); $i++) {
         $sCondtipos = " $tipos as tipos, ";
     }
 
-    $sqlitem    = $clemite_nota_emp->get_sql_item($sCondtipos, $e60_numemp);
+    $sqlitem    = $clemite_nota_emp->get_sql_item($sCondtipos, $e60_numemp,true);
     $resultitem = db_query($sqlitem);
 
     db_fieldsmemory($resultitem);

@@ -23,7 +23,7 @@ class EmpEmpenho extends LegacyModel
      * @var string
      */
     protected $primaryKey = 'e60_numemp';
-
+    
     /**
      * @var array
      */

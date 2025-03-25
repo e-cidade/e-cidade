@@ -118,6 +118,7 @@
       db_query("delete from empempaut where e61_autori = ".$e54_autori);
       db_query("delete from empauthist where e57_autori = ".$e54_autori);
       db_query("delete from empautoriza where e54_autori = ".$e54_autori);
+      db_query("delete from credenciamentosaldo where l213_autori = ".$e54_autori);
 
       if(pg_last_error() == true){
         db_msgbox('ERRO: Autorização não foi excluida '.pg_last_error());

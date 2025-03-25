@@ -5,7 +5,7 @@ use App\Repositories\Patrimonial\Compras\PrecoreferenciaRepository;
 use App\Repositories\Patrimonial\Compras\PcprocitemRepository;
 use App\Repositories\Patrimonial\Compras\PcprocRepository;
 use App\Services\Patrimonial\compras\PcitenscotaService;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 require_once("libs/db_stdlib.php");
 require_once("libs/db_conecta.php");

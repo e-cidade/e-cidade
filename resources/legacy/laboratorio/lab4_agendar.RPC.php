@@ -1,28 +1,28 @@
 <?
 /*
- *     E-cidade Software Publico para Gestao Municipal                
- *  Copyright (C) 2014  DBSeller Servicos de Informatica             
- *                            www.dbseller.com.br                     
- *                         e-cidade@dbseller.com.br                   
- *                                                                    
- *  Este programa e software livre; voce pode redistribui-lo e/ou     
- *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme  
- *  publicada pela Free Software Foundation; tanto a versao 2 da      
- *  Licenca como (a seu criterio) qualquer versao mais nova.          
- *                                                                    
- *  Este programa e distribuido na expectativa de ser util, mas SEM   
- *  QUALQUER GARANTIA; sem mesmo a garantia implicita de              
- *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM           
- *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais  
- *  detalhes.                                                         
- *                                                                    
- *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU     
- *  junto com este programa; se nao, escreva para a Free Software     
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA          
- *  02111-1307, USA.                                                  
- *  
- *  Copia da licenca no diretorio licenca/licenca_en.txt 
- *                                licenca/licenca_pt.txt 
+ *     E-cidade Software Publico para Gestao Municipal
+ *  Copyright (C) 2014  DBSeller Servicos de Informatica
+ *                            www.dbseller.com.br
+ *                         e-cidade@dbseller.com.br
+ *
+ *  Este programa e software livre; voce pode redistribui-lo e/ou
+ *  modifica-lo sob os termos da Licenca Publica Geral GNU, conforme
+ *  publicada pela Free Software Foundation; tanto a versao 2 da
+ *  Licenca como (a seu criterio) qualquer versao mais nova.
+ *
+ *  Este programa e distribuido na expectativa de ser util, mas SEM
+ *  QUALQUER GARANTIA; sem mesmo a garantia implicita de
+ *  COMERCIALIZACAO ou de ADEQUACAO A QUALQUER PROPOSITO EM
+ *  PARTICULAR. Consulte a Licenca Publica Geral GNU para obter mais
+ *  detalhes.
+ *
+ *  Voce deve ter recebido uma copia da Licenca Publica Geral GNU
+ *  junto com este programa; se nao, escreva para a Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ *  02111-1307, USA.
+ *
+ *  Copia da licenca no diretorio licenca/licenca_en.txt
+ *                                licenca/licenca_pt.txt
  */
 
 require("libs/db_stdlib.php");
@@ -62,7 +62,7 @@ $cllab_resultadoitem  = new cl_lab_resultadoitem;
 $cllab_resultadoalfa  = new cl_lab_resultadoalfa;
 $cllab_resultadonum   = new cl_lab_resultadonum;
 
-if($iTipo==1){ //Auto complete profissional agendamento de exames 
+if($iTipo==1){ //Auto complete profissional agendamento de exames
 	$sName   = html_entity_decode(crossUrlDecode($_POST['string']));
 	$oDaoMedicos = db_utils::getdao('medicos');
   $sCampos  = 'distinct medicos.sd03_i_codigo as cod, ';
@@ -90,14 +90,14 @@ if ($iTipo == 2) { //Auto complete exames agendamento de exames
 
   $sCampos  = 'la08_i_codigo as cod, ';
   $sCampos .= 'la08_c_descr as label ';
-  $sWhere   = "(la08_c_descr like upper('%".$sName."%') or sau_procedimento.sd63_c_procedimento like ('".$sName."%'))"; 
+  $sWhere   = "(la08_c_descr like upper('%".$sName."%') or sau_procedimento.sd63_c_procedimento like ('".$sName."%'))";
   $sWhere  .= "and lab_exameproced.la53_i_ativo = 1";
   $sWhere  .= "and EXISTS ( select * from lab_setorexame where la09_i_exame = la08_i_codigo ) ";
   $sSql     = $oDaoLabExames->sql_query_procedimento(null, $sCampos, 'label', $sWhere);
   $rs       = $oDaoLabExames->sql_record($sSql);
   $iLinhas  = $oDaoLabExames->numrows;
   $aRetorno = "";
-  
+
   if ($iLinhas > 0){
     $aRetorno = db_utils::getCollectionByRecord($rs, false, false, true);
   }
@@ -250,7 +250,6 @@ if ( $objParam->exec == 'CarregaGridAutorizado' ) {
   for ( $x = 0; $x < $cllab_requisicao->numrows; $x++ ) {
 
     $oExame = db_utils::fieldsmemory( $result, $x );
-
     if ( ( $oExame->la21_c_situacao == "8 - Autorizado" ) || ( $oExame->la21_c_situacao == "f - falta material" ) ) {
 
       //montar array com linhas do grid
@@ -647,32 +646,32 @@ if($objParam->exec == 'digitacaoalt'){
 
 /*
 if($objParam->exec == 'DadosExame'){
-  //select que traz o saldo 
+  //select que traz o saldo
   $sSql = "select la35_i_fichas,
-                  
+
                        ( select count(la21_d_data) from lab_requisicao
                            inner join lab_requiitem on la21_i_requisicao = la22_i_codigo
                            where la21_d_data = '$ano/$mes/$s'
                             and la35_i_setorexame=la21_i_setorexame
-                            
+
                           group by la21_d_data
                        )::integer as total_agendado
                     from lab_horario
                     inner join lab_setorexame on la35_i_setorexame=la09_i_codigo
                     left join lab_ausencia       on la36_i_setorexame = lab_setorexame.la09_i_codigo
-                                                    and '$ano/$mes/$s' between lab_ausencia.la36_d_ini and lab_ausencia.la36_d_fim             
+                                                    and '$ano/$mes/$s' between lab_ausencia.la36_d_ini and lab_ausencia.la36_d_fim
                    left join sau_motivo_ausencia on lab_ausencia.la36_i_tipo = sau_motivo_ausencia.s139_i_codigo
-                   where $str_where 
+                   where $str_where
                      and la35_i_diasemana = {$this->sem[$diasem]}
-                      and ( la35_d_valfim is null or 
-                     ( la35_d_valfim is not null and la35_d_valfim >= '$ano/$mes/$s' ) 
+                      and ( la35_d_valfim is null or
+                     ( la35_d_valfim is not null and la35_d_valfim >= '$ano/$mes/$s' )
                     )
-                and ( la35_d_valinicio is null or 
-                     ( la35_d_valinicio is not null and la35_d_valinicio <= '$ano/$mes/$s' ) 
-                    )                 
-                     "; 
+                and ( la35_d_valinicio is null or
+                     ( la35_d_valinicio is not null and la35_d_valinicio <= '$ano/$mes/$s' )
+                    )
+                     ";
 
-   
+
 }
 */
 echo $objJson->encode($objRetorno);

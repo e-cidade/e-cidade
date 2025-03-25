@@ -382,6 +382,8 @@ class cl_empnotaord {
      $sql .= "      inner join empempenho  on  empempenho.e60_numemp  = empnota.e69_numemp";
      $sql .= "      inner join cgm         on  cgm.z01_numcgm         = matordem.m51_numcgm";
      $sql .= "      inner join db_depart   on  db_depart.coddepto     = matordem.m51_depto";
+     $sql .= "      left join conlancamnota on c66_codnota            = e69_codnota ";
+     $sql .= "      left join conlancamemp on c66_codlan              = c75_codlan ";
      $sql2 = "";
      if($dbwhere==""){
        if($m72_codnota!=null ){

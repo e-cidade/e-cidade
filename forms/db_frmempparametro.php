@@ -178,6 +178,13 @@ $clempparametro->rotulo->label();
                 </td>
             </tr>
             <tr>
+                <td nowrap title="<?= @$Te30_anularpprocessado ?>"> <?= @$Le30_anularpprocessado ?> </td>
+                <td><? $matriz = array("f" => "Não", "t" => "Sim");
+                    db_select("e30_anularpprocessado", $matriz, true, 1);
+                    ?>
+                </td>
+            </tr>
+            <tr>
                 <td nowrap title="<?= @$Te30_notaliquidacao ?>"><?= @$Le30_notaliquidacao ?></td>
                 <td>
                     <?
@@ -248,6 +255,16 @@ $clempparametro->rotulo->label();
                 <td><?
                     $matriz = array("f" => "Não", "t" => "Sim");
                     db_select("e30_atestocontinterno", $matriz, true, 1);
+                    ?>
+                </td>
+            </tr>
+            <tr>
+                <td nowrap title="<?=@$Te30_empsolicitadesdobramento ?>">
+                    <?=@$Le30_empsolicitadesdobramento ?>
+                </td>
+                <td><?
+                    $matriz = array("f"=>"Não","t"=>"Sim");
+                    db_select("e30_empsolicitadesdobramento",$matriz,true,1);
                     ?>
                 </td>
             </tr>

@@ -1,4 +1,4 @@
-<?
+<?php
 /*
  *     E-cidade Software Publico para Gestao Municipal
  *  Copyright (C) 2014  DBselller Servicos de Informatica
@@ -182,7 +182,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                         echo " ", "<b></b>", "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
                         ?>
                         <b> Data Empenho:</b>
-                        <?
+                        <?php
                         if ($db_opcao ==  1 && !$e60_emiss) {
                             $e60_emiss_dia = date("d", db_getsession("DB_datausu"));
                             $e60_emiss_mes = date("m", db_getsession("DB_datausu"));
@@ -197,13 +197,13 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                         <?= @$Le54_autori ?>
                     </td>
                     <td>
-                        <?
+                        <?php
                         db_input('e54_autori', 8, $Ie54_autori, true, 'text', 3);
                         echo " ", "<b></b>", "&nbsp;&nbsp;&nbsp;&nbsp;";
                         ?>
                         <b> Data Autorização:</b>
 
-                        <?
+                        <?php
                         db_inputData('e54_emiss', @$e54_emiss_dia, @$e54_emiss_mes, @$e54_emiss_ano, true, 'text', 3);
                         ?>
                     </td>
@@ -213,43 +213,43 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                         <b> Credor:</b>
                     </td>
                     <td>
-                        <?
+                        <?php
                         db_input('e54_numcgm', 8, $Ie54_numcgm, true, 'text', 3);
                         db_input('z01_nome', 100, $Iz01_nome, true, 'text', 3);
                         ?>
                     </td>
                 </tr>
                 <tr>
-                    <?php 
-                        if ($buscarOrdenadores == 1 || $buscarOrdenadores == 2) {
-                    ?>        
-                        <td nowrap title="<?= @$Te54_numcgm ?>">
-                            <b> Ordenador da Despesa:</b>
-                        </td>  
-                    <td>
                     <?php
+                    if ($buscarOrdenadores == 1 || $buscarOrdenadores == 2) {
+                    ?>
+                    <td nowrap title="<?= @$Te54_numcgm ?>">
+                        <b> Ordenador da Despesa:</b>
+                    </td>
+                    <td>
+                        <?php
                         }
-                        $arrayCount = count($ordenadoresArray);  
+                        $arrayCount = count($ordenadoresArray);
                         $cont       = 0;
                         if ($buscarOrdenadores == 1 ) {
                             $where = $o41_cgmordenador ? " z01_numcgm in ($o41_cgmordenador) " :  "z01_numcgm is null";
                             $result_cgm = $clcgm->sql_record($clcgm->sql_buscar_ordenador(null," o41_nomeordenador asc ",$where));
                             if ($clcgm->numrows == 0 ) {
                                 $result_cgm = $clcgm->sql_record($clcgm->sql_query_ordenador(null," o41_nomeordenador asc ",$where));
-                             } 
+                            }
                             db_selectrecord("o41_cgmordenador", $result_cgm, true, $db_opcao, "", "", "", "", "");
                         } elseif ($buscarOrdenadores == 2 ) {
-                   
+
                             if ($rowCount > 1) {
                                 foreach($ordenadoresArray as $ordenadores) {
-                                    $cont++; 
+                                    $cont++;
                                     $numCgm .= "'";
-                                    $numCgm .= $ordenadores['z01_numcgm']; 
+                                    $numCgm .= $ordenadores['z01_numcgm'];
                                     if ($arrayCount == $cont) {
-                                        $numCgm .= "'";   
+                                        $numCgm .= "'";
                                     } else {
-                                        $numCgm .= "',";  
-                                    }        
+                                        $numCgm .= "',";
+                                    }
                                 }
                                 $where = " z01_numcgm in ($numCgm) ";
                                 $result_cgm = $clcgm->sql_record($clcgm->sql_query_ordenador(null," sort_order asc, o41_nomeordenador asc ",$where));
@@ -259,22 +259,22 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                                 $result_cgm = $clcgm->sql_record($clcgm->sql_buscar_ordenador(null," o41_nomeordenador asc ",$where));
                                 if ($clcgm->numrows == 0 ) {
                                     $result_cgm = $clcgm->sql_record($clcgm->sql_query_ordenador(null," o41_nomeordenador asc ",$where));
-                                 } 
+                                }
                                 db_selectrecord("o41_cgmordenador", $result_cgm, true, $db_opcao, "", "", "", "", "");
-                               
+
                             }
                         } else {
-                            $o41_cgmordenador = '';
-                            ?>
-                            <td nowrap title="<?= @$Te54_numcgm ?>">
-                               <b><? db_ancora('<b>Ordenador da Despesa:</b>',"js_pesquisa_cgm(true);",$fimperiodocontabil);?></b>
-                            </td> 
-                            <td>
-                            <? 
-                                db_input("o41_cgmordenador",8,$Io41_cgmordenador,true,"text",$fimperiodocontabil,"onChange='js_pesquisa_cgm(false);'");
-                                db_input("o41_cgmordenadordescr",40,$Io41_cgmordenadordescr,true,"text",3);
+                        $o41_cgmordenador = '';
+                        ?>
+                    <td nowrap title="<?= @$Te54_numcgm ?>">
+                        <b><?php db_ancora('<b>Ordenador da Despesa:</b>',"js_pesquisa_cgm(true);",$fimperiodocontabil);?></b>
+                    </td>
+                    <td>
+                        <?php
+                        db_input("o41_cgmordenador",8,$Io41_cgmordenador,true,"text",$fimperiodocontabil,"onChange='js_pesquisa_cgm(false);'");
+                        db_input("o41_cgmordenadordescr",40,$Io41_cgmordenadordescr,true,"text",3);
                         }
-                    ?>    
+                        ?>
                     </td>
                 </tr>
                 <tr>
@@ -282,7 +282,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                         <?= @$Le54_codcom ?>
                     </td>
                     <td>
-                        <?
+                        <?php
                         if (isset($e54_codcom) && $e54_codcom == '') {
                             $pc50_descr = '';
                         }
@@ -306,7 +306,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                         <?= @$Le54_tipol ?>
                     </td>
                     <td>
-                        <?
+                        <?php
                         if (isset($tipocompra) || isset($e54_codcom)) {
                             if (isset($e54_codcom) && empty($tipocompra)) {
                                 $tipocompra = $e54_codcom;
@@ -337,13 +337,13 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                         <?= @$Le54_numerl ?>
                     </td>
                     <td>
-                        <?
+                        <?php
                         db_input('e54_numerl', 8, $Ie54_numerl, true, 'text', 3, "onchange='js_validaNumLicitacao();'");
                         echo " ", "<b></b>", "&nbsp;&nbsp;&nbsp;&nbsp;";
                         ?>
                         <strong>Modalidade:</strong>
 
-                        <?
+                        <?php
                         db_input('e54_nummodalidade', 61, $e54_nummodalidade, true, 'text', 3, "");
                         ?>
                     </td>
@@ -379,7 +379,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                         <?= $Le54_codtipo ?>
                     </td>
                     <td>
-                        <?
+                        <?php
                         $result = $clemptipo->sql_record($clemptipo->sql_query_file(null, "e41_codtipo,e41_descr"));
                         db_selectrecord("e54_codtipo", $result, true, $db_opcao);
 
@@ -391,7 +391,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                         <?= $Le44_tipo ?>
                     </td>
                     <td>
-                        <?
+                        <?php
                         $result = $clempprestatip->sql_record($clempprestatip->sql_query_file(null, "e44_tipo as tipo,e44_descr,e44_obriga", "e44_obriga "));
                         $numrows = $clempprestatip->numrows;
                         $arr = array();
@@ -412,75 +412,121 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                         <b>Desdobramento:</b>
                     </td>
                     <td>
-                        <?
+                        <?php
+                        use Illuminate\Support\Facades\DB;
                         if (isset($e54_autori)) {
-                            $anoUsu = db_getsession("DB_anousu");
-                            $sWhere = "e56_autori = " . $e54_autori . " and e56_anousu = " . $anoUsu;
-                            $result = $clempautidot->sql_record($clempautidot->sql_query_dotacao(null, "e56_coddot", null, $sWhere));
+
+                            $clempautidot   = new cl_empautidot;
+                            $clorcdotacao   = new cl_orcdotacao;
+                            $clempautitem   = new cl_empautitem;
+
+                            $anoUsu         = db_getsession("DB_anousu");
+                            $sWhere         = "e56_autori = {$e54_autori} and e56_anousu = {$anoUsu}";
+
+                            $result         = $clempautidot->sql_record($clempautidot->sql_query_dotacao(null, "e56_coddot", null, $sWhere));
                             echo pg_last_error();
+
                             if ($clempautidot->numrows > 0) {
+ 
                                 $oResult = db_utils::fieldsMemory($result, 0);
-                                $result = $clorcdotacao->sql_record($clorcdotacao->sql_query($anoUsu, $oResult->e56_coddot, "o56_elemento,o56_codele"));
+                                $result  = $clorcdotacao->sql_record($clorcdotacao->sql_query($anoUsu, $oResult->e56_coddot, "o56_elemento, o56_codele"));
+
                                 if ($clorcdotacao->numrows > 0) {
 
-                                    $oResult = db_utils::fieldsMemory($result, 0);
-                                    $oResult->estrutural = criaContaMae($oResult->o56_elemento . "00");
-                                    $sWhere = "o56_elemento like '$oResult->estrutural%' and o56_codele <> $oResult->o56_codele and o56_anousu = $anoUsu";
-                                    //$sSql   = $clempautitem->sql_query_pcmaterele(null,null,"o56_codele,o56_elemento,o56_descr",null,$sWhere);
+                                    $oResult              = db_utils::fieldsMemory($result, 0);
+                                    $oResult->estrutural  = criaContaMae("{$oResult->o56_elemento}00");
+                                    $sWhereEstrutural     = "o56_elemento like '{$oResult->estrutural}%' and o56_codele <> {$oResult->o56_codele} and o56_anousu = {$anoUsu}";
 
-                                    $sSql = "select distinct o56_codele,o56_elemento,o56_descr
-                                from empautitem
-                                inner join empautoriza on empautoriza.e54_autori = empautitem.e55_autori
-                                inner join pcmater on pcmater.pc01_codmater    = empautitem.e55_item
-                                inner join pcmaterele on pcmater.pc01_codmater = pcmaterele.pc07_codmater
-                                left join orcelemento on orcelemento.o56_codele = pcmaterele.pc07_codele
-                                and orcelemento.o56_anousu = $anoUsu
-                                where o56_elemento like '$oResult->estrutural%'
-                                and e55_autori = $e54_autori and o56_anousu = $anoUsu";
+                                    $caseAuxOrdenacao = 'CASE WHEN orcelemento.o56_codele = empautitem.e55_codele THEN 0 ELSE 1 END AS auxilia_ordenacao';
 
-                                    $result = $clempautitem->sql_record($sSql);
-                                    $aEle = array();
-                                    $aCodele = array();
-                                    if ($clempautitem->numrows > 0) {
-                                        $oResult = db_utils::getCollectionByRecord($result);
+                                    $result = DB::table('empautitem')
+                                        ->select('e55_codele', 'orcelemento.o56_codele', 'orcelemento.o56_elemento', 'orcelemento.o56_descr',
+                                            DB::raw($caseAuxOrdenacao))
+                                        ->join('empautoriza', 'empautoriza.e54_autori', '=', 'empautitem.e55_autori')
+                                        ->join('pcmater', 'pcmater.pc01_codmater', '=', 'empautitem.e55_item')
+                                        ->join('pcmaterele', 'pcmater.pc01_codmater', '=', 'pcmaterele.pc07_codmater')
+                                        ->leftJoin('orcelemento', function($join) use ($anoUsu) {
+                                            $join->on('orcelemento.o56_codele', '=', 'pcmaterele.pc07_codele')
+                                                ->where('orcelemento.o56_anousu', '=', $anoUsu);
+                                        })
+                                        ->where('orcelemento.o56_elemento', 'like', "{$oResult->estrutural}%")
+                                        ->where('empautitem.e55_autori', '=', $e54_autori)
+                                        ->where('orcelemento.o56_anousu', '=', $anoUsu)
+                                        ->orderBy('auxilia_ordenacao')
+                                        ->orderBy('e55_codele')
+                                        ->orderBy('orcelemento.o56_codele')
+                                        ->distinct()
+                                        ->get();
 
+                                    $result = $result->isNotEmpty() ? $result->toArray() : [];
+                                    $aEle     = [];
+                                    $aCodele  = [];
+                                    $aDescr   = [];
 
-                                        $numrows = $clorcelemento->numrows;
-
-
-                                        foreach ($oResult as $oRow) {
-                                            $aEle[$oRow->o56_codele] = $oRow->o56_descr;
-                                            $aCodele[] = substr($oRow->o56_elemento,1);
-                                        }
+                                    $oResult = collect($result);
+                                    foreach ($oResult as $oRow) {
+                                        $aEle[$oRow->o56_codele]    = $oRow->o56_descr;
+                                        $aCodele[$oRow->o56_codele] = substr($oRow->o56_elemento, 1);
+                                        $aDescr[$oRow->o56_codele]  = $oRow->o56_descr;
+                                        $codele                     = $oRow->o56_codele;
                                     }
 
-                                    $result = $clempautitem->sql_record($clempautitem->sql_query_autoriza(null, null, "e55_codele", null, "e55_autori = $e54_autori"));
-
+                                    $result = $clempautitem->sql_record($clempautitem->sql_query_autoriza(null, null, "e55_codele", null, "e55_autori = {$e54_autori}"));
                                     if ($clempautitem->numrows > 0) {
                                         $oResult = db_utils::fieldsMemory($result, 0);
                                     }
                                     $e56_codele = $oResult->e55_codele;
-                                    $e56_codele2 = $oResult->e55_codele;
                                     db_select("e56_codele", $aCodele, true, 1);
                                     db_select("e56_codele2", $aEle, true, 1);
                                 }
                             }
                         } else {
-                            $aEle = array();
-                            $aCodele = array();
+                            $aEle     = [];
+                            $aCodele  = [];
                             $e56_codele = "";
-                            db_select("e56_codele", $aEle, true, 1);
+                            $codele = 0;
+                            db_select("e56_codele", $aCodele, true, 1);
                         }
                         ?>
+                        <!-- Campo hidden para armazenar o valor do desdobramento -->
+                        <input type="hidden" id="e56_codele2" name="e56_codele2" value="">
+
+                        <script>
+
+                            document.getElementById('e56_codele').addEventListener('input', function() {
+                                document.getElementById('e56_codele2').value = document.getElementById('e56_codele').value;
+                            });
+
+                            syncSelects('e56_codele', 'e56_codele2');
+                            syncSelects('e56_codele2', 'e56_codele');
+
+                            function syncSelects(select1Id, select2Id) {
+                                const select1 = document.getElementById(select1Id);
+                                const select2 = document.getElementById(select2Id);
+
+                                select1.addEventListener('change', function() {
+                                    select2.value = select1.value;
+                                });
+
+                                select2.addEventListener('change', function() {
+                                    select1.value = select2.value;
+                                });
+                            }
+
+                        </script>
                     </td>
                 </tr>
+
                 <tr>
                     <td nowrap title="Tipos de despesa">
                         <strong>Tipos de despesa :</strong>
                     </td>
                     <td>
-                        <?
-                        $arr  = array('0' => 'Não se aplica', '1' => 'Benefícios Previdenciários do Poder Executivo', '2' => 'Benefícios Previdenciários do Poder Legislativo');
+                        <?php
+                        $arr  = array('0' => 'Não se aplica',
+                            '1' => 'Benefícios Previdenciários do Poder Executivo',
+                            '2' => 'Benefícios Previdenciários do Poder Legislativo'
+                        );
 
                         $sSql = "SELECT si09_tipoinstit AS tipoinstit FROM infocomplementaresinstit WHERE si09_instit = " . db_getsession("DB_instit");
 
@@ -509,7 +555,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                         <strong>Cessão de mão de obra/empreitada:</strong>
                     </td>
                     <td>
-                        <?
+                        <?php
                         $arr  = array(
                             '1' => 'Não',
                             '2' => 'Sim'
@@ -518,13 +564,13 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                         ?>
                     </td>
                 </tr>
-                <?php if (substr($aCodele[0],0,6) == '339030') { ?>
+                <?php if (substr($aCodele[$codele],0,6) == '339030') { ?>
                     <tr id="trAquisicaoProducaoRural">
                         <td nowrap title="Aquisição de Produção Rural ">
                             <strong>Aquisição de Produção Rural :</strong>
                         </td>
                         <td>
-                            <?
+                            <?php
                             $arr  = array(
                                 '0' => '0 - Não se aplica',
                                 '1' => '1 - Aquisição de produção de produtor rural pessoa física ou segurado especial em geral',
@@ -552,7 +598,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                             <strong>O Produtor Rural opta pela CP sobre a folha:</strong>
                         </td>
                         <td>
-                            <?
+                            <?php
                             $arr  = array(
                                 '1' => 'Não',
                                 '2' => 'Sim'
@@ -572,7 +618,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                                         <strong>Possui Cadastro Nacional de Obras (CNO):</strong>
                                     </td>
                                     <td>
-                                        <?
+                                        <?php
                                         $arr  = array(
                                             '0' => 'Selecione',
                                             '1' => 'Sim',
@@ -607,7 +653,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                                         <strong>Indicativo de Prestação de Serviços em Obra de Construção Civil:</strong>
                                     </td>
                                     <td>
-                                        <?
+                                        <?php
                                         $arr  = array(
                                             '' =>  'Selecione',
                                             '0' => '0 - Não é obra de construção civil ou não está sujeita a matrícula de obra',
@@ -623,7 +669,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                                         <strong>Prestador é contribuinte da CPRB:</strong>
                                     </td>
                                     <td>
-                                        <?
+                                        <?php
                                         $arr  = array(
                                             '' => 'Selecione',
                                             '0' => '0 - Não é contribuinte da CPRB retenção de 11%',
@@ -638,7 +684,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                                         <strong> Tipo de Serviço:</strong>
                                     </td>
                                     <td>
-                                        <?
+                                        <?php
                                         $arr = array(
                                             ''=> 'Selecione',
                                             '100000001'=> '100000001 - Limpeza, conservação ou zeladoria',
@@ -687,7 +733,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                         <strong>Referente a Emenda Parlamentar:</strong>
                     </td>
                     <td>
-                        <?
+                        <?php
                         $arr  = array(
                             '0' => 'Selecione',
                             '1' => '1 - Emenda Parlamentar Individual',
@@ -706,7 +752,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                         <strong>Esfera da Emenda Parlamentar:</strong>
                     </td>
                     <td>
-                        <?
+                        <?php
                         $arr  = array(
                             '0' => 'Selecione',
                             '1' => '1 - União',
@@ -741,7 +787,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                             <strong>Data da Sentença Judicial:</strong>
                         </td>
                         <td>
-                            <?
+                            <?php
                             db_inputData('e60_datasentenca', @$e60_datasentenca_dia, @$e60_datasentenca_mes, @$e60_datasentenca_ano, true, 'text', $db_opcao);
                             ?>
                         </td>
@@ -754,17 +800,17 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                         <?= @$Le54_destin ?>
                     </td>
                     <td>
-                        <?
+                        <?php
                         db_input('e54_destin', 90, $Ie54_destin, true, 'text', $db_opcao, "")
                         ?>
                     </td>
                 </tr>
                 <tr>
                     <td nowrap title="Código c206_sequencial">
-                        <? db_ancora("Convênio", "js_pesquisae60_numconvenio(true);", $db_opcao); ?>
+                        <?php db_ancora("Convênio", "js_pesquisae60_numconvenio(true);", $db_opcao); ?>
                     </td>
                     <td>
-                        <?
+                        <?php
                         db_input('e60_numconvenio', 11, $Ie60_numconvenio, true, 'text', $db_opcao, "onChange='js_pesquisae60_numconvenio(false);'");
                         db_input("c206_objetoconvenio", 50, 0, true, "text", 3);
                         ?>
@@ -772,11 +818,11 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                 </tr>
                 <tr>
                     <td nowrap title="Dívida Consolidada">
-                        <? db_ancora("Dívida Consolidada", "js_pesquisaDivida(true);", $db_opcao); ?>
+                        <?php db_ancora("Dívida Consolidada", "js_pesquisaDivida(true);", $db_opcao); ?>
                     </td>
                     <td>
-                        <? db_input("op01_numerocontratoopc",11,$op01_numerocontratoopc,true,"text",$db_opcao,"onChange='js_pesquisaDivida(false);'") ?>
-                        <? db_input("op01_text_numerocontratoopc",50, $op01_text_numerocontratoopc,true,"text",3) ?>
+                        <?php db_input("op01_numerocontratoopc",11,$op01_numerocontratoopc,true,"text",$db_opcao,"onChange='js_pesquisaDivida(false);'") ?>
+                        <?php db_input("op01_text_numerocontratoopc",50, $op01_text_numerocontratoopc,true,"text",3) ?>
                     </td>
                 </tr>
                 <tr>
@@ -800,7 +846,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                         <?= db_ancora(substr(@$Le40_codhist, 12, 50), "js_pesquisahistorico(true);", isset($emprocesso) && $emprocesso == true ? "1" : "1"); ?>
                     </td>
                     <td nowrap="nowrap">
-                        <?
+                        <?php
                         db_input('e57_codhist', 8, $Ie57_codhist, true, '', 1, " onchange='js_pesquisahistorico(false);'");
                         if ($db_opcao == 1)
                             db_input('e40_descr', 45, $Ie40_descr, true, '', 3);
@@ -836,17 +882,17 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                         </fieldset>
                     </td>
                 </tr>
-                <?
+                <?php
                 $anousu = db_getsession("DB_anousu");
 
                 if ($anousu > 2007) {
                     ?>
                     <tr style="display: none;">
-                        <td nowrap title="<?= @$Te54_concarpeculiar ?>"><?
+                        <td nowrap title="<?= @$Te54_concarpeculiar ?>"><?php
                             db_ancora(@$Le54_concarpeculiar, "js_pesquisae54_concarpeculiar(true);", $db_opcao);
                             ?></td>
                         <td>
-                            <?
+                            <?php
                             if (isset($concarpeculiar) && trim(@$concarpeculiar) != "") {
                                 $e54_concarpeculiar = $concarpeculiar;
                                 $c58_descr = $descr_concarpeculiar;
@@ -856,7 +902,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                             ?>
                         </td>
                     </tr>
-                    <?
+                    <?php
                 } else {
                     $e54_concarpeculiar = 0;
                     db_input("e54_concarpeculiar", 10, 0, true, "hidden", 3, "");
@@ -866,13 +912,13 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
 
                 <!--
                 <tr>
-                    <td nowrap title="<? //= @$Te60_convenio
+                    <td nowrap title="<?php //= @$Te60_convenio
                 ?>">
-                        <? //= @$Le60_convenio
+                        <?php //= @$Le60_convenio
                 ?>
                     </td>
                     <td>
-                        <?
+                        <?php
                 /*$aConvenio = array('2' => 'Não', '1' => 'Sim');
                 db_select('e60_convenio', $aConvenio, true, $db_opcao, "");*/
                 ?>
@@ -881,13 +927,13 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
                 -->
                 <!--
                 <tr>
-                    <td nowrap title="<? //= @$Te60_dataconvenio
+                    <td nowrap title="<?php //= @$Te60_dataconvenio
                 ?>">
-                        <? //= @$Le60_dataconvenio
+                        <?php //= @$Le60_dataconvenio
                 ?>
                     </td>
                     <td>
-                        <?
+                        <?php
                 //db_inputData('e60_dataconvenio',@$e60_dataconvenio_dia, @$e60_dataconvenio_mes,@$e60_dataconvenio_ano, true, 'text', $db_opcao);
                 ?>
                     </td>
@@ -898,9 +944,9 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
 
             <?php
             if (!$oAssintaraDigital->verificaAssituraAtiva()) {
-                 if ($db_opcao == 1) {
+                if ($db_opcao == 1) {
                     echo "<input name='op' type='button' value='Empenhar e não imprimir' onclick='return js_naoimprimir()';>";
-                 }
+                }
             }
             ?>
             <input name="lanc" type="button" id="lanc" value="Lançar autorizações" onclick="parent.location.href='emp1_empautoriza001.php';">
@@ -1291,7 +1337,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
     }
 
     function js_mostracgmordenador(erro, chave,chave2)
-    { 
+    {
         if (chave2 == 'JURIDICA') {
             alert("É obrigatório que o ordenador seja uma pessoa física.")
             document.form1.o41_cgmordenador.value = '';
@@ -1306,9 +1352,9 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
         }
     }
 
-    function js_mostracgmordenador1(chave, chave1,chave2) 
+    function js_mostracgmordenador1(chave, chave1,chave2)
     {
-       
+
         if (chave2 == 'JURIDICA') {
             alert("É obrigatório que o ordenador seja uma pessoa física.")
             document.form1.o41_cgmordenador.value = '';
@@ -1319,7 +1365,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
             document.form1.o41_cgmordenadordescr.value = chave1;
             db_iframe_cgm.hide();
         }
-      
+
     }
 
     function js_naoimprimir() {
@@ -1746,7 +1792,7 @@ if (isset($chavepesquisa) && $db_opcao == 1) {
         $('efd60_cessaomaoobra').style.width = "68.6%";
         $('e60_emendaparlamentar').style.width = "68.6%";
         $('e60_esferaemendaparlamentar').style.width = "68.6%";
-        $('o41_cgmordenador').style.width = "10%";     
+        $('o41_cgmordenador').style.width = "10%";
         $('o41_cgmordenadordescr').style.width = "58%";
         $('e60_datasentenca').style.width = "10%";
 

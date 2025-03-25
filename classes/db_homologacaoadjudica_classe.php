@@ -1105,4 +1105,463 @@ class cl_homologacaoadjudica
         return true;
 
     }
+
+    function sqlItensHomologados($l202_licitacao = null,$l202_sequencial)
+    {
+
+        return "select
+                    distinct pc01_codmater,
+                    pc01_tabela,
+                    pc01_taxa,
+                    UPPER(CONCAT(pc01_descrmater, ' ', pc01_complmater)) AS descricao,
+                    cgmforncedor.z01_nome,
+                    cgmforncedor.z01_cgccpf,
+                    UPPER(m61_abrev) as m61_abrev,
+                    pc11_quant,
+                    UPPER(LEFT(pc23_obs, 50)) AS marca,
+                    pc23_valor,
+                    pcorcamval.pc23_vlrun,
+                    pcorcamval.pc23_percentualdesconto,
+                    pcorcamval.pc23_perctaxadesctabela,
+                    l203_homologaadjudicacao,
+                    pc81_codprocitem,
+                    l04_descricao,
+                    pc11_seq,
+                    l20_criterioadjudicacao,
+                    l20_tipojulg,
+                    liclicitem.l21_ordem
+                from
+                    pcprocitem
+                inner join pcproc on
+                    pcproc.pc80_codproc = pcprocitem.pc81_codproc
+                inner join solicitem on
+                    solicitem.pc11_codigo = pcprocitem.pc81_solicitem
+                inner join solicita on
+                    solicita.pc10_numero = solicitem.pc11_numero
+                inner join db_depart on
+                    db_depart.coddepto = solicita.pc10_depto
+                left join solicitemunid on
+                    solicitemunid.pc17_codigo = solicitem.pc11_codigo
+                left join matunid on
+                    matunid.m61_codmatunid = solicitemunid.pc17_unid
+                left join db_usuarios on
+                    pcproc.pc80_usuario = db_usuarios.id_usuario
+                left join solicitempcmater on
+                    solicitempcmater.pc16_solicitem = solicitem.pc11_codigo
+                left join pcmater on
+                    pcmater.pc01_codmater = solicitempcmater.pc16_codmater
+                left join licitemobra on
+                    licitemobra.obr06_pcmater = pcmater.pc01_codmater
+                left join pcsubgrupo on
+                    pcsubgrupo.pc04_codsubgrupo = pcmater.pc01_codsubgrupo
+                left join pctipo on
+                    pctipo.pc05_codtipo = pcsubgrupo.pc04_codtipo
+                left join solicitemele on
+                    solicitemele.pc18_solicitem = solicitem.pc11_codigo
+                left join orcelemento on
+                    orcelemento.o56_codele = solicitemele.pc18_codele
+                    and orcelemento.o56_anousu = " . db_getsession("DB_anousu") . "
+                left join empautitempcprocitem on
+                    empautitempcprocitem.e73_pcprocitem = pcprocitem.pc81_codprocitem
+                left join empautitem on
+                    empautitem.e55_autori = empautitempcprocitem.e73_autori
+                    and empautitem.e55_sequen = empautitempcprocitem.e73_sequen
+                left join empautoriza on
+                    empautoriza.e54_autori = empautitem.e55_autori
+                left join cgm on
+                    empautoriza.e54_numcgm = cgm.z01_numcgm
+                left join empempaut on
+                    empempaut.e61_autori = empautitem.e55_autori
+                left join empempenho on
+                    empempenho.e60_numemp = empempaut.e61_numemp
+                left join liclicitem on
+                    liclicitem.l21_codpcprocitem = pcprocitem.pc81_codprocitem
+                left join liclicita on
+                    liclicita.l20_codigo = liclicitem.l21_codliclicita
+                left join liclicitemlote on
+                    liclicitemlote.l04_liclicitem = liclicitem.l21_codigo
+                left join pcorcamitemlic on
+                    liclicitem.l21_codigo = pcorcamitemlic.pc26_liclicitem
+                left join pcorcamitem on
+                    pcorcamitemlic.pc26_orcamitem = pcorcamitem.pc22_orcamitem
+                left join pcorcamjulg on
+                    pcorcamitem.pc22_orcamitem = pcorcamjulg.pc24_orcamitem
+                left join pcorcamval on
+                    (pc24_orcamitem,
+                    pc24_orcamforne) = (pc23_orcamitem,
+                    pc23_orcamforne)
+                left join pcorcamforne on
+                    pc24_orcamforne = pc21_orcamforne
+                left join cgm cgmforncedor on
+                    pcorcamforne.pc21_numcgm = cgmforncedor.z01_numcgm
+                inner join homologacaoadjudica on
+                    l202_licitacao = l21_codliclicita
+                inner join itenshomologacao on
+                    l203_homologaadjudicacao = l202_sequencial
+                    and l203_item = pc81_codprocitem
+                where
+                    liclicitem.l21_codliclicita = {$l202_licitacao}
+                    and pc24_pontuacao = 1
+                    and itenshomologacao.l203_homologaadjudicacao = {$l202_sequencial}
+                order by
+                    z01_nome,
+                    l04_descricao,
+                    pc11_seq";
+
+    }
+
+    function sqlItensAdjudicados($l202_licitacao){
+        return "select
+                    distinct pc01_codmater,
+                    pc01_tabela,
+                    pc01_taxa,
+                    UPPER(CONCAT(pc01_descrmater, ' ', pc01_complmater)) AS descricao,
+                    cgmforncedor.z01_nome,
+                    cgmforncedor.z01_cgccpf,
+                    UPPER(m61_abrev) as m61_abrev,
+                    pc11_quant,
+                    UPPER(LEFT(pc23_obs, 50)) AS marca,
+                    pc23_valor,
+                    pcorcamval.pc23_vlrun,
+                    pcorcamval.pc23_percentualdesconto,
+                    pcorcamval.pc23_perctaxadesctabela,
+                    l203_homologaadjudicacao,
+                    pc81_codprocitem,
+                    l04_descricao,
+                    pc11_seq,
+                    l20_criterioadjudicacao,
+                    liclicitem.l21_ordem
+                from
+                    pcprocitem
+                inner join pcproc on
+                    pcproc.pc80_codproc = pcprocitem.pc81_codproc
+                inner join solicitem on
+                    solicitem.pc11_codigo = pcprocitem.pc81_solicitem
+                inner join solicita on
+                    solicita.pc10_numero = solicitem.pc11_numero
+                inner join db_depart on
+                    db_depart.coddepto = solicita.pc10_depto
+                left join solicitemunid on
+                    solicitemunid.pc17_codigo = solicitem.pc11_codigo
+                left join matunid on
+                    matunid.m61_codmatunid = solicitemunid.pc17_unid
+                left join db_usuarios on
+                    pcproc.pc80_usuario = db_usuarios.id_usuario
+                left join solicitempcmater on
+                    solicitempcmater.pc16_solicitem = solicitem.pc11_codigo
+                left join pcmater on
+                    pcmater.pc01_codmater = solicitempcmater.pc16_codmater
+                left join licitemobra on
+                    licitemobra.obr06_pcmater = pcmater.pc01_codmater
+                left join pcsubgrupo on
+                    pcsubgrupo.pc04_codsubgrupo = pcmater.pc01_codsubgrupo
+                left join pctipo on
+                    pctipo.pc05_codtipo = pcsubgrupo.pc04_codtipo
+                left join solicitemele on
+                    solicitemele.pc18_solicitem = solicitem.pc11_codigo
+                left join orcelemento on
+                    orcelemento.o56_codele = solicitemele.pc18_codele
+                    and orcelemento.o56_anousu = " . db_getsession("DB_anousu") . "
+                left join empautitempcprocitem on
+                    empautitempcprocitem.e73_pcprocitem = pcprocitem.pc81_codprocitem
+                left join empautitem on
+                    empautitem.e55_autori = empautitempcprocitem.e73_autori
+                    and empautitem.e55_sequen = empautitempcprocitem.e73_sequen
+                left join empautoriza on
+                    empautoriza.e54_autori = empautitem.e55_autori
+                left join cgm on
+                    empautoriza.e54_numcgm = cgm.z01_numcgm
+                left join empempaut on
+                    empempaut.e61_autori = empautitem.e55_autori
+                left join empempenho on
+                    empempenho.e60_numemp = empempaut.e61_numemp
+                left join liclicitem on
+                    liclicitem.l21_codpcprocitem = pcprocitem.pc81_codprocitem
+                left join liclicita on
+                    liclicita.l20_codigo = liclicitem.l21_codliclicita
+                left join liclicitemlote on
+                    liclicitemlote.l04_liclicitem = liclicitem.l21_codigo
+                left join pcorcamitemlic on
+                    liclicitem.l21_codigo = pcorcamitemlic.pc26_liclicitem
+                left join pcorcamitem on
+                    pcorcamitemlic.pc26_orcamitem = pcorcamitem.pc22_orcamitem
+                left join pcorcamjulg on
+                    pcorcamitem.pc22_orcamitem = pcorcamjulg.pc24_orcamitem
+                left join pcorcamval on
+                    (pc24_orcamitem,
+                    pc24_orcamforne) = (pc23_orcamitem,
+                    pc23_orcamforne)
+                left join pcorcamforne on
+                    pc24_orcamforne = pc21_orcamforne
+                left join cgm cgmforncedor on
+                    pcorcamforne.pc21_numcgm = cgmforncedor.z01_numcgm
+                left join homologacaoadjudica on
+                    l202_licitacao = l21_codliclicita
+                left join itenshomologacao on
+                    l203_homologaadjudicacao = l202_sequencial
+                    and l203_item = pc81_codprocitem
+                where
+                    liclicitem.l21_codliclicita = $l202_licitacao
+                    and pc24_pontuacao = 1
+                    and itenshomologacao.l203_sequencial is null
+                order by
+                    pc11_seq,
+                    z01_nome";
+    }
+
+    function totalAdjudicadoPorFornecedor($l202_licitacao,$z01_nome){
+        $sSql = "select
+                    cgmforncedor.z01_nome,
+                    SUM(pc23_valor) as total
+                from
+                    pcprocitem
+                inner join pcproc on
+                    pcproc.pc80_codproc = pcprocitem.pc81_codproc
+                inner join solicitem on
+                    solicitem.pc11_codigo = pcprocitem.pc81_solicitem
+                inner join solicita on
+                    solicita.pc10_numero = solicitem.pc11_numero
+                inner join db_depart on
+                    db_depart.coddepto = solicita.pc10_depto
+                left join solicitempcmater on
+                    solicitempcmater.pc16_solicitem = solicitem.pc11_codigo
+                left join pcmater on
+                    pcmater.pc01_codmater = solicitempcmater.pc16_codmater
+                left join licitemobra on
+                    licitemobra.obr06_pcmater = pcmater.pc01_codmater
+                left join pcsubgrupo on
+                    pcsubgrupo.pc04_codsubgrupo = pcmater.pc01_codsubgrupo
+                left join pctipo on
+                    pctipo.pc05_codtipo = pcsubgrupo.pc04_codtipo
+                left join solicitemele on
+                    solicitemele.pc18_solicitem = solicitem.pc11_codigo
+                left join orcelemento on
+                    orcelemento.o56_codele = solicitemele.pc18_codele
+                    and orcelemento.o56_anousu = " . db_getsession("DB_anousu") . "
+                left join empautitempcprocitem on
+                    empautitempcprocitem.e73_pcprocitem = pcprocitem.pc81_codprocitem
+                left join empautitem on
+                    empautitem.e55_autori = empautitempcprocitem.e73_autori
+                    and empautitem.e55_sequen = empautitempcprocitem.e73_sequen
+                left join empautoriza on
+                    empautoriza.e54_autori = empautitem.e55_autori
+                left join cgm on
+                    empautoriza.e54_numcgm = cgm.z01_numcgm
+                left join empempaut on
+                    empempaut.e61_autori = empautitem.e55_autori
+                left join empempenho on
+                    empempenho.e60_numemp = empempaut.e61_numemp
+                left join liclicitem on
+                    liclicitem.l21_codpcprocitem = pcprocitem.pc81_codprocitem
+                left join liclicita on
+                    liclicita.l20_codigo = liclicitem.l21_codliclicita
+                left join liclicitemlote on
+                    liclicitemlote.l04_liclicitem = liclicitem.l21_codigo
+                left join pcorcamitemlic on
+                    liclicitem.l21_codigo = pcorcamitemlic.pc26_liclicitem
+                left join pcorcamitem on
+                    pcorcamitemlic.pc26_orcamitem = pcorcamitem.pc22_orcamitem
+                left join pcorcamjulg on
+                    pcorcamitem.pc22_orcamitem = pcorcamjulg.pc24_orcamitem
+                left join pcorcamval on
+                    (pc24_orcamitem,
+                    pc24_orcamforne) = (pc23_orcamitem,
+                    pc23_orcamforne)
+                left join pcorcamforne on
+                    pc24_orcamforne = pc21_orcamforne
+                left join cgm cgmforncedor on
+                    pcorcamforne.pc21_numcgm = cgmforncedor.z01_numcgm
+                left join homologacaoadjudica on
+                    l202_licitacao = l21_codliclicita
+                left join itenshomologacao on
+                    l203_homologaadjudicacao = l202_sequencial
+                    and l203_item = pc81_codprocitem
+                where
+                    liclicitem.l21_codliclicita = $l202_licitacao
+                    and pc24_pontuacao = 1
+                    and itenshomologacao.l203_sequencial is null
+                    and TRIM(cgmforncedor.z01_nome) = '$z01_nome'
+                group by
+                    cgmforncedor.z01_nome
+                order by
+                    cgmforncedor.z01_nome;";
+
+                    $rsTotal = db_query($sSql);
+                    return db_utils::fieldsMemory($rsTotal, 0)->total;
+    }
+
+    function totalHomologadoPorFornecedor($l202_licitacao = null,$l202_sequencial,$z01_nome){
+        $sSql = "select
+                    cgmforncedor.z01_nome,
+                    SUM(pc23_valor) AS total
+                from
+                    pcprocitem
+                inner join pcproc on
+                    pcproc.pc80_codproc = pcprocitem.pc81_codproc
+                inner join solicitem on
+                    solicitem.pc11_codigo = pcprocitem.pc81_solicitem
+                inner join solicita on
+                    solicita.pc10_numero = solicitem.pc11_numero
+                inner join db_depart on
+                    db_depart.coddepto = solicita.pc10_depto
+                left join solicitemunid on
+                    solicitemunid.pc17_codigo = solicitem.pc11_codigo
+                left join matunid on
+                    matunid.m61_codmatunid = solicitemunid.pc17_unid
+                left join db_usuarios on
+                    pcproc.pc80_usuario = db_usuarios.id_usuario
+                left join solicitempcmater on
+                    solicitempcmater.pc16_solicitem = solicitem.pc11_codigo
+                left join pcmater on
+                    pcmater.pc01_codmater = solicitempcmater.pc16_codmater
+                left join licitemobra on
+                    licitemobra.obr06_pcmater = pcmater.pc01_codmater
+                left join pcsubgrupo on
+                    pcsubgrupo.pc04_codsubgrupo = pcmater.pc01_codsubgrupo
+                left join pctipo on
+                    pctipo.pc05_codtipo = pcsubgrupo.pc04_codtipo
+                left join solicitemele on
+                    solicitemele.pc18_solicitem = solicitem.pc11_codigo
+                left join orcelemento on
+                    orcelemento.o56_codele = solicitemele.pc18_codele
+                    and orcelemento.o56_anousu = " . db_getsession("DB_anousu") . "
+                left join empautitempcprocitem on
+                    empautitempcprocitem.e73_pcprocitem = pcprocitem.pc81_codprocitem
+                left join empautitem on
+                    empautitem.e55_autori = empautitempcprocitem.e73_autori
+                    and empautitem.e55_sequen = empautitempcprocitem.e73_sequen
+                left join empautoriza on
+                    empautoriza.e54_autori = empautitem.e55_autori
+                left join cgm on
+                    empautoriza.e54_numcgm = cgm.z01_numcgm
+                left join empempaut on
+                    empempaut.e61_autori = empautitem.e55_autori
+                left join empempenho on
+                    empempenho.e60_numemp = empempaut.e61_numemp
+                left join liclicitem on
+                    liclicitem.l21_codpcprocitem = pcprocitem.pc81_codprocitem
+                left join liclicita on
+                    liclicita.l20_codigo = liclicitem.l21_codliclicita
+                left join liclicitemlote on
+                    liclicitemlote.l04_liclicitem = liclicitem.l21_codigo
+                left join pcorcamitemlic on
+                    liclicitem.l21_codigo = pcorcamitemlic.pc26_liclicitem
+                left join pcorcamitem on
+                    pcorcamitemlic.pc26_orcamitem = pcorcamitem.pc22_orcamitem
+                left join pcorcamjulg on
+                    pcorcamitem.pc22_orcamitem = pcorcamjulg.pc24_orcamitem
+                left join pcorcamval on
+                    (pc24_orcamitem,
+                    pc24_orcamforne) = (pc23_orcamitem,
+                    pc23_orcamforne)
+                left join pcorcamforne on
+                    pc24_orcamforne = pc21_orcamforne
+                left join cgm cgmforncedor on
+                    pcorcamforne.pc21_numcgm = cgmforncedor.z01_numcgm
+                inner join homologacaoadjudica on
+                    l202_licitacao = l21_codliclicita
+                inner join itenshomologacao on
+                    l203_homologaadjudicacao = l202_sequencial
+                    and l203_item = pc81_codprocitem
+                WHERE
+                    liclicitem.l21_codliclicita = $l202_licitacao
+                    AND pc24_pontuacao = 1
+                    AND itenshomologacao.l203_homologaadjudicacao = $l202_sequencial
+                    and TRIM(cgmforncedor.z01_nome) = '$z01_nome'
+                GROUP BY
+                    cgmforncedor.z01_nome
+                ORDER BY
+                    cgmforncedor.z01_nome;";
+
+            $rsTotal = db_query($sSql);
+            return db_utils::fieldsMemory($rsTotal, 0)->total;
+    }
+
+    function getValorTotal($codigoLicitacao,$codigoHomologacao){
+        
+        $sWhere = $codigoHomologacao == null ? "AND itenshomologacao.l203_sequencial is null" : "AND itenshomologacao.l203_homologaadjudicacao = $codigoHomologacao";
+
+        $sSql = "SELECT 
+                    SUM(pc23_valor) AS totalGeral
+                FROM 
+                    pcprocitem
+                INNER JOIN pcproc ON 
+                    pcproc.pc80_codproc = pcprocitem.pc81_codproc
+                INNER JOIN solicitem ON 
+                    solicitem.pc11_codigo = pcprocitem.pc81_solicitem
+                INNER JOIN solicita ON 
+                    solicita.pc10_numero = solicitem.pc11_numero
+                INNER JOIN db_depart ON 
+                    db_depart.coddepto = solicita.pc10_depto
+                LEFT JOIN solicitemunid ON 
+                    solicitemunid.pc17_codigo = solicitem.pc11_codigo
+                LEFT JOIN matunid ON 
+                    matunid.m61_codmatunid = solicitemunid.pc17_unid
+                LEFT JOIN db_usuarios ON 
+                    pcproc.pc80_usuario = db_usuarios.id_usuario
+                LEFT JOIN solicitempcmater ON 
+                    solicitempcmater.pc16_solicitem = solicitem.pc11_codigo
+                LEFT JOIN pcmater ON 
+                    pcmater.pc01_codmater = solicitempcmater.pc16_codmater
+                LEFT JOIN licitemobra ON 
+                    licitemobra.obr06_pcmater = pcmater.pc01_codmater
+                LEFT JOIN pcsubgrupo ON 
+                    pcsubgrupo.pc04_codsubgrupo = pcmater.pc01_codsubgrupo
+                LEFT JOIN pctipo ON 
+                    pctipo.pc05_codtipo = pcsubgrupo.pc04_codtipo
+                LEFT JOIN solicitemele ON 
+                    solicitemele.pc18_solicitem = solicitem.pc11_codigo
+                LEFT JOIN orcelemento ON 
+                    orcelemento.o56_codele = solicitemele.pc18_codele
+                    AND orcelemento.o56_anousu = " . db_getsession("DB_anousu") . "
+                LEFT JOIN empautitempcprocitem ON 
+                    empautitempcprocitem.e73_pcprocitem = pcprocitem.pc81_codprocitem
+                LEFT JOIN empautitem ON 
+                    empautitem.e55_autori = empautitempcprocitem.e73_autori
+                    AND empautitem.e55_sequen = empautitempcprocitem.e73_sequen
+                LEFT JOIN empautoriza ON 
+                    empautoriza.e54_autori = empautitem.e55_autori
+                LEFT JOIN cgm ON 
+                    empautoriza.e54_numcgm = cgm.z01_numcgm
+                LEFT JOIN empempaut ON 
+                    empempaut.e61_autori = empautitem.e55_autori
+                LEFT JOIN empempenho ON 
+                    empempenho.e60_numemp = empempaut.e61_numemp
+                LEFT JOIN liclicitem ON 
+                    liclicitem.l21_codpcprocitem = pcprocitem.pc81_codprocitem
+                LEFT JOIN liclicita ON 
+                    liclicita.l20_codigo = liclicitem.l21_codliclicita
+                LEFT JOIN liclicitemlote ON 
+                    liclicitemlote.l04_liclicitem = liclicitem.l21_codigo
+                LEFT JOIN pcorcamitemlic ON 
+                    liclicitem.l21_codigo = pcorcamitemlic.pc26_liclicitem
+                LEFT JOIN pcorcamitem ON 
+                    pcorcamitemlic.pc26_orcamitem = pcorcamitem.pc22_orcamitem
+                LEFT JOIN pcorcamjulg ON 
+                    pcorcamitem.pc22_orcamitem = pcorcamjulg.pc24_orcamitem
+                LEFT JOIN pcorcamval ON 
+                    (pc24_orcamitem, pc24_orcamforne) = (pc23_orcamitem, pc23_orcamforne)
+                LEFT JOIN homologacaoadjudica ON 
+                    l202_licitacao = l21_codliclicita
+                LEFT JOIN itenshomologacao ON 
+                    l203_homologaadjudicacao = l202_sequencial
+                    AND l203_item = pc81_codprocitem
+                WHERE 
+                    liclicitem.l21_codliclicita = $codigoLicitacao
+                    AND pc24_pontuacao = 1 $sWhere";
+            $rsTotalGeral = db_query($sSql);
+            return db_utils::fieldsMemory($rsTotalGeral, 0)->totalgeral;
+
+    }
+
+    function getCodigoHomologacao($codigoLicitacao){
+        $rsCodigoHomologacao = db_query("select l202_sequencial from homologacaoadjudica where l202_licitacao = $codigoLicitacao and l202_datahomologacao is not null");
+        return db_utils::fieldsMemory($rsCodigoHomologacao, 0)->l202_sequencial;
+    }
+
+    function sqlGetResponsavel($codigoLicitacao,$tipoResponsavel){
+
+        return "SELECT z01_nome, z01_cgccpf FROM liccomissaocgm INNER JOIN cgm ON l31_numcgm = z01_numcgm WHERE l31_licitacao = $codigoLicitacao AND l31_tipo = '$tipoResponsavel'";
+
+    }
 }

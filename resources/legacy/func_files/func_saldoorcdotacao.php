@@ -81,8 +81,9 @@ if(!isset($nivel)) {
     }
 
      $DBtxtperiodoini = $anousu."-".$DBtxtmes."-01";
-     if ($DBtxtmes + 1 > 12) {
-       $DBtxtperiodofim = "(".($anousu+1)."-01-01)-1";
+     $iUltimoDiaMes = date("d", mktime(0,0,0,$DBtxtmes+1,0,$anousu));
+     if ($DBtxtmes + 1 > 12 && $iDiaFinal == $iUltimoDiaMes) {
+       $DBtxtperiodofim = $anousu . "-{$DBtxtmes}-{$iUltimoDiaMes}";
      } else {
        $DBtxtperiodofim = "".$anousu."-{$DBtxtmes}-{$iDiaFinal}";
      }

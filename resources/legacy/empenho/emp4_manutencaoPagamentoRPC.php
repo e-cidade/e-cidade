@@ -476,7 +476,7 @@ switch($oParam->exec) {
 		* Se o usuario marcou a opcao para "Efetuar pagamento" o sistema gera pagamento seguindo a mesma logica
 		*   da rotina de pagamento de empenho por agenda (Caixa > Procedimentos > Agenda > Pgtos Empenho p/ Agenda )
 		*/
-      	if ($oParam->lEfetuarPagamento) {
+    if ($oParam->lEfetuarPagamento) {
 
 			if ($iCodForma == 2 && $oMovimento->iCheque == '' && $oMovimento->iCodCheque == '') {
 				throw new Exception("ERRO [2] - Para efetuar o pagamento é necessário emitir o cheque.");
@@ -518,6 +518,70 @@ switch($oParam->exec) {
 				$oAutentica->sAutentica     = $oOrdemPagamento->getRetornoautenticacao();
 				$oRetorno->aAutenticacoes[] = $oAutentica;
 
+        $clempempenho = new cl_empempenho;
+        $controlaDivida = $clempempenho->getControlaDividaParam(db_getsession("DB_anousu"));
+        
+        if ($controlaDivida == true) {
+          
+          list($empenho, $ano) = explode('/', $oMovimento->empenho);
+          $clempelemento = new cl_empelemento;
+          $instituicao  = db_getsession("DB_instit");
+          $where = "empempenho.e60_codemp = '{$empenho}' and empempenho.e60_anousu = {$ano} and e60_instit = {$instituicao}";
+          $result = $clempelemento->sql_record($clempelemento->sql_query(null, null, "substr(o56_elemento,2,2) as elemento", "e64_codele",$where));                   
+          if($clempelemento->numrows > 0){
+            $oResult = db_utils::fieldsMemory($result,0);
+          }
+         
+          if ($oResult->elemento == 32 || $oResult->elemento == 46) {
+            $sDataMovimento = App\Support\String\DateFormatter::convertDateFormatBRToISO($oParam->dtPagamento);
+            $sSqlConsultaFimPeriodoContabil = "SELECT * FROM condataconf WHERE c99_anousu = ".db_getsession('DB_anousu')." and c99_instit = ".db_getsession('DB_instit');
+            $rsConsultaFimPeriodoContabil   = db_query($sSqlConsultaFimPeriodoContabil);
+            if (pg_num_rows($rsConsultaFimPeriodoContabil) > 0) {
+                $oFimPeriodoContabil = db_utils::fieldsMemory($rsConsultaFimPeriodoContabil, 0);
+                
+                if ($oFimPeriodoContabil->c99_data != '' && db_strtotime($sDataMovimento) <= db_strtotime($oFimPeriodoContabil->c99_data)) {                
+                    $erro = true;
+                }
+            }
+           
+            if (!$erro) {
+              $dtPagamento    = App\Support\String\DateFormatter::convertDateFormatBRToISO($oParam->dtPagamento);
+              $clempempenho = new cl_empempenho;
+              $instituicao  = db_getsession("DB_instit");
+              $where    = " empempenho.e60_codemp = '{$empenho}' and empempenho.e60_anousu = {$ano} and e60_instit = {$instituicao} ";
+              $res      = $clempempenho->sql_record($clempempenho->sql_query_file(null,"*",null,$where));
+
+              if ($clempempenho->numrows > 0) {
+                $oEmpenho = db_utils::fieldsMemory($res, 0);
+              } 
+
+              $justificativa = "Pagamento da OP ($oMovimento->iCodNota) do Empenho ($empenho)";
+                    
+              $clMovimentacao = new cl_movimentacaodedivida();
+              $clMovimentacao->op02_operacaodecredito = $oEmpenho->e60_dividaconsolidada;
+              $clMovimentacao->op02_movimentacao      = 2;
+              $clMovimentacao->op02_tipo              = 0;
+              $clMovimentacao->op02_data              = $dtPagamento;
+              $clMovimentacao->op02_justificativa     = $justificativa;
+              $clMovimentacao->op02_valor             = $oMovimento->nValor;
+              $clMovimentacao->op02_movautomatica     = 't';
+              $clMovimentacao->op02_codigoplanilha    = $oMovimento->iCodMov;
+              $clMovimentacao->incluir();
+  
+              if ($clMovimentacao->erro_status == "0"){
+                $oRetorno->status = 2;
+                $oRetorno->message = "Erro ao incluir movimentação automática na Dívida Consolidada.";
+                throw new Exception($oRetorno->message);
+              } 
+            } else {
+  
+                $oRetorno->status = 2;
+                $oRetorno->message = "Não foi possível alterar a movimentação automática na Dívida Consolidada.<br> A data é inferior à data de encerramento do período contábil.";
+                throw new Exception($oRetorno->message);
+            }
+        }
+        } 
+        
 			}
       	}
       

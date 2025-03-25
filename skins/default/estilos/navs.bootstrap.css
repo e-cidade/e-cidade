@@ -1,0 +1,60 @@
+/* Estilos principais para nav pills */
+.nav-pills {
+  display: flex;
+  flex-wrap: wrap;
+  padding-left: 0;
+  margin-bottom: 1rem;
+  list-style: none;
+  justify-content: end;
+}
+
+.nav-pills .nav-item {
+  margin-bottom: 0.5em;
+}
+
+.nav-pills .nav-link {
+  display: block;
+  padding: 0.8em 1em;
+  margin-right: 0.25rem;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: #000;
+  background-color: transparent;
+  border: none;
+  border-radius: 0.25rem;
+  transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Estilos para o item ativo */
+.nav-pills .nav-link.active {
+  color: #fff;
+  background-color: #316648;
+  border-color: #316648;
+}
+
+/* Estilos para hover e foco */
+.nav-pills .nav-link:hover,
+.nav-pills .nav-link:focus {
+  color: #fff;
+  background-color: #316648;
+}
+
+.nav-pills .nav-link.disabled {
+  color: #6c757d;
+  pointer-events: none;
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+}
+
+/* Estilo para links desabilitados */
+.nav-item.disabled {
+  opacity: 0.65; /* Torna o item visualmente desabilitado */
+  color: #6c757d; /* Cor cinza para links desabilitados */
+  background-color: transparent;
+  cursor: not-allowed;
+}
+
+.nav-item.disabled .nav-link{
+  pointer-events: none;
+}

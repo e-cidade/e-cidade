@@ -6,7 +6,7 @@ use App\Repositories\Configuracao\AssinaturaDigitalParametroRepository;
 use App\Repositories\Configuracao\AssinaturaDigitalAssinatesRepository;
 use App\Models\Empenho\Empempenho;
 use \App\Models\Empenho\Empanulado;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 use \App\Models\Caixa\Slip;
 use \App\Models\Empenho\Empord;
 use \App\Models\Configuracao\AssinaturaDigitalAssinante;
@@ -31,6 +31,7 @@ class AssinaturaDigital
 
     private const URL_EXCLUIR_DOCUMENTO = "/ocs/v2.php/apps/libresign/api/v1/sign/file_id/";
 
+    private const URL_VALIDA_DOCUMENTO = "/ocs/v2.php/apps/libresign/api/v1/file/validate/uuid/";
     private const TIPO_DOC_EMPENHO = 0;
 
     private const TIPO_DOC_LIQUIDACAO = 1;
@@ -236,6 +237,33 @@ class AssinaturaDigital
         }
     }
 
+    protected function validaArquivoAssinado($UUID)
+    {
+        $user = self::USUARIO_ADMINISTRADOR;
+        $password = $this->assinaturaDigitalParametro->db242_assinador_token;
+        $url = $this->assinaturaDigitalParametro->db242_assinador_url . self::URL_VALIDA_DOCUMENTO . $UUID;
+        $client = new Client();
+        try {
+            $response = $client->request('GET', $url, [
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Basic ' . base64_encode($user . ':' . $password),
+                    'Content-Type' => 'application/json'
+                ],
+                'http_errors' => false
+            ]);
+
+            $body = $response->getBody();
+            $data = json_decode($body);
+            if($data->ocs->data->status != 3){
+                return false;
+            }
+            return true;
+        } catch (RequestException $e) {
+            return $e->getMessage();
+        }
+    }
+
     protected function postLibresing($data)
     {
         $this->curl_init = curl_init();
@@ -264,6 +292,7 @@ class AssinaturaDigital
 
 
         curl_close($this->curl_init);
+
         return json_decode($response)->ocs;
     }
 
@@ -385,6 +414,57 @@ class AssinaturaDigital
         }
     }
 
+    public function getDocumentosPententesPorUsuario(?int $iPagina = 1)
+    {
+        try {
+            $todosPentendes = new stdClass();
+            // Solicitados Assinatura
+            $todosPentendes->aDocumentosSemAssinatura = $this->getDocumentosPorStatusPorUsuario($iPagina, 1);
+
+            // Parcialmente Assinados
+            $todosPentendes->aDocumentosParcialmenteAssinados = $this->getDocumentosPorStatusPorUsuario($iPagina, 2);
+
+            return $todosPentendes;
+        } catch (Exception $error) {
+            throw new Exception($error->getMessage());
+        }
+    }
+
+    public function getDocumentosAssindadosPorUsuario(?int $iPagina = 1)
+    {
+
+        try {
+            $todosDocumentos = new stdClass();
+            // Assinatura total
+            $todosDocumentos->aDocumentosAssinados = $this->getDocumentosPorStatusPorUsuario($iPagina, 3);
+
+            // Parcialmente Assinados
+            $todosDocumentos->aDocumentosParcialmenteAssinados = $this->getDocumentosPorStatusPorUsuario($iPagina, 2);
+
+            return $todosDocumentos;
+        } catch (Exception $error) {
+            throw new Exception($error->getMessage());
+        }
+    }
+
+    public function getDocumentosPorStatusPorUsuario(?int $iPagina = 1, ?int $sStatus)
+    {
+        try {
+            $url = $this->assinaturaDigitalParametro->db242_assinador_url . self::URL_LISTA_DOCUMENTOS . '?page=' . $iPagina . '&length=1000&status[]='.$sStatus;
+            $headers = [
+                'Accept' => 'application/json',
+                'Authorization' => 'Basic ' . base64_encode($this->oUsuario->getLogin() . ':' . $this->oUsuario->getSenha()),
+                'Content-Type' => 'application/json'
+            ];
+            $response = $this->client->request('GET', $url, [
+                'headers' => $headers
+            ]);
+            return $response->getBody()->getContents();
+        } catch (Exception $error) {
+            throw new Exception($error->getMessage());
+        }
+    }
+
     public function getUrlBaseUrlFile()
     {
         return $this->assinaturaDigitalParametro->db242_assinador_url;
@@ -427,6 +507,7 @@ class AssinaturaDigital
         try {
 
             $aEmpenhos = $this->assinaturaDigitalAssinanteRepository->getEmpenhosAssinados($oParametros);
+
             if(!$aEmpenhos){
                 db_redireciona('db_erros.php?fechar=true&db_erro=Nenhum registro encontrado para o filtro!');
             }
@@ -440,6 +521,11 @@ class AssinaturaDigital
             $aNomesArquivos = [];
             foreach ($aEmpenhos as $oEmpenho){
                 if(!$oEmpenho->e60_id_documento_assinado){
+                    sleep(4);
+                    continue;
+                }
+                if(!$this->validaArquivoAssinado($oEmpenho->e60_id_documento_assinado)){
+                    sleep(4);
                     continue;
                 }
                 $aNomesArquivos[] = $temp_dir."/".$oEmpenho->e60_id_documento_assinado.".pdf";
@@ -487,6 +573,10 @@ class AssinaturaDigital
                 if(!$oLiquidacao->e69_id_documento_assinado){
                     continue;
                 }
+                if(!$this->validaArquivoAssinado($oLiquidacao->e69_id_documento_assinado)){
+                    sleep(4);
+                    continue;
+                }
                 $aNomesArquivos[] = $temp_dir."/".$oLiquidacao->e69_id_documento_assinado.".pdf";
                 file_put_contents($temp_dir."/".$oLiquidacao->e69_id_documento_assinado.".pdf", $this->getDocumentoAssinado($oLiquidacao->e69_id_documento_assinado));
                 sleep(4);
@@ -523,6 +613,10 @@ class AssinaturaDigital
             $aNomesArquivos = [];
             foreach ($aAnulacoesEmpenho as $oAnulacaoEmpenho){
                 if(!$oAnulacaoEmpenho->e94_id_documento_assinado){
+                    continue;
+                }
+                if(!$this->validaArquivoAssinado($oAnulacaoEmpenho->e94_id_documento_assinado)){
+                    sleep(4);
                     continue;
                 }
                 $aNomesArquivos[] = $temp_dir."/".$oAnulacaoEmpenho->e94_id_documento_assinado.".pdf";
@@ -563,6 +657,10 @@ class AssinaturaDigital
                 if(!$oOrdemPagamento->e82_id_documento_assinado){
                     continue;
                 }
+                if(!$this->validaArquivoAssinado($oOrdemPagamento->e82_id_documento_assinado)){
+                    sleep(4);
+                    continue;
+                }
                 $aNomesArquivos[] = $temp_dir."/".$oOrdemPagamento->e82_id_documento_assinado.".pdf";
                 file_put_contents($temp_dir."/".$oOrdemPagamento->e82_id_documento_assinado.".pdf", $this->getDocumentoAssinado($oOrdemPagamento->e82_id_documento_assinado));
                 sleep(4);
@@ -577,6 +675,42 @@ class AssinaturaDigital
                 return $pdf;
             }
         }catch (Exception $error){
+            throw new Exception($error->getMessage());
+        }
+    }
+
+    public function getDocumentoSemAssinatura($uuid)
+    {
+        try {
+
+            $oDocumento = $this->assinaturaDigitalAssinanteRepository->getDocumentosSemAssinatura($uuid);
+
+            if(!$oDocumento){
+                db_redireciona('db_erros.php?fechar=true&db_erro=Não foi localizado documento com esse ID!');
+            }
+
+            if($oDocumento->tipo_doc == 'emp'){
+                db_redireciona("emp2_emitenotaemp002.php?&listacgm=&ver=com&e60_numemp={$oDocumento->documento}&dtInicial=&dtFinal=&tipos=1&assinar=false");
+            }
+
+            if($oDocumento->tipo_doc == 'anl'){
+                db_redireciona("emp2_anulemp002.php?&e94_codanu={$oDocumento->documento}&assinar=false");
+            }
+
+            if($oDocumento->tipo_doc == 'lqd'){
+                db_redireciona('emp2_emitenotaliq002.php?&assinar=false&codordem='.$oDocumento->documento);
+            }
+
+            if($oDocumento->tipo_doc == 'ops'){
+                $aDocumento = explode("-", $oDocumento->documento);
+                db_redireciona("emp2_emitenotadespesa002.php?sOrdens={$aDocumento[0]}&sMovimentos=$aDocumento[1]");
+            }
+
+            if($oDocumento->tipo_doc == 'slip'){
+                db_redireciona("cai1_slip003.php?numslip_de={$oDocumento->documento}&listacgm=&numslip_ate={$oDocumento->documento}&assinar=false");
+            }
+
+        } catch (Exception $error) {
             throw new Exception($error->getMessage());
         }
     }
@@ -598,6 +732,10 @@ class AssinaturaDigital
             $aNomesArquivos = [];
             foreach ($aSlips as $oOrdemPagamento){
                 if(!$oOrdemPagamento->k17_id_documento_assinado){
+                    continue;
+                }
+                if(!$this->validaArquivoAssinado($oOrdemPagamento->k17_id_documento_assinado)){
+                    sleep(4);
                     continue;
                 }
                 $aNomesArquivos[] = $temp_dir."/".$oOrdemPagamento->k17_id_documento_assinado.".pdf";
@@ -641,6 +779,7 @@ class AssinaturaDigital
     {
         try {
             $aOrdensPagamento = $this->assinaturaDigitalAssinanteRepository->getOrdemPagamento($oParametros);
+
             if(empty($aOrdensPagamento)){
                 throw new Exception(" Nenhuma Ordem de pagamento localizada!");
             }

@@ -2,7 +2,7 @@
 
 use App\Repositories\Patrimonial\Compras\PrazoEntregaRepository;
 use App\Services\Patrimonial\compras\PrazoEntregaService;
-use Illuminate\Database\Capsule\Manager as DB;  
+use Illuminate\Support\Facades\DB;
 
 
 global $oErro;
@@ -32,26 +32,26 @@ try {
 
         case 'salvarPrazoEntrega':
             $service = new PrazoEntregaService();
-        
+
                 DB::beginTransaction();
-                
+
                 foreach ($oParam->aItens as $item) {
 
                     $dadosPrazoEntrega = new stdClass();
                     $dadosPrazoEntrega->pc97_descricao = $item->descricao;
                     $dadosPrazoEntrega->pc97_ativo = $item->ativo;
-        
+
                     $prazoEntrega = $service->salvarPrazoEntrega($dadosPrazoEntrega);
-        
+
 
                     if (empty($prazoEntrega)) {
                         throw new Exception('Não foi possível salvar o prazo de entrega.');
                     }
                 }
-        
+
                 DB::commit();
 
-            
+
             $oRetorno->status = 1;
             $oRetorno->message = 'Salvo com sucesso!';
             break;
@@ -59,7 +59,7 @@ try {
         case 'getPrazos':
             $prazoEntregaRepository = new PrazoEntregaRepository();
             $oRetorno->prazo = $prazoEntregaRepository->getprazosfornecedores($oParam->sequencial);
-            
+
 
 
             foreach ($oRetorno->prazo as $prazo) {
@@ -70,31 +70,31 @@ try {
             }
                 $oRetorno->prazo = $itensPrazo;
                 break;
-        
+
         case 'alteraPrazo':
 
             $service = new PrazoEntregaService();
-        
+
                 DB::beginTransaction();
-                
+
                 foreach ($oParam->aItens as $item) {
                     $prazoAtualizado = $service->alterarPrazoEntrega($item);
-                   
+
                      if (empty($prazoAtualizado)) {
                          throw new Exception('Não foi possível Alterar o prazo de entrega.');
                      }
                 }
-        
+
                 DB::commit();
 
-            
+
             $oRetorno->status = 1;
             $oRetorno->message = 'Alterado com sucesso!';
             break;
 
             case 'excluirPrazo':
                 $service = new PrazoEntregaService();
-            
+
                 try {
                     // Tenta excluir o prazo
                     $serviceexclusaoPrazo = $service->deletaPrazo($oParam->pc97_sequencial);

@@ -22,6 +22,7 @@ class cl_licpregaocgm {
    var $l46_licpregao = 0;
    var $l46_naturezacargo = 0;
    var $l46_cargo  = 0;
+   var $l46_descricaonaturezacargo = null;
    // cria propriedade com as variaveis do arquivo 
    var $campos = "
                  l46_sequencial = int8 = Sequencial 
@@ -29,7 +30,8 @@ class cl_licpregaocgm {
                  l46_numcgm = int8 = Nº Cgm Participante da Comissão 
                  l46_licpregao = int8 = Código Licitação
                  l46_naturezacargo	= int8 = Natureza Cargo
-				 l46_cargo = varchar(50) = Cargo
+				         l46_cargo = varchar(50) = Cargo
+                 l46_descricaonaturezacargo = varchar (50) = descrição natureza cargo.
                  ";
    //funcao construtor da classe 
    function cl_licpregaocgm() { 
@@ -55,6 +57,7 @@ class cl_licpregaocgm {
        $this->l46_licpregao = ($this->l46_licpregao == ""?@$GLOBALS["HTTP_POST_VARS"]["l46_licpregao"]:$this->l46_licpregao);
        $this->l46_cargo  = ($this->l46_cargo  == ""?@$GLOBALS["HTTP_POST_VARS"]["l46_cargo"]:$this->l46_cargo );
        $this->l46_naturezacargo  = ($this->l46_naturezacargo  == ""?@$GLOBALS["HTTP_POST_VARS"]["l46_naturezacargo"]:$this->l46_naturezacargo );
+       $this->l46_descricaonaturezacargo  = ($this->l46_descricaonaturezacargo  == ""?@$GLOBALS["HTTP_POST_VARS"]["l46_descricaonaturezacargo"]:$this->l46_descricaonaturezacargo );
      }else{
        $this->l46_sequencial = ($this->l46_sequencial == ""?@$GLOBALS["HTTP_POST_VARS"]["l46_sequencial"]:$this->l46_sequencial);
      }
@@ -99,6 +102,17 @@ class cl_licpregaocgm {
        $this->erro_status = "0";
        return false;
      }
+
+     if($this->l46_descricaonaturezacargo  == null && $this->l46_naturezacargo == "6"){ 
+      $this->erro_sql = " Campo Descrição da natureza do cargo não Informado.";
+      $this->erro_campo = "l46_descricaonaturezacargo ";
+      $this->erro_banco = "";
+      $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+      $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+      $this->erro_status = "0";
+      return false;
+    }
+
     if($this->l46_naturezacargo == null ){ 
        $this->erro_sql = " Campo Natureza Cargo nao Informado.";
        $this->erro_campo = "l46_naturezacargo";
@@ -149,7 +163,8 @@ class cl_licpregaocgm {
                                       ,l46_numcgm 
                                       ,l46_licpregao 
                                       ,l46_naturezacargo	
-                                      ,l46_cargo 
+                                      ,l46_cargo
+                                      ,l46_descricaonaturezacargo 
                        )
                 values (
                                 $this->l46_sequencial 
@@ -157,7 +172,8 @@ class cl_licpregaocgm {
                                ,$this->l46_numcgm 
                                ,$this->l46_licpregao 
                                ,$this->l46_naturezacargo	
-                               ,'$this->l46_cargo' 
+                               ,'$this->l46_cargo'
+                               ," . ($this->l46_descricaonaturezacargo == "null" || $this->l46_descricaonaturezacargo == "" ? "null" : "'" . $this->l46_descricaonaturezacargo . "'") . "
                       )";
      $result = db_query($sql); 
      if($result==false){ 
@@ -282,9 +298,25 @@ class cl_licpregaocgm {
          return false;
        }
      }
-     
-     
-     
+
+     if(trim($this->l46_descricaonaturezacargo) == "" && $this->l46_naturezacargo == "6"){ 
+      $this->erro_sql = " Campo Descrição da Natureza do Cargo não Informado.";
+      $this->erro_campo = "l46_descricaonaturezacargo ";
+      $this->erro_banco = "";
+      $this->erro_msg   = "Usuário: \\n\\n ".$this->erro_sql." \\n\\n";
+      $this->erro_msg   .=  str_replace('"',"",str_replace("'","",  "Administrador: \\n\\n ".$this->erro_banco." \\n"));
+      $this->erro_status = "0";
+      return false;
+    }
+
+    if(trim($this->l46_descricaonaturezacargo) == ""){
+      $sql  .= $virgula." l46_descricaonaturezacargo  = null  ";
+      $virgula = ",";
+    } else {
+      $sql  .= $virgula." l46_descricaonaturezacargo  = '$this->l46_descricaonaturezacargo'  ";
+      $virgula = ",";
+    }
+
      
      $sql .= " where ";
      if($l46_sequencial!=null){

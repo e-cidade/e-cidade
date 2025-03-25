@@ -70,7 +70,7 @@ $clrotulo->label("o15_codigo");
                         <label>Competência:</label>
                         <?php
                         db_input('anofolha', 4, 1, true, 'text', 2, "class='field-size1' onkeyup='moveFocusToMesfolha(event)'", "", "", "", 4);
-                        db_input('mesfolha', 2, 1, true, 'text', 2, "class='field-size1'", "", "", "", 2);
+                        db_input('mesfolha', 2, 1, true, 'text', 2, "class='field-size1' onblur='padZero(this)'", "", "", "", 2);
                         ?>
                       </td>
                       <td align="left" style="display: none;">
@@ -246,6 +246,13 @@ function checkFase(fase) {
     }
   });
   js_limpa();
+}
+
+function padZero(input) {
+  let value = input.value.trim();
+  if (value.length === 1 && value !== '0') {
+    input.value = '0' + value;
+  }
 }
 
 async function js_processar() {

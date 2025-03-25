@@ -1,0 +1,78 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+}
+
+.accordion {
+  margin: 20px auto;
+  border-radius: 5px;
+}
+
+.accordion-item {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.accordion-header {
+  padding: 15px;
+  background-color: #316648; /* Alterado para o tom de verde */
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.accordion-header:hover {
+  background-color: #274d38; /* Tom mais escuro para hover */
+}
+
+.accordion-content {
+  padding: 0;
+  background-color: #f8f9fa;
+  height: 0;
+  overflow: hidden;
+  transition: height 0.3s ease;
+}
+
+.accordion-content p {
+  margin: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.accordion-content.active {
+  height: auto;
+}
+
+.accordion-header.active + .accordion-content {
+  height: auto;
+  transition: height 0.3s ease;
+}
+
+/* Estilos adicionais para imitar o Bootstrap */
+.accordion-header::after {
+  content: '\25bc';
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+.accordion-header.active::after {
+  transform: rotate(180deg);
+}
+
+.accordion-error {
+  border: 2px solid red;
+}

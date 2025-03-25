@@ -151,13 +151,13 @@ class AvisoLicitacaoPNCP extends ModeloBasePNCP
             $aDadosAPI[$key]['descricao']                   = utf8_encode($item->descricao);
             $aDadosAPI[$key]['quantidade']                  = $item->pc11_quant;
             $aDadosAPI[$key]['unidadeMedida']               = utf8_encode($item->unidademedida);
-            $aDadosAPI[$key]['orcamentoSigiloso']           = $oDado->orcamentosigiloso == 'f' ? 0 : 1;
+            $aDadosAPI[$key]['orcamentoSigiloso']           = $item->l21_sigilo == 'f' ? 'false' : 'true';
             $aDadosAPI[$key]['valorUnitarioEstimado']       = $item->valorunitarioestimado;
             $aDadosAPI[$key]['valorTotal']                  = $vlrtotal;
             $aDadosAPI[$key]['criterioJulgamentoId']        = $item->criteriojulgamentoid;
             $aDadosAPI[$key]['itemcategoriaid']             = $item->itemcategoriaid;
         }
-        
+
         return $aDadosAPI;
     }
 
@@ -436,7 +436,7 @@ class AvisoLicitacaoPNCP extends ModeloBasePNCP
                 case 204:
                     $message = "Erro No Content.";
                     break;
-    
+
                 case 400:
                     $messageError = "";
                     if (isset($rsApiPNCPItens['contentPncp']->error)) {
@@ -450,24 +450,24 @@ class AvisoLicitacaoPNCP extends ModeloBasePNCP
                     }
                     $message = $messageError . "\n";
                     break;
-    
+
                 case 401:
                     $message = "Erro Unauthorized.";
                     break;
-    
+
                 case 422:
                     $message = "Erro Unprocessable Entity.";
                     break;
-    
+
                 case 500:
                     $message = "Erro Internal Server Error.";
                     break;
-    
+
                 default:
                     $message = "Erro desconhecido na requisição.";
                     break;
             }
-    
+
             return [
                 "httpStatus" => $rsApiPNCPItens['httpStatus'],
                 "message" => "Numero Item: " . $rsApiPNCPItens['numeroItem'] . " \n" . $message

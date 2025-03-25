@@ -766,12 +766,12 @@ class cl_balancete312024
                             LEFT JOIN contabancaria ON c56_contabancaria=db83_sequencial
                             LEFT JOIN db_operacaodecredito ON db83_codigoopcredito=op01_sequencial
                                 WHERE substr(c60_estrut,1 ,1 ) in ('4')
-                                AND (CASE 
-                                        WHEN op01_numerocontratoopc != '' AND db83_tipoconta = 3 THEN k81_datareceb between '$sDataInicialFiltros' AND '$sDataFinalFiltros'
-                                        WHEN op01_numerocontratoopc != '' AND db83_tipoconta = 1 AND  k81_datareceb between '$sDataInicialFiltros' AND '$sDataFinalFiltros' THEN c61_codtce is null
-                                        WHEN op01_numerocontratoopc != '' AND db83_tipoconta = 1 THEN c61_codtce IS NOT NULL  
-                                        ELSE true
-                                    END)
+                                AND 
+                                ((    op01_numerocontratoopc != '' AND db83_tipoconta = 3 AND k81_datareceb BETWEEN '$sDataInicialFiltros' AND '$sDataFinalFiltros')
+                                  OR (op01_numerocontratoopc != '' AND db83_tipoconta = 1 AND k81_datareceb <= '$sDataFinalFiltros' AND c61_codtce IS NULL)
+                                  OR (op01_numerocontratoopc != '' AND db83_tipoconta = 1 AND c61_codtce IS NOT NULL)
+                                  OR (op01_numerocontratoopc = '' OR op01_numerocontratoopc IS NULL )
+                                )
                                 AND c19_reduz IN (" . implode(',', $aContas) . ")
                                 AND conplanoorcamentoanalitica.c61_instit = " . db_getsession('DB_instit') . "
                                 AND conplanoorcamentoanalitica.c61_anousu = " . db_getsession("DB_anousu") . "

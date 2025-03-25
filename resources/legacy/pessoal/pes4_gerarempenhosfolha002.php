@@ -282,9 +282,9 @@ db_app::load("estilos.css");
         </td>
        </tr>
        <tr>
-        <td colspan="7" style="text-align: center;">
-          <span id='buttonReservas'>
-          </span>
+        <td colspan="7" style="text-align: center;">        
+          <span id='buttonDotacoes'></span>
+          <span id='buttonReservas'></span>          
           <input type='button' onclick="js_gerarEmpenhos()"     id='empenhar'     value='Gerar Empenhos' disabled>
           <input type='button' onclick="js_gerarTotalizacoes()" id='totalizacoes' value='Totalizações' >
             <input type='button' onclick="js_emiteRelatorioOrdemEmpenho()" id='relatorio' value='Imprimir' disabled>
@@ -566,6 +566,7 @@ function js_retornoConsultaEmpenhos(oResponse) {
   nSaldoDotacaoAnterior      = new Number(0);
   var lErro                  = false;
   var iQtdeErro              = 0;
+  let aDotacao = [];
   if (oRetorno.status == 1) {
 
     for (var i = 0; i < oRetorno.itens.length; i++) {
@@ -682,28 +683,36 @@ function js_retornoConsultaEmpenhos(oResponse) {
          nValorBruto           += new Number(rh73_valor);
          nSaldoDotacao          = new Number(saldodotacao);
          if (o120_orcreserva == "") {
-
-           if (rh72_coddot != iDotacaoAnterior) {
+          if (oParametros.iTipoEmpenho == 2) {
+            if (aDotacao[rh72_coddot] !== undefined) {
+              aDotacao[rh72_coddot] -= new Number(rh73_valor);
+            } else {
+              aDotacao[rh72_coddot] = new Number(saldodotacao) - new Number(rh73_valor);
+            }
+            nSaldoDotacao = aDotacao[rh72_coddot];
+          } else {
+            if (rh72_coddot != iDotacaoAnterior) {
 
               nValorAcumuladoDotacao = new Number(rh73_valor);
               nSaldoDotacaoAnterior  = new Number(saldodotacao);
               var nSaldoDotacao      = new Number(saldodotacao);
               nSaldoDotacao          -= nValorAcumuladoDotacao;
 
-           } else {
+            } else {
 
-             nSaldoDotacaoAnterior   = (nSaldoDotacao);
-             nValorAcumuladoDotacao += new Number(rh73_valor).toFixed(2);
-             nSaldoDotacao          -= nValorAcumuladoDotacao;
+              nSaldoDotacaoAnterior   = (nSaldoDotacao);
+              nValorAcumuladoDotacao += new Number(rh73_valor).toFixed(2);
+              nSaldoDotacao          -= nValorAcumuladoDotacao;
 
-           }
+            }
+          }
          }
          var oCellSaldo             = document.createElement("TD");
          oCellSaldo.style.textAlign ='right';
          oCellSaldo.innerHTML       = js_formatar(nSaldoDotacao, 'f');
          oCellSaldo.className       = "border";
          oCellSaldo.style.color     = 'black';
-         if ((nSaldoDotacao < 0 || nSaldoDotacaoAnterior < rh73_valor) && o120_orcreserva == "") {
+         if ((nSaldoDotacao < 0 || (oParametros.iTipoEmpenho == 1 && nSaldoDotacaoAnterior < rh73_valor)) && o120_orcreserva == "") {
 
           oCellSaldo.style.color = 'red';
 
@@ -772,20 +781,24 @@ function js_retornoConsultaEmpenhos(oResponse) {
 
      if (lReservadoSaldo && lBotoes) {
        $('empenhar').disabled     = false;
+       $('buttonDotacoes').innerHTML = "<input type='button' onclick='js_imprimirDotacoes()'  id='imprimiriDotacoes'    value='Imprimir Dotações' disabled>";
        $('buttonReservas').innerHTML = "<input type='button' onclick='js_cancelarReservas()' id='cancelarreserva'    value='Cancelar reservas de Saldos' >";
 
      } else if (!lReservadoSaldo && lBotoes) {
 
        $('empenhar').disabled     = true;
        if (oRetorno.itens.length > 0) {
+         $('buttonDotacoes').innerHTML = "<input type='button' onclick='js_imprimirDotacoes()'  id='imprimiriDotacoes'    value='Imprimir Dotações' >";
          $('buttonReservas').innerHTML = "<input type='button' onclick='js_reservarSaldos()'  id='reservasaldo'    value='Reservar Saldos' >";
        } else {
+         $('buttonDotacoes').innerHTML = "<input type='button' onclick='js_imprimirDotacoes()'  id='imprimiriDotacoes'    value='Imprimir Dotações' disabled>";
          $('buttonReservas').innerHTML = "<input type='button' onclick='js_reservarSaldos()'  id='reservasaldo'    value='Reservar Saldos' disabled>";
        }
 
      }
      if (!lBotoes) {
        $('empenhar').disabled     = true;
+       $('buttonDotacoes').innerHTML = "<input type='button' onclick='js_imprimirDotacoes()'  id='imprimiriDotacoes'    value='Imprimir Dotações' disabled>";
        $('buttonReservas').innerHTML = "<input type='button' onclick='js_reservarSaldos()'  id='reservasaldo'    value='Reservar Saldos' disabled>";
 
      }
@@ -2121,6 +2134,19 @@ function js_mostraDotacao(chave){
                        (document.body.clientWidth)-40,
                        document.body.scrollHeight-180);
 }
+
+function js_imprimirDotacoes() {
+  let query = "iTipoEmpenho="+oParametros.iTipoEmpenho;
+  query     += "&iAnoFolha="+oParametros.iAnoFolha;
+  query     += "&iMesFolha="+oParametros.iMesFolha;
+  query     += "&iTipo="+oParametros.iTipo;
+  query     += "&sSemestre="+oParametros.sSemestre;
+  query     += "&sSigla="+oParametros.sSigla;
+
+  jan = window.open('pes4_saldodotacoes.php?'+query, "", 'width='+(screen.availWidth-5)+',height='+(screen.availHeight-40)+',scrollbars=1,location=0');
+  jan.moveTo(0,0);
+}
+
 $('rh72_orgao').style.width="95px";
 $('rh72_orgaodescr').style.width="300px";
 $('rh72_unidade').style.width="395px";

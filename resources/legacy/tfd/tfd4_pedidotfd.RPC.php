@@ -108,7 +108,8 @@ if ($oParam->exec == 'getCgsCns') {
     $oRetorno->z01_v_mae      = urlencode($oDadosCgsUnd->z01_v_mae);
     $oRetorno->z01_v_pai      = urlencode($oDadosCgsUnd->z01_v_pai);
     $oRetorno->z01_v_nome     = urlencode($oDadosCgsUnd->z01_v_nome);
-    $oRetorno->z01_codigoibge = $oDadosCgsUnd->z01_codigoibge;
+    $oRetorno->z01_v_nome     = urlencode($oDadosCgsUnd->z01_v_nome);
+    $oRetorno->z01_i_numtfd   = $oDadosCgsUnd->z01_i_numtfd;
   } else {
 
     $oRetorno->z01_v_ender    = '';
@@ -128,6 +129,7 @@ if ($oParam->exec == 'getCgsCns') {
     $oRetorno->z01_v_mae      = '';
     $oRetorno->z01_v_pai      = '';
     $oRetorno->z01_codigoibge = '';
+    $oRetorno->z01_i_numtfd   = '';
   }
 
   /* pega o cartão sus */
@@ -191,6 +193,7 @@ if ($oParam->exec == 'getCgsCns') {
   $oDaoCgsUnd->z01_v_pai      = db_stdClass::normalizeStringJsonEscapeString($oParam->z01_v_pai);
   $oDaoCgsUnd->z01_i_cgsund   = $oParam->iCgs;
   $oDaoCgsUnd->z01_codigoibge = empty($oParam->z01_codigoibge) ? null : $oParam->z01_codigoibge;
+  $oDaoCgsUnd->z01_i_numtfd   = $oParam->z01_i_numtfd;
 
   $oDaoCgsUnd->alterar($oParam->iCgs);
 

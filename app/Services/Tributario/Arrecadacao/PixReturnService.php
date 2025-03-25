@@ -13,7 +13,7 @@ use AutenticacaoBaixaBanco;
 use BusinessException;
 use DateTime;
 use Exception;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 use ParameterException;
 use Throwable;
 

@@ -4,7 +4,7 @@ namespace App\Services\Tributario\ISSQN\Redesim;
 
 use App\Models\ISSQN\RedesimLog;
 use App\Repositories\Tributario\ISSQN\Redesim\DTO\CompanyDTO;
-use DBString;
+use App\Support\String\StringHelper;
 
 class CreateRedesimLogService
 {
@@ -24,7 +24,7 @@ class CreateRedesimLogService
             [
                 'q190_data' => date('Y-m-d H:i'),
                 'q190_cpfcnpj' => $data->cpfCnpj,
-                'q190_json' => json_encode(DBString::utf8_encode_all($data->originalData), JSON_UNESCAPED_UNICODE)
+                'q190_json' => json_encode(StringHelper::utf8_encode_all($data->originalData), JSON_UNESCAPED_UNICODE)
             ]
         );
     }

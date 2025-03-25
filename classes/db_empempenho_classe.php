@@ -2287,6 +2287,8 @@ class cl_empempenho
         $sql .= "                                                    and empautitempcprocitem.e73_sequen    = empautitem.e55_sequen ";
         $sql .= "       left join pcprocitem                          on pcprocitem.pc81_codprocitem        = empautitempcprocitem.e73_pcprocitem ";
         $sql .= "       left join solicitem                           on solicitem.pc11_codigo              = pcprocitem.pc81_solicitem ";
+        $sql .= "       left join solicita                            ON pc11_numero = pc10_numero ";
+        $sql .= "       left join solicitaregistropreco               on solicitaregistropreco.pc54_solicita = solicita.pc10_numero ";
         $sql .= "       left join liclicitem                          on liclicitem.l21_codpcprocitem       = empautitempcprocitem.e73_pcprocitem ";
         $sql .= "       left join pcorcamitemlic                      on pcorcamitemlic.pc26_liclicitem     = liclicitem.l21_codigo ";
         $sql .= "       left join pcorcamjulg                         on pcorcamjulg.pc24_orcamitem         = pcorcamitemlic.pc26_orcamitem ";
@@ -2302,7 +2304,77 @@ class cl_empempenho
         $sql .= "                                                    and pcorcamjulgpai.pc24_pontuacao      = 1 ";
         $sql .= "       left join pcorcamval     as pcorcamvalpai     on pcorcamvalpai.pc23_orcamitem       = pcorcamjulgpai.pc24_orcamitem ";
         $sql .= "                                                    and pcorcamvalpai.pc23_orcamforne      = pcorcamjulgpai.pc24_orcamforne ";
-        $sql .= "       left join orcdotacao on o58_coddot = e60_coddot and o58_anousu = e60_anousu";
+        $sql .= "       left join orcdotacao on o58_coddot = e60_coddot and o58_anousu = e60_anousu ";
+        $sql .= "       left join pcmater on pcmater.pc01_codmater = empempitem.e62_item ";
+        $sql .= "       left join empempenhocontrato   on empempenho.e60_numemp = empempenhocontrato.e100_numemp ";
+        $sql .= "       left join acordo   on empempenhocontrato.e100_acordo = acordo.ac16_sequencial ";
+        $sql2 = "";
+        if ($dbwhere == "") {
+            if ($e60_numemp != null) {
+                $sql2 .= " where empempenho.e60_numemp = $e60_numemp ";
+            }
+        } else if ($dbwhere != "") {
+            $sql2 = " where $dbwhere";
+        }
+        $sql .= $sql2;
+        if ($ordem != null) {
+            $sql .= " order by ";
+            $campos_sql = split("#", $ordem);
+            $virgula = "";
+            for ($i = 0; $i < sizeof($campos_sql); $i++) {
+                $sql .= $virgula . $campos_sql[$i];
+                $virgula = ",";
+            }
+        }
+        return $sql;
+    }
+
+    function sql_query_itens_consulta_controle_empenho($e60_numemp = null, $campos = "*", $ordem = null, $dbwhere = "")
+    {
+        $sql = "select ";
+        if ($campos != "*") {
+            $campos_sql = split("#", $campos);
+            $virgula = "";
+            for ($i = 0; $i < sizeof($campos_sql); $i++) {
+                $sql .= $virgula . $campos_sql[$i];
+                $virgula = ",";
+            }
+        } else {
+            $sql .= $campos;
+        }
+        $sql .= "  from fc_saldoitensempenho({$e60_numemp}) ";
+        $sql .= "       inner join empempitem                         on ricoditem                          = e62_sequencial ";
+        $sql .= "       inner join empempenho                         on e62_numemp                         = e60_numemp ";
+        $sql .= "       inner join orcelemento                        on e62_codele                         = o56_codele ";
+        $sql .= "                                                    and e60_anousu                         = o56_anousu ";
+        $sql .= "       left join empempaut                           on empempaut.e61_numemp               = empempenho.e60_numemp ";
+        $sql .= "       left join empautitem                          on empautitem.e55_autori              = empempaut.e61_autori ";
+        $sql .= "                                                    and empautitem.e55_sequen              = empempitem.e62_sequen";
+        $sql .= "       left join empautitempcprocitem                on empautitempcprocitem.e73_autori    = empautitem.e55_autori ";
+        $sql .= "                                                    and empautitempcprocitem.e73_sequen    = empautitem.e55_sequen ";
+        $sql .= "       left join pcprocitem                          on pcprocitem.pc81_codprocitem        = empautitempcprocitem.e73_pcprocitem ";
+        $sql .= "       left join solicitem                           on solicitem.pc11_codigo              = pcprocitem.pc81_solicitem ";
+        $sql .= "       left join solicita                            ON pc11_numero = pc10_numero ";
+        $sql .= "       left join solicitaregistropreco               on solicitaregistropreco.pc54_solicita = solicita.pc10_numero ";
+        $sql .= "       left join liclicitem                          on liclicitem.l21_codpcprocitem       = empautitempcprocitem.e73_pcprocitem ";
+        $sql .= "       left join pcorcamitemlic                      on pcorcamitemlic.pc26_liclicitem     = liclicitem.l21_codigo ";
+        $sql .= "       left join pcorcamjulg                         on pcorcamjulg.pc24_orcamitem         = pcorcamitemlic.pc26_orcamitem ";
+        $sql .= "                                                    and pcorcamjulg.pc24_pontuacao         = 1 ";
+        $sql .= "       left join pcorcamval                          on pcorcamval.pc23_orcamitem          = pcorcamjulg.pc24_orcamitem ";
+        $sql .= "                                                    and pcorcamval.pc23_orcamforne         = pcorcamjulg.pc24_orcamforne ";
+        $sql .= "       left join solicitemvinculo                    on solicitemvinculo.pc55_solicitemfilho = solicitem.pc11_codigo ";
+        $sql .= "       left join solicitem       as solicitempai     on solicitempai.pc11_codigo             = solicitemvinculo.pc55_solicitempai ";
+        $sql .= "       left join pcprocitem      as pcprocitempai    on pcprocitempai.pc81_solicitem         = solicitempai.pc11_codigo ";
+        $sql .= "       left join liclicitem      as liclicitempai    on liclicitempai.l21_codpcprocitem      = pcprocitempai.pc81_codprocitem ";
+        $sql .= "       left join pcorcamitemlic as pcorcamitemlicpai on pcorcamitemlicpai.pc26_liclicitem    = liclicitempai.l21_codigo ";
+        $sql .= "       left join pcorcamjulg    as pcorcamjulgpai    on pcorcamjulgpai.pc24_orcamitem      = pcorcamitemlicpai.pc26_orcamitem ";
+        $sql .= "                                                    and pcorcamjulgpai.pc24_pontuacao      = 1 ";
+        $sql .= "       left join pcorcamval     as pcorcamvalpai     on pcorcamvalpai.pc23_orcamitem       = pcorcamjulgpai.pc24_orcamitem ";
+        $sql .= "                                                    and pcorcamvalpai.pc23_orcamforne      = pcorcamjulgpai.pc24_orcamforne ";
+        $sql .= "       left join orcdotacao on o58_coddot = e60_coddot and o58_anousu = e60_anousu ";
+        $sql .= "       left join pcmater on pcmater.pc01_codmater = empempitem.e62_item ";
+        $sql .= "       left join empempenhocontrato   on empempenho.e60_numemp = empempenhocontrato.e100_numemp ";
+        $sql .= "       left join acordo   on empempenhocontrato.e100_acordo = acordo.ac16_sequencial ";
         $sql2 = "";
         if ($dbwhere == "") {
             if ($e60_numemp != null) {
@@ -3060,6 +3132,26 @@ class cl_empempenho
         join empempenhopncp on
             e213_contrato = e60_numemp
             where e60_instit = " . db_getsession("DB_instit")  . $sWhere;
+    }
+
+    function getConveniosByEmpenho($e60_numemp) {
+
+        $sql = "SELECT 
+                    cc.c206_sequencial     as cod_convenio,
+                    cc.c206_nroconvenio    as num_convenio,
+                    cc.c206_dataassinatura as data_assinatura,
+                    cc.c206_objetoconvenio as obj_convenio
+                FROM 
+                    empempenho ee
+                INNER JOIN
+                    convconvenios cc ON cc.c206_sequencial = ee.e60_numconvenio
+                WHERE 
+                    ee.e60_numemp = {$e60_numemp};";
+
+        $result  = db_query($sql);
+        $aResult = pg_fetch_all($result);
+        
+        return !empty($aResult) ? $aResult : [];
     }
 
 }

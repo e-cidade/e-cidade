@@ -3,7 +3,7 @@
 namespace App\Repositories\Patrimonial\Compras;
 
 use App\Models\Patrimonial\Compras\Pcgrupo;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class PcgrupoRepository
 {

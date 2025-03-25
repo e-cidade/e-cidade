@@ -27,7 +27,7 @@ use App\Repositories\Contabilidade\CondataconfRepository;
 use DateTime;
 use Error;
 use Exception;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 use App\Models\Veiculo;
 use App\Services\Patrimonial\Veiculo\Abastecimento\Importacao\Command\GetDadosUltimaMovimentacao;
 use App\Services\Patrimonial\Veiculo\VeicAbastRetiradaService;

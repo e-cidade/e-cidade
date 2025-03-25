@@ -35,7 +35,8 @@ include("classes/db_pcgrupo_classe.php");
 include("classes/db_pcsubgrupo_classe.php");
 include("dbforms/db_funcoes.php");
 include("classes/db_condataconf_classe.php");
-
+require_once("classes/db_historicomaterial_classe.php");
+require_once 'libs/renderComponents/index.php';
 db_postmemory($HTTP_GET_VARS);
 db_postmemory($HTTP_POST_VARS);
 
@@ -44,11 +45,12 @@ $clpcmaterele = new cl_pcmaterele;
 $clpcgrupo = new cl_pcgrupo;
 $clpcsubgrupo = new cl_pcsubgrupo;
 $clcondataconf = new cl_condataconf;
-
 $db_opcao = 1;
 $db_botao = true;
 if (((isset($HTTP_POST_VARS["db_opcao"]) && $HTTP_POST_VARS["db_opcao"]) == "Incluir")) {
     db_inicio_transacao();
+    $pc01_data = implode('-', array_reverse(explode('/', $pc01_data)));
+
     $sqlerro = false;
     $clpcmater->pc01_libaut = @$pc01_libaut;
     $clpcmater->pc01_ativo = "false";
@@ -58,6 +60,7 @@ if (((isset($HTTP_POST_VARS["db_opcao"]) && $HTTP_POST_VARS["db_opcao"]) == "Inc
     $clpcmater->pc01_tabela = $pc01_tabela;
     $clpcmater->pc01_taxa   = $pc01_taxa;
     $clpcmater->pc01_regimobiliario   = $pc01_regimobiliario;
+    $clpcmater->pc01_unid   = $pc01_unid;
 
     /*FIM - OC3770*/
     if (!empty($pc01_data)) {
@@ -89,6 +92,41 @@ if (((isset($HTTP_POST_VARS["db_opcao"]) && $HTTP_POST_VARS["db_opcao"]) == "Inc
         $codmater =  $clpcmater->pc01_codmater;
     }
 
+    if($sqlerro == false){
+        $clhistoricomaterial = new cl_historicomaterial;
+        $rsHistoricoMaterial = $clhistoricomaterial->sql_record(
+            $clhistoricomaterial->sql_query(
+                null,
+                "*",
+                null,
+                "db150_coditem = $clpcmater->pc01_codmater"
+            )
+        );
+        
+        if(pg_num_rows($rsHistoricoMaterial) == 0){
+            //inserir na tabela historico material
+            $clhistoricomaterial->db150_tiporegistro           = 10;
+            $clhistoricomaterial->db150_coditem                = $clpcmater->pc01_codmater;
+            $clhistoricomaterial->db150_pcmater                = $clpcmater->pc01_codmater;
+            $clhistoricomaterial->db150_dscitem                = substr($clpcmater->pc01_descrmater.'-'.$clpcmater->pc01_complmater,0,999);
+            $clhistoricomaterial->db150_unidademedida          = null;
+            $clhistoricomaterial->db150_tipocadastro           = 1;
+            $clhistoricomaterial->db150_justificativaalteracao = '';
+            $clhistoricomaterial->db150_mes                    = date("m", db_getsession("DB_datausu"));
+            $clhistoricomaterial->db150_data                   = date("Y-m-d", db_getsession("DB_datausu"));
+            $clhistoricomaterial->db150_instit                 = db_getsession('DB_instit');
+            $clhistoricomaterial->db150_codunid                = $clpcmater->pc01_unid;
+            $clhistoricomaterial->incluir(null);
+
+            if ($clhistoricomaterial->erro_status == 0) {
+                $sqlerro = true;
+                $erro_msg = $clhistoricomaterial->erro_msg;
+            }
+        }
+    }
+    // echo '<pre>';
+    // print_r($erro_msg);
+    // exit;
     if ($sqlerro == false) {
         $arr =  explode("XX", $codeles);
         for ($i = 0; $i < count($arr); $i++) {
@@ -119,6 +157,11 @@ if (isset($impmater)) {
     }
 }
 ?>
+
+<script type="text/javascript" defer>
+  loadComponents(['buttonsSolid']);
+</script>
+
 <html>
 
 <head>
@@ -126,7 +169,9 @@ if (isset($impmater)) {
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <meta http-equiv="Expires" CONTENT="0">
     <script language="JavaScript" type="text/javascript" src="scripts/scripts.js"></script>
+    
     <link href="estilos.css" rel="stylesheet" type="text/css">
+    <?php db_app::load("estilos.bootstrap.css");?>
     <script>
         function js_iniciar() {
             if (document.form1)
@@ -145,7 +190,7 @@ if (isset($impmater)) {
         </tr>
     </table>
     <center>
-        <table width="790" border="0" cellspacing="0" cellpadding="0">
+        <table width="920" border="0" cellspacing="0" cellpadding="0">
             <tr>
                 <td>&nbsp;</td>
             </tr>

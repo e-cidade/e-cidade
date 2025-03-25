@@ -274,7 +274,7 @@ ob_start();
             </thead>
             <tbody>
                 <tr style="height: 20px">
-                    <td class="s0" dir="ltr">Número do Empnho</td>
+                    <td class="s0" dir="ltr">Número do Empenho</td>
                     <td class="s1" dir="ltr">Intervalo de Datas para Ordem Cronológica</td>
                 </tr>
                 <?php

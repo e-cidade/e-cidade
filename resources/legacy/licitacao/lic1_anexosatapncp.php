@@ -24,13 +24,6 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
     db_app::load("estilos.css, grid.style.css");
     db_app::load("scripts.js, prototype.js, strings.js, datagrid.widget.js");
     ?>
-    
-    <script type="text/javascript">
-        loadComponents([
-            'buttonsSolid',
-            'simpleModal'
-        ]);
-    </script>
 </head>
 
 <body bgcolor=#CCCCCC leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
@@ -82,6 +75,12 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
                         );
                         db_select('l216_tipoanexo', $aTipoAnexos, true, $db_opcao, " onchange=''");
                         ?>
+                    </td>
+                </tr>
+                <tr style="display: none">
+                    <td></td>
+                    <td >
+                        <?php db_input('l20_codigo', 60, '', true, 'text', 3, ""); ?>
                     </td>
                 </tr>
                 <div id='anexo' style='display:none'></div>
@@ -140,7 +139,7 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
     ], true); ?>
 
         <?php db_textarea('justificativapncp', 10, 48, false, true, 'text', $db_opcao, "", "", "justificativapncp", "255"); ?>
-        
+
         <div style="width: 100%; display: flex; justify-content: center;">
             <?php $component->render('buttons/solid', [
                 'designButton' => 'success',
@@ -186,7 +185,7 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
         if(mostra===true){
             js_OpenJanelaIframe('CurrentWindow.corpo',
                 'db_iframe_acocontroleataspncp',
-                'func_licatareg.php?enviopncp=true&funcao_js=parent.js_preencheAta|l221_numata|l20_objeto',
+                'func_licatareg.php?enviopncp=true&funcao_js=parent.js_preencheAta|l221_numata|l20_codigo|l20_objeto',
                 'Pesquisa Atas',true);
         }else{
             js_OpenJanelaIframe('CurrentWindow.corpo',
@@ -197,8 +196,9 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
         }
     }
 
-    function js_preencheAta(l221_numata,l20_objeto){
+    function js_preencheAta(l221_numata,l20_codigo,l20_objeto){
         document.form.l221_numata.value = l221_numata;
+        document.form.l20_codigo.value = l20_codigo;
         document.form.l20_objeto.value = l20_objeto;
         db_iframe_acocontroleataspncp.hide();
         js_getAnexo();
@@ -349,6 +349,7 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
         const documentosSelecionados = oGridDocumentos.getSelection("object")
         let iSelecionados = documentosSelecionados.length;
         let iCodigoAta = $('l221_numata').value;
+        let iCodigoLicitacao = $('l20_codigo').value;
         let aDocumentos = [];
 
         if (iSelecionados === 0) {
@@ -378,6 +379,7 @@ parse_str($HTTP_SERVER_VARS["QUERY_STRING"], $result);
 
         oParametros.exec = 'EnviarDocumentoPNCP';
         oParametros.iCodigoAta = iCodigoAta;
+        oParametros.iCodigoLicitacao = iCodigoLicitacao;
         oParametros.aDocumentos = aDocumentos;
 
         let oAjax = new Ajax.Request(

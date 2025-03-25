@@ -25,5 +25,5 @@
  *                                licenca/licenca_pt.txt 
  */
 
-$campos = "tpcontra.h13_codigo,tpcontra.h13_regime,tpcontra.h13_tpcont,tpcontra.h13_descr";
+$campos = "tpcontra.h13_codigo,tpcontra.h13_regime,tpcontra.h13_tpcont,tpcontra.h13_descr,tpcontra.h13_tipocargo";
 ?>

@@ -64,7 +64,7 @@ class BaseFilters implements IFilters
             $array['dataInicio'] = $this->dataInicio->format('d/m/Y H:i');
         }
 
-        if (!empty($this->dataInicio)) {
+        if (!empty($this->dataTermino)) {
             $array['dataTermino'] = $this->dataTermino->format('d/m/Y H:i');
         }
 
@@ -80,7 +80,7 @@ class BaseFilters implements IFilters
         $value = DateTime::createFromFormat('d/m/Y H:i', $value);
 
         if (!$value) {
-            $value = (new DateTime())->format('d/m/Y H:i');
+            $value = (new DateTime('d/m/Y H:i'));
         }
 
         return $value;

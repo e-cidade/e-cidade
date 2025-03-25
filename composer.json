@@ -17,6 +17,7 @@
         "ext-pgsql": "*",
         "ext-simplexml": "*",
         "ext-soap": "*",
+        "azuyalabs/yasumi": "^2.6",
         "dbseller/legacy": "^1.0",
         "dex/composer-plug-and-play": "^0.13.0",
         "doctrine/dbal": "^3.9",
@@ -56,6 +57,7 @@
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.4",
         "fakerphp/faker": "^1.9.1",
+        "friendsofphp/php-cs-fixer": "*",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^5.10",
@@ -124,7 +126,8 @@
         ],
         "test": [
             "php vendor/composer/bin/phpunit -d error_reporting[\"E_ALL & ~E_NOTICE\"] -v --colors=auto app/Tests/Unit"
-        ]
+        ],
+        "fix-style": "vendor/bin/php-cs-fixer fix"
     },
     "extra": {
         "laravel": {

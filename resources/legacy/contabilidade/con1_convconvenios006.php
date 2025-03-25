@@ -6,31 +6,45 @@ include("libs/db_usuariosonline.php");
 include("dbforms/db_funcoes.php");
 include("classes/db_convconvenios_classe.php");
 include("classes/db_convdetalhaconcedentes_classe.php");
+include("classes/db_placaixarec_classe.php");
 $clconvconvenios = new cl_convconvenios;
-
 $clconvdetalhaconcedentes = new cl_convdetalhaconcedentes;
+$clplacaixarec = new cl_placaixarec;
 
 db_postmemory($HTTP_POST_VARS);
    $db_opcao = 33;
 $db_botao = false;
+
 if(isset($excluir)){
   $sqlerro=false;
   db_inicio_transacao();
-  $clconvdetalhaconcedentes->c207_sequencial=$c206_sequencial;
-  $clconvdetalhaconcedentes->excluir($c206_sequencial);
 
-  if($clconvdetalhaconcedentes->erro_status==0){
+  $arrecadacoes_vinculadas = $clplacaixarec->validateArrecadacoesByConvenio($c206_sequencial);
+
+  if(!empty($arrecadacoes_vinculadas)) {
+    $clconvconvenios->erro_msg = 'Não é possível excluir o convênio. Convênio vinculado à arrecadação de receita.';
+    $clconvconvenios->erro_campo = 1;
     $sqlerro=true;
   }
-  $erro_msg = $clconvdetalhaconcedentes->erro_msg;
-  $clconvconvenios->excluir($c206_sequencial);
-  if($clconvconvenios->erro_status==0){
-    $sqlerro=true;
+
+  if(empty($arrecadacoes_vinculadas)) {
+
+    $clconvdetalhaconcedentes->excluir(null, 'c207_codconvenio = '. $c206_sequencial);
+    if($clconvdetalhaconcedentes->erro_status==0){
+      $sqlerro=true;
+    }
+    $erro_msg = $clconvdetalhaconcedentes->erro_msg;
+    $clconvconvenios->excluir($c206_sequencial);
+    if($clconvconvenios->erro_status==0){
+      $sqlerro=true;
+    }
   }
+
   $erro_msg = $clconvconvenios->erro_msg;
   db_fim_transacao($sqlerro);
-   $db_opcao = 3;
-   $db_botao = true;
+  $db_opcao = 3;
+  $db_botao = true;
+
 }else if(isset($chavepesquisa)){
    $db_opcao = 3;
    $db_botao = true;

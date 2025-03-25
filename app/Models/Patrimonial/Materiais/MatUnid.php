@@ -21,6 +21,8 @@ class MatUnid extends LegacyModel{
         'm61_descr',
         'm61_usaquant',
         'm61_abrev',
-        'm61_usadec'
+        'm61_usadec',
+        'm61_codsicom',
+        'm61_ativo'
     ];
 }

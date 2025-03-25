@@ -53,7 +53,7 @@ switch ($_POST["action"]) {
         }
 
         $result_unidade = array();
-        $result_sql_unid = $clmatunid->sql_record($clmatunid->sql_query_file(null, "m61_codmatunid,substr(m61_descr,1,20) as m61_descr,m61_usaquant,m61_usadec", "m61_descr"));
+        $result_sql_unid = $clmatunid->sql_record($clmatunid->sql_query_file(null, "m61_codmatunid,substr(m61_descr,1,20) as m61_descr,m61_usaquant,m61_usadec", "m61_descr","m61_ativo='t'"));
         $numrows_unid = $clmatunid->numrows;
         for ($i = 0; $i < $numrows_unid; $i++) {
             db_fieldsmemory($result_sql_unid, $i);
@@ -111,6 +111,7 @@ switch ($_POST["action"]) {
       (SELECT distinct pcmater.pc01_codmater,
                         pcmater.pc01_descrmater,
                         pcmater.pc01_servico,
+                        pcmater.pc01_unid,
                         z01_numcgm,
                         matunid.m61_codmatunid,
                        case
@@ -161,6 +162,7 @@ switch ($_POST["action"]) {
         $sqlQuery .= "UNION SELECT distinct pcmater.pc01_codmater,
                         pcmater.pc01_descrmater,
                         pcmater.pc01_servico,
+                        pcmater.pc01_unid,
                         z01_numcgm,
                         matunid.m61_codmatunid,
                        case
@@ -233,16 +235,27 @@ switch ($_POST["action"]) {
 
 
 
+                $rsUnidade = db_query("select pc01_unid from pcmater WHERE pc01_codmater = {$oDados->pc01_codmater}");
+                $pc01_unid = db_utils::fieldsMemory($rsUnidade, 0)->pc01_unid;
+                $desabilitarUnidade = false;
+
+
+                if($pc01_unid != ""){
+                    $desabilitarUnidade = "disabled style='background-color: #DEB887;'";
+                }
+
                 $selectunid = "";
-                $selectunid = "<select id='unidade_{$oDados->pc01_codmater}'>";
+                $selectunid = "<select id='unidade_{$oDados->pc01_codmater}' $desabilitarUnidade >";
                 $selectunid .= "<option selected='selected'></option>";
                 foreach ($result_unidade as $key => $item) {
-                    if ($key == $oDadosEmpAutItem->e55_unid)
+                    if ($key == $oDados->pc01_unid){
+                    $unidadeCadastrada = true;
                         $selectunid .= "<option value='$key' selected='selected'>$item</option>";
-                    else
+                    }
+                    else{
                         $selectunid .= "<option value='$key'>$item</option>";
+                    }
                 }
-                $selectunid .= "</select>";
 
                 $selectservico = "";
                 if ($oDadosEmpAutItem->e55_vlrun != "") {

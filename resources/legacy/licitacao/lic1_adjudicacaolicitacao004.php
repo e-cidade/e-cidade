@@ -368,6 +368,9 @@
         $campos = "DISTINCT pc01_codmater,pc01_tabela,pc01_taxa,pc01_descrmater,pc01_complmater,cgmforncedor.z01_nome,cgmforncedor.z01_cgccpf,m61_descr,m61_abrev,pc11_quant,pc23_obs,pc23_valor,pcorcamval.pc23_vlrun,pcorcamval.pc23_percentualdesconto,pcorcamval.pc23_perctaxadesctabela,l203_homologaadjudicacao,pc81_codprocitem,l04_descricao,pc11_seq,l20_criterioadjudicacao,liclicitem.l21_ordem AS ordem";
         $sWhere = " liclicitem.l21_codliclicita = {$codigo_preco} and pc24_pontuacao = 1 AND itenshomologacao.l203_sequencial is null";
         $result = $clhomologacaoadjudica->sql_record($clhomologacaoadjudica->sql_query_itens_semhomologacao(null, $campos, "pc11_seq,z01_nome", $sWhere));
+
+        dd($clhomologacaoadjudica->sql_query_itens_semhomologacao(null, $campos, "pc11_seq,z01_nome", $sWhere));
+    
         $array1 = array();
         $op = 0;
 

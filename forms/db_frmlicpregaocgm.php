@@ -90,9 +90,6 @@ if (isset($db_opcaoal)) {
         </td>
       </tr>
 
-
-
-
       <tr>
         <td nowrap title="<?= @$Tl46_naturezacargo ?>">
           <?= @$Ll46_naturezacargo ?>
@@ -100,7 +97,18 @@ if (isset($db_opcaoal)) {
         <td>
           <?
           $al46_naturezacargo = array('1' => '1-Servidor Efetivo', '2' => '2-Empregado Temporário', '3' => '3-Cargo em Comissão', '4' => '4-Empregado Público', '5' => '5-Agente Político', '6' => '6-Outra');
-          db_select('l46_naturezacargo', $al46_naturezacargo, true, $db_opcao, "");
+          db_select('l46_naturezacargo', $al46_naturezacargo, true, $db_opcao,  " onchange='onChangeNaturezaObjeto(false);'");
+          ?>
+        </td>
+      </tr>
+
+      <tr id="trDescricaoNaturezaCargo" style="<?php echo ($l46_naturezacargo == '6') ? '' : 'display:none;'; ?>">
+        <td nowrap title="Descrição da Natureza do Cargo:">
+          <b>Descrição da Natureza do Cargo</b>
+        </td>
+        <td>
+          <?
+          db_input('l46_descricaonaturezacargo', 54, 0, true, 'text', $db_opcao, "","","","",50)
           ?>
         </td>
       </tr>
@@ -187,4 +195,17 @@ if (isset($db_opcaoal)) {
     document.form1.z01_nome.value = chave2;
     db_iframe_cgm.hide();
   }
+
+  function onChangeNaturezaObjeto(){
+
+    if(document.form1.l46_naturezacargo.value == "6"){
+      document.getElementById('trDescricaoNaturezaCargo').style.display = "";
+      return;
+    }
+
+    document.getElementById('l46_descricaonaturezacargo').value = "";
+    document.getElementById('trDescricaoNaturezaCargo').style.display = "none";
+
+  }
+
 </script>

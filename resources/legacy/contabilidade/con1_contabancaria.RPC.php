@@ -273,7 +273,7 @@ switch ($oParam->exec) {
 
       $service     = new ContaBancariaService();
    
-      $ckeysTables = $service->checkGeneral($oParam->db83_sequencial);
+      $ckeysTables = $service->checkGeneral($oParam->db83_sequencial,$oParam->db83_reduzido,$oParam->db83_instituicao);
       
       $tablesObject = new stdClass();
       $tablesObject->c60_codcon = $ckeysTables->c60_codcon;
@@ -312,7 +312,7 @@ switch ($oParam->exec) {
       };
 
       $service     = new ContaBancariaService();
-      $ckeysTables = $service->checkGeneral($oParam->db83_sequencial);
+      $ckeysTables = $service->checkGeneral($oParam->db83_sequencial,$oParam->db83_reduzido,$oParam->db83_instituicao);
     
       $tablesObject = new stdClass();
       $tablesObject->c60_codcon        = $ckeysTables->c60_codcon;

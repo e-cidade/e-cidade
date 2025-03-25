@@ -110,6 +110,23 @@ if (isset($processar)&&$processar!=""){
     $oCertidao           = new Certidao( $certidao );
     $iCertidaoSequencial = $oCertidao->getSequencial();
 
+    #Verifica se o range de titulos selecionados está nas condições abaixo
+    $consulta = "SELECT * from cartorio.titulos where cda_id = $certidao and 
+    status = 'ENVIADO' or status = 'PROTESTADO' or status = 'PROTESTO POR EDITAL'";
+
+    $query = db_query($consulta);
+    $count = pg_num_rows($query);
+
+    if($count > 0){
+      $sqlerro = true;
+      $oErro             =  new stdClass();
+      $oErro->sTipo      = "ERRO";
+      $oErro->sDescricao = utf8_encode("CDA $certidao não pode ser cancelada porque possui transação no sistema de protesto");
+      $aMensagemErros[]  = $oErro;
+
+      continue;
+    }
+
     if ( !empty($iCertidaoSequencial) ) {
 
       if ( $oCertidao->isCobrancaExtrajudicial() ) {

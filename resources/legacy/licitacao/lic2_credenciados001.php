@@ -9,10 +9,6 @@ require_once 'libs/renderComponents/index.php';
 db_postmemory($HTTP_POST_VARS);
 ?>
 
-<script type="text/javascript" defer>
-  loadComponents(['todosIcones','selectsChoicesSimple','cardsSimple','radiosBordered','buttonsSolid']);
-</script>
-
 <html>
 
 <head>

@@ -316,7 +316,7 @@ try {
             $clliclicita->l20_tipoprocesso = $oParam->l20_tipoprocesso;
             $clliclicita->l20_dtpubratificacao = implode("-", (array_reverse(explode("/", $oParam->l20_dtpubratificacao))));
             $clliclicita->l20_dtlimitecredenciamento = $oParam->l20_dtlimitecredenciamento;
-            $clliclicita->l20_veicdivulgacao = $oParam->l20_veicdivulgacao;
+            $clliclicita->l20_veicdivulgacao = utf8_decode($oParam->l20_veicdivulgacao);
             $clliclicita->alterar($oParam->licitacao, null, null);
 
             if ($clliclicita->erro_status == "0") {
@@ -553,7 +553,7 @@ try {
             $clliclicita->l20_tipoprocesso = $l20_tipoprocesso;
             $clliclicita->l20_dtpubratificacao = $oParam->l20_dtpubratificacao;
             $clliclicita->l20_dtlimitecredenciamento = $oParam->l20_dtlimitecredenciamento;
-            $clliclicita->l20_veicdivulgacao = $oParam->l20_veicdivulgacao;
+            $clliclicita->l20_veicdivulgacao = utf8_decode($oParam->l20_veicdivulgacao);
             //            $clliclicita->l20_justificativa = $oParam->l20_justificativa;
             //            $clliclicita->l20_razao = $oParam->l20_razao;
             $clliclicita->alterar($oParam->licitacao, null, null);

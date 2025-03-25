@@ -769,6 +769,8 @@ if ($oInstit->db21_usasisagua == "t") {
     if ($('anoUsu').value >= 2022) {
       if (iCodigoConta != '' & idb83_codigoopcredito != '') {
         js_getSaltesOP(idb83_codigoopcredito);
+      } else {
+        js_getSaltesOP('');
       }
     }
 
@@ -881,6 +883,7 @@ if ($oInstit->db21_usasisagua == "t") {
       if (idb83_codigoopcredito != '' & iCodigoConta != '') {
         js_getSaltesOP(idb83_codigoopcredito);
       } else {
+        js_getSaltesOP('');
         $('op01_numerocontratoopc').value = '';
         $('op01_dataassinaturacop').value = '';
       }
@@ -1909,6 +1912,8 @@ if ($oInstit->db21_usasisagua == "t") {
 
     oReceita.k81_obs = $F('k81_obs');
     oReceita.recurso = $F('recurso');
+    oReceita.iOperacaodecredito = oSaltesOP.op01_sequencial;
+    oReceita.iEstrutural = $('estrutural').value ;
     oReceita.k81_operbanco = $F('k81_operbanco');
     oReceita.k81_convenio = $F('k81_convenio');
 
@@ -2121,13 +2126,20 @@ if ($oInstit->db21_usasisagua == "t") {
       return false;
     }
     var aReceitasPlanilha = new Array();
-
+    var sDtRecebimento = '';
     for (var iIndice in aReceitas) {
 
       var oReceitaTela = aReceitas[iIndice];
 
       if (typeof(oReceitaTela) == 'function') {
         continue;
+      }
+
+      let partes = oReceitaTela.k81_datareceb.split('/');
+      let data = new Date(partes[2], partes[1] - 1, partes[0]);
+
+      if (sDtRecebimento == '' || data < sDtRecebimento) {
+        sDtRecebimento = data;
       }
 
       var oReceita = new Object();
@@ -2148,6 +2160,8 @@ if ($oInstit->db21_usasisagua == "t") {
       oReceita.dtRecebimento = oReceitaTela.k81_datareceb;
       oReceita.sOperacaoBancaria = oReceitaTela.k81_operbanco;
       oReceita.iConvenio = oReceitaTela.k81_convenio;
+      oReceita.iOperacaodecredito = oReceitaTela.iOperacaodecredito;
+      oReceita.iEstrutural =  oReceitaTela.iEstrutural;
 
       aReceitasPlanilha.push(oReceita);
     }
@@ -2164,7 +2178,7 @@ if ($oInstit->db21_usasisagua == "t") {
     var oParametro = new Object();
     oParametro.exec = 'salvarPlanilha';
     oParametro.k144_numeroprocesso = encodeURIComponent(tagString($F('k144_numeroprocesso')));
-    oParametro.novaDtRecebimento = $F('k81_datareceb');
+    oParametro.novaDtRecebimento = $F('k81_datareceb') != '' ? $F('k81_datareceb') : sDtRecebimento.toLocaleDateString("pt-BR");
     if (lMenuAlteracao) {
       oParametro.exec = 'alterarPlanilha';
     }
@@ -2192,7 +2206,7 @@ if ($oInstit->db21_usasisagua == "t") {
         var oJanelaRelatorio = window.open(sUrlOpen, '', 'width=' + (screen.availWidth - 5) + ',height=' + (screen.availHeight - 40) + ',scrollbars=1,location=0 ');
       }
 
-      js_autenticar(oRetorno.iCodigoPlanilha);
+      js_autenticar(oRetorno.iCodigoPlanilha, oRetorno.sDtRecebimento);
       //js_novaReceita();
     } else {
       alert(oRetorno.message.urlDecode());
@@ -2609,7 +2623,7 @@ if ($oInstit->db21_usasisagua == "t") {
     return false;
   }
 
-  function js_autenticar(iPlaninhaAutentica) {
+  function js_autenticar(iPlaninhaAutentica, sDtRecebimento = null) {
 
 
     if (iPlaninhaAutentica == '') {
@@ -2623,7 +2637,7 @@ if ($oInstit->db21_usasisagua == "t") {
     var oParametro = new Object();
     oParametro.exec = 'autenticarPlanilha';
     oParametro.iPlanilha = iPlaninhaAutentica;
-    oParametro.novaDtRecebimento = $F('k81_datareceb');
+    oParametro.novaDtRecebimento = $F('k81_datareceb') != '' ? $F('k81_datareceb') : sDtRecebimento;
     oParametro.k144_numeroprocesso = encodeURIComponent(tagString($F("k144_numeroprocesso")));
 
     var oAjax = new Ajax.Request(sRPC, {

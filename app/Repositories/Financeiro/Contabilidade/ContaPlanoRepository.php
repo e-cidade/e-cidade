@@ -6,12 +6,12 @@ use App\Domain\Financeiro\Contabilidade\ContaPlano;
 use App\Models\Financeiro\Contabilidade\ConPlano;
 use App\Repositories\Financeiro\Contabilidade\ContaPlanoRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\DB;
 
 class ContaPlanoRepository implements ContaPlanoRepositoryInterface
 {
     private ConPlano $model;
-   
+
     public function __construct()
     {
         $this->model = new ConPlano;
@@ -19,8 +19,8 @@ class ContaPlanoRepository implements ContaPlanoRepositoryInterface
 
 
     public function saveByContaPlano(ContaPlano $dadosContaPlano): ?ConPlano
-    { 
-        
+    {
+
         $dados = [
             "c60_codcon"                  => $dadosContaPlano->getC60Codcon(),
             "c60_anousu"                  => $dadosContaPlano->getC60Anousu(),
@@ -39,9 +39,9 @@ class ContaPlanoRepository implements ContaPlanoRepositoryInterface
             "c60_nregobrig"               => $dadosContaPlano->getC60Nregobrig(),
             "c60_cgmpessoa"               => $dadosContaPlano->getC60Cgmpessoa(),
             "c60_naturezadareceita"       => $dadosContaPlano->getC60Naturezadareceita(),
-            "c60_infcompmsc"              => $dadosContaPlano->getC60Infcompmsc()  
+            "c60_infcompmsc"              => $dadosContaPlano->getC60Infcompmsc()
         ];
-        
+
         return $this->model->create($dados);
     }
 
@@ -71,7 +71,7 @@ class ContaPlanoRepository implements ContaPlanoRepositoryInterface
 
     public function searchEstruturalAccounts(int $ultimoEstrut,int $ano): ?Collection
     {
- 
+
         $result = $this->model
                 ->where('c60_estrut', 'like', "$ultimoEstrut%")
                 ->where('c60_anousu', $ano)
@@ -84,7 +84,7 @@ class ContaPlanoRepository implements ContaPlanoRepositoryInterface
 
     public function searchNewEstruturalAccounts(int $ultimoEstrut,int $ano): ?Collection
     {
-        
+
         $result = $this->model
                 ->where('c60_estrut', $ultimoEstrut)
                 ->where('c60_anousu', $ano)
@@ -103,9 +103,8 @@ class ContaPlanoRepository implements ContaPlanoRepositoryInterface
         if (!empty($result) && isset($result[0]->new_value)) {
             return true;
         }
-    
-        return false;   
+
+        return false;
     }
 
 }
- 

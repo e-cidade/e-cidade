@@ -84,8 +84,10 @@ $clrotulo->label("o15_codigo");
             <td style="border: 2px groove white;" valign="top">
               <input type="checkbox" value="IdentificacaoRemessaobras" id="IdentificacaoRemessaobras" />
               <label for="IDE">Identificação da Remessa (IDE)</label><br>
+                <?php if (db_getsession("DB_anousu") < 2025) {?>
               <input type="checkbox" value="PessoaObras" id="PessoaObras" />
               <label for="PESSOA">Pessoas Físicas (PESSOA)</label><br>
+                <?php } ?>
               <input type="checkbox" value="Licobras" id="Licobras" />
               <label for="LICOBRAS">Licitação, Obras e Serviços de Engenharia (LICOBRAS)</label><br>
               <input type="checkbox" value="ExecucaodeContratosObras" id="ExecucaodeContratosObras" />

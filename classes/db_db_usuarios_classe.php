@@ -975,5 +975,14 @@ class cl_db_usuarios {
       */
       return $isAdm;
   }
+
+  function vefica_user_contas($id){
+
+      $sSql="select nome from db_usuarios where id_usuario = $id and login like '%contass%'";
+      $result = db_query($sSql);
+      $isAdm = pg_result($result,0,0);
+
+      return $isAdm;
+  }
 }
 ?>

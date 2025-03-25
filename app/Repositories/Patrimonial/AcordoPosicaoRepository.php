@@ -140,4 +140,36 @@ class AcordoPosicaoRepository implements AcordoPosicaoRepositoryInterface
             ->first(['ac26_sequencial']);
         return $acordoPosicao->ac26_sequencial;
     }
+
+    public function getAcordoPosicoes($ac16_sequencial){
+        $query1 = $this->model
+            ->join('acordoitem', 'ac20_acordoposicao', '=', 'ac26_sequencial')
+            ->join('acordoitemexecutado', 'ac20_sequencial', '=', 'ac29_acordoitem')
+            ->join('acordoitemexecutadoempautitem', 'ac29_sequencial', '=', 'ac19_acordoitemexecutado')
+            ->join('empautitem', function ($join) {
+                $join->on('e55_sequen', '=', 'ac19_sequen')
+                    ->on('ac19_autori', '=', 'e55_autori');
+            })
+            ->join('empautoriza', 'e54_autori', '=', 'e55_autori')
+            ->leftJoin('empempaut', 'e61_autori', '=', 'e54_autori')
+            ->leftJoin('empempenho', 'e61_numemp', '=', 'e60_numemp')
+            ->where('ac26_acordo', $ac16_sequencial)
+            ->groupBy('e54_autori', 'e54_emiss', 'e60_codemp', 'e60_anousu', 'e60_numemp', 'e54_anulad')
+            ->select('e54_autori', 'e60_numemp');
+
+        $query2 = $this->model
+            ->join('acordoitem', 'ac20_acordoposicao', '=', 'ac26_sequencial')
+            ->join('acordoitemexecutado', 'ac20_sequencial', '=', 'ac29_acordoitem')
+            ->join('acordoitemexecutadoperiodo', 'ac29_sequencial', '=', 'ac38_acordoitemexecutado')
+            ->join('acordoitemexecutadoempenho', 'ac38_sequencial', '=', 'ac39_acordoitemexecutadoperiodo')
+            ->join('empempenho', 'ac39_numemp', '=', 'e60_numemp')
+            ->leftJoin('empempaut', 'e60_numemp', '=', 'e61_numemp')
+            ->join('empautoriza', 'e54_autori', '=', 'e61_autori')
+            ->where('ac26_acordo', $ac16_sequencial)
+            ->distinct()
+            ->select('e54_autori', 'e60_numemp');
+
+        return $query1->union($query2)->orderBy('e54_autori')->get();
+    }
+
 }

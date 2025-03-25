@@ -72,10 +72,11 @@ class LoteFabrica
     private function separarPorItem($data, int $numrows): array
     {
         $lotes = [];
-        $resultado = db_utils::fieldsMemory($data, 0);
         $itemFabrica = new ItemFabrica();
 
         for ($i = 0; $i < $numrows; $i++) {
+            $resultado = db_utils::fieldsMemory($data, $i);
+
             $lote = new Lote();
             $lote->setNumero($i+1);
             $lote->setDescricao($resultado->descricaolote);
@@ -86,6 +87,7 @@ class LoteFabrica
             $lote->setItens($itemFabrica->criarItemSimples($data, $i));
             $lotes[] = $lote;
         }
+
         return $lotes;
     }
 }

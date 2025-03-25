@@ -22,9 +22,9 @@ class ContaBancarias
     private int $db83_bancoagencia;
 
      /**
-     * @var integer
+     * @var string
      */
-    private int $db83_codbanco;
+    private string $db83_codbanco;
 
     /**
      * @var string

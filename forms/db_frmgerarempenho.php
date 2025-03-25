@@ -373,7 +373,8 @@ if ($F('tipo') == '1' && ($F('ponto') == 'r14' || $F('ponto') == 'r48' || $F('po
 	    if ($F('ponto') == 'r48') {
 	      js_consultaFolhaComplementar();
 	    } else if ($F('ponto') == 'r20') {
-	      js_getRescisoes();
+		$('filtroRescisao').style.display = '';
+		$('linhaRescisoes').style.display = '';
 	    } else if ($F('ponto') == 'sup') {
         js_consultaFolhaSuplementar();
       }
@@ -476,14 +477,6 @@ if ($F('tipo') == '1' && ($F('ponto') == 'r14' || $F('ponto') == 'r48' || $F('po
 
 function js_mostraEmpenhosAGerar() {
 
- if ($F('ponto') == 'r20' && $F('tipo') == 1) {
-
-	 if (oGridrescisoes.getSelection().length== 0) {
-
-		 alert('selecione alguma rescisão para continuar.');
-		 return false;
-	 }
- }
  var sPrograma = 'pes4_gerarempenhosfolha002.php';
  if ($F('ponto') == 'r20' && $F('tipo') == 1) {
 	 sPrograma = 'pes4_gerarempenhosfolharescisao002.php';
@@ -549,14 +542,10 @@ function js_getQueryTela(sMethod) {
 
 	 var aListarescisoes = new Array();
 	 var aRescisoes = oGridrescisoes.getSelection("object")
-	 if (oGridrescisoes.getSelection().length == 0) {
-
-		 alert('selecione alguma rescisão para continuar.');
-		 return false;
-	 } else {
-		 aRescisoes.each(function(oRescisao, id) {
-			 aListarescisoes.push(oRescisao.aCells[0].getValue());
-		 });
+	 if (!oGridrescisoes.getSelection().length == 0) {
+		aRescisoes.each(function(oRescisao, id) {
+			aListarescisoes.push(oRescisao.aCells[0].getValue());
+		});
 	 }
 	 oParam.aRescisoes = aListarescisoes;
  }

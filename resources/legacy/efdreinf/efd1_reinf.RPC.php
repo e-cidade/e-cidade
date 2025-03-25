@@ -88,7 +88,7 @@ try {
                     $filtroNumCno = " and efd60_numcno = '{$oEfdreinfr2010->efd60_numcno}' ";
                 } 
                
-                $sWhere  = " where length(cgm.z01_cgccpf) = 14 and e69_dtnota between '{$sDataInicialFiltros}' and '{$sDataFinalFiltros}' and e23_ativo = true and e21_retencaotipocalc in (4)  and z01_cgccpf = '$oEfdreinfr2010->z01_cgccpf' $filtroNumCno ";
+                $sWhere  = " where length(cgm.z01_cgccpf) = 14 and e60_instit = {$sInstituicao} and e69_dtnota between '{$sDataInicialFiltros}' and '{$sDataFinalFiltros}' and e23_ativo = true and e21_retencaotipocalc in (4)  and z01_cgccpf = '$oEfdreinfr2010->z01_cgccpf' $filtroNumCno ";
                 $rsnotas2010 = $clempnota->sql_record($clempnota->sqlRelRetencoesPJ($sWhere, null, null, $sCampos));
                 $separador = " ; ";
                 $oefdreinfr2010     = new stdClass();
@@ -103,7 +103,7 @@ try {
                 } 
                 
                 if ($sHash != $sHashproximo) {
-                    // echo $sHash."  -  ".$sHashproximo."  -   ".$valorBruto."<br>";
+
                     $oefdreinfr2010->Estabelecimento = db_formatar($oEfdreinfr2010->z01_cgccpf, 'cnpj')." - ".removeAccents($oEfdreinfr2010->z01_nome);
                     $oefdreinfr2010->CNPJPrestador   = $oEfdreinfr2010->efd60_numcno;
                     $oefdreinfr2010->ValorBruto      = "R$" . db_formatar($valorBruto, 'f');
