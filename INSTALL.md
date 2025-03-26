@@ -243,4 +243,8 @@ Restaure o banco dadao inicial:
     cp dbportal-v3-desktop.data.dist dbportal-v3-desktop.data
     bin/v3/extension/install Desktop dbseller
 
+### 7. LOGIN PADRÃO
 
+#### O usuário e senha para o banco de dados zerado:
+* Usuário: dbseller
+* Senha: dbseller
