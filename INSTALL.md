@@ -8,7 +8,70 @@ instalação siga os passos do [guia de atualização](UPGRADE.md).
 - [Primeiro acesso](#primeiro-acesso)
 
 ### Docker
-...em breve ..
+#### Obs.: Tenha o docker instalado na sua maquina. [Link Instalar Docker](https://docs.docker.com/get-started/get-docker/)
+
+**Pré-requisitos:** 
+
+- Tenha conhecimento prévio de Docker
+- Já tenha ele instalado na maquina.
+- Usaremos S.O Baseado em Linux para este exemplo;
+- Tenha uma chave ssh no Github ou baixe o projeto pelo https
+
+Faça o clone do projeto: [https://github.com/e-cidade/e-cidade](https://github.com/e-cidade/e-cidade)
+
+```bash
+git clone git@github.com:e-cidade/e-cidade.git
+```
+
+Entre na pasta do projeto e configure o .env e execute o docker compose
+
+```bash
+cd e-cidade
+cp .env.example .env
+docker compose up -d 
+```
+
+Entra dentro do container para instalar modo desktop
+
+```bash
+docker exec -it e-cidade-web-1 /bin/bash
+mkdir /var/www/html/extension/log/
+cd /var/www/html/extension/data/extension
+cp Desktop.data.dist Desktop.data
+cd /var/www/html/extension/modification/data/modification/
+cp dbportal-v3-desktop.data.dist dbportal-v3-desktop.data
+cd /var/www/html/
+git config core.fileMode false
+bin/v3/extension/uninstall Desktop dbseller
+bin/v3/extension/install Desktop dbseller
+```
+
+Faça o clone do banco de dados: 
+
+```bash
+
+# Clone o projeto
+git clone git@github.com:e-cidade/base-dados-ecidade.git 
+
+# Entra na pasta
+cd base-dados-ecidade
+
+# Descompacta o arquivo 
+bunzip2 dump_e-cidade-zerada.sql.bz2
+
+# Copia para o container
+docker cp dump_e-cidade-zerada.sql e-cidade-bd-1:/tmp/
+
+# Entra no container do banco de dados
+docker exec -it e-cidade-bd-1 /bin/bash
+
+# Vá para a pasta tmp
+cd /tmp
+
+# Resature o bkp zerado ou outro que tiver
+psql -U ecidade ecidade -f dump_e-cidade-zerada.sql
+
+```
 
 
 ## Instalação em servidor web
