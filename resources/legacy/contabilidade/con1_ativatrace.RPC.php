@@ -1,4 +1,5 @@
 <?php
+use App\Helpers\CacheHelper;
 /*
  *     E-cidade Software Público para Gestão Municipal                
  *  Copyright (C) 2014  DBseller Serviços de Informática             
@@ -61,6 +62,8 @@ try {
 
   $oJson               = new services_json();
   $oParametros         = $oJson->decode(str_replace("\\", "", $_POST["json"]));
+  $db_id_usuario       = db_getsession('DB_id_usuario');
+  $db_login            = db_getsession('DB_login');
 
   $oRetorno            = new stdClass();
   $oRetorno->iStatus   = 1;
@@ -74,7 +77,10 @@ try {
 
 
       if ($oParametros->lActive) {
-        db_destroysession("TracelogObject");
+        CacheHelper::remove('TracelogObject_'.$db_id_usuario);
+
+        $sMessage = "[INFO | ". date("d/m/Y - H:i:s") ."] Enabled Trace Log - db_id_usuario: $db_id_usuario. db_login: $db_login \n";
+        $oTraceLog->write($sMessage);
       }
 
       $oTraceLog->setProperty('lActive', $oParametros->lActive);
@@ -84,18 +90,16 @@ try {
       $oTraceLog->setProperty('lShowTime', $oParametros->lShowTime);
       $oTraceLog->setProperty('lShowBackTrace', $oParametros->lShowBackTrace);
 
-      /**
-       * Compatibiliadade com a versÃ£o antiga
-       */
-      db_putsession("DB_traceLog", true);
 
       if (!$oParametros->lShowAccount) {
         db_destroysession("DB_traceLogAcount");
       }
 
       if (!$oParametros->lActive) {
+        $sMessage = "[INFO | ". date("d/m/Y - H:i:s") ."] Disabled Trace Log - db_id_usuario: $db_id_usuario. db_login: $db_login \n";
+        $oTraceLog->write($sMessage);
 
-        db_destroysession("DB_traceLog");
+        CacheHelper::remove('TracelogObject_'.$db_id_usuario);
         //  db_destroysession("DB_traceLogAcount");
       }
 

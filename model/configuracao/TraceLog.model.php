@@ -1,4 +1,5 @@
 <?php
+use App\Helpers\CacheHelper;
 /*
  *     E-cidade Software Publico para Gestao Municipal
  *  Copyright (C) 2014  DBSeller Servicos de Informatica
@@ -61,18 +62,19 @@ class TraceLog {
   	$this->sDiretorio = $sDiretorio;
 
   	$this->sFilePath = "tmp/TRACELOG_FILE_DBSeller_".date('Ymd').".log";
-    $this->persistSession();
+    $this->persistCache();
     return;
   }
 
 
   /**
-   * Salva objeto na sessão
+   * Salva objeto em Cache
    * @access public
    */
-  public function persistSession() {
+  public function persistCache() {
+    $objectName = 'TracelogObject_'.db_getsession('DB_id_usuario');
 
-    $_SESSION['TracelogObject'] = serialize($this);
+    CacheHelper::set($objectName, serialize($this));
     return;
   }
 
@@ -94,9 +96,10 @@ class TraceLog {
    * @return TraceLog
    */
   public static function getInstance() {
+    $objectName = 'TracelogObject_'.db_getsession('DB_id_usuario');
 
-    if ( isset($_SESSION['TracelogObject']) ) {
-      TraceLog::$oInstanciaTraceLog = unserialize($_SESSION['TracelogObject']);
+    if ( CacheHelper::get($objectName) ) {
+      TraceLog::$oInstanciaTraceLog = unserialize(CacheHelper::get($objectName));
     }
 
     if ( empty(Tracelog::$oInstanciaTraceLog) ) {
@@ -114,7 +117,7 @@ class TraceLog {
    */
   public function write( $sMessage ) {
 
-    $rsFile    = fopen($this->sDiretorio.$this->sFilePath, 'a');
+    $rsFile = fopen($this->sDiretorio.$this->sFilePath, 'a+');
     fputs($rsFile,$sMessage);
     fclose($rsFile);
     return;
@@ -158,7 +161,7 @@ class TraceLog {
       throw new ParameterException("Propriedade {$sProperty} não encontrada.");
     }
     $this->{$sProperty} = $sValue;
-    $this->persistSession();
+    $this->persistCache();
     return;
   }
 
@@ -167,7 +170,7 @@ class TraceLog {
    */
   public function setDiretorio($sDiretorio) {
   	$this->sDiretorio = $sDiretorio;
-  	$this->persistSession();
+  	$this->persistCache();
   	return;
   }
 
@@ -240,9 +243,10 @@ class TraceLog {
       }
     }
 
-    $this->aComandos[] = 'begin';
-    $this->aComandos[] = 'commit';
-    $this->aComandos[] = 'rollback';
+    $this->aComandos[] = 'select';
+    $this->aComandos[] = 'insert';
+    $this->aComandos[] = 'update';
+    $this->aComandos[] = 'delete';
 
     foreach( $this->aComandos as $sComando ) {
 

@@ -101,7 +101,8 @@ RUN apt-get install -y --no-install-recommends \
   php7.4-opcache \
   php7.4-readline \
   php7.4-fpm \
-  php7.4-xdebug
+  php7.4-xdebug \
+  php7.4-apcu
 
 # Habilita o xdebug no PHP
 RUN echo "xdebug.mode=develop,coverage,debug" >> /etc/php/7.4/mods-available/xdebug.ini && \
@@ -190,7 +191,9 @@ WORKDIR /var/www/html
 
 USER contass
 
-#RUN chmod -R 777 /var/www/html/tmp/
+RUN sudo mkdir /var/www/html/tmp/
+
+RUN sudo chmod -R 777 /var/www/html/tmp/
 #
 #RUN /var/www/html/composer install
 
