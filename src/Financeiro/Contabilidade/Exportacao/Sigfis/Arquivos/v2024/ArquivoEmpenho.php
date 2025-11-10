@@ -7,7 +7,7 @@ use ECidade\Financeiro\Contabilidade\Exportacao\Sigfis\Common\Helper;
 use Illuminate\Database\Capsule\Manager as DB;
 use stdClass;
 
-
+//use ECidade\Financeiro\Orcamento\Recurso\Origem;
 
 class ArquivoEmpenho extends ArquivoBase
 {
@@ -190,23 +190,85 @@ class ArquivoEmpenho extends ArquivoBase
             33903929 => 33903923,
             46907107 => 46907101,
             33909205 => 33909299,
-            44905233 => 44905208
+            44905233 => 44905208,
+            33903926 => 33903999,
+            33904716 => 33903936,
+            33903938 => 33903936
         );
+
+$fontes50 = array(
+    6000 => 1600,
+    6001 => 1600,
+    6002 => 1600,
+    6003 => 1600,
+    6004 => 1600,
+    6005 => 1600,
+    6012 => 1601,
+    6021 => 1602,
+    6031 => 1603,
+    6032 => 1600,
+    6041 => 1604,
+    6051 => 1659,
+    6211 => 1621,
+    6212 => 1621,
+    6213 => 1621,
+    6214 => 1621,
+    6215 => 1621,
+    6216 => 1621,
+    6217 => 1621,
+    6218 => 1621,
+    6219 => 1621,
+    6311 => 1631,
+    6312 => 1632,
+    6351 => 1635,
+    6591 => 1501,
+    6592 => 1501,
+    6593 => 1600,
+    6593 => 1500,
+    6594 => 1600,
+    6594 => 1500,
+    6595 => 1500,
+    6596 => 1600,
+    6597 => 1600,
+    6219 => 1621
+    );
 
         $empenhos = $this->getEmpenhos();
 
         if ($empenhos->isEmpty()) {
-            throw new BusinessException('Não há empenhos para a competência informada.');
+            throw new BusinessException('NÃ£o hÃ¡ empenhos para a competÃªncia informada.');
         }
 
         $RemessaEmpenho = new stdClass();
         $RemessaEmpenho->Empenhos = [];
         $xi = 1;
         foreach ($empenhos as $item) {
-                
-            
+            //if($item->e60_numemp != 967899){continue;}    
+            /*if($item->e60_numemp == 967899){
+                echo "<pre>";
+                print_r($item);
+                echo "</pre>";
+                die("COnfere");
+            }*/
+            /*if($item->e60_codemp == 343){
+                //$origemRecurso = Origem::getEmpenho($item->e60_numemp, $item->e60_anousu);
+                //var_dump($origemRecurso);
+                //echo "<pre>";
+                //print_r($item);
+                //echo "</pre>";
+                //die("Parou a bodega");
+            }*/
+            /*if($item->e60_codemp == 343){
+                echo "<pre>";
+                print_r($item);
+                echo "</pre>";
+            }*/
+            //die("Maoe");
             $dadosextras = $this->buscaCamposAuxiliares($item->e60_numemp);
-            
+            //echo "<pre>";
+            //print_r($dadosextras);
+            //echo "<pre>";
+            //die("Teste");
             $item->natureza = substr($item->c60_estrut,1, 8);
 
             if(empty($item->fonte)){
@@ -216,7 +278,7 @@ class ArquivoEmpenho extends ArquivoBase
             
             // validacoes
             if (empty($item->fonte)) {                
-                $this->addLog("[Empenho {$item->e60_numemp}]: Recurso sem vinculo com Fonte Recurso padrão STN");
+                $this->addLog("[Empenho {$item->e60_numemp}]: Recurso sem vinculo com Fonte Recurso padrÃ£o STN");
                 continue;
             }
 
@@ -236,16 +298,42 @@ class ArquivoEmpenho extends ArquivoBase
             $Empenho->Tipo = $item->e60_codtipo;
             $Empenho->CodigoFuncao = $item->o52_siconfi;
             $Empenho->CodigoSubFuncao = $item->o53_siconfi;
-            $Empenho->CodigoAcao = (strlen($item->o55_projativ) == 3) ? "0".$item->o55_projativ : $item->o55_projativ;
+
+            if(strlen($item->o55_projativ) == 3 && substr($item->o55_projativ, 0, 1) != 0){
+                $codacao = $item->o55_projativ;
+            }elseif(strlen($item->o55_projativ) == 4){
+                $codacao = $item->o55_projativ;
+            }else{
+                $codacao = "0".$item->o55_projativ;
+            }
+            //$Empenho->CodigoAcao = (strlen($item->o55_projativ) == 3) ? "0".$item->o55_projativ : $item->o55_projativ;
+            $Empenho->CodigoAcao = $codacao;
             $Empenho->TipoAcao = $item->o55_tipo;
             $Empenho->CodigoPrograma = $item->o54_programa;
             $Empenho->NaturezaDespesa = substr($item->natureza, 0, 6);
-            $Empenho->FonteRecurso = $item->fonte;
+            if($this->instit == 50){
+                $Empenho->FonteRecurso = $item->fonte;
+                if($fontes50[$item->fonte]){
+                    $Empenho->FonteRecurso = $fontes50[$item->fonte];
+                }
+            }else{
+                $Empenho->FonteRecurso = $item->fonte;
+            }
+            //$Empenho->FonteRecurso = $item->fonte;
             $Empenho->ValorEmpenho = $item->e60_vlremp;
 
-            $Empenho->Historico = !empty($item->e60_re40_descr)
-                ? Helper::convertAndLimit($item->e60_re40_descr, 255)
-                : 'PADRAO';
+            
+                $texto = str_replace('&#13;', ' ', $item->e60_resumo);
+                $texto = str_replace(["\r", "\n"], ' ', $texto);
+                $texto = trim($texto);
+
+
+            $historico = $item->e40_descr . " - " . $texto;
+            $historico = substr($historico, 0, 255);
+            $historico = utf8_encode($historico);
+
+
+            $Empenho->Historico = !empty($historico) ? $historico : 'PADRÃƒO';
 
             $Empenho->NomeCredor = Helper::convertAndLimit($item->z01_nome, 255);
             $Empenho->CnpjCpfNifCredor = $item->z01_cgccpf;
@@ -260,27 +348,27 @@ class ArquivoEmpenho extends ArquivoBase
             }
 
             // CodigoJustificativaAusenciaAtoJuridico
-            $Empenho->CodigoJustificativaAusenciaAtoJuridico = $dadosextras["jaaj"];
+            $Empenho->CodigoJustificativaAusenciaAtoJuridico = $dadosextras["jaaj"]; //$item->ausenciaatojuridico;
             if (empty($Empenho->CodigoJustificativaAusenciaAtoJuridico)) {
                 $Empenho->CodigoJustificativaAusenciaAtoJuridico = null;
             }
 
             // CodigoJustificativaAusenciaInstrumentoPrevio
-            $Empenho->CodigoJustificativaAusenciaInstrumentoPrevio = $dadosextras["jaip"];
+            $Empenho->CodigoJustificativaAusenciaInstrumentoPrevio = $dadosextras["jaip"];//$item->ausenciainstrumentoprevio;
             if (empty($Empenho->CodigoJustificativaAusenciaAtoJuridico)) {
                 $Empenho->CodigoJustificativaAusenciaInstrumentoPrevio = null;
             }
 
             $Empenho->SubElementos = [];
             $EmpenhoSubElemento = new stdClass();
-            $EmpenhoSubElemento->Identificador = $this->codeleIdentificador($item->e60_numemp);
+            $EmpenhoSubElemento->Identificador = $this->codeleIdentificador($item->e60_numemp); //$xi;//$item->planodespesa;
             $EmpenhoSubElemento->Valor = $item->e60_vlremp;
             $EmpenhoSubElemento->NaturezaDespesa = $item->natureza;
 
             if($fonteselemento[$Empenho->NaturezaDespesa]){
                 $Empenho->NaturezaDespesa = $fonteselemento[$Empenho->NaturezaDespesa];
             }
-            
+            //var_dump($EmpenhoSubElemento->NaturezaDespesa); die("Confere");
             if($fontessubelemento[$EmpenhoSubElemento->NaturezaDespesa]){
                 $EmpenhoSubElemento->NaturezaDespesa = $fontessubelemento[$EmpenhoSubElemento->NaturezaDespesa];
             }
@@ -316,7 +404,8 @@ class ArquivoEmpenho extends ArquivoBase
                 'orcdotacao.o58_orgao',
                 'orcdotacao.o58_unidade',
                 'e173_sequencial as ausenciaatojuridico',
-                'e174_sequencial as ausenciainstrumentoprevio'
+                'e174_sequencial as ausenciainstrumentoprevio',
+                'empempenho.e60_resumo'
             ])
             ->selectRaw("
                 CASE
@@ -393,10 +482,17 @@ class ArquivoEmpenho extends ArquivoBase
                 'empjustificativainstrumentoprevio.e176_justificativainstrumentoprevio'
             )
             ->whereBetween('empempenho.e60_emiss', [$this->dtDataInicial, $this->dtDataFinal])
-            ->where('empempenho.e60_instit', $this->instit)            
+            ->where('empempenho.e60_instit', $this->instit)
+            //->where('empempenho.e60_vlranu', '=', 0)            
             ->get();
             
-                
+
+            //$sql_with_bindings = str_replace_array('?', $query->getBindings(), $query->toSql());            
+            //$sql_with_bindings = str_replace('"', '', $sql_with_bindings);
+            //var_dump($sql_with_bindings);
+            //die("Confere");
+
+            
 
         return $query;
     }

@@ -10,12 +10,33 @@ use stdClass;
 class ArquivoPagamentoRestosPagarAnulacao extends ArquivoBase
 {
     protected $sNomeArquivo = 'PagamentoRestosPagarAnulacao';
-    
+
+    public function testa($var){
+        echo "<pre>";
+        print_r($var);
+        echo "</pre>";
+    }
 
     public function buscaCPFordenador($cgm){
         $sql = pg_query("SELECT z01_cgccpf FROM cgm WHERE z01_numcgm = {$cgm}");
         $resultado = pg_fetch_all($sql);
         return $resultado[0]["z01_cgccpf"];
+    }
+
+    public function buscaCodord2($codlan){
+        $di = $this->dtDataInicial;
+        $df = $this->dtDataFinal;
+
+        $sql = pg_query("SELECT c70_codlan, c70_data, c70_valor, c71_coddoc, c53_descr, c80_codord, c75_numemp, c76_numcgm, z01_nome, e69_numero, e69_codnota, c72_complem, c73_coddot, c74_codrec, c70_anousu, c53_tipo, c67_codele from conlancam inner join conlancamdoc on c71_codlan = c70_codlan inner join conhistdoc on c71_coddoc = c53_coddoc left join conlancamord on c70_codlan = c80_codlan left join conlancamemp on c75_codlan = c70_codlan left join conlancamcgm on c70_codlan = c76_codlan left join cgm on z01_numcgm = c76_numcgm left join conlancamnota on c70_codlan = c66_codlan left join empnota on c66_codnota = e69_codnota left join conlancamcompl on c70_codlan = c72_codlan left join conlancamdot on c73_codlan = c70_codlan and c73_anousu = c70_anousu left join conlancamele on c67_codlan = c70_codlan left join conlancamrec on c74_codlan = c70_codlan and c74_anousu = c70_anousu where c70_codlan = {$codlan}");
+        $resultado = pg_fetch_all($sql);
+    
+        return $resultado[0]["c80_codord"];
+    }
+
+    public function buscaLancamentoDoPagamento($op, $data){
+        $sql = pg_query("SELECT c70_codlan, c70_data, c70_valor, c71_coddoc, c53_descr, c80_codord, c75_numemp, c76_numcgm, z01_nome, e69_numero, e69_codnota, c72_complem, c73_coddot, c74_codrec, c70_anousu, c53_tipo, c67_codele from conlancam inner join conlancamdoc on c71_codlan = c70_codlan inner join conhistdoc on c71_coddoc = c53_coddoc left join conlancamord on c70_codlan = c80_codlan left join conlancamemp on c75_codlan = c70_codlan left join conlancamcgm on c70_codlan = c76_codlan left join cgm on z01_numcgm = c76_numcgm left join conlancamnota on c70_codlan = c66_codlan left join empnota on c66_codnota = e69_codnota left join conlancamcompl on c70_codlan = c72_codlan left join conlancamdot on c73_codlan = c70_codlan and c73_anousu = c70_anousu left join conlancamele on c67_codlan = c70_codlan left join conlancamrec on c74_codlan = c70_codlan and c74_anousu = c70_anousu where c80_codord = {$op} AND c71_coddoc = 37 AND c70_data = '{$data}'");
+        $resultado = pg_fetch_all($sql);
+        return $resultado[0]["c70_codlan"];
     }
 
     public function gerarDados()
@@ -30,33 +51,40 @@ class ArquivoPagamentoRestosPagarAnulacao extends ArquivoBase
         }
 
         $data = new stdClass();
-        $data->PagamentosRestosPagarAnulacoes = [];        
+        $data->PagamentosRestosPagarAnulacoes = [];
+        //$this->testa($estornos); die("Confere");
 
         $guardalancamento = array();
 
+        $ix = 1;
         foreach ($estornos as $estorno) {
+            //if($estorno->NumeroEmpenho != 4347){continue;}
             if(in_array($estorno->Identificador, $guardalancamento)){
                 continue;
             }
             array_push($guardalancamento, $estorno->Identificador);
+            $numeropagamento = $this->sCodigoTribunal . $estorno->NumeroEmpenho . $estorno->AnoEmpenho;
+            
+            $codlanpag = $this->buscaLancamentoDoPagamento($estorno->e71_codord, $estorno->DataAnulacao);
             
             $rpAnulacao = new stdClass();
-            $rpAnulacao->Identificador = $estorno->Identificador;
+            $rpAnulacao->Identificador = $ix;
             $rpAnulacao->CodigoUnidadeGestora = $this->sCodigoTribunal;
             $rpAnulacao->NumeroEmpenho = $estorno->NumeroEmpenho;
             $rpAnulacao->AnoEmpenho = $estorno->AnoEmpenho;
             $rpAnulacao->Competencia = $this->competencia;
-            $rpAnulacao->NumeroAnulacao = $estorno->NumeroNotaPagamento;
+            $rpAnulacao->NumeroAnulacao = $estorno->NumeroNotaPagamento;//$estorno->Identificador;
             $rpAnulacao->DataAnulacao = $estorno->DataAnulacao;
-            $rpAnulacao->NumeroNotaPagamento = $estorno->NumNota;
-            $rpAnulacao->AnoPagamentoRestosPagar = $estorno->c70_anousu;
-            $rpAnulacao->CPFResponsavel = $ugs;
+            $rpAnulacao->NumeroNotaPagamento = $numeropagamento; //$codlanpag;//$estorno->Identificador;//$estorno->e71_codord;//$estorno->NumNota; //$estorno->NumeroNotaPagamento;
+            $rpAnulacao->AnoPagamentoRestosPagar = $estorno->c70_anousu;//$estorno->AnoPagamentoRestosPagar;
+            $rpAnulacao->CPFResponsavel = $ugs;//$estorno->CPFResponsavel;
             $rpAnulacao->Justificativa = utf8_decode(Helper::convertAndLimit($estorno->Justificativa, 255));
             $rpAnulacao->Valor = $estorno->Valor;
             $rpAnulacao->CodigoOrgao = $estorno->CodigoOrgao;
             $rpAnulacao->CodigoUnidadeOrcamentaria = $estorno->CodigoUnidadeOrcamentaria;
 
             $data->PagamentosRestosPagarAnulacoes[] = (object) ['PagamentoRestosPagarAnulacao' => $rpAnulacao];
+            $ix++;
         }
 
         $this->aDados = $data;
@@ -78,7 +106,8 @@ class ArquivoPagamentoRestosPagarAnulacao extends ArquivoBase
                 'conlancam.c70_valor as Valor',
                 'orcdotacao.o58_orgao as CodigoOrgao',
                 'orcdotacao.o58_unidade as CodigoUnidadeOrcamentaria',
-                "c70_anousu"
+                "c70_anousu",
+                "e71_codord"
             )
             ->join('empempenho', 'empempenho.e60_numemp', 'empresto.e91_numemp')
             ->join('orcdotacao', function ($join) {
@@ -101,6 +130,10 @@ class ArquivoPagamentoRestosPagarAnulacao extends ArquivoBase
             ->whereIn('conlancamdoc.c71_coddoc', [36, 38])
             ->whereBetween('conlancam.c70_data', [$this->dtDataInicial, $this->dtDataFinal])
             ->where('empempenho.e60_instit', $this->instit);
+
+            //$sql_with_bindings = str_replace_array('?', $query->getBindings(), $query->toSql());
+            //$sql_with_bindings = str_replace("\"", "", $sql_with_bindings);
+            //var_dump($sql_with_bindings); die("confere");
 
         return $query->get();
     }

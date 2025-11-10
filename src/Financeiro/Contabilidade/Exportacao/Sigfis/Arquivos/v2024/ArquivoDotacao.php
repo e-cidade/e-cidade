@@ -21,7 +21,12 @@ class ArquivoDotacao extends ArquivoBase
         return $resultado;
     }
 
-    
+    public function testa($var){
+        echo "<pre>";
+        print_r($var);
+        echo "</pre>";
+    }
+
     public function gerarDados()
     {
         $clOrcDotacao = new cl_orcdotacao;
@@ -59,38 +64,40 @@ class ArquivoDotacao extends ArquivoBase
     
     
         $fontes50 = array(
-          200 => 1500,
-          6000 => 1500,
-          6001 => 1600,
-          6002 => 1600,
-          6003 => 1600,
-          6004 => 1600,
-          6005 => 1600,
-          6012 => 1601,
-          6021 => 1602,
-          6031 => 1603,
-          6032 => 1659,
-          6041 => 1600,
-          6051 => 1659,
-          6211 => 1621,
-          6212 => 1621,
-          6213 => 1621,
-          6214 => 1621,
-          6215 => 1621,
-          6216 => 1621,
-          6217 => 1621,
-          6218 => 1621,
-          6219 => 1621,
-          6311 => 1631,
-          6312 => 1631,
-          6351 => 1635,
-          6591 => 1659,
-          6592 => 1659,
-          6593 => 1659,
-          6594 => 1659,
-          6595 => 1659,
-          6596 => 1659,
-          6597 => 1659
+          6000 => 1600,
+            6001 => 1600,
+            6002 => 1600,
+            6003 => 1600,
+            6004 => 1600,
+            6005 => 1600,
+            6012 => 1601,
+            6021 => 1602,
+            6031 => 1603,
+            6032 => 1600,
+            6041 => 1604,
+            6051 => 1605,
+            6211 => 1621,
+            6212 => 1621,
+            6213 => 1621,
+            6214 => 1621,
+            6215 => 1621,
+            6216 => 1621,
+            6217 => 1621,
+            6218 => 1621,
+            6219 => 1621,
+            6311 => 1631,
+            6312 => 1632,
+            6351 => 1635,
+            6591 => 1501,
+            6592 => 1501,
+            6593 => 1600,
+            6593 => 1500,
+            6594 => 1600,
+            6594 => 1500,
+            6595 => 1500,
+            6596 => 1600,
+            6597 => 1600,
+            6219 => 1621
         );
 
         $fontes65 = array(
@@ -114,61 +121,129 @@ class ArquivoDotacao extends ArquivoBase
 
         $fontes0 = array(
           5 => 1569,
-          28 => 1550,
-          200 => 1500,
-          201 => 1501, 
-          202 => 1501, 
-          203 => 1501, 
-          204 => 1501, 
-          205 => 1501, 
-          206 => 1501, 
-          207 => 1501, 
-          208 => 1501, 
-          209 => 1501, 
-          210 => 1501, 
-          212 => 1501, 
-          225 => 1501, 
-          219 => 1704, 
-          8 => 1704, 
-          219 => 1705, 
-          8 => 1705, 
-          211 => 1700, 
-          211 => 1701, 
-          211 => 1702, 
-          211 => 1703, 
-          6 => 1750, 
-          173 => 1751, 
-          24 => 1708, 
-          92 => 1700, 
-          220 => 1749, 
-          160 => 1749, 
-          98 => 1701, 
-          21 => 1701, 
-          97 => 1755, 
-          97 => 1756, 
-          215 => 1801, 
-          216 => 1800, 
-          80 => 1501, 
-          50 => 1799, 
-          213 => 1754, 
-          224 => 1899, 
-          214 => 1802, 
-          178 => 1752, 
-          117 => 1701,
-          23 => 1540,
-        11 => 1551,
-        45 => 1553,
-        34 => 1569,
-        164 => 1660,
-        148 => 1700,
-        22 => 1700,
-        105 => 1700,
-        18 => 1700,
-        44 => 1700,
-        14 => 1700,
-        124 => 1700,
-        158 => 1700,
-        151 => 1700
+6 => 1750,
+8 => 1704,
+8 => 1705,
+10 => 1500,
+11 => 1551,
+12 => 1552,
+14 => 1700,
+16 => 1569,
+18 => 1700,
+21 => 1701,
+22 => 1700,
+23 => 1540,
+24 => 1708,
+28 => 1550,
+29 => 1500,
+34 => 1569,
+44 => 1700,
+45 => 1553,
+50 => 1799,
+62 => 1660,
+68 => 1500,
+78 => 1500,
+80 => 1501,
+92 => 1700,
+97 => 1755,
+97 => 1756,
+98 => 1701,
+101 => 1500,
+102 => 1700,
+104 => 1500,
+105 => 1700,
+108 => 1500,
+111 => 1500,
+117 => 1701,
+124 => 1700,
+131 => 1500,
+134 => 6002,
+136 => 1500,
+138 => 1500,
+139 => 1500,
+145 => 1500,
+147 => 1660,
+148 => 1700,
+149 => 1500,
+150 => 1500,
+151 => 1700,
+157 => 1500,
+158 => 1700,
+160 => 1749,
+161 => 1500,
+164 => 1660,
+167 => 1569,
+170 => 1700,
+171 => 1701,
+173 => 1751,
+178 => 1752,
+200 => 1500,
+201 => 1501,
+202 => 1501,
+203 => 1501,
+204 => 1501,
+205 => 1501,
+206 => 1501,
+207 => 1501,
+208 => 1501,
+209 => 1501,
+210 => 1501,
+211 => 1700,
+211 => 1701,
+211 => 1702,
+211 => 1703,
+212 => 1501,
+213 => 1754,
+214 => 1802,
+215 => 1801,
+216 => 1800,
+219 => 1704,
+219 => 1705,
+220 => 1749,
+224 => 1899,
+225 => 1501,
+1500 => 1500,
+1569 => 1500,
+1700 => 1500,
+1703 => 1500,
+1704 => 1500,
+6002 => 1600,
+6212 => 1621,
+6594 => 1659,
+6000 => 1600,
+6001 => 1600,
+6002 => 1600,
+6003 => 1600,
+6004 => 1600,
+6005 => 1600,
+6012 => 1601,
+6021 => 1602,
+6031 => 1603,
+6032 => 1600,
+6041 => 1604,
+6051 => 1605,
+6211 => 1621,
+6212 => 1621,
+6213 => 1621,
+6214 => 1621,
+6215 => 1621,
+6216 => 1621,
+6217 => 1621,
+6218 => 1621,
+6219 => 1621,
+6311 => 1631,
+6312 => 1632,
+6351 => 1635,
+6591 => 1501,
+6592 => 1501,
+6593 => 1600,
+6593 => 1500,
+6594 => 1600,
+6594 => 1500,
+6595 => 1500,
+6596 => 1600,
+6597 => 1600,
+6219 => 1621
         );
 
         $RemessaDotacao = new stdClass();
@@ -212,7 +287,8 @@ class ArquivoDotacao extends ArquivoBase
                         $tipodaacao = 1;
                     }
                 }
-                $oDados->TipoAcao = $tipodaacao;                
+                $oDados->TipoAcao = $tipodaacao; //substr($oDadosQuery->o58_projativ, 0, 1); //$oDadosQuery->o55_tipo;          
+                //$oDados->CodigoAcao = (strlen($oDadosQuery->o58_projativ) == 3 ) ? "0".$oDadosQuery->o58_projativ : $oDadosQuery->o58_projativ;
                 $oDados->CodigoAcao = $oDadosQuery->o58_projativ;
                 $oDados->CodigoFuncao = (strlen($oDadosQuery->o58_funcao) == 1) ? "0".$oDadosQuery->o58_funcao : $oDadosQuery->o58_funcao;
                 $oDados->CodigoSubFuncao = (strlen($oDadosQuery->o58_subfuncao) == 2) ? "0".$oDadosQuery->o58_subfuncao : $oDadosQuery->o58_subfuncao;
@@ -259,8 +335,8 @@ class ArquivoDotacao extends ArquivoBase
                         $oDados->NaturezaDespesa = $fonteselemento[$oDados->NaturezaDespesa];
                     }
                 }elseif(db_getsession('DB_instit') == 65){
-                    if($fontes65[$oDados->CodigoFonteRecurso]){
-                        $oDados->CodigoFonteRecurso = $fontes65[$oDados->CodigoFonteRecurso];
+                    if($fontes0[$oDados->CodigoFonteRecurso]){
+                        $oDados->CodigoFonteRecurso = $fontes0[$oDados->CodigoFonteRecurso];
                     }
                 }elseif(db_getsession('DB_instit') == 96){
                     if($fontes96[$oDados->CodigoFonteRecurso]){
@@ -328,6 +404,34 @@ class ArquivoDotacao extends ArquivoBase
             $RemessaDotacao->Dotacoes = $dotacao;
             pg_query("DROP TABLE etceado");
 
+            /*
+            for ($i = 0; $i < pg_num_rows($rsOrcDotacao); $i++) {
+                $oDadosQuery = db_utils::fieldsMemory($rsOrcDotacao, $i);
+
+                $oDadosDotacao = new stdClass();
+
+                $identificador = date("Y", db_getsession("DB_datausu"));
+                $identificador .= date("m", db_getsession("DB_datausu"));
+                $identificador .= $oDadosQuery->o58_coddot;
+
+                $oDadosDotacao->Identificador = $identificador;
+                $oDadosDotacao->CodigoUnidadeGestora = $this->sCodigoTribunal;
+                $oDadosDotacao->Ano = $oDadosQuery->o58_anousu;
+                $oDadosDotacao->CodigoOrgao = $oDadosQuery->o58_orgao;
+                $oDadosDotacao->CodigoUnidadeOrcamentaria = $oDadosQuery->o58_unidade;
+                $oDadosDotacao->CodigoPrograma = $oDadosQuery->o58_programa;
+                $tipo = (!in_array($oDadosQuery->o55_tipo, [1,2])) ? 3 : $oDadosQuery->o55_tipo;
+                $oDadosDotacao->TipoAcao =  $tipo;
+                $oDadosDotacao->CodigoAcao = $oDadosQuery->o58_projativ;
+                $oDadosDotacao->CodigoFuncao = $oDadosQuery->o52_siconfi;
+                $oDadosDotacao->CodigoSubFuncao = $oDadosQuery->o53_siconfi;
+                $oDadosDotacao->NaturezaDespesa = $oDadosQuery->natureza_despesa;
+                $oDadosDotacao->CodigoFonteRecurso = $oDadosQuery->codigo_siconfi;
+                $oDadosDotacao->ValorDotacao = $oDadosQuery->o58_valor;
+
+                $dotacao[] = (object) ['Dotacao' => $oDadosDotacao];
+            }*/
+            //$RemessaDotacao->Dotacoes = $dotacao;
         }
         $this->aDados= $RemessaDotacao;
     }//função gera dados

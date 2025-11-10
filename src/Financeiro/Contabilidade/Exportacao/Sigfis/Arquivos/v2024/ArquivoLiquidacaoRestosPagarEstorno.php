@@ -9,7 +9,7 @@ use stdClass;
 
 class ArquivoLiquidacaoRestosPagarEstorno extends ArquivoBase
 {
-    
+    //protected $sNomeArquivo = 'LiquidacaoRestosPagarEstorno';
     protected $sNomeArquivo = 'LiquidacaoRestosPagarAnulacao';
 
     public function gerarDados()

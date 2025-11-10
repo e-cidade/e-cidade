@@ -35,7 +35,9 @@ class ArquivoEmpenhoAtoJuridico extends ArquivoBase
     */
     public function gerarDados()
     {
-        
+        /*$campos = [
+            'e60_numemp', 'e60_codemp', 'e60_anousu', 'o58_orgao', 'o58_unidade', 'e166_tipoatojuridico'
+        ];*/
         $campos = [
             'e60_numemp', 'e60_codemp', 'e60_anousu', 'o58_orgao', 'o58_unidade'
         ];
@@ -59,18 +61,26 @@ class ArquivoEmpenhoAtoJuridico extends ArquivoBase
         $obj = new \stdClass();
         $obj->EmpenhosAtosJuridicos = [];
 
-        
+        //$dadosug = $this->deparaUnidadeGestora($this->instit);
+
+
         //Pelo sequencial do empenho e60_numemp, buscar o tipo do ato jurídico na tabela nova
 
         foreach ($empenhos as $empenho) {
             $dadosextras = $this->buscaCamposAuxiliares($empenho->e60_numemp);
 
-                        
+            /*if($empenho->e60_numemp == 954704){
+                echo "<pre>";
+                print_r($dadosextras);
+                echo "<pre>";
+                die("Boi");
+            }*/
+            
             $numeroatojuridico = $dadosextras["noatoju"];
             $codunidadeatoju = $dadosextras["ugaj"];
             $codtipoatoju = $dadosextras["tajuo"];
 
-            
+            //if($dadosextras["tipro"] == 99 || $dadosextras["tajuo"] == 99 || $dadosextras["tipro"] == 0 || $dadosextras["tajuo"] == 0){continue;}
             if(($dadosextras["tipro"] == 99 || $dadosextras["tajuo"] == 99 || $dadosextras["tipro"] == 0 || $dadosextras["tajuo"] == 0) && !$dadosextras["noatoju"]){continue;}
             
             $dadosEmpenhoAtoJuridico = (object)[
@@ -79,11 +89,11 @@ class ArquivoEmpenhoAtoJuridico extends ArquivoBase
                 'Competencia' => $this->competencia,
                 'CodigoOrgao' => $empenho->o58_orgao,
                 'CodigoUnidadeOrcamentaria' => $empenho->o58_unidade,
-                'NumeroAtoJuridicoTCE' => $numeroatojuridico,
-                'CodigoUnidadeGestoraAtoJuridico' => $codunidadeatoju,
+                'NumeroAtoJuridicoTCE' => $numeroatojuridico,//1,
+                'CodigoUnidadeGestoraAtoJuridico' => $codunidadeatoju,//$this->sCodigoTribunal,
                 'NumeroEmpenho' => $empenho->e60_codemp,
                 'AnoEmpenho' => $empenho->e60_anousu,
-                'CodigoTipoAtoJuridico' => $codtipoatoju
+                'CodigoTipoAtoJuridico' => $codtipoatoju//$empenho->e166_tipoatojuridico
             ];
 
             $obj->EmpenhosAtosJuridicos[] = (object)['EmpenhoAtoJuridico' => $dadosEmpenhoAtoJuridico];
@@ -94,3 +104,14 @@ class ArquivoEmpenhoAtoJuridico extends ArquivoBase
 }
 
 
+/*
+jaip - Justificativa da Ausência de Instrumento Prévio
+jaaj - Justificativa da Ausência de Ato Jurídico
+
+tipro - Tipo de Instrumento Prévio   
+noinpr - Nº Instrumento Prévio
+
+tajuo - Tipo do Ato Jurídico
+noatoju - Nº do Ato Jurídico
+
+*/

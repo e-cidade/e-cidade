@@ -122,7 +122,12 @@ class ArquivoConciliacaoBancaria extends ArquivoBase
             throw new \Exception('Não foi encontrardo nenhuma conta bancária para o arquivo de Remessa ');
         }
 
-    
+
+
+        //echo "<pre>";
+        //print_r($contasBancarias);
+        //echo "</pre>";
+        //die("Confere");
 
         $obj = new \stdClass();
         $obj->ConciliacoesBancarias = [];
@@ -315,7 +320,7 @@ class ArquivoConciliacaoBancaria extends ArquivoBase
                 $dataFechamentoConta = (new \Datetime($contaBancaria->k13_limite))->format('Y-m-d');
 
                 $dadosLiquidacaoEmpenho = (object)[
-                    'Identificador' => $contaBancaria->k13_reduz,
+                    'Identificador' => $contaBancaria->k13_reduz, //$contaBancaria->codigo_conplano.$contaBancaria->siconfi,
                     'CodigoUnidadeGestora' => $this->sCodigoTribunal,
                     'Exercicio' => $this->iAnoUsu,                    
                     'Competencia' => $this->competencia,
@@ -353,7 +358,26 @@ class ArquivoConciliacaoBancaria extends ArquivoBase
                 
             }
             if (floatval($contaBancaria->saldo_debito) == 0 && floatval($contaBancaria->saldo_credito == 0)) {continue;}
-            
+            //if (floatval($contaBancaria->saldo_debito) != 0 && floatval($contaBancaria->saldo_credito != 0)) {
+                /*
+                if(db_getsession('DB_instit') == 50){
+                    if($fontes50[$contaBancaria->siconfi]){
+                      $contaBancaria->siconfi = $fontes50[$contaBancaria->siconfi];
+                    }
+                }elseif(db_getsession('DB_instit') == 65){
+                    if($fontes65[$contaBancaria->siconfi]){
+                      $contaBancaria->siconfi = $fontes65[$contaBancaria->siconfi];
+                    }
+                }elseif(db_getsession('DB_instit') == 96){
+                    if($fontes96[$contaBancaria->siconfi]){
+                      $contaBancaria->siconfi = $fontes96[$contaBancaria->siconfi];
+                    }
+                }else{
+                    if($fontes0[$contaBancaria->siconfi]){
+                      $contaBancaria->siconfi = $fontes0[$contaBancaria->siconfi];
+                    }
+                }
+                */
                 if($fontes0[$contaBancaria->siconfi]){
                     $contaBancaria->siconfi = $fontes0[$contaBancaria->siconfi];
                 }
@@ -392,10 +416,10 @@ class ArquivoConciliacaoBancaria extends ArquivoBase
                 if($arquivosdo == "0"){
                     $novadata = "2025-01-02";
                 }
-                
+                //if($contaBancaria->k13_reduz != 15235){continue;}
 
                 $dadosLiquidacaoEmpenho = (object)[
-                    'Identificador' => $contaBancaria->k13_reduz,
+                    'Identificador' => $contaBancaria->k13_reduz, //$contaBancaria->codigo_conplano.$contaBancaria->siconfi,
                     'CodigoUnidadeGestora' => $this->sCodigoTribunal,
                     'Exercicio' => $this->iAnoUsu,                    
                     'Competencia' => $this->competencia,

@@ -10,10 +10,15 @@ class ArquivoContaBancaria extends ArquivoBase
 {
     protected $sNomeArquivo  = 'ContaBancaria';
     /**
-    * Busca os dados para gerar o Arquivo de Unidade OrÁament·ria
+    * Busca os dados para gerar o Arquivo de Unidade Or√ßament√°ria
     */
 
-    
+    public function testa($var){
+        echo "<pre>";
+        print_r($var);
+        echo "</pre>";
+    }
+
 
     public function gerarDados()
     {
@@ -23,7 +28,8 @@ class ArquivoContaBancaria extends ArquivoBase
         $expl2ode = explode("\\\"", $expl1ode[2]);
         $arquivosdo = $expl2ode[1];
         if($arquivosdo == "0"){
-            $this->competencia = $this->iAnoUsu . "00";
+            //$this->competencia = "202400";            
+            $this->competencia = $this->iAnoUsu . "00"; //"202400";
         }
         
         $camposContasBancarias = [
@@ -92,12 +98,62 @@ class ArquivoContaBancaria extends ArquivoBase
                 pcasp.conta
            ORDER BY k13_reduz
         "));
-        
+
+        /*
+        $kql = "select $camposContasBancarias from balancete_verificacao_por_recurso(
+                $this->iAnoUsu,
+                '$this->dtDataInicial',
+                '$this->dtDataFinal',
+                false,
+                (
+                    SELECT array_agg(c61_reduz)
+                        FROM
+                        (SELECT c61_reduz
+                           FROM contabilidade.conplano
+                           JOIN contabilidade.conplanoreduz ON (c61_codcon, c61_anousu) = (c60_codcon, c60_anousu)
+                          WHERE c61_instit IN ($this->instit)
+                            and c61_anousu = $this->iAnoUsu
+                            and c60_estrut like '111%'
+                        ) AS x
+                )::int[]
+            ) x
+            left join pcaspconplano on pcasp_id = codigo_conplano
+            left join pcasp on pcasp.id = pcasp_id
+            join contabancaria on db83_sequencial = conta_bancaria_id
+            join bancoagencia on db89_sequencial = db83_bancoagencia
+            join db_bancos on db90_codban =  db89_db_bancos
+            join saltes on k13_conta = reduzido
+            GROUP BY
+                x.siconfi,
+                x.codigo_conplano,
+                db90_codban,
+                db90_descr,
+                db89_codagencia,
+                db89_digito,
+                db83_conta,
+                db83_tipoconta,
+                db83_dvconta,
+                db83_identificador,
+                db83_descricao,
+                k13_dtimplantacao,
+                k13_limite,
+                k13_reduz,
+                pcasp.conta
+           ORDER BY x.siconfi";           
+           var_dump($kql); die("Confere");
+           */
+
+
+
         if (empty($contasBancarias)) {
-            throw new \Exception('N„o foi encontrardo nenhuma conta banc·ria para o arquivo de Remessa ');
+            throw new \Exception('N√£o foi encontrardo nenhuma conta banc√°ria para o arquivo de Remessa ');
         }
 
-        
+        //echo "<pre>";
+        //print_r($contasBancarias);
+        //echo "</pre>";
+        //die("Confere");
+
         $obj = new \stdClass();
         $obj->ContasBancarias = [];
 
@@ -240,14 +296,19 @@ class ArquivoContaBancaria extends ArquivoBase
             }
         }
         $contasBancarias2 = array_values($contasBancarias2);
-
+        //$this->testa($contasBancarias); die("Confere");
         $verifica = array();
         foreach ($contasBancarias2 as $contaBancaria) {
+            //if($contaBancaria->k13_reduz != 14289){continue;}
+            
             if (empty($contaBancaria->conta)) {
-                $consulta = pg_query("SELECT distinct o15_recurso, c60_estrut from saltes join conplanoreduz on conplanoreduz.c61_reduz = saltes.k13_reduz and c61_anousu= 2024 join conplanoexe on conplanoexe.c62_reduz = conplanoreduz.c61_reduz and c61_anousu=c62_anousu join conplano on conplanoreduz.c61_codcon = conplano.c60_codcon and c61_anousu=c60_anousu left join conplanoconta on conplanoconta.c63_codcon = conplanoreduz.c61_codcon and conplanoconta.c63_anousu = conplanoreduz.c61_anousu and conplanoconta.c63_reduz = conplanoreduz.c61_reduz left join empagetipo on empagetipo.e83_conta = saltes.k13_conta join orctiporec on o15_codigo = c61_codigo join fonterecurso on orctiporec_id = o15_codigo and exercicio = c61_anousu where k13_reduz = {$contaBancaria->k13_reduz}");
+                $ano = $this->iAnoUsu;
+                $consulta = pg_query("SELECT distinct o15_recurso, c60_estrut from saltes join conplanoreduz on conplanoreduz.c61_reduz = saltes.k13_reduz and c61_anousu= {$ano} join conplanoexe on conplanoexe.c62_reduz = conplanoreduz.c61_reduz and c61_anousu=c62_anousu join conplano on conplanoreduz.c61_codcon = conplano.c60_codcon and c61_anousu=c60_anousu left join conplanoconta on conplanoconta.c63_codcon = conplanoreduz.c61_codcon and conplanoconta.c63_anousu = conplanoreduz.c61_anousu and conplanoconta.c63_reduz = conplanoreduz.c61_reduz left join empagetipo on empagetipo.e83_conta = saltes.k13_conta join orctiporec on o15_codigo = c61_codigo join fonterecurso on orctiporec_id = o15_codigo and exercicio = c61_anousu where k13_reduz = {$contaBancaria->k13_reduz}");
                 $resultado = pg_fetch_all($consulta);                
                 $contaBancaria->siconfi = $resultado[0]["o15_recurso"];
                 $contaBancaria->conta = $resultado[0]["c60_estrut"];
+                
+                
                 
                 if(substr($contaBancaria->conta, 0,6) == 111112){
                     $contaBancaria->conta = 111110200;
@@ -275,16 +336,70 @@ class ArquivoContaBancaria extends ArquivoBase
                     $contaBancaria->conta = 111110603;
                 } elseif(substr($contaBancaria->conta, 0, 15) == 111110603470200){
                     $contaBancaria->conta = 111110603;
+                } elseif(substr($contaBancaria->conta, 0, 15) == 111110103000000){
+                    $contaBancaria->conta = 111110100;
                 }
+                
+
+                /*if(empty($contaBancaria->conta)){
+                    var_dump($contaBancaria->k13_reduz); echo "<br>";
+                }*/
                 
             }
             
             if (floatval($contaBancaria->saldo_debito) == 0 && floatval($contaBancaria->saldo_credito == 0)) {continue;}
-            
+            //$this->testa($contaBancaria);
+            //if (floatval($contaBancaria->saldo_debito) != 0 && floatval($contaBancaria->saldo_credito != 0)) {
+
+                /*
+                if(db_getsession('DB_instit') == 50){
+                    if($fontes50[$contaBancaria->siconfi]){
+                      $contaBancaria->siconfi = $fontes50[$contaBancaria->siconfi];
+                    }else{
+                        $contaBancaria->siconfi = 1700;
+                    }
+                }elseif(db_getsession('DB_instit') == 65){
+                    if($fontes65[$contaBancaria->siconfi]){
+                      $contaBancaria->siconfi = $fontes65[$contaBancaria->siconfi];
+                    }else{
+                        $contaBancaria->siconfi = 1700;
+                    }
+                }elseif(db_getsession('DB_instit') == 96){
+                    if($fontes96[$contaBancaria->siconfi]){
+                      $contaBancaria->siconfi = $fontes96[$contaBancaria->siconfi];
+                    }else{
+                        $contaBancaria->siconfi = 1700;
+                    }
+                }elseif(db_getsession('DB_instit') == 55){
+                    if($fontes96[$contaBancaria->siconfi]){
+                      $contaBancaria->siconfi = $fontes0[$contaBancaria->siconfi];
+                    }else{
+                        $contaBancaria->siconfi = 1500;
+                    }
+                }elseif(db_getsession('DB_instit') == 75){
+                    if($fontes96[$contaBancaria->siconfi]){
+                      $contaBancaria->siconfi = $fontes0[$contaBancaria->siconfi];
+                    }else{
+                        $contaBancaria->siconfi = 1500;
+                    }
+                }else{
+                    if($fontes0[$contaBancaria->siconfi]){
+                      $contaBancaria->siconfi = $fontes0[$contaBancaria->siconfi];
+                    }else{
+                        $contaBancaria->siconfi = 1700;
+                    }
+                }
+                */
                 if($fontes0[$contaBancaria->siconfi]){
                     $contaBancaria->siconfi = $fontes0[$contaBancaria->siconfi];
-                }                
+                }
                 
+                //$dataAberturaConta = (new \Datetime($contaBancaria->k13_dtimplantacao))->format('Y-m-d\TH:i:s');
+                //$dataFechamentoConta = (new \Datetime($contaBancaria->k13_limite))->format('Y-m-d\TH:i:s');
+                //echo "<pre>";
+                //print_r($contaBancaria);
+                //echo "</pre>";
+                //die("Confere");
                 if($verifica[$contaBancaria->db83_conta]){continue;}
 
                 $dataAberturaConta = (new \Datetime($contaBancaria->k13_dtimplantacao))->format('Y-m-d');
@@ -303,27 +418,33 @@ class ArquivoContaBancaria extends ArquivoBase
                         $contaBancaria->db90_descr = "SANTANDER";
                     }
 
-                $dadosLiquidacaoEmpenho = (object)[                    
+                $dadosLiquidacaoEmpenho = (object)[
+                    //'Identificador' =>$contaBancaria->codigo_conplano.$contaBancaria->siconfi.$contaBancaria->k13_reduz,
                     'Identificador' => $contaBancaria->k13_reduz,
                     'CodigoUnidadeGestora' => $this->sCodigoTribunal,
                     'Competencia' => $this->competencia,
                     'CodigoBanco' => $contaBancaria->db90_codban,
-                    'NomeBanco' => Helper::convertAndLimit(substr($contaBancaria->db90_descr, 0, 20)),
+                    'NomeBanco' => substr(utf8_decode($contaBancaria->db90_descr), 0, 20),                    
                     'CodigoAgencia' => $contaBancaria->db89_codagencia,
                     'NumeroContaBancaria' => $contaBancaria->db83_conta,
-                    'DescricaoContaBancaria' => utf8_encode(substr(Helper::convertAndLimit($contaBancaria->db83_descricao), 0, 20)),
+                    'DescricaoContaBancaria' => substr(utf8_decode($contaBancaria->db83_descricao), 0, 20),
                     'FonteRecursos' => $contaBancaria->siconfi,
                     'AberturaContaBancaria' =>  $dataAberturaConta,
-                    'EncerramentoContaBancaria' => $dataFechamentoConta,                    
+                    'EncerramentoContaBancaria' => $dataFechamentoConta,
+                    //'EncerramentoContaBancaria' => !empty($dataFechamentoConta) ? $dataFechamentoConta : $dataAberturaConta,
                     'SaldoInicialContaBancaria' => $contaBancaria->saldo_anterior,
                     'EntradasFinanceiras' => $contaBancaria->saldo_debito,
                     'SaidasFinanceiras' => $contaBancaria->saldo_credito,
-                    'SaldoFinalContaBancaria' => $contaBancaria->saldo_final,                    
+                    'SaldoFinalContaBancaria' => $contaBancaria->saldo_final,
+                    /**
+                     * @todo -> remover condicao temporaria apenas para teste
+                     */
+                    //'ContaContabil' => (!empty($contaBancaria->conta)) ?  $contaBancaria->conta : '111310600',
                     'ContaContabil' => $contaBancaria->conta
                 ];
                 $verifica[$contaBancaria->db83_conta] = $contaBancaria->db83_tipoconta;
                 $obj->ContasBancarias[] = (object)['ContaBancaria' => $dadosLiquidacaoEmpenho];
-            
+            //}
         }
         $this->aDados =  $obj;
     }

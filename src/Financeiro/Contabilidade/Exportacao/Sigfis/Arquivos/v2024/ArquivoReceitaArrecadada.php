@@ -11,7 +11,13 @@ class ArquivoReceitaArrecadada extends ArquivoBase
 
     /**
     * Busca os dados para gerar o Arquivo de Unidade Orçamentária
-    */    
+    */
+
+    public function testa($var){
+        echo "<pre>";
+        print_r($var);
+        echo "</pre>";
+    }
 
     public function gerarDados()
     {   
@@ -226,9 +232,19 @@ class ArquivoReceitaArrecadada extends ArquivoBase
 17235030 => 17235001,
 17175010 => 17175001,
 17235040 => 17235001,
-413900011 => 13999901
+13900011 => 13999901,
+17180542 => 17145301,
+17213599 => 17145101,
+17235060 => 17235001,
+19189901 => 19229901,
+13250155 => 13210101
 );
-                
+        
+        //echo "<pre>";
+        //print_r($aReceitasVinculadas);
+        //echo "</pre>";
+        //die("Confere");
+
 
         $daoConlancam = new \cl_conlancam;
 
@@ -245,7 +261,10 @@ class ArquivoReceitaArrecadada extends ArquivoBase
         $where .= " and c70_anousu = {$this->iAnoUsu}";
         $where .= " and c70_data between '{$this->dtDataInicial}' and '{$this->dtDataFinal}'";
         $where .= " and c53_tipo in (100,101)";
+
         
+
+        //$sSqlConlancam = $daoConlancam->sql_query_receita_planoreceita_modificado($campos, null, $where);
         
         $sSqlConlancam = "SELECT distinct SUBSTRING(o57_fonte FROM 2 FOR 8) AS o57_fonte_grupo, c53_tipo, substr(planoreceita.conta,1,8) as codigo_item_receita,codigo_siconfi,o15_complemento as complemento,c70_anousu,RANK() OVER (ORDER BY substr(planoreceita.conta,1,8),codigo_siconfi) AS grupo_receita,extract(YEAR from c70_data) || to_char(c70_data,'MM') as competencia, case when substr(o57_fonte, 1, 1) = '4' then 1 when substr(o57_fonte, 1, 1) = '9' and substr(o57_fonte, 1, 3) <> '917' then 2 when substr(o57_fonte, 1, 3) = '917' then 3 else 0 end as deducao, sum(c70_valor) as vt from conlancam inner join conlancamrec on c74_codlan = c70_codlan inner join conlancamdoc on c71_codlan = c70_codlan inner join conhistdoc on c53_coddoc = c71_coddoc inner join orcreceita on o70_codrec = c74_codrec and o70_anousu = c74_anousu inner join orcfontes on o57_codfon = o70_codfon and o57_anousu = o70_anousu inner join conplanoorcamento on c60_codcon = o57_codfon and c60_anousu = o57_anousu left join planoreceitaconplanoorcamento on conplanoorcamento_codigo = c60_codigo left join planoreceita on planoreceita.id = planoreceita_id and planoreceita.exercicio = c70_anousu and planoreceita.uniao = 't' inner join orctiporec on o15_codigo = o70_codigo inner join fonterecurso on orctiporec_id = o15_codigo and fonterecurso.exercicio = c74_anousu where o70_instit = {$this->instit} and c70_anousu = {$this->iAnoUsu} and c70_data between '{$this->dtDataInicial}' and '{$this->dtDataFinal}' and c53_tipo in (100,101) GROUP BY SUBSTRING(o57_fonte FROM 2 FOR 8), c53_tipo,
     substr(planoreceita.conta,1,8),
@@ -260,7 +279,8 @@ class ArquivoReceitaArrecadada extends ArquivoBase
         ELSE 0 
     END";
         
-        $rsConlancam   = db_query($sSqlConlancam);        
+        $rsConlancam   = db_query($sSqlConlancam);
+        
         
         if (pg_num_rows($rsConlancam) > 0) {
             if (empty($this->sCodigoTribunal)) {
@@ -346,7 +366,8 @@ class ArquivoReceitaArrecadada extends ArquivoBase
 
                     $receitaArrecadada[] =  (object) ['ReceitaArrecadada' => $oDadosReceitaArrecadada];
                 }
-            }else{
+            }else{                
+
                 for ($i = 0; $i < pg_num_rows($rsConlancam); $i++) {
                 $oDadosQuery = db_utils::fieldsMemory($rsConlancam, $i);                
 
@@ -390,7 +411,7 @@ class ArquivoReceitaArrecadada extends ArquivoBase
             
 
             $resultado = array();
-            
+            //$this->testa($receitaArrecadada); die("Confere");
             foreach($receitaArrecadada as $objeto) {
                 $codigoUnidadeGestora = $objeto->ReceitaArrecadada->CodigoUnidadeGestora;
                 $codigoItemReceita = $objeto->ReceitaArrecadada->CodigoItemReceita;
@@ -423,7 +444,7 @@ class ArquivoReceitaArrecadada extends ArquivoBase
             }
             
             $RemessaReceitaArrecadada->ReceitasArrecadadas = $receitaArrecadadaFinal;
-            
+            //die("Parou aqui");
             $this->aDados= $RemessaReceitaArrecadada;
         }
     }

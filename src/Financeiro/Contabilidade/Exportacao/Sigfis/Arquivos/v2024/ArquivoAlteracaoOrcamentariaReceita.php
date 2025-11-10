@@ -13,7 +13,12 @@ class ArquivoAlteracaoOrcamentariaReceita extends ArquivoBase
     /**
     * Busca os dados para gerar o Arquivo de Unidade Orçamentária
     */
-    
+
+    public function testa($var){
+        echo "<pre>";
+        print_r($var);
+        echo "</pre>";
+    }
 
     public function checavalor($codproj){
         $sql = pg_query("SELECT distinct o47_codsup, o39_codproj, o39_numero as decreto, o58_orgao, o47_anousu, case when o47_valor > 0 then o47_valor end as suplementado, case when o47_valor < 0 then o47_valor *-1 end as reduzido, o46_data, o49_data from orcsuplem inner join orcsuplemtipo on o48_tiposup = orcsuplem.o46_tiposup inner join orcsuplemval on o47_codsup=o46_codsup left outer join orcsuplemlan on o49_codsup = o47_codsup inner join orcprojeto on o39_codproj = orcsuplem.o46_codlei left join orcprojetoorcprojetolei on o39_codproj = o139_orcprojeto inner join orclei on o45_codlei = orcprojeto.o39_codlei left join orcsuplemretif on o48_retificado = orcprojeto.o39_codproj inner join orcdotacao on o58_coddot =orcsuplemval.o47_coddot and o58_anousu=orcsuplemval.o47_anousu inner join orcelemento on o58_codele = o56_codele and o56_anousu = o58_anousu inner join orctiporec on o58_codigo = o15_codigo inner join complementofonterecurso on o15_complemento = o200_sequencial where ( o39_usalimite is true or o139_orcprojeto is not null) and o48_retificado is null AND o39_codproj = {$codproj} AND o49_data BETWEEN '{$this->dtDataInicial}' AND '{$this->dtDataFinal}' ORDER BY o39_codproj");
@@ -155,10 +160,10 @@ class ArquivoAlteracaoOrcamentariaReceita extends ArquivoBase
 
         if($this->competencia == 202404 || $this->competencia == 202405 || $this->competencia == 202406 || $this->competencia == 202407 || $this->competencia == 202408 || $this->competencia == 202409 || $this->competencia == 202410 || $this->competencia == 202411 || $this->competencia == 202412){
         
-            
+            //Alterado        
             $novosdados = $this->buscaSuplementacoes();
             $guardado = $this->guardaAdicionais();
-            
+            //$this->testa($novosdados); die("Veja");
 
             $dados = array();        
             foreach ($novosdados as $item) {            
@@ -265,7 +270,7 @@ class ArquivoAlteracaoOrcamentariaReceita extends ArquivoBase
 
             $sSqlOrcSuplem = $daoOrcSuplem->sql_query_suplementacoes_receita_modificado(null, $sCampos, null, $sWhere, null);
             $rsOrcSuplem   = db_query($sSqlOrcSuplem);
-            
+            //var_dump($sSqlOrcSuplem); die("Consulta");
 
             if (pg_num_rows($rsOrcSuplem) > 0) {            
                 if (empty($this->sCodigoTribunal)) {
@@ -342,7 +347,8 @@ class ArquivoAlteracaoOrcamentariaReceita extends ArquivoBase
         $where .= " and o39_data between '{$this->dtDataInicial}' and '{$this->dtDataFinal}'";
 
         $sSqlOrcSuplem = $daoOrcSuplem->sql_query_suplementacoes_receita_modificado(null, $campos, null, $where, null);
-                        
+        //$sSqlOrcSuplem = $daoOrcSuplem->sql_query_suplementacoes_receita(null, $campos, null, $where, null);
+                
         $rsOrcSuplem   = db_query($sSqlOrcSuplem);        
 
         $valor = 0;

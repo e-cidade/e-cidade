@@ -38,16 +38,23 @@ class ArquivoAlteracaoOrcamentariaDespesa extends ArquivoBase
         return $resultado;
     }
 
-    
+    public function testa($var){
+        echo "<pre>";
+        print_r($var);
+        echo "</pre>";
+    }
 
     public function gerarDados(){           
 
         $daoOrcSuplem  = new \cl_orcsuplem;
 
-        $sCampos  = " distinct o46_codsup,o47_valor as valor,";        
+        $sCampos  = " distinct o46_codsup,o47_valor as valor,";
+        //$sCampos .= "RANK() OVER (PARTITION BY o55_projativ ORDER BY o46_codsup,";
+        //$sCampos .= "codigo_siconfi,substr(planodespesa.conta,1,6)) AS grupo_despesa,";
         $sCampos .= " o45_descr as lei,o45_datafim as data_lei_autorizativa,";
         $sCampos .= "o39_numero as numero_instrumento,o39_anousu as ano_alteracao,o49_data as data_instrumento,";
-        $sCampos .= "'1' as tipo_atualizacao,o15_codigo,o48_tiposup,";        
+        $sCampos .= "'1' as tipo_atualizacao,o15_codigo,o48_tiposup,";
+        //$sCampos .= "substr(planodespesa.conta,1,6) as natureza_despesa,";
         $sCampos .= "o58_programa,o58_funcao,o58_subfuncao,o55_projativ,";
         $sCampos .= "o55_tipo,o58_orgao,o58_unidade,codigo_siconfi, c60_estrut";
 
@@ -55,25 +62,27 @@ class ArquivoAlteracaoOrcamentariaDespesa extends ArquivoBase
         $sWhere .= " and o49_data between '{$this->dtDataInicial}' and '{$this->dtDataFinal}'";
 
         $orderBy = "o55_projativ";
-        
+        //$sSqlOrcSuplem = $daoOrcSuplem->sql_query_suplementacoes_despesa(null, $sCampos, $orderBy, $sWhere);
         $sSqlOrcSuplem = $daoOrcSuplem->sql_query_suplementacoes_despesaSigfis(null, $sCampos, $orderBy, $sWhere);
 
         $rsOrcSuplem   = db_query($sSqlOrcSuplem);
+        //var_dump(pg_num_rows($rsOrcSuplem));
         
+        //if(($this->instit == 45 || $this->instit == 75 || $this->instit == 90) && pg_num_rows($rsOrcSuplem) == 0){
+        $inst = db_getsession("DB_instit");
+        $novosql = "SELECT distinct o47_codsup, o49_data as data_instrumento, o45_numlei as lei, o39_codproj, o39_numero as numero_instrumento, o46_tiposup, o48_descr, o47_coddot, o58_orgao, o47_anousu, case when o47_valor > 0 then o47_valor end as suplementado, case when o47_valor < 0 then o47_valor *-1 end as reduzido, o58_codigo, o39_usalimite, o139_orcprojeto, o58_unidade, o39_anousu as ano_alteracao, '1' as tipo_atualizacao, o45_datafim as data_lei_autorizativa, o48_tiposup, o58_funcao, o58_subfuncao, o58_programa, o55_tipo, o55_projativ, c60_estrut, codigo_siconfi, o47_valor as valor from orcsuplem inner join orcsuplemtipo on o48_tiposup = orcsuplem.o46_tiposup inner join orcsuplemval on o47_codsup=o46_codsup left outer join orcsuplemlan on o49_codsup = o47_codsup inner join orcprojeto on o39_codproj = orcsuplem.o46_codlei left join orcprojetoorcprojetolei on o39_codproj = o139_orcprojeto inner join orclei on o45_codlei = orcprojeto.o39_codlei left join orcsuplemretif on o48_retificado = orcprojeto.o39_codproj inner join orcdotacao on o58_coddot =orcsuplemval.o47_coddot and o58_anousu=orcsuplemval.o47_anousu and o58_instit in ({$inst}) inner join orcelemento on o58_codele = o56_codele and o56_anousu = o58_anousu inner join orctiporec on o58_codigo = o15_codigo inner join complementofonterecurso on o15_complemento = o200_sequencial inner join orcprojativ on o55_projativ = o58_projativ and o55_anousu = o58_anousu inner join conplanoorcamento on conplanoorcamento.c60_anousu = o58_anousu and conplanoorcamento.c60_codcon = o58_codele inner join fonterecurso on fonterecurso.orctiporec_id = o15_codigo and fonterecurso.exercicio = o58_anousu where ( o39_usalimite is true or o139_orcprojeto is not null) and o48_retificado is null and o46_tiposup in (1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014,1015,1016,1050) and 1=1 and orcsuplemlan.o49_data >= '{$this->dtDataInicial}' and orcsuplemlan.o49_data <= '{$this->dtDataFinal}' and o49_codsup is not null";
+        $novosdados = pg_query($novosql);
         
-        
-            $inst = db_getsession("DB_instit");
-                $novosql = "SELECT distinct o47_codsup, o49_data as data_instrumento, o45_numlei as lei, o39_codproj, o39_numero as numero_instrumento, o46_tiposup, o48_descr, o47_coddot, o58_orgao, o47_anousu, case when o47_valor > 0 then o47_valor end as suplementado, case when o47_valor < 0 then o47_valor *-1 end as reduzido, o58_codigo, o39_usalimite, o139_orcprojeto, o58_unidade, o39_anousu as ano_alteracao, '1' as tipo_atualizacao, o45_datafim as data_lei_autorizativa, o48_tiposup, o58_funcao, o58_subfuncao, o58_programa, o55_tipo, o55_projativ, c60_estrut, codigo_siconfi, o47_valor as valor from orcsuplem inner join orcsuplemtipo on o48_tiposup = orcsuplem.o46_tiposup inner join orcsuplemval on o47_codsup=o46_codsup left outer join orcsuplemlan on o49_codsup = o47_codsup inner join orcprojeto on o39_codproj = orcsuplem.o46_codlei left join orcprojetoorcprojetolei on o39_codproj = o139_orcprojeto inner join orclei on o45_codlei = orcprojeto.o39_codlei left join orcsuplemretif on o48_retificado = orcprojeto.o39_codproj inner join orcdotacao on o58_coddot =orcsuplemval.o47_coddot and o58_anousu=orcsuplemval.o47_anousu and o58_instit in ({$inst}) inner join orcelemento on o58_codele = o56_codele and o56_anousu = o58_anousu inner join orctiporec on o58_codigo = o15_codigo inner join complementofonterecurso on o15_complemento = o200_sequencial inner join orcprojativ on o55_projativ = o58_projativ and o55_anousu = o58_anousu inner join conplanoorcamento on conplanoorcamento.c60_anousu = o58_anousu and conplanoorcamento.c60_codcon = o58_codele inner join fonterecurso on fonterecurso.orctiporec_id = o15_codigo and fonterecurso.exercicio = o58_anousu where ( o39_usalimite is true or o139_orcprojeto is not null) and o48_retificado is null and o46_tiposup in (1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014,1015,1016,1050) and 1=1 and orcsuplemlan.o49_data >= '{$this->dtDataInicial}' and orcsuplemlan.o49_data <= '{$this->dtDataFinal}' and o49_codsup is not null";
-                    $novosdados = pg_query($novosql);
-                    $rsOrcSuplem = $novosdados;
-            
+        $rsOrcSuplem = $novosdados;
+        //}
         if(db_getsession("DB_instit") == 50){
-            $fonteselemento = array(            
+            $fonteselemento = array(
             337270 => 337170,
-            319009 => 339008
+            319009 => 339008,
+            319034 => 339034
         );
-            if (pg_num_rows($rsOrcSuplem) > 0){
-            
+        if (pg_num_rows($rsOrcSuplem) > 0){
+
             if (empty($this->sCodigoTribunal)) {
                 throw new \Exception("O código do tribunal deve ser informado para geração do arquivo");
             }
@@ -85,7 +94,10 @@ class ArquivoAlteracaoOrcamentariaDespesa extends ArquivoBase
             $guardavalor = array();
 
             for ($i = 0; $i < pg_num_rows($rsOrcSuplem); $i++) {
-                $oDadosQuery = db_utils::fieldsMemory($rsOrcSuplem, $i);                
+                $oDadosQuery = db_utils::fieldsMemory($rsOrcSuplem, $i);
+
+
+                //if(abs($oDadosQuery->valor) != "360000" && abs($oDadosQuery->valor) != "45000"){continue;}
 
                 $anoInstrumento = explode("-", $oDadosQuery->data_instrumento)[0];
                 $mesInstrumento = explode("-", $oDadosQuery->data_instrumento)[1];
@@ -116,13 +128,48 @@ class ArquivoAlteracaoOrcamentariaDespesa extends ArquivoBase
                 $codacao = (strlen($oDadosQuery->o55_projativ) == 3) ? "0".$oDadosQuery->o55_projativ : $oDadosQuery->o55_projativ;
 
                 $chave = "c" . $oDadosQuery->o58_orgao . $oDadosQuery->o58_unidade . $noinstrumento . $oDadosQuery->tipo_atualizacao . $deParaSuplemTipo->tipoalteracao . $deParaSuplemTipo->fonteabertura . $codfunc . $codsubfunc . $oDadosQuery->o58_programa . $oDadosQuery->o55_tipo . $codacao . $conta . "c";
+                //$chave = string($chave);
                 
+                //if($chave != "5011865712110122110126514339039"){continue;}
+
                 
-                if(array_key_exists($chave, $guardavalor)){
+                /*
+                if(in_array($chave, $guarda)){
+                    $guardavalor[$chave] += abs($oDadosQuery->valor);
+                    continue;
+                }else{
+                    $xvalor = abs($oDadosQuery->valor);
+                }
+                array_push($guarda, $chave);
+                */
+                /*
+                var_dump($chave);
+                var_dump(abs($oDadosQuery->valor)); echo "<br>";
+                if(in_array($chave, $guardavalor)){
+                    $guardavalor[$chave] += abs($oDadosQuery->valor);
+                }else{
+                    $guardavalor[$chave] = abs($oDadosQuery->valor);
+                }
+
+                if(in_array($chave, $guarda)){
+                    $guardavalor[$chave] += abs($oDadosQuery->valor);
+                    continue;
+                }else{
+                    $xvalor = abs($oDadosQuery->valor);
+                }
+                array_push($guarda, $chave);
+                */
+
+                
+                if(array_key_exists($chave, $guardavalor)){                    
+                    //var_dump($chave);
+                    //var_dump(abs($oDadosQuery->valor)); echo "<br>";
                     $xvalor = abs($oDadosQuery->valor);
                     $xvalor = (float)$xvalor;
                     $guardavalor[$chave] += $xvalor;
                 }else{
+                    //var_dump($chave);
+                    //var_dump(abs($oDadosQuery->valor)); echo "<br>";
                     $xvalor = abs($oDadosQuery->valor);
                     $xvalor = (float)$xvalor;
                     $guardavalor[$chave] = $xvalor;
@@ -135,8 +182,12 @@ class ArquivoAlteracaoOrcamentariaDespesa extends ArquivoBase
 
                 
 
+                
+                //var_dump($guardavalor);
+                //var_dump($guardavalor[$chave]); echo "<br>";
+
                 $oDadosAlteracaoOrcamentariaDespesa = new \stdClass();
-                $oDadosAlteracaoOrcamentariaDespesa->Identificador = $ix;
+                $oDadosAlteracaoOrcamentariaDespesa->Identificador = $ix; //$identificador;
                 $oDadosAlteracaoOrcamentariaDespesa->CodigoOrgao = $oDadosQuery->o58_orgao;
                 $oDadosAlteracaoOrcamentariaDespesa->CodigoUnidadeOrcamentaria = $oDadosQuery->o58_unidade;
                 $oDadosAlteracaoOrcamentariaDespesa->Competencia = $competencia;
@@ -156,9 +207,9 @@ class ArquivoAlteracaoOrcamentariaDespesa extends ArquivoBase
                 $oDadosAlteracaoOrcamentariaDespesa->CodigoPrograma = $oDadosQuery->o58_programa;
                 $oDadosAlteracaoOrcamentariaDespesa->TipoAcao = $oDadosQuery->o55_tipo;
                 $oDadosAlteracaoOrcamentariaDespesa->CodigoAcao =  (strlen($oDadosQuery->o55_projativ) == 3) ? "0".$oDadosQuery->o55_projativ : $oDadosQuery->o55_projativ;
-                $oDadosAlteracaoOrcamentariaDespesa->NaturezaDespesa = $conta;
+                $oDadosAlteracaoOrcamentariaDespesa->NaturezaDespesa = $conta; //substr($oDadosQuery->c60_estrut, 1, 6);
                 $oDadosAlteracaoOrcamentariaDespesa->FonteRecurso = $oDadosQuery->codigo_siconfi;
-                $oDadosAlteracaoOrcamentariaDespesa->ValorAlteracao = $chave;
+                $oDadosAlteracaoOrcamentariaDespesa->ValorAlteracao = $chave; //($guardavalor[$chave]) ? $guardavalor[$chave] : $xvalor; //abs($oDadosQuery->valor);
                 $oDadosAlteracaoOrcamentariaDespesa->CodigoCreditoAdicional = $deParaSuplemTipo->creditoadicional;
 
                 $alteracaoOrcamentariaDespesa[] =  (object) [
@@ -167,12 +218,17 @@ class ArquivoAlteracaoOrcamentariaDespesa extends ArquivoBase
                 $ix++;                
             }
 
-                        
-            foreach ($alteracaoOrcamentariaDespesa as $linha) {
-                $linha->AlteracaoOrcamentariaDespesa->ValorAlteracao = $guardavalor[$linha->AlteracaoOrcamentariaDespesa->ValorAlteracao];
-            }           
+            //$this->testa($alteracaoOrcamentariaDespesa);
+            //die("Mostra");
 
             
+            foreach ($alteracaoOrcamentariaDespesa as $linha) {
+                $linha->AlteracaoOrcamentariaDespesa->ValorAlteracao = $guardavalor[$linha->AlteracaoOrcamentariaDespesa->ValorAlteracao];
+            }
+            
+
+            //$this->testa($guardavalor);
+            //die("confere");
 
             $RemessaAlteracaoOrcamentariaDespesa->AlteracoesOrcamentariasDespesas = $alteracaoOrcamentariaDespesa;
             $this->aDados= $RemessaAlteracaoOrcamentariaDespesa;

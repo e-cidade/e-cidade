@@ -11,7 +11,13 @@ use stdClass;
 class ArquivoAnulacaoEmpenho extends ArquivoBase
 {
     protected $sNomeArquivo = 'AnulacaoDeEmpenho';
-    
+
+    public function testa($var){
+        echo "<pre>";
+        print_r($var);
+        echo "</pre>";
+    }
+
 
     public function gerarDados()
     {
@@ -122,7 +128,11 @@ class ArquivoAnulacaoEmpenho extends ArquivoBase
             33903929 => 33903923,
             46907107 => 46907101,
             33909205 => 33909299,
-            44905233 => 44905208
+            44905233 => 44905208,
+            33903926 => 33903999,
+            33904716 => 33903936,
+            44905239 => 44905208,
+            33903938 => 33903936
         );
 
         $campos = [
@@ -165,9 +175,16 @@ class ArquivoAnulacaoEmpenho extends ArquivoBase
         foreach ($empenhos as $empenho) {
             $elementos = DB::table('empanuladoele')
                 ->select(['e95_codele', 'e95_valor', 'c60_estrut'])
-                ->join('conplanoorcamento', 'c60_codcon', 'e95_codele')                
+                ->join('conplanoorcamento', 'c60_codcon', 'e95_codele')
+                /*->join('planodespesaconplanoorcamento', 'conplanoorcamento_codigo', 'c60_codigo')
+                ->join('planodespesa', function (JoinClause $join) {
+                    $join->on('planodespesa.id', 'planodespesa_id')
+                        ->where('uniao', '=', 't');
+                })*/
                 ->where('e95_codanu', $empenho->e94_codanu)
-                ->where('c60_anousu', $empenho->e60_anousu)                
+                ->where('c60_anousu', $empenho->e60_anousu)
+                //->where('exercicio', $empenho->e60_anousu)
+                //->where('uniao', '=', 't');
                 ->get()                
                 ->map(function ($elemento) {
                     return (object)[
@@ -176,10 +193,14 @@ class ArquivoAnulacaoEmpenho extends ArquivoBase
                         'NaturezaDespesa' =>  substr($elemento->c60_estrut, 1, 8),
                     ];
                 })
-                ->toArray();                
+                ->toArray();
+
+                
 
                 if($fontessubelemento[$elementos[0]->NaturezaDespesa]){
                 $elementos[0]->NaturezaDespesa = $fontessubelemento[$elementos[0]->NaturezaDespesa];
+
+                
 
             }
 

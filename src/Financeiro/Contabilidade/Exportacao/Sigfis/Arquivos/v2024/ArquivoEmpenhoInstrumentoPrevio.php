@@ -35,6 +35,12 @@ class ArquivoEmpenhoInstrumentoPrevio extends ArquivoBase
         }        
     }
 
+    public function testa($var){
+        echo "<pre>";
+        print_r($var);
+        echo "</pre>";
+    }
+
     public function gerarDados()
     {
         $campos = [
@@ -60,25 +66,32 @@ class ArquivoEmpenhoInstrumentoPrevio extends ArquivoBase
         $obj->EmpenhosInstrumentosPrevios = [];
 
         foreach ($empenhos as $empenho) {
-
-            $dadosextras = $this->buscaCamposAuxiliares($empenho->e60_numemp);            
-                            
+            
+            $dadosextras = $this->buscaCamposAuxiliares($empenho->e60_numemp);
+            /*if($empenho->e60_codemp == "601"){
+                $this->testa($dadosextras); die("Confere");
+            }*/
+            
+            
+            
             $numeroatojuridico = $dadosextras["noatoju"];
             $codunidadeatoju = $dadosextras["ugaj"];
             $codinstprev = $dadosextras["tipro"];
-            $codunidadeinstprev = $dadosextras["ugip"];
+            //$codunidadeinstprev = $dadosextras["ugip"];
+            $codunidadeinstprev = $dadosextras["ugaj"];
             if(($dadosextras["tipro"] == 99 || $dadosextras["tajuo"] == 99 || $dadosextras["tipro"] == 0 || $dadosextras["tajuo"] == 0) && !$dadosextras["noinpr"]){continue;}
             $data = (object)[
                 'Identificador' => $empenho->e60_numemp,
-                'CodigoUnidadeGestora' => $this->getUgResponsavelFolha(),
+                'CodigoUnidadeGestora' => $this->getUgResponsavelFolha(),//$this->sCodigoTribunal,
                 'Competencia' => $this->competencia,
-                'NumeroAtoJuridicoTCE' => $dadosextras["noinpr"],
-                'CodigoUnidadeGestoraAtoJuridico' => $codunidadeinstprev,
+                'NumeroAtoJuridicoTCE' => $dadosextras["noinpr"], //$numeroatojuridico,  //null,
+                //'NumeroAtoJuridicoTCE' => $numeroatojuridico,  //null,
+                'CodigoUnidadeGestoraAtoJuridico' => $codunidadeinstprev,//null,
                 'NumeroEmpenho' => $empenho->e60_codemp,
                 'AnoEmpenho' => $empenho->e60_anousu,
                 'CodigoUnidadeOrcamentaria' => $empenho->o58_unidade,
                 'CodigoOrgao' => $empenho->o58_orgao,
-                'CodigoTipoInstrumentoPrevio' => $codinstprev
+                'CodigoTipoInstrumentoPrevio' => $codinstprev//$this->deParaCodigoInstrumentoPrevio($empenho->e60_codcom)
             ];
 
             $obj->EmpenhosInstrumentosPrevios[] = (object)['EmpenhoInstrumentoPrevio' => $data];
