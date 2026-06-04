@@ -321,8 +321,7 @@ if (pg_numrows($result) == 0 or pg_numrows($result1) == 0) {
    */
   session_unregister("DB_tentativasAcesso");
 
-  echo "<script>window.opener.document.getElementById('captcha').classList.add('container-captcha-hide');</script>";
-  echo "<script>if(window.opener==null)location.href='index.php';</script>";
+  echo "<script>if (window.opener && !window.opener.closed) { try { window.opener.document.getElementById('captcha').classList.add('container-captcha-hide'); } catch (e) {} }</script>";
 
   if (!session_is_registered("DB_acessado")) {
     session_register("DB_acessado");
@@ -403,7 +402,8 @@ if (pg_numrows($result) == 0 or pg_numrows($result1) == 0) {
   }
 
   pg_close($conn);
-  ?>
+  $sUrlInicio = 'inicio.php?uso=' . rawurlencode($DB_login);
+?>
   <html>
 
   <head>
@@ -412,63 +412,21 @@ if (pg_numrows($result) == 0 or pg_numrows($result1) == 0) {
     <meta http-equiv="Expires" CONTENT="0">
     <link href="estilos.css" rel="stylesheet" type="text/css">
     <script type="text/javascript">
-      wname = 'wname' + Math.floor(Math.random() * 10000);
-      var nav = navigator.appName;
-      var ver = navigator.appVersion;
-      var age = navigator.userAgent;
-      sizeWidth = screen.availWidth;
-      sizeHeight = screen.availHeight;
+      (function() {
+        var url = <?= json_encode($sUrlInicio); ?>;
 
-      if (age.indexOf("Firefox") != -1) {
-        debugger;
-        jan = window.open('inicio.php?uso=<?= $DB_login ?>&janelaWidth=' + sizeWidth + '&janelaHeight=' + sizeHeight, wname, 'width=' + sizeWidth + ',height=' + sizeHeight + ',fullscreen=1,toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=1,resizable=0');
-        jan.moveTo(0, 0);
-      } else if (nav.indexOf('Microsoft') != -1) {
-
-        ver = navigator.appVersion;
-        ver = ver.substr(ver.indexOf("MSIE"));
-        ver = ver.substr(0, ver.search(";"));
-        ver = ver.substr(5);
-        ver = new Number(ver);
-        if (ver <= 5.5) {
-
-          window.opener.alert('<?= _M(MENSAGEM . 'navegador_5_5'); ?>');
-          window.close();
-        } else {
-
-          jan = window.open('inicio.php?uso=<?= $DB_login ?>&janelaWidth=' + sizeWidth + '&janelaHeight=', wname, 'width=' + sizeWidth + ',height=' + sizeHeight + ',fullscreen=0,toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=1,resizable=0');
-          jan.moveTo(0, 0);
-        }
-      } else if (nav.indexOf('Netscape') != -1) {
-
-        if (parseFloat(navigator.vendorSub) >= 7 && parseFloat(navigator.appVersion) >= 5) {
-
-          jan = window.open('inicio.php?uso=<?= $DB_login ?>&janelaWidth=' + sizeWidth + '&janelaHeight=', wname, 'width=' + sizeWidth + ',height=' + sizeHeight + ',fullscreen=0,toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=1,resizable=0');
-          jan.moveTo(0, 0);
-        } else if (age.substr(0, 7) == "Mozilla") {
-
-          if (isNaN(parseFloat(navigator.vendorSub)) && parseFloat(navigator.appVersion) >= 5) {
-
-            jan = window.open('inicio.php?uso=<?= $DB_login ?>&janelaWidth=' + sizeWidth + '&janelaHeight=', wname, 'width=' + sizeWidth + ',height=' + sizeHeight + ',fullscreen=0,toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=1,resizable=0');
-            jan.moveTo(0, 0);
-          } else if (parseFloat(navigator.vendorSub) >= 1.6 && parseFloat(navigator.appVersion) >= 5) {
-
-            jan = window.open('inicio.php?uso=<?= $DB_login ?>&janelaWidth=' + sizeWidth + '&janelaHeight=', wname, 'width=' + sizeWidth + ',height=' + sizeHeight + ',fullscreen=0,toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=1,resizable=0');
-            jan.moveTo(0, 0);
-          } else {
-
-            window.opener.alert('<?= _M(MENSAGEM . 'navegador_nao_autorizado'); ?>');
+        if (window.opener && !window.opener.closed) {
+          try {
+            window.opener.location.href = url;
             window.close();
+            return;
+          } catch (e) {
+            // Fallback abaixo.
           }
         }
-      } else {
 
-        window.opener.alert('<?= _M(MENSAGEM . 'navegador_nao_autorizado'); ?>');
-        window.close();
-      }
-      if (navigator.cookieEnabled == false) {
-        window.open('cookie.html', '_blank');
-      }
+        window.location.href = url;
+      })();
     </script>
   </head>
 
@@ -476,9 +434,6 @@ if (pg_numrows($result) == 0 or pg_numrows($result1) == 0) {
   </body>
 
   </html>
-  <script type="text/javascript">
-    window.close();
-  </script>
 <?php
 }
 ?>

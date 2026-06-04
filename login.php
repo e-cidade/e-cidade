@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/bootstrap.php';
 /*
  *     E-cidade Software Publico para Gestao Municipal
  *  Copyright (C) 2014  DBSeller Servicos de Informatica
@@ -201,7 +202,7 @@ if ($lValidaLogin) {
 
     $('usu_senha').value = '';
 
-    var jan = window.open(sUrl, wname, 'width=1,height=1');
+    window.location.href = sUrl;
   }
 
   function js_mostrarelatorio() {

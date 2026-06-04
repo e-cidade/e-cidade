@@ -35,6 +35,7 @@ e-cidade.sublime-project
 sftp-config.json
 extension/modification/log/dbportal-v3-desktop
 extension/log/*
+!extension/log/.gitkeep
 extension/log/application.log
 webservices/.requisicao.webservice.php.swp
 integracao_externa/portal_transparencia/libs/db_config.ini

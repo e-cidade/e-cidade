@@ -143,6 +143,11 @@ ENV NODE_MAJOR 20
 RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
 RUN apt-get install -y gcc g++ make nodejs
 
+# Garante que o bootstrap do e-Cidade esteja disponivel antes do carregamento
+# das classes legadas, que dependem de ECIDADE_PATH.
+# Mantido apenas no FPM para não interferir no Composer e em comandos CLI.
+RUN printf 'auto_prepend_file=/var/www/html/docker/bootstrap.php\n' > /etc/php/7.4/fpm/conf.d/99-ecidade-bootstrap.ini
+
 # Exporta variável que permite a execução do composer como root sem emitir avisos
 #ENV PATH=$PATH:/root/composer/vendor/bin COMPOSER_ALLOW_SUPERUSER=1
 
@@ -192,8 +197,10 @@ WORKDIR /var/www/html
 USER contass
 
 RUN sudo mkdir /var/www/html/tmp/
+RUN sudo mkdir -p /var/www/html/extension/log/
 
 RUN sudo chmod -R 777 /var/www/html/tmp/
+RUN sudo chmod -R 777 /var/www/html/extension/log/
 #
 #RUN /var/www/html/composer install
 
