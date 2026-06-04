@@ -56,17 +56,20 @@ docker compose up -d --build
 
 O bootstrap do banco cria os papéis PostgreSQL, o schema mínimo de autenticação, as funções de sessão `fc_*session` e a regra de acesso local necessária para o ambiente de desenvolvimento.
 
+Persistência local:
+
+* `docker/bd/pgsql`: dados do PostgreSQL.
+* `docker/scripts/iniciarbd.sql`: seed inicial executado no primeiro boot.
+
 Após subir, os acessos ficam expostos em:
 
 * Aplicação: `http://localhost:8282`
 * Adminer: `http://localhost:8484`
 
-Login de validação no seed local:
+Credenciais de validação no ambiente local:
 
 * Usuário: `dbseller`
 * Senha: `dbseller`
-
-O fluxo de login local redireciona a janela principal para `inicio.php` após a autenticação, então não depende de uma segunda janela pop-up.
 
 ## Upgrade
 
@@ -78,4 +81,4 @@ Algumas perguntas aparecem recorrentemente. Olhe primeiro por aqui: [FAQ](https:
 
 ---
 
-Documento by [Contass](https://www.contassconsultoria.com.br/). Como fonte o documento criado pela comunidade i-Educar.
+Documento pela comunidade e-Cidade.

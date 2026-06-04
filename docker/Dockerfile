@@ -16,7 +16,6 @@ RUN apt-get update
 RUN apt-get install -y --no-install-recommends tzdata \
   locales \
   ca-certificates \
-  sudo \
   software-properties-common \
   curl \
   unzip \
@@ -171,15 +170,6 @@ RUN mkdir -p /run/php/
 COPY supervisord/supervisord.conf /etc/supervisor/supervisord.conf
 COPY supervisord/conf.d/ /etc/supervisor/conf.d/
 
-#RUN useradd -d /home/contass -g www-data -G sudo,adm,cdrom,dip,plugdev -k /etc/skel -m -s /bin/bash contass
-RUN adduser --uid 1000 --disabled-password --gecos "" contass
-RUN usermod -g www-data contass
-#RUN  sed -i /etc/sudoers -re 's/^%sudo.*/%sudo all=(all:all) nopasswd: all/g' && \
-#     sed -i /etc/sudoers -re 's/^root.*/root all=(all:all) nopasswd: all/g' && \
-#     sed -i /etc/sudoers -re 's/^#includedir.*/## **removed the include directive** ##"/g' && \
-
-RUN echo 'contass ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
-
 # Limpa os temporários
 RUN apt-get clean && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
@@ -193,14 +183,8 @@ EXPOSE 80
 WORKDIR /var/www/html
 
 #RUN chmod -R 775 /var/www/html/*
-
-USER contass
-
-RUN sudo mkdir /var/www/html/tmp/
-RUN sudo mkdir -p /var/www/html/extension/log/
-
-RUN sudo chmod -R 777 /var/www/html/tmp/
-RUN sudo chmod -R 777 /var/www/html/extension/log/
+RUN mkdir -p /var/www/html/tmp /var/www/html/extension/log && \
+  chmod -R 777 /var/www/html/tmp /var/www/html/extension/log
 #
 #RUN /var/www/html/composer install
 

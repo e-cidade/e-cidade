@@ -1,9 +1,7 @@
 -- iniciarbd.sql
 CREATE ROLE ecidade WITH SUPERUSER LOGIN PASSWORD 'ecidade';
 CREATE ROLE plugin WITH LOGIN PASSWORD 'plugin';
-CREATE ROLE dbseller WITH LOGIN PASSWORD 'dbseller';
 CREATE ROLE dbportal WITH LOGIN PASSWORD 'dbportal';
-CREATE ROLE contass WITH LOGIN PASSWORD 'contass';
 CREATE ROLE usersrole WITH LOGIN PASSWORD 'usersrole';
 CREATE DATABASE ecidade OWNER ecidade;
 
@@ -11,8 +9,6 @@ CREATE DATABASE ecidade OWNER ecidade;
 ALTER ROLE ecidade SET search_path = public, sicom, recursoshumanos, site, empenho, diversos, issqn, secretariadeeducacao, tfd, arrecadacao, agua, ouvidoria, acordos, laboratorio, cadastro, habitacao, vacinas, inflatores, escola, juridico, notificacoes, orcamento, licitacao, projetos, divida, protocolo, itbi, material, merenda, pessoal, prefeitura, agendamento, veiculos, tributario, recursoshumanos, dbpref, farmacia, marcas, cemiterio, transporteescolar, ambulatorial, patrimonio, gestorbi, caixa, fiscal, biblioteca, configuracoes, contabilidade, esocial, compras, contrib, social, custos;
 
 ALTER ROLE dbportal SET search_path = public, sicom, recursoshumanos, site, empenho, diversos, issqn, secretariadeeducacao, tfd, arrecadacao, agua, ouvidoria, acordos, laboratorio, cadastro, habitacao, vacinas, inflatores, escola, juridico, notificacoes, orcamento, licitacao, projetos, divida, protocolo, itbi, material, merenda, pessoal, prefeitura, agendamento, veiculos, tributario, recursoshumanos, dbpref, farmacia, marcas, cemiterio, transporteescolar, ambulatorial, patrimonio, gestorbi, caixa, fiscal, biblioteca, configuracoes, contabilidade, esocial, compras, contrib, social, custos;
-
-ALTER ROLE dbseller SET search_path = public, sicom, recursoshumanos, site, empenho, diversos, issqn, secretariadeeducacao, tfd, arrecadacao, agua, ouvidoria, acordos, laboratorio, cadastro, habitacao, vacinas, inflatores, escola, juridico, notificacoes, orcamento, licitacao, projetos, divida, protocolo, itbi, material, merenda, pessoal, prefeitura, agendamento, veiculos, tributario, recursoshumanos, dbpref, farmacia, marcas, cemiterio, transporteescolar, ambulatorial, patrimonio, gestorbi, caixa, fiscal, biblioteca, configuracoes, contabilidade, esocial, compras, contrib, social, custos;
 
 ALTER ROLE plugin SET search_path = public, sicom, recursoshumanos, site, empenho, diversos, issqn, secretariadeeducacao, tfd, arrecadacao, agua, ouvidoria, acordos, laboratorio, cadastro, habitacao, vacinas, inflatores, escola, juridico, notificacoes, orcamento, licitacao, projetos, divida, protocolo, itbi, material, merenda, pessoal, prefeitura, agendamento, veiculos, tributario, recursoshumanos, dbpref, farmacia, marcas, cemiterio, transporteescolar, ambulatorial, patrimonio, gestorbi, caixa, fiscal, biblioteca, configuracoes, contabilidade, esocial, compras, contrib, social, custos;
 
@@ -245,10 +241,10 @@ ON CONFLICT (db30_codver) DO UPDATE
       db30_data = EXCLUDED.db30_data,
       db30_obs = EXCLUDED.db30_obs;
 
-GRANT USAGE ON SCHEMA configuracoes TO ecidade, dbportal, dbseller;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA configuracoes TO ecidade, dbportal, dbseller;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA configuracoes TO ecidade, dbportal, dbseller;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.db_versao TO ecidade, dbportal, dbseller;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.db_versaocpd TO ecidade, dbportal, dbseller;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.db_versaousu TO ecidade, dbportal, dbseller;
-GRANT USAGE, SELECT ON SEQUENCE public.db_versao_db30_codver_seq TO ecidade, dbportal, dbseller;
+GRANT USAGE ON SCHEMA configuracoes TO ecidade, dbportal;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA configuracoes TO ecidade, dbportal;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA configuracoes TO ecidade, dbportal;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.db_versao TO ecidade, dbportal;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.db_versaocpd TO ecidade, dbportal;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.db_versaousu TO ecidade, dbportal;
+GRANT USAGE, SELECT ON SEQUENCE public.db_versao_db30_codver_seq TO ecidade, dbportal;
