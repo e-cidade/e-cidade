@@ -7,6 +7,3 @@ if (!defined('DS')) {
 if (!defined('ECIDADE_PATH')) {
   define('ECIDADE_PATH', '/var/www/html/');
 }
-
-require_once __DIR__ . '/../definitions.php';
-
