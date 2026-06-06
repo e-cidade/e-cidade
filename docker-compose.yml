@@ -47,21 +47,3 @@ services:
         interval: 10s
         timeout: 5s
         retries: 5
-
-    adminer:
-      image: adminer:latest
-      restart: always
-      environment:
-        ADMINER_DEFAULT_SERVER: bd
-        ADMINER_DEFAULT_USER: ecidade
-        ADMINER_DEFAULT_PASSWORD: ecidade
-        ADMINER_DEFAULT_TYPE: postgresql
-        ADMINER_DEFAULT_PORT: "5432"
-        ADMINER_DEFAULT_DB: ecidade
-      networks:
-        - ecidade
-      ports:
-        - "${ADMINER_PORT:-8484}:8080"
-      depends_on:
-        bd:
-          condition: service_healthy
