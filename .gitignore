@@ -57,8 +57,8 @@ phinx.yml
 docker/db-data
 extension/data/extension/Desktop.data
 extension/modification/data/modification/dbportal-v3-desktop.data
-volumes/pgsql/data/*
-!volumes/pgsql/data/.gitkeep
+volumes/postgres/data/*
+!volumes/postgres/data/.gitkeep
 extension/modification/data/group/modifications.data
 DEC_*.pdf
 legacy_config/sicom/

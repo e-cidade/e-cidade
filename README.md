@@ -58,8 +58,8 @@ O bootstrap do banco cria os papéis PostgreSQL, o schema mínimo de autenticaç
 
 Persistência local:
 
-* `./volumes/pgsql/data`: dados do PostgreSQL.
-* `./volumes/pgsql/initdb`: scripts de inicialização executados no primeiro boot.
+* `./volumes/postgres/data`: dados do PostgreSQL.
+* `./volumes/postgres/dump`: scripts de inicialização executados no primeiro boot.
 
 Se quiser usar outro seed inicial, coloque arquivos SQL nessa pasta.
 
