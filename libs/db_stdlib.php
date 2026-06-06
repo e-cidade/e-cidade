@@ -155,7 +155,8 @@ function checkPIS($pis)
         return false;
     } else {
         for ($d = 0, $p = 3, $c = 0; $c < 10; $c++) {
-            $d += $pis[$c] * $p;
+            $d += $pis{
+                $c} * $p;
             $p  = ($p < 3) ? 9 : --$p;
         }
 
