@@ -321,7 +321,7 @@ if (pg_numrows($result) == 0 or pg_numrows($result1) == 0) {
    */
   session_unregister("DB_tentativasAcesso");
 
-  echo "<script>if (window.opener && !window.opener.closed) { try { window.opener.document.getElementById('captcha').classList.add('container-captcha-hide'); } catch (e) {} }</script>";
+  echo "<script>window.opener.document.getElementById('captcha').classList.add('container-captcha-hide');</script>";
 
   if (!session_is_registered("DB_acessado")) {
     session_register("DB_acessado");
