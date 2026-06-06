@@ -58,18 +58,15 @@ O bootstrap do banco cria os papéis PostgreSQL, o schema mínimo de autenticaç
 
 Persistência local:
 
-* `docker/bd/pgsql`: dados do PostgreSQL.
-* `docker/scripts/iniciarbd.sql`: seed inicial executado no primeiro boot.
+* `./volumes/pgsql/data`: dados do PostgreSQL.
+* `./volumes/pgsql/initdb`: scripts de inicialização executados no primeiro boot.
 
-Após subir, os acessos ficam expostos em:
-
-* Aplicação: `http://localhost:8282`
-* Adminer: `http://localhost:8484`
+Se quiser usar outro seed inicial, coloque arquivos SQL nessa pasta.
 
 Credenciais de validação no ambiente local:
 
-* Usuário: `dbseller`
-* Senha: `dbseller`
+* Usuário: `admin`
+* Senha: `admin`
 
 ## Upgrade
 

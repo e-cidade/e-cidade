@@ -179,7 +179,8 @@ WORKDIR /var/www/html
 
 #RUN chmod -R 775 /var/www/html/*
 RUN mkdir -p /var/www/html/tmp /var/www/html/extension/log && \
-  chmod -R 777 /var/www/html/tmp /var/www/html/extension/log
+  chown -R www-data:www-data /var/www/html/tmp /var/www/html/extension/log && \
+  chmod -R 775 /var/www/html/tmp /var/www/html/extension/log
 #
 #RUN /var/www/html/composer install
 

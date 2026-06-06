@@ -6,7 +6,7 @@ networks:
 services:
     web:
         build:
-            context: ./docker
+            context: ./.docker
             dockerfile: Dockerfile
         extra_hosts:
             - 'host.docker.internal:host-gateway'
@@ -29,7 +29,7 @@ services:
       ports:
         - "${DB_PORTA:-5432}:5432"
       build:
-        context: ./docker/bd
+        context: ./.docker/bd
         x-bake:
           no-cache: true
       environment:
@@ -38,8 +38,8 @@ services:
         # POSTGRES_DB: ${DB_BASE}
         POSTGRES_INITDB_ARGS: '--encoding=LATIN1 --lc-collate=pt_BR.ISO-8859-1 --lc-ctype=pt_BR.ISO-8859-1 --lc-messages=pt_BR.ISO-8859-1 --lc-monetary=pt_BR.ISO-8859-1 --lc-numeric=pt_BR.ISO-8859-1 --lc-time=pt_BR.ISO-8859-1'
       volumes:
-        - ./docker/scripts/iniciarbd.sql:/docker-entrypoint-initdb.d/iniciarbd.sql
-        - './docker/bd/pgsql:/var/lib/postgresql/data'
+        - ./volumes/pgsql/initdb:/docker-entrypoint-initdb.d
+        - ./volumes/pgsql/data:/var/lib/postgresql/data
       networks:
         - ecidade
       healthcheck:
@@ -56,7 +56,7 @@ services:
         ADMINER_DEFAULT_USER: ecidade
         ADMINER_DEFAULT_PASSWORD: ecidade
         ADMINER_DEFAULT_TYPE: postgresql
-        ADMINER_DEFAULT_PORT: "${DB_PORTA:-5432}:5432"
+        ADMINER_DEFAULT_PORT: "5432"
         ADMINER_DEFAULT_DB: ecidade
       networks:
         - ecidade
@@ -65,4 +65,3 @@ services:
       depends_on:
         bd:
           condition: service_healthy
-
