@@ -1,5 +1,5 @@
 -- iniciarbd.sql
--- Mantém dbportal por compatibilidade com scripts legados do projeto.
+-- Role histórica do projeto, mantida por compatibilidade com scripts e migrações legadas.
 CREATE ROLE ecidade WITH SUPERUSER LOGIN PASSWORD 'ecidade';
 CREATE ROLE plugin WITH LOGIN PASSWORD 'plugin';
 CREATE ROLE dbportal WITH LOGIN PASSWORD 'dbportal';
