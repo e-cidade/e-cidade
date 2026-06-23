@@ -162,8 +162,7 @@ function checkPIS($pis)
 
         $d = ((10 * $d) % 11) % 10;
 
-        return ($pis{
-            $c} == $d) ? true : false;
+        return ($pis[$c] == $d) ? true : false;
     }
 }
 

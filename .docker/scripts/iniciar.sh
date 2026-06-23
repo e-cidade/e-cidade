@@ -31,7 +31,7 @@
 #fi
 
 # Habilita o vhost do e-cidade no apache2
-sudo a2ensite ecidade.conf
+a2ensite ecidade.conf
 
 #: ${WWW_UID:=33}
 #: ${WWW_GID:=33}

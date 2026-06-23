@@ -46,6 +46,28 @@ ajudar a alcançar nossos objetivos.
 
 Consulte o passo a passo no [guia de instalação](INSTALL.md).
 
+## Docker Local
+
+Para subir o ambiente local com Docker:
+
+```bash
+docker compose up -d --build
+```
+
+O bootstrap do banco cria os papéis PostgreSQL, o schema mínimo de autenticação, as funções de sessão `fc_*session` e a regra de acesso local necessária para o ambiente de desenvolvimento.
+
+Persistência local:
+
+* `./volumes/postgres/data`: dados do PostgreSQL.
+* `./volumes/postgres/dump`: scripts de inicialização executados no primeiro boot.
+
+Se quiser usar outro seed inicial, coloque arquivos SQL nessa pasta.
+
+Credenciais de validação no ambiente local:
+
+* Usuário: `admin`
+* Senha: `admin`
+
 ## Upgrade
 
 Para realizar o _upgrade_ da versão do e-Cidade, considere seguir os passos no [guia de atualização](UPGRADE.md).
@@ -56,5 +78,4 @@ Algumas perguntas aparecem recorrentemente. Olhe primeiro por aqui: [FAQ](https:
 
 ---
 
-Documento by [Contass](https://www.contassconsultoria.com.br/). Como fonte o documento criado pela comunidade i-Educar.
-
+Documento pela comunidade e-Cidade.

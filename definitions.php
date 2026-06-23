@@ -17,10 +17,14 @@ use \ECidade\V3\Extension\Logger;
 define('ECIDADE_EXTENSION_VERSION', '3.0.0');
 
 // separador de diretorios: '/'
-//define('DS', DIRECTORY_SEPARATOR);
+if (!defined('DS')) {
+  define('DS', DIRECTORY_SEPARATOR);
+}
 
 // caminho absoluto do ecidade (ex.: /var/www/e-cidade/ )
-define('ECIDADE_PATH', __DIR__ . DS);
+if (!defined('ECIDADE_PATH')) {
+  define('ECIDADE_PATH', __DIR__ . DS);
+}
 
 $host = null;
 if (isset($_SERVER['HTTP_HOST'])) {

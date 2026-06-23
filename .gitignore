@@ -35,7 +35,6 @@ e-cidade.sublime-project
 sftp-config.json
 extension/modification/log/dbportal-v3-desktop
 extension/log/*
-extension/log/application.log
 webservices/.requisicao.webservice.php.swp
 integracao_externa/portal_transparencia/libs/db_config.ini
 extension/modification/data/file/sync/user/*
@@ -58,7 +57,8 @@ phinx.yml
 docker/db-data
 extension/data/extension/Desktop.data
 extension/modification/data/modification/dbportal-v3-desktop.data
-docker/bd/pgsql
+volumes/postgres/data/*
+!volumes/postgres/data/.gitkeep
 extension/modification/data/group/modifications.data
 DEC_*.pdf
 legacy_config/sicom/
