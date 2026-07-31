@@ -71,11 +71,11 @@ $oReceitaPeriodoTesourariaRepository = new ReceitaPeriodoTesourariaRepositoryLeg
     $iEmendaParlamentar,
     $iRegularizacaoRepasse,
     $iInstituicao,
+    $iRecurso,
     $sReceitas,
     $sEstrutura,
     $sContas,
     $sContribuintes,
-    $iRecurso
 );
 
 if ($iFormato == 1) {

@@ -32,11 +32,11 @@ implements IReceitaPeriodoTesourariaRepository
         $iEmendaParlamentar,
         $iRegularizacaoRepasse,
         $iInstituicao,
+        $iRecurso,
         $sReceitas = NULL,
         $sEstrutura = NULL,
         $sContas = NULL,
-        $sContribuintes = NULL,
-        $iRecurso
+        $sContribuintes = NULL
     ) {
         $this->sTipo = $sTipo;
         $this->iAno = date("Y", strtotime($dDataInicial));
@@ -53,11 +53,11 @@ implements IReceitaPeriodoTesourariaRepository
             $iEmendaParlamentar,
             $iRegularizacaoRepasse,
             $iInstituicao,
+            $iRecurso,
             $sReceitas,
             $sEstrutura,
             $sContas,
             $sContribuintes,
-            $iRecurso
         );
     }
 
