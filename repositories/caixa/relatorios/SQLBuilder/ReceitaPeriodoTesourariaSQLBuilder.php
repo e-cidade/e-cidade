@@ -125,11 +125,11 @@ class ReceitaPeriodoTesourariaSQLBuilder
         $iEmendaParlamentar,
         $iRegularizacaoRepasse,
         $iInstituicao,
+        $iRecurso,
         $sReceitas = NULL,
         $sEstrutura = NULL,
         $sContas = NULL,
-        $sContribuintes = NULL,
-        $iRecurso
+        $sContribuintes = NULL
     ) {
         $this->sTipo = $sTipo;
         $this->sTipoReceita = $sTipoReceita;
