@@ -2,6 +2,11 @@ FROM postgres:12.17-bullseye
 
 ENV DEBIAN_FRONTEND noninteractive
 
+# Debian bullseye atingiu EOL; aponta para archive.debian.org e remove o repo
+# de security (nao existe mais no archive; os pacotes ficaram em bullseye main)
+RUN sed -i 's|deb.debian.org|archive.debian.org|g' /etc/apt/sources.list && \
+    sed -i '/debian-security/d' /etc/apt/sources.list
+
 RUN echo "Acquire::http {No-Cache=True;};" > /etc/apt/apt.conf.d/no-cache
 
 RUN apt-get update

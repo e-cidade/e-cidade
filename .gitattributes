@@ -1,0 +1,45 @@
+# Normaliza quebras de linha (LF) e marca arquivos binários.
+# O atributo "text" não altera o charset dos arquivos, apenas o EOL.
+
+# Detecção automática de texto vs binário
+* text=auto
+
+# Arquivos de texto (normalizados para LF)
+*.php text eol=lf
+*.js text eol=lf
+*.css text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.html text eol=lf
+*.sql text eol=lf
+*.sh text eol=lf
+*.ini text eol=lf
+*.xml text eol=lf
+*.dist text eol=lf
+*.example text eol=lf
+
+# Binários (não normalizar)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar.gz binary
+*.gz binary
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.eot binary
+*.swf binary
+*.db binary
+
+# Exclui metadados de desenvolvimento dos pacotes gerados por "git archive"
+.gitattributes export-ignore
+.gitignore export-ignore
+.editorconfig export-ignore
+.github export-ignore

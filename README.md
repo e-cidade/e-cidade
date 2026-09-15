@@ -78,4 +78,4 @@ Algumas perguntas aparecem recorrentemente. Olhe primeiro por aqui: [FAQ](https:
 
 ---
 
-Documento pela comunidade e-Cidade.
+Documento com apoio da comunidade e-Cidade e de empresas apoiadoras. Como fonte, o documento criado pela comunidade i-Educar.
