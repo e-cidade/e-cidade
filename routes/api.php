@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LibreSignCallbackController;
 use App\Http\Controllers\RedesimController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,3 +22,8 @@ Route::group(['middleware' => ['redesimAuth']], function () {
             ->name('redesim.companies');
     });
 });
+
+// Callback do middleware LibreSign (devolucao do PDF assinado).
+// Autenticado por Bearer token (ECIDADE_CALLBACK_TOKEN) no proprio controller.
+Route::post('/libresign/callback', [LibreSignCallbackController::class, 'store'])
+    ->name('libresign.callback');
