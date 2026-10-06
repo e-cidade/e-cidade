@@ -15,8 +15,9 @@ existentes e facilitar a colaboração entre seus participantes.
 O desenvolvimento do e-Cidade acontece hoje em diferentes repositórios
 mantidos por participantes do ecossistema.
 
-A organização `e-cidade` busca tornar essas linhas mais fáceis de descobrir sem
-definir artificialmente uma delas como implementação única ou preferencial.
+A organização `e-cidade` busca dar visibilidade a essas linhas, registrar suas
+origens e mantenedores e facilitar a descoberta de onde cada desenvolvimento
+acontece.
 
 Alguns repositórios são mantidos diretamente por seus respectivos mantenedores;
 outros podem aparecer nesta organização como **mirrors**, identificados
