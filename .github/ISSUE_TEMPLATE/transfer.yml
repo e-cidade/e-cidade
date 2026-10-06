@@ -28,6 +28,13 @@ body:
     validations:
       required: true
   - type: textarea
+    id: maintenance
+    attributes:
+      label: Situação atual de manutenção
+      description: Informe se o projeto está sendo mantido ativamente, está em transição ou possui outra condição relevante.
+    validations:
+      required: true
+  - type: textarea
     id: future
     attributes:
       label: Expectativa de manutenção futura
