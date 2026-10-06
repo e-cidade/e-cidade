@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discussão comunitária
+    url: https://github.com/e-cidade/e-cidade/discussions
+    about: Use Discussions para dúvidas, ideias ainda imaturas ou quando não souber onde contribuir.

@@ -1,0 +1,47 @@
+name: Transferência de projeto ou repositório
+description: Propor que um projeto passe a ser mantido na organização e-cidade
+title: "[Transferência] "
+labels: ["community", "governance", "human-required"]
+body:
+  - type: input
+    id: repository
+    attributes:
+      label: Repositório atual
+    validations:
+      required: true
+  - type: textarea
+    id: relation
+    attributes:
+      label: Relação com o e-Cidade
+    validations:
+      required: true
+  - type: input
+    id: license
+    attributes:
+      label: Licença
+    validations:
+      required: true
+  - type: textarea
+    id: maintainers
+    attributes:
+      label: Autores e mantenedores atuais
+    validations:
+      required: true
+  - type: textarea
+    id: maintenance
+    attributes:
+      label: Situação atual de manutenção
+      description: Informe se o projeto está sendo mantido ativamente, está em transição ou possui outra condição relevante.
+    validations:
+      required: true
+  - type: textarea
+    id: future
+    attributes:
+      label: Expectativa de manutenção futura
+    validations:
+      required: true
+  - type: textarea
+    id: infrastructure
+    attributes:
+      label: Infraestrutura e riscos
+      description: Informe secrets, integrações, domínios, CI, dependências e riscos conhecidos.
