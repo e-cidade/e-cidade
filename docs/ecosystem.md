@@ -51,26 +51,25 @@ registrado explicitamente em vez de inferido.
 - Relação histórica: o histórico contém o commit
   `e640eb485bf9a29f1fcda9c289c4ab23cffefe1d`, também presente na linha
   DBSeller, seguido por commits próprios do Sertão Digital
-- Licença: arquivos-fonte contêm avisos de GPL versão 2 ou posterior, mas o
-  GitHub não detecta uma licença no repositório e os arquivos de licença
-  referenciados nos cabeçalhos não foram localizados na verificação
-- Situação na organização: candidato a mirror, pendente de esclarecimento
-  sobre a situação da licença
+- Estrutura: a aplicação e-Cidade está contida no diretório `ecidade/`
+- Licença: arquivos da linha e-Cidade preservam avisos GPL versão 2 ou
+  posterior; a ausência de licença detectável na raiz é tratada como questão
+  de empacotamento/documentação, não como bloqueio para o mirror
+- Situação na organização: linha validada para preparação de mirror
 
 ### CPD
 
 - Origem candidata: [`w3aewander/e-cidadeCPD`](https://github.com/w3aewander/e-cidadeCPD)
 - Tipo atual: projeto externo conhecido
 - Descrição do repositório: versão do e-Cidade utilizada pela CPD Municipal
-- Mantenedor identificado: `w3aewander`
+- Mantenedores identificados no histórico recente: Vanderlei
+  (`w3aewander`) e Rafael Matos (`utf8-porfavor`)
 - Branch principal: `main`
 - Última atividade verificada: 2026-10-02
 - Licença: GPL-2.0, com arquivo `LICENSE` presente e licença detectada pelo GitHub
-- Relação histórica: o repositório possui desenvolvimento próprio recente, mas
-  o commit usado como referência comum entre as linhas DBSeller e Sertão
-  Digital não está presente em seu histórico
-- Situação na organização: candidato a mirror, pendente de confirmação da
-  relação histórica e da origem a ser representada
+- Relação histórica: o repositório possui desenvolvimento próprio recente; a
+  governança confirmou essa origem como representativa da linha CPD
+- Situação na organização: linha validada para preparação de mirror
 
 ## Critério para novos mirrors
 
