@@ -57,16 +57,20 @@ registrado explicitamente em vez de inferido.
 - Situação na organização: candidato a mirror, pendente de esclarecimento
   sobre a situação da licença
 
-## Iniciativas ainda em levantamento
-
 ### CPD
 
-A comunidade conhece referências a uma linha identificada como CPD, mas ainda
-não foi confirmado um repositório público de origem que permita registrar
-mantenedor, histórico e licença com segurança.
-
-Até essa confirmação, ela permanece como lacuna do levantamento e não será
-criado um mirror.
+- Origem candidata: [`w3aewander/e-cidadeCPD`](https://github.com/w3aewander/e-cidadeCPD)
+- Tipo atual: projeto externo conhecido
+- Descrição do repositório: versão do e-Cidade utilizada pela CPD Municipal
+- Mantenedor identificado: `w3aewander`
+- Branch principal: `main`
+- Última atividade verificada: 2026-10-02
+- Licença: GPL-2.0, com arquivo `LICENSE` presente e licença detectada pelo GitHub
+- Relação histórica: o repositório possui desenvolvimento próprio recente, mas
+  o commit usado como referência comum entre as linhas DBSeller e Sertão
+  Digital não está presente em seu histórico
+- Situação na organização: candidato a mirror, pendente de confirmação da
+  relação histórica e da origem a ser representada
 
 ## Critério para novos mirrors
 
