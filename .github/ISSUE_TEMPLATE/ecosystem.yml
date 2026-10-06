@@ -1,0 +1,26 @@
+name: Atualização do mapa do ecossistema
+description: Informar um projeto, distribuição ou repositório relacionado ao e-Cidade
+title: "[Ecossistema] "
+labels: ["community"]
+body:
+  - type: input
+    id: repository
+    attributes:
+      label: Repositório ou projeto
+    validations:
+      required: true
+  - type: input
+    id: maintainer
+    attributes:
+      label: Mantenedor
+  - type: textarea
+    id: relation
+    attributes:
+      label: Relação com o e-Cidade
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidências e referências
+      description: Links que permitam verificar origem, histórico, licença ou manutenção.

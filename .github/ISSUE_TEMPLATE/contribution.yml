@@ -1,0 +1,23 @@
+name: Proposta de contribuição
+description: Propor uma contribuição comunitária já suficientemente definida
+title: "[Contribuição] "
+labels: ["community"]
+body:
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposta
+      description: Descreva a contribuição e sua relação com o e-Cidade.
+    validations:
+      required: true
+  - type: input
+    id: repository
+    attributes:
+      label: Repositório relacionado
+      description: Informe o repositório, se houver.
+  - type: textarea
+    id: impact
+    attributes:
+      label: Resultado esperado
+    validations:
+      required: true
