@@ -27,15 +27,15 @@ registrado explicitamente em vez de inferido.
 
 ### Contass
 
-- Repositório: `e-cidade/e-cidade-Contass`
+- Repositório: [`e-cidade/e-cidade-Contass`](https://github.com/e-cidade/e-cidade-Contass)
 - Tipo: distribuição mantida diretamente
 - Mantenedor: Contass
 - Situação na organização: repositório mantido pelo próprio responsável
 
 ### DBSeller
 
-- Origem: `DBSeller/e-cidade`
-- Mirror: `e-cidade/e-cidade-DBSeller`
+- Origem: [`DBSeller/e-cidade`](https://github.com/DBSeller/e-cidade)
+- Mirror: [`e-cidade/e-cidade-DBSeller`](https://github.com/e-cidade/e-cidade-DBSeller)
 - Tipo: mirror
 - Mantenedor da origem: DBSeller
 - Observação histórica: a DBSeller é a criadora original do e-Cidade
@@ -43,7 +43,7 @@ registrado explicitamente em vez de inferido.
 
 ### Sertão Digital
 
-- Origem: `sertaodigitalorg/e-Cidade-SD`
+- Origem: [`sertaodigitalorg/e-Cidade-SD`](https://github.com/sertaodigitalorg/e-Cidade-SD)
 - Tipo atual: projeto externo conhecido
 - Mantenedor identificado: Sertão Digital
 - Branch principal: `main`
@@ -54,8 +54,8 @@ registrado explicitamente em vez de inferido.
 - Licença: arquivos-fonte contêm avisos de GPL versão 2 ou posterior, mas o
   GitHub não detecta uma licença no repositório e os arquivos de licença
   referenciados nos cabeçalhos não foram localizados na verificação
-- Situação na organização: candidato a mirror, pendente de confirmação da
-  situação da licença e da identificação pública da linha pelo mantenedor
+- Situação na organização: candidato a mirror, pendente de esclarecimento
+  sobre a situação da licença
 
 ## Iniciativas ainda em levantamento
 
