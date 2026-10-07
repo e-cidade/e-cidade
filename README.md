@@ -30,8 +30,8 @@ Veja o [mapa do ecossistema](docs/ecosystem.md).
 Você pode:
 
 - contribuir diretamente com uma das linhas de desenvolvimento existentes;
-- usar as Discussions deste repositório quando não souber onde uma contribuição
-  deve ser feita;
+- usar o [fórum da comunidade](https://ecidades.popsolutions.co) quando não
+  souber onde uma contribuição deve ser feita;
 - propor documentação ou melhorias para a estrutura comunitária;
 - apresentar um projeto relacionado ao e-Cidade;
 - propor a transferência de um repositório ou projeto para manutenção
